@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.Android", "DVBTTelevizor\DVBTTelevizor.Android\DVBTTelevizor.Android.csproj", "{F151692A-25DB-4364-982D-96A1FBDFE9B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor", "DVBTTelevizor\DVBTTelevizor\DVBTTelevizor.csproj", "{DDF26E90-BCC0-464E-BBA2-DAF9E64D0701}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVBTTelevizor", "DVBTTelevizor\DVBTTelevizor\DVBTTelevizor.csproj", "{DDF26E90-BCC0-464E-BBA2-DAF9E64D0701}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D54974CA-1DE5-430E-812E-133929BDDFE4}"
+	ProjectSection(SolutionItems) = preProject
+		WifiDebug.bat = WifiDebug.bat
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
