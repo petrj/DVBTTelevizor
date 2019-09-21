@@ -7,6 +7,8 @@ namespace DVBTTelevizor
 {
     public class DVBTStatus : JSONObject
     {
+        public long SuccessFlag { get; set; }
+
         public long snr { get; set; }
         public long bitErrorRate { get; set; }
         public long droppedUsbFps { get; set; }
@@ -18,14 +20,16 @@ namespace DVBTTelevizor
 
         public void ParseFromByteArray(byte[]ar, int offset)
         {
-            snr = GetBigEndianLongFromByteArray(ar, offset);
-            bitErrorRate = GetBigEndianLongFromByteArray(ar, offset+8);
-            droppedUsbFps = GetBigEndianLongFromByteArray(ar, offset+2*8);
-            rfStrengthPercentage = GetBigEndianLongFromByteArray(ar, offset + 3*8);
-            hasSignal = GetBigEndianLongFromByteArray(ar, offset + 4*8);
-            hasCarrier = GetBigEndianLongFromByteArray(ar, offset + 5 * 8);
-            hasSync = GetBigEndianLongFromByteArray(ar, offset + 6 * 8);
-            hasLock = GetBigEndianLongFromByteArray(ar, offset + 7 * 8);
+            SuccessFlag = GetBigEndianLongFromByteArray(ar, offset);
+
+            snr = GetBigEndianLongFromByteArray(ar, offset+8);
+            bitErrorRate = GetBigEndianLongFromByteArray(ar, offset+16);
+            droppedUsbFps = GetBigEndianLongFromByteArray(ar, offset+3*8);
+            rfStrengthPercentage = GetBigEndianLongFromByteArray(ar, offset + 4*8);
+            hasSignal = GetBigEndianLongFromByteArray(ar, offset + 5*8);
+            hasCarrier = GetBigEndianLongFromByteArray(ar, offset + 6 * 8);
+            hasSync = GetBigEndianLongFromByteArray(ar, offset + 7 * 8);
+            hasLock = GetBigEndianLongFromByteArray(ar, offset + 8 * 8);
         }
 
         public static byte[] GetByteArrayFromBigEndianLong(long l)
