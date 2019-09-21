@@ -68,9 +68,10 @@ namespace DVBTTelevizor
                 nwStream.Write(bytesToSend.ToArray(), 0, bytesToSend.Count);
 
 
-                //var responseSize = 9 * 8 + 2;
-                var responseSize = client.ReceiveBufferSize;
+                var responseSize = 9 * 8 + 2;
+            //var responseSize = client.ReceiveBufferSize;
 
+            /*
                 byte[] bytesToRead = new byte[responseSize];
                 int bytesRead = nwStream.Read(bytesToRead, 0, responseSize);
 
@@ -82,6 +83,29 @@ namespace DVBTTelevizor
                 {
                     Debug.WriteLine($"{i}: {bytesToRead[i]}");
                 }
+                */
+                List<byte> bytesRead = new List<byte>();
+
+                int totalBytesRead = 0;
+
+                var startTime = DateTime.Now;
+
+                do
+                {
+                    byte[] bytesToReadPart = new byte[responseSize];
+                    var bytes = nwStream.Read(bytesToReadPart, 0, responseSize - totalBytesRead);
+                    totalBytesRead += bytes;
+                    for (var i = 0; i < bytes; i++) bytesRead.Add(bytesToReadPart[i]);
+
+                    client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+                    System.Threading.Thread.Sleep(500);
+                    if (Math.Abs((DateTime.Now - startTime).TotalSeconds) > 60)
+                    {
+                        break;
+                    }
+                }
+                while (totalBytesRead < responseSize);
 
                 InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead}";
 
@@ -95,14 +119,12 @@ namespace DVBTTelevizor
                  * always consists of at least one value.
                 */
 
-                var requestNumber = bytesToRead[0];
-                var longsCountInResponse = bytesToRead[1];
-                var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesToRead, 2);
+                var requestNumber = bytesRead[0];
+                var longsCountInResponse = bytesRead[1];                
 
-                status.ParseFromByteArray(bytesToRead, 2);
+                status.ParseFromByteArray(bytesRead.ToArray(), 2);
 
-                return status;
-            
+                return status;            
         }
 
         public void SendCloseConnection(TcpClient client, NetworkStream nwStream)
@@ -161,20 +183,40 @@ namespace DVBTTelevizor
             var responseSize = 10;
             //var responseSize = client.ReceiveBufferSize;
 
-            byte[] bytesToRead = new byte[responseSize];
-            int bytesRead = nwStream.Read(bytesToRead, 0, responseSize);
+            List<byte> bytesRead = new List<byte>();
 
+            int totalBytesRead = 0;
+
+            var startTime = DateTime.Now;
+
+            do
+            {
+                byte[] bytesToReadPart = new byte[responseSize];
+                var bytes = nwStream.Read(bytesToReadPart, 0, 10 - totalBytesRead);
+                totalBytesRead += bytes;
+                for (var i = 0; i < bytes; i++) bytesRead.Add(bytesToReadPart[i]);
+
+                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+                System.Threading.Thread.Sleep(500);
+                if (Math.Abs((DateTime.Now-startTime).TotalSeconds) > 5)
+                {
+                    break;
+                }
+            }
+            while (totalBytesRead < responseSize);
+            
             //Debug.WriteLine($"Total bytes: {bytesRead}");
             //for (var i = 0; i < bytesRead; i++)
             //{
             //    Debug.WriteLine($"{i}: {bytesToRead[i]}");
             //}
 
-            InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead}";
+            InfoLabel.Text += Environment.NewLine + $"Bytes received: {totalBytesRead}";
 
-            var requestNumber = bytesToRead[0];
-            var longsCountInResponse = bytesToRead[1];
-            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesToRead, 2);
+            var requestNumber = bytesRead[0];
+            var longsCountInResponse = bytesRead[1];
+            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead.ToArray(), 2);
 
             InfoLabel.Text += Environment.NewLine + $"BytesSuccessFlag: {successFlag}";
             InfoLabel.Text += Environment.NewLine + $"longsCountInResponse: {longsCountInResponse}";
