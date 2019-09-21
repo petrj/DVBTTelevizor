@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,8 +81,10 @@ namespace DVBTTelevizor
             bytesToSend.AddRange(payLoadAsByteArray);
 
             nwStream.Write(bytesToSend.ToArray(), 0, 9);
+            nwStream.Flush();
 
             var responseSize = 9 * 8 + 2;
+            ///var responseSize = tcpClient.ReceiveBufferSize;
 
             byte[] bytesToRead = new byte[responseSize];
             int bytesRead = nwStream.Read(bytesToRead, 0, responseSize);            
@@ -135,7 +138,7 @@ namespace DVBTTelevizor
 
                 var ver = GetVersion();
 
-                Tune(490000000, 8000000, 0);
+                Tune(490000000, 8000000, 1);
 
                 System.Threading.Thread.Sleep(2000);
 
@@ -245,6 +248,7 @@ namespace DVBTTelevizor
             bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
 
             nwStream.Write(bytesToSend.ToArray(), 0, 1 + 8 + 3 * 8);
+            nwStream.Flush();
 
             var responseSize = 8 + 2;
 
