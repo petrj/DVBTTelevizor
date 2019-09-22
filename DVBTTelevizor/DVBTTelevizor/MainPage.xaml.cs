@@ -397,17 +397,20 @@ namespace DVBTTelevizor
                 {
                     client.Connect("127.0.0.1", _configuration.Driver.TransferPort);
                     client.ReceiveBufferSize = 1000000; // 1 MB
+                    client.SendTimeout = 5000;
+                    client.ReceiveTimeout = 50000;
                     using (var nwStream = client.GetStream())
                     {
+                        byte[] bytesToReadPart = new byte[client.ReceiveBufferSize];
                         using (var fs = new FileStream("/storage/emulated/0/Download/mux.ts", FileMode.Create, FileAccess.Write))
                         {
                             do
-                            {
-                                byte[] bytesToReadPart = new byte[client.ReceiveBufferSize];
+                            {                                
                                 var bytesRead = nwStream.Read(bytesToReadPart, 0, client.ReceiveBufferSize);
                                 fs.Write(bytesToReadPart, 0, bytesRead);
+                                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);                                
                             }
-                            while (nwStream.DataAvailable);
+                            while (client.Connected);
                         }
                     }
                     client.Close();
