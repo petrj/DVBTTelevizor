@@ -9,6 +9,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
+using System.IO;
 
 namespace DVBTTelevizor
 {
@@ -135,37 +138,58 @@ namespace DVBTTelevizor
             List<byte> bytesToSend = new List<byte>();
 
             bytesToSend.Add(1); // REQ_EXIT
+            bytesToSend.Add(0); // REQ_EXIT
 
-            var payLoadAsByteArray = DVBTStatus.GetByteArrayFromBigEndianLong(0);
+            var bytesRead = Send(client, nwStream, bytesToSend.ToArray(), 10);
+         
+            InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead.Length}";             
 
-            bytesToSend.AddRange(payLoadAsByteArray);
+            var requestNumber = bytesRead[0];
+            var longsCountInResponse = bytesRead[1];
+            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 2);    
+        }
 
-            nwStream.Write(bytesToSend.ToArray(), 0, 9);
-            nwStream.Flush();
+        private byte[] Send(TcpClient client, NetworkStream nwStream, byte[] bytesToSend, int responseSize, int secondsTimeout = 10)
+        {
+            nwStream.Write(bytesToSend.ToArray(), 0, bytesToSend.Length);
 
-            //var responseSize = 8 + 2;
-            var responseSize = client.ReceiveBufferSize;
+            List<byte> bytesRead = new List<byte>();
 
-            byte[] bytesToRead = new byte[responseSize];
-            int bytesRead = nwStream.Read(bytesToRead, 0, responseSize);
+            int totalBytesRead = 0;
 
-            //while (nwStream.DataAvailable);
+            var startTime = DateTime.Now;
 
-            nwStream.Flush();
+            //* byte 0 will be the Request.ordinal of the Request
+            //* byte 1 will be N the number of longs in the payload
+            //* byte 3 to byte 6 will be the success flag (0 or 1). This indicates whether the request was succesful.
+            //* byte 7 till the end the rest of the longs in the payload follow
+            //*  *
+            //* Basically the success flag is always part of the payload, so the payload
+            //* always consists of at least one value.
 
-            for (var i = 0; i < bytesRead; i++)
+            do
             {
-                Debug.WriteLine($"{i}: {bytesToRead[i]}");
+                byte[] bytesToReadPart = new byte[responseSize];
+                var bytes = nwStream.Read(bytesToReadPart, 0, responseSize - totalBytesRead);
+                totalBytesRead += bytes;
+                for (var i = 0; i < bytes; i++) bytesRead.Add(bytesToReadPart[i]);
+
+                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+                System.Threading.Thread.Sleep(500);
+                if (Math.Abs((DateTime.Now - startTime).TotalSeconds) > secondsTimeout)
+                {
+                    break;
+                }
             }
+            while (totalBytesRead < responseSize);
 
-            InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead}";
-             
+            //for (var i = 0; i < bytesRead.Count; i++)
+            //{
+            //    Debug.WriteLine($"{i}: {bytesRead[i]}");
+            //}
 
-            var requestNumber = bytesToRead[0];
-            var longsCountInResponse = bytesToRead[1];
-            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesToRead, 2);
-
-    
+            return bytesRead.ToArray();
         }
 
         private bool Tune(TcpClient client, NetworkStream nwStream, long frequency, long bandwidth, int deliverySyetem)
@@ -234,39 +258,17 @@ namespace DVBTTelevizor
                 List<byte> bytesToSend = new List<byte>();
 
                 bytesToSend.Add(0); // REQ_PROTOCOL_VERSION
-                                    //var payLoadAsByteArray = DVBTStatus.GetByteArrayFromBigEndianLong(0);
-                                    //bytesToSend.AddRange(payLoadAsByteArray);
-                bytesToSend.Add(0);
+                bytesToSend.Add(0); // Payload size
 
-                nwStream.Write(bytesToSend.ToArray(), 0, bytesToSend.Count);
+                var bytesRead = Send(client, nwStream, bytesToSend.ToArray(), 26);
+                
+                InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead.Length}";
 
-                //var responseSize = 3 * 8 + 2;
-                var responseSize = client.ReceiveBufferSize;
-
-                byte[] bytesToRead = new byte[responseSize];
-                int bytesRead = nwStream.Read(bytesToRead, 0, responseSize);
-
-                InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead}";
-
-                Debug.WriteLine($"Total bytes: {bytesRead}");
-                for (var i = 0; i < bytesRead; i++)
-                {
-                    Debug.WriteLine($"{i}: {bytesToRead[i]}");
-                }
-
-                //* byte 0 will be the Request.ordinal of the Request
-                //* byte 1 will be N the number of longs in the payload
-                //* byte 3 to byte 6 will be the success flag (0 or 1). This indicates whether the request was succesful.
-                //* byte 7 till the end the rest of the longs in the payload follow
-                //*  *
-                //* Basically the success flag is always part of the payload, so the payload
-                //* always consists of at least one value.
-
-                var requestNumber = bytesToRead[0];
-                var longsCountInResponse = bytesToRead[1];
-                version.SuccessFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesToRead, 2);
-                version.Version = DVBTStatus.GetBigEndianLongFromByteArray(bytesToRead, 10);
-                version.AllRequestsLength = DVBTStatus.GetBigEndianLongFromByteArray(bytesToRead, 18);
+                var requestNumber = bytesRead[0];
+                var longsCountInResponse = bytesRead[1];
+                version.SuccessFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 2);
+                version.Version = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 10);
+                version.AllRequestsLength = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 18);
 
             return version;
         }
@@ -370,22 +372,43 @@ namespace DVBTTelevizor
 
         private void StopButton_Clicked(object sender, EventArgs e)
         {
-            //Disconnect();
+            try
+            {
+                SendCloseConnection(client, nwStream);
+
+                InfoLabel.Text += "Stopped";
+            }
+            catch (Exception ex)
+            {
+                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+            }
         }
 
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
+            RunWithPermission(Permission.Storage, async () => await Record());
+        }
+
+        private async Task Record()
+        {
             try
             {
-
                 using (var client = new TcpClient())
                 {
                     client.Connect("127.0.0.1", _configuration.Driver.TransferPort);
                     client.ReceiveBufferSize = 1000000; // 1 MB
                     using (var nwStream = client.GetStream())
                     {
-                        byte[] bytesToReadPart = new byte[client.ReceiveBufferSize];
-                        var bytesRead = nwStream.Read(bytesToReadPart, 0, client.ReceiveBufferSize);
+                        using (var fs = new FileStream("/storage/emulated/0/Download/mux.ts", FileMode.Create, FileAccess.Write))
+                        {
+                            do
+                            {
+                                byte[] bytesToReadPart = new byte[client.ReceiveBufferSize];
+                                var bytesRead = nwStream.Read(bytesToReadPart, 0, client.ReceiveBufferSize);
+                                fs.Write(bytesToReadPart, 0, bytesRead);
+                            }
+                            while (nwStream.DataAvailable);
+                        }
                     }
                     client.Close();
                 }
@@ -394,7 +417,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }                    
+            }
         }
 
         private void TuneButton_Clicked(object sender, EventArgs e)
@@ -418,5 +441,53 @@ namespace DVBTTelevizor
                 InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
             }
         }
+
+        public async Task RunWithPermission(Permission perm, List<Command> commands)
+        {
+            var f = new Func<Task>(
+                 async () =>
+                 {
+                     foreach (var command in commands)
+                     {
+                         await Task.Run(() => command.Execute(null));
+                     }
+                 });
+
+            await RunWithPermission(perm, f);
+        }
+
+        public async Task RunWithPermission(Permission perm, Func<Task> action)
+        {
+            try
+            {
+                var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
+                if (status != PermissionStatus.Granted)
+                {
+                    //if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
+                    //{
+                    //    await _dlgService.Information("Aplikace vyžaduje potvrzení k oprávnění.", "Informace");
+                    //}
+
+                    var results = await CrossPermissions.Current.RequestPermissionsAsync(perm);
+
+                    if (results.ContainsKey(perm))
+                        status = results[perm];
+                }
+
+                if (status == PermissionStatus.Granted)
+                {
+                    await action();
+                }
+                else if (status != PermissionStatus.Unknown)
+                {
+                    //await _dlgService.Error("Nebylo uděleno oprávnění", "Chyba");
+                }
+            }
+            catch (Exception ex)
+            {
+                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+            }
+        }
+
     }
 }
