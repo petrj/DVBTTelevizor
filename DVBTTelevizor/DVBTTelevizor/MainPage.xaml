@@ -12,7 +12,9 @@
             <Button x:Name="InitButton" Text="Init" VerticalOptions="Start"></Button>
             <Button x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
             <Button x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>
-            <Button x:Name="TuneButton" Text="Tune" VerticalOptions="Start"></Button>        
+            <Button x:Name="TuneButton" Text="Tune" VerticalOptions="Start"></Button>
+            <Button x:Name="PlayButton" Text="Play" VerticalOptions="Start"></Button>
+            <Button x:Name="RecordButton" Text="Record" VerticalOptions="Start"></Button>
             <Button x:Name="StopButton" Text="Stop" VerticalOptions="Start"></Button>
             <Label x:Name="InfoLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
         </StackLayout>

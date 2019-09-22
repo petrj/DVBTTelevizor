@@ -31,6 +31,9 @@ namespace DVBTTelevizor
             this.InitButton.Clicked += InitButton_Clicked;
             this.TuneButton.Clicked += TuneButton_Clicked;
             this.StopButton.Clicked += StopButton_Clicked;
+            this.PlayButton.Clicked += PlayButton_Clicked;
+            this.RecordButton.Clicked += RecordButton_Clicked;
+
 
             _configuration = new DVBTTelevizorConfiguration();   
 
@@ -355,9 +358,43 @@ namespace DVBTTelevizor
             MessagingCenter.Send("", "Init");
         }
 
+        private void PlayButton_Clicked(object sender, EventArgs e)
+        {
+            //var url = $"http://127.0.0.1:{_configuration.Driver.TransferPort}";
+            //var url = $"rtsp://127.0.0.1:{_configuration.Driver.TransferPort}";
+            var url = $"udp://127.0.0.1:{_configuration.Driver.TransferPort}";
+            MessagingCenter.Send(url, "PlayUrl");
+            InfoLabel.Text = Environment.NewLine + $"Playing url: {url}";
+        }
+
+
         private void StopButton_Clicked(object sender, EventArgs e)
         {
             //Disconnect();
+        }
+
+        private void RecordButton_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+
+                using (var client = new TcpClient())
+                {
+                    client.Connect("127.0.0.1", _configuration.Driver.TransferPort);
+                    client.ReceiveBufferSize = 1000000; // 1 MB
+                    using (var nwStream = client.GetStream())
+                    {
+                        byte[] bytesToReadPart = new byte[client.ReceiveBufferSize];
+                        var bytesRead = nwStream.Read(bytesToReadPart, 0, client.ReceiveBufferSize);
+                    }
+                    client.Close();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+            }                    
         }
 
         private void TuneButton_Clicked(object sender, EventArgs e)

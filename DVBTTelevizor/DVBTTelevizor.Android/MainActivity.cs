@@ -35,6 +35,15 @@ namespace DVBTTelevizor.Droid
 
                 StartActivityForResult(req, StartRequestCode);
             });
+
+            MessagingCenter.Subscribe<string>(this, "PlayUrl", (url) =>
+            {
+                var intent = new Intent(Intent.ActionView);
+                var uri = Android.Net.Uri.Parse(url);
+                intent.SetDataAndType(uri, "video/*");
+                intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask); // necessary for Android 5
+                Android.App.Application.Context.StartActivity(intent);
+            });
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
