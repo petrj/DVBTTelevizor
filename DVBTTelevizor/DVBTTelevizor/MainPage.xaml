@@ -9,14 +9,30 @@
     <ScrollView>
         <StackLayout>
             <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
+            <Label x:Name="InfoLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+            
             <Button x:Name="InitButton" Text="Init" VerticalOptions="Start"></Button>
             <Button x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
             <Button x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>
             <Button x:Name="TuneButton" Text="Tune" VerticalOptions="Start"></Button>
+
+            <Label Text="Freq:" TextColor="White"/>
+            <Entry x:Name="EntryFrequency" Text="490000000" TextColor="White"/>            
+
+            <Label Text="BandWidth:" TextColor="White"/>
+            <Entry x:Name="EntryBandWidth" Text="8000000" TextColor="White"/>
+
+            <Label Text="DVBT Type:" TextColor="White"/>
+            <Entry x:Name="EntryDVBT" Text="0" TextColor="White"/>
+
+            <Label Text="PIDs:" TextColor="White"/>
+            <Entry x:Name="EntryPID1" Text="6145" TextColor="White"/>
+            <Entry x:Name="EntryPID2" Text="2301" TextColor="White"/>
+            <Entry x:Name="EntryPID3" Text="2302" TextColor="White"/>
+
             <Button x:Name="PlayButton" Text="Play" VerticalOptions="Start"></Button>
             <Button x:Name="RecordButton" Text="Record" VerticalOptions="Start"></Button>
-            <Button x:Name="StopButton" Text="Stop" VerticalOptions="Start"></Button>
-            <Label x:Name="InfoLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+            <Button x:Name="StopButton" Text="Stop" VerticalOptions="Start"></Button>            
         </StackLayout>
     </ScrollView>
 

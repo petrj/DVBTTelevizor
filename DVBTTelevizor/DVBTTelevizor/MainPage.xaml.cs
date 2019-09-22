@@ -196,50 +196,16 @@ namespace DVBTTelevizor
         {         
             List<byte> bytesToSend = new List<byte>();
 
-            bytesToSend.Add(2); // REQ_TUNE
-                                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(3)); // Payload for 3 longs
+            bytesToSend.Add(2); // REQ_TUNE                                
             bytesToSend.Add(3); // Payload for 3 longs
 
             bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
             bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
             bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
 
-            nwStream.Write(bytesToSend.ToArray(), 0, bytesToSend.Count);
-        //nwStream.Flush();
-
-            var responseSize = 10;
-            //var responseSize = client.ReceiveBufferSize;
-
-            List<byte> bytesRead = new List<byte>();
-
-            int totalBytesRead = 0;
-
-            var startTime = DateTime.Now;
-
-            do
-            {
-                byte[] bytesToReadPart = new byte[responseSize];
-                var bytes = nwStream.Read(bytesToReadPart, 0, 10 - totalBytesRead);
-                totalBytesRead += bytes;
-                for (var i = 0; i < bytes; i++) bytesRead.Add(bytesToReadPart[i]);
-
-                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-
-                System.Threading.Thread.Sleep(500);
-                if (Math.Abs((DateTime.Now-startTime).TotalSeconds) > 5)
-                {
-                    break;
-                }
-            }
-            while (totalBytesRead < responseSize);
+            var bytesRead = Send(client, nwStream, bytesToSend.ToArray(), 10);
             
-            //Debug.WriteLine($"Total bytes: {bytesRead}");
-            //for (var i = 0; i < bytesRead; i++)
-            //{
-            //    Debug.WriteLine($"{i}: {bytesToRead[i]}");
-            //}
-
-            InfoLabel.Text += Environment.NewLine + $"Bytes received: {totalBytesRead}";
+            InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead.Length}";
 
             var requestNumber = bytesRead[0];
             var longsCountInResponse = bytesRead[1];
@@ -250,7 +216,32 @@ namespace DVBTTelevizor
 
             return successFlag == 1;
         }
-        
+
+        private bool SetPIDs(TcpClient client, NetworkStream nwStream, long VPID, long APID, long TPID)
+        {
+            List<byte> bytesToSend = new List<byte>();
+
+            bytesToSend.Add(4); // REQ_SET_PIDS                                
+            bytesToSend.Add(3); // Payload for 3 longs
+
+            bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(VPID)); 
+            bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(APID)); 
+            bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(TPID)); 
+
+            var bytesRead = Send(client, nwStream, bytesToSend.ToArray(), 10);
+
+            InfoLabel.Text += Environment.NewLine + $"Bytes received: {bytesRead.Length}";
+
+            var requestNumber = bytesRead[0];
+            var longsCountInResponse = bytesRead[1];
+            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead.ToArray(), 2);
+
+            InfoLabel.Text += Environment.NewLine + $"BytesSuccessFlag: {successFlag}";
+            InfoLabel.Text += Environment.NewLine + $"longsCountInResponse: {longsCountInResponse}";
+
+            return successFlag == 1;
+        }
+
         private DVBTVersion GetVersion(TcpClient client, NetworkStream nwStream)
         {
             var version = new DVBTVersion();
@@ -364,7 +355,7 @@ namespace DVBTTelevizor
         {
             //var url = $"http://127.0.0.1:{_configuration.Driver.TransferPort}";
             //var url = $"rtsp://127.0.0.1:{_configuration.Driver.TransferPort}";
-            var url = $"udp://127.0.0.1:{_configuration.Driver.TransferPort}";
+            var url = $"http://127.0.0.1:{_configuration.Driver.TransferPort}";
             MessagingCenter.Send(url, "PlayUrl");
             InfoLabel.Text = Environment.NewLine + $"Playing url: {url}";
         }
@@ -429,11 +420,40 @@ namespace DVBTTelevizor
 
             try
             {
+                //[CT 24]
+                //    SERVICE_ID = 259
+                // VIDEO_PID = 769
+                // AUDIO_PID = 785 787
+                // PID_06 = 801
+                // PID_05 = 880
+                // FREQUENCY = 730000000
+                // MODULATION = QAM/64
+                // BANDWIDTH_HZ = 8000000
+                // INVERSION = AUTO
+                // CODE_RATE_HP = 2 / 3
+                // CODE_RATE_LP = 1/2
+                // GUARD_INTERVAL = 1/4
+                // TRANSMISSION_MODE = 8K
+                // HIERARCHY = NONE
+                // DELIVERY_SYSTEM = DVBT
+
                 //using (var client = new TcpClient("127.0.0.1", _configuration.Driver.ControlPort))
                 //{
                 //    using (var nwStream = client.GetStream())
                 //    {
-                        Tune(client, nwStream, 490000000, 8000000, 0);
+
+                var freq = Convert.ToInt64(EntryFrequency.Text);
+                var bandWidth = Convert.ToInt64(EntryBandWidth.Text);
+
+                var type = Convert.ToInt32(EntryDVBT.Text);                
+
+                var pid1 = Convert.ToInt64(EntryPID1.Text);
+                var pid2 = Convert.ToInt64(EntryPID2.Text);
+                var pid3 = Convert.ToInt64(EntryPID3.Text);
+
+                Tune(client, nwStream, freq, bandWidth, type);
+                var res = SetPIDs(client, nwStream, pid1, pid2, pid3);
+
                 //    }
                 //    client.Close();
                 //}
