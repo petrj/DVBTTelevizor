@@ -33,6 +33,7 @@ namespace DVBTTelevizor
             this.StopButton.Clicked += StopButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
             this.RecordButton.Clicked += RecordButton_Clicked;
+            this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
 
@@ -40,9 +41,12 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
             {
-                InfoLabel.Text = message;
+                PortsLabel.Text = message;
 
                 _driver.Configuration.Driver = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
+
+                PortsLabel.Text = $"Control port: {_driver.Configuration.Driver.ControlPort}, Transfer port: {_driver.Configuration.Driver.TransferPort}";
+
                 _driver.Connect();
             });
         }
@@ -121,6 +125,33 @@ namespace DVBTTelevizor
             RunWithPermission(Permission.Storage, async () => await Record());
         }
 
+        private void SetPIDsButton_Clicked(object sender, EventArgs e)
+        {
+            InfoLabel.Text = Environment.NewLine + "Settting PIDs ...";
+
+            try
+            {
+                var pids = new List<long>();
+
+                if (!String.IsNullOrEmpty(EntryPID1.Text))
+                    pids.Add(Convert.ToInt64(EntryPID1.Text));
+
+                if (!String.IsNullOrEmpty(EntryPID2.Text))
+                    pids.Add(Convert.ToInt64(EntryPID2.Text));
+
+                if (!String.IsNullOrEmpty(EntryPID3.Text))
+                    pids.Add(Convert.ToInt64(EntryPID3.Text));
+
+                var pidRes = _driver.SetPIDs(pids);
+             
+                InfoLabel.Text += Environment.NewLine + $"PIDs Set result: {pidRes}";
+            }
+            catch (Exception ex)
+            {
+                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+            }
+        }
+
         private async Task Record()
         {
             try
@@ -156,7 +187,7 @@ namespace DVBTTelevizor
 
         private void TuneButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = Environment.NewLine + "Tuning 490 Mhz, 8 Mhz bandwith ...";
+            InfoLabel.Text = Environment.NewLine + "Tuning  ...";
 
             try
             {
@@ -165,24 +196,9 @@ namespace DVBTTelevizor
 
                 var type = DeliverySystemPicker.SelectedIndex;
 
-                var tuneRes = _driver.Tune(freq, bandWidth, type);
-
-                var pids = new List<long>();
-
-                if (!String.IsNullOrEmpty(EntryPID1.Text))
-                    pids.Add(Convert.ToInt64(EntryPID1.Text));
-
-                if (!String.IsNullOrEmpty(EntryPID2.Text))
-                    pids.Add(Convert.ToInt64(EntryPID2.Text));
-
-                if (!String.IsNullOrEmpty(EntryPID3.Text))
-                    pids.Add(Convert.ToInt64(EntryPID3.Text));
-
-                var pidRes = _driver.SetPIDs(pids);
+                var tuneRes = _driver.Tune(freq, bandWidth, type);             
 
                 InfoLabel.Text += Environment.NewLine + $"Tune result: {tuneRes}";
-                InfoLabel.Text += Environment.NewLine + $"PIDs Set result: {pidRes}";
-
             }
             catch (Exception ex)
             {
