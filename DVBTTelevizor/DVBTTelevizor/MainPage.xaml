@@ -10,29 +10,61 @@
         <StackLayout>
             <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
             <Label x:Name="InfoLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
-            
+
             <Button x:Name="InitButton" Text="Init" VerticalOptions="Start"></Button>
             <Button x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
             <Button x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>
             <Button x:Name="TuneButton" Text="Tune" VerticalOptions="Start"></Button>
 
-            <Label Text="Freq:" TextColor="White"/>
-            <Entry x:Name="EntryFrequency" Text="490000000" TextColor="White"/>            
 
-            <Label Text="BandWidth:" TextColor="White"/>
-            <Entry x:Name="EntryBandWidth" Text="8000000" TextColor="White"/>
+            <Grid Margin="20,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70*" />
+                    <ColumnDefinition Width="30*" />
+                </Grid.ColumnDefinitions>
 
-            <Label Text="DVBT Type:" TextColor="White"/>
-            <Entry x:Name="EntryDVBT" Text="0" TextColor="White"/>
 
-            <Label Text="PIDs:" TextColor="White"/>
-            <Entry x:Name="EntryPID1" Text="6145" TextColor="White"/>
-            <Entry x:Name="EntryPID2" Text="2301" TextColor="White"/>
-            <Entry x:Name="EntryPID3" Text="2302" TextColor="White"/>
+                <Label  Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="0" Grid.Column="1"  x:Name="EntryFrequency" Text="490" TextColor="White"/>
+
+                <Label  Grid.Row="1" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="1" Grid.Column="1"  x:Name="EntryBandWidth" Text="8" TextColor="White"/>
+
+                <Label  Grid.Row="2" Grid.Column="0" Text="DeliverySystem" TextColor="White"/>
+                <Picker Grid.Row="2" Grid.Column="1"
+                            x:Name="DeliverySystemPicker"
+                            Margin="20,0,0,0"
+                            TextColor="White">
+                    <Picker.Items>
+                        <x:String>DVBT</x:String>
+                        <x:String>DVBT2</x:String>
+                    </Picker.Items>
+                </Picker>
+            </Grid>
+
+            <Grid Margin="20,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="25*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Text="PIDs:" TextColor="White"/>
+                <Entry Grid.Row="0" Grid.Column="1"  x:Name="EntryPID1" Text="2301" TextColor="White"/>
+                <Entry Grid.Row="0" Grid.Column="2"  x:Name="EntryPID2" Text="" TextColor="White"/>
+                <Entry Grid.Row="0" Grid.Column="3"  x:Name="EntryPID3" Text="" TextColor="White"/>
+            </Grid>
 
             <Button x:Name="PlayButton" Text="Play" VerticalOptions="Start"></Button>
             <Button x:Name="RecordButton" Text="Record" VerticalOptions="Start"></Button>
-            <Button x:Name="StopButton" Text="Stop" VerticalOptions="Start"></Button>            
+            <Button x:Name="StopButton" Text="Stop" VerticalOptions="Start"></Button>
         </StackLayout>
     </ScrollView>
 
