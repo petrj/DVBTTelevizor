@@ -47,7 +47,9 @@ namespace DVBTTelevizor
 
                 PortsLabel.Text = $"Control port: {_driver.Configuration.Driver.ControlPort}, Transfer port: {_driver.Configuration.Driver.TransferPort}";
 
-                _driver.Connect();
+                //_driver.Connect();
+
+                _driver.Start();
             });
         }
 
@@ -59,15 +61,7 @@ namespace DVBTTelevizor
             {
                 var status = _driver.GetStatus();
 
-                StatusLabel.Text = Environment.NewLine + $"Success: {status.SuccessFlag}";
-                StatusLabel.Text += Environment.NewLine + $"snr: {status.snr}";
-                StatusLabel.Text += Environment.NewLine + $"bitErrorRate: {status.bitErrorRate}";
-                StatusLabel.Text += Environment.NewLine + $"droppedUsbFps: {status.droppedUsbFps}";
-                StatusLabel.Text += Environment.NewLine + $"rfStrengthPercentage: {status.rfStrengthPercentage}";
-                StatusLabel.Text += Environment.NewLine + $"hasSignal: {status.hasSignal}";
-                StatusLabel.Text += Environment.NewLine + $"hasCarrier: {status.hasCarrier}";
-                StatusLabel.Text += Environment.NewLine + $"hasSync: {status.hasSync}";
-                StatusLabel.Text += Environment.NewLine + $"hasLock: {status.hasLock}";
+                StatusLabel.Text = status.ToString();
             }
             catch (Exception ex)
             {
