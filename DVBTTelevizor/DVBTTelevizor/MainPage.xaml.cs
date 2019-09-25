@@ -53,43 +53,41 @@ namespace DVBTTelevizor
 
         private void GetStatusButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = Environment.NewLine + "Getting status ...";
+            StatusLabel.Text = Environment.NewLine + "Getting status ...";
 
             try
             {
                 var status = _driver.GetStatus();
 
-                InfoLabel.Text = "Status";
-
-                InfoLabel.Text += Environment.NewLine + $"Success: {status.SuccessFlag}";
-                InfoLabel.Text += Environment.NewLine + $"snr: {status.snr}";
-                InfoLabel.Text += Environment.NewLine + $"bitErrorRate: {status.bitErrorRate}";
-                InfoLabel.Text += Environment.NewLine + $"droppedUsbFps: {status.droppedUsbFps}";
-                InfoLabel.Text += Environment.NewLine + $"rfStrengthPercentage: {status.rfStrengthPercentage}";
-                InfoLabel.Text += Environment.NewLine + $"hasSignal: {status.hasSignal}";
-                InfoLabel.Text += Environment.NewLine + $"hasCarrier: {status.hasCarrier}";
-                InfoLabel.Text += Environment.NewLine + $"hasSync: {status.hasSync}";
-                InfoLabel.Text += Environment.NewLine + $"hasLock: {status.hasLock}";
+                StatusLabel.Text = Environment.NewLine + $"Success: {status.SuccessFlag}";
+                StatusLabel.Text += Environment.NewLine + $"snr: {status.snr}";
+                StatusLabel.Text += Environment.NewLine + $"bitErrorRate: {status.bitErrorRate}";
+                StatusLabel.Text += Environment.NewLine + $"droppedUsbFps: {status.droppedUsbFps}";
+                StatusLabel.Text += Environment.NewLine + $"rfStrengthPercentage: {status.rfStrengthPercentage}";
+                StatusLabel.Text += Environment.NewLine + $"hasSignal: {status.hasSignal}";
+                StatusLabel.Text += Environment.NewLine + $"hasCarrier: {status.hasCarrier}";
+                StatusLabel.Text += Environment.NewLine + $"hasSync: {status.hasSync}";
+                StatusLabel.Text += Environment.NewLine + $"hasLock: {status.hasLock}";
             }
             catch (Exception ex)
             {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+                StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
             }
         }
 
         private void GetVersionButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = Environment.NewLine + "Getting Version ...";
+            VersionLabel.Text = Environment.NewLine + "Getting Version ...";
 
             try
             {
                 var version = _driver.GetVersion();
 
-                InfoLabel.Text = $"Version: {version.ToString()}";
+                VersionLabel.Text = $"Version: {version.ToString()}";
             }
             catch (Exception ex)
             {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+                VersionLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
             }
         }
 
@@ -143,7 +141,7 @@ namespace DVBTTelevizor
                     pids.Add(Convert.ToInt64(EntryPID3.Text));
 
                 var pidRes = _driver.SetPIDs(pids);
-             
+
                 InfoLabel.Text += Environment.NewLine + $"PIDs Set result: {pidRes}";
             }
             catch (Exception ex)
@@ -196,7 +194,7 @@ namespace DVBTTelevizor
 
                 var type = DeliverySystemPicker.SelectedIndex;
 
-                var tuneRes = _driver.Tune(freq, bandWidth, type);             
+                var tuneRes = _driver.Tune(freq, bandWidth, type);
 
                 InfoLabel.Text += Environment.NewLine + $"Tune result: {tuneRes}";
             }

@@ -42,15 +42,32 @@ namespace DVBTTelevizor
         {
             _client = new TcpClient();
             _client.Connect("127.0.0.1", _configuration.Driver.ControlPort);
-            _client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-            _client.SendTimeout = 5000;
-            _client.ReceiveTimeout = 50000;
-            _nwStream = _client.GetStream();
+
+
+            //_client.Client.NoDelay = true;
+
+            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+            //int size = sizeof(UInt32);
+            //UInt32 on = 1;
+            //UInt32 keepAliveInterval = 1000; //Send a packet once every second.
+            //UInt32 retryInterval = 1000; //If no response, resend every second.
+            //byte[] inArray = new byte[size * 3];
+            //Array.Copy(BitConverter.GetBytes(on), 0, inArray, 0, size);
+            //Array.Copy(BitConverter.GetBytes(keepAliveInterval), 0, inArray, size, size);
+            //Array.Copy(BitConverter.GetBytes(retryInterval), 0, inArray, size * 2, size);
+            //_client.Client.IOControl(IOControlCode.KeepAliveValues, inArray, null);
+
+            //_client.SendTimeout = 60 * 1000; // 1 min
+            //_client.ReceiveTimeout = 60 * 1000;
+            //_nwStream = _client.GetStream();
         }
 
         private byte[] Send(byte[] bytesToSend, int responseSize, int secondsTimeout = 10)
         {
-            _nwStream.Write(bytesToSend.ToArray(), 0, bytesToSend.Length);
+            //_nwStream.Write(bytesToSend.ToArray(), 0, bytesToSend.Length);
+
+            _client.Client.Send(bytesToSend, bytesToSend.Length, SocketFlags.None);
 
             List<byte> bytesRead = new List<byte>();
 
@@ -66,6 +83,15 @@ namespace DVBTTelevizor
             //* Basically the success flag is always part of the payload, so the payload
             //* always consists of at least one value.
 
+            byte[] bytesToReadPart = new byte[responseSize];
+            _client.Client.Receive(bytesToReadPart, responseSize, SocketFlags.None);
+
+            if (bytesToSend[0] != bytesToReadPart[0])
+            {
+                throw new Exception("Bad response");
+            }
+
+            /*
             do
             {
                 byte[] bytesToReadPart = new byte[responseSize];
@@ -82,13 +108,14 @@ namespace DVBTTelevizor
                 }
             }
             while (totalBytesRead < responseSize);
+            */
 
             //for (var i = 0; i < bytesRead.Count; i++)
             //{
             //    Debug.WriteLine($"{i}: {bytesRead[i]}");
             //}
 
-            return bytesRead.ToArray();
+            return bytesToReadPart.ToArray();
         }
 
         public DVBTStatus GetStatus()
@@ -129,14 +156,14 @@ namespace DVBTTelevizor
             var requestNumber = bytesRead[0];
             var longsCountInResponse = bytesRead[1];
 
-            version.SuccessFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 2);
+            version.SuccessFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 2) == 1;
             version.Version = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 10);
             version.AllRequestsLength = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 18);
 
             return version;
         }
 
-        public bool Tune(long frequency, long bandwidth, int deliverySyetem)
+        public DVBTResponse Tune(long frequency, long bandwidth, int deliverySyetem)
         {
             List<byte> bytesToSend = new List<byte>();
 
@@ -158,10 +185,10 @@ namespace DVBTTelevizor
             var longsCountInResponse = bytesRead[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead.ToArray(), 2);
 
-            return successFlag == 1;
+            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
         }
 
-        public bool SendCloseConnection()
+        public DVBTResponse SendCloseConnection()
         {
             List<byte> bytesToSend = new List<byte>();
 
@@ -174,10 +201,10 @@ namespace DVBTTelevizor
             var longsCountInResponse = bytesRead[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead, 2);
 
-            return successFlag == 1;
+            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
         }
 
-        public bool SetPIDs(List<long> PIDs)
+        public DVBTResponse SetPIDs(List<long> PIDs)
         {
             List<byte> bytesToSend = new List<byte>();
 
@@ -195,7 +222,7 @@ namespace DVBTTelevizor
             var longsCountInResponse = bytesRead[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(bytesRead.ToArray(), 2);
 
-            return successFlag == 1;
+            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
         }
     }
 }

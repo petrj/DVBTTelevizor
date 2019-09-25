@@ -5,10 +5,8 @@ using System.Text;
 
 namespace DVBTTelevizor
 {
-    public class DVBTStatus : JSONObject
+    public class DVBTStatus : DVBTResponse
     {
-        public long SuccessFlag { get; set; }
-
         public long snr { get; set; }
         public long bitErrorRate { get; set; }
         public long droppedUsbFps { get; set; }
@@ -20,7 +18,7 @@ namespace DVBTTelevizor
 
         public void ParseFromByteArray(byte[]ar, int offset)
         {
-            SuccessFlag = GetBigEndianLongFromByteArray(ar, offset);
+            SuccessFlag = GetBigEndianLongFromByteArray(ar, offset) == 1;
 
             snr = GetBigEndianLongFromByteArray(ar, offset+8);
             bitErrorRate = GetBigEndianLongFromByteArray(ar, offset+16);

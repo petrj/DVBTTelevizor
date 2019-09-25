@@ -8,14 +8,17 @@
 
     <ScrollView>
         <StackLayout>
-            <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />                  
+            <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
 
             <Button x:Name="InitButton" Text="Init" VerticalOptions="Start"></Button>
 
             <Label x:Name="PortsLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
 
             <Button x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
+            <Label x:Name="StatusLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+
             <Button x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>
+            <Label x:Name="VersionLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
 
             <Label Text="Tune Settings" TextColor="Yellow" FontSize="Large"/>
 
@@ -64,7 +67,7 @@
                 <Entry Grid.Row="0" Grid.Column="0"  x:Name="EntryPID1" Text="2301" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1__"/>
                 <Entry Grid.Row="0" Grid.Column="1"  x:Name="EntryPID2" Text="" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID2__"/>
                 <Entry Grid.Row="0" Grid.Column="2"  x:Name="EntryPID3" Text="" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID3__"/>
-                
+
                 <Button Grid.Row="1" Grid.Column="2" x:Name="SetPIDsButton" Text="Set PIDs" />
             </Grid>
 
