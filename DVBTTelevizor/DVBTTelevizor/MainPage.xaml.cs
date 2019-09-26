@@ -59,9 +59,12 @@ namespace DVBTTelevizor
 
             try
             {
-                var status = _driver.GetStatus();
+                Task.Run( async () =>
+                {
+                    var status = await _driver.GetStatus();
+                    StatusLabel.Text = status.ToString();
+                });
 
-                StatusLabel.Text = status.ToString();
             }
             catch (Exception ex)
             {

@@ -9,9 +9,11 @@ namespace DVBTTelevizor
         public bool SuccessFlag { get; set; }
         public DateTime ResponseTime { get; set; }
 
+        public List<byte> Bytes { get; set; } = new List<byte>();
+
         public DVBTResponse()
         {
-            ResponseTime = DateTime.Now;
+
         }
     }
 }

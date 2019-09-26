@@ -20,9 +20,15 @@ namespace DVBTTelevizor
                     return res;
                 } else
                 {
-                    return new char[];
+                    return new char[0];
                 }
             }
+        }
+
+        public DVBTRequest(IEnumerable<byte> bytes, int responseBytesExpectedCount)
+        {
+            Bytes.AddRange(bytes);
+            ResponseBytesExpectedCount = responseBytesExpectedCount;
         }
     }
 }
