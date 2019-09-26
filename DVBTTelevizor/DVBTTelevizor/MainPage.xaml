@@ -14,12 +14,33 @@
 
             <Label x:Name="PortsLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
 
-            <Button x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
-            <Label x:Name="StatusLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+            <Grid Margin="20,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70*" />                    
+                    <ColumnDefinition Width="30*" />
+                </Grid.ColumnDefinitions>
 
-            <Button x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>
-            <Label x:Name="VersionLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+                 <Label Grid.Row="0" Grid.Column="0" x:Name="StatusLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+                 <Button Grid.Row="0" Grid.Column="1" x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
+            </Grid>
 
+
+            <Grid Margin="20,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70*" />
+                    <ColumnDefinition Width="30*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" x:Name="VersionLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+                <Button Grid.Row="0" Grid.Column="1" x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>                
+            </Grid>
+         
             <Label Text="Tune Settings" TextColor="Yellow" FontSize="Large"/>
 
             <Grid Margin="20,10,0,0">

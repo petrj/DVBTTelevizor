@@ -47,8 +47,6 @@ namespace DVBTTelevizor
 
                 PortsLabel.Text = $"Control port: {_driver.Configuration.Driver.ControlPort}, Transfer port: {_driver.Configuration.Driver.TransferPort}";
 
-                //_driver.Connect();
-
                 _driver.Start();
             });
         }
@@ -56,36 +54,52 @@ namespace DVBTTelevizor
         private void GetStatusButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = Environment.NewLine + "Getting status ...";
-
-            try
+            
+            Task.Run( async () =>
             {
-                Task.Run( async () =>
+                try
                 {
                     var status = await _driver.GetStatus();
-                    StatusLabel.Text = status.ToString();
-                });
 
-            }
-            catch (Exception ex)
-            {
-                StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = status.ToString();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+                    });
+                }
+            });            
         }
 
         private void GetVersionButton_Clicked(object sender, EventArgs e)
         {
-            VersionLabel.Text = Environment.NewLine + "Getting Version ...";
+            VersionLabel.Text = "Getting Version ...";
 
-            try
+            Task.Run(async () =>
             {
-                var version = _driver.GetVersion();
+                try
+                {
+                    var version = await _driver.GetVersion();
 
-                VersionLabel.Text = $"Version: {version.ToString()}";
-            }
-            catch (Exception ex)
-            {
-                VersionLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        VersionLabel.Text = $"Version: {version.ToString()}";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        VersionLabel.Text =  $"Request failed ({ex.Message})";
+                    });
+                }
+            });           
+
         }
 
         private void InitButton_Clicked(object sender, EventArgs e)
@@ -103,16 +117,27 @@ namespace DVBTTelevizor
 
         private void StopButton_Clicked(object sender, EventArgs e)
         {
-            try
-            {
-                var res = _driver.SendCloseConnection();
+            InfoLabel.Text = "stopping driver  ...";
 
-                InfoLabel.Text = Environment.NewLine + $"Stop result: {res}";
-            }
-            catch (Exception ex)
+            Task.Run(async () =>
             {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }
+                try
+                {
+                    var res = _driver.SendCloseConnection();
+
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        InfoLabel.Text = Environment.NewLine + $"Stop result: {res}";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        InfoLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
         }
 
         private void RecordButton_Clicked(object sender, EventArgs e)
@@ -122,29 +147,39 @@ namespace DVBTTelevizor
 
         private void SetPIDsButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = Environment.NewLine + "Settting PIDs ...";
 
-            try
+            InfoLabel.Text = "Settting PIDs  ...";
+
+            Task.Run(async () =>
             {
-                var pids = new List<long>();
+                try
+                {
+                    var pids = new List<long>();
 
-                if (!String.IsNullOrEmpty(EntryPID1.Text))
-                    pids.Add(Convert.ToInt64(EntryPID1.Text));
+                    if (!String.IsNullOrEmpty(EntryPID1.Text))
+                        pids.Add(Convert.ToInt64(EntryPID1.Text));
 
-                if (!String.IsNullOrEmpty(EntryPID2.Text))
-                    pids.Add(Convert.ToInt64(EntryPID2.Text));
+                    if (!String.IsNullOrEmpty(EntryPID2.Text))
+                        pids.Add(Convert.ToInt64(EntryPID2.Text));
 
-                if (!String.IsNullOrEmpty(EntryPID3.Text))
-                    pids.Add(Convert.ToInt64(EntryPID3.Text));
+                    if (!String.IsNullOrEmpty(EntryPID3.Text))
+                        pids.Add(Convert.ToInt64(EntryPID3.Text));
 
-                var pidRes = _driver.SetPIDs(pids);
+                    var pidRes = _driver.SetPIDs(pids);
 
-                InfoLabel.Text += Environment.NewLine + $"PIDs Set result: {pidRes}";
-            }
-            catch (Exception ex)
-            {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        InfoLabel.Text = Environment.NewLine + $"PIDs Set result: {pidRes}";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        InfoLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
         }
 
         private async Task Record()
@@ -182,23 +217,32 @@ namespace DVBTTelevizor
 
         private void TuneButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = Environment.NewLine + "Tuning  ...";
+            InfoLabel.Text = "Tuning  ...";
 
-            try
+            Task.Run(async () =>
             {
-                var freq = Convert.ToInt64(EntryFrequency.Text) * 1000000;
-                var bandWidth = Convert.ToInt64(EntryBandWidth.Text) * 1000000;
+                try
+                {
+                    var freq = Convert.ToInt64(EntryFrequency.Text) * 1000000;
+                    var bandWidth = Convert.ToInt64(EntryBandWidth.Text) * 1000000;
 
-                var type = DeliverySystemPicker.SelectedIndex;
+                    var type = DeliverySystemPicker.SelectedIndex;
 
-                var tuneRes = _driver.Tune(freq, bandWidth, type);
+                    var tuneRes = await _driver.Tune(freq, bandWidth, type);
 
-                InfoLabel.Text += Environment.NewLine + $"Tune result: {tuneRes}";
-            }
-            catch (Exception ex)
-            {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        InfoLabel.Text += Environment.NewLine + $"Tune result: {tuneRes}";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        InfoLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
         }
 
         public async Task RunWithPermission(Permission perm, List<Command> commands)
