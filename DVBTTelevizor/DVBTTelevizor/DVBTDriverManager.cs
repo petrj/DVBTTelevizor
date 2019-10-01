@@ -12,6 +12,7 @@ using Xamarin.Forms;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.IO;
+using LoggerService;
 
 namespace DVBTTelevizor
 {
@@ -19,6 +20,8 @@ namespace DVBTTelevizor
     {
         DVBTTelevizorConfiguration _configuration;
         DVBTBackgroundRequest _request = new DVBTBackgroundRequest();
+
+        ILoggingService _log;
 
         BackgroundWorker _worker;
 
@@ -29,7 +32,7 @@ namespace DVBTTelevizor
             Configuration = new DVBTTelevizorConfiguration();
             _worker = new BackgroundWorker();
             _worker.DoWork += worker_DoWork;
-
+            _log = new BasicLoggingService(LoggingLevelEnum.Debug);
         }
 
         public bool Busy
@@ -101,8 +104,8 @@ namespace DVBTTelevizor
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var stayAliveConnectionRequestMiliseconds = 1000;
-            var lastStayAliveConnectionRequestTime = DateTime.MinValue;
+            //var stayAliveConnectionRequestMiliseconds = 1000;
+            //var lastStayAliveConnectionRequestTime = DateTime.MinValue;
 
             var client = new TcpClient();
             client.Connect("127.0.0.1", _configuration.Driver.ControlPort);
@@ -135,9 +138,14 @@ namespace DVBTTelevizor
                 
                 if (readingAlllowed)
                 {
-                    var readByteCount = stream.Read(buffer, 0, 1024);
+                    var readByteCount = client.Client.Available > 0 
+                        ?  stream.Read(buffer, 0, 1024)
+                        : 0;
+
                     if (readByteCount > 0)
                     {
+                        _log.Debug($"worker_DoWork: read {readByteCount} bytes");
+
                         lock (_workerLock)
                         {
                             // adding bytes to output
@@ -159,6 +167,7 @@ namespace DVBTTelevizor
 
                 System.Threading.Thread.Sleep(500);
 
+                /*
                 if (!readingAlllowed && !stayAliveReading)
                 {
                     // stay alive connection request- sending get version every x miliseconds
@@ -172,9 +181,14 @@ namespace DVBTTelevizor
 
                 if (stayAliveReading)
                 {
-                    var bytesread = stream.Read(buffer, 0, 26);
+                    var bytesread = client.Client.Available > 0
+                        ? stream.Read(buffer, 0, 26)
+                        : 0;   
+                    
                     if (bytesread > 0)
                     {
+                        _log.Debug($"worker_DoWork: read {bytesread} bytes while reading stayAliveReading .....");
+
                         for (var i = 0; i < bytesread; i++)
                         {
                             stayAliveBytes.Add(buffer[i]);
@@ -186,8 +200,11 @@ namespace DVBTTelevizor
                         }
                     }
                 }
+                */
 
             } while (client.Connected);
+
+            _log.Debug($"client disconnected");
         }
 
         public DVBTTelevizorConfiguration Configuration
@@ -259,6 +276,8 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySyetem)
         {
+            // 26 bytes
+
             List<byte> bytesToSend = new List<byte>();
 
             bytesToSend.Add(2); // REQ_TUNE
