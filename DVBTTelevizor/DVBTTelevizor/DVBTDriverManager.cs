@@ -101,8 +101,8 @@ namespace DVBTTelevizor
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            //var stayAliveConnectionRequestMiliseconds = 1000;
-            //var lastStayAliveConnectionRequestTime = DateTime.MinValue;
+            var stayAliveConnectionRequestMiliseconds = 1000;
+            var lastStayAliveConnectionRequestTime = DateTime.MinValue;
 
             var client = new TcpClient();
             client.Connect("127.0.0.1", _configuration.Driver.ControlPort);
@@ -110,18 +110,21 @@ namespace DVBTTelevizor
             client.ReceiveTimeout = int.MaxValue;
 
             var stream = client.GetStream();
-            byte[] buffer = new byte[client.ReceiveBufferSize];
+            byte[] buffer = new byte[1024];
             bool readingAlllowed = false;
+
+            bool stayAliveReading = false;
+            List<byte> stayAliveBytes = new List<byte>();
 
             do
             {
             
                 lock (_workerLock)
                 {
-                    if (_request.State == RequestStateEnum.SendingRequest)
+                    if (!stayAliveReading && _request.State == RequestStateEnum.SendingRequest)
                     {
-                        client.Client.Send(_request.Request.Bytes.ToArray());
-                        //stream.Write(_request.Request.Bytes.ToArray(), 0, _request.Request.Bytes.Count);
+                        //client.Client.Send(_request.Request.Bytes.ToArray());
+                        stream.Write(_request.Request.Bytes.ToArray(), 0, _request.Request.Bytes.Count);
                         readingAlllowed = true;
 
                         _request.Response = new DVBTResponse();
@@ -129,10 +132,10 @@ namespace DVBTTelevizor
                     }
                 }
 
-                /*
+                
                 if (readingAlllowed)
                 {
-                    var readByteCount = stream.Read(buffer, 0, client.ReceiveBufferSize);
+                    var readByteCount = stream.Read(buffer, 0, 1024);
                     if (readByteCount > 0)
                     {
                         lock (_workerLock)
@@ -142,7 +145,7 @@ namespace DVBTTelevizor
                             {                              
                                 for (var i = 0; i < readByteCount; i++)
                                 {
-                                    _request.Response.Bytes.Add(Convert.ToByte(buffer[i]));
+                                    _request.Response.Bytes.Add(buffer[i]);
                                 }
                                 if (_request.Request.ResponseBytesExpectedCount == _request.Response.Bytes.Count)
                                 {
@@ -152,53 +155,37 @@ namespace DVBTTelevizor
                             }
                         }
                     }                   
-                }
-                *
-                */
-
-                var bytesAvailable = client.Client.Available;
-                if (bytesAvailable > 0)
-                {
-                    client.Client.Receive(buffer, bytesAvailable, SocketFlags.None);
-
-                    if (readingAlllowed)
-                    {
-                        lock (_workerLock)
-                        {
-                            // adding bytes to output
-                            if (_request.State == RequestStateEnum.ReadingResponse)
-                            {
-                                for (var i = 0; i < bytesAvailable; i++)
-                                {
-                                    _request.Response.Bytes.Add(Convert.ToByte(buffer[i]));
-                                }
-                                if (_request.Request.ResponseBytesExpectedCount == _request.Response.Bytes.Count)
-                                {
-                                    _request.State = RequestStateEnum.ResponseReceived;
-                                    readingAlllowed = false;
-                                }
-                            }
-                        }
-                    }
-                }
+                }     
 
                 System.Threading.Thread.Sleep(500);
 
-                //if (!readingAlllowed)
-                //{
-                //    // stay alive connection request- sending get version every x miliseconds
-                //    if ((DateTime.Now - lastStayAliveConnectionRequestTime).TotalMilliseconds > stayAliveConnectionRequestMiliseconds)
-                //    {
-                //        stream.Write(new byte[] { 0, 0 }, 0, 2);
-                //        var bytesread = stream.Read(buffer, 0, 26);
-                //        if (bytesread != 26)
-                //        {
+                if (!readingAlllowed && !stayAliveReading)
+                {
+                    // stay alive connection request- sending get version every x miliseconds
+                    if ((DateTime.Now - lastStayAliveConnectionRequestTime).TotalMilliseconds > stayAliveConnectionRequestMiliseconds)
+                    {
+                        stream.Write(new byte[] { 0, 0 }, 0, 2);
+                        stayAliveBytes.Clear();
+                        stayAliveReading = true;
+                    }                   
+                }
 
-                //        }
-
-                //        lastStayAliveConnectionRequestTime = DateTime.Now;
-                //    }
-                //}
+                if (stayAliveReading)
+                {
+                    var bytesread = stream.Read(buffer, 0, 26);
+                    if (bytesread > 0)
+                    {
+                        for (var i = 0; i < bytesread; i++)
+                        {
+                            stayAliveBytes.Add(buffer[i]);
+                        }
+                        
+                        if (stayAliveBytes.Count == 26)
+                        {
+                            stayAliveReading = false;
+                        }
+                    }
+                }
 
             } while (client.Connected);
         }
