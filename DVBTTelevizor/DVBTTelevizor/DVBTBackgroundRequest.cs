@@ -9,6 +9,8 @@ namespace DVBTTelevizor
         public RequestStateEnum State { get; set; } = RequestStateEnum.Ready;
 
         public DVBTRequest Request { get; set; }
-        public DVBTResponse Response { get; set; }
-}
+        public DVBTResponse Response { get; set; } = new DVBTResponse();
+
+
+    }
 }

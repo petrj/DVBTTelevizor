@@ -104,8 +104,8 @@ namespace DVBTTelevizor
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            //var stayAliveConnectionRequestMiliseconds = 1000;
-            //var lastStayAliveConnectionRequestTime = DateTime.MinValue;
+            var stayAliveConnectionRequestMiliseconds = 1000;
+            var lastStayAliveConnectionRequestTime = DateTime.MinValue;
 
             var client = new TcpClient();
             client.Connect("127.0.0.1", _configuration.Driver.ControlPort);
@@ -121,36 +121,33 @@ namespace DVBTTelevizor
 
             do
             {
-            
-                lock (_workerLock)
-                {
+               
                     if (!stayAliveReading && _request.State == RequestStateEnum.SendingRequest)
                     {
-                        //client.Client.Send(_request.Request.Bytes.ToArray());
-                        stream.Write(_request.Request.Bytes.ToArray(), 0, _request.Request.Bytes.Count);
+                        _request.State = RequestStateEnum.ReadingResponse;
+                        _request.Response.Bytes.Clear();
                         readingAlllowed = true;
 
-                        _request.Response = new DVBTResponse();
-                        _request.State = RequestStateEnum.ReadingResponse;                        
+                        _request.Request.Send(stream);
                     }
-                }
 
-                
-                if (readingAlllowed)
-                {
-                    var readByteCount = client.Client.Available > 0 
-                        ?  stream.Read(buffer, 0, 1024)
-                        : 0;
+                    //client.Client.Send(_request.Request.Bytes.ToArray());
+                    //stream.Write(_request.Request.Bytes.ToArray(), 0, _request.Request.Bytes.Count);                    
 
-                    if (readByteCount > 0)
+                    if (readingAlllowed)
                     {
-                        _log.Debug($"worker_DoWork: read {readByteCount} bytes");
+                        _log.Debug("Reading from strem ...");
+                        var readByteCount = stream.Read(buffer, 0, 1024);
+                        _log.Debug("Reading from strem completed ...");
 
-                        lock (_workerLock)
+                        if (readByteCount > 0)
                         {
+                            _log.Debug($"worker_DoWork: read {readByteCount} bytes");
+
+
                             // adding bytes to output
                             if (_request.State == RequestStateEnum.ReadingResponse)
-                            {                              
+                            {
                                 for (var i = 0; i < readByteCount; i++)
                                 {
                                     _request.Response.Bytes.Add(buffer[i]);
@@ -159,14 +156,24 @@ namespace DVBTTelevizor
                                 {
                                     _request.State = RequestStateEnum.ResponseReceived;
                                     readingAlllowed = false;
-                                }                                
+                                }
                             }
-                        }
-                    }                   
-                }     
 
+                        }
+                    }
+                
+
+            
                 System.Threading.Thread.Sleep(500);
 
+                // stay alive connection request- sending get version every x miliseconds
+                if ((DateTime.Now - lastStayAliveConnectionRequestTime).TotalMilliseconds > stayAliveConnectionRequestMiliseconds)
+                {
+_log.Debug("Keep alive ...");
+                    client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                    lastStayAliveConnectionRequestTime = DateTime.Now;
+                }                
+                
                 /*
                 if (!readingAlllowed && !stayAliveReading)
                 {
@@ -223,14 +230,20 @@ namespace DVBTTelevizor
         {
             var status = new DVBTStatus();
 
-            List<byte> bytesToSend = new List<byte>();
-
-            bytesToSend.Add(3); // REQ_GET_STATUS
-            bytesToSend.Add(0); // no payload
+            /*
+                    (long) snr, // parameter 1
+                    (long) bitErrorRate, // parameter 2
+                    (long) droppedUsbFps, // parameter 3
+                    (long) rfStrengthPercentage, // parameter 4
+                    hasSignal ? 1L : 0L, // parameter 5
+                    hasCarrier ? 1L : 0L, // parameter 6
+                    hasSync ? 1L : 0L, // parameter 7
+                    hasLock ? 1L : 0L // parameter 8            
+            */
 
             var responseSize = 2 + 9 * 8;
 
-            var req = new DVBTRequest(bytesToSend, responseSize);
+            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_GET_STATUS, new List<long>(), responseSize);
 
             var response = await SendRequest(req, 5);
 
@@ -248,15 +261,10 @@ namespace DVBTTelevizor
         public async Task<DVBTVersion> GetVersion()
         {
             var version = new DVBTVersion();
-            
-            List<byte> bytesToSend = new List<byte>();
-
-            bytesToSend.Add(0); // REQ_PROTOCOL_VERSION
-            bytesToSend.Add(0); // Payload size
 
             var responseSize = 26;  // 1 + 1 + 8 + 8 + 8
 
-            var req = new DVBTRequest(bytesToSend, responseSize);
+            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_PROTOCOL_VERSION, new List<long>(), responseSize);
             var response = await SendRequest(req, 5);
 
             if (response.Bytes.Count < responseSize)
@@ -278,18 +286,20 @@ namespace DVBTTelevizor
         {
             // 26 bytes
 
-            List<byte> bytesToSend = new List<byte>();
+            //List<byte> bytesToSend = new List<byte>();
 
-            bytesToSend.Add(2); // REQ_TUNE
-            bytesToSend.Add(3); // Payload for 3 longs
+            //bytesToSend.Add(2); // REQ_TUNE
+            //bytesToSend.Add(3); // Payload for 3 longs
 
-            bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
-            bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
-            bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
+            //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
+            //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
+            //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
+
+            var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySyetem) };
 
             var responseSize = 10;
 
-            var req = new DVBTRequest(bytesToSend, responseSize);
+            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_TUNE, payload, responseSize);
             var response = await SendRequest(req, 10);
 
             if (response.Bytes.Count < responseSize)
@@ -302,14 +312,9 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> SendCloseConnection()
         {            
-            List<byte> bytesToSend = new List<byte>();
-
-            bytesToSend.Add(1); // REQ_EXIT
-            bytesToSend.Add(0);
-
             var responseSize = 10;
 
-            var req = new DVBTRequest(bytesToSend, responseSize);
+            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_EXIT, new List<long>(), responseSize);
             var response = await SendRequest(req, 5);
 
             var requestNumber = response.Bytes[0];
@@ -321,19 +326,32 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)
         {        
-            List<byte> bytesToSend = new List<byte>();
-
-            bytesToSend.Add(4); // REQ_SET_PIDS
-            bytesToSend.Add(Convert.ToByte(PIDs.Count));
-
-            foreach (var pid in PIDs)
-            {
-                bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(pid));
-            }
-
             var responseSize = 10;
 
-            var req = new DVBTRequest(bytesToSend, responseSize);
+            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_SET_PIDS, PIDs, responseSize);
+            var response = await SendRequest(req, 5);
+
+            var requestNumber = response.Bytes[0];
+            var longsCountInResponse = response.Bytes[1];
+            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
+
+            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
+        }
+
+        public async Task<DVBTResponse> GetCapabalities()
+        {
+            var responseSize = 2 + 7 * 8;
+
+            /*
+                    supportedDeliverySystems, // parameter 1
+                    frontendProperties.getFrequencyMin(), // parameter 2
+                    frontendProperties.getFrequencyMax(), // parameter 3
+                    frontendProperties.getFrequencyStepSize(), // parameter 4
+                    (long)dvbDevice.getDeviceFilter().getVendorId(), // parameter 5
+                    (long)dvbDevice.getDeviceFilter().getProductId() // parameter 6
+            */
+
+            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_GET_CAPABILITIES, new List<long>(), responseSize);
             var response = await SendRequest(req, 5);
 
             var requestNumber = response.Bytes[0];

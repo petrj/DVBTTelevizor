@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 
 namespace DVBTTelevizor
 {
     public class DVBTRequest
     {
-        public List<byte> Bytes { get; set; } = new List<byte>();
+        public DVBTDriverRequestTypeEnum DVBTDriverRequestType;
+        public List<long> Payload = new List<long>();
+
+        //public List<byte> Bytes { get; set; } = new List<byte>();
         public int ResponseBytesExpectedCount { get; set; }
 
+        /*
         public char[] BytesAsCharArray
         {
             get
@@ -24,11 +29,26 @@ namespace DVBTTelevizor
                 }
             }
         }
+        */
 
-        public DVBTRequest(IEnumerable<byte> bytes, int responseBytesExpectedCount)
+        public DVBTRequest(DVBTDriverRequestTypeEnum requestType, List<long> payload, int responseBytesExpectedCount)
         {
-            Bytes.AddRange(bytes);
+            DVBTDriverRequestType = requestType;
             ResponseBytesExpectedCount = responseBytesExpectedCount;
+        }
+
+        public void Send(NetworkStream stream)
+        {
+            stream.Write(new byte[] { (byte)DVBTDriverRequestType }, 0, 1 );
+            stream.Flush();
+            stream.Write(new byte[] { (byte)Payload.Count }, 0, 1 );
+            stream.Flush();
+
+            foreach (var payload in Payload)
+            {
+                stream.Write(DVBTStatus.GetByteArrayFromBigEndianLong(payload), 0, 8);
+                stream.Flush();
+            }
         }
     }
 }
