@@ -21,6 +21,7 @@ namespace DVBTTelevizor
     public partial class MainPage : ContentPage
     {
         DVBTDriverManager _driver;
+        DialogService _dlgService;
 
         public MainPage()
         {
@@ -28,16 +29,20 @@ namespace DVBTTelevizor
 
             this.GetStatusButton.Clicked += GetStatusButton_Clicked;
             this.GetVersionButton.Clicked += GetVersionButton_Clicked;
+            this.GetCapButton.Clicked += GetCapButton_Clicked;
             this.InitButton.Clicked += InitButton_Clicked;
             this.TuneButton.Clicked += TuneButton_Clicked;
             this.StopButton.Clicked += StopButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
             this.RecordButton.Clicked += RecordButton_Clicked;
+            this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
+
 
             DeliverySystemPicker.SelectedIndex = 0;
 
             _driver = new DVBTDriverManager();
+            _dlgService = new DialogService(this);
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
             {
@@ -54,7 +59,7 @@ namespace DVBTTelevizor
         private void GetStatusButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = Environment.NewLine + "Getting status ...";
-            
+
             Task.Run( async () =>
             {
                 try
@@ -73,12 +78,40 @@ namespace DVBTTelevizor
                         StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
                     });
                 }
-            });            
+            });
         }
+
+
+        private void GetCapButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = "Getting capabilities ...";
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var capabalities = await _driver.GetCapabalities();
+
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = $"Capabalities: {capabalities.ToString()}";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
+
+        }
+
 
         private void GetVersionButton_Clicked(object sender, EventArgs e)
         {
-            VersionLabel.Text = "Getting Version ...";
+            StatusLabel.Text = "Getting Version ...";
 
             Task.Run(async () =>
             {
@@ -88,23 +121,22 @@ namespace DVBTTelevizor
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        VersionLabel.Text = $"Version: {version.ToString()}";
+                        StatusLabel.Text = $"Version: {version.ToString()}";
                     });
                 }
                 catch (Exception ex)
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        VersionLabel.Text =  $"Request failed ({ex.Message})";
+                        StatusLabel.Text =  $"Request failed ({ex.Message})";
                     });
                 }
-            });           
+            });
 
         }
 
         private void InitButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = Environment.NewLine + "Initializing ...";
             MessagingCenter.Send("", "Init");
         }
 
@@ -112,12 +144,12 @@ namespace DVBTTelevizor
         {
             var url = $"http://127.0.0.1:{_driver.Configuration.Driver.TransferPort}";
             MessagingCenter.Send(url, "PlayUrl");
-            InfoLabel.Text = Environment.NewLine + $"Playing url: {url}";
+            StatusLabel.Text = $"Playing url: {url}";
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = "stopping driver  ...";
+            StatusLabel.Text = "stopping driver  ...";
 
             Task.Run(async () =>
             {
@@ -125,16 +157,18 @@ namespace DVBTTelevizor
                 {
                     var res = _driver.SendCloseConnection();
 
+                    await _driver.Stop();
+
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        InfoLabel.Text = Environment.NewLine + $"Stop result: {res}";
+                        StatusLabel.Text = Environment.NewLine + $"Stop result: {res}";
                     });
                 }
                 catch (Exception ex)
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        InfoLabel.Text = $"Request failed ({ex.Message})";
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
                     });
                 }
             });
@@ -142,13 +176,18 @@ namespace DVBTTelevizor
 
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
-            RunWithPermission(Permission.Storage, async () => await Record());
+            RunWithPermission(Permission.Storage, async () => await _driver.StartRecording());
+        }
+
+        private void StopRecordButton_Clicked(object sender, EventArgs e)
+        {
+            _driver.StopRecording();
         }
 
         private void SetPIDsButton_Clicked(object sender, EventArgs e)
         {
 
-            InfoLabel.Text = "Settting PIDs  ...";
+            StatusLabel.Text = "Settting PIDs  ...";
 
             Task.Run(async () =>
             {
@@ -156,68 +195,31 @@ namespace DVBTTelevizor
                 {
                     var pids = new List<long>();
 
-                    if (!String.IsNullOrEmpty(EntryPID1.Text))
-                        pids.Add(Convert.ToInt64(EntryPID1.Text));
+                    foreach (var PIDAsString in EntryPIDs.Text.Split(','))
+                    {
+                        pids.Add(Convert.ToInt64(PIDAsString));
+                    }
 
-                    if (!String.IsNullOrEmpty(EntryPID2.Text))
-                        pids.Add(Convert.ToInt64(EntryPID2.Text));
-
-                    if (!String.IsNullOrEmpty(EntryPID3.Text))
-                        pids.Add(Convert.ToInt64(EntryPID3.Text));
-
-                    var pidRes = _driver.SetPIDs(pids);
+                    var pidRes = await _driver.SetPIDs(pids);
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        InfoLabel.Text = Environment.NewLine + $"PIDs Set result: {pidRes}";
+                        StatusLabel.Text = Environment.NewLine + $"PIDs Set result: {pidRes}";
                     });
                 }
                 catch (Exception ex)
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        InfoLabel.Text = $"Request failed ({ex.Message})";
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
                     });
                 }
             });
         }
 
-        private async Task Record()
-        {
-            try
-            {
-                using (var client = new TcpClient())
-                {
-                    client.Connect("127.0.0.1", _driver.Configuration.Driver.TransferPort);
-                    client.ReceiveBufferSize = 1000000; // 1 MB
-                    client.SendTimeout = 5000;
-                    client.ReceiveTimeout = 50000;
-                    using (var nwStream = client.GetStream())
-                    {
-                        byte[] bytesToReadPart = new byte[client.ReceiveBufferSize];
-                        using (var fs = new FileStream("/storage/emulated/0/Download/mux.ts", FileMode.Create, FileAccess.Write))
-                        {
-                            do
-                            {
-                                var bytesRead = nwStream.Read(bytesToReadPart, 0, client.ReceiveBufferSize);
-                                fs.Write(bytesToReadPart, 0, bytesRead);
-                                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                            }
-                            while (client.Connected);
-                        }
-                    }
-                    client.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-            }
-        }
-
         private void TuneButton_Clicked(object sender, EventArgs e)
         {
-            InfoLabel.Text = "Tuning  ...";
+            StatusLabel.Text = "Tuning  ...";
 
             Task.Run(async () =>
             {
@@ -232,14 +234,14 @@ namespace DVBTTelevizor
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        InfoLabel.Text += Environment.NewLine + $"Tune result: {tuneRes}";
+                        StatusLabel.Text += Environment.NewLine + $"Tune result: {tuneRes}";
                     });
                 }
                 catch (Exception ex)
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        InfoLabel.Text = $"Request failed ({ex.Message})";
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
                     });
                 }
             });
@@ -266,10 +268,10 @@ namespace DVBTTelevizor
                 var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
                 if (status != PermissionStatus.Granted)
                 {
-                    //if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
-                    //{
-                    //    await _dlgService.Information("Aplikace vyžaduje potvrzení k oprávnění.", "Informace");
-                    //}
+                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
+                    {
+                        await _dlgService.Information("Aplikace vyžaduje potvrzení k oprávnění.", "Informace");
+                    }
 
                     var results = await CrossPermissions.Current.RequestPermissionsAsync(perm);
 
@@ -281,14 +283,14 @@ namespace DVBTTelevizor
                 {
                     await action();
                 }
-                else if (status != PermissionStatus.Unknown)
+                else
                 {
-                    //await _dlgService.Error("Nebylo uděleno oprávnění", "Chyba");
+                    await _dlgService.Error("Missing permissions", "Chyba");
                 }
             }
             catch (Exception ex)
             {
-                InfoLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+                //_log.Error(ex);
             }
         }
 

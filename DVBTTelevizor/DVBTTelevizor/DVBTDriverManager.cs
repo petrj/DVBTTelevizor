@@ -13,205 +13,193 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.IO;
 using LoggerService;
+using System.Runtime.InteropServices;
 
 namespace DVBTTelevizor
 {
     public class DVBTDriverManager
     {
         DVBTTelevizorConfiguration _configuration;
-        DVBTBackgroundRequest _request = new DVBTBackgroundRequest();
 
         ILoggingService _log;
 
-        BackgroundWorker _worker;
+        TcpClient _controlClient;
+        TcpClient _transferClient;
+        NetworkStream _controlStream;
+        NetworkStream _recordStream;
+        bool _recording = false;
 
-        private static object _workerLock = new object();
+        private static object _recordLock = new object();
 
         public DVBTDriverManager()
         {
             Configuration = new DVBTTelevizorConfiguration();
-            _worker = new BackgroundWorker();
-            _worker.DoWork += worker_DoWork;
+
             _log = new BasicLoggingService(LoggingLevelEnum.Debug);
         }
 
-        public bool Busy
-        {
-            get
-            {
-                return _worker.IsBusy;
-            }
-        }
-
-        public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 10)
-        {
-            lock (_workerLock)
-            {
-                if (_request.State == RequestStateEnum.Error)
-                {
-                    _request.State = RequestStateEnum.Ready; 
-                }                  
-
-                if (_request.State != RequestStateEnum.Ready)
-                    throw new Exception("Driver not ready");
-
-                _request.Request = request;
-                _request.State = RequestStateEnum.SendingRequest;
-            }
-
-            var startTime = DateTime.Now;
-
-           return await Task.Run(() =>
-           {
-               try
-               {
-                   do
-                   {
-                       var timeSpan = Math.Abs((DateTime.Now - startTime).TotalSeconds);
-                       if (timeSpan > secondsTimeout)
-                       {
-                           throw new TimeoutException("TimeOut");
-                       }
-
-                       System.Threading.Thread.Sleep(200);
-                   }
-                   while (_request.State != RequestStateEnum.ResponseReceived);
-
-                   lock (_workerLock)
-                   {
-                       _request.State = RequestStateEnum.Ready;
-                   }
-
-               }
-               catch (TimeoutException)
-               {
-                   lock (_workerLock)
-                   {
-                       _request.State = RequestStateEnum.Error;
-                       return new DVBTResponse() { SuccessFlag = false };
-                   }
-               }
-
-               return _request.Response;
-           });
-        }
-
-
         public void Start()
         {
-            _worker.RunWorkerAsync();
+            _controlClient = new TcpClient();
+            _controlClient.Connect("127.0.0.1", _configuration.Driver.ControlPort);
+            _controlStream = _controlClient.GetStream();
+
+            //_client.NoDelay = true;
+            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+            _transferClient = new TcpClient();
+            _transferClient.Connect("127.0.0.1", _configuration.Driver.TransferPort);
+            _recordStream = _transferClient.GetStream();
+        }
+
+        public async Task Stop()
+        {
+            await SendCloseConnection();
+            _controlClient.Close();
+            _transferClient.Close();
+        }
+
+        public async Task StartRecording()
+        {
+            var recordBackgroundWorker = new BackgroundWorker();
+            recordBackgroundWorker.DoWork += worker_DoWork;
+
+            lock (_recordLock)
+            {
+                _recording = true;
+            }
+
+            recordBackgroundWorker.RunWorkerAsync();
+        }
+
+        public void StopRecording()
+        {
+            lock (_recordLock)
+            {
+                _recording = false;
+            }
+        }
+
+        public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
+        {
+            var startTime = DateTime.Now;
+
+            return await Task.Run(() =>
+            {
+                var _responseBuffer = new List<byte>();
+
+                try
+                {
+                    byte[] buffer = new byte[1024];
+
+                    bool reading = true;
+
+                    request.Send(_controlStream);
+
+                    do
+                    {
+                        if (_controlClient.Client.Available > 0)
+                        {
+                            _log.Debug("Reading from stream ...");
+                            var readByteCount = _controlStream.Read(buffer, 0, 1); // requeest type
+                                readByteCount += _controlStream.Read(buffer, 1, 1); // payload size
+                            var size = buffer[1];
+                            for (var j=0;j<size;j++)
+                            {
+                                readByteCount += _controlStream.Read(buffer, 2+j*8, 8); // payload
+                            }
+                            _log.Debug($"Reading from stream completed, bytes read: {readByteCount} ...");
+
+                            for (var i = 0; i < readByteCount; i++)
+                            {
+                                _responseBuffer.Add(buffer[i]);
+                            }
+                            if (request.ResponseBytesExpectedCount >= _responseBuffer.Count)
+                            {
+                                reading = false;
+                            }
+                        }
+                        else
+                        {
+                            _log.Debug("No data available ...");
+                        }
+
+                        var timeSpan = Math.Abs((DateTime.Now - startTime).TotalSeconds);
+                        if (timeSpan > secondsTimeout)
+                        {
+                            throw new TimeoutException("TimeOut");
+                        }
+
+                        System.Threading.Thread.Sleep(200);
+                    }
+                    while (reading);
+
+                }
+                catch (TimeoutException)
+                {
+                    _log.Debug("Timeout for reading data ...");
+                    return new DVBTResponse() { SuccessFlag = false };
+                }
+                catch (Exception ex)
+                {
+                    _log.Debug($"General error: {ex}");
+                    return new DVBTResponse() { SuccessFlag = false };
+                }
+
+                    var response = new DVBTResponse() { SuccessFlag = true };
+                response.Bytes.AddRange(_responseBuffer);
+                return response;
+            });
         }
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var stayAliveConnectionRequestMiliseconds = 1000;
-            var lastStayAliveConnectionRequestTime = DateTime.MinValue;
-
-            var client = new TcpClient();
-            client.Connect("127.0.0.1", _configuration.Driver.ControlPort);
-            client.SendTimeout = int.MaxValue;
-            client.ReceiveTimeout = int.MaxValue;
-
-            var stream = client.GetStream();
-            byte[] buffer = new byte[1024];
-            bool readingAlllowed = false;
-
-            bool stayAliveReading = false;
-            List<byte> stayAliveBytes = new List<byte>();
-
-            do
+            try
             {
-               
-                    if (!stayAliveReading && _request.State == RequestStateEnum.SendingRequest)
+                byte[] buffer = new byte[1000000];
+                var bufferSize = 1024*1024;
+
+                var fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd") + "-DVBT-raw-stream.ts";
+
+                using (var fs = new FileStream(fName, FileMode.Create, FileAccess.Write))
+                {
+                    bool rec;
+
+                    do
                     {
-                        _request.State = RequestStateEnum.ReadingResponse;
-                        _request.Response.Bytes.Clear();
-                        readingAlllowed = true;
-
-                        _request.Request.Send(stream);
-                    }
-
-                    //client.Client.Send(_request.Request.Bytes.ToArray());
-                    //stream.Write(_request.Request.Bytes.ToArray(), 0, _request.Request.Bytes.Count);                    
-
-                    if (readingAlllowed)
-                    {
-                        _log.Debug("Reading from strem ...");
-                        var readByteCount = stream.Read(buffer, 0, 1024);
-                        _log.Debug("Reading from strem completed ...");
-
-                        if (readByteCount > 0)
+                        lock (_recordLock)
                         {
-                            _log.Debug($"worker_DoWork: read {readByteCount} bytes");
+                            rec = _recording;
+                        }
 
+                        if (_transferClient.Available > 0)
+                        {
+                            var bytesRead = _recordStream.Read(buffer, 0, bufferSize);
 
-                            // adding bytes to output
-                            if (_request.State == RequestStateEnum.ReadingResponse)
+                            if (rec)
                             {
-                                for (var i = 0; i < readByteCount; i++)
-                                {
-                                    _request.Response.Bytes.Add(buffer[i]);
-                                }
-                                if (_request.Request.ResponseBytesExpectedCount == _request.Response.Bytes.Count)
-                                {
-                                    _request.State = RequestStateEnum.ResponseReceived;
-                                    readingAlllowed = false;
-                                }
+                                fs.Write(buffer, 0, bytesRead);
                             }
 
+                            _log.Debug($"worker_DoWork : bytes read: {bytesRead} ...");
+                            _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                        } else
+                        {
+                            _log.Debug($"worker_DoWork : no data on transfer port...");
                         }
+
+                        System.Threading.Thread.Sleep(200);
                     }
-                
-
-            
-                System.Threading.Thread.Sleep(500);
-
-                // stay alive connection request- sending get version every x miliseconds
-                if ((DateTime.Now - lastStayAliveConnectionRequestTime).TotalMilliseconds > stayAliveConnectionRequestMiliseconds)
-                {
-_log.Debug("Keep alive ...");
-                    client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                    lastStayAliveConnectionRequestTime = DateTime.Now;
-                }                
-                
-                /*
-                if (!readingAlllowed && !stayAliveReading)
-                {
-                    // stay alive connection request- sending get version every x miliseconds
-                    if ((DateTime.Now - lastStayAliveConnectionRequestTime).TotalMilliseconds > stayAliveConnectionRequestMiliseconds)
-                    {
-                        stream.Write(new byte[] { 0, 0 }, 0, 2);
-                        stayAliveBytes.Clear();
-                        stayAliveReading = true;
-                    }                   
+                    while (_transferClient.Connected && rec);
                 }
 
-                if (stayAliveReading)
-                {
-                    var bytesread = client.Client.Available > 0
-                        ? stream.Read(buffer, 0, 26)
-                        : 0;   
-                    
-                    if (bytesread > 0)
-                    {
-                        _log.Debug($"worker_DoWork: read {bytesread} bytes while reading stayAliveReading .....");
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "Error while reading from TransferPort");
+            }
 
-                        for (var i = 0; i < bytesread; i++)
-                        {
-                            stayAliveBytes.Add(buffer[i]);
-                        }
-                        
-                        if (stayAliveBytes.Count == 26)
-                        {
-                            stayAliveReading = false;
-                        }
-                    }
-                }
-                */
-
-            } while (client.Connected);
-
-            _log.Debug($"client disconnected");
+            _log.Debug($"record background worker finished");
         }
 
         public DVBTTelevizorConfiguration Configuration
@@ -238,14 +226,14 @@ _log.Debug("Keep alive ...");
                     hasSignal ? 1L : 0L, // parameter 5
                     hasCarrier ? 1L : 0L, // parameter 6
                     hasSync ? 1L : 0L, // parameter 7
-                    hasLock ? 1L : 0L // parameter 8            
+                    hasLock ? 1L : 0L // parameter 8
             */
 
             var responseSize = 2 + 9 * 8;
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_GET_STATUS, new List<long>(), responseSize);
 
-            var response = await SendRequest(req, 5);
+            var response = await SendRequest(req);
 
             if (response.Bytes.Count < responseSize)
                 throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
@@ -278,7 +266,7 @@ _log.Debug("Keep alive ...");
             version.SuccessFlag = DVBTStatus.GetBigEndianLongFromByteArray(ar, 2) == 1;
             version.Version = DVBTStatus.GetBigEndianLongFromByteArray(ar, 10);
             version.AllRequestsLength = DVBTStatus.GetBigEndianLongFromByteArray(ar, 18);
-            
+
             return version;
         }
 
@@ -311,7 +299,7 @@ _log.Debug("Keep alive ...");
         }
 
         public async Task<DVBTResponse> SendCloseConnection()
-        {            
+        {
             var responseSize = 10;
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_EXIT, new List<long>(), responseSize);
@@ -325,7 +313,7 @@ _log.Debug("Keep alive ...");
         }
 
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)
-        {        
+        {
             var responseSize = 10;
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_SET_PIDS, PIDs, responseSize);
@@ -338,18 +326,11 @@ _log.Debug("Keep alive ...");
             return new DVBTResponse() { SuccessFlag = successFlag == 1 };
         }
 
-        public async Task<DVBTResponse> GetCapabalities()
+        public async Task<DVBTCapabilities> GetCapabalities()
         {
-            var responseSize = 2 + 7 * 8;
+            var cap = new DVBTCapabilities();
 
-            /*
-                    supportedDeliverySystems, // parameter 1
-                    frontendProperties.getFrequencyMin(), // parameter 2
-                    frontendProperties.getFrequencyMax(), // parameter 3
-                    frontendProperties.getFrequencyStepSize(), // parameter 4
-                    (long)dvbDevice.getDeviceFilter().getVendorId(), // parameter 5
-                    (long)dvbDevice.getDeviceFilter().getProductId() // parameter 6
-            */
+            var responseSize = 2 + 7 * 8;
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_GET_CAPABILITIES, new List<long>(), responseSize);
             var response = await SendRequest(req, 5);
@@ -358,7 +339,9 @@ _log.Debug("Keep alive ...");
             var longsCountInResponse = response.Bytes[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
 
-            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
+            cap.ParseFromByteArray(response.Bytes.ToArray(), 2);
+
+            return cap;
         }
     }
 }
