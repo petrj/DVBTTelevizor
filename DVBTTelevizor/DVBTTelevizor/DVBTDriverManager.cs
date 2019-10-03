@@ -83,6 +83,7 @@ namespace DVBTTelevizor
         public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
         {
             var startTime = DateTime.Now;
+            var bufferSize = 1024;
 
             return await Task.Run(() =>
             {
@@ -90,7 +91,7 @@ namespace DVBTTelevizor
 
                 try
                 {
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[bufferSize];
 
                     bool reading = true;
 
@@ -101,22 +102,20 @@ namespace DVBTTelevizor
                         if (_controlClient.Client.Available > 0)
                         {
                             _log.Debug("Reading from stream ...");
-                            var readByteCount = _controlStream.Read(buffer, 0, 1); // requeest type
-                                readByteCount += _controlStream.Read(buffer, 1, 1); // payload size
-                            var size = buffer[1];
-                            for (var j=0;j<size;j++)
-                            {
-                                readByteCount += _controlStream.Read(buffer, 2+j*8, 8); // payload
-                            }
+
+                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize); 
                             _log.Debug($"Reading from stream completed, bytes read: {readByteCount} ...");
 
-                            for (var i = 0; i < readByteCount; i++)
+                            if (readByteCount > 0)
                             {
-                                _responseBuffer.Add(buffer[i]);
-                            }
-                            if (request.ResponseBytesExpectedCount >= _responseBuffer.Count)
-                            {
-                                reading = false;
+                                for (var i = 0; i < readByteCount; i++)
+                                {
+                                    _responseBuffer.Add(buffer[i]);
+                                }
+                                if (request.ResponseBytesExpectedCount >= _responseBuffer.Count)
+                                {
+                                    reading = false;
+                                }
                             }
                         }
                         else
@@ -146,7 +145,7 @@ namespace DVBTTelevizor
                     return new DVBTResponse() { SuccessFlag = false };
                 }
 
-                    var response = new DVBTResponse() { SuccessFlag = true };
+                var response = new DVBTResponse() { SuccessFlag = true };
                 response.Bytes.AddRange(_responseBuffer);
                 return response;
             });
@@ -157,7 +156,7 @@ namespace DVBTTelevizor
             try
             {
                 byte[] buffer = new byte[1000000];
-                var bufferSize = 1024*1024;
+                var bufferSize = 2048;
 
                 var fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd") + "-DVBT-raw-stream.ts";
 
@@ -176,12 +175,13 @@ namespace DVBTTelevizor
                         {
                             var bytesRead = _recordStream.Read(buffer, 0, bufferSize);
 
+                            _log.Debug($"worker_DoWork : bytes read: {bytesRead} ...");
+
                             if (rec)
                             {
                                 fs.Write(buffer, 0, bytesRead);
                             }
-
-                            _log.Debug($"worker_DoWork : bytes read: {bytesRead} ...");
+                            
                             _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                         } else
                         {

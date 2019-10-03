@@ -35,6 +35,7 @@ namespace DVBTTelevizor
         {
             DVBTDriverRequestType = requestType;
             ResponseBytesExpectedCount = responseBytesExpectedCount;
+            Payload = payload;
         }
 
         public void Send(NetworkStream stream)
