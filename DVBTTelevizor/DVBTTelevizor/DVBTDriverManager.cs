@@ -50,6 +50,10 @@ namespace DVBTTelevizor
             _transferClient = new TcpClient();
             _transferClient.Connect("127.0.0.1", _configuration.Driver.TransferPort);
             _recordStream = _transferClient.GetStream();
+
+            var recordBackgroundWorker = new BackgroundWorker();
+            recordBackgroundWorker.DoWork += worker_DoWork;
+            recordBackgroundWorker.RunWorkerAsync();
         }
 
         public async Task Stop()
@@ -61,15 +65,10 @@ namespace DVBTTelevizor
 
         public async Task StartRecording()
         {
-            var recordBackgroundWorker = new BackgroundWorker();
-            recordBackgroundWorker.DoWork += worker_DoWork;
-
             lock (_recordLock)
             {
                 _recording = true;
-            }
-
-            recordBackgroundWorker.RunWorkerAsync();
+            }            
         }
 
         public void StopRecording()
@@ -157,28 +156,33 @@ namespace DVBTTelevizor
             {
                 byte[] buffer = new byte[1000000];
                 var bufferSize = 2048;
-
-                var fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd") + "-DVBT-raw-stream.ts";
-
-                using (var fs = new FileStream(fName, FileMode.Create, FileAccess.Write))
+                FileStream fs = null;
+                bool rec = false;
+    
+                do
                 {
-                    bool rec;
-
-                    do
-                    {
                         lock (_recordLock)
                         {
+                            // reading synchronized
                             rec = _recording;
                         }
 
                         if (_transferClient.Available > 0)
                         {
+                            _log.Debug($"worker_DoWork : bytes to read: {_transferClient.Available} ...");
+
                             var bytesRead = _recordStream.Read(buffer, 0, bufferSize);
 
                             _log.Debug($"worker_DoWork : bytes read: {bytesRead} ...");
 
                             if (rec)
                             {
+                                if (fs == null)
+                                {
+                                    var fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-DVBT-raw-stream.ts";
+                                    fs = new FileStream(fName, FileMode.Create, FileAccess.Write);                                    
+                                }
+
                                 fs.Write(buffer, 0, bytesRead);
                             }
                             
@@ -188,10 +192,16 @@ namespace DVBTTelevizor
                             _log.Debug($"worker_DoWork : no data on transfer port...");
                         }
 
+                        if (!rec && fs != null)
+                        {
+                            fs.Flush();
+                            fs.Close();
+                            fs = null;
+                        }
+
                         System.Threading.Thread.Sleep(200);
                     }
-                    while (_transferClient.Connected && rec);
-                }
+                    while (_transferClient.Connected);                
 
             }
             catch (Exception ex)
