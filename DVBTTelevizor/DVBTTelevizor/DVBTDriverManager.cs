@@ -30,12 +30,33 @@ namespace DVBTTelevizor
         bool _recording = false;
 
         private static object _recordLock = new object();
+        private static object _infoLock = new object();
+
+        private string _dataStreamInfo  = "Data reading not initialized";
 
         public DVBTDriverManager()
         {
             Configuration = new DVBTTelevizorConfiguration();
 
             _log = new BasicLoggingService(LoggingLevelEnum.Debug);
+        }
+
+        public string DataStreamInfo
+        {
+            get
+            {
+                lock (_infoLock)
+                {
+                    return _dataStreamInfo;
+                }
+            }
+            set
+            {
+                lock (_infoLock)
+                {
+                    _dataStreamInfo = value;
+                }
+            }
         }
 
         public void Start()
@@ -68,7 +89,7 @@ namespace DVBTTelevizor
             lock (_recordLock)
             {
                 _recording = true;
-            }            
+            }
         }
 
         public void StopRecording()
@@ -102,7 +123,7 @@ namespace DVBTTelevizor
                         {
                             _log.Debug("Reading from stream ...");
 
-                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize); 
+                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize);
                             _log.Debug($"Reading from stream completed, bytes read: {readByteCount} ...");
 
                             if (readByteCount > 0)
@@ -144,7 +165,12 @@ namespace DVBTTelevizor
                     return new DVBTResponse() { SuccessFlag = false };
                 }
 
-                var response = new DVBTResponse() { SuccessFlag = true };
+                var response = new DVBTResponse()
+                {
+                    SuccessFlag = true,
+                    RequestTime = startTime,
+                    ResponseTime = DateTime.Now
+                };
                 response.Bytes.AddRange(_responseBuffer);
                 return response;
             });
@@ -154,54 +180,107 @@ namespace DVBTTelevizor
         {
             try
             {
+                DataStreamInfo = "Reading data started ...";
+
                 byte[] buffer = new byte[1000000];
                 var bufferSize = 2048;
                 FileStream fs = null;
                 bool rec = false;
-    
+                string fName = null;
+
+                DateTime lastBitRateMeasureStartTime = DateTime.Now;
+                long bytesReadFromLastMeasureStartTime = 0;
+                string lastSpeed = "";
+
                 do
                 {
-                        lock (_recordLock)
+                    lock (_recordLock)
+                    {
+                        // reading synchronized
+                        rec = _recording;
+                    }
+
+                    string status = "Reading";
+                    if (rec)
+                    {
+                        status += " and recording";
+                        if (fs != null)
                         {
-                            // reading synchronized
-                            rec = _recording;
+                            status += $" ({fName})";
                         }
+                    }
 
-                        if (_transferClient.Available > 0)
+                    if (_transferClient.Available > 0)
+                    {
+                        var bytesRead = _recordStream.Read(buffer, 0, bufferSize);
+                        bytesReadFromLastMeasureStartTime += bytesRead;
+
+                        _log.Debug($"Bytes read: {bytesRead} ...");
+
+                        if (rec)
                         {
-                            _log.Debug($"worker_DoWork : bytes to read: {_transferClient.Available} ...");
-
-                            var bytesRead = _recordStream.Read(buffer, 0, bufferSize);
-
-                            _log.Debug($"worker_DoWork : bytes read: {bytesRead} ...");
-
-                            if (rec)
+                            if (fs == null)
                             {
-                                if (fs == null)
-                                {
-                                    var fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-DVBT-raw-stream.ts";
-                                    fs = new FileStream(fName, FileMode.Create, FileAccess.Write);                                    
-                                }
-
-                                fs.Write(buffer, 0, bytesRead);
+                                fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-DVBT-raw-stream.ts";
+                                fs = new FileStream(fName, FileMode.Create, FileAccess.Write);
                             }
-                            
-                            _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                        } else
-                        {
-                            _log.Debug($"worker_DoWork : no data on transfer port...");
+
+                            fs.Write(buffer, 0, bytesRead);
                         }
 
-                        if (!rec && fs != null)
-                        {
-                            fs.Flush();
-                            fs.Close();
-                            fs = null;
-                        }
+                         _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                    } else
+                    {
+                        _log.Debug($"No data on transfer port...");
+
+                        status += " (no data)";
 
                         System.Threading.Thread.Sleep(200);
                     }
-                    while (_transferClient.Connected);                
+
+                    if (!rec && fs != null)
+                    {
+                        fs.Flush();
+                        fs.Close();
+                        fs = null;
+                    }
+
+                    // calculating speed:
+                    var totalSeconds = (DateTime.Now - lastBitRateMeasureStartTime).TotalSeconds;
+                    if (totalSeconds > 2)
+                    {
+                        var bytesPerSec = bytesReadFromLastMeasureStartTime*8 / totalSeconds;
+                        string speed;
+                        if (bytesPerSec < 1000)
+                        {
+                            speed = $", {bytesPerSec} b/sec";
+                        } else
+                        {
+                            speed = $", {Convert.ToInt32(bytesPerSec/1000.0)} Kb/sec";
+                        }
+
+                        status += speed;
+
+                        if (totalSeconds>3)
+                        {
+                            lastSpeed = speed;
+                            lastBitRateMeasureStartTime = DateTime.Now;
+                        }
+                    } else
+                    {
+                        if (lastSpeed != String.Empty)
+                        {
+                            status += lastSpeed;
+                        }
+                        else
+                        {
+                            status += ", 0 b/sec";
+                        }
+                    }
+
+                    DataStreamInfo = status;
+                }
+                while (_transferClient.Connected);
 
             }
             catch (Exception ex)
@@ -209,7 +288,8 @@ namespace DVBTTelevizor
                 _log.Error(ex, "Error while reading from TransferPort");
             }
 
-            _log.Debug($"record background worker finished");
+            _log.Debug($"Reading data finished");
+            DataStreamInfo = "Reading data finished";
         }
 
         public DVBTTelevizorConfiguration Configuration
@@ -252,6 +332,8 @@ namespace DVBTTelevizor
             var longsCountInResponse = response.Bytes[1];
 
             status.ParseFromByteArray(response.Bytes.ToArray(), 2);
+            status.RequestTime = response.RequestTime;
+            status.ResponseTime = response.ResponseTime;
 
             return status;
         }
@@ -276,6 +358,9 @@ namespace DVBTTelevizor
             version.SuccessFlag = DVBTStatus.GetBigEndianLongFromByteArray(ar, 2) == 1;
             version.Version = DVBTStatus.GetBigEndianLongFromByteArray(ar, 10);
             version.AllRequestsLength = DVBTStatus.GetBigEndianLongFromByteArray(ar, 18);
+
+            version.RequestTime = response.RequestTime;
+            version.ResponseTime = response.ResponseTime;
 
             return version;
         }
@@ -305,7 +390,12 @@ namespace DVBTTelevizor
 
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
 
-            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
+            return new DVBTResponse()
+            {
+                SuccessFlag = successFlag == 1,
+                RequestTime = response.RequestTime,
+                ResponseTime = response.ResponseTime
+            };
         }
 
         public async Task<DVBTResponse> SendCloseConnection()
@@ -319,7 +409,12 @@ namespace DVBTTelevizor
             var longsCountInResponse = response.Bytes[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
 
-            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
+            return new DVBTResponse()
+            {
+                SuccessFlag = successFlag == 1,
+                RequestTime = response.RequestTime,
+                ResponseTime = response.ResponseTime
+            };
         }
 
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)
@@ -333,7 +428,12 @@ namespace DVBTTelevizor
             var longsCountInResponse = response.Bytes[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
 
-            return new DVBTResponse() { SuccessFlag = successFlag == 1 };
+            return new DVBTResponse()
+            {
+                SuccessFlag = successFlag == 1,
+                RequestTime = response.RequestTime,
+                ResponseTime = response.ResponseTime
+            };
         }
 
         public async Task<DVBTCapabilities> GetCapabalities()
@@ -350,6 +450,9 @@ namespace DVBTTelevizor
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
 
             cap.ParseFromByteArray(response.Bytes.ToArray(), 2);
+
+            cap.RequestTime = response.RequestTime;
+            cap.ResponseTime = response.ResponseTime;
 
             return cap;
         }
