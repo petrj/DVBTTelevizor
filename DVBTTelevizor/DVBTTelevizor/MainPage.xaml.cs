@@ -12,6 +12,7 @@ using Xamarin.Forms;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.IO;
+using System.Threading;
 
 namespace DVBTTelevizor
 {
@@ -54,6 +55,26 @@ namespace DVBTTelevizor
 
                 _driver.Start();
             });
+
+
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                do
+                {
+                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                        new Action(
+                            delegate
+                            {
+                                DataStreamInfoLabel.Text = _driver.DataStreamInfo;
+                            }));
+
+                    // 2 secs delay
+                    Thread.Sleep(2 * 1000);
+
+                } while (true);
+            }).Start();
         }
 
         private void GetStatusButton_Clicked(object sender, EventArgs e)
@@ -155,13 +176,11 @@ namespace DVBTTelevizor
             {
                 try
                 {
-                    var res = _driver.SendCloseConnection();
-
                     await _driver.Stop();
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        StatusLabel.Text = Environment.NewLine + $"Stop result: {res}";
+                        StatusLabel.Text = Environment.NewLine + $"Stopped";
                     });
                 }
                 catch (Exception ex)

@@ -10,7 +10,6 @@
         <StackLayout>
             <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
 
-
             <Grid Margin="20,10,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50" />
@@ -26,20 +25,23 @@
             </Grid>
 
             <Label x:Name="PortsLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+            <Label x:Name="DataStreamInfoLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
 
             <Grid Margin="20,10,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="250" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="150" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="70*" />
                     <ColumnDefinition Width="30*" />
                 </Grid.ColumnDefinitions>
 
-                 <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"  x:Name="StatusLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
-                 <Button Grid.Row="0" Grid.Column="1" x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start"></Button>
-                <Button Grid.Row="1" Grid.Column="1" x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start"></Button>
-                <Button Grid.Row="2" Grid.Column="1" x:Name="GetCapButton" Text="Get cap." VerticalOptions="Start"></Button>
+                <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"  x:Name="StatusLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
+                <Button Grid.Row="0" Grid.Column="1" x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start" HeightRequest="70"></Button>
+                <Button Grid.Row="1" Grid.Column="1" x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start" HeightRequest="70"></Button>
+                <Button Grid.Row="2" Grid.Column="1" x:Name="GetCapButton" Text="Get cap." VerticalOptions="Start" HeightRequest="70"></Button>
             </Grid>
 
             <Label Text="Tune Settings" TextColor="Yellow" FontSize="Large"/>
@@ -49,7 +51,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70*" />
+                    <ColumnDefinition Width="40*" />
+                    <ColumnDefinition Width="30*" />
                     <ColumnDefinition Width="30*" />
                 </Grid.ColumnDefinitions>
 
@@ -70,7 +73,7 @@
                     </Picker.Items>
                 </Picker>
 
-                <Button Grid.Row="3" Grid.Column="1" x:Name="TuneButton" Text="Tune" />
+                <Button Grid.Row="2" Grid.Column="2" x:Name="TuneButton" Text="Tune" />
             </Grid>
 
             <Label Text="PIDs Settings" TextColor="Yellow" FontSize="Large"/>
@@ -90,22 +93,21 @@
                 <Button Grid.Row="1" Grid.Column="2" x:Name="SetPIDsButton" Text="Set PIDs" />
             </Grid>
 
-            <Button x:Name="PlayButton" Text="Play" VerticalOptions="Start"></Button>
-
             <Grid Margin="20,10,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="50" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70*" />
+                    <ColumnDefinition Width="40*" />
+                    <ColumnDefinition Width="30*" />
                     <ColumnDefinition Width="30*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="RecordButton" Text="Start Record" VerticalOptions="Start" />
-                <Button Grid.Row="0" Grid.Column="1"  x:Name="StopRecordButton" Text="Stop record" VerticalOptions="Start" />
+                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start" HeightRequest="70" />
+                <Button Grid.Row="0" Grid.Column="1"  x:Name="RecordButton" Text="Start Record" VerticalOptions="Start" HeightRequest="70" />
+                <Button Grid.Row="0" Grid.Column="2"  x:Name="StopRecordButton" Text="Stop record" VerticalOptions="Start" HeightRequest="70" />
 
             </Grid>
-
 
         </StackLayout>
     </ScrollView>
