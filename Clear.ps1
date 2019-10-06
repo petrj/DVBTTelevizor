@@ -6,7 +6,13 @@ foreach ($folder in `
         "DVBTTelevizor\DVBTTelevizor\bin",
         "DVBTTelevizor\DVBTTelevizor\obj",
         "DVBTTelevizor\DVBTTelevizor.Android\bin",
-        "DVBTTelevizor\DVBTTelevizor.Android\obj"
+        "DVBTTelevizor\DVBTTelevizor.Android\obj",
+		"LoggerService\bin",
+		"LoggerService\obj",
+		"MPEGTS\bin",
+		"MPEGTS\obj",
+		"MPEGTSConsole\bin",
+		"MPEGTSConsole\obj"
      ))
 {
     $fullPath = [System.IO.Path]::Combine($scriptPath,$folder)
