@@ -4,25 +4,13 @@ using System.Collections.Generic;
 namespace MPEGTS
 {
     // https://www.etsi.org/deliver/etsi_en/300400_300499/300468/01.03.01_60/en_300468v010301p.pdf
-    // page 20 
+    // page 20
     // page 53 - Service Descriptor
 
-    public class SDTTableHeader
+    public class SDTTable : TableHeader
     {
-        public byte ID { get; set; }
-        public bool SectionSyntaxIndicator { get; set; }
-        public bool Private { get; set; }
-        public byte Reserved { get; set; }
-        public byte UnusuedLengthBits { get; set; }
-
         public int TableIdExt { get; set; }
         public byte ReservedExt { get; set; }
-        public byte Version { get; set; }
-        public bool CurrentIndicator { get; set; }
-        public byte SectionNumber { get; set; }
-        public byte LastSectionNumber { get; set; }
-
-        public int NetworkID { get; set; }
 
         public int ServiceId { get; set; }
 
@@ -32,8 +20,6 @@ namespace MPEGTS
         public List<ServiceDescriptor> ServiceDescriptors { get; set; } = new List<ServiceDescriptor>();
 
 
-        public int Length;
-
         public List<byte> TableData = new List<byte>();
 
         public void WriteToConsole()
@@ -42,8 +28,7 @@ namespace MPEGTS
             Console.WriteLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
             Console.WriteLine($"Private               : {Private}");
             Console.WriteLine($"Reserved              : {Reserved}");
-            Console.WriteLine($"UnusuedLengthBits     : {UnusuedLengthBits}");
-            Console.WriteLine($"Length                : {Length}");
+            Console.WriteLine($"SectionLength         : {SectionLength}");
 
             if (SectionSyntaxIndicator)
             {
@@ -62,7 +47,7 @@ namespace MPEGTS
             foreach (var desc in ServiceDescriptors)
             {
                 Console.WriteLine($"");
-                Console.WriteLine($"Service descriptor"); 
+                Console.WriteLine($"Service descriptor");
                 Console.WriteLine($"__________________");
                 Console.WriteLine($"Tag           : {desc.Tag}");
                 Console.WriteLine($"Length        : {desc.Length}");
@@ -72,12 +57,12 @@ namespace MPEGTS
             }
         }
 
-        public static SDTTableHeader Parse(List<byte> bytes)
+        public static SDTTable Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
                 return null;
 
-            var res = new SDTTableHeader();
+            var res = new SDTTable();
 
             var pointerFiled = bytes[0];
             var pos = 1 + pointerFiled;
@@ -87,16 +72,14 @@ namespace MPEGTS
 
             res.ID = bytes[pos];
 
-            // read next 2 bytes 
+            // read next 2 bytes
             var tableHeader1 = bytes[pos + 1];
             var tableHeader2 = bytes[pos + 2];
 
             res.SectionSyntaxIndicator = ((tableHeader1 & 128)==128);
             res.Private = ((tableHeader1 & 64) == 64);
             res.Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
-            res.UnusuedLengthBits = Convert.ToByte((tableHeader1 & 12) >> 2);
-
-            res.Length = Convert.ToInt32( ((tableHeader1 & 3) >> 8) + tableHeader2);
+            res.SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
 
             pos = pos + 3;
 
@@ -104,7 +87,7 @@ namespace MPEGTS
             {
                 if (bytes.Count < pos + 4)
                     return null;
-                
+
                 var tableIdExt0 = bytes[pos];
                 var tableIdExt1 = bytes[pos+1];
                 var tableIdExt2 = bytes[pos + 2];
@@ -136,7 +119,7 @@ namespace MPEGTS
             // reading descriptors
             while (pos+4<bytes.Count)
             {
-                // 4 bytes 
+                // 4 bytes
                 if (bytes.Count < pos + 4)
                     break;
 
@@ -173,10 +156,10 @@ namespace MPEGTS
                     sDescriptor.ServiceName += Convert.ToChar(bytes[pos + i]);
                 }
 
-                pos = pos + sDescriptor.ServiceNameLength + 5; 
+                pos = pos + sDescriptor.ServiceNameLength + 5;
 
                 res.ServiceDescriptors.Add(sDescriptor);
-               
+
             }
 
             return res;

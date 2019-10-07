@@ -52,7 +52,7 @@ namespace MPEGTS
                 }
                 c++;
 
-                if (c>10)
+                if (c>=10)
                 {
                     Console.WriteLine(sb.ToString());
                     Console.WriteLine(sbc.ToString());
@@ -124,7 +124,7 @@ namespace MPEGTS
                         TransportPriority = (b & 32) == 32;
                         pidFirstByte = b;
                         break;
-                    case 2:                       
+                    case 2:
 
                         var pidFirst5Bits = (pidFirstByte & 31) << 8;
                         PID = pidFirst5Bits + b;

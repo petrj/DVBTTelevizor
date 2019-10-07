@@ -41,15 +41,21 @@ namespace MPEGTSConsole
                 pid17PacketsPayLoad.AddRange(pid17Packet.Payload);
             }
 
-            var psiTAbleHeader = SDTTableHeader.Parse(pid17PacketsPayLoad);
+            var psiTAbleHeader = SDTTable.Parse(pid17PacketsPayLoad);
             psiTAbleHeader.WriteToConsole();
 
 
             var pid16Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 16);
+            var pid16PacketsPayLoad = new List<byte>();
+
             foreach (var pid16Packet in pid16Packets)
             {
                 pid16Packet.WriteToConsole();
+                pid16PacketsPayLoad.AddRange(pid16Packet.Payload);
             }
+
+            var niTable = NITTable.Parse(pid16PacketsPayLoad);
+            niTable.WriteToConsole();
 
             //Console.ReadLine();
         }
