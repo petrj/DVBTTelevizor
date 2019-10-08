@@ -32,8 +32,6 @@ namespace MPEGTSConsole
             var packets = MPEGTransportStreamPacket.Parse(streamBytes);
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
 
-            Console.WriteLine($"id17Packets: {pid17Packets.Count}");
-
             var pid17PacketsPayLoad = new List<byte>();
             foreach (var pid17Packet in pid17Packets)
             {
@@ -56,6 +54,21 @@ namespace MPEGTSConsole
 
             var niTable = NITTable.Parse(pid16PacketsPayLoad);
             niTable.WriteToConsole();
+
+
+            var pid0Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 0);
+
+            Console.WriteLine($"id0Packets: {pid0Packets.Count}");
+
+            var pid0PacketsPayLoad = new List<byte>();
+            foreach (var pid0Packet in pid0Packets)
+            {
+                pid0Packet.WriteToConsole();
+                pid0PacketsPayLoad.AddRange(pid0Packet.Payload);
+            }
+
+            var psiTable = PSITable.Parse(pid0PacketsPayLoad);
+            psiTable.WriteToConsole();
 
             //Console.ReadLine();
         }
