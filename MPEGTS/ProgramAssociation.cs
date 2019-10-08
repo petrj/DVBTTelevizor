@@ -7,6 +7,6 @@ namespace MPEGTS
     public class ProgramAssociation
     {
         public int ProgramNumber { get;set; }
-        public int ProgramPID { get; set; }
+        public int ProgramMapPID { get; set; }
     }
 }

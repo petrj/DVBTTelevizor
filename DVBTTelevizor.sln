@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MPEGTS", "MPEGTS\MPEGTS.csproj", "{21353C2B-4A82-431A-B1C5-CA57E87685EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPEGTSConsole", "MPEGTSConsole\MPEGTSConsole.csproj", "{BCCA7246-2298-40BC-8E9A-CF5CDEBA0004}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPEGTSTest", "MPEGTSTest\MPEGTSTest.csproj", "{C1EFCBA5-B520-4DC0-841E-7F78E2404E8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,10 +46,10 @@ Global
 		{21353C2B-4A82-431A-B1C5-CA57E87685EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21353C2B-4A82-431A-B1C5-CA57E87685EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21353C2B-4A82-431A-B1C5-CA57E87685EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCCA7246-2298-40BC-8E9A-CF5CDEBA0004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCCA7246-2298-40BC-8E9A-CF5CDEBA0004}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCCA7246-2298-40BC-8E9A-CF5CDEBA0004}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCCA7246-2298-40BC-8E9A-CF5CDEBA0004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1EFCBA5-B520-4DC0-841E-7F78E2404E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1EFCBA5-B520-4DC0-841E-7F78E2404E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1EFCBA5-B520-4DC0-841E-7F78E2404E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1EFCBA5-B520-4DC0-841E-7F78E2404E8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

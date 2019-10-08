@@ -6,6 +6,13 @@ namespace MPEGTS
 {
     public class NITTable : TableHeader
     {
+        public string NetworkName { get; set; }
+
+        public int TransportStreamId { get; set; }
+        public int OriginalNetworkId { get; set; }
+        public int ServiceId { get; set; }
+        public byte LinkageType { get; set; }
+
         public static NITTable Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
@@ -57,14 +64,20 @@ namespace MPEGTS
                 var descriptorTag = bytes[pos + 0];
                 var descriptorLength = bytes[pos + 1];
 
-                Console.WriteLine($"Found descriptor: {descriptorTag}");
-                Console.WriteLine($"          length: {descriptorLength}");
-                Console.WriteLine($"        position: {pos+2}");
-                Console.WriteLine($"------------------------------------");
+                if (descriptorTag == 64)
+                {
+                    // 64 (dec) 40 (hex) - network_name_descriptor
+                    res.NetworkName = GetStringFromByteArray(bytes.ToArray(), pos + 2, descriptorLength);
+                }
 
-                // TODO: read descriptors of given descriptorTag
-                // 74 (dec) 4A (hex)
-                // 64 (dec) 40 (hex)
+                if (descriptorTag == 74)
+                {
+                    // 74 (dec) 4A (hex) - linkage_descriptor
+                    res.TransportStreamId = Convert.ToInt32(((bytes[pos + 2]) << 8) + bytes[pos + 3]);
+                    res.OriginalNetworkId = Convert.ToInt32(((bytes[pos + 4]) << 8) + bytes[pos + 5]);
+                    res.ServiceId = Convert.ToInt32(((bytes[pos + 6]) << 8) + bytes[pos + 7]);
+                    res.LinkageType = bytes[pos + 8];
+                }
 
                 pos += descriptorLength + 2;
             }
@@ -96,8 +109,8 @@ namespace MPEGTS
                     Console.WriteLine($"------------------------------------");
 
                     // TODO: read descriptors of given descriptorTag
-                    // 90 (dec) 5A (hex)
-                    // 98 (dec) 62 (hex)
+                    // 90 (dec) 5A (hex)  - terrestrial_delivery_system_descriptor
+                    // 98 (dec) 62 (hex) - frequency_list_descriptor
 
                     pos += descriptorLength + 2;
                 }
@@ -121,6 +134,14 @@ namespace MPEGTS
                 Console.WriteLine($"SectionNumber          : {SectionNumber}");
                 Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
             }
+
+            Console.WriteLine($"NetworkName            : {NetworkName}");
+
+            Console.WriteLine($"TransportStreamId      : {TransportStreamId}");
+            Console.WriteLine($"OriginalNetworkId      : {OriginalNetworkId}");
+            Console.WriteLine($"ServiceId              : {ServiceId}");
+            Console.WriteLine($"LinkageType            : {LinkageType}");
+
         }
     }
 }

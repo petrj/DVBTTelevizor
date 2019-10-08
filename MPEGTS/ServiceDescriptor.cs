@@ -13,6 +13,8 @@ namespace MPEGTS
 
         public string ProviderName { get; set; }
         public string ServiceName { get; set; }
+
+        public int Number { get; set; } = -1;
     }
 }
 

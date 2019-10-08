@@ -57,10 +57,17 @@ namespace MPEGTS
                 var programNum = Convert.ToInt32(((bytes[pos+0]) << 8) + (bytes[pos + 1]));
                 var programPID = Convert.ToInt32(((bytes[pos + 2] & 31) << 8) + (bytes[pos + 3]));
 
+                //Console.WriteLine($"0: {bytes[pos + 0]}");
+                //Console.WriteLine($"1: {bytes[pos + 1]}");
+                //Console.WriteLine($"2: {bytes[pos + 2]}");
+                //Console.WriteLine($"3: {bytes[pos + 3]}");
+
+                //Console.WriteLine($"Program test bits: {bytes[pos + 2]}");
+
                 res.ProgramAssociations.Add(new ProgramAssociation()
                 {
                     ProgramNumber = programNum,
-                    ProgramPID = programPID
+                    ProgramMapPID = programPID
                 });
 
                 pos +=4;
@@ -90,7 +97,7 @@ namespace MPEGTS
             {
                 Console.WriteLine($"Program:");
                 Console.WriteLine($"   Number: {programAssociations.ProgramNumber}");
-                Console.WriteLine($"   PID: {programAssociations.ProgramPID}");
+                Console.WriteLine($"   PID: {programAssociations.ProgramMapPID}");
                 Console.WriteLine($"------------------------------------");
             }
         }

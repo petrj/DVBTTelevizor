@@ -1,15 +1,15 @@
-﻿using MPEGTS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MPEGTS;
 
-namespace MPEGTSConsole
+namespace MPEGTSTest
 {
-    class Program
+    class MainClass
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var path = @"c:\temp\2019-10-04-17-52-02-DVBT-raw-stream_730Mhz_PID_16_17_00.ts";
+            var path = @"/temp/2019-10-04-17-52-02-DVBT-raw-stream_730Mhz_PID_16_17_00.ts";
 
             byte[] buffer = new byte[188];
             var streamBytes = new List<byte>();
@@ -31,6 +31,8 @@ namespace MPEGTSConsole
 
             var packets = MPEGTransportStreamPacket.Parse(streamBytes);
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
+
+            Console.WriteLine($"id17Packets: {pid17Packets.Count}");
 
             var pid17PacketsPayLoad = new List<byte>();
             foreach (var pid17Packet in pid17Packets)
@@ -55,7 +57,6 @@ namespace MPEGTSConsole
             var niTable = NITTable.Parse(pid16PacketsPayLoad);
             niTable.WriteToConsole();
 
-
             var pid0Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 0);
 
             Console.WriteLine($"id0Packets: {pid0Packets.Count}");
@@ -69,8 +70,6 @@ namespace MPEGTSConsole
 
             var psiTable = PSITable.Parse(pid0PacketsPayLoad);
             psiTable.WriteToConsole();
-
-            //Console.ReadLine();
         }
     }
 }
