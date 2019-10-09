@@ -9,7 +9,7 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = @"/temp/2019-10-04-17-52-02-DVBT-raw-stream_730Mhz_PID_16_17_00.ts";
+            var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_0.ts";
 
             byte[] buffer = new byte[188];
             var streamBytes = new List<byte>();
@@ -30,6 +30,18 @@ namespace MPEGTSTest
             }
 
             var packets = MPEGTransportStreamPacket.Parse(streamBytes);
+
+
+            var pid768Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
+            Console.WriteLine($"pid768Packets: {pid768Packets.Count}");
+
+            foreach (var p in pid768Packets)
+            {
+                p.WriteToConsole();
+            }
+
+
+            /*
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
 
             Console.WriteLine($"id17Packets: {pid17Packets.Count}");
@@ -70,6 +82,7 @@ namespace MPEGTSTest
 
             var psiTable = PSITable.Parse(pid0PacketsPayLoad);
             psiTable.WriteToConsole();
+            */
         }
     }
 }
