@@ -31,16 +31,9 @@ namespace MPEGTSTest
 
             var packets = MPEGTransportStreamPacket.Parse(streamBytes);
 
+            // step 1: reading packets with PID 0, 17 (16)
 
-            var pid768Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
-            Console.WriteLine($"pid768Packets: {pid768Packets.Count}");
-
-            foreach (var p in pid768Packets)
-            {
-                p.WriteToConsole();
-            }
-
-
+            // PID 17 ( SDT )
 
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
 
@@ -53,9 +46,10 @@ namespace MPEGTSTest
                 pid17PacketsPayLoad.AddRange(pid17Packet.Payload);
             }
 
-            var psiTAbleHeader = SDTTable.Parse(pid17PacketsPayLoad);
-            psiTAbleHeader.WriteToConsole();
+            var sDTTable = SDTTable.Parse(pid17PacketsPayLoad);
+            sDTTable.WriteToConsole();
 
+            // PID 16 ( NIT )
 
             var pid16Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 16);
             var pid16PacketsPayLoad = new List<byte>();
@@ -68,6 +62,8 @@ namespace MPEGTSTest
 
             var niTable = NITTable.Parse(pid16PacketsPayLoad);
             niTable.WriteToConsole();
+
+            // PID 0 ( PSI )
 
             var pid0Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 0);
 
@@ -83,6 +79,29 @@ namespace MPEGTSTest
             var psiTable = PSITable.Parse(pid0PacketsPayLoad);
             psiTable.WriteToConsole();
 
+            // step 2: find map PIDs from SDT a PSI
+
+            // list of services and PMT PIDs:
+
+            Console.WriteLine("----- Services ---------------");
+            var services = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sDTTable, psiTable);
+            foreach (var service in services)
+            {
+                Console.WriteLine($"Map PID  : {service.Value}");
+                Console.WriteLine($"Provider : {service.Key.ProviderName}");
+                Console.WriteLine($"Name     : {service.Key.ServiceName}");
+                Console.WriteLine("-------------------------");
+            }
+
+            // step 3: reading packets with PID 0, 17 (16) and map PID packet of given service
+
+            var pid768Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
+            Console.WriteLine($"pid768Packets: {pid768Packets.Count}");
+
+            foreach (var p in pid768Packets)
+            {
+                p.WriteToConsole();
+            }
 
             Console.WriteLine("Press Enter");
             Console.ReadLine();

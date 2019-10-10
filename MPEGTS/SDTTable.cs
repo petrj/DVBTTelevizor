@@ -54,7 +54,7 @@ namespace MPEGTS
                 Console.WriteLine($"ServisType    : {desc.ServisType}");
                 Console.WriteLine($"ProviderName  : {desc.ProviderName}");
                 Console.WriteLine($"ServiceName   : {desc.ServiceName}");
-                Console.WriteLine($"Number        : {desc.Number}");
+                Console.WriteLine($"ProgramNumber : {desc.ProgramNumber}");
             }
         }
 
@@ -158,7 +158,7 @@ namespace MPEGTS
                 }
 
                 var numPos = pos + sDescriptor.ServiceNameLength;
-                sDescriptor.Number = Convert.ToInt32(((bytes[numPos + 0]) << 8) + (bytes[numPos + 1]));
+                sDescriptor.ProgramNumber = Convert.ToInt32(((bytes[numPos + 0]) << 8) + (bytes[numPos + 1]));
 
                 pos = pos + sDescriptor.ServiceNameLength + 5;
 

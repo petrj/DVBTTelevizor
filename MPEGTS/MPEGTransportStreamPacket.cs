@@ -213,5 +213,24 @@ namespace MPEGTS
 
             return res;
         }
+
+        public static Dictionary<ServiceDescriptor, int> GetAvailableServicesMapPIDs(SDTTable sDTTable, PSITable pSITable)
+        {
+            var res = new Dictionary<ServiceDescriptor, int>();
+
+            foreach (var sdi in sDTTable.ServiceDescriptors)
+            {
+                foreach (var pr in pSITable.ProgramAssociations)
+                {
+                    if (pr.ProgramNumber == sdi.ProgramNumber)
+                    {
+                        res.Add(sdi, pr.ProgramMapPID);
+                        break;
+                    }
+                }
+            }
+
+            return res;
+        }
     }
 }
