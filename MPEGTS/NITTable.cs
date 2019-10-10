@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MPEGTS
 {
-    public class NITTable : TableHeader
+    public class NITTable : DVBTTable
     {
         public string NetworkName { get; set; }
 

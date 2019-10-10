@@ -1,23 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MPEGTS
 {
-    // https://en.wikipedia.org/wiki/Program-specific_information#PAT_(Program_association_specific_data)
-
-    public class PSITable : DVBTTable
+    public class PMTTable : DVBTTable
     {
-        public int TableIdExt { get; set; }
+        public PMTTable()
+        {
+        }
 
-        public List<ProgramAssociation> ProgramAssociations { get; set; } = new List<ProgramAssociation>();
-
-        public static PSITable Parse(List<byte> bytes)
+        public static PMTTable Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
                 return null;
 
-            var res = new PSITable();
+            var res = new PMTTable();
 
             var pointerFiled = bytes[0];
             var pos = 1 + pointerFiled;
@@ -38,9 +35,7 @@ namespace MPEGTS
 
             pos = pos + 3;
 
-            var posAfterTable = pos + res.SectionLength;
-
-            res.TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
+            res.TableIDExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
             pos = pos + 2;
 
@@ -52,26 +47,16 @@ namespace MPEGTS
 
             pos = pos + 3;
 
-            while (pos< posAfterTable)
-            {
-                var programNum = Convert.ToInt32(((bytes[pos+0]) << 8) + (bytes[pos + 1]));
-                var programPID = Convert.ToInt32(((bytes[pos + 2] & 31) << 8) + (bytes[pos + 3]));
+            // reserved bits, PCR PID
 
-                //Console.WriteLine($"0: {bytes[pos + 0]}");
-                //Console.WriteLine($"1: {bytes[pos + 1]}");
-                //Console.WriteLine($"2: {bytes[pos + 2]}");
-                //Console.WriteLine($"3: {bytes[pos + 3]}");
+            pos = pos + 2;
 
-                //Console.WriteLine($"Program test bits: {bytes[pos + 2]}");
+            var programInfoLength = Convert.ToInt32(((bytes[pos+0] & 3) << 8) + bytes[pos + 1]);
 
-                res.ProgramAssociations.Add(new ProgramAssociation()
-                {
-                    ProgramNumber = programNum,
-                    ProgramMapPID = programPID
-                });
+            pos = pos + 2;
 
-                pos +=4;
-            }
+            Console.WriteLine($"pos 0 byte: {bytes[pos + 0]}");
+            Console.WriteLine($"pos 1 byte: {bytes[pos + 1]}");
 
             return res;
         }
@@ -86,20 +71,12 @@ namespace MPEGTS
 
             if (SectionSyntaxIndicator)
             {
-                Console.WriteLine($"TableIdExt             : {TableIdExt}");
                 Console.WriteLine($"Version                : {Version}");
                 Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
                 Console.WriteLine($"SectionNumber          : {SectionNumber}");
                 Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
-            }
+            }         
 
-            foreach (var programAssociations in ProgramAssociations)
-            {
-                Console.WriteLine($"Program:");
-                Console.WriteLine($"   Number: {programAssociations.ProgramNumber}");
-                Console.WriteLine($"   PID: {programAssociations.ProgramMapPID}");
-                Console.WriteLine($"------------------------------------");
-            }
         }
     }
 }

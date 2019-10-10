@@ -7,7 +7,7 @@ namespace MPEGTS
     // page 20
     // page 53 - Service Descriptor
 
-    public class SDTTable : TableHeader
+    public class SDTTable : DVBTTable
     {
         public int TableIdExt { get; set; }
         public byte ReservedExt { get; set; }

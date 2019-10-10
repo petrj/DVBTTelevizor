@@ -9,15 +9,30 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_0.ts";
+            var path = "TestData" + Path.DirectorySeparatorChar + "PID_1024_16_17_0.ts";
 
+            //AnalyzeTSPackets(path);
+            var packets = MPEGTransportStreamPacket.Parse(LoadBytesFromFile(path));
+            var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 1024);
+           
+            foreach (var packet in pmtPackets)
+            {
+                packet.WriteToConsole();
+                var mptPacket = PMTTable.Parse(packet.Payload);
+                mptPacket.WriteToConsole();
+            }
+
+            //Console.WriteLine("Press Enter");
+            //Console.ReadLine();
+        }
+
+        public static List<byte> LoadBytesFromFile(string path)
+        {
             byte[] buffer = new byte[188];
             var streamBytes = new List<byte>();
 
             using (var fs = new FileStream(path, FileMode.Open))
-            {
-                var header = new MPEGTransportStreamPacket();
-
+            {               
                 // testing finding sync byte:
                 //fs.Read(buffer, 0, 12);
 
@@ -29,7 +44,13 @@ namespace MPEGTSTest
                 fs.Close();
             }
 
-            var packets = MPEGTransportStreamPacket.Parse(streamBytes);
+            return streamBytes;
+        }
+
+        public static void AnalyzeTSPackets(string path)
+        {        
+            var bytes = LoadBytesFromFile(path);         
+            var packets = MPEGTransportStreamPacket.Parse(bytes);
 
             // step 1: reading packets with PID 0, 17 (16)
 
@@ -90,7 +111,7 @@ namespace MPEGTSTest
                 Console.WriteLine($"Map PID  : {service.Value}");
                 Console.WriteLine($"Provider : {service.Key.ProviderName}");
                 Console.WriteLine($"Name     : {service.Key.ServiceName}");
-                Console.WriteLine("-------------------------");
+                Console.WriteLine("--------------------------------------------------");
             }
 
             // step 3: reading packets with PID 0, 17 (16) and map PID packet of given service
@@ -103,8 +124,17 @@ namespace MPEGTSTest
                 p.WriteToConsole();
             }
 
-            Console.WriteLine("Press Enter");
-            Console.ReadLine();
+            var pids = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sDTTable, psiTable);
+            Console.WriteLine("Map PIDs list:");
+            Console.WriteLine("--------------------------------------------------");
+            foreach (var p in pids)
+            {
+                Console.WriteLine($"PID            : {p.Value}");
+                Console.WriteLine($"Service Name   : {p.Key.ServiceName}");
+                Console.WriteLine($"Program Number : {p.Key.ProgramNumber}");
+                Console.WriteLine($"Provider       : {p.Key.ProviderName}");
+                Console.WriteLine("--------------------------------------------------");
+            }
         }
     }
 }
