@@ -37,33 +37,40 @@ namespace MPEGTS
 
             var sb = new StringBuilder();
             var sbc = new StringBuilder();
+            var sbb = new StringBuilder();
             int c = 0;
             int row = 0;
+
             for (var i=0;i<Payload.Count;i++)
             {
-                sb.Append($"{Payload[i].ToString(),3} ");
+                sbb.Append($"{Convert.ToString(Payload[i], 2).PadLeft(8, '0'),9} ");
+                sb.Append($"{Payload[i].ToString(), 9} ");
+
 
                 if (Payload[i] >= 32 && Payload[i] <= 128)
                 {
-                    sbc.Append($"{Convert.ToChar(Payload[i]),3} ");
+                    sbc.Append($"{Convert.ToChar(Payload[i]), 9} ");
                 } else
                 {
-                    sbc.Append($"{"",3} ");
+                    sbc.Append($"{"",9} ");
                 }
                 c++;
 
                 if (c>=10)
                 {
+                    Console.WriteLine(sbb.ToString());
                     Console.WriteLine(sb.ToString());
                     Console.WriteLine(sbc.ToString());
                     Console.WriteLine();
                     sb.Clear();
+                    sbb.Clear();
                     sbc.Clear();
 
                     c = 0;
                     row++;
                 }
             }
+            Console.WriteLine(sbb.ToString());
             Console.WriteLine(sb.ToString());
             Console.WriteLine(sbc.ToString());
             Console.WriteLine();

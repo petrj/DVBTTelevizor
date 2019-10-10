@@ -41,7 +41,7 @@ namespace MPEGTSTest
             }
 
 
-            /*
+
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
 
             Console.WriteLine($"id17Packets: {pid17Packets.Count}");
@@ -82,7 +82,10 @@ namespace MPEGTSTest
 
             var psiTable = PSITable.Parse(pid0PacketsPayLoad);
             psiTable.WriteToConsole();
-            */
+
+
+            Console.WriteLine("Press Enter");
+            Console.ReadLine();
         }
     }
 }
