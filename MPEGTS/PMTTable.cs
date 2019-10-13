@@ -5,9 +5,7 @@ namespace MPEGTS
 {
     public class PMTTable : DVBTTable
     {
-        public PMTTable()
-        {
-        }
+        public List<ElementaryStreamSpecificData> Streams { get; set; } = new List<ElementaryStreamSpecificData>();
 
         public static PMTTable Parse(List<byte> bytes)
         {
@@ -55,8 +53,24 @@ namespace MPEGTS
 
             pos = pos + 2;
 
-            Console.WriteLine($"pos 0 byte: {bytes[pos + 0]}");
-            Console.WriteLine($"pos 1 byte: {bytes[pos + 1]}");
+            // skipping program info
+            pos += programInfoLength;
+
+            // 2 (pointer and Table Id) + 2 (Section Length) + length  - CRC - Program Info Length
+            var posAfterElementaryStreamSpecificData = 4 + res.SectionLength - 4 - programInfoLength;  
+
+            while (pos < posAfterElementaryStreamSpecificData)
+            {
+                // reading elementary stream info data until end of section
+                var stream = new ElementaryStreamSpecificData();
+                stream.StreamType = bytes[pos + 0];
+                stream.PID = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
+                stream.ESInfoLength = Convert.ToInt32(((bytes[pos + 3] & 15) << 8) + bytes[pos + 4]);
+
+                res.Streams.Add(stream);
+
+                pos += 5 + stream.ESInfoLength;
+            }
 
             return res;
         }
@@ -75,8 +89,16 @@ namespace MPEGTS
                 Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
                 Console.WriteLine($"SectionNumber          : {SectionNumber}");
                 Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
-            }         
+            }
 
+
+            Console.WriteLine($"---- Stream:-----------------------");
+            foreach (var stream in Streams)
+            {
+                Console.WriteLine($"PID                    : {stream.PID}");
+                Console.WriteLine($"StreamType (byte)      : {stream.StreamType}");
+                Console.WriteLine($"-----------------------------------");
+            }
         }
     }
 }

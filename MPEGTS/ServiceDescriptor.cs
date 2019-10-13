@@ -5,7 +5,7 @@ namespace MPEGTS
     public class ServiceDescriptor
     {
         public byte Tag { get; set; }
-        public byte Length { get; set; }
+        public int Length { get; set; }
         public byte ServisType { get; set; }
 
         public byte ProviderNameLength { get; set; }

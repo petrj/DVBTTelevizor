@@ -5,6 +5,7 @@ namespace MPEGTS
 {
     // https://www.etsi.org/deliver/etsi_en/300400_300499/300468/01.03.01_60/en_300468v010301p.pdf
     // page 20
+    // page 27
     // page 53 - Service Descriptor
 
     public class SDTTable : DVBTTable
@@ -73,14 +74,10 @@ namespace MPEGTS
 
             res.ID = bytes[pos];
 
-            // read next 2 bytes
-            var tableHeader1 = bytes[pos + 1];
-            var tableHeader2 = bytes[pos + 2];
-
-            res.SectionSyntaxIndicator = ((tableHeader1 & 128)==128);
-            res.Private = ((tableHeader1 & 64) == 64);
-            res.Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
-            res.SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
+            res.SectionSyntaxIndicator = ((bytes[pos + 1] & 128)==128);
+            res.Private = ((bytes[pos + 1] & 64) == 64);
+            res.Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);
+            res.SectionLength = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
 
             pos = pos + 3;
 
@@ -89,14 +86,10 @@ namespace MPEGTS
                 if (bytes.Count < pos + 4)
                     return null;
 
-                var tableIdExt0 = bytes[pos];
-                var tableIdExt1 = bytes[pos+1];
-                var tableIdExt2 = bytes[pos + 2];
-
-                res.TableIdExt = (tableIdExt0 << 8) + tableIdExt1;
-                res.ReservedExt = Convert.ToByte((tableIdExt2 & 192) >> 6);
-                res.Version = Convert.ToByte((tableIdExt2 & 62) >> 1);
-                res.CurrentIndicator = (tableIdExt2 & 1) == 1;
+                res.TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
+                res.ReservedExt = Convert.ToByte((bytes[pos + 2] & 192) >> 6);
+                res.Version = Convert.ToByte((bytes[pos + 2] & 62) >> 1);
+                res.CurrentIndicator = (bytes[pos + 2] & 1) == 1;
                 res.SectionNumber = bytes[pos + 3];
                 res.LastSectionNumber = bytes[pos + 4];
 
@@ -106,27 +99,27 @@ namespace MPEGTS
             if (bytes.Count < pos + 7)
                 return null;
 
-            res.NetworkID = (bytes[pos] << 8) + bytes[pos + 1];
+            res.NetworkID = (bytes[pos+0] << 8) + bytes[pos + 1];
             res.ServiceId = (bytes[pos+3] << 8) + bytes[pos + 4];
 
-            res.RunningStatus = Convert.ToByte((bytes[pos + 6] & 224) >> 5);
-            res.DescriptorsLoopLength = ((bytes[pos + 6] & 15)   << 8) + bytes[pos + 7];
-
-            pos = pos + 8;
-
-            if (bytes.Count < pos + 4)
-                return null;
+            pos += 3;
+                // pointer + table id + sect.length + descriptors - crc
+            var posAfterDescriptors = 4 + res.SectionLength - 4;
 
             // reading descriptors
-            while (pos+4<bytes.Count)
+            while (pos< posAfterDescriptors)
             {
-                // 4 bytes
-                if (bytes.Count < pos + 4)
-                    break;
-
                 var sDescriptor = new ServiceDescriptor();
+                sDescriptor.ProgramNumber = ((bytes[pos + 0]) << 8) + bytes[pos + 1];
+
+                pos += 3;
+
+                sDescriptor.Length = ((bytes[pos + 0] & 7) << 8) + bytes[pos + 1];
+
+                pos += 2;
+
                 sDescriptor.Tag = bytes[pos + 0];
-                sDescriptor.Length = bytes[pos + 1];
+
                 sDescriptor.ServisType = bytes[pos + 2];
                 sDescriptor.ProviderNameLength = bytes[pos + 3];
 
@@ -160,7 +153,7 @@ namespace MPEGTS
                 var numPos = pos + sDescriptor.ServiceNameLength;
                 sDescriptor.ProgramNumber = Convert.ToInt32(((bytes[numPos + 0]) << 8) + (bytes[numPos + 1]));
 
-                pos = pos + sDescriptor.ServiceNameLength + 5;
+                pos = pos + sDescriptor.ServiceNameLength;
 
                 res.ServiceDescriptors.Add(sDescriptor);
 

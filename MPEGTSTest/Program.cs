@@ -9,9 +9,13 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = "TestData" + Path.DirectorySeparatorChar + "PID_1024_16_17_0.ts";
+            var path = "TestData" + Path.DirectorySeparatorChar + "PID_16_17_00.ts";
 
-            //AnalyzeTSPackets(path);
+            AnalyzeMPEGTS(path);
+
+            path = "TestData" + Path.DirectorySeparatorChar + "PID_1024_16_17_00.ts";
+
+
             var packets = MPEGTransportStreamPacket.Parse(LoadBytesFromFile(path));
             var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 1024);
            
@@ -47,7 +51,7 @@ namespace MPEGTSTest
             return streamBytes;
         }
 
-        public static void AnalyzeTSPackets(string path)
+        public static void AnalyzeMPEGTS(string path)
         {        
             var bytes = LoadBytesFromFile(path);         
             var packets = MPEGTransportStreamPacket.Parse(bytes);
@@ -58,7 +62,7 @@ namespace MPEGTSTest
 
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
 
-            Console.WriteLine($"id17Packets: {pid17Packets.Count}");
+            Console.WriteLine($"SDT (PID 17) packets found: {pid17Packets.Count}");
 
             var pid17PacketsPayLoad = new List<byte>();
             foreach (var pid17Packet in pid17Packets)
@@ -75,6 +79,8 @@ namespace MPEGTSTest
             var pid16Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 16);
             var pid16PacketsPayLoad = new List<byte>();
 
+            Console.WriteLine($"NIT (PID 16) packets found: {pid16Packets.Count}");
+
             foreach (var pid16Packet in pid16Packets)
             {
                 pid16Packet.WriteToConsole();
@@ -88,7 +94,7 @@ namespace MPEGTSTest
 
             var pid0Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 0);
 
-            Console.WriteLine($"id0Packets: {pid0Packets.Count}");
+            Console.WriteLine($"PSI (PID 0) packets found: {pid0Packets.Count}");
 
             var pid0PacketsPayLoad = new List<byte>();
             foreach (var pid0Packet in pid0Packets)
