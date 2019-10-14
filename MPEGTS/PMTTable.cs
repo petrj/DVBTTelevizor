@@ -57,7 +57,7 @@ namespace MPEGTS
             pos += programInfoLength;
 
             // 2 (pointer and Table Id) + 2 (Section Length) + length  - CRC - Program Info Length
-            var posAfterElementaryStreamSpecificData = 4 + res.SectionLength - 4 - programInfoLength;  
+            var posAfterElementaryStreamSpecificData = 4 + res.SectionLength - 4 - programInfoLength;
 
             while (pos < posAfterElementaryStreamSpecificData)
             {
@@ -69,7 +69,14 @@ namespace MPEGTS
 
                 res.Streams.Add(stream);
 
-                pos += 5 + stream.ESInfoLength;
+                pos += 5;
+
+                // Elementary stream descriptors folow
+                // TODO: read stream descriptor from bytes[pos + 0] position
+
+                Console.WriteLine($"Reading Es Info from position {pos} (byte 0: {bytes[pos + 0]}, byte 1: {bytes[pos + 1]})");
+
+                pos += stream.ESInfoLength;
             }
 
             return res;
@@ -97,6 +104,7 @@ namespace MPEGTS
             {
                 Console.WriteLine($"PID                    : {stream.PID}");
                 Console.WriteLine($"StreamType (byte)      : {stream.StreamType}");
+                Console.WriteLine($"StreamType (enum)      : {stream.StreamTypeDesc}");
                 Console.WriteLine($"-----------------------------------");
             }
         }

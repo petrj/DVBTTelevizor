@@ -10,15 +10,14 @@ namespace MPEGTSTest
         public static void Main(string[] args)
         {
             var path = "TestData" + Path.DirectorySeparatorChar + "PID_16_17_00.ts";
-
-            AnalyzeMPEGTS(path);
+            //AnalyzeMPEGTS(path);
 
             path = "TestData" + Path.DirectorySeparatorChar + "PID_1024_16_17_00.ts";
 
 
             var packets = MPEGTransportStreamPacket.Parse(LoadBytesFromFile(path));
             var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 1024);
-           
+
             foreach (var packet in pmtPackets)
             {
                 packet.WriteToConsole();
@@ -26,8 +25,8 @@ namespace MPEGTSTest
                 mptPacket.WriteToConsole();
             }
 
-            //Console.WriteLine("Press Enter");
-            //Console.ReadLine();
+            Console.WriteLine("Press Enter");
+            Console.ReadLine();
         }
 
         public static List<byte> LoadBytesFromFile(string path)
@@ -36,7 +35,7 @@ namespace MPEGTSTest
             var streamBytes = new List<byte>();
 
             using (var fs = new FileStream(path, FileMode.Open))
-            {               
+            {
                 // testing finding sync byte:
                 //fs.Read(buffer, 0, 12);
 
@@ -52,8 +51,8 @@ namespace MPEGTSTest
         }
 
         public static void AnalyzeMPEGTS(string path)
-        {        
-            var bytes = LoadBytesFromFile(path);         
+        {
+            var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
 
             // step 1: reading packets with PID 0, 17 (16)
