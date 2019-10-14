@@ -27,9 +27,13 @@ namespace DVBTTelevizor
         TcpClient _transferClient;
         NetworkStream _controlStream;
         NetworkStream _recordStream;
-        bool _recording = false;
 
-        private static object _recordLock = new object();
+        bool _recording = false;
+        bool _redingBuffer = false;
+
+        List<byte> _readBuffer = new List<byte>();
+
+        private static object _readThreadLock = new object();
         private static object _infoLock = new object();
 
         private string _dataStreamInfo  = "Data reading not initialized";
@@ -55,6 +59,17 @@ namespace DVBTTelevizor
                 lock (_infoLock)
                 {
                     _dataStreamInfo = value;
+                }
+            }
+        }
+
+        public List<byte> Buffer
+        {
+            get
+            {
+                lock (_readThreadLock)
+                {
+                    return _readBuffer;
                 }
             }
         }
@@ -86,7 +101,7 @@ namespace DVBTTelevizor
 
         public async Task StartRecording()
         {
-            lock (_recordLock)
+            lock (_readThreadLock)
             {
                 _recording = true;
             }
@@ -94,11 +109,29 @@ namespace DVBTTelevizor
 
         public void StopRecording()
         {
-            lock (_recordLock)
+            lock (_readThreadLock)
             {
                 _recording = false;
             }
         }
+
+        public void StartReadBuffer()
+        {
+            lock (_readThreadLock)
+            {
+                _readBuffer.Clear();
+                _redingBuffer = true;
+            }
+        }
+
+        public void StopReadBuffer()
+        {
+            lock (_readThreadLock)
+            {
+                _redingBuffer = false;
+            }
+        }
+
 
         public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
         {
@@ -182,10 +215,10 @@ namespace DVBTTelevizor
             {
                 DataStreamInfo = "Reading data started ...";
 
-                byte[] buffer = new byte[1000000];
-                var bufferSize = 2048;
+                byte[] buffer = new byte[2048];                
                 FileStream fs = null;
                 bool rec = false;
+                bool readingBuffer = false;
                 string fName = null;
 
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
@@ -194,10 +227,11 @@ namespace DVBTTelevizor
 
                 do
                 {
-                    lock (_recordLock)
+                    lock (_readThreadLock)
                     {
-                        // reading synchronized
+                        // sync reading record state
                         rec = _recording;
+                        readingBuffer = _redingBuffer;
                     }
 
                     string status = "Reading";
@@ -209,10 +243,14 @@ namespace DVBTTelevizor
                             status += $" ({fName})";
                         }
                     }
+                    if (readingBuffer)
+                    {
+                        status += " and reading buffer";                        
+                    }
 
                     if (_transferClient.Available > 0)
                     {
-                        var bytesRead = _recordStream.Read(buffer, 0, bufferSize);
+                        var bytesRead = _recordStream.Read(buffer, 0, buffer.Length);
                         bytesReadFromLastMeasureStartTime += bytesRead;
 
                         _log.Debug($"Bytes read: {bytesRead} ...");
@@ -226,6 +264,11 @@ namespace DVBTTelevizor
                             }
 
                             fs.Write(buffer, 0, bytesRead);
+                        }
+                        if (readingBuffer)
+                        {
+                            for (var i = 0; i < bytesRead; i++)
+                                Buffer.Add(buffer[i]);
                         }
 
                          _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);

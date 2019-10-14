@@ -38,6 +38,7 @@ namespace DVBTTelevizor
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
+            this.SearchchannelsButton.Clicked += SearchchannelsButton_Clicked;
 
 
             DeliverySystemPicker.SelectedIndex = 0;
@@ -75,6 +76,131 @@ namespace DVBTTelevizor
 
                 } while (true);
             }).Start();
+        }
+
+        private void SearchchannelsButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = Environment.NewLine + "Searching channels ...";
+            StatusLabel.Text += Environment.NewLine;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var freq = Convert.ToInt64(EntryFrequency.Text) * 1000000;
+                    var bandWidth = Convert.ToInt64(EntryBandWidth.Text) * 1000000;
+
+                    var type = DeliverySystemPicker.SelectedIndex;
+
+                    var tuneRes = await _driver.Tune(freq, bandWidth, type);
+
+                    if (tuneRes.SuccessFlag)
+                    {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            StatusLabel.Text += $"Tuned freq {EntryFrequency.Text} Mhz (Bandwidth {EntryBandWidth.Text}, {DeliverySystemPicker.SelectedItem})";
+                            StatusLabel.Text += Environment.NewLine;
+                        });
+
+                        // waiting
+                        System.Threading.Thread.Sleep(1000);
+
+                        var status = await _driver.GetStatus();
+
+                        if (status.SuccessFlag)
+                        {
+                            if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
+                            {
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    StatusLabel.Text += "Signal locked, frequency tuned successfully";
+                                    StatusLabel.Text += "Setting PID filter 0,16,17 ....";
+                                    StatusLabel.Text += Environment.NewLine;
+                                });
+
+                                // waiting 
+                                System.Threading.Thread.Sleep(1000);
+
+                                var pids = new List<long>() { 0, 16, 17 };
+                                var pidRes = await _driver.SetPIDs(pids);
+
+                                if (pidRes.SuccessFlag)
+                                {
+                                    Device.BeginInvokeOnMainThread(() =>
+                                    {
+                                        StatusLabel.Text += "Scanning SDT and PSI tables (10s)....";
+                                        StatusLabel.Text += Environment.NewLine;
+                                    });
+
+                                     _driver.StartReadBuffer();
+
+                                    // waiting 
+                                    System.Threading.Thread.Sleep(10000);
+
+                                     _driver.StopReadBuffer();
+
+                                    if (_driver.Buffer.Count > 0 )
+                                    {
+                                        Device.BeginInvokeOnMainThread(() =>
+                                        {
+                                            StatusLabel.Text += $"Bytes read: {_driver.Buffer.Count}";
+                                            StatusLabel.Text += Environment.NewLine;
+                                        });
+
+                                        // TODO : analyze SDT a PSI table, then set PMT PID and analyze bytes again .......
+
+                                    } else
+                                    {
+                                        Device.BeginInvokeOnMainThread(() =>
+                                        {
+                                            StatusLabel.Text += "Error, No data read";
+                                            StatusLabel.Text += Environment.NewLine;
+                                        });
+                                    }
+
+                                } else
+                                {
+                                    Device.BeginInvokeOnMainThread(() =>
+                                    {
+                                        StatusLabel.Text += "PID filter request failed";
+                                        StatusLabel.Text += Environment.NewLine;
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    StatusLabel.Text += "Status request failed";
+                                    StatusLabel.Text += Environment.NewLine;
+                                });
+                            }
+                        } else
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                StatusLabel.Text += "Status request failed";
+                                StatusLabel.Text += Environment.NewLine;
+                            });
+                        }
+                    } else
+                    {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            StatusLabel.Text += "Tune request failed";
+                            StatusLabel.Text += Environment.NewLine;
+                        });
+                    }
+                   
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
+                    });
+                }
+            });
         }
 
         private void GetStatusButton_Clicked(object sender, EventArgs e)

@@ -109,6 +109,9 @@
 
             </Grid>
 
+
+            <Button x:Name="SearchchannelsButton" Text="Search channels" VerticalOptions="Start" HeightRequest="70" />
+
         </StackLayout>
     </ScrollView>
 
