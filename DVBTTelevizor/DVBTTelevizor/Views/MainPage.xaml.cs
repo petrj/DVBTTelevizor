@@ -117,6 +117,7 @@ namespace DVBTTelevizor
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         StatusLabel.Text = status;
+                        StatusLabel.Text += Environment.NewLine;
                     });
 
                     if (searchMapPIDsResult.Result != SearchProgramResultEnum.OK)
@@ -128,7 +129,7 @@ namespace DVBTTelevizor
 
                     foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
                     {
-                        var searchPIDsResult = await _driver.SearchProgramPIDs(sDescriptor.Value);
+                        var searchPIDsResult = await _driver.SearchProgramPIDs(Convert.ToInt32(sDescriptor.Value));
 
                         switch (searchPIDsResult.Result)
                         {
@@ -144,13 +145,14 @@ namespace DVBTTelevizor
                             case SearchProgramResultEnum.OK:
                                 var pids = string.Join(",", searchPIDsResult.PIDs);
 
-                                status = $"ServiceName: {sDescriptor.Key.ServiceName}, Map PID: {sDescriptor.Value} PIDs: {pids}";
+                                status = $"{sDescriptor.Key.ServiceName}, Map PID: {sDescriptor.Value} PIDs: {pids}";
                                 break;
                         }
 
                         Device.BeginInvokeOnMainThread(() =>
                         {
                             StatusLabel.Text += status;
+                            StatusLabel.Text += Environment.NewLine;
                         });
                     }
 

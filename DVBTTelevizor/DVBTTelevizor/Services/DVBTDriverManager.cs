@@ -500,7 +500,7 @@ namespace DVBTTelevizor
             return cap;
         }
 
-        public async Task<SearchPIDsResult> SearchProgramPIDs(long MapPID)
+        public async Task<SearchPIDsResult> SearchProgramPIDs(int MapPID)
         {
             var res = new SearchPIDsResult();
 
@@ -551,7 +551,8 @@ namespace DVBTTelevizor
 
                 // parsing PMT table to get PIDs:
 
-                var pmtTable = PMTTable.Parse(Buffer);
+                var pmtPacketBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, MapPID);
+                var pmtTable = PMTTable.Parse(pmtPacketBytes);
 
                 res.Result = SearchProgramResultEnum.OK;
 
@@ -632,7 +633,7 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                // analyze SDT a PSI table
+                // analyze SDT a PSI table               
 
                 var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 17);
                 var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer,  0);
