@@ -40,7 +40,9 @@ namespace DVBTTelevizor
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
-            this.SearchchannelsButton.Clicked += SearchchannelsButton_Clicked;
+            this.SearchchannelsButton.Clicked += AutomaticTune_Clicked;
+            this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
+            this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
 
 
             DeliverySystemPicker.SelectedIndex = 0;
@@ -81,7 +83,57 @@ namespace DVBTTelevizor
             }).Start();
         }
 
-        private void SearchchannelsButton_Clicked(object sender, EventArgs e)
+        private void StopReadStreamButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = Environment.NewLine + "Stoppig background reading ...";
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    _driver.StopBackgroundReading();
+
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = "Background reading stopped";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = Environment.NewLine + $"Stopping background reading failed ({ex.Message})";
+                    });
+                }
+            });
+        }
+
+        private void StartReadStreamButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = Environment.NewLine + "Starting background reading ...";
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    _driver.StartBackgroundReading();
+
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = "Background reading started";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = Environment.NewLine + $"Starting background reading failed ({ex.Message})";
+                    });
+                }
+            });
+        }
+
+        private void AutomaticTune_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = Environment.NewLine + "Searching channels ...";
             StatusLabel.Text += Environment.NewLine;

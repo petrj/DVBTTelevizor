@@ -82,8 +82,13 @@ namespace DVBTTelevizor
             _controlStream = _controlClient.GetStream();
 
             //_client.NoDelay = true;
-            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);          
 
+            StartBackgroundReading();
+        }
+
+        public void StartBackgroundReading()
+        {
             _transferClient = new TcpClient();
             _transferClient.Connect("127.0.0.1", _configuration.Driver.TransferPort);
             _recordStream = _transferClient.GetStream();
@@ -93,11 +98,16 @@ namespace DVBTTelevizor
             recordBackgroundWorker.RunWorkerAsync();
         }
 
+        public void StopBackgroundReading()
+        {
+            _transferClient.Close();
+        }
+
         public async Task Stop()
         {
             await SendCloseConnection();
             _controlClient.Close();
-            _transferClient.Close();
+            StopBackgroundReading();
         }
 
         public async Task StartRecording()
@@ -213,7 +223,7 @@ namespace DVBTTelevizor
         {
             try
             {
-                DataStreamInfo = "Reading data started ...";
+                DataStreamInfo = "Reading data ...";
 
                 byte[] buffer = new byte[2048];
                 FileStream fs = null;
@@ -298,7 +308,7 @@ namespace DVBTTelevizor
                             speed = $", {bytesPerSec} b/sec";
                         } else
                         {
-                            speed = $", {Convert.ToInt32(bytesPerSec/1000.0)} Kb/sec";
+                            speed = $", {Convert.ToInt32(bytesPerSec/1000.0).ToString("N2")} Kb/sec";
                         }
 
                         status += speed;

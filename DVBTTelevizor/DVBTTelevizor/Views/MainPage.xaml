@@ -10,24 +10,28 @@
         <StackLayout>
             <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
 
-            <Grid Margin="20,10,0,0">
+            <Label Text="Driver" TextColor="Yellow" FontSize="Medium"/>
+
+            <Grid Margin="20,10,20,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70*" />
-                    <ColumnDefinition Width="30*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="InitButton" Text="Init" VerticalOptions="Start"></Button>
-                <Button Grid.Row="0" Grid.Column="1"  x:Name="StopButton" Text="Stop" VerticalOptions="Start"></Button>
+                <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  x:Name="InitButton" Text="Init" VerticalOptions="Start" HeightRequest="60" />
+                <Button Grid.Row="0" Grid.Column="2"  x:Name="StopButton" Text="Stop" VerticalOptions="Start" HeightRequest="60" />
+                <Button Grid.Row="1" Grid.Column="0"  x:Name="StartReadStreamButton" Text="Start reading" VerticalOptions="Start" HeightRequest="60"/>
+                <Button Grid.Row="1" Grid.Column="1"  x:Name="StopReadStreamButton" Text="Stop reading" VerticalOptions="Start" HeightRequest="60"/>
+            </Grid>            
 
-            </Grid>
+            <Label Margin="20,10,20,0" x:Name="PortsLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
+            <Label Margin="20,10,20,0" x:Name="DataStreamInfoLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
 
-            <Label x:Name="PortsLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
-            <Label x:Name="DataStreamInfoLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
-
-            <Grid Margin="20,10,0,0">
+            <Grid Margin="20,10,20,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
@@ -35,37 +39,38 @@
                     <ColumnDefinition Width="33*" />
                     <ColumnDefinition Width="34*" />
                     <ColumnDefinition Width="33*" />
-                </Grid.ColumnDefinitions>                
+                </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0" x:Name="GetStatusButton" Text="Status" VerticalOptions="Start" ></Button>
-                <Button Grid.Row="0" Grid.Column="1" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start"></Button>
-                <Button Grid.Row="0" Grid.Column="2" x:Name="GetCapButton"  Text="Cap." VerticalOptions="Start"></Button>
+                <Button Grid.Row="0" Grid.Column="0" x:Name="GetStatusButton" Text="Status" VerticalOptions="Start"  HeightRequest="60"></Button>
+                <Button Grid.Row="0" Grid.Column="1" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start"  HeightRequest="60"></Button>
+                <Button Grid.Row="0" Grid.Column="2" x:Name="GetCapButton"  Text="Cap." VerticalOptions="Start"  HeightRequest="60"></Button>
             </Grid>
 
-            <Label x:Name="StatusLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
+            <Label Margin="20,10,20,0" x:Name="StatusLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
 
-            <Label Text="Tune Settings" TextColor="Yellow" FontSize="Large"/>
+            <Label Text="Manual tuning" TextColor="Yellow" FontSize="Medium"/>
 
-            <Grid Margin="20,10,0,0">
+            <Grid Margin="20,10,20,20">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*" />
-                    <ColumnDefinition Width="30*" />
-                    <ColumnDefinition Width="30*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
-                <Label  Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="0" Grid.Column="1"  x:Name="EntryFrequency" Text="730" TextColor="White"/>
+                <Label  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Frequency (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="0"  Grid.Column="2" x:Name="EntryFrequency" Text="730" TextColor="White"/>
 
-                <Label  Grid.Row="1" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="1" Grid.Column="1"  x:Name="EntryBandWidth" Text="8" TextColor="White"/>
+                <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="BandWidth  (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="1"  Grid.Column="2" x:Name="EntryBandWidth" Text="8" TextColor="White"/>
 
-                <Label  Grid.Row="2" Grid.Column="0" Text="DeliverySystem" TextColor="White"/>
-                <Picker Grid.Row="2" Grid.Column="1"
-                            x:Name="DeliverySystemPicker"
-                            Margin="20,0,0,0"
+                <Label  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="DeliverySystem" TextColor="White"/>
+                <Picker Grid.Row="2" Grid.Column="2" 
+                            x:Name="DeliverySystemPicker"                            
                             TextColor="White">
                     <Picker.Items>
                         <x:String>DVBT</x:String>
@@ -73,40 +78,47 @@
                     </Picker.Items>
                 </Picker>
 
-                <Button Grid.Row="2" Grid.Column="2" x:Name="TuneButton" Text="Tune" />
+                <Label Grid.Row="3" Grid.Column="0" Text="PID filter" TextColor="White"/>
+                <Entry Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="2" x:Name="EntryPIDs" Text="768,801,16,17,18,769,785,787,0" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__"/>
+
+                <Button Grid.Row="4" Grid.Column="0" x:Name="TuneButton" Text="Tune"   HeightRequest="60" />
+                <Button Grid.Row="4" Grid.Column="1" x:Name="SetPIDsButton" Text="Set PIDs"  HeightRequest="60" />
             </Grid>
 
-            <Label Text="PIDs Settings" TextColor="Yellow" FontSize="Large"/>
+            <Label Text="Automatic tuning" TextColor="Yellow" FontSize="Medium"/>
 
-            <Grid Margin="20,10,0,0">
+            <Button  Margin="20,10,20,0" x:Name="SearchchannelsButton" Text="Tune" VerticalOptions="Start" />
+
+            <Label Text="Recording" TextColor="Yellow" FontSize="Medium"/>
+
+            <Grid Margin="20,10,20,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20*" />
-                    <ColumnDefinition Width="50*" />
-                    <ColumnDefinition Width="30*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0"  x:Name="LabelPID" Text="PIDs" TextColor="White" />
-                <Entry Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"  x:Name="EntryPIDs" Text="768,801,17,18,769,785,787,0" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID2__"/>
-                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SetPIDsButton" Text="Set PIDs" />
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="SearchchannelsButton" Text="Search" VerticalOptions="Start" />
+                <Button Grid.Row="0" Grid.Column="0"  x:Name="RecordButton" Text="Start Record" VerticalOptions="Start"  HeightRequest="60"/>
+                <Button Grid.Row="0" Grid.Column="2"  x:Name="StopRecordButton" Text="Stop record" VerticalOptions="Start"  HeightRequest="60"/>
+
             </Grid>
 
-            <Grid Margin="20,10,0,0">
+            <Label Text="Actions" TextColor="Yellow" FontSize="Medium"/>
+
+            <Grid Margin="20,10,20,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*" />
-                    <ColumnDefinition Width="30*" />
-                    <ColumnDefinition Width="30*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start" HeightRequest="70" />
-                <Button Grid.Row="0" Grid.Column="1"  x:Name="RecordButton" Text="Start Record" VerticalOptions="Start" HeightRequest="70" />
-                <Button Grid.Row="0" Grid.Column="2"  x:Name="StopRecordButton" Text="Stop record" VerticalOptions="Start" HeightRequest="70" />
+                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60"/>
 
             </Grid>
 
