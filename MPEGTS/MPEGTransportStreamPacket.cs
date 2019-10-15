@@ -113,6 +113,22 @@ namespace MPEGTS
             return res;
         }
 
+        public static List<byte> GetPacketPayloadBytesByPID(List<byte> bytes, int PID)
+        {
+            var packets = Parse(bytes);
+
+            var filteredPackets = FindPacketsByPID(packets, PID);
+
+            var result = new List<byte>();
+
+            foreach (var packet in filteredPackets)
+            {
+                result.AddRange(packet.Payload);
+            }
+
+            return result;
+        }
+
         public void Parse(IEnumerable<byte> bytes)
         {
             Payload.Clear();
@@ -214,9 +230,9 @@ namespace MPEGTS
             return res;
         }
 
-        public static Dictionary<ServiceDescriptor, int> GetAvailableServicesMapPIDs(SDTTable sDTTable, PSITable pSITable)
+        public static Dictionary<ServiceDescriptor, long> GetAvailableServicesMapPIDs(SDTTable sDTTable, PSITable pSITable)
         {
-            var res = new Dictionary<ServiceDescriptor, int>();
+            var res = new Dictionary<ServiceDescriptor, long>();
 
             foreach (var sdi in sDTTable.ServiceDescriptors)
             {

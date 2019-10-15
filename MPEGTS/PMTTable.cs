@@ -74,7 +74,7 @@ namespace MPEGTS
                 // Elementary stream descriptors folow
                 // TODO: read stream descriptor from bytes[pos + 0] position
 
-                Console.WriteLine($"Reading Es Info from position {pos} (byte 0: {bytes[pos + 0]}, byte 1: {bytes[pos + 1]})");
+                //Console.WriteLine($"Reading Es Info from position {pos} (byte 0: {bytes[pos + 0]}, byte 1: {bytes[pos + 1]})");
 
                 pos += stream.ESInfoLength;
             }

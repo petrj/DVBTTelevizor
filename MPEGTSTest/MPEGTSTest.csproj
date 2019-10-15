@@ -46,7 +46,7 @@
     <None Include="TestData\PID_16_17_00.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestData\PID_768_16_17_0.ts">
+    <None Include="TestData\PID_768_16_17_00.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestData\PID_1024_16_17_00.ts">

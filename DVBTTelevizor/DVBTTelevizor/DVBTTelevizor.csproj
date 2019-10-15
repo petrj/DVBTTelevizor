@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\LoggerService\LoggerService.csproj" />
+    <ProjectReference Include="..\..\MPEGTS\MPEGTS.csproj" />
   </ItemGroup>
 
   <ItemGroup>

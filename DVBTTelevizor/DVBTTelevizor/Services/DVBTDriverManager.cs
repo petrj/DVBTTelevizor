@@ -14,6 +14,7 @@ using Plugin.Permissions.Abstractions;
 using System.IO;
 using LoggerService;
 using System.Runtime.InteropServices;
+using MPEGTS;
 
 namespace DVBTTelevizor
 {
@@ -132,7 +133,6 @@ namespace DVBTTelevizor
             }
         }
 
-
         public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
         {
             var startTime = DateTime.Now;
@@ -215,7 +215,7 @@ namespace DVBTTelevizor
             {
                 DataStreamInfo = "Reading data started ...";
 
-                byte[] buffer = new byte[2048];                
+                byte[] buffer = new byte[2048];
                 FileStream fs = null;
                 bool rec = false;
                 bool readingBuffer = false;
@@ -245,7 +245,7 @@ namespace DVBTTelevizor
                     }
                     if (readingBuffer)
                     {
-                        status += " and reading buffer";                        
+                        status += " and reading buffer";
                     }
 
                     if (_transferClient.Available > 0)
@@ -498,6 +498,160 @@ namespace DVBTTelevizor
             cap.ResponseTime = response.ResponseTime;
 
             return cap;
+        }
+
+        public async Task<SearchPIDsResult> SearchProgramPIDs(long MapPID)
+        {
+            var res = new SearchPIDsResult();
+
+            try
+            {
+                // setting PID filter
+
+                var pids = new List<long>() { 0, 16, 17, MapPID };
+                var pidRes = await SetPIDs(pids);
+
+                if (!pidRes.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // getting status
+
+                var status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+                {
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    return res;
+                }
+
+                // waiting
+                System.Threading.Thread.Sleep(1000);
+
+                StartReadBuffer();
+
+                // waiting
+                System.Threading.Thread.Sleep(10000);
+
+                StopReadBuffer();
+
+                if (Buffer.Count == 0)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // parsing PMT table to get PIDs:
+
+                var pmtTable = PMTTable.Parse(Buffer);
+
+                res.Result = SearchProgramResultEnum.OK;
+
+                foreach (var stream in pmtTable.Streams)
+                {
+                    res.PIDs.Add(stream.PID);
+                }
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }
+        }
+
+        public async Task<SearchMapPIDsResult> SearchProgramMapPIDs(long frequency, long bandWidth, int deliverySyetem)
+        {
+            var res = new SearchMapPIDsResult();
+
+            try
+            {
+                var tuneRes = await Tune(frequency, bandWidth, deliverySyetem);
+
+                if (!tuneRes.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // freq tuned
+
+                // waiting
+                System.Threading.Thread.Sleep(1000);
+
+                // getting status
+
+                var status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+                {
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    return res;
+                }
+
+                // waiting
+                System.Threading.Thread.Sleep(1000);
+
+                // setting PID filter
+
+                var pids = new List<long>() { 0, 16, 17 };
+                var pidRes = await SetPIDs(pids);
+
+                if (!pidRes.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                StartReadBuffer();
+
+                // waiting
+                System.Threading.Thread.Sleep(10000);
+
+                StopReadBuffer();
+
+                if (Buffer.Count == 0)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // analyze SDT a PSI table
+
+                var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 17);
+                var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer,  0);
+
+                var sdtTable = SDTTable.Parse(sdtBytes);
+                var psiTable = PSITable.Parse(psiBytes);
+
+                res.ServiceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
+                res.Result = SearchProgramResultEnum.OK;
+
+                return res;
+
+            } catch (Exception ex)
+            {
+                _log.Error(ex);
+
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }
         }
     }
 }

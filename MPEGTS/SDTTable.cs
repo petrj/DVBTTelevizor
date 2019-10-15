@@ -83,9 +83,6 @@ namespace MPEGTS
 
             if (res.SectionSyntaxIndicator)
             {
-                if (bytes.Count < pos + 4)
-                    return null;
-
                 res.TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
                 res.ReservedExt = Convert.ToByte((bytes[pos + 2] & 192) >> 6);
                 res.Version = Convert.ToByte((bytes[pos + 2] & 62) >> 1);
@@ -96,13 +93,10 @@ namespace MPEGTS
                 pos = pos + 5;
             }
 
-            if (bytes.Count < pos + 7)
-                return null;
-
-            res.NetworkID = (bytes[pos+0] << 8) + bytes[pos + 1];
+            res.NetworkID = (bytes[pos+0] << 8) + bytes[pos + 1]; // original network Id
             res.ServiceId = (bytes[pos+3] << 8) + bytes[pos + 4];
-
             pos += 3;
+
                 // pointer + table id + sect.length + descriptors - crc
             var posAfterDescriptors = 4 + res.SectionLength - 4;
 
@@ -150,13 +144,9 @@ namespace MPEGTS
                     sDescriptor.ServiceName += Convert.ToChar(bytes[pos + i]);
                 }
 
-                var numPos = pos + sDescriptor.ServiceNameLength;
-                sDescriptor.ProgramNumber = Convert.ToInt32(((bytes[numPos + 0]) << 8) + (bytes[numPos + 1]));
-
                 pos = pos + sDescriptor.ServiceNameLength;
 
                 res.ServiceDescriptors.Add(sDescriptor);
-
             }
 
             return res;

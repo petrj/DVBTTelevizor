@@ -10,13 +10,13 @@ namespace MPEGTSTest
         public static void Main(string[] args)
         {
             var path = "TestData" + Path.DirectorySeparatorChar + "PID_16_17_00.ts";
-            //AnalyzeMPEGTS(path);
+            AnalyzeMPEGTS(path);
 
-            path = "TestData" + Path.DirectorySeparatorChar + "PID_1024_16_17_00.ts";
+            path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
 
 
             var packets = MPEGTransportStreamPacket.Parse(LoadBytesFromFile(path));
-            var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 1024);
+            var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
 
             foreach (var packet in pmtPackets)
             {
@@ -59,50 +59,48 @@ namespace MPEGTSTest
 
             // PID 17 ( SDT )
 
+            var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
+            foreach (var packet in pid17Packets)
+            {
+                packet.WriteToConsole();
+            }
 
             Console.WriteLine($"SDT (PID 17) packets found: {pid17Packets.Count}");
 
-            var pid17PacketsPayLoad = new List<byte>();
-            foreach (var pid17Packet in pid17Packets)
-            {
-                pid17Packet.WriteToConsole();
-                pid17PacketsPayLoad.AddRange(pid17Packet.Payload);
-            }
-
-            var sDTTable = SDTTable.Parse(pid17PacketsPayLoad);
+            var sDTTable = SDTTable.Parse(sdtBytes);
             sDTTable.WriteToConsole();
 
+            /*
             // PID 16 ( NIT )
 
+            var nitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 16);
             var pid16Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 16);
-            var pid16PacketsPayLoad = new List<byte>();
 
             Console.WriteLine($"NIT (PID 16) packets found: {pid16Packets.Count}");
 
             foreach (var pid16Packet in pid16Packets)
             {
                 pid16Packet.WriteToConsole();
-                pid16PacketsPayLoad.AddRange(pid16Packet.Payload);
             }
 
-            var niTable = NITTable.Parse(pid16PacketsPayLoad);
+            var niTable = NITTable.Parse(nitBytes);
             niTable.WriteToConsole();
+            */
 
             // PID 0 ( PSI )
 
+            var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 0);
             var pid0Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 0);
 
             Console.WriteLine($"PSI (PID 0) packets found: {pid0Packets.Count}");
 
-            var pid0PacketsPayLoad = new List<byte>();
             foreach (var pid0Packet in pid0Packets)
             {
                 pid0Packet.WriteToConsole();
-                pid0PacketsPayLoad.AddRange(pid0Packet.Payload);
             }
 
-            var psiTable = PSITable.Parse(pid0PacketsPayLoad);
+            var psiTable = PSITable.Parse(psiBytes);
             psiTable.WriteToConsole();
 
             // step 2: find map PIDs from SDT a PSI
@@ -119,8 +117,10 @@ namespace MPEGTSTest
                 Console.WriteLine("--------------------------------------------------");
             }
 
+
             // step 3: reading packets with PID 0, 17 (16) and map PID packet of given service
 
+            /*
             var pid768Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
             Console.WriteLine($"pid768Packets: {pid768Packets.Count}");
 
@@ -139,7 +139,7 @@ namespace MPEGTSTest
                 Console.WriteLine($"Program Number : {p.Key.ProgramNumber}");
                 Console.WriteLine($"Provider       : {p.Key.ProviderName}");
                 Console.WriteLine("--------------------------------------------------");
-            }
+            }*/
         }
     }
 }

@@ -39,9 +39,10 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"  x:Name="StatusLabel" Text="" HorizontalOptions="CenterAndExpand" TextColor="White"/>
-                <Button Grid.Row="0" Grid.Column="1" x:Name="GetStatusButton" Text="Get status" VerticalOptions="Start" HeightRequest="70"></Button>
-                <Button Grid.Row="1" Grid.Column="1" x:Name="GetVersionButton" Text="Get version" VerticalOptions="Start" HeightRequest="70"></Button>
-                <Button Grid.Row="2" Grid.Column="1" x:Name="GetCapButton" Text="Get cap." VerticalOptions="Start" HeightRequest="70"></Button>
+
+                <Button Grid.Row="0" Grid.Column="1" x:Name="GetStatusButton" Text="Status" VerticalOptions="Start" ></Button>
+                <Button Grid.Row="1" Grid.Column="1" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start"></Button>
+                <Button Grid.Row="2" Grid.Column="1" x:Name="GetCapButton" Text="Capab." VerticalOptions="Start"></Button>
             </Grid>
 
             <Label Text="Tune Settings" TextColor="Yellow" FontSize="Large"/>
@@ -90,7 +91,8 @@
 
                 <Label Grid.Row="0" Grid.Column="0"  x:Name="LabelPID" Text="PIDs" TextColor="White" />
                 <Entry Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"  x:Name="EntryPIDs" Text="768,801,17,18,769,785,787,0" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID2__"/>
-                <Button Grid.Row="1" Grid.Column="2" x:Name="SetPIDsButton" Text="Set PIDs" />
+                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"  x:Name="SetPIDsButton" Text="Set PIDs" />
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="SearchchannelsButton" Text="Search" VerticalOptions="Start" />
             </Grid>
 
             <Grid Margin="20,10,0,0">
@@ -108,9 +110,6 @@
                 <Button Grid.Row="0" Grid.Column="2"  x:Name="StopRecordButton" Text="Stop record" VerticalOptions="Start" HeightRequest="70" />
 
             </Grid>
-
-
-            <Button x:Name="SearchchannelsButton" Text="Search channels" VerticalOptions="Start" HeightRequest="70" />
 
         </StackLayout>
     </ScrollView>

@@ -94,104 +94,66 @@ namespace DVBTTelevizor
 
                     var tuneRes = await _driver.Tune(freq, bandWidth, type);
 
-                    if (tuneRes.SuccessFlag)
+                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(freq, bandWidth, type);
+
+                    var status = String.Empty;
+                    switch (searchMapPIDsResult.Result)
                     {
-                        Device.BeginInvokeOnMainThread(() =>
+                        case SearchProgramResultEnum.Error:
+                            status = "Search error";
+                            break;
+                        case SearchProgramResultEnum.NoSignal:
+                            status = "No signal";
+                            break;
+                        case SearchProgramResultEnum.NoProgramFound:
+                            status = "No program found";
+                            break;
+                        case SearchProgramResultEnum.OK:
+
+                            status = $"Program MAP PIDs found";
+                            break;
+                    }
+
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = status;
+                    });
+
+                    if (searchMapPIDsResult.Result != SearchProgramResultEnum.OK)
+                    {
+                        return;
+                    }
+
+                    // searching PIDs
+
+                    foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
+                    {
+                        var searchPIDsResult = await _driver.SearchProgramPIDs(sDescriptor.Value);
+
+                        switch (searchPIDsResult.Result)
                         {
-                            StatusLabel.Text += $"Tuned freq {EntryFrequency.Text} Mhz (Bandwidth {EntryBandWidth.Text}, {DeliverySystemPicker.SelectedItem})";
-                            StatusLabel.Text += Environment.NewLine;
-                        });
+                            case SearchProgramResultEnum.Error:
+                                status = $"Error scanning Map PID {sDescriptor.Value}";
+                                break;
+                            case SearchProgramResultEnum.NoSignal:
+                                status = "No signal";
+                                break;
+                            case SearchProgramResultEnum.NoProgramFound:
+                                status = "No program found";
+                                break;
+                            case SearchProgramResultEnum.OK:
+                                var pids = string.Join(",", searchPIDsResult.PIDs);
 
-                        // waiting
-                        System.Threading.Thread.Sleep(1000);
-
-                        var status = await _driver.GetStatus();
-
-                        if (status.SuccessFlag)
-                        {
-                            if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
-                            {
-                                Device.BeginInvokeOnMainThread(() =>
-                                {
-                                    StatusLabel.Text += "Signal locked, frequency tuned successfully";
-                                    StatusLabel.Text += "Setting PID filter 0,16,17 ....";
-                                    StatusLabel.Text += Environment.NewLine;
-                                });
-
-                                // waiting 
-                                System.Threading.Thread.Sleep(1000);
-
-                                var pids = new List<long>() { 0, 16, 17 };
-                                var pidRes = await _driver.SetPIDs(pids);
-
-                                if (pidRes.SuccessFlag)
-                                {
-                                    Device.BeginInvokeOnMainThread(() =>
-                                    {
-                                        StatusLabel.Text += "Scanning SDT and PSI tables (10s)....";
-                                        StatusLabel.Text += Environment.NewLine;
-                                    });
-
-                                     _driver.StartReadBuffer();
-
-                                    // waiting 
-                                    System.Threading.Thread.Sleep(10000);
-
-                                     _driver.StopReadBuffer();
-
-                                    if (_driver.Buffer.Count > 0 )
-                                    {
-                                        Device.BeginInvokeOnMainThread(() =>
-                                        {
-                                            StatusLabel.Text += $"Bytes read: {_driver.Buffer.Count}";
-                                            StatusLabel.Text += Environment.NewLine;
-                                        });
-
-                                        // TODO : analyze SDT a PSI table, then set PMT PID and analyze bytes again .......
-
-                                    } else
-                                    {
-                                        Device.BeginInvokeOnMainThread(() =>
-                                        {
-                                            StatusLabel.Text += "Error, No data read";
-                                            StatusLabel.Text += Environment.NewLine;
-                                        });
-                                    }
-
-                                } else
-                                {
-                                    Device.BeginInvokeOnMainThread(() =>
-                                    {
-                                        StatusLabel.Text += "PID filter request failed";
-                                        StatusLabel.Text += Environment.NewLine;
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                Device.BeginInvokeOnMainThread(() =>
-                                {
-                                    StatusLabel.Text += "Status request failed";
-                                    StatusLabel.Text += Environment.NewLine;
-                                });
-                            }
-                        } else
-                        {
-                            Device.BeginInvokeOnMainThread(() =>
-                            {
-                                StatusLabel.Text += "Status request failed";
-                                StatusLabel.Text += Environment.NewLine;
-                            });
+                                status = $"ServiceName: {sDescriptor.Key.ServiceName}, Map PID: {sDescriptor.Value} PIDs: {pids}";
+                                break;
                         }
-                    } else
-                    {
+
                         Device.BeginInvokeOnMainThread(() =>
                         {
-                            StatusLabel.Text += "Tune request failed";
-                            StatusLabel.Text += Environment.NewLine;
+                            StatusLabel.Text += status;
                         });
                     }
-                   
+
                 }
                 catch (Exception ex)
                 {
