@@ -274,9 +274,8 @@ namespace DVBTTelevizor
                          _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                     } else
                     {
-                        _log.Debug($"No data on transfer port...");
-
-                        status += " (no data)";
+                        //_log.Debug($"No data on transfer port...");
+                        //status += " (no data)";
 
                         System.Threading.Thread.Sleep(200);
                     }
@@ -308,6 +307,7 @@ namespace DVBTTelevizor
                         {
                             lastSpeed = speed;
                             lastBitRateMeasureStartTime = DateTime.Now;
+                            bytesReadFromLastMeasureStartTime = 0;
                         }
                     } else
                     {
@@ -538,20 +538,33 @@ namespace DVBTTelevizor
 
                 StartReadBuffer();
 
-                // waiting
-                System.Threading.Thread.Sleep(10000);
+
+                var timeoutForReadingBuffer = 10; //  10 secs
+                var startTime = DateTime.Now;
+
+                List<byte> pmtPacketBytes = new List<byte>();
+
+                while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
+                {
+                    pmtPacketBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, MapPID);
+
+                    if (pmtPacketBytes.Count > 0)
+                    {
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(500);
+                }
 
                 StopReadBuffer();
 
-                if (Buffer.Count == 0)
+                if (pmtPacketBytes.Count == 0)
                 {
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
 
-                // parsing PMT table to get PIDs:
-
-                var pmtPacketBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, MapPID);
+                // parsing PMT table to get PIDs:            
                 var pmtTable = PMTTable.Parse(pmtPacketBytes);
 
                 res.Result = SearchProgramResultEnum.OK;
@@ -622,22 +635,37 @@ namespace DVBTTelevizor
 
                 StartReadBuffer();
 
-                // waiting
-                System.Threading.Thread.Sleep(10000);
+                var timeoutForReadingBuffer = 10; //  10 secs
+                var startTime = DateTime.Now;
+
+                List<byte> sdtBytes = new List<byte>();
+                List<byte> psiBytes = new List<byte>();
+
+
+                while ((DateTime.Now-startTime).TotalSeconds < timeoutForReadingBuffer)
+                {
+                    // searching for PID 0 (PSI) and 17 (SDT) packets ..
+                    sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 17);
+                    psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 0);
+
+                    if (sdtBytes.Count> 0 && psiBytes.Count >0)
+                    {
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(500);
+                }
 
                 StopReadBuffer();
 
-                if (Buffer.Count == 0)
+                if (sdtBytes.Count == 0 || psiBytes.Count == 0)
                 {
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
 
                 // analyze SDT a PSI table               
-
-                var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 17);
-                var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer,  0);
-
+                
                 var sdtTable = SDTTable.Parse(sdtBytes);
                 var psiTable = PSITable.Parse(psiBytes);
 

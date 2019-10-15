@@ -13,6 +13,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
+using LoggerService;
 
 namespace DVBTTelevizor
 {
@@ -23,6 +24,7 @@ namespace DVBTTelevizor
     {
         DVBTDriverManager _driver;
         DialogService _dlgService;
+        ILoggingService _log;
 
         public MainPage()
         {
@@ -45,6 +47,7 @@ namespace DVBTTelevizor
 
             _driver = new DVBTDriverManager();
             _dlgService = new DialogService(this);
+            _log = new BasicLoggingService();
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
             {
@@ -109,8 +112,12 @@ namespace DVBTTelevizor
                             status = "No program found";
                             break;
                         case SearchProgramResultEnum.OK:
-
-                            status = $"Program MAP PIDs found";
+                            var mapPIDs = new List<long>();
+                            foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
+                            {
+                                mapPIDs.Add(sd.Value);
+                            }
+                            status = $"Program MAP PIDs found: {String.Join(",",mapPIDs)}";
                             break;
                     }
 
@@ -151,8 +158,10 @@ namespace DVBTTelevizor
 
                         Device.BeginInvokeOnMainThread(() =>
                         {
+                            
                             StatusLabel.Text += status;
                             StatusLabel.Text += Environment.NewLine;
+                            _log.Info(status);
                         });
                     }
 
