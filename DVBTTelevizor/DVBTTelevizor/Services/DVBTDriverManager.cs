@@ -31,6 +31,7 @@ namespace DVBTTelevizor
 
         bool _recording = false;
         bool _redingBuffer = false;
+        bool _streaming = false;
 
         List<byte> _readBuffer = new List<byte>();
 
@@ -39,11 +40,11 @@ namespace DVBTTelevizor
 
         private string _dataStreamInfo  = "Data reading not initialized";
 
-        public DVBTDriverManager()
+        public DVBTDriverManager(ILoggingService loggingService)
         {
             Configuration = new DVBTTelevizorConfiguration();
 
-            _log = new BasicLoggingService(LoggingLevelEnum.Debug);
+            _log = loggingService;
         }
 
         public string DataStreamInfo
@@ -82,7 +83,7 @@ namespace DVBTTelevizor
             _controlStream = _controlClient.GetStream();
 
             //_client.NoDelay = true;
-            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);          
+            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
             StartBackgroundReading();
         }
@@ -123,6 +124,22 @@ namespace DVBTTelevizor
             lock (_readThreadLock)
             {
                 _recording = false;
+            }
+        }
+
+        public void StartStreaming()
+        {
+            lock (_readThreadLock)
+            {
+                _streaming = true;
+            }
+        }
+
+        public void StopStreaming()
+        {
+            lock (_readThreadLock)
+            {
+                _streaming = false;
             }
         }
 
@@ -227,8 +244,11 @@ namespace DVBTTelevizor
 
                 byte[] buffer = new byte[2048];
                 FileStream fs = null;
+                Socket sendSocket = null;
+                EndPoint sendEndPoint = null;
                 bool rec = false;
                 bool readingBuffer = false;
+                bool streaming = false;
                 string fName = null;
 
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
@@ -242,6 +262,7 @@ namespace DVBTTelevizor
                         // sync reading record state
                         rec = _recording;
                         readingBuffer = _redingBuffer;
+                        streaming = _streaming;
                     }
 
                     string status = "Reading";
@@ -256,6 +277,10 @@ namespace DVBTTelevizor
                     if (readingBuffer)
                     {
                         status += " and reading buffer";
+                    }
+                    if (streaming)
+                    {
+                        status += " and streaming to port 8080";
                     }
 
                     if (_transferClient.Available > 0)
@@ -280,13 +305,21 @@ namespace DVBTTelevizor
                             for (var i = 0; i < bytesRead; i++)
                                 Buffer.Add(buffer[i]);
                         }
+                        if (streaming)
+                        {
+                            if (sendSocket == null)
+                            {
+                                sendSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                                sendSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 8);
+                                sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                                sendEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.01"), 8080);
+                            }
+                            sendSocket.SendTo(buffer, bytesRead, SocketFlags.Broadcast, sendEndPoint);
+                        }
 
                          _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                     } else
                     {
-                        //_log.Debug($"No data on transfer port...");
-                        //status += " (no data)";
-
                         System.Threading.Thread.Sleep(200);
                     }
 
@@ -295,6 +328,12 @@ namespace DVBTTelevizor
                         fs.Flush();
                         fs.Close();
                         fs = null;
+                    }
+
+                    if (!streaming && fs != null)
+                    {
+                        sendSocket.Close();
+                        sendSocket = null;
                     }
 
                     // calculating speed:
@@ -574,7 +613,7 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                // parsing PMT table to get PIDs:            
+                // parsing PMT table to get PIDs:
                 var pmtTable = PMTTable.Parse(pmtPacketBytes);
 
                 res.Result = SearchProgramResultEnum.OK;
@@ -674,8 +713,8 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                // analyze SDT a PSI table               
-                
+                // analyze SDT a PSI table
+
                 var sdtTable = SDTTable.Parse(sdtBytes);
                 var psiTable = PSITable.Parse(psiBytes);
 

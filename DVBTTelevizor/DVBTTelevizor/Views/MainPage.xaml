@@ -24,9 +24,7 @@
 
                 <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  x:Name="InitButton" Text="Init" VerticalOptions="Start" HeightRequest="60" />
                 <Button Grid.Row="0" Grid.Column="2"  x:Name="StopButton" Text="Stop" VerticalOptions="Start" HeightRequest="60" />
-                <Button Grid.Row="1" Grid.Column="0"  x:Name="StartReadStreamButton" Text="Start reading" VerticalOptions="Start" HeightRequest="60"/>
-                <Button Grid.Row="1" Grid.Column="1"  x:Name="StopReadStreamButton" Text="Stop reading" VerticalOptions="Start" HeightRequest="60"/>
-            </Grid>            
+            </Grid>
 
             <Label Margin="20,10,20,0" x:Name="PortsLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
             <Label Margin="20,10,20,0" x:Name="DataStreamInfoLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
@@ -69,8 +67,8 @@
                 <Entry Grid.Row="1"  Grid.Column="2" x:Name="EntryBandWidth" Text="8" TextColor="White"/>
 
                 <Label  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="DeliverySystem" TextColor="White"/>
-                <Picker Grid.Row="2" Grid.Column="2" 
-                            x:Name="DeliverySystemPicker"                            
+                <Picker Grid.Row="2" Grid.Column="2"
+                            x:Name="DeliverySystemPicker"
                             TextColor="White">
                     <Picker.Items>
                         <x:String>DVBT</x:String>
@@ -87,7 +85,7 @@
 
             <Label Text="Automatic tuning" TextColor="Yellow" FontSize="Medium"/>
 
-            <Button  Margin="20,10,20,0" x:Name="SearchchannelsButton" Text="Tune" VerticalOptions="Start" />
+            <Button  Margin="20,10,20,0" x:Name="SearchchannelsButton" Text="Tune" VerticalOptions="Start"   HeightRequest="60"/>
 
             <Label Text="Recording" TextColor="Yellow" FontSize="Medium"/>
 
@@ -119,6 +117,24 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60"/>
+                <Button Grid.Row="0" Grid.Column="1"  x:Name="TestButton" Text="Test" VerticalOptions="Start"  HeightRequest="60"/>
+            </Grid>
+
+            <Label Text="Streaming" TextColor="Yellow" FontSize="Medium"/>
+
+            <Grid Margin="20,10,20,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0"  x:Name="StartStreamButton" Text="Start stream" VerticalOptions="Start"  HeightRequest="60"/>
+                <Label Grid.Row="0" Grid.Column="1"  Text="port 8080" VerticalOptions="CenterAndExpand" TextColor="White"/>
+                <Button Grid.Row="0" Grid.Column="2"  x:Name="StopStreamButton" Text="Stop stream" VerticalOptions="Start"  HeightRequest="60"/>
 
             </Grid>
 

@@ -24,6 +24,7 @@ namespace DVBTTelevizor
     {
         DVBTDriverManager _driver;
         DialogService _dlgService;
+        ChannelsService _channelsService;
         ILoggingService _log;
 
         public MainPage()
@@ -41,15 +42,16 @@ namespace DVBTTelevizor
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
             this.SearchchannelsButton.Clicked += AutomaticTune_Clicked;
-            this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
-            this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
-
+            this.StartStreamButton.Clicked += StartStreamButton_Clicked;
+            this.StopStreamButton.Clicked += StopStreamButton_Clicked;
+            this.TestButton.Clicked += TestButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
 
-            _driver = new DVBTDriverManager();
             _dlgService = new DialogService(this);
             _log = new BasicLoggingService();
+            _driver = new DVBTDriverManager(_log);
+            _channelsService = new ChannelsService(_log, _driver);
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
             {
@@ -83,51 +85,85 @@ namespace DVBTTelevizor
             }).Start();
         }
 
-        private void StopReadStreamButton_Clicked(object sender, EventArgs e)
+        private void TestButton_Clicked(object sender, EventArgs e)
         {
-            StatusLabel.Text = Environment.NewLine + "Stoppig background reading ...";
+            /*
+            var channel1 = new Channel()
+            {
+                Number = 1,
+                Name = "CT 1",
+                ProviderName = "Ceska televize",
+                PIDs = "0, 16, 17, 258"
+            };
+
+            var channel2 = new Channel()
+            {
+                Number = 2,
+                Name = "CT 24",
+                ProviderName = "Ceska televize",
+                PIDs = "0, 16, 17, 258"
+            };
+
+            channelsService.Channels.Add(channel1);
+            channelsService.Channels.Add(channel2);
+
+            RunWithPermission(Permission.Storage, async () => await channelsService.Save());
+            */
+
+            Task.Run(async () =>
+            {
+                await RunWithPermission(Permission.Storage, async () =>
+                {
+                    await _channelsService.Load();
+                });
+            });
+        }
+
+        private void StopStreamButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = Environment.NewLine + "Stoppig streaming ...";
 
             Task.Run(async () =>
             {
                 try
                 {
-                    _driver.StopBackgroundReading();
+                    _driver.StopStreaming();
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        StatusLabel.Text = "Background reading stopped";
+                        StatusLabel.Text = "Streaming stopped";
                     });
                 }
                 catch (Exception ex)
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        StatusLabel.Text = Environment.NewLine + $"Stopping background reading failed ({ex.Message})";
+                        StatusLabel.Text = Environment.NewLine + $"Stoppig streaming failed ({ex.Message})";
                     });
                 }
             });
         }
 
-        private void StartReadStreamButton_Clicked(object sender, EventArgs e)
+        private void StartStreamButton_Clicked(object sender, EventArgs e)
         {
-            StatusLabel.Text = Environment.NewLine + "Starting background reading ...";
+            StatusLabel.Text = Environment.NewLine + "Starting streaming to port 8080 ...";
 
             Task.Run(async () =>
             {
                 try
                 {
-                    _driver.StartBackgroundReading();
+                    _driver.StartStreaming();
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        StatusLabel.Text = "Background reading started";
+                        StatusLabel.Text = "Streaming started";
                     });
                 }
                 catch (Exception ex)
                 {
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        StatusLabel.Text = Environment.NewLine + $"Starting background reading failed ({ex.Message})";
+                        StatusLabel.Text = Environment.NewLine + $"Starting streaming to port 8080 failed ({ex.Message})";
                     });
                 }
             });
@@ -210,7 +246,7 @@ namespace DVBTTelevizor
 
                         Device.BeginInvokeOnMainThread(() =>
                         {
-                            
+
                             StatusLabel.Text += status;
                             StatusLabel.Text += Environment.NewLine;
                             _log.Info(status);
@@ -253,7 +289,6 @@ namespace DVBTTelevizor
             });
         }
 
-
         private void GetCapButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = "Getting capabilities ...";
@@ -280,7 +315,6 @@ namespace DVBTTelevizor
 
         }
 
-
         private void GetVersionButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = "Getting Version ...";
@@ -304,7 +338,6 @@ namespace DVBTTelevizor
                     });
                 }
             });
-
         }
 
         private void InitButton_Clicked(object sender, EventArgs e)
@@ -314,7 +347,7 @@ namespace DVBTTelevizor
 
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
-            var url = $"http://127.0.0.1:{_driver.Configuration.Driver.TransferPort}";
+            var url = $"http://127.0.0.1:8080";
             MessagingCenter.Send(url, "PlayUrl");
             StatusLabel.Text = $"Playing url: {url}";
         }
@@ -356,7 +389,6 @@ namespace DVBTTelevizor
 
         private void SetPIDsButton_Clicked(object sender, EventArgs e)
         {
-
             StatusLabel.Text = "Settting PIDs  ...";
 
             Task.Run(async () =>
@@ -460,7 +492,7 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                //_log.Error(ex);
+                _log.Error(ex);
             }
         }
 
