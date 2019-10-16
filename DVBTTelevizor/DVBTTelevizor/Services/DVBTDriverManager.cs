@@ -310,7 +310,7 @@ namespace DVBTTelevizor
                             if (sendSocket == null)
                             {
                                 sendSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                                sendSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 8);
+                                //sendSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 8);
                                 sendSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                                 sendEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.01"), 8080);
                             }
@@ -330,7 +330,7 @@ namespace DVBTTelevizor
                         fs = null;
                     }
 
-                    if (!streaming && fs != null)
+                    if (!streaming && sendSocket != null)
                     {
                         sendSocket.Close();
                         sendSocket = null;
