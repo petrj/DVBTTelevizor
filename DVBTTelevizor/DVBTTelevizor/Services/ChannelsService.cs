@@ -25,7 +25,10 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "channels.sqlLite");
+                // this folder is deleted when rebuilding 
+                //return Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "channels.sqlLite");
+
+                return Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "channels.sqlLite");
             }
         }
 

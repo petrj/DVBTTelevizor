@@ -22,9 +22,10 @@ namespace DVBTTelevizor
     [DesignTimeVisible(false)]
     public partial class MainPage : ContentPage
     {
+        private MainPageViewModel _viewModel;
+
         DVBTDriverManager _driver;
-        DialogService _dlgService;
-        ChannelsService _channelsService;
+        DialogService _dlgService;       
         ILoggingService _log;
 
         public MainPage()
@@ -49,7 +50,9 @@ namespace DVBTTelevizor
             _dlgService = new DialogService(this);
             _log = new BasicLoggingService();
             _driver = new DVBTDriverManager(_log);
-            _channelsService = new ChannelsService(_log, _driver);
+           
+
+            BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver);
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
             {
@@ -85,7 +88,7 @@ namespace DVBTTelevizor
 
         private void TestButton_Clicked(object sender, EventArgs e)
         {
-            /*
+           
             var channel1 = new Channel()
             {
                 Number = 1,
@@ -102,114 +105,18 @@ namespace DVBTTelevizor
                 PIDs = "0, 16, 17, 258"
             };
 
+            var channelsService = new ChannelsService(_log, _driver);
+
             channelsService.Channels.Add(channel1);
             channelsService.Channels.Add(channel2);
 
-            RunWithPermission(Permission.Storage, async () => await channelsService.Save());
-            */
-
-            Task.Run(async () =>
-            {
-                await RunWithPermission(Permission.Storage, async () =>
-                {
-                    await _channelsService.Load();
-                });
-            });
+            _viewModel.RunWithPermission(Permission.Storage, async () => await channelsService.Save());
+           
         }
 
         private void AutomaticTune_Clicked(object sender, EventArgs e)
         {
-            StatusLabel.Text = Environment.NewLine + "Searching channels ...";
-            StatusLabel.Text += Environment.NewLine;
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var freq = Convert.ToInt64(EntryFrequency.Text) * 1000000;
-                    var bandWidth = Convert.ToInt64(EntryBandWidth.Text) * 1000000;
-
-                    var type = DeliverySystemPicker.SelectedIndex;
-
-                    var tuneRes = await _driver.Tune(freq, bandWidth, type);
-
-                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(freq, bandWidth, type);
-
-                    var status = String.Empty;
-                    switch (searchMapPIDsResult.Result)
-                    {
-                        case SearchProgramResultEnum.Error:
-                            status = "Search error";
-                            break;
-                        case SearchProgramResultEnum.NoSignal:
-                            status = "No signal";
-                            break;
-                        case SearchProgramResultEnum.NoProgramFound:
-                            status = "No program found";
-                            break;
-                        case SearchProgramResultEnum.OK:
-                            var mapPIDs = new List<long>();
-                            foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
-                            {
-                                mapPIDs.Add(sd.Value);
-                            }
-                            status = $"Program MAP PIDs found: {String.Join(",",mapPIDs)}";
-                            break;
-                    }
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = status;
-                        StatusLabel.Text += Environment.NewLine;
-                    });
-
-                    if (searchMapPIDsResult.Result != SearchProgramResultEnum.OK)
-                    {
-                        return;
-                    }
-
-                    // searching PIDs
-
-                    foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
-                    {
-                        var searchPIDsResult = await _driver.SearchProgramPIDs(Convert.ToInt32(sDescriptor.Value));
-
-                        switch (searchPIDsResult.Result)
-                        {
-                            case SearchProgramResultEnum.Error:
-                                status = $"Error scanning Map PID {sDescriptor.Value}";
-                                break;
-                            case SearchProgramResultEnum.NoSignal:
-                                status = "No signal";
-                                break;
-                            case SearchProgramResultEnum.NoProgramFound:
-                                status = "No program found";
-                                break;
-                            case SearchProgramResultEnum.OK:
-                                var pids = string.Join(",", searchPIDsResult.PIDs);
-
-                                status = $"{sDescriptor.Key.ServiceName}, Map PID: {sDescriptor.Value} PIDs: {pids}";
-                                break;
-                        }
-
-                        Device.BeginInvokeOnMainThread(() =>
-                        {
-
-                            StatusLabel.Text += status;
-                            StatusLabel.Text += Environment.NewLine;
-                            _log.Info(status);
-                        });
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-                    });
-                }
-            });
+            _viewModel.AutomaticTuneCommand.Execute(null);            
         }
 
         private void GetStatusButton_Clicked(object sender, EventArgs e)
@@ -327,7 +234,7 @@ namespace DVBTTelevizor
 
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
-            RunWithPermission(Permission.Storage, async () => await _driver.StartRecording());
+            _viewModel.RunWithPermission(Permission.Storage, async () => await _driver.StartRecording());
         }
 
         private void StopRecordButton_Clicked(object sender, EventArgs e)
@@ -397,52 +304,7 @@ namespace DVBTTelevizor
             });
         }
 
-        public async Task RunWithPermission(Permission perm, List<Command> commands)
-        {
-            var f = new Func<Task>(
-                 async () =>
-                 {
-                     foreach (var command in commands)
-                     {
-                         await Task.Run(() => command.Execute(null));
-                     }
-                 });
-
-            await RunWithPermission(perm, f);
-        }
-
-        public async Task RunWithPermission(Permission perm, Func<Task> action)
-        {
-            try
-            {
-                var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
-                if (status != PermissionStatus.Granted)
-                {
-                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
-                    {
-                        await _dlgService.Information("Aplikace vyžaduje potvrzení k oprávnění.", "Informace");
-                    }
-
-                    var results = await CrossPermissions.Current.RequestPermissionsAsync(perm);
-
-                    if (results.ContainsKey(perm))
-                        status = results[perm];
-                }
-
-                if (status == PermissionStatus.Granted)
-                {
-                    await action();
-                }
-                else
-                {
-                    await _dlgService.Error("Missing permissions", "Chyba");
-                }
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex);
-            }
-        }
+    
 
     }
 }

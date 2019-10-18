@@ -10,6 +10,59 @@
         <StackLayout>
             <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
 
+            <Label Text="Channels" TextColor="Yellow" FontSize="Medium"/>
+
+            <Label Text="{Binding Status}"  x:Name="TuneLabel" TextColor="White" />
+
+            <Grid Margin="20,10,20,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ListView Grid.Row="0" Grid.Column="0" x:Name="ChannelsListView"
+                    ItemsSource="{Binding Channels}"
+                    CachingStrategy="RecycleElement"
+                    IsPullToRefreshEnabled="True"
+                    RefreshCommand="{Binding RefreshCommand}"
+                    IsRefreshing="{Binding IsBusy}"
+                    SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <ViewCell.View>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="1" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="100" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
+                                        <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
+                                        <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
+
+                                        <Label Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding PIDsLabel}" TextColor="White"/>
+
+                                        <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                    </Grid>
+
+                                </ViewCell.View>
+
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
             <Label Text="Driver" TextColor="Yellow" FontSize="Medium"/>
 
             <Grid Margin="20,10,20,0">
@@ -61,10 +114,10 @@
                 </Grid.ColumnDefinitions>
 
                 <Label  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="Frequency (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="0"  Grid.Column="2" x:Name="EntryFrequency" Text="730" TextColor="White"/>
+                <Entry Grid.Row="0"  Grid.Column="2" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White"/>
 
                 <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="BandWidth  (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="1"  Grid.Column="2" x:Name="EntryBandWidth" Text="8" TextColor="White"/>
+                <Entry Grid.Row="1"  Grid.Column="2" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White"/>
 
                 <Label  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="DeliverySystem" TextColor="White"/>
                 <Picker Grid.Row="2" Grid.Column="2"

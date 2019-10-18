@@ -11,6 +11,21 @@ namespace DVBTTelevizor
         [PrimaryKey, Column("Number")]
         public int Number { get; set; }
 
+        public long Frequency { get; set; }
+
+        
+        public string FrequencyLabel
+        {
+            get
+            {
+                return "Freq: " + Frequency/1000000 + " Mhz";
+            }
+        }
+
+        public long Bandwdith { get; set; }
+
+        public int DVBTType { get; set; }
+
         //[Column("Name")]
         public string Name { get; set; }
 
@@ -19,5 +34,14 @@ namespace DVBTTelevizor
 
         //[Column("PIDs")]
         public string PIDs { get; set; }
+
+        public string PIDsLabel
+        {
+            get
+            {
+                return "PIDs: " + PIDs;
+            }
+        }
+
     }
 }
