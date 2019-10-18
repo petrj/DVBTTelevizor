@@ -9,24 +9,52 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = "TestData" + Path.DirectorySeparatorChar + "PID_16_17_00.ts";
-            AnalyzeMPEGTS(path);
+            //var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
+            //AnalyzeMPEGTS(path);
 
-            path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
-
-
-            var packets = MPEGTransportStreamPacket.Parse(LoadBytesFromFile(path));
-            var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
-
-            foreach (var packet in pmtPackets)
-            {
-                packet.WriteToConsole();
-                var mptPacket = PMTTable.Parse(packet.Payload);
-                mptPacket.WriteToConsole();
-            }
+            // 33 s video sample:
+            var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
+            StreamMpegTS(path);
 
             Console.WriteLine("Press Enter");
             Console.ReadLine();
+        }
+
+        public static void StreamMpegTS(string path)
+        {
+            try
+            {
+                var bufferLength = 4096;
+                byte[] buffer = new byte[bufferLength];
+                long totalBytesRead = 0;
+
+                var startTime = DateTime.Now;
+
+                // TODO: stream read bytes (http server and RTSP?)
+
+                using (var fs = new FileStream(path, FileMode.Open))
+                {
+                    while (fs.Position + bufferLength < fs.Length)
+                    {
+                        var bytesRead = fs.Read(buffer, 0, bufferLength);
+                        totalBytesRead += bytesRead;
+
+                        Console.WriteLine($"Read {bytesRead} bytes (total: {totalBytesRead})");
+                    }
+                    fs.Close();
+                }
+
+                var totalSeconds = (DateTime.Now - startTime).TotalSeconds;
+                var bitRate = (totalBytesRead * 8 / totalSeconds) / 1000000.00;
+
+                Console.WriteLine($"Total time: {totalSeconds}");
+                Console.WriteLine($"Bitrate: { bitRate} Mb/sec");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         public static List<byte> LoadBytesFromFile(string path)
@@ -117,29 +145,16 @@ namespace MPEGTSTest
                 Console.WriteLine("--------------------------------------------------");
             }
 
-
             // step 3: reading packets with PID 0, 17 (16) and map PID packet of given service
 
-            /*
-            var pid768Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
-            Console.WriteLine($"pid768Packets: {pid768Packets.Count}");
+            var pmtPackets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 768);
 
-            foreach (var p in pid768Packets)
+            foreach (var packet in pmtPackets)
             {
-                p.WriteToConsole();
+                packet.WriteToConsole();
+                var mptPacket = PMTTable.Parse(packet.Payload);
+                mptPacket.WriteToConsole();
             }
-
-            var pids = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sDTTable, psiTable);
-            Console.WriteLine("Map PIDs list:");
-            Console.WriteLine("--------------------------------------------------");
-            foreach (var p in pids)
-            {
-                Console.WriteLine($"PID            : {p.Value}");
-                Console.WriteLine($"Service Name   : {p.Key.ServiceName}");
-                Console.WriteLine($"Program Number : {p.Key.ProgramNumber}");
-                Console.WriteLine($"Provider       : {p.Key.ProviderName}");
-                Console.WriteLine("--------------------------------------------------");
-            }*/
         }
     }
 }

@@ -120,24 +120,6 @@
                 <Button Grid.Row="0" Grid.Column="1"  x:Name="TestButton" Text="Test" VerticalOptions="Start"  HeightRequest="60"/>
             </Grid>
 
-            <Label Text="Streaming" TextColor="Yellow" FontSize="Medium"/>
-
-            <Grid Margin="20,10,20,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="StartStreamButton" Text="Start stream" VerticalOptions="Start"  HeightRequest="60"/>
-                <Label Grid.Row="0" Grid.Column="1"  Text="port 8080" VerticalOptions="CenterAndExpand" TextColor="White"/>
-                <Button Grid.Row="0" Grid.Column="2"  x:Name="StopStreamButton" Text="Stop stream" VerticalOptions="Start"  HeightRequest="60"/>
-
-            </Grid>
-
         </StackLayout>
     </ScrollView>
 

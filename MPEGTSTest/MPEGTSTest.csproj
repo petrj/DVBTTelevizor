@@ -40,7 +40,11 @@
       <Name>MPEGTS</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="TestData\stream.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="TestData\PID_16_17_00.ts">

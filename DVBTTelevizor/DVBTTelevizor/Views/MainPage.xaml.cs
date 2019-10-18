@@ -42,8 +42,6 @@ namespace DVBTTelevizor
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
             this.SearchchannelsButton.Clicked += AutomaticTune_Clicked;
-            this.StartStreamButton.Clicked += StartStreamButton_Clicked;
-            this.StopStreamButton.Clicked += StopStreamButton_Clicked;
             this.TestButton.Clicked += TestButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
@@ -116,56 +114,6 @@ namespace DVBTTelevizor
                 {
                     await _channelsService.Load();
                 });
-            });
-        }
-
-        private void StopStreamButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = Environment.NewLine + "Stoppig streaming ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    _driver.StopStreaming();
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = "Streaming stopped";
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = Environment.NewLine + $"Stoppig streaming failed ({ex.Message})";
-                    });
-                }
-            });
-        }
-
-        private void StartStreamButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = Environment.NewLine + "Starting streaming to port 8080 ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    _driver.StartStreaming();
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = "Streaming started";
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = Environment.NewLine + $"Starting streaming to port 8080 failed ({ex.Message})";
-                    });
-                }
             });
         }
 
