@@ -14,6 +14,7 @@ using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
 using LoggerService;
+using Octane.Xamarin.Forms.VideoPlayer;
 
 namespace DVBTTelevizor
 {
@@ -202,9 +203,16 @@ namespace DVBTTelevizor
 
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
-            var url = $"http://127.0.0.1:8080";
-            MessagingCenter.Send(url, "PlayUrl");
-            StatusLabel.Text = $"Playing url: {url}";
+            VideoPlayer.AutoPlay = true;
+
+            VideoPlayer.Source = StreamVideoSource.FromStream(() =>
+            {
+                return new FileStream("/storage/emulated/0/Download/stream.ts", FileMode.Open);
+            }, ".m2t");
+            
+
+            //VideoPlayer.Source = FileVideoSource.FromFile("/storage/emulated/0/Download/stream.ts");
+            //VideoPlayer.Source = UriVideoSource.FromUri("http://vjs.zencdn.net/v/oceans.mp4");
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
