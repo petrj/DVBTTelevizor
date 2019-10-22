@@ -8,6 +8,8 @@ using Android.Widget;
 using Android.OS;
 using Xamarin.Forms;
 using Android.Content;
+using System.Threading.Tasks;
+using Android.Net.Wifi;
 
 namespace DVBTTelevizor.Droid
 {
@@ -15,11 +17,12 @@ namespace DVBTTelevizor.Droid
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         private const int StartRequestCode = 1000;
+        bool _waitingForInit = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
+            ToolbarResource = Resource.Layout.Toolbar;            
 
             base.OnCreate(savedInstanceState);
 
@@ -34,11 +37,33 @@ namespace DVBTTelevizor.Droid
 
             MessagingCenter.Subscribe<string>(this, "Init", (message) =>
             {
-                var req = new Intent(Intent.ActionView);
-                req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
-                req.PutExtra(Intent.ExtraReturnResult, true);
+                try
+                {
+                    var req = new Intent(Intent.ActionView);
+                    req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
+                    req.PutExtra(Intent.ExtraReturnResult, true);
 
-                StartActivityForResult(req, StartRequestCode);
+                    _waitingForInit = true;
+
+                    Task.Run( () =>
+                    {
+                        System.Threading.Thread.Sleep(5000); // wait 5 secs;
+
+                        if (_waitingForInit)
+                        {
+                            _waitingForInit = false;
+                            MessagingCenter.Send("Driver response timeout", "DVBTDriverConfigurationFailed");
+                        }
+
+                    });
+
+                    StartActivityForResult(req, StartRequestCode);
+
+                } catch (Exception ex)
+                {
+                    _waitingForInit = false;
+                    MessagingCenter.Send(ex.ToString(), "DVBTDriverConfigurationFailed");
+                }
             });
 
             MessagingCenter.Subscribe<string>(this, "PlayUrl", (url) =>
@@ -49,6 +74,10 @@ namespace DVBTTelevizor.Droid
                 intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask); // necessary for Android 5
                 Android.App.Application.Context.StartActivity(intent);
             });
+
+            // wifi state permission required
+            //WifiManager wifiManager = (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
+            //int ip = wifiManager.ConnectionInfo.IpAddress;
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
@@ -59,9 +88,10 @@ namespace DVBTTelevizor.Droid
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            //var d = data.GetStringArrayListExtra
             if (requestCode == StartRequestCode && resultCode == Result.Ok)
             {
+                _waitingForInit = false;
+
                 if (data != null)
                 {
                     var cfg = new DVBTDriverConfiguration();
@@ -82,6 +112,9 @@ namespace DVBTTelevizor.Droid
                         cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
 
                     MessagingCenter.Send(cfg.ToString(), "DVBTDriverConfiguration");
+                } else
+                {
+                    MessagingCenter.Send("No response from driver", "DVBTDriverConfigurationFailed");
                 }
             }
         }

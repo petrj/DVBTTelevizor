@@ -13,7 +13,8 @@ namespace DVBTTelevizor
 
         public long Frequency { get; set; }
 
-        
+        public long ProgramMapPID { get; set; }
+
         public string FrequencyLabel
         {
             get
@@ -39,7 +40,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return "PIDs: " + PIDs;
+                return $"PIDs: {ProgramMapPID.ToString()},{PIDs}";
             }
         }
 

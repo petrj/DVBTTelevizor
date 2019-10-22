@@ -20,17 +20,20 @@ namespace DVBTTelevizor
 {
     public class DVBTDriverManager
     {
-        DVBTTelevizorConfiguration _configuration;
+        DVBTDriverConfiguration _driverConfiguration;
 
         ILoggingService _log;
 
         TcpClient _controlClient;
         TcpClient _transferClient;
         NetworkStream _controlStream;
-        NetworkStream _recordStream;
+        NetworkStream _transferStream;
+        private DVBTTelevizorConfiguration _config;
 
-        bool _recording = false;
-        bool _redingBuffer = false;
+        private bool _recordingStream = false;
+        private DateTime _recordStartTime = DateTime.MinValue;
+
+        bool _readingBuffer = false;        
 
         List<byte> _readBuffer = new List<byte>();
 
@@ -39,11 +42,10 @@ namespace DVBTTelevizor
 
         private string _dataStreamInfo  = "Data reading not initialized";
 
-        public DVBTDriverManager(ILoggingService loggingService)
+        public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
-            Configuration = new DVBTTelevizorConfiguration();
-
             _log = loggingService;
+            _config = config;
         }
 
         public string DataStreamInfo
@@ -78,7 +80,7 @@ namespace DVBTTelevizor
         public void Start()
         {
             _controlClient = new TcpClient();
-            _controlClient.Connect("127.0.0.1", _configuration.Driver.ControlPort);
+            _controlClient.Connect("127.0.0.1", _driverConfiguration.ControlPort);
             _controlStream = _controlClient.GetStream();
 
             //_client.NoDelay = true;
@@ -90,8 +92,8 @@ namespace DVBTTelevizor
         public void StartBackgroundReading()
         {
             _transferClient = new TcpClient();
-            _transferClient.Connect("127.0.0.1", _configuration.Driver.TransferPort);
-            _recordStream = _transferClient.GetStream();
+            _transferClient.Connect("127.0.0.1", _driverConfiguration.TransferPort);
+            _transferStream = _transferClient.GetStream();
 
             var recordBackgroundWorker = new BackgroundWorker();
             recordBackgroundWorker.DoWork += worker_DoWork;
@@ -114,7 +116,11 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _recording = true;
+                if (!_recordingStream)
+                {
+                    _recordingStream = true;
+                    _recordStartTime = DateTime.Now;
+                }
             }
         }
 
@@ -122,7 +128,11 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _recording = false;
+                if (_recordingStream)
+                {
+                    _recordingStream = false;
+                    _recordStartTime = DateTime.MinValue;
+                }
             }
         }
 
@@ -131,7 +141,7 @@ namespace DVBTTelevizor
             lock (_readThreadLock)
             {
                 _readBuffer.Clear();
-                _redingBuffer = true;
+                _readingBuffer = true;
             }
         }
 
@@ -139,7 +149,7 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _redingBuffer = false;
+                _readingBuffer = false;
             }
         }
 
@@ -219,6 +229,42 @@ namespace DVBTTelevizor
             });
         }
 
+
+        private string RecordFileName
+        {
+            get
+            {
+                if (!_recordingStream || _recordStartTime == DateTime.MinValue)
+                    return Path.Combine(_config.StorageFolder, $"stream.ts"); ;
+
+                var minutesFromRecordStart = Convert.ToInt32((DateTime.Now - _recordStartTime).TotalMinutes);
+                return Path.Combine(_config.StorageFolder, $"stream-{minutesFromRecordStart.ToString().PadLeft(4,'0')}.ts");
+            }
+        }
+
+        public string PlaylistFileName
+        {
+            get
+            {
+                return Path.Combine(_config.StorageFolder, $"playlist.m3u8"); 
+            }
+        }
+
+        public void CreatePlayList()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("#EXTM3U");
+            for (var i=0;i<720;i++) // 12h
+            {
+                sb.AppendLine(Path.Combine($"stream-{i.ToString().PadLeft(4, '0')}.ts"));
+            }
+
+            if (File.Exists(PlaylistFileName))
+                File.Delete(PlaylistFileName);
+
+            File.WriteAllText(PlaylistFileName, sb.ToString());
+        }
+
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             try
@@ -226,11 +272,12 @@ namespace DVBTTelevizor
                 DataStreamInfo = "Reading data ...";
 
                 byte[] buffer = new byte[2048];
-                FileStream fs = null;
+
+                FileStream recordFileStream = null;
+                string recordingFileName = null;
+
                 bool rec = false;
-                bool readingBuffer = false;
-                bool streaming = false;
-                string fName = null;
+                bool readingBuffer = false;    
 
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
                 long bytesReadFromLastMeasureStartTime = 0;
@@ -241,44 +288,65 @@ namespace DVBTTelevizor
                     lock (_readThreadLock)
                     {
                         // sync reading record state
-                        rec = _recording;
-                        readingBuffer = _redingBuffer;
+                        rec = _recordingStream;
+                        readingBuffer = _readingBuffer;
                     }
 
-                    string status = "Reading";
+                    string status = String.Empty;
+ 
+                    status = "Reading";
+
                     if (rec)
                     {
-                        status += " and recording";
-                        if (fs != null)
+                        status += ", recording";
+                        if (recordFileStream != null)
                         {
-                            status += $" ({fName})";
+                            status += $" ({System.IO.Path.GetFileName(recordingFileName)})";
                         }
                     }
                     if (readingBuffer)
                     {
-                        status += " and reading buffer";
-                    }
-                    if (streaming)
-                    {
-                        status += " and streaming to port 8080";
-                    }
-
+                        status += ", reading Buffer";
+                    }          
+                   
                     if (_transferClient.Available > 0)
                     {
-                        var bytesRead = _recordStream.Read(buffer, 0, buffer.Length);
+                        var bytesRead = _transferStream.Read(buffer, 0, buffer.Length);
                         bytesReadFromLastMeasureStartTime += bytesRead;
 
                         _log.Debug($"Bytes read: {bytesRead} ...");
 
                         if (rec)
                         {
-                            if (fs == null)
+                            if (recordFileStream == null)
                             {
-                                fName = "/storage/emulated/0/Download/" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + "-DVBT-raw-stream.ts";
-                                fs = new FileStream(fName, FileMode.Create, FileAccess.Write);
+                                // todo: clear old records 
+
+                                recordingFileName = RecordFileName;
+
+                                if (File.Exists(recordingFileName))                                
+                                    File.Delete(recordingFileName);                                
+
+                                recordFileStream = new FileStream(recordingFileName, FileMode.Create, FileAccess.Write);
                             }
 
-                            fs.Write(buffer, 0, bytesRead);
+                            if (RecordFileName != recordingFileName)
+                            {
+                                // TODO: cut stram on right position
+
+                                // new file
+                                recordFileStream.Flush();
+                                recordFileStream.Close();
+
+                                recordingFileName = RecordFileName;
+
+                                if (File.Exists(recordingFileName))                                
+                                    File.Delete(recordingFileName);                                
+
+                                recordFileStream = new FileStream(recordingFileName, FileMode.Create, FileAccess.Write);
+                            }
+
+                            recordFileStream.Write(buffer, 0, bytesRead);
                         }
                         if (readingBuffer)
                         {
@@ -286,17 +354,18 @@ namespace DVBTTelevizor
                                 Buffer.Add(buffer[i]);
                         }
 
-                         _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                    } else
+                        _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                    }
+                    else
                     {
                         System.Threading.Thread.Sleep(200);
                     }
 
-                    if (!rec && fs != null)
+                    if (!rec && recordFileStream != null)
                     {
-                        fs.Flush();
-                        fs.Close();
-                        fs = null;
+                        recordFileStream.Flush();
+                        recordFileStream.Close();
+                        recordFileStream = null;
                     }
 
                     // calculating speed:
@@ -347,15 +416,15 @@ namespace DVBTTelevizor
             DataStreamInfo = "Reading data finished";
         }
 
-        public DVBTTelevizorConfiguration Configuration
+        public DVBTDriverConfiguration Configuration
         {
             get
             {
-                return _configuration;
+                return _driverConfiguration;
             }
             set
             {
-                _configuration = value;
+                _driverConfiguration = value;
             }
         }
 

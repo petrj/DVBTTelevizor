@@ -14,21 +14,20 @@ namespace DVBTTelevizor
 
         private ILoggingService _log = new BasicLoggingService();
         private DVBTDriverManager _driver;
+        private DVBTTelevizorConfiguration _config;
 
-        public ChannelsService(ILoggingService logingService, DVBTDriverManager driver)
+        public ChannelsService(ILoggingService logingService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
             _log = logingService;
             _driver = driver;
+            _config = config;
          }
 
-        public static string DBPath
+        public string DBPath
         {
             get
             {
-                // this folder is deleted when rebuilding 
-                //return Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "channels.sqlLite");
-
-                return Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "channels.sqlLite");
+                return Path.Combine(_config.StorageFolder, "channels.sqlLite");
             }
         }
 

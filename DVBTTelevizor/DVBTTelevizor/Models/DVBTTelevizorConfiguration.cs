@@ -12,40 +12,21 @@ namespace DVBTTelevizor
 {
     public class DVBTTelevizorConfiguration : CustomSharedPreferencesObject
     {
-        public string DriverConfigurationJSON
+        public string StorageFolder
         {
             get
             {
-                return GetPersistingSettingValue<string>("DriverConfiguration");
-            }
-            set
-            {
-                SavePersistingSettingValue<string>("DriverConfiguration", value);
-            }
-        }
-
-        public DVBTDriverConfiguration Driver
-        {
-            get
-            {
-                var val = DriverConfigurationJSON;
+                var val = GetPersistingSettingValue<string>("StorageFolder");
                 if (string.IsNullOrEmpty(val))
-                    return null;
-
-                var driverConfiguration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(val);                
-
-                return driverConfiguration;
+                {
+                    val = "/storage/emulated/0/Download/";
+                }
+                return val;
             }
             set
             {
-                if (value == null)
-                {
-                    DriverConfigurationJSON = string.Empty;
-                } else
-                {
-                    DriverConfigurationJSON = value.ToString();
-                }                
+                SavePersistingSettingValue<string>("StorageFolder", value);
             }
-        }
+        }       
     }
 }

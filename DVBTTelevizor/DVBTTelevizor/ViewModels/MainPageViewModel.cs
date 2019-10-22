@@ -10,16 +10,18 @@ using System.Threading.Tasks;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace DVBTTelevizor
 {
     public class MainPageViewModel :  INotifyPropertyChanged
     {
-        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        //private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         private ChannelsService _channelsService;
         private DVBTDriverManager _driver;
+        private DVBTTelevizorConfiguration _config;
 
         private long _tuneFrequency = 730;
         private long _tuneBandwidth = 8;
@@ -65,18 +67,30 @@ namespace DVBTTelevizor
 
         #endregion
 
-        public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver)
+        public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
             _driver = driver;
-            _channelsService = new ChannelsService(_loggingService, _driver);
+            _channelsService = new ChannelsService(_loggingService, _driver, config);
+            _config = config;
+
+            MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
+            {
+                _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
+                Status = $"Initialized ({_driver.Configuration.DeviceName})";
+                _driver.Start();
+            });
+
+            MessagingCenter.Subscribe<string>(this, "DVBTDriverConfigurationFailed", (message) =>
+            {                
+                Status = $"Initialization failed ({message})";                
+            });
 
             RefreshCommand = new Command(async () => await Refresh());
             AutomaticTuneCommand = new Command(async () => await AutomaticTune());
 
             RefreshCommand.Execute(null);
-
         }
 
         public Channel SelectedChannel
@@ -160,8 +174,6 @@ namespace DVBTTelevizor
         {
             _loggingService.Info($"Refreshing channels");
 
-            await _semaphoreSlim.WaitAsync();
-
             await RunWithPermission(Permission.Storage, async () =>
             {
                 try
@@ -180,8 +192,6 @@ namespace DVBTTelevizor
                 finally
                 {
                     IsBusy = false;
-
-                    _semaphoreSlim.Release();                    
                 }
             });
         }
@@ -192,9 +202,7 @@ namespace DVBTTelevizor
             
             Channels.Clear();
             _channelsService.Channels.Clear();
-
-            await _semaphoreSlim.WaitAsync();
-
+            
             try
             {
                 IsBusy = true;
@@ -258,17 +266,26 @@ namespace DVBTTelevizor
 
                             var ch = new Channel();
                             ch.PIDs = pids;
+                            ch.ProgramMapPID = sDescriptor.Value;
                             ch.Name = sDescriptor.Key.ServiceName;
                             ch.ProviderName = sDescriptor.Key.ProviderName;
                             ch.Frequency = freq;
+                            ch.Bandwdith = bandWidth;
                             ch.Number = Channels.Count + 1;
+                            ch.DVBTType = type;
 
                             Channels.Add(ch);
-                            _channelsService.Channels.Add(ch);
+                            //_channelsService.Channels.Add(ch);
+
+                            Status = $"Added {sDescriptor.Key.ServiceName}";
 
                             break;
                     }
-                }                
+                }
+
+                Status = $"Tuning finished";
+
+                await SaveChannels();
 
             }
             catch (Exception ex)
@@ -278,14 +295,17 @@ namespace DVBTTelevizor
             finally
             {
                 IsBusy = false;                
+            }            
+        }
 
-                _semaphoreSlim.Release();               
-            }
-
+        private async Task SaveChannels()
+        {
             await RunWithPermission(Permission.Storage, async () =>
-            {                
-                await _channelsService.Save();                 
-            });
+            {
+                _channelsService.Channels.Clear();
+                _channelsService.Channels.AddRange(Channels);
+                await _channelsService.Save();
+            });            
         }
 
         public async Task RunWithPermission(Permission perm, List<Command> commands)
@@ -333,7 +353,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex);
             }
-        }
+        }     
 
     }
 }

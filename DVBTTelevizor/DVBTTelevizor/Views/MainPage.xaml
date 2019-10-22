@@ -3,16 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:o="clr-namespace:Octane.Xamarin.Forms.VideoPlayer;assembly=Octane.Xamarin.Forms.VideoPlayer"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.MainPage">
 
     <ScrollView>
         <StackLayout>
             <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
-
+            
             <Label Text="Channels" TextColor="Yellow" FontSize="Medium"/>
 
+            <Label Text=""  x:Name="DebugLabel" TextColor="White" />
             <Label Text="{Binding Status}"  x:Name="TuneLabel" TextColor="White" />
 
             <Grid Margin="20,10,20,0">
@@ -51,7 +51,7 @@
                                         <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
                                         <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
 
-                                        <Label Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" Text="{Binding PIDsLabel}" TextColor="White"/>
+                                        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0" Text="{Binding PIDsLabel}" TextColor="White"/>
 
                                         <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
                                     </Grid>
@@ -80,7 +80,6 @@
                 <Button Grid.Row="0" Grid.Column="2"  x:Name="StopButton" Text="Stop" VerticalOptions="Start" HeightRequest="60" />
             </Grid>
 
-            <Label Margin="20,10,20,0" x:Name="PortsLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
             <Label Margin="20,10,20,0" x:Name="DataStreamInfoLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
 
             <Grid Margin="20,10,20,0">
@@ -170,13 +169,8 @@
                     <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60"/>
-                <Button Grid.Row="0" Grid.Column="1"  x:Name="TestButton" Text="Test" VerticalOptions="Start"  HeightRequest="60"/>
+                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60"/>                
             </Grid>
-
-            
-           <o:VideoPlayer x:Name="VideoPlayer" />
-            
 
         </StackLayout>
     </ScrollView>

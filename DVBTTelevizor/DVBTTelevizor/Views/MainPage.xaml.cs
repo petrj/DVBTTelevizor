@@ -14,7 +14,6 @@ using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
 using LoggerService;
-using Octane.Xamarin.Forms.VideoPlayer;
 
 namespace DVBTTelevizor
 {
@@ -28,6 +27,7 @@ namespace DVBTTelevizor
         DVBTDriverManager _driver;
         DialogService _dlgService;       
         ILoggingService _log;
+        private DVBTTelevizorConfiguration _config;
 
         public MainPage()
         {
@@ -44,28 +44,17 @@ namespace DVBTTelevizor
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
             this.SearchchannelsButton.Clicked += AutomaticTune_Clicked;
-            this.TestButton.Clicked += TestButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
 
             _dlgService = new DialogService(this);
             _log = new BasicLoggingService();
-            _driver = new DVBTDriverManager(_log);
+            _config = new DVBTTelevizorConfiguration();
+
+            _driver = new DVBTDriverManager(_log, _config);
            
 
-            BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver);
-
-            MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
-            {
-                PortsLabel.Text = message;
-
-                _driver.Configuration.Driver = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
-
-                PortsLabel.Text = $"Control port: {_driver.Configuration.Driver.ControlPort}, Transfer port: {_driver.Configuration.Driver.TransferPort}";
-
-                _driver.Start();
-            });
-
+            BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver, _config);
 
             new Thread(() =>
             {
@@ -85,35 +74,7 @@ namespace DVBTTelevizor
 
                 } while (true);
             }).Start();
-        }
-
-        private void TestButton_Clicked(object sender, EventArgs e)
-        {
-           
-            var channel1 = new Channel()
-            {
-                Number = 1,
-                Name = "CT 1",
-                ProviderName = "Ceska televize",
-                PIDs = "0, 16, 17, 258"
-            };
-
-            var channel2 = new Channel()
-            {
-                Number = 2,
-                Name = "CT 24",
-                ProviderName = "Ceska televize",
-                PIDs = "0, 16, 17, 258"
-            };
-
-            var channelsService = new ChannelsService(_log, _driver);
-
-            channelsService.Channels.Add(channel1);
-            channelsService.Channels.Add(channel2);
-
-            _viewModel.RunWithPermission(Permission.Storage, async () => await channelsService.Save());
-           
-        }
+        }            
 
         private void AutomaticTune_Clicked(object sender, EventArgs e)
         {
@@ -203,16 +164,8 @@ namespace DVBTTelevizor
 
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
-            VideoPlayer.AutoPlay = true;
-
-            VideoPlayer.Source = StreamVideoSource.FromStream(() =>
-            {
-                return new FileStream("/storage/emulated/0/Download/stream.ts", FileMode.Open);
-            }, ".m2t");
-            
-
-            //VideoPlayer.Source = FileVideoSource.FromFile("/storage/emulated/0/Download/stream.ts");
-            //VideoPlayer.Source = UriVideoSource.FromUri("http://vjs.zencdn.net/v/oceans.mp4");
+            _driver.CreatePlayList();
+            MessagingCenter.Send(_driver.PlaylistFileName, "PlayUrl");
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
