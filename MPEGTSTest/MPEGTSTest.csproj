@@ -39,6 +39,10 @@
       <Project>{21353C2B-4A82-431A-B1C5-CA57E87685EA}</Project>
       <Name>MPEGTS</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LoggerService\LoggerService.csproj">
+      <Project>{48F92363-A63A-45E9-AD73-E7DD3E51E35F}</Project>
+      <Name>LoggerService</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="TestData\stream.ts">

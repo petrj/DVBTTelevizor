@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MPEGTS;
+using LoggerService;
 
 namespace MPEGTSTest
 {
@@ -14,32 +15,37 @@ namespace MPEGTSTest
 
             // 33 s video sample:
             var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
-            StreamMpegTS(path);
+            RecordMpegTS(path);
 
-            Console.WriteLine("Press Enter");
-            Console.ReadLine();
+            //Console.WriteLine("Press Enter");
+            //Console.ReadLine();
         }
 
-        public static void StreamMpegTS(string path)
+        public static void RecordMpegTS(string path)
         {
             try
             {
+                var recBuffer = new RecordBuffer(new BasicLoggingService());
+
                 var bufferLength = 4096;
                 byte[] buffer = new byte[bufferLength];
                 long totalBytesRead = 0;
 
                 var startTime = DateTime.Now;
 
-                // TODO: stream read bytes (http server and RTSP?)
+                // reading bytes from file - simulation of HW byte stream
 
                 using (var fs = new FileStream(path, FileMode.Open))
                 {
+                    fs.Read(new byte[1024], 0, 10); // simulate bad stream begin
+
                     while (fs.Position + bufferLength < fs.Length)
                     {
                         var bytesRead = fs.Read(buffer, 0, bufferLength);
                         totalBytesRead += bytesRead;
 
-                        Console.WriteLine($"Read {bytesRead} bytes (total: {totalBytesRead})");
+                        recBuffer.AddBytes(buffer, bytesRead);
+                        //Console.WriteLine($"Read {bytesRead} bytes (total: {totalBytesRead})");
                     }
                     fs.Close();
                 }
@@ -49,6 +55,10 @@ namespace MPEGTSTest
 
                 Console.WriteLine($"Total time: {totalSeconds}");
                 Console.WriteLine($"Bitrate: { bitRate} Mb/sec");
+
+                Console.WriteLine($"RecordFileName: { recBuffer.RecordFileName}");
+
+
 
             }
             catch (Exception ex)
