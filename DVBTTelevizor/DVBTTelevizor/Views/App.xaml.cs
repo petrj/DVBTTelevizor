@@ -6,11 +6,22 @@ namespace DVBTTelevizor
 {
     public partial class App : Application
     {
+        MainPage _mainPage;
+
         public App()
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            _mainPage = new MainPage();
+            MainPage = _mainPage;
+        }
+
+        public System.IO.Stream VideoStream
+        {
+            get
+            {
+                return _mainPage.VideoStream;
+            }
         }
 
         protected override void OnStart()

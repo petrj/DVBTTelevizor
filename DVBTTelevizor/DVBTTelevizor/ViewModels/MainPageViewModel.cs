@@ -27,7 +27,7 @@ namespace DVBTTelevizor
         private long _tuneBandwidth = 8;
         private int _tuneDVBTType = 0;
 
-        private string _status;
+        private string _status;        
 
         bool isBusy = false;
 
@@ -101,8 +101,8 @@ namespace DVBTTelevizor
             }
             set
             {
-                _selectedChannel = value;
-                
+                _selectedChannel = value;                
+
                 OnPropertyChanged(nameof(SelectedChannel));
             }
         }

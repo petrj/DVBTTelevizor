@@ -169,7 +169,9 @@
                     <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60"/>                
+                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60"/>
+                <Button Grid.Row="0" Grid.Column="1"  x:Name="StopReadStreamButton" Text="Stop read" VerticalOptions="Start"  HeightRequest="60"/>
+                <Button Grid.Row="0" Grid.Column="2"  x:Name="StartReadStreamButton" Text="Start read" VerticalOptions="Start"  HeightRequest="60"/>
             </Grid>
 
         </StackLayout>

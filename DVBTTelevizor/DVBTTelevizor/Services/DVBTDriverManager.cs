@@ -30,9 +30,8 @@ namespace DVBTTelevizor
         NetworkStream _transferStream;
         private DVBTTelevizorConfiguration _config;
 
-        private bool _recordingStream = false;
-        private DateTime _recordStartTime = DateTime.MinValue;
-
+        private bool _readingStream = true;
+        private bool _recording = false;  
         bool _readingBuffer = false;        
 
         List<byte> _readBuffer = new List<byte>();
@@ -46,6 +45,39 @@ namespace DVBTTelevizor
         {
             _log = loggingService;
             _config = config;
+        }
+
+        public Stream VideoStream
+        {
+            get
+            {
+                if (_readingStream)
+                    return null;
+
+                return _transferStream;
+            }
+        }
+
+        public bool Recording
+        {
+            get
+            {
+                lock (_readThreadLock)
+                {
+                    return _recording;
+                }
+            }
+        }
+
+        public bool ReadingStream
+        {
+            get
+            {
+                lock (_readThreadLock)
+                {
+                    return _readingStream;
+                }
+            }
         }
 
         public string DataStreamInfo
@@ -105,6 +137,22 @@ namespace DVBTTelevizor
             _transferClient.Close();
         }
 
+        public void StartReadStream()
+        {
+            lock (_readThreadLock)
+            {
+                _readingStream = true;
+            }
+        }
+
+        public void StopReadStream()
+        {
+            lock (_readThreadLock)
+            {
+                _readingStream = false;
+            }
+        }
+
         public async Task Stop()
         {
             await SendCloseConnection();
@@ -116,10 +164,9 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                if (!_recordingStream)
+                if (!Recording)
                 {
-                    _recordingStream = true;
-                    _recordStartTime = DateTime.Now;
+                    _recording = true;
                 }
             }
         }
@@ -128,10 +175,9 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                if (_recordingStream)
+                if (Recording)
                 {
-                    _recordingStream = false;
-                    _recordStartTime = DateTime.MinValue;
+                    _recording = false;
                 }
             }
         }
@@ -234,11 +280,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (!_recordingStream || _recordStartTime == DateTime.MinValue)
-                    return Path.Combine(_config.StorageFolder, $"stream.ts"); ;
-
-                var minutesFromRecordStart = Convert.ToInt32((DateTime.Now - _recordStartTime).TotalMinutes);
-                return Path.Combine(_config.StorageFolder, $"stream-{minutesFromRecordStart.ToString().PadLeft(4,'0')}.ts");
+                return Path.Combine(_config.StorageFolder, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.ts");
             }
         }
 
@@ -276,8 +318,9 @@ namespace DVBTTelevizor
                 FileStream recordFileStream = null;
                 string recordingFileName = null;
 
+                bool readingStream = true;
                 bool rec = false;
-                bool readingBuffer = false;    
+                bool readingBuffer = false;
 
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
                 long bytesReadFromLastMeasureStartTime = 0;
@@ -288,109 +331,104 @@ namespace DVBTTelevizor
                     lock (_readThreadLock)
                     {
                         // sync reading record state
-                        rec = _recordingStream;
+                        rec = _recording;
                         readingBuffer = _readingBuffer;
+                        readingStream = _readingStream;
                     }
 
                     string status = String.Empty;
- 
-                    status = "Reading";
 
-                    if (rec)
+                    if (!readingStream)
                     {
-                        status += ", recording";
-                        if (recordFileStream != null)
-                        {
-                            status += $" ({System.IO.Path.GetFileName(recordingFileName)})";
-                        }
-                    }
-                    if (readingBuffer)
-                    {
-                        status += ", reading Buffer";
-                    }          
-                   
-                    if (_transferClient.Available > 0)
-                    {
-                        var bytesRead = _transferStream.Read(buffer, 0, buffer.Length);
-                        bytesReadFromLastMeasureStartTime += bytesRead;
-
-                        _log.Debug($"Bytes read: {bytesRead} ...");
-
-                        if (rec)
-                        {
-                            if (recordFileStream == null)
-                            {
-                                // todo: clear old records 
-
-                                recordingFileName = RecordFileName;
-
-                                if (File.Exists(recordingFileName))                                
-                                    File.Delete(recordingFileName);                                
-
-                                recordFileStream = new FileStream(recordingFileName, FileMode.Create, FileAccess.Write);
-                            }
-
-                            if (RecordFileName != recordingFileName)
-                            {
-                                // TODO: cut stram on right position
-
-                                // new file
-                                recordFileStream.Flush();
-                                recordFileStream.Close();
-
-                                recordingFileName = RecordFileName;
-
-                                if (File.Exists(recordingFileName))                                
-                                    File.Delete(recordingFileName);                                
-
-                                recordFileStream = new FileStream(recordingFileName, FileMode.Create, FileAccess.Write);
-                            }
-
-                            recordFileStream.Write(buffer, 0, bytesRead);
-                        }
-                        if (readingBuffer)
-                        {
-                            for (var i = 0; i < bytesRead; i++)
-                                Buffer.Add(buffer[i]);
-                        }
-
-                        _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                        status = "Waiting for stream";
+                        System.Threading.Thread.Sleep(200);
                     }
                     else
                     {
-                        System.Threading.Thread.Sleep(200);
-                    }
+                        status = "Reading stream";
 
-                    if (!rec && recordFileStream != null)
-                    {
-                        recordFileStream.Flush();
-                        recordFileStream.Close();
-                        recordFileStream = null;
+                        if (rec)
+                        {
+                            status += ", recording";
+                            if (recordFileStream != null)
+                            {
+                                status += $" ({System.IO.Path.GetFileName(recordingFileName)})";
+                            }
+                        }
+                        if (readingBuffer)
+                        {
+                            status += ", reading Buffer";
+                        }
+
+                        if (_transferClient.Available > 0)
+                        {
+                            var bytesRead = _transferStream.Read(buffer, 0, buffer.Length);
+                            bytesReadFromLastMeasureStartTime += bytesRead;
+
+                            _log.Debug($"Bytes read: {bytesRead} ...");
+
+                            if (rec)
+                            {
+                                if (recordFileStream == null)
+                                {
+                                    // todo: clear old records 
+
+                                    recordingFileName = RecordFileName;
+
+                                    if (File.Exists(recordingFileName))
+                                        File.Delete(recordingFileName);
+
+                                    recordFileStream = new FileStream(recordingFileName, FileMode.Create, FileAccess.Write);
+                                }
+
+                                recordFileStream.Write(buffer, 0, bytesRead);
+                            }
+                            if (readingBuffer)
+                            {
+                                for (var i = 0; i < bytesRead; i++)
+                                    Buffer.Add(buffer[i]);
+                            }
+
+                            _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                        }
+                        else
+                        {
+                            System.Threading.Thread.Sleep(200);
+                        }
+
+                        if (!rec && recordFileStream != null)
+                        {
+                            recordFileStream.Flush();
+                            recordFileStream.Close();
+                            recordFileStream = null;
+                        }
                     }
 
                     // calculating speed:
                     var totalSeconds = (DateTime.Now - lastBitRateMeasureStartTime).TotalSeconds;
                     if (totalSeconds > 2)
                     {
-                        var bytesPerSec = bytesReadFromLastMeasureStartTime*8 / totalSeconds;
+                        var bytesPerSec = bytesReadFromLastMeasureStartTime * 8 / totalSeconds;
                         string speed;
                         if (bytesPerSec < 1000)
                         {
                             speed = $", {bytesPerSec} b/sec";
-                        } else
+                        }
+                        else
                         {
-                            speed = $", {Convert.ToInt32(bytesPerSec/1000.0).ToString("N2")} Kb/sec";
+                            speed = $", {Convert.ToInt32(bytesPerSec / 1000.0).ToString("N2")} Kb/sec";
                         }
 
                         status += speed;
 
-                        if (totalSeconds>3)
+                        if (totalSeconds > 3)
                         {
                             lastSpeed = speed;
                             lastBitRateMeasureStartTime = DateTime.Now;
                             bytesReadFromLastMeasureStartTime = 0;
                         }
-                    } else
+                    }
+                    else
                     {
                         if (lastSpeed != String.Empty)
                         {
@@ -427,6 +465,7 @@ namespace DVBTTelevizor
                 _driverConfiguration = value;
             }
         }
+
 
         public async Task<DVBTStatus> GetStatus()
         {

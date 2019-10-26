@@ -14,6 +14,10 @@ using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
 using LoggerService;
+using Android.Media;
+using LibVLCSharp.Shared;
+using MediaPlayer = LibVLCSharp.Shared.MediaPlayer;
+using Android.Widget;
 
 namespace DVBTTelevizor
 {
@@ -44,6 +48,8 @@ namespace DVBTTelevizor
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
             this.SearchchannelsButton.Clicked += AutomaticTune_Clicked;
+            this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
+            this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
 
@@ -74,7 +80,16 @@ namespace DVBTTelevizor
 
                 } while (true);
             }).Start();
-        }            
+        }
+
+        public System.IO.Stream VideoStream
+        {
+            get
+            {
+                return _driver.VideoStream;
+
+            }
+        }
 
         private void AutomaticTune_Clicked(object sender, EventArgs e)
         {
@@ -163,9 +178,8 @@ namespace DVBTTelevizor
         }
 
         private void PlayButton_Clicked(object sender, EventArgs e)
-        {
-            _driver.CreatePlayList();
-            MessagingCenter.Send(_driver.PlaylistFileName, "PlayUrl");
+        {            
+            MessagingCenter.Send("CT1", "PlayStream");
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
@@ -265,7 +279,45 @@ namespace DVBTTelevizor
             });
         }
 
-    
+        private void StopReadStreamButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = "Stop read stream ...";
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    _driver.StopReadStream();
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
+        }
+
+        private void StartReadStreamButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = "Start read stream ...";
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    _driver.StartReadStream();
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
+        }
 
     }
 }

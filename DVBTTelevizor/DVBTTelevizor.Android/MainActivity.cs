@@ -11,6 +11,11 @@ using Android.Content;
 using System.Threading.Tasks;
 using Android.Net.Wifi;
 
+using VideoView = LibVLCSharp.Platforms.Android.VideoView;
+using LibVLCSharp.Shared;
+
+
+
 namespace DVBTTelevizor.Droid
 {
     [Activity(Label = "DVBTTelevizor", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
@@ -33,7 +38,8 @@ namespace DVBTTelevizor.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App());
+            var app = new App();
+            LoadApplication(app);
 
             MessagingCenter.Subscribe<string>(this, "Init", (message) =>
             {
@@ -75,14 +81,34 @@ namespace DVBTTelevizor.Droid
                 Android.App.Application.Context.StartActivity(intent);
             });
 
+            MessagingCenter.Subscribe<string>(this, "PlayStream", (name) =>
+            {
+                Core.Initialize();
+
+                var _libVLC = new LibVLC();
+                var _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+
+                var _videoView = new VideoView(this) { MediaPlayer = _mediaPlayer };
+                AddContentView(_videoView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
+                //var media = new Media(_libVLC, "https://www.w6rz.net/newmobcal1920_12mbps.ts", FromType.FromLocation);
+                //var media = new Media(_libVLC, "/storage/emulated/0/Download/stream.ts", FromType.FromPath);
+                var media = new Media(_libVLC, app.VideoStream, new string[] { } );
+
+                _videoView.MediaPlayer.Play(media); 
+            });
+
             // wifi state permission required
             //WifiManager wifiManager = (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
             //int ip = wifiManager.ConnectionInfo.IpAddress;
+
+                 
+            
         }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
+                       
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
