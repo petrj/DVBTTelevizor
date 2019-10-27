@@ -32,9 +32,7 @@ namespace DVBTTelevizor
         DialogService _dlgService;       
         ILoggingService _log;
         private DVBTTelevizorConfiguration _config;
-
-        LibVLC _libVLC = null;
-        MediaPlayer _mediaPlayer;
+        PlayerPage _playerPage;
 
         public MainPage()
         {
@@ -47,7 +45,6 @@ namespace DVBTTelevizor
             this.TuneButton.Clicked += TuneButton_Clicked;
             this.StopButton.Clicked += StopButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
-            this.StopPlayButton.Clicked += StopPlayButton_Clicked;
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
@@ -64,7 +61,9 @@ namespace DVBTTelevizor
                 AutoInitAfterStart = true
             };
 
-            _driver = new DVBTDriverManager(_log, _config);           
+            _driver = new DVBTDriverManager(_log, _config);
+
+            _playerPage = new PlayerPage(_driver);
 
             BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver, _config);
 
@@ -87,24 +86,14 @@ namespace DVBTTelevizor
                 } while (true);
             }).Start();
 
-
-            MessagingCenter.Subscribe<string>(this, "PlayStream", (name) =>
+            MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                new Action(
-                delegate
-                {              
-                    var media = new Media(_libVLC, _driver.VideoStream, new string[] { });
-
-                    videoView.MediaPlayer.Play(media);
-                }));
-
-            });         
-
-            Core.Initialize();
-            _libVLC = new LibVLC();
-            _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
-            videoView.MediaPlayer = _mediaPlayer;
+                 new Action( () =>                 
+                 {
+                     Navigation.PushAsync(_playerPage);
+                 }));
+            });
 
             if (_config.AutoInitAfterStart)
             {
@@ -209,14 +198,9 @@ namespace DVBTTelevizor
             MessagingCenter.Send("", "Init");
         }
 
-        private void StopPlayButton_Clicked(object sender, EventArgs e)
-        {
-            videoView.MediaPlayer.Stop();
-        }
-
         private void PlayButton_Clicked(object sender, EventArgs e)
         {            
-            MessagingCenter.Send("CT1", "PlayStream");
+            Navigation.PushAsync(_playerPage);
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
@@ -355,6 +339,5 @@ namespace DVBTTelevizor
                 }
             });
         }
-
     }
 }

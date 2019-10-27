@@ -13,7 +13,7 @@ namespace DVBTTelevizor
             InitializeComponent();
 
             _mainPage = new MainPage();
-            MainPage = _mainPage;
+            MainPage = new NavigationPage(_mainPage);            
         }
 
         protected override void OnStart()
