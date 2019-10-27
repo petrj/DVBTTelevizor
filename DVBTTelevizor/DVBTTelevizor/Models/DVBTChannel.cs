@@ -6,7 +6,7 @@ using System.Text;
 namespace DVBTTelevizor
 {
     [Table("Channels")]
-    public class Channel
+    public class DVBTChannel
     {
         [PrimaryKey, Column("Number")]
         public int Number { get; set; }
@@ -41,6 +41,24 @@ namespace DVBTTelevizor
             get
             {
                 return $"PIDs: {ProgramMapPID.ToString()},{PIDs}";
+            }
+        }
+
+        public List<long> PIDsArary
+        {
+            get
+            {
+                var res = new List<long>();
+                res.Add(ProgramMapPID);
+                res.Add(0);
+                res.Add(16);
+                res.Add(17);
+                foreach (var pid in PIDs.Split(','))
+                {
+                    res.Add(Convert.ToInt64(pid));
+                }
+
+                return res;
             }
         }
 

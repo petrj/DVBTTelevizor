@@ -34,9 +34,9 @@ namespace DVBTTelevizor
         public Command RefreshCommand { get; set; }
         public Command AutomaticTuneCommand { get; set; }
 
-        private Channel _selectedChannel;
+        private DVBTChannel _selectedChannel;
 
-        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
+        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
 
         #region INotifyPropertyChanged
@@ -93,7 +93,7 @@ namespace DVBTTelevizor
             RefreshCommand.Execute(null);
         }
 
-        public Channel SelectedChannel
+        public DVBTChannel SelectedChannel
         {
             get
             {
@@ -101,9 +101,14 @@ namespace DVBTTelevizor
             }
             set
             {
-                _selectedChannel = value;                
+                _selectedChannel = value;
 
                 OnPropertyChanged(nameof(SelectedChannel));
+
+               Task.Run(async () =>
+               {
+                   await PlayChannel(_selectedChannel);
+               });
             }
         }
 
@@ -168,6 +173,21 @@ namespace DVBTTelevizor
                 _status = value;
                 OnPropertyChanged(nameof(Status));
             }
+        }
+
+        private async Task PlayChannel(DVBTChannel channel)
+        {
+            var tunedRes = await _driver.Tune(channel.Frequency, channel.Bandwdith, channel.DVBTType);
+            if (!tunedRes.SuccessFlag)
+                return;
+
+            var setPIDsRes = await _driver.SetPIDs(channel.PIDsArary);
+            if (!setPIDsRes.SuccessFlag)
+                return;
+
+            _driver.StopReadStream();
+
+            MessagingCenter.Send(channel.Name, "PlayStream");            
         }
 
         private async Task Refresh()
@@ -264,7 +284,7 @@ namespace DVBTTelevizor
                         case SearchProgramResultEnum.OK:
                             var pids = string.Join(",", searchPIDsResult.PIDs);
 
-                            var ch = new Channel();
+                            var ch = new DVBTChannel();
                             ch.PIDs = pids;
                             ch.ProgramMapPID = sDescriptor.Value;
                             ch.Name = sDescriptor.Key.ServiceName;

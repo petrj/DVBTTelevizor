@@ -10,7 +10,7 @@ namespace DVBTTelevizor
 {
     public class ChannelsService
     {
-        public List<Channel> Channels = new List<Channel>();
+        public List<DVBTChannel> Channels = new List<DVBTChannel>();
 
         private ILoggingService _log = new BasicLoggingService();
         private DVBTDriverManager _driver;
@@ -41,7 +41,7 @@ namespace DVBTTelevizor
 
                     var db = new SQLiteConnection(DBPath);
 
-                   foreach (var channel in db.Table<Channel>())
+                   foreach (var channel in db.Table<DVBTChannel>())
                    {
                         Channels.Add(channel);
                    }
@@ -65,9 +65,9 @@ namespace DVBTTelevizor
                 {
                     var db = new SQLiteConnection(DBPath);
 
-                    db.DropTable<Channel>();
+                    db.DropTable<DVBTChannel>();
 
-                    db.CreateTable<Channel>();
+                    db.CreateTable<DVBTChannel>();
 
                     foreach (var channel in Channels)
                     {

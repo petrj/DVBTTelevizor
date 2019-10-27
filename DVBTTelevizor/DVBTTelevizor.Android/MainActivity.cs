@@ -83,26 +83,31 @@ namespace DVBTTelevizor.Droid
 
             MessagingCenter.Subscribe<string>(this, "PlayStream", (name) =>
             {
-                Core.Initialize();
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                new Action(
+                delegate
+                {
+                    var _libVLC = new LibVLC();
+                    var _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
 
-                var _libVLC = new LibVLC();
-                var _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+                    var _videoView = new VideoView(this) { MediaPlayer = _mediaPlayer };
+                    AddContentView(_videoView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
+                    //var media = new Media(_libVLC, "https://www.w6rz.net/newmobcal1920_12mbps.ts", FromType.FromLocation);
+                    //var media = new Media(_libVLC, "/storage/emulated/0/Download/stream.ts", FromType.FromPath);
+                    var media = new Media(_libVLC, app.VideoStream, new string[] { });
 
-                var _videoView = new VideoView(this) { MediaPlayer = _mediaPlayer };
-                AddContentView(_videoView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
-                //var media = new Media(_libVLC, "https://www.w6rz.net/newmobcal1920_12mbps.ts", FromType.FromLocation);
-                //var media = new Media(_libVLC, "/storage/emulated/0/Download/stream.ts", FromType.FromPath);
-                var media = new Media(_libVLC, app.VideoStream, new string[] { } );
+                    _videoView.MediaPlayer.Play(media);
+                }));               
 
-                _videoView.MediaPlayer.Play(media); 
+                
             });
 
             // wifi state permission required
             //WifiManager wifiManager = (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
             //int ip = wifiManager.ConnectionInfo.IpAddress;
 
-                 
-            
+            Core.Initialize();
+
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
