@@ -16,14 +16,6 @@ namespace DVBTTelevizor
             MainPage = _mainPage;
         }
 
-        public System.IO.Stream VideoStream
-        {
-            get
-            {
-                return _mainPage.VideoStream;
-            }
-        }
-
         protected override void OnStart()
         {
             // Handle when your app starts

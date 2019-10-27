@@ -38,8 +38,7 @@ namespace DVBTTelevizor.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            var app = new App();
-            LoadApplication(app);
+            LoadApplication(new App());
 
             MessagingCenter.Subscribe<string>(this, "Init", (message) =>
             {
@@ -70,44 +69,7 @@ namespace DVBTTelevizor.Droid
                     _waitingForInit = false;
                     MessagingCenter.Send(ex.ToString(), "DVBTDriverConfigurationFailed");
                 }
-            });
-
-            MessagingCenter.Subscribe<string>(this, "PlayUrl", (url) =>
-            {
-                var intent = new Intent(Intent.ActionView);
-                var uri = Android.Net.Uri.Parse(url);
-                intent.SetDataAndType(uri, "video/*");
-                intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTask); // necessary for Android 5
-                Android.App.Application.Context.StartActivity(intent);
-            });
-
-            MessagingCenter.Subscribe<string>(this, "PlayStream", (name) =>
-            {
-                Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                new Action(
-                delegate
-                {
-                    var _libVLC = new LibVLC();
-                    var _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
-
-                    var _videoView = new VideoView(this) { MediaPlayer = _mediaPlayer };
-                    AddContentView(_videoView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent));
-                    //var media = new Media(_libVLC, "https://www.w6rz.net/newmobcal1920_12mbps.ts", FromType.FromLocation);
-                    //var media = new Media(_libVLC, "/storage/emulated/0/Download/stream.ts", FromType.FromPath);
-                    var media = new Media(_libVLC, app.VideoStream, new string[] { });
-
-                    _videoView.MediaPlayer.Play(media);
-                }));               
-
-                
-            });
-
-            // wifi state permission required
-            //WifiManager wifiManager = (WifiManager)Android.App.Application.Context.GetSystemService(Service.WifiService);
-            //int ip = wifiManager.ConnectionInfo.IpAddress;
-
-            Core.Initialize();
-
+            });   
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)

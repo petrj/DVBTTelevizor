@@ -27,6 +27,18 @@ namespace DVBTTelevizor
             {
                 SavePersistingSettingValue<string>("StorageFolder", value);
             }
-        }       
+        }
+
+        public bool AutoInitAfterStart
+        {
+            get
+            {
+               return GetPersistingSettingValue<bool>("AutoInitAfterStart");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("AutoInitAfterStart", value);
+            }
+        }
     }
 }
