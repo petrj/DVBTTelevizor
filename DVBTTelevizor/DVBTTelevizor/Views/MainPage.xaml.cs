@@ -43,7 +43,7 @@ namespace DVBTTelevizor
             this.GetCapButton.Clicked += GetCapButton_Clicked;
             this.InitButton.Clicked += InitButton_Clicked;
             this.TuneButton.Clicked += TuneButton_Clicked;
-            this.StopButton.Clicked += StopButton_Clicked;
+            this.DisconnectButton.Clicked += DisconnectButton_Clicked;
             this.SaveChannelsButton.Clicked += SaveChannelsButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
             this.RecordButton.Clicked += RecordButton_Clicked;
@@ -204,15 +204,15 @@ namespace DVBTTelevizor
            Navigation.PushModalAsync(_playerPage);
         }
 
-        private void StopButton_Clicked(object sender, EventArgs e)
+        private void DisconnectButton_Clicked(object sender, EventArgs e)
         {
-            StatusLabel.Text = "stopping driver  ...";
+            StatusLabel.Text = "Disconnecting driver  ...";
 
             Task.Run(async () =>
             {
                 try
                 {
-                    await _driver.Stop();
+                    await _driver.Disconnect();
 
                     Device.BeginInvokeOnMainThread(() =>
                     {

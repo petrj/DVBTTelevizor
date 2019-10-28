@@ -199,18 +199,12 @@ namespace DVBTTelevizor
 
         private async Task PlayChannel(DVBTChannel channel)
         {
-            _driver.StopReadStream();
-
-            var tunedRes = await _driver.Tune(channel.Frequency, channel.Bandwdith, channel.DVBTType);
-            if (!tunedRes.SuccessFlag)
+            var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
+            if (!playRes)
                 return;
 
-            var setPIDsRes = await _driver.SetPIDs(channel.PIDsArary);
-            if (!setPIDsRes.SuccessFlag)
-                return;                        
-
             MessagingCenter.Send(channel.Name, "PlayStream");            
-        }
+        }        
 
         private async Task Refresh()
         {
@@ -219,6 +213,9 @@ namespace DVBTTelevizor
                _loggingService.Info($"Refreshing channels");
 
                Channels.Clear();
+
+               if (_config.Channels == null)
+                   return;
 
                // adding one by one
                foreach (var ch in _config.Channels)

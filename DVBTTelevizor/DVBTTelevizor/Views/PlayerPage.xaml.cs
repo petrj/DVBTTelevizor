@@ -50,6 +50,11 @@ namespace DVBTTelevizor
             base.OnDisappearing();
 
             videoView.MediaPlayer.Stop();
+
+           Task.Run(async () =>
+           {
+               await _driver.Stop();
+           });            
         }
     }
 }

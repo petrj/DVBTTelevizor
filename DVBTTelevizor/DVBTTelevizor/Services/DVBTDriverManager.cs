@@ -153,7 +153,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task Stop()
+        public async Task Disconnect()
         {
             await SendCloseConnection();
             _controlClient.Close();
@@ -197,6 +197,49 @@ namespace DVBTTelevizor
             {
                 _readingBuffer = false;
             }
+        }
+
+        public async Task<bool> Play(long frequency, long bandwidth, int deliverySyetem, List<long> PIDs)
+        {
+            var tunedRes = await Tune(frequency, bandwidth, deliverySyetem);
+            if (!tunedRes.SuccessFlag)
+                return false;
+
+            var setPIDsRes = await SetPIDs(PIDs);
+            if (!setPIDsRes.SuccessFlag)
+                return false;
+
+            // wait 5s for signal ......
+
+            for (var i=0;i<5;i++)
+            {
+                var statusRes = await GetStatus();
+                if (!tunedRes.SuccessFlag)
+                {
+                    return false;
+                }
+
+                if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
+                {
+                    StopReadStream();
+                    return true;
+                }
+
+                System.Threading.Thread.Sleep(1000);
+            }
+
+            return false;
+        }
+
+        public async Task<bool> Stop()
+        {
+            StartReadStream();
+
+            var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17 });
+            if (!setPIDsRes.SuccessFlag)
+                return false;
+
+            return true;
         }
 
         public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
