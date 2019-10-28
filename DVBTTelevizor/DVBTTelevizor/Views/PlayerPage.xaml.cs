@@ -17,6 +17,7 @@ namespace DVBTTelevizor
         LibVLC _libVLC = null;
         MediaPlayer _mediaPlayer;
         DVBTDriverManager _driver;
+        Media _media = null;
 
         public PlayerPage(DVBTDriverManager driver)
         {
@@ -28,16 +29,20 @@ namespace DVBTTelevizor
 
             _libVLC = new LibVLC();
             _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
-            videoView.MediaPlayer = _mediaPlayer;            
+            videoView.MediaPlayer = _mediaPlayer;
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
 
-            var media = new Media(_libVLC, _driver.VideoStream, new string[] { });
-
-            videoView.MediaPlayer.Play(media);
+            if (_media == null)
+            {
+                _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+            }
+            
+            videoView.MediaPlayer.Play(_media);
+            
         }
 
         protected override void OnDisappearing()

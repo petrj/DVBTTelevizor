@@ -4,16 +4,10 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
              mc:Ignorable="d"
-             x:Class="DVBTTelevizor.MainPage">
-
+             x:Class="DVBTTelevizor.MainPage"
+             Title="DVBT Televizor">
     <ScrollView>
-        <StackLayout>
-            <Label Text="DVBT Televizor" HorizontalOptions="Center" VerticalOptions="Start" />
-            
-            <Label Text="Channels" TextColor="Yellow" FontSize="Medium"/>
-
-            <Label Text=""  x:Name="DebugLabel" TextColor="White" />
-            <Label Text="{Binding Status}"  x:Name="TuneLabel" TextColor="White" />
+        <StackLayout>            
 
             <Grid Margin="20,10,20,0">
                 <Grid.RowDefinitions>
@@ -63,6 +57,9 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
+
+            <Label Text=""  x:Name="DebugLabel" TextColor="White" />
+            <Label Text="{Binding Status}"  x:Name="TuneLabel" TextColor="White" />
 
             <Label Text="Driver" TextColor="Yellow" FontSize="Medium"/>
 
@@ -184,7 +181,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60" />
-                <Button Grid.Row="0" Grid.Column="1"  x:Name="StopPlayButton" Text="Stop" VerticalOptions="Start"  HeightRequest="60"/>
+                <Button Grid.Row="0" Grid.Column="1"  x:Name="SaveChannelsButton" Text="Update Channels" VerticalOptions="Start"  HeightRequest="60"/>
                 
             </Grid>           
 

@@ -6,7 +6,7 @@ using System.Text;
 namespace DVBTTelevizor
 {
     [Table("Channels")]
-    public class DVBTChannel
+    public class DVBTChannel : JSONObject
     {
         [PrimaryKey, Column("Number")]
         public int Number { get; set; }

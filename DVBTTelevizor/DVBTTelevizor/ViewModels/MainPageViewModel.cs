@@ -19,10 +19,9 @@ namespace DVBTTelevizor
         //private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
-        private ChannelsService _channelsService;
         private DVBTDriverManager _driver;
         private DVBTTelevizorConfiguration _config;
-
+        
         private long _tuneFrequency = 730;
         private long _tuneBandwidth = 8;
         private int _tuneDVBTType = 0;
@@ -71,8 +70,7 @@ namespace DVBTTelevizor
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
-            _driver = driver;
-            _channelsService = new ChannelsService(_loggingService, _driver, config);
+            _driver = driver;            
             _config = config;
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
@@ -110,6 +108,30 @@ namespace DVBTTelevizor
                    await PlayChannel(_selectedChannel);
                });
             }
+        }
+
+        public bool ChannelExists(long frequency,string name, long ProgramMapPID)
+        {
+            foreach (var ch in Channels)
+            {
+                if (ch.Frequency == frequency &&
+                    ch.Name == name &&
+                    ch.ProgramMapPID == ProgramMapPID)
+                {
+                    return true;                    
+                }
+            }
+
+            return false;
+        }
+
+        public async Task SaveChannelsToConfig()
+        {
+            await Task.Run(() =>
+            {
+                _config.Channels = Channels;
+                //Status = JsonConvert.SerializeObject(Channels); ;
+            });
         }
 
         public long TuneFrequency
@@ -177,51 +199,40 @@ namespace DVBTTelevizor
 
         private async Task PlayChannel(DVBTChannel channel)
         {
+            _driver.StopReadStream();
+
             var tunedRes = await _driver.Tune(channel.Frequency, channel.Bandwdith, channel.DVBTType);
             if (!tunedRes.SuccessFlag)
                 return;
 
             var setPIDsRes = await _driver.SetPIDs(channel.PIDsArary);
             if (!setPIDsRes.SuccessFlag)
-                return;
-
-            _driver.StopReadStream();
+                return;                        
 
             MessagingCenter.Send(channel.Name, "PlayStream");            
         }
 
         private async Task Refresh()
         {
-            _loggingService.Info($"Refreshing channels");
+           await Task.Run(() =>
+           {
+               _loggingService.Info($"Refreshing channels");
 
-            await RunWithPermission(Permission.Storage, async () =>
-            {
-                try
-                {                   
+               Channels.Clear();
 
-                    IsBusy = true;
-
-                    await _channelsService.Load();
-                    Channels.Clear();
-
-                    foreach (var ch in _channelsService.Channels)
-                    {
-                        Channels.Add(ch);
-                    }
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
-            });
+               // adding one by one
+               foreach (var ch in _config.Channels)
+               {
+                   Channels.Add(ch);
+               }
+           });
         }
 
         private async Task AutomaticTune()
         {
             Status = "Searching channels ...";
             
-            Channels.Clear();
-            _channelsService.Channels.Clear();
+            //Channels.Clear();
             
             try
             {
@@ -294,10 +305,18 @@ namespace DVBTTelevizor
                             ch.Number = Channels.Count + 1;
                             ch.DVBTType = type;
 
-                            Channels.Add(ch);
-                            //_channelsService.Channels.Add(ch);
+                            if (ChannelExists(freq, ch.Name, ch.ProgramMapPID))
+                            {
+                                Status = $"Channel {sDescriptor.Key.ServiceName} already added";
+                            }
+                            else
+                            {
 
-                            Status = $"Added {sDescriptor.Key.ServiceName}";
+                                Channels.Add(ch);
+                                //_channelsService.Channels.Add(ch);
+
+                                Status = $"Added {sDescriptor.Key.ServiceName}";
+                            }
 
                             break;
                     }
@@ -305,7 +324,7 @@ namespace DVBTTelevizor
 
                 Status = $"Tuning finished";
 
-                await SaveChannels();
+                await SaveChannelsToConfig();
 
             }
             catch (Exception ex)
@@ -316,16 +335,6 @@ namespace DVBTTelevizor
             {
                 IsBusy = false;                
             }            
-        }
-
-        private async Task SaveChannels()
-        {
-            await RunWithPermission(Permission.Storage, async () =>
-            {
-                _channelsService.Channels.Clear();
-                _channelsService.Channels.AddRange(Channels);
-                await _channelsService.Save();
-            });            
         }
 
         public async Task RunWithPermission(Permission perm, List<Command> commands)

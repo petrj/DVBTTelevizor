@@ -44,6 +44,7 @@ namespace DVBTTelevizor
             this.InitButton.Clicked += InitButton_Clicked;
             this.TuneButton.Clicked += TuneButton_Clicked;
             this.StopButton.Clicked += StopButton_Clicked;
+            this.SaveChannelsButton.Clicked += SaveChannelsButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
@@ -88,10 +89,10 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
-                Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                Device.BeginInvokeOnMainThread(
                  new Action( () =>                 
                  {
-                     Navigation.PushAsync(_playerPage);
+                     Navigation.PushModalAsync(_playerPage);
                  }));
             });
 
@@ -199,8 +200,8 @@ namespace DVBTTelevizor
         }
 
         private void PlayButton_Clicked(object sender, EventArgs e)
-        {            
-            Navigation.PushAsync(_playerPage);
+        {
+           Navigation.PushModalAsync(_playerPage);
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
@@ -329,6 +330,26 @@ namespace DVBTTelevizor
                 try
                 {
                     _driver.StartReadStream();
+                }
+                catch (Exception ex)
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        StatusLabel.Text = $"Request failed ({ex.Message})";
+                    });
+                }
+            });
+        }
+
+        private void SaveChannelsButton_Clicked(object sender, EventArgs e)
+        {
+            StatusLabel.Text = "Saving channels to  configuration ...";
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    _viewModel.SaveChannelsToConfig();
                 }
                 catch (Exception ex)
                 {

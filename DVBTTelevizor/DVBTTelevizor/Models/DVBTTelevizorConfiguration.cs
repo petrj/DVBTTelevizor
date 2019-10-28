@@ -3,6 +3,7 @@ using Android.Preferences;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -26,6 +27,23 @@ namespace DVBTTelevizor
             set
             {
                 SavePersistingSettingValue<string>("StorageFolder", value);
+            }
+        }
+
+        public ObservableCollection<DVBTChannel> Channels
+        {
+            get
+            {
+                var val = GetPersistingSettingValue<string>("ChannelsJson");
+                if (!string.IsNullOrEmpty(val))
+                {
+                    return JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(val);
+                }
+                return null;
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("ChannelsJson", JsonConvert.SerializeObject(value));
             }
         }
 
