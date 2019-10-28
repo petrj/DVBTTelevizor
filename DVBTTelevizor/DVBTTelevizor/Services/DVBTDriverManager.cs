@@ -109,6 +109,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool Started
+        {
+            get
+            {
+                return _controlClient != null && _controlClient.Connected;
+            }
+        }
+
         public void Start()
         {
             _controlClient = new TcpClient();

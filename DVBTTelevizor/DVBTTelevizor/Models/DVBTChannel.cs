@@ -53,9 +53,13 @@ namespace DVBTTelevizor
                 res.Add(0);
                 res.Add(16);
                 res.Add(17);
-                foreach (var pid in PIDs.Split(','))
+
+                if (!String.IsNullOrEmpty(PIDs))
                 {
-                    res.Add(Convert.ToInt64(pid));
+                    foreach (var pid in PIDs.Split(','))
+                    {
+                        res.Add(Convert.ToInt64(pid));
+                    }
                 }
 
                 return res;
