@@ -36,11 +36,7 @@ namespace DVBTTelevizor
 
         public MainPage()
         {
-            InitializeComponent();          
-
-
-            this.SaveChannelsButton.Clicked += SaveChannelsButton_Clicked;
-            this.PlayButton.Clicked += PlayButton_Clicked;            
+            InitializeComponent();   
 
             _dlgService = new DialogService(this);
             _log = new BasicLoggingService();
@@ -60,26 +56,7 @@ namespace DVBTTelevizor
              };
 
             BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver, _config);
-
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-
-                do
-                {
-                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                        new Action(
-                            delegate
-                            {
-                                DataStreamInfoLabel.Text = _driver.DataStreamInfo;
-                            }));
-
-                    // 2 secs delay
-                    Thread.Sleep(2 * 1000);
-
-                } while (true);
-            }).Start();
-
+                       
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
                 Device.BeginInvokeOnMainThread(
@@ -109,32 +86,16 @@ namespace DVBTTelevizor
         private void ToolbarServicePage_Clicked(object sender, EventArgs e)
         {
             Navigation.PushModalAsync(_servicePage);
-        }      
-
-
-        private void PlayButton_Clicked(object sender, EventArgs e)
-        {
-           Navigation.PushModalAsync(_playerPage);
         }
-      
-        private void SaveChannelsButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = "Saving channels to  configuration ...";
 
-            Task.Run(async () =>
-            {
-                try
-                {
-                    _viewModel.SaveChannelsToConfig();
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Request failed ({ex.Message})";
-                    });
-                }
-            });
+        private void ToolbarPlay_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(_playerPage);
+        }
+
+        private void ToolbarRefresh_Clicked(object sender, EventArgs e)
+        {
+            _viewModel.RefreshCommand.Execute(null);
         }
     }
 }

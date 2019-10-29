@@ -54,6 +54,7 @@ namespace DVBTTelevizor
             this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
             this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
             this.AddChannelsButton.Clicked += AddChannelsButton_Clicked;
+            this.TestButton.Clicked += TestButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
 
@@ -298,6 +299,11 @@ namespace DVBTTelevizor
             });
         }
 
+        private void TestButton_Clicked(object sender, EventArgs e)
+        {
+            _viewModel.RunWithPermission(Permission.Storage, async () => { _loggingService.Info("test"); });
+        }
+
         private void AddChannelsButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = "Adding channels ...";
@@ -306,7 +312,7 @@ namespace DVBTTelevizor
             {
                 try
                 {
-                    var res = _viewModel.SaveTunedChannels();
+                    var res = await _viewModel.SaveTunedChannels();
 
                     if (res>0)
                         StatusLabel.Text = $"Channels added ({res})";

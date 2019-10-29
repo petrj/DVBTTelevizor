@@ -6,12 +6,12 @@
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.MainPage"
              Title="DVBT Televizor">
-    <ScrollView>
-        <StackLayout>            
 
-            <Grid Margin="20,10,20,0">
+            <Grid Margin="0,0,0,0" RowSpacing="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="300" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -56,33 +56,15 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-            </Grid>
 
-            <Label Margin="20,10,20,0"  Text=""  x:Name="DebugLabel" TextColor="White" />
-            <Label Margin="20,10,20,0"  Text="{Binding Status}"  x:Name="TuneLabel" TextColor="White" />
-            <Label Margin="20,10,20,0" x:Name="DataStreamInfoLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
-            <Label Margin="20,10,20,0" x:Name="StatusLabel" Text="" HorizontalOptions="Start" TextColor="White"/>
-
-            <Grid Margin="20,10,20,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Row="0" Grid.Column="0"  x:Name="PlayButton" Text="Play" VerticalOptions="Start"  HeightRequest="60" />
-                <Button Grid.Row="0" Grid.Column="1"  x:Name="SaveChannelsButton" Text="Update Channels" VerticalOptions="Start"  HeightRequest="60"/>
-
-            </Grid>            
-            
-        </StackLayout>
-    </ScrollView>
+        <Label Grid.Row="1" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
+        <Label Grid.Row="2" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+    </Grid>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Name="ToolbarServicePage" Text="Service menu" Clicked="ToolbarServicePage_Clicked" Icon="Settings.png" />
+        <ToolbarItem Name="ToolbarRefresh" Text="Refresh" Clicked="ToolbarRefresh_Clicked" Icon="Refresh.png" />
+        <ToolbarItem Name="ToolbarPlay" Text="Play" Clicked="ToolbarPlay_Clicked"  />
     </ContentPage.ToolbarItems>
 
 </ContentPage>

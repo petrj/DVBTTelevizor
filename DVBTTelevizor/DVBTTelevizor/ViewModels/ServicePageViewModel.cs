@@ -195,11 +195,13 @@ namespace DVBTTelevizor
             }
         }
 
-        public int SaveTunedChannels()
+        public async Task<int> SaveTunedChannels()
         {
             var c = 0;
 
-            var channels = _config.Channels;
+            var channelService = new JSONChannelsService(_loggingService, _config);
+
+            var channels = await channelService.LoadChannels();
             if (channels == null) channels = new ObservableCollection<DVBTChannel>();
 
             foreach (var ch in TunedChannels)
@@ -211,7 +213,7 @@ namespace DVBTTelevizor
                 }
             }
 
-            _config.Channels = channels;
+            await channelService.SaveChannels(channels);
 
             return c;
         }

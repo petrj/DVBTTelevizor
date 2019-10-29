@@ -69,6 +69,22 @@
 
                 </Grid>
 
+                <Label Text="Stream read control" TextColor="Yellow" FontSize="Medium"/>
+
+                <Grid Margin="20,10,20,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="33*" />
+                        <ColumnDefinition Width="33*" />
+                        <ColumnDefinition Width="33*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="0"  x:Name="TestButton" Text="Test" VerticalOptions="Start"  HeightRequest="60"/>                    
+
+                </Grid>
+
                 <Label Text="Tuning" TextColor="Yellow" FontSize="Medium"/>
 
                 <StackLayout Margin="0,10,0,0">

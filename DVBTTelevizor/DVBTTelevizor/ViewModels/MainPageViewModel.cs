@@ -26,9 +26,36 @@ namespace DVBTTelevizor
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
             :base(loggingService, dialogService, driver, config)
         {
-            RefreshCommand = new Command(async () => await Refresh());           
+            //efreshCommand = new Command(async () => await RefreshWithPermissions());           
+
+         
+        RefreshCommand = new Command(async () => await RunWithPermission(Permission.Storage,
+            new Func<Task>(
+             async () =>
+             {
+                 await Refresh();
+             })));
 
             RefreshCommand.Execute(null);
+
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                do
+                {
+                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                        new Action(
+                            delegate
+                            {
+                                OnPropertyChanged(nameof(DataStreamInfo));
+                            }));
+
+                    // 2 secs delay
+                    Thread.Sleep(2 * 1000);
+
+                } while (true);
+            }).Start();
         }
 
         public DVBTChannel SelectedChannel
@@ -49,7 +76,15 @@ namespace DVBTTelevizor
                });
             }
         }
-               
+
+        public string DataStreamInfo
+        {
+            get
+            {
+                return _driver.DataStreamInfo;
+            }            
+        }
+
         public async Task SaveChannelsToConfig()
         {
             await Task.Run(() =>
@@ -66,25 +101,39 @@ namespace DVBTTelevizor
                 return;
 
             MessagingCenter.Send(channel.Name, "PlayStream");            
-        }        
+        }
+
+        private async Task RefreshWithPermissions()
+        {
+            Xamarin.Forms.Device.BeginInvokeOnMainThread( () =>              
+                Refresh()
+              );
+        }
 
         private async Task Refresh()
         {
-           await Task.Run(() =>
-           {
-               _loggingService.Info($"Refreshing channels");
+            try
+            {
+                _loggingService.Info($"Refreshing channels");
 
                Channels.Clear();
 
-               if (_config.Channels == null)
-                   return;
+                var chService = new JSONChannelsService(_loggingService, _config);
 
-               // adding one by one
-               foreach (var ch in _config.Channels)
-               {
-                   Channels.Add(ch);
-               }
-           });
+                var channels = await chService.LoadChannels();
+
+                // adding one by one
+                foreach (var ch in channels)
+                {
+                    Channels.Add(ch);
+                }
+
+                OnPropertyChanged(nameof(Channels));
+
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while loading channels");
+            }             
         }
 
 
