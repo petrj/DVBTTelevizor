@@ -4,12 +4,11 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="DVBTTelevizor.ServicePage">
+             x:Class="DVBTTelevizor.ServicePage"
+             Title="Service menu">
     <ContentPage.Content>
         <ScrollView>
-            <StackLayout Margin="20,10,20,0">  
-
-                <Label Text="Driver service" TextColor="Yellow" FontSize="Medium"/>
+            <StackLayout Margin="20,10,20,0">
 
                 <Grid Margin="20,10,20,0">
                     <Grid.RowDefinitions>
@@ -81,7 +80,7 @@
                         <ColumnDefinition Width="33*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0"  x:Name="TestButton" Text="Test" VerticalOptions="Start"  HeightRequest="60"/>                    
+                    <Button Grid.Row="0" Grid.Column="0"  x:Name="TestButton" Text="Test" VerticalOptions="Start"  HeightRequest="60"/>
 
                 </Grid>
 
@@ -118,67 +117,15 @@
                             <ColumnDefinition Width="33*" />
                         </Grid.ColumnDefinitions>
 
-
                         <Button Grid.Row="0" Grid.Column="0" x:Name="TuneButton" Text="Tune"   HeightRequest="60" />
                         <Button Grid.Row="0" Grid.Column="1" x:Name="SetPIDsButton" Text="Set PIDs"  HeightRequest="60" />
+                        <Button Grid.Row="0" Grid.Column="2" x:Name="PlayButton" Text="Play"  HeightRequest="60" />
                     </Grid>
 
-                    <Button Margin="20,10,20,0" x:Name="SearchchannelsButton" Text="Search channels" VerticalOptions="Start"   HeightRequest="60"/>
-
-                    <Grid Margin="20,10,20,0" x:Name="SearchGrid" >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />                            
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        
-
-                        <ListView Grid.Row="0" Grid.Column="0" x:Name="ChannelsListView"
-                        ItemsSource="{Binding TunedChannels}"
-                        CachingStrategy="RecycleElement"
-                        HeightRequest="{Binding ChannelsHeight}">  
-                            
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <ViewCell>
-                                    <ViewCell.View>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*" />
-                                                <RowDefinition Height="*" />
-                                                <RowDefinition Height="1" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="100" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
-                                            <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
-                                            <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
-
-                                            <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0" Text="{Binding PIDsLabel}" TextColor="White"/>
-
-                                            <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
-                                        </Grid>
-
-                                    </ViewCell.View>
-
-                                </ViewCell>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-
-                        <Button Grid.Row="1" Grid.Column="0"  x:Name="AddChannelsButton" Text="Add channels" VerticalOptions="Start"/>
-
-                    </Grid>                    
-
                 </StackLayout>
-
 
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
+
 </ContentPage>

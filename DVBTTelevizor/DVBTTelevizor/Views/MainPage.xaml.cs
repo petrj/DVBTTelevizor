@@ -28,15 +28,16 @@ namespace DVBTTelevizor
         private MainPageViewModel _viewModel;
 
         DVBTDriverManager _driver;
-        DialogService _dlgService;       
+        DialogService _dlgService;
         ILoggingService _log;
         private DVBTTelevizorConfiguration _config;
         PlayerPage _playerPage;
         ServicePage _servicePage;
+        TunePage _tunePage;
 
         public MainPage()
         {
-            InitializeComponent();   
+            InitializeComponent();
 
             _dlgService = new DialogService(this);
             _log = new BasicLoggingService();
@@ -48,7 +49,8 @@ namespace DVBTTelevizor
             _driver = new DVBTDriverManager(_log, _config);
 
             _playerPage = new PlayerPage(_driver);
-            _servicePage = new ServicePage(_log,_dlgService,_driver,_config);
+            _tunePage = new TunePage(_log, _dlgService, _driver, _config);
+            _servicePage = new ServicePage(_log,_dlgService,_driver,_config, _playerPage);
 
             _servicePage.Disappearing += delegate
              {
@@ -56,17 +58,17 @@ namespace DVBTTelevizor
              };
 
             BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver, _config);
-                       
+
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
                 Device.BeginInvokeOnMainThread(
-                 new Action( () =>                 
+                 new Action( () =>
                  {
                      Navigation.PushModalAsync(_playerPage);
                  }));
             });
 
-            
+
             if (_config.AutoInitAfterStart)
             {
                 Task.Run( () =>
@@ -77,25 +79,27 @@ namespace DVBTTelevizor
                    delegate
                    {
                        MessagingCenter.Send("", "Init");
-                   }));                   
+                   }));
                });
-                
+
             }
         }
 
         private void ToolbarServicePage_Clicked(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(_servicePage);
+            Navigation.PushAsync(_servicePage);
         }
 
-        private void ToolbarPlay_Clicked(object sender, EventArgs e)
+        private void ToolbarTune_Clicked(object sender, EventArgs e)
         {
-            Navigation.PushModalAsync(_playerPage);
+            Navigation.PushAsync(_tunePage);
         }
 
         private void ToolbarRefresh_Clicked(object sender, EventArgs e)
         {
             _viewModel.RefreshCommand.Execute(null);
         }
+
+
     }
 }

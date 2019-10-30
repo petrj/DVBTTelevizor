@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DVBTTelevizor.TunePage"
+             Title="Tune">
+    <ContentPage.Content>
+
+        <Grid Margin="10,10,10,0" RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="0" >
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End"/>
+
+                <Label Grid.Row="1" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End"/>
+
+                <Label  Grid.Row="2" Grid.Column="0"  Text="DeliverySystem" TextColor="White"/>
+                <Picker Grid.Row="2" Grid.Column="1" x:Name="DeliverySystemPicker"
+                        TextColor="White"
+                        HorizontalOptions="End">
+                        <Picker.Items>
+                            <x:String>DVBT</x:String>
+                            <x:String>DVBT2</x:String>
+                        </Picker.Items>
+                    </Picker>
+
+                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SearchchannelsButton" Text="Search channels" VerticalOptions="Start"/>
+            </Grid>
+
+            <Grid Grid.Row="1" Grid.Column="0"  x:Name="SearchGrid" VerticalOptions="StartAndExpand">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ListView Grid.Row="0" Grid.Column="0" x:Name="ChannelsListView"
+                        ItemsSource="{Binding TunedChannels}"
+                        CachingStrategy="RecycleElement"
+                        HasUnevenRows="True">
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <ViewCell.View>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="1" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="100" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
+                                        <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
+                                        <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
+
+                                        <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                    </Grid>
+
+                                </ViewCell.View>
+
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+            </Grid>
+
+            <Button Grid.Row="2" Grid.Column="0" x:Name="AddChannelsButton" Text="Add channels" VerticalOptions="Start"/>
+            <Label Grid.Row="3" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
+            <Label Grid.Row="4" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+
+        </Grid>
+
+    </ContentPage.Content>
+</ContentPage>

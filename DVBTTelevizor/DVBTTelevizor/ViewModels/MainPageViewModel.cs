@@ -97,13 +97,6 @@ namespace DVBTTelevizor
             MessagingCenter.Send(channel.Name, "PlayStream");
         }
 
-        private async Task RefreshWithPermissions()
-        {
-            Xamarin.Forms.Device.BeginInvokeOnMainThread( () =>
-                Refresh()
-              );
-        }
-
         private async Task Refresh()
         {
             try

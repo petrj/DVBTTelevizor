@@ -29,8 +29,9 @@ namespace DVBTTelevizor
         protected IDialogService _dialogService;
         protected DVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
+        protected PlayerPage _playerPage;
 
-        public ServicePage(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public ServicePage(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, PlayerPage playerPage)
         {
             InitializeComponent();
 
@@ -38,6 +39,7 @@ namespace DVBTTelevizor
             _dialogService = dialogService;
             _driver = driver;
             _config = config;
+            _playerPage = playerPage;
 
             BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
 
@@ -50,11 +52,10 @@ namespace DVBTTelevizor
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
-            this.SearchchannelsButton.Clicked += AutomaticTune_Clicked;
             this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
             this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
-            this.AddChannelsButton.Clicked += AddChannelsButton_Clicked;
             this.TestButton.Clicked += TestButton_Clicked;
+            this.PlayButton.Clicked += PlayButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;
 
@@ -138,11 +139,6 @@ namespace DVBTTelevizor
             });
         }
 
-        private void AutomaticTune_Clicked(object sender, EventArgs e)
-        {
-            _viewModel.TuneCommand.Execute(null);
-        }
-
         private void GetStatusButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = Environment.NewLine + "Getting status ...";
@@ -191,7 +187,6 @@ namespace DVBTTelevizor
                     });
                 }
             });
-
         }
 
         private void GetVersionButton_Clicked(object sender, EventArgs e)
@@ -218,6 +213,7 @@ namespace DVBTTelevizor
                 }
             });
         }
+
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
             _viewModel.RunWithStoragePermission(async () => await _driver.StartRecording());
@@ -299,32 +295,14 @@ namespace DVBTTelevizor
             });
         }
 
+        private void PlayButton_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushModalAsync(_playerPage);
+        }
+
         private void TestButton_Clicked(object sender, EventArgs e)
         {
             _viewModel.RunWithStoragePermission(async () => { _loggingService.Info("test"); });
-        }
-
-        private void AddChannelsButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = "Adding channels ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var res = await _viewModel.SaveTunedChannels();
-
-                    if (res>0)
-                        StatusLabel.Text = $"Channels added ({res})";
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Request failed ({ex.Message})";
-                    });
-                }
-            });
         }
     }
 }

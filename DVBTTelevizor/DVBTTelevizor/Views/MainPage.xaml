@@ -2,17 +2,17 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.MainPage"
              Title="DVBT Televizor">
 
             <Grid Margin="0,0,0,0" RowSpacing="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -62,9 +62,9 @@
     </Grid>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Name="ToolbarServicePage" Text="Service menu" Clicked="ToolbarServicePage_Clicked" Icon="Settings.png" />
         <ToolbarItem Name="ToolbarRefresh" Text="Refresh" Clicked="ToolbarRefresh_Clicked" Icon="Refresh.png" />
-        <ToolbarItem Name="ToolbarPlay" Text="Play" Clicked="ToolbarPlay_Clicked"  />
+        <ToolbarItem Name="ToolbarTune" Text="Tune" Clicked="ToolbarTune_Clicked" Icon="Tune.png"  />
+        <ToolbarItem Name="ToolbarServicePage" Text="Service menu" Clicked="ToolbarServicePage_Clicked" Icon="Settings.png" />
     </ContentPage.ToolbarItems>
 
 </ContentPage>
