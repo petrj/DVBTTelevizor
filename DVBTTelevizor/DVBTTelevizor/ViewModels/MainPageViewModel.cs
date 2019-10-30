@@ -26,15 +26,9 @@ namespace DVBTTelevizor
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
             :base(loggingService, dialogService, driver, config)
         {
-            //efreshCommand = new Command(async () => await RefreshWithPermissions());           
+            //efreshCommand = new Command(async () => await RefreshWithPermissions());
 
-         
-        RefreshCommand = new Command(async () => await RunWithPermission(Permission.Storage,
-            new Func<Task>(
-             async () =>
-             {
-                 await Refresh();
-             })));
+            RefreshCommand = new Command(async () => await Refresh());
 
             RefreshCommand.Execute(null);
 
@@ -82,7 +76,7 @@ namespace DVBTTelevizor
             get
             {
                 return _driver.DataStreamInfo;
-            }            
+            }
         }
 
         public async Task SaveChannelsToConfig()
@@ -92,7 +86,7 @@ namespace DVBTTelevizor
                 _config.Channels = Channels;
                 //Status = JsonConvert.SerializeObject(Channels); ;
             });
-        } 
+        }
 
         private async Task PlayChannel(DVBTChannel channel)
         {
@@ -100,12 +94,12 @@ namespace DVBTTelevizor
             if (!playRes)
                 return;
 
-            MessagingCenter.Send(channel.Name, "PlayStream");            
+            MessagingCenter.Send(channel.Name, "PlayStream");
         }
 
         private async Task RefreshWithPermissions()
         {
-            Xamarin.Forms.Device.BeginInvokeOnMainThread( () =>              
+            Xamarin.Forms.Device.BeginInvokeOnMainThread( () =>
                 Refresh()
               );
         }
@@ -120,20 +114,27 @@ namespace DVBTTelevizor
 
                 var chService = new JSONChannelsService(_loggingService, _config);
 
-                var channels = await chService.LoadChannels();
-
-                // adding one by one
-                foreach (var ch in channels)
+                await Device.InvokeOnMainThreadAsync(async () =>
                 {
-                    Channels.Add(ch);
-                }
+                   await RunWithPermission(Permission.Storage, new Func<Task>(
+                        async () =>
+                        {
+                            var channels = await chService.LoadChannels();
+
+                             // adding one by one
+                             foreach (var ch in channels)
+                            {
+                                Channels.Add(ch);
+                            }
+                        }));
+               });
 
                 OnPropertyChanged(nameof(Channels));
 
             } catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while loading channels");
-            }             
+            }
         }
 
 
