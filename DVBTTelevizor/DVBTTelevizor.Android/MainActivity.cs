@@ -13,8 +13,7 @@ using Android.Net.Wifi;
 
 using VideoView = LibVLCSharp.Platforms.Android.VideoView;
 using LibVLCSharp.Shared;
-
-
+using Plugin.Permissions;
 
 namespace DVBTTelevizor.Droid
 {
@@ -27,7 +26,7 @@ namespace DVBTTelevizor.Droid
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;            
+            ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
 
@@ -71,14 +70,12 @@ namespace DVBTTelevizor.Droid
                     _waitingForInit = false;
                     MessagingCenter.Send(ex.ToString(), "DVBTDriverConfigurationFailed");
                 }
-            });   
+            });
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-                       
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)

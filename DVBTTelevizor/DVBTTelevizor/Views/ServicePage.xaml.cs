@@ -220,7 +220,7 @@ namespace DVBTTelevizor
         }
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
-            _viewModel.RunWithPermission(Permission.Storage, async () => await _driver.StartRecording());
+            _viewModel.RunWithStoragePermission(async () => await _driver.StartRecording());
         }
 
         private void StopRecordButton_Clicked(object sender, EventArgs e)
@@ -258,7 +258,7 @@ namespace DVBTTelevizor
                 }
             });
         }
-        
+
         private void StopReadStreamButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = "Stop read stream ...";
@@ -301,7 +301,7 @@ namespace DVBTTelevizor
 
         private void TestButton_Clicked(object sender, EventArgs e)
         {
-            _viewModel.RunWithPermission(Permission.Storage, async () => { _loggingService.Info("test"); });
+            _viewModel.RunWithStoragePermission(async () => { _loggingService.Info("test"); });
         }
 
         private void AddChannelsButton_Clicked(object sender, EventArgs e)
@@ -325,6 +325,6 @@ namespace DVBTTelevizor
                     });
                 }
             });
-        }       
+        }
     }
 }

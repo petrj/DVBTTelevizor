@@ -114,20 +114,19 @@ namespace DVBTTelevizor
 
                 var chService = new JSONChannelsService(_loggingService, _config);
 
-                await Device.InvokeOnMainThreadAsync(async () =>
-                {
-                   await RunWithPermission(Permission.Storage, new Func<Task>(
-                        async () =>
-                        {
-                            var channels = await chService.LoadChannels();
+                ObservableCollection<DVBTChannel> channels = null;
 
-                             // adding one by one
-                             foreach (var ch in channels)
-                            {
-                                Channels.Add(ch);
-                            }
-                        }));
-               });
+                await RunWithStoragePermission(
+                    async () =>
+                    {
+                        channels = await chService.LoadChannels();
+                    });
+
+                // adding one by one
+                foreach (var ch in channels)
+                {
+                    Channels.Add(ch);
+                }
 
                 OnPropertyChanged(nameof(Channels));
 

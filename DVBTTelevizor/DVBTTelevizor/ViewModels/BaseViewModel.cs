@@ -20,7 +20,7 @@ namespace DVBTTelevizor
         protected IDialogService _dialogService;
         protected DVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
-     
+
         private string _status;
 
         bool isBusy = false;
@@ -111,36 +111,20 @@ namespace DVBTTelevizor
             return false;
         }
 
-        public async Task RunWithPermission(Permission perm, List<Command> commands)
-        {
-            var f = new Func<Task>(
-                 async () =>
-                 {
-                     foreach (var command in commands)
-                     {
-                         await Task.Run(() => command.Execute(null));
-                     }
-                 });
-
-            await RunWithPermission(perm, f);
-        }
-
-        public async Task RunWithPermission(Permission perm, Func<Task> action)
+        public async Task RunWithStoragePermission(Func<Task> action)
         {
             try
             {
-                var status = await CrossPermissions.Current.CheckPermissionStatusAsync(perm);
+                var status = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
+
                 if (status != PermissionStatus.Granted)
                 {
-                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(perm))
+                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Storage))
                     {
-                        await _dialogService.Information("Application requires permission", "Information");
+                        await _dialogService.Information("Application requires storage permission", "Information");
                     }
 
-                    var results = await CrossPermissions.Current.RequestPermissionsAsync(perm);
-
-                    if (results.ContainsKey(perm))
-                        status = results[perm];
+                    status = await CrossPermissions.Current.RequestPermissionAsync<StoragePermission>();
                 }
 
                 if (status == PermissionStatus.Granted)
@@ -149,7 +133,7 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    await _dialogService.Error("Missing permissions", "Error");
+                    await _dialogService.Error("Storage not granted", "Error");
                 }
             }
             catch (Exception ex)
