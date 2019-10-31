@@ -31,25 +31,6 @@ namespace DVBTTelevizor
             RefreshCommand = new Command(async () => await Refresh());
 
             RefreshCommand.Execute(null);
-
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-
-                do
-                {
-                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                        new Action(
-                            delegate
-                            {
-                                OnPropertyChanged(nameof(DataStreamInfo));
-                            }));
-
-                    // 2 secs delay
-                    Thread.Sleep(2 * 1000);
-
-                } while (true);
-            }).Start();
         }
 
         public DVBTChannel SelectedChannel
@@ -68,14 +49,6 @@ namespace DVBTTelevizor
                {
                    await PlayChannel(_selectedChannel);
                });
-            }
-        }
-
-        public string DataStreamInfo
-        {
-            get
-            {
-                return _driver.DataStreamInfo;
             }
         }
 

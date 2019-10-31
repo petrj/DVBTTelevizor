@@ -56,6 +56,10 @@ namespace DVBTTelevizor
              {
                  _viewModel.RefreshCommand.Execute(null);
              };
+            _tunePage.Disappearing += delegate
+            {
+                _viewModel.RefreshCommand.Execute(null);
+            };
 
             BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver, _config);
 

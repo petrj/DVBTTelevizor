@@ -57,26 +57,7 @@ namespace DVBTTelevizor
             this.TestButton.Clicked += TestButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
 
-            DeliverySystemPicker.SelectedIndex = 0;
-
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-
-                do
-                {
-                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                        new Action(
-                            delegate
-                            {
-                                DataStreamInfoLabel.Text = _driver.DataStreamInfo;
-                            }));
-
-                    // 2 secs delay
-                    Thread.Sleep(2 * 1000);
-
-                } while (true);
-            }).Start();
+            DeliverySystemPicker.SelectedIndex = 0;;
         }
 
         private void InitButton_Clicked(object sender, EventArgs e)

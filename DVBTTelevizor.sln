@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.Android", "DV
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D54974CA-1DE5-430E-812E-133929BDDFE4}"
 	ProjectSection(SolutionItems) = preProject
+		BuildAPK.bat = BuildAPK.bat
+		BuildAPK.ps1 = BuildAPK.ps1
 		Clear.bat = Clear.bat
 		Clear.ps1 = Clear.ps1
 		WifiDebug.bat = WifiDebug.bat
@@ -18,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MPEGTS", "MPEGTS\MPEGTS.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MPEGTSTest", "MPEGTSTest\MPEGTSTest.csproj", "{C1EFCBA5-B520-4DC0-841E-7F78E2404E8F}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "DVBTTelevizor", "DVBTTelevizor\DVBTTelevizor\DVBTTelevizor.csproj", "{D7D14254-AEC9-49B9-8543-1DE3D0E4ADDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVBTTelevizor", "DVBTTelevizor\DVBTTelevizor\DVBTTelevizor.csproj", "{D7D14254-AEC9-49B9-8543-1DE3D0E4ADDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,31 +10,43 @@ namespace DVBTTelevizor
 {
     public class TunePageViewModel : BaseViewModel
     {
+        private bool _manualTuning = true;
         private long _tuneFrequency = 730;
         private long _tuneBandwidth = 8;
         private int _tuneDVBTType = 0;
 
-        public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
+        public ObservableCollection<DVBTChannel> TunedChannels { get; set;  } = new ObservableCollection<DVBTChannel>();
 
         public Command TuneCommand { get; set; }
+        public Command SaveTunedChannelsCommand { get; set; }
 
         public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
             TuneCommand = new Command(async () => await Tune());
+            SaveTunedChannelsCommand = new Command(async () => await SaveTunedChannels());
+        }
 
-            TunedChannels.Add(new DVBTChannel()
+        public bool AddChannelsVisible
+        {
+            get
             {
-                Name="Test",
-                Frequency=730000000,
-                PIDs = "0,16,17"
-            });
-            TunedChannels.Add(new DVBTChannel()
+                return TunedChannels.Count>0;
+            }
+        }
+
+        public bool ManualTuning
+        {
+            get
             {
-                Name = "Test 2",
-                Frequency = 730000000,
-                PIDs = "0,16,17"
-            });
+                return _manualTuning;
+            }
+            set
+            {
+                _manualTuning = value;
+
+                OnPropertyChanged(nameof(TuneFrequency));
+            }
         }
 
         public long TuneFrequency
@@ -82,8 +94,6 @@ namespace DVBTTelevizor
         private async Task Tune()
         {
             Status = $"Searching channels on freq {TuneFrequency}...";
-
-            //TunedChannels.Clear();
 
             try
             {
@@ -165,9 +175,6 @@ namespace DVBTTelevizor
                 }
 
                 Status = $"Tuning finished";
-
-                //await SaveChannelsToConfig();
-
             }
             catch (Exception ex)
             {
@@ -176,30 +183,48 @@ namespace DVBTTelevizor
             finally
             {
                 IsBusy = false;
+                OnPropertyChanged(nameof(TunedChannels));
+                OnPropertyChanged(nameof(AddChannelsVisible));
             }
         }
 
         public async Task<int> SaveTunedChannels()
         {
-            var c = 0;
-
-            var channelService = new JSONChannelsService(_loggingService, _config);
-
-            var channels = await channelService.LoadChannels();
-            if (channels == null) channels = new ObservableCollection<DVBTChannel>();
-
-            foreach (var ch in TunedChannels)
+            try
             {
-                if (!BaseViewModel.ChannelExists(channels, ch.Frequency, ch.Name, ch.ProgramMapPID))
+                var c = 0;
+
+                var channelService = new JSONChannelsService(_loggingService, _config);
+
+                var channels = await channelService.LoadChannels();
+                if (channels == null) channels = new ObservableCollection<DVBTChannel>();
+
+                foreach (var ch in TunedChannels)
                 {
-                    c++;
-                    channels.Add(ch);
+                    if (!BaseViewModel.ChannelExists(channels, ch.Frequency, ch.Name, ch.ProgramMapPID))
+                    {
+                        c++;
+                        channels.Add(ch);
+                    }
                 }
+
+                await channelService.SaveChannels(channels);
+
+                TunedChannels.Clear();
+
+                return c;
             }
-
-            await channelService.SaveChannels(channels);
-
-            return c;
+            catch (Exception ex)
+            {
+                Status = $"Error ({ex.Message})";
+                return 0;
+            }
+            finally
+            {
+                IsBusy = false;
+                OnPropertyChanged(nameof(TunedChannels));
+                OnPropertyChanged(nameof(AddChannelsVisible));
+            }
         }
 
     }

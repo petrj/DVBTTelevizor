@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.TunePage"
-             Title="Tune">
+             Title="Tuning">
     <ContentPage.Content>
 
         <Grid Margin="10,10,10,0" RowSpacing="0">
@@ -29,23 +29,24 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End"/>
+                <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" TextColor="White"/>
+                <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
 
-                <Label Grid.Row="1" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End"/>
+                <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
-                <Label  Grid.Row="2" Grid.Column="0"  Text="DeliverySystem" TextColor="White"/>
-                <Picker Grid.Row="2" Grid.Column="1" x:Name="DeliverySystemPicker"
-                        TextColor="White"
-                        HorizontalOptions="End">
+                <Label Grid.Row="2" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                <Entry Grid.Row="2" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+
+                <Label  Grid.Row="3" Grid.Column="0"  Text="DeliverySystem" TextColor="White"/>
+                <Picker Grid.Row="3" Grid.Column="1" x:Name="DeliverySystemPicker" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" >
                         <Picker.Items>
                             <x:String>DVBT</x:String>
                             <x:String>DVBT2</x:String>
                         </Picker.Items>
                     </Picker>
 
-                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SearchchannelsButton" Text="Search channels" VerticalOptions="Start"/>
+                <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" VerticalOptions="Start"/>
             </Grid>
 
             <Grid Grid.Row="1" Grid.Column="0"  x:Name="SearchGrid" VerticalOptions="StartAndExpand">
@@ -93,7 +94,7 @@
 
             </Grid>
 
-            <Button Grid.Row="2" Grid.Column="0" x:Name="AddChannelsButton" Text="Add channels" VerticalOptions="Start"/>
+            <Button Grid.Row="2" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save tuned channels" VerticalOptions="Start" IsVisible="{Binding AddChannelsVisible}" />
             <Label Grid.Row="3" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
             <Label Grid.Row="4" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
 

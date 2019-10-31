@@ -73,6 +73,33 @@ namespace DVBTTelevizor
             {
                 Status = $"Initialization failed ({message})";
             });
+
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                do
+                {
+                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                        new Action(
+                            delegate
+                            {
+                                OnPropertyChanged(nameof(DataStreamInfo));
+                            }));
+
+                    // 2 secs delay
+                    Thread.Sleep(2 * 1000);
+
+                } while (true);
+            }).Start();
+        }
+
+        public string DataStreamInfo
+        {
+            get
+            {
+                return _driver.DataStreamInfo;
+            }
         }
 
         public bool IsBusy
