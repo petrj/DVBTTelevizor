@@ -20,7 +20,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="0" Grid.Column="0" >
+            <Grid Grid.Row="0" Grid.Column="0" x:Name="OptionsGrid" >
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -38,63 +38,51 @@
                 <Label Grid.Row="2" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
                 <Entry Grid.Row="2" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
-                <Label  Grid.Row="3" Grid.Column="0"  Text="DeliverySystem" TextColor="White"/>
-                <Picker Grid.Row="3" Grid.Column="1" x:Name="DeliverySystemPicker" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" >
-                        <Picker.Items>
-                            <x:String>DVBT</x:String>
-                            <x:String>DVBT2</x:String>
-                        </Picker.Items>
-                    </Picker>
+                <Label Grid.Row="3" Grid.Column="0" Text="DVBT" TextColor="White"/>
+                <CheckBox Grid.Row="3" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End"/>
 
-                <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" VerticalOptions="Start"/>
+                <Label Grid.Row="4" Grid.Column="0" Text="DVBT2" TextColor="White"/>
+                <CheckBox Grid.Row="4" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End"/>
+
+                <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" VerticalOptions="Start"/>
+                <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" VerticalOptions="Start" IsVisible="{Binding TuningInProgress}"/>
             </Grid>
 
-            <Grid Grid.Row="1" Grid.Column="0"  x:Name="SearchGrid" VerticalOptions="StartAndExpand">
+            <ListView Grid.Row="1" Grid.Column="0" x:Name="ChannelsListView"
+                    ItemsSource="{Binding TunedChannels}"
+                    CachingStrategy="RecycleElement"
+                    HasUnevenRows="True">
+                
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="1" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="40" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="100" />
+                                    </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
+                                    <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
+                                    <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
 
-                <ListView Grid.Row="0" Grid.Column="0" x:Name="ChannelsListView"
-                        ItemsSource="{Binding TunedChannels}"
-                        CachingStrategy="RecycleElement"
-                        HasUnevenRows="True">
+                                    <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                </Grid>
 
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ViewCell>
-                                <ViewCell.View>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*" />
-                                            <RowDefinition Height="1" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="100" />
-                                        </Grid.ColumnDefinitions>
+                            </ViewCell.View>
 
-                                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
-                                        <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
-                                        <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
 
-                                        <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
-                                    </Grid>
-
-                                </ViewCell.View>
-
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-
-            </Grid>
-
-            <Button Grid.Row="2" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save tuned channels" VerticalOptions="Start" IsVisible="{Binding AddChannelsVisible}" />
+            <Button Grid.Row="2" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save tuned channels" VerticalOptions="Start" IsVisible="{Binding AddChannelsVisible}" />            
             <Label Grid.Row="3" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
             <Label Grid.Row="4" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
 

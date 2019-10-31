@@ -26,8 +26,6 @@ namespace DVBTTelevizor
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
             :base(loggingService, dialogService, driver, config)
         {
-            //efreshCommand = new Command(async () => await RefreshWithPermissions());
-
             RefreshCommand = new Command(async () => await Refresh());
 
             RefreshCommand.Execute(null);

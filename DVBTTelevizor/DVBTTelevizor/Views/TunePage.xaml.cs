@@ -29,8 +29,6 @@ namespace DVBTTelevizor
             _config = config;
 
             BindingContext = _viewModel = new TunePageViewModel(_loggingService, _dialogService, _driver, _config);
-
-            DeliverySystemPicker.SelectedIndex = 0;
         }
     }
 }
