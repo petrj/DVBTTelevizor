@@ -201,7 +201,32 @@ namespace DVBTTelevizor
 
             State = TuneState.TuningInProgress;
 
-            /* debug
+            _tuningAborted = false;
+
+            try
+            {
+                long freq = TuneFrequency * 1000000;
+                long bandWidth = TuneBandwidth * 1000000;
+
+                await Tune(freq, bandWidth);
+
+                Status = $"Tuning finished";
+            }
+            catch (Exception ex)
+            {
+                Status = $"Tune error ({ex.Message})";
+            }
+            finally
+            {
+                State = TuneState.TuneFinished;
+                OnPropertyChanged(nameof(TunedChannels));
+                OnPropertyChanged(nameof(AddChannelsVisible));
+            }
+        }
+
+        private async Task Tune(long freq, long bandWidth)
+        {
+             /*//debug
             await Task.Run(() =>
             {
                 _tuningAborted = false;
@@ -224,14 +249,10 @@ namespace DVBTTelevizor
 
                     TunedChannels.Add(ch);
                 }
-            });
-            */
-
-            _tuningAborted = false;
+            });*/
 
             try
             {
-
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
                     if (!DVBTTuning && dvbtTypeIndex == 0)
@@ -239,14 +260,11 @@ namespace DVBTTelevizor
                     if (!DVBT2Tuning && dvbtTypeIndex == 1)
                         continue;
 
-                    long freq = TuneFrequency * 1000000;
-                    long bandWidth = TuneBandwidth * 1000000;
-                    int type = dvbtTypeIndex;
-                    var tuneRes = await _driver.Tune(freq, bandWidth, type);
+                    var tuneRes = await _driver.Tune(freq, bandWidth, dvbtTypeIndex);
 
-                    Status = $"Tuning freq. {TuneFrequency} Mhz (type {type}) ...";
+                    Status = $"Tuning freq. {TuneFrequency} Mhz (type {dvbtTypeIndex}) ...";
 
-                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(freq, bandWidth, type);
+                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(freq, bandWidth, dvbtTypeIndex);
 
                     switch (searchMapPIDsResult.Result)
                     {
@@ -310,7 +328,7 @@ namespace DVBTTelevizor
                                 ch.Frequency = freq;
                                 ch.Bandwdith = bandWidth;
                                 ch.Number = 0;
-                                ch.DVBTType = type;
+                                ch.DVBTType = dvbtTypeIndex;
 
                                 TunedChannels.Add(ch);
 
@@ -327,17 +345,10 @@ namespace DVBTTelevizor
                     }
                 }
 
-                Status = $"Tuning finished";
             }
             catch (Exception ex)
             {
-                Status = $"Tune error ({ex.Message})";
-            }
-            finally
-            {
-                State = TuneState.TuneFinished;
-                OnPropertyChanged(nameof(TunedChannels));
-                OnPropertyChanged(nameof(AddChannelsVisible));
+                throw;
             }
         }
 

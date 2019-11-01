@@ -8,111 +8,116 @@
              Title="Tuning">
     <ContentPage.Content>
 
-        <Grid Margin="10,10,10,0" RowSpacing="0" VerticalOptions="StartAndExpand">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
-            <Grid Grid.Row="0" Grid.Column="0"  VerticalOptions="Start" IsVisible="{Binding TuneReady}">
+            <!-- top controls -->
+            <StackLayout VerticalOptions="Start" Margin="10,10,10,0">
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}"/>
 
-               <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" />
-                <Label Grid.Row="1" Grid.Column="0" Text="Manual tuning" TextColor="White"/>
-                <CheckBox Grid.Row="1" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
-            </Grid>
+                <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}">
 
-            <Grid Grid.Row="1" Grid.Column="0" x:Name="OptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" TextColor="White"/>
+                    <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
+                </Grid>
 
-                <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+                <Grid x:Name="OptionsGrid" IsVisible="{Binding TuneOptionsVisible}">
 
-                <Label Grid.Row="1" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
-                <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="2" Grid.Column="0" Text="DVBT" TextColor="White"/>
-                <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
-                <Label Grid.Row="3" Grid.Column="0" Text="DVBT2" TextColor="White"/>
-                <CheckBox Grid.Row="3" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End"/>
-            </Grid>
+                    <Label Grid.Row="1" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                    <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
-            <ListView Grid.Row="2" Grid.Column="0" x:Name="ChannelsListView"
-                    ItemsSource="{Binding TunedChannels}"
-                    CachingStrategy="RecycleElement"
-                    HasUnevenRows="True">
+                    <Label Grid.Row="2" Grid.Column="0" Text="DVBT" TextColor="White"/>
+                    <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End" VerticalOptions="Center" />
 
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <ViewCell.View>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="1" />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="100" />
-                                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="3" Grid.Column="0" Text="DVBT2" TextColor="White"/>
+                    <CheckBox Grid.Row="3" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
+                </Grid>
 
-                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
-                                    <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
-                                    <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
 
-                                    <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
-                                </Grid>
+            </StackLayout>
 
-                            </ViewCell.View>
+            <!-- middle controls -->
+            <StackLayout VerticalOptions="CenterAndExpand" Margin="10,10,10,0">
 
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                <ListView x:Name="ChannelsListView"
+                        ItemsSource="{Binding TunedChannels}"
+                        CachingStrategy="RecycleElement"
+                        HasUnevenRows="True"
+                        VerticalOptions="StartAndExpand">
 
-            <Grid Grid.Row="3" Grid.Column="0"  VerticalOptions="Start">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <ViewCell.View>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="1" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="100" />
+                                        </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
+                                        <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
+                                        <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
 
-                <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}"/>
-                <Button Grid.Row="1" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save"  IsVisible="{Binding AddChannelsVisible}" />
-                <Button Grid.Row="1" Grid.Column="1" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
-            </Grid>
+                                        <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                    </Grid>
 
-            <Label Grid.Row="4" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
-            <Label Grid.Row="5" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+                                </ViewCell.View>
 
-        </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+
+            <!-- bottom controls -->
+            <StackLayout VerticalOptions="End" Spacing="0" Margin="10,10,10,0">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}"/>
+                    <Button Grid.Row="1" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save"  IsVisible="{Binding AddChannelsVisible}" />
+                    <Button Grid.Row="1" Grid.Column="1" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
+                </Grid>
+
+                <Label Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
+                <Label Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+
+            </StackLayout>
+
+        </StackLayout>
 
     </ContentPage.Content>
 </ContentPage>
