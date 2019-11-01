@@ -7,12 +7,26 @@
              x:Class="DVBTTelevizor.MainPage"
              Title="DVBT Televizor">
 
-            <Grid Margin="0,0,0,0" RowSpacing="0">
-                <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="InfoLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="BackgroundColor" Value="#262626"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid Margin="0,0,0,0" RowSpacing="0">
+
+               <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -41,11 +55,11 @@
                                             <ColumnDefinition Width="100" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
-                                        <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
-                                        <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
+                                        <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="2" Text="{Binding Number}" TextColor="White" />
+                                        <Label Grid.Row="0" Grid.Column="1"  Text="{Binding Name}" TextColor="White"/>
+                                        <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Margin="20,0,0,0" TextColor="White"/>
 
-                                        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,0,0" Text="{Binding PIDsLabel}" TextColor="White"/>
+                                        <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
 
                                         <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
                                     </Grid>
@@ -57,8 +71,8 @@
                     </ListView.ItemTemplate>
                 </ListView>
 
-        <Label Grid.Row="1" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
-        <Label Grid.Row="2" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+        <Label Grid.Row="1" Grid.Column="0" Text="{Binding Status}" x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
+        <Label Grid.Row="2" Grid.Column="0" Text="{Binding DataStreamInfo}" x:Name="DataStreamInfoLabel" Style="{DynamicResource InfoLabelStyle}"/>
     </Grid>
 
     <ContentPage.ToolbarItems>

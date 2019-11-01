@@ -6,6 +6,17 @@
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.App">
     <Application.Resources>
+        <ResourceDictionary >
+
+            <Color x:Key="primary-back-title-color">#262626</Color>
+            <Color x:Key="primary-title-color">#41b3ff</Color>
+
+            <!-- Pallete-end -->
+            <Style ApplyToDerivedTypes="true" TargetType="NavigationPage">
+                <Setter Property="BarBackgroundColor" Value="{StaticResource Key=primary-back-title-color}"/>
+                <Setter Property="BarTextColor" Value="{StaticResource Key=primary-title-color}"/>
+            </Style>
+        </ResourceDictionary>
 
     </Application.Resources>
 </Application>

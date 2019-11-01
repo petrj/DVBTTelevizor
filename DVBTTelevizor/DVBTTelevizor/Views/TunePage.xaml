@@ -6,6 +6,20 @@
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.TunePage"
              Title="Tuning">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="InfoLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="BackgroundColor" Value="#262626"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
 
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
@@ -112,8 +126,8 @@
                     <Button Grid.Row="1" Grid.Column="1" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
                 </Grid>
 
-                <Label Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
-                <Label Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+                <Label Text="{Binding Status}"  x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
+                <Label Text="{Binding DataStreamInfo}"  Style="{DynamicResource InfoLabelStyle}"/>
 
             </StackLayout>
 
