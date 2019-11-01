@@ -54,7 +54,6 @@ namespace DVBTTelevizor
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
             this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
             this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
-            this.TestButton.Clicked += TestButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;;
@@ -197,7 +196,13 @@ namespace DVBTTelevizor
 
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
-            _viewModel.RunWithStoragePermission(async () => await _driver.StartRecording());
+            Task.Run(async () =>
+              await _viewModel.RunWithStoragePermission(
+                   async () =>
+                   {
+                       await _driver.StartRecording();
+                   })
+              );
         }
 
         private void StopRecordButton_Clicked(object sender, EventArgs e)
@@ -279,11 +284,6 @@ namespace DVBTTelevizor
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
             Navigation.PushModalAsync(_playerPage);
-        }
-
-        private void TestButton_Clicked(object sender, EventArgs e)
-        {
-            _viewModel.RunWithStoragePermission(async () => { _loggingService.Info("test"); });
         }
     }
 }

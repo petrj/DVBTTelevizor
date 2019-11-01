@@ -31,8 +31,8 @@ namespace DVBTTelevizor
         private DVBTTelevizorConfiguration _config;
 
         private bool _readingStream = true;
-        private bool _recording = false;  
-        bool _readingBuffer = false;        
+        private bool _recording = false;
+        bool _readingBuffer = false;
 
         List<byte> _readBuffer = new List<byte>();
 
@@ -339,7 +339,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(_config.StorageFolder, $"playlist.m3u8"); 
+                return Path.Combine(_config.StorageFolder, $"playlist.m3u8");
             }
         }
 
@@ -422,7 +422,7 @@ namespace DVBTTelevizor
                             {
                                 if (recordFileStream == null)
                                 {
-                                    // todo: clear old records 
+                                    // todo: clear old records
 
                                     recordingFileName = RecordFileName;
 
@@ -461,13 +461,18 @@ namespace DVBTTelevizor
                     {
                         var bytesPerSec = bytesReadFromLastMeasureStartTime * 8 / totalSeconds;
                         string speed;
-                        if (bytesPerSec < 1000)
+
+                        if (bytesPerSec > 1000000)
                         {
-                            speed = $", {bytesPerSec} b/sec";
+                            speed = $", {Convert.ToInt32(bytesPerSec / 1000000.0).ToString("N2")} Mb/sec";
+                        }
+                        else if (bytesPerSec > 1000)
+                        {
+                            speed = $", {Convert.ToInt32(bytesPerSec / 1000.0).ToString("N2")} Kb/sec";
                         }
                         else
                         {
-                            speed = $", {Convert.ToInt32(bytesPerSec / 1000.0).ToString("N2")} Kb/sec";
+                            speed = $", {bytesPerSec} b/sec";
                         }
 
                         status += speed;

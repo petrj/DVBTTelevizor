@@ -9,6 +9,18 @@ $manifestPath = "DVBTTelevizor\DVBTTelevizor.Android\Properties\AndroidManifest.
 
 $slnFileName = Join-Path -Path $PSScriptRoot -ChildPath "DVBTTelevizor.sln"
 
+$projFileName = Join-Path -Path $PSScriptRoot -ChildPath "DVBTTelevizor\DVBTTelevizor.Android\DVBTTelevizor.Android.csproj"
+$projFileNameTmp = [System.IO.Path]::GetTempFileName()
+
+Copy-Item $projFileName -Destination $projFileNameTmp -Force
+[string]$proj = Get-Content -Path $projFileName
+
+$proj = $proj.Replace("<DebugSymbols>true</DebugSymbols>","<DebugSymbols>false</DebugSymbols>")
+$proj = $proj.Replace("<EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>","<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>")
+$proj = $proj.Replace("<AndroidUseSharedRuntime>true</AndroidUseSharedRuntime>","<AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>")
+
+$proj | Out-File -FilePath $projFileName
+
 # restore nuget packages
 
 if (-not (Test-Path -Path "nuget.exe"))
@@ -40,6 +52,6 @@ try
     }
 } finally
 {
-    
+    Copy-Item $projFileNameTmp -Destination $projFileName -Force
 }
 
