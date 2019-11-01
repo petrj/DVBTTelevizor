@@ -24,11 +24,12 @@ namespace DVBTTelevizor
 
         ILoggingService _log;
 
-        TcpClient _controlClient;
-        TcpClient _transferClient;
-        NetworkStream _controlStream;
-        NetworkStream _transferStream;
+        private TcpClient _controlClient;
+        private TcpClient _transferClient;
+        private NetworkStream _controlStream;
+        private NetworkStream _transferStream;
         private DVBTTelevizorConfiguration _config;
+        private long _lastTunedFreq = -1;
 
         private bool _readingStream = true;
         private bool _recording = false;
@@ -122,6 +123,8 @@ namespace DVBTTelevizor
             _controlClient = new TcpClient();
             _controlClient.Connect("127.0.0.1", _driverConfiguration.ControlPort);
             _controlStream = _controlClient.GetStream();
+
+            _lastTunedFreq = -1;
 
             //_client.NoDelay = true;
             //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -398,6 +401,11 @@ namespace DVBTTelevizor
                     {
                         status = "Reading stream";
 
+                        if (_lastTunedFreq >= 0)
+                        {
+                            status += $" ({_lastTunedFreq / 1000000} Mhz)";
+                        }
+
                         if (rec)
                         {
                             status += ", recording";
@@ -586,6 +594,16 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySyetem)
         {
+            if (frequency == _lastTunedFreq)
+            {
+                return new DVBTResponse()
+                {
+                    SuccessFlag = true,
+                    RequestTime = DateTime.Now,
+                    ResponseTime = DateTime.Now
+                };
+            }
+
             // 26 bytes
 
             //List<byte> bytesToSend = new List<byte>();
@@ -608,6 +626,11 @@ namespace DVBTTelevizor
                 throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
 
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
+
+            if (successFlag == 1)
+            {
+                _lastTunedFreq = frequency;
+            }
 
             return new DVBTResponse()
             {

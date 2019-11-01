@@ -13,7 +13,7 @@ namespace DVBTTelevizor
     {
         private bool _manualTuning = true;
         private bool _tuningAborted = false;
-        private long _tuneFrequency = 730;
+        private string _tuneFrequency = "730";
         private long _tuneBandwidth = 8;
 
         private bool _DVBTTuning = true;
@@ -132,7 +132,7 @@ namespace DVBTTelevizor
         }
 
 
-        public long TuneFrequency
+        public string TuneFrequency
         {
             get
             {
@@ -205,7 +205,7 @@ namespace DVBTTelevizor
 
             try
             {
-                long freq = TuneFrequency * 1000000;
+                long freq = Convert.ToInt64(TuneFrequency) * 1000000;
                 long bandWidth = TuneBandwidth * 1000000;
 
                 await Tune(freq, bandWidth);
@@ -226,7 +226,7 @@ namespace DVBTTelevizor
 
         private async Task Tune(long freq, long bandWidth)
         {
-             /*//debug
+            /* //debug
             await Task.Run(() =>
             {
                 _tuningAborted = false;
@@ -249,7 +249,8 @@ namespace DVBTTelevizor
 
                     TunedChannels.Add(ch);
                 }
-            });*/
+            });
+            */
 
             try
             {

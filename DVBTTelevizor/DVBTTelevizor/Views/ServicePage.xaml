@@ -13,12 +13,11 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
+            </Grid.RowDefinitions>            
 
             <ScrollView Grid.Row="0" Grid.Column="0" >
 
-                <StackLayout Margin="0,0,0,0">
+                <StackLayout Margin="0,0,0,0">                    
 
                     <Grid Margin="0,0,0,0">
                         <Grid.RowDefinitions>
@@ -113,12 +112,14 @@
 
                     </StackLayout>
 
+                    <Label Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
+                    
                 </StackLayout>
 
              </ScrollView>
 
-            <Label Grid.Row="1" Grid.Column="0" Text="{Binding Status}"  x:Name="StatusLabel" Margin="0,0,0,0" TextColor="White" BackgroundColor="Gray"/>
-            <Label Grid.Row="2" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
+            
+            <Label Grid.Row="1" Grid.Column="0" Text="{Binding DataStreamInfo}"  Margin="0,0,0,0" x:Name="DataStreamInfoLabel" TextColor="White" BackgroundColor="Gray"/>
 
         </Grid>
 
