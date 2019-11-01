@@ -12,19 +12,28 @@ namespace DVBTTelevizor
     public class TunePageViewModel : BaseViewModel
     {
         private bool _manualTuning = true;
-        private bool _tuningInProgress = false;
-        private bool _tuningAborted = true;
+        private bool _tuningAborted = false;
         private long _tuneFrequency = 730;
         private long _tuneBandwidth = 8;
 
         private bool _DVBTTuning = true;
         private bool _DVBT2Tuning = true;
 
+        private TuneState _tuneState = TuneState.Ready;
+
         public ObservableCollection<DVBTChannel> TunedChannels { get; set;  } = new ObservableCollection<DVBTChannel>();
 
         public Command TuneCommand { get; set; }
         public Command AbortTuneCommand { get; set; }
         public Command SaveTunedChannelsCommand { get; set; }
+        public Command FinishTunedCommand { get; set; }
+
+        public enum TuneState
+        {
+            Ready = 0,
+            TuningInProgress = 1,
+            TuneFinished = 2
+        }
 
         public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
@@ -32,29 +41,28 @@ namespace DVBTTelevizor
             TuneCommand = new Command(async () => await Tune());
             AbortTuneCommand = new Command(async () => await AbortTune());
             SaveTunedChannelsCommand = new Command(async () => await SaveTunedChannels());
+            FinishTunedCommand = new Command(async () => await FinishTune());
+
         }
 
-        public bool AddChannelsVisible
+
+
+        public bool TuneReady
         {
             get
             {
-                return TunedChannels.Count>0;
+                return State == TuneState.Ready;
             }
         }
 
-        public bool TuningInProgress
+        public bool TuneOptionsVisible
         {
             get
             {
-                return _tuningInProgress;
-            }
-            set
-            {
-                _tuningInProgress = value;
-
-                OnPropertyChanged(nameof(TuningInProgress));
+                return ManualTuning && State == TuneState.Ready;
             }
         }
+
 
         public bool ManualTuning
         {
@@ -66,9 +74,63 @@ namespace DVBTTelevizor
             {
                 _manualTuning = value;
 
-                OnPropertyChanged(nameof(TuneFrequency));
+                OnPropertyChanged(nameof(ManualTuning));
+                OnPropertyChanged(nameof(TuneOptionsVisible));
             }
         }
+
+
+        public TuneState State
+        {
+            get
+            {
+                return _tuneState;
+            }
+            set
+            {
+                _tuneState = value;
+
+                OnPropertyChanged(nameof(TuneReady));
+                OnPropertyChanged(nameof(TuneOptionsVisible));
+                OnPropertyChanged(nameof(TuningInProgress));
+                OnPropertyChanged(nameof(TuningNotInProgress));
+                OnPropertyChanged(nameof(AddChannelsVisible));
+                OnPropertyChanged(nameof(TuningFinished));
+            }
+        }
+
+        public bool TuningInProgress
+        {
+            get
+            {
+                return State == TuneState.TuningInProgress;
+            }
+        }
+
+        public bool AddChannelsVisible
+        {
+            get
+            {
+                return State == TuneState.TuneFinished && TunedChannels.Count > 0;
+            }
+        }
+
+        public bool TuningFinished
+        {
+            get
+            {
+                return State == TuneState.TuneFinished;
+            }
+        }
+
+        public bool TuningNotInProgress
+        {
+            get
+            {
+                return !TuningInProgress;
+            }
+        }
+
 
         public long TuneFrequency
         {
@@ -136,14 +198,39 @@ namespace DVBTTelevizor
             Status = $"Searching channels on freq {TuneFrequency}...";
 
             TunedChannels.Clear();
-            OnPropertyChanged(nameof(TunedChannels));
-            OnPropertyChanged(nameof(AddChannelsVisible));
+
+            State = TuneState.TuningInProgress;
+
+            /* debug
+            await Task.Run(() =>
+            {
+                _tuningAborted = false;
+                for (var i = 0; i < 15; i++)
+                {
+                    System.Threading.Thread.Sleep(1000);
+
+                    if (_tuningAborted)
+                        break;
+
+                    var ch = new DVBTChannel();
+                    ch.PIDs = "0,16,17";
+                    ch.ProgramMapPID = 0;
+                    ch.Name = $"Test {i}";
+                    ch.ProviderName = "Mux  1";
+                    ch.Frequency = 730000000;
+                    ch.Bandwdith = 8000000;
+                    ch.Number = i+1;
+                    ch.DVBTType = 0;
+
+                    TunedChannels.Add(ch);
+                }
+            });
+            */
 
             _tuningAborted = false;
 
             try
             {
-                TuningInProgress = true;
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
@@ -184,7 +271,7 @@ namespace DVBTTelevizor
 
                     if (searchMapPIDsResult.Result != SearchProgramResultEnum.OK)
                     {
-                        return;
+                        continue;
                     }
 
                     if (_tuningAborted)
@@ -248,11 +335,31 @@ namespace DVBTTelevizor
             }
             finally
             {
-                TuningInProgress = false;
+                State = TuneState.TuneFinished;
                 OnPropertyChanged(nameof(TunedChannels));
                 OnPropertyChanged(nameof(AddChannelsVisible));
             }
         }
+
+        public async Task FinishTune()
+        {
+            try
+            {
+                TunedChannels.Clear();
+                State = TuneState.Ready;
+            }
+            catch (Exception ex)
+            {
+                Status = $"Error ({ex.Message})";
+            }
+            finally
+            {
+                IsBusy = false;
+                OnPropertyChanged(nameof(TunedChannels));
+                OnPropertyChanged(nameof(AddChannelsVisible));
+            }
+        }
+
 
         public async Task<int> SaveTunedChannels()
         {
@@ -277,6 +384,8 @@ namespace DVBTTelevizor
                 await channelService.SaveChannels(channels);
 
                 TunedChannels.Clear();
+
+                State = TuneState.Ready;
 
                 return c;
             }
