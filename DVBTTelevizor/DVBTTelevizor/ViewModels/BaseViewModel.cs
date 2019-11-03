@@ -61,8 +61,12 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
             {
+                _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");
+
                 if (!_driver.Started)
                 {
+                    _loggingService.Debug($"Starting driver");
+
                     _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
                     Status = $"Initialized ({_driver.Configuration.DeviceName})";
                     _driver.Start();
@@ -138,7 +142,7 @@ namespace DVBTTelevizor
             return false;
         }
 
-        public async Task RunWithStoragePermission(Func<Task> action)
+        public static async Task<bool> RunWithStoragePermission(Func<Task> action, IDialogService dialogService)
         {
             try
             {
@@ -148,7 +152,7 @@ namespace DVBTTelevizor
                 {
                     if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Storage))
                     {
-                        await _dialogService.Information("Application requires storage permission", "Information");
+                        await dialogService.Information("Application requires storage permission", "Information");
                     }
 
                     status = await CrossPermissions.Current.RequestPermissionAsync<StoragePermission>();
@@ -157,16 +161,46 @@ namespace DVBTTelevizor
                 if (status == PermissionStatus.Granted)
                 {
                     await action();
+                    return true;
                 }
                 else
                 {
-                    await _dialogService.Error("Storage not granted", "Error");
+                    await dialogService.Error("Storage permission not granted", "Error");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {                
+                return false;
+            }
+        }
+
+        public static async Task<bool> RunWithStoragePermission(Func<Task> action)
+        {
+            try
+            {
+                var status = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
+
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await CrossPermissions.Current.RequestPermissionAsync<StoragePermission>();
+                }
+
+                if (status == PermissionStatus.Granted)
+                {
+                    await action();
+                    return true;
+                }
+                else
+                {                  
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex);
+                return false;
             }
         }
+
     }
 }

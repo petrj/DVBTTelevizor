@@ -26,9 +26,9 @@ namespace DVBTTelevizor
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
             :base(loggingService, dialogService, driver, config)
         {
-            RefreshCommand = new Command(async () => await Refresh());
+           RefreshCommand = new Command(async () => await Refresh());
 
-            RefreshCommand.Execute(null);
+           RefreshCommand.Execute(null);
         }
 
         public DVBTChannel SelectedChannel
@@ -39,7 +39,9 @@ namespace DVBTTelevizor
             }
             set
             {
-                _selectedChannel = value;
+                _loggingService.Debug($"Selected channel {value}");
+
+                _selectedChannel = value;                
 
                 OnPropertyChanged(nameof(SelectedChannel));
 
@@ -54,13 +56,16 @@ namespace DVBTTelevizor
         {
             await Task.Run(() =>
             {
+                _loggingService.Debug($"Saving channels to config");
+
                 _config.Channels = Channels;
-                //Status = JsonConvert.SerializeObject(Channels); ;
             });
         }
 
         private async Task PlayChannel(DVBTChannel channel)
         {
+            _loggingService.Debug($"Playing channel {channel}");
+
             var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
             if (!playRes)
                 return;
@@ -84,7 +89,7 @@ namespace DVBTTelevizor
                     async () =>
                     {
                         channels = await chService.LoadChannels();
-                    });
+                    }, _dialogService);
 
                 // adding one by one
                 foreach (var ch in channels)

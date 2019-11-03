@@ -12,6 +12,9 @@ namespace LoggerService
         public void Error(Exception ex, string message = null)
         { }
 
+        public void Error(string message)
+        { }
+
         public void Info(string message)
         { }
 

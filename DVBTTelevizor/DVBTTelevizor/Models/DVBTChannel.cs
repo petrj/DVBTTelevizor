@@ -44,6 +44,23 @@ namespace DVBTTelevizor
             }
         }
 
+        public string DVBTTypeLabel
+        {
+            get
+            {
+                if (DVBTType == 0)
+                {
+                    return "DVBT";
+                }
+                if (DVBTType == 1)
+                {
+                    return "DVBT2";
+                }
+
+                return "?";
+            }
+        }
+
         public List<long> PIDsArary
         {
             get

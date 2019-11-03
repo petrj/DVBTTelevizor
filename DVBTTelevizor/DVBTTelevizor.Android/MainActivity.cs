@@ -14,6 +14,7 @@ using Android.Net.Wifi;
 using VideoView = LibVLCSharp.Platforms.Android.VideoView;
 using LibVLCSharp.Shared;
 using Plugin.Permissions;
+using LoggerService;
 
 namespace DVBTTelevizor.Droid
 {
@@ -22,6 +23,7 @@ namespace DVBTTelevizor.Droid
     {
         private const int StartRequestCode = 1000;
         bool _waitingForInit = false;
+        ILoggingService _loggingService;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -39,12 +41,18 @@ namespace DVBTTelevizor.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App());
-
+                       
+            InitLogging();
+            var app = new App(_loggingService);
+            LoadApplication(app);
+            
             MessagingCenter.Subscribe<string>(this, "Init", (message) =>
             {
                 try
                 {
+
+                    _loggingService.Info("Initializing DVBT driver");
+
                     var req = new Intent(Intent.ActionView);
                     req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
                     req.PutExtra(Intent.ExtraReturnResult, true);
@@ -58,6 +66,7 @@ namespace DVBTTelevizor.Droid
                         if (_waitingForInit)
                         {
                             _waitingForInit = false;
+                            _loggingService.Error("Driver response timeout");
                             MessagingCenter.Send("Driver response timeout", "DVBTDriverConfigurationFailed");
                         }
 
@@ -68,9 +77,10 @@ namespace DVBTTelevizor.Droid
                 } catch (Exception ex)
                 {
                     _waitingForInit = false;
+                    _loggingService.Error(ex,"Driver initializing failed");
                     MessagingCenter.Send(ex.ToString(), "DVBTDriverConfigurationFailed");
                 }
-            });
+            });            
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
@@ -103,11 +113,33 @@ namespace DVBTTelevizor.Droid
                     if (data.HasExtra("VendorIds"))
                         cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
 
+                    _loggingService.Info($"Received DVBT driver configuration: {cfg}");
+
                     MessagingCenter.Send(cfg.ToString(), "DVBTDriverConfiguration");
                 } else
                 {
                     MessagingCenter.Send("No response from driver", "DVBTDriverConfigurationFailed");
                 }
+            }
+        }
+
+        private async Task InitLogging()
+        {
+            var permitted = await BaseViewModel.RunWithStoragePermission(
+                async () =>
+                {
+                    _loggingService = new FileLoggingService()
+                    {
+                        LogFilename = "/storage/emulated/0/Download/DVBTTelevizor.log.txt"
+                    };
+
+                    _loggingService.Debug("File logger initialized");
+                });
+
+            if (!permitted)
+            {
+                _loggingService = new BasicLoggingService();
+                _loggingService.Debug("Basic logger initialized");
             }
         }
     }

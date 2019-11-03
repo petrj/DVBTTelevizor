@@ -79,5 +79,10 @@ namespace LoggerService
         {
             Write(LoggingLevelEnum.Error, $"{message} {ex}");
         }
+
+        public void Error(string message)
+        {
+            Write(LoggingLevelEnum.Error, $"{message}");
+        }
     }
 }

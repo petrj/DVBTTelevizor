@@ -14,9 +14,6 @@ using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
 using LoggerService;
-using Android.Media;
-using LibVLCSharp.Shared;
-using Android.Widget;
 using Xamarin.Forms.Xaml;
 
 namespace DVBTTelevizor
@@ -197,11 +194,11 @@ namespace DVBTTelevizor
         private void RecordButton_Clicked(object sender, EventArgs e)
         {
             Task.Run(async () =>
-              await _viewModel.RunWithStoragePermission(
+              await BaseViewModel.RunWithStoragePermission(
                    async () =>
                    {
                        await _driver.StartRecording();
-                   })
+                   }, _dialogService)
               );
         }
 

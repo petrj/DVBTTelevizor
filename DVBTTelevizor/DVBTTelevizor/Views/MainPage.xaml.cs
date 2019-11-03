@@ -14,9 +14,6 @@ using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
 using LoggerService;
-using Android.Media;
-using LibVLCSharp.Shared;
-using Android.Widget;
 
 namespace DVBTTelevizor
 {
@@ -29,28 +26,32 @@ namespace DVBTTelevizor
 
         DVBTDriverManager _driver;
         DialogService _dlgService;
-        ILoggingService _log;
+        ILoggingService _loggingService;
         private DVBTTelevizorConfiguration _config;
         PlayerPage _playerPage;
         ServicePage _servicePage;
         TunePage _tunePage;
 
-        public MainPage()
+        public MainPage(ILoggingService loggingService)
         {
             InitializeComponent();
 
             _dlgService = new DialogService(this);
-            _log = new BasicLoggingService();
+
+            _loggingService = loggingService;
+
             _config = new DVBTTelevizorConfiguration()
             {
                 AutoInitAfterStart = true
             };
 
-            _driver = new DVBTDriverManager(_log, _config);
+            _driver = new DVBTDriverManager(_loggingService, _config);
 
             _playerPage = new PlayerPage(_driver);
-            _tunePage = new TunePage(_log, _dlgService, _driver, _config);
-            _servicePage = new ServicePage(_log,_dlgService,_driver,_config, _playerPage);
+            _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config);
+            _servicePage = new ServicePage(_loggingService, _dlgService,_driver,_config, _playerPage);
+
+            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config);
 
             _servicePage.Disappearing += delegate
              {
@@ -59,9 +60,7 @@ namespace DVBTTelevizor
             _tunePage.Disappearing += delegate
             {
                 _viewModel.RefreshCommand.Execute(null);
-            };
-
-            BindingContext = _viewModel = new MainPageViewModel(_log, _dlgService, _driver, _config);
+            };            
 
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
@@ -77,7 +76,6 @@ namespace DVBTTelevizor
             {
                 Task.Run( () =>
                {
-
                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
                    new Action(
                    delegate
@@ -85,8 +83,7 @@ namespace DVBTTelevizor
                        MessagingCenter.Send("", "Init");
                    }));
                });
-
-            }
+            }            
         }
 
         private void ToolbarServicePage_Clicked(object sender, EventArgs e)

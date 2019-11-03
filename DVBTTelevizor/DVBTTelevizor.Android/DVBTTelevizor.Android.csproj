@@ -119,6 +119,10 @@
     <Folder Include="Resources\drawable-xxxhdpi\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\LoggerService\LoggerService.csproj">
+      <Project>{48F92363-A63A-45E9-AD73-E7DD3E51E35F}</Project>
+      <Name>LoggerService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DVBTTelevizor\DVBTTelevizor.csproj">
       <Project>{D909A3AA-45B0-4F06-9975-404C7CAA96AB}</Project>
       <Name>DVBTTelevizor</Name>

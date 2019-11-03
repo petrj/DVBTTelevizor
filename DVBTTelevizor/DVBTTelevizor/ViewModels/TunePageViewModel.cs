@@ -42,11 +42,8 @@ namespace DVBTTelevizor
             AbortTuneCommand = new Command(async () => await AbortTune());
             SaveTunedChannelsCommand = new Command(async () => await SaveTunedChannels());
             FinishTunedCommand = new Command(async () => await FinishTune());
-
         }
-
-
-
+               
         public bool TuneReady
         {
             get
@@ -182,7 +179,7 @@ namespace DVBTTelevizor
             }
             set
             {
-                _DVBTTuning = value;
+                _DVBT2Tuning = value;
 
                 OnPropertyChanged(nameof(DVBT2Tuning));
             }
@@ -195,6 +192,8 @@ namespace DVBTTelevizor
 
         private async Task Tune()
         {
+            _loggingService.Info($"Tuning {TuneFrequency} Mhz");
+
             Status = $"Searching channels on freq {TuneFrequency}...";
 
             TunedChannels.Clear();

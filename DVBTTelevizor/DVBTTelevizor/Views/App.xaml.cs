@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoggerService;
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -7,12 +8,15 @@ namespace DVBTTelevizor
     public partial class App : Application
     {
         MainPage _mainPage;
+        ILoggingService _loggingService;
 
-        public App()
+        public App(ILoggingService loggingService)
         {
             InitializeComponent();
 
-            _mainPage = new MainPage();
+            _loggingService = loggingService;
+
+            _mainPage = new MainPage(_loggingService);
             MainPage = new NavigationPage(_mainPage);
         }
 
