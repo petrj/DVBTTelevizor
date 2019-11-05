@@ -15,6 +15,8 @@ using VideoView = LibVLCSharp.Platforms.Android.VideoView;
 using LibVLCSharp.Shared;
 using Plugin.Permissions;
 using LoggerService;
+using Plugin.Permissions.Abstractions;
+using Plugin.CurrentActivity;
 
 namespace DVBTTelevizor.Droid
 {
@@ -30,7 +32,11 @@ namespace DVBTTelevizor.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
+            _loggingService = new BasicLoggingService();            
+
             base.OnCreate(savedInstanceState);
+
+            CrossCurrentActivity.Current.Activity = this;
 
             Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
 
@@ -83,11 +89,6 @@ namespace DVBTTelevizor.Droid
             });            
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
-        {
-            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             if (requestCode == StartRequestCode && resultCode == Result.Ok)
@@ -123,24 +124,26 @@ namespace DVBTTelevizor.Droid
             }
         }
 
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Android.Content.PM.Permission[] grantResults)
+        {
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
         private async Task InitLogging()
         {
-            var permitted = await BaseViewModel.RunWithStoragePermission(
-                async () =>
-                {
-                    _loggingService = new FileLoggingService()
-                    {
-                        LogFilename = "/storage/emulated/0/Download/DVBTTelevizor.log.txt"
-                    };
+            var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
-                    _loggingService.Debug("File logger initialized");
-                });
-
-            if (!permitted)
+            if (permitted == PermissionStatus.Granted)
             {
-                _loggingService = new BasicLoggingService();
-                _loggingService.Debug("Basic logger initialized");
-            }
+                _loggingService = new FileLoggingService()
+                {
+                    LogFilename = "/storage/emulated/0/Download/DVBTTelevizor.log.txt"
+                };
+
+                _loggingService.Debug("File logger initialized");
+            } 
         }
     }
 }

@@ -175,32 +175,5 @@ namespace DVBTTelevizor
             }
         }
 
-        public static async Task<bool> RunWithStoragePermission(Func<Task> action)
-        {
-            try
-            {
-                var status = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
-
-                if (status != PermissionStatus.Granted)
-                {
-                    status = await CrossPermissions.Current.RequestPermissionAsync<StoragePermission>();
-                }
-
-                if (status == PermissionStatus.Granted)
-                {
-                    await action();
-                    return true;
-                }
-                else
-                {                  
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
     }
 }
