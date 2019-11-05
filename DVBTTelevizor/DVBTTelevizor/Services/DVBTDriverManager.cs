@@ -45,6 +45,9 @@ namespace DVBTTelevizor
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             _log = loggingService;
+
+            _log.Debug($"Initializing DVBT driver manager");
+            
             _config = config;
         }
 
@@ -120,6 +123,8 @@ namespace DVBTTelevizor
 
         public void Start()
         {
+            _log.Debug($"Starting");
+
             _controlClient = new TcpClient();
             _controlClient.Connect("127.0.0.1", _driverConfiguration.ControlPort);
             _controlStream = _controlClient.GetStream();
@@ -134,6 +139,8 @@ namespace DVBTTelevizor
 
         public void StartBackgroundReading()
         {
+            _log.Debug($"Starting background reading");
+
             _transferClient = new TcpClient();
             _transferClient.Connect("127.0.0.1", _driverConfiguration.TransferPort);
             _transferStream = _transferClient.GetStream();
@@ -145,6 +152,8 @@ namespace DVBTTelevizor
 
         public void StopBackgroundReading()
         {
+            _log.Debug($"Stopping background reading");
+
             _transferClient.Close();
         }
 
@@ -152,6 +161,8 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
+                _log.Debug($"Starting read stream");
+
                 _readingStream = true;
             }
         }
@@ -160,12 +171,16 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
+                _log.Debug($"Stopping read stream");
+
                 _readingStream = false;
             }
         }
 
         public async Task Disconnect()
         {
+            _log.Debug($"Dsconnecting");
+
             await SendCloseConnection();
             _controlClient.Close();
             StopBackgroundReading();
@@ -175,6 +190,8 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
+                _log.Debug($"starting recording");
+
                 if (!Recording)
                 {
                     _recording = true;
@@ -186,6 +203,8 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
+                _log.Debug($"Stopping recording");
+
                 if (Recording)
                 {
                     _recording = false;
@@ -197,6 +216,8 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
+                _log.Debug($"starting read buffer");
+
                 _readBuffer.Clear();
                 _readingBuffer = true;
             }
@@ -206,12 +227,16 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
+                _log.Debug($"Stopping read buffer");
+
                 _readingBuffer = false;
             }
         }
 
         public async Task<bool> Play(long frequency, long bandwidth, int deliverySyetem, List<long> PIDs)
         {
+            _log.Debug($"Playing {frequency} Mhz, type: {deliverySyetem}, PIDs: {String.Join(",", PIDs)}");
+
             var tunedRes = await Tune(frequency, bandwidth, deliverySyetem);
             if (!tunedRes.SuccessFlag)
                 return false;
@@ -224,14 +249,18 @@ namespace DVBTTelevizor
 
             for (var i=0;i<5;i++)
             {
+                _log.Debug($"Getting status {i+1}/{5}");
+
                 var statusRes = await GetStatus();
                 if (!tunedRes.SuccessFlag)
-                {
+                {                    
                     return false;
                 }
 
                 if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
                 {
+                    _log.Debug($"Signal found");
+
                     StopReadStream();
                     return true;
                 }
@@ -244,6 +273,8 @@ namespace DVBTTelevizor
 
         public async Task<bool> Stop()
         {
+            _log.Debug("Stopping ...");
+
             StartReadStream();
 
             var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17 });
@@ -255,6 +286,8 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
         {
+            _log.Debug($"Sending request {request}");
+
             var startTime = DateTime.Now;
             var bufferSize = 1024;
 
@@ -318,6 +351,8 @@ namespace DVBTTelevizor
                     return new DVBTResponse() { SuccessFlag = false };
                 }
 
+                _log.Debug($"Request sent");
+
                 var response = new DVBTResponse()
                 {
                     SuccessFlag = true,
@@ -328,8 +363,7 @@ namespace DVBTTelevizor
                 return response;
             });
         }
-
-
+        
         private string RecordFileName
         {
             get
@@ -345,24 +379,11 @@ namespace DVBTTelevizor
                 return Path.Combine(_config.StorageFolder, $"playlist.m3u8");
             }
         }
-
-        public void CreatePlayList()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("#EXTM3U");
-            for (var i=0;i<720;i++) // 12h
-            {
-                sb.AppendLine(Path.Combine($"stream-{i.ToString().PadLeft(4, '0')}.ts"));
-            }
-
-            if (File.Exists(PlaylistFileName))
-                File.Delete(PlaylistFileName);
-
-            File.WriteAllText(PlaylistFileName, sb.ToString());
-        }
-
+               
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
+            _log.Debug("Starting reader tread");
+
             try
             {
                 DataStreamInfo = "Reading data ...";
@@ -530,9 +551,10 @@ namespace DVBTTelevizor
             }
         }
 
-
         public async Task<DVBTStatus> GetStatus()
         {
+            _log.Debug("Getting status");
+
             var status = new DVBTStatus();
 
             /*
@@ -562,11 +584,15 @@ namespace DVBTTelevizor
             status.RequestTime = response.RequestTime;
             status.ResponseTime = response.ResponseTime;
 
+            _log.Debug($"Status response: {status.ToString()}");
+
             return status;
         }
 
         public async Task<DVBTVersion> GetVersion()
         {
+            _log.Debug($"Getting version");
+
             var version = new DVBTVersion();
 
             var responseSize = 26;  // 1 + 1 + 8 + 8 + 8
@@ -589,13 +615,19 @@ namespace DVBTTelevizor
             version.RequestTime = response.RequestTime;
             version.ResponseTime = response.ResponseTime;
 
+            _log.Debug($"Version response: {version.ToString()}");
+
             return version;
         }
 
         public async Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySyetem)
         {
+            _log.Debug($"Tuning {frequency} Mhz, type: {deliverySyetem}");
+
             if (frequency == _lastTunedFreq)
             {
+                _log.Debug($"Frequency already tuned");
+
                 return new DVBTResponse()
                 {
                     SuccessFlag = true,
@@ -632,6 +664,8 @@ namespace DVBTTelevizor
                 _lastTunedFreq = frequency;
             }
 
+            _log.Debug($"Tune response: {successFlag}");
+
             return new DVBTResponse()
             {
                 SuccessFlag = successFlag == 1,
@@ -642,6 +676,8 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> SendCloseConnection()
         {
+            _log.Debug($"Closing connection");
+
             var responseSize = 10;
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_EXIT, new List<long>(), responseSize);
@@ -650,6 +686,8 @@ namespace DVBTTelevizor
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
+
+            _log.Debug($"Close connection response: {successFlag}");
 
             return new DVBTResponse()
             {
@@ -661,6 +699,8 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)
         {
+            _log.Debug($"Setting PIDs: {String.Join(",", PIDs)}");
+
             var responseSize = 10;
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_SET_PIDS, PIDs, responseSize);
@@ -669,6 +709,8 @@ namespace DVBTTelevizor
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
+
+            _log.Debug($"Set PIDS response: {successFlag}");
 
             return new DVBTResponse()
             {
@@ -680,6 +722,8 @@ namespace DVBTTelevizor
 
         public async Task<DVBTCapabilities> GetCapabalities()
         {
+            _log.Debug($"Getting capabilities");
+
             var cap = new DVBTCapabilities();
 
             var responseSize = 2 + 7 * 8;
@@ -696,11 +740,15 @@ namespace DVBTTelevizor
             cap.RequestTime = response.RequestTime;
             cap.ResponseTime = response.ResponseTime;
 
+            _log.Debug($"Capabilities response: {cap.ToString()}");
+
             return cap;
         }
 
         public async Task<SearchPIDsResult> SearchProgramPIDs(int MapPID)
         {
+            _log.Debug($"Searching PIDS of Map PID: {MapPID}");
+
             var res = new SearchPIDsResult();
 
             try
@@ -737,7 +785,6 @@ namespace DVBTTelevizor
 
                 StartReadBuffer();
 
-
                 var timeoutForReadingBuffer = 10; //  10 secs
                 var startTime = DateTime.Now;
 
@@ -773,6 +820,8 @@ namespace DVBTTelevizor
                     res.PIDs.Add(stream.PID);
                 }
 
+                _log.Debug($"Searching PIDS response: {res}");
+
                 return res;
             }
             catch (Exception ex)
@@ -785,6 +834,8 @@ namespace DVBTTelevizor
 
         public async Task<SearchMapPIDsResult> SearchProgramMapPIDs(long frequency, long bandWidth, int deliverySyetem)
         {
+            _log.Debug($"Searching Program Map PIDs: freq: {frequency} Mhz, type: {deliverySyetem}");
+
             var res = new SearchMapPIDsResult();
 
             try
@@ -870,6 +921,8 @@ namespace DVBTTelevizor
 
                 res.ServiceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
                 res.Result = SearchProgramResultEnum.OK;
+
+                _log.Debug($"Searching Program Map PIDS response: {res}");
 
                 return res;
 

@@ -10,15 +10,15 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            //var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
-            //AnalyzeMPEGTS(path);
+            var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
+            AnalyzeMPEGTS(path);
 
             // 33 s video sample:
-            var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
-            RecordMpegTS(path);
+            //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
+            //RecordMpegTS(path);
 
-            //Console.WriteLine("Press Enter");
-            //Console.ReadLine();
+            Console.WriteLine("Press Enter");
+            Console.ReadLine();
         }
 
         public static void RecordMpegTS(string path)
