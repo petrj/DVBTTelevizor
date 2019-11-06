@@ -24,12 +24,12 @@ namespace DVBTTelevizor
             InitializeComponent();
 
             _driver = driver;
-
+         
             Core.Initialize();
 
             _libVLC = new LibVLC();
             _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
-            videoView.MediaPlayer = _mediaPlayer;
+            videoView.MediaPlayer = _mediaPlayer;          
         }
 
         protected override void OnAppearing()

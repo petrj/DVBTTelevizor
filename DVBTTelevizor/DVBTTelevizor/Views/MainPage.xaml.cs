@@ -44,10 +44,17 @@ namespace DVBTTelevizor
             {
                 AutoInitAfterStart = true
             };
-
+            
             _driver = new DVBTDriverManager(_loggingService, _config);
 
-            _playerPage = new PlayerPage(_driver);
+            try
+            {
+                _playerPage = new PlayerPage(_driver);
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while initializing player page");
+            }
+
             _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config);
             _servicePage = new ServicePage(_loggingService, _dlgService,_driver,_config, _playerPage);
 
@@ -65,9 +72,19 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
                 Device.BeginInvokeOnMainThread(
-                 new Action( () =>
-                 {
-                     Navigation.PushModalAsync(_playerPage);
+                 new Action(() =>
+                {
+                if (_playerPage != null)
+                {
+                    Navigation.PushModalAsync(_playerPage);
+                } else
+                {
+                    Task.Run(async() =>
+                            {
+                                await _dlgService.Error("Player not initialized");
+                            }
+                       );                         
+                     }
                  }));
             });
 

@@ -300,6 +300,10 @@ namespace DVBTTelevizor
 
                     // searching PIDs
 
+                    var chService = new JSONChannelsService(_loggingService, _config);
+                    var alreadySavedChannels = await chService.LoadChannels();
+                    var alreadySavedChannelsCount = alreadySavedChannels.Count;
+
                     foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
                     {
                         Status = $"Searching Map PID {sDescriptor.Value}";
@@ -327,7 +331,7 @@ namespace DVBTTelevizor
                                 ch.ProviderName = sDescriptor.Key.ProviderName;
                                 ch.Frequency = freq;
                                 ch.Bandwdith = bandWidth;
-                                ch.Number = 0;
+                                ch.Number = alreadySavedChannelsCount + TunedChannels.Count + 1;
                                 ch.DVBTType = dvbtTypeIndex;
 
                                 TunedChannels.Add(ch);

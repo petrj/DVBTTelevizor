@@ -307,13 +307,14 @@ namespace DVBTTelevizor
                     {
                         if (_controlClient.Client.Available > 0)
                         {
-                            _log.Debug("Reading from stream ...");
+                            //_log.Debug("Reading from stream ...");
 
-                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize);
-                            _log.Debug($"Reading from stream completed, bytes read: {readByteCount} ...");
+                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize);                            
 
                             if (readByteCount > 0)
                             {
+                                _log.Debug($"Received {readByteCount} bytes");
+
                                 for (var i = 0; i < readByteCount; i++)
                                 {
                                     _responseBuffer.Add(buffer[i]);
@@ -326,7 +327,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            _log.Debug("No data available ...");
+                            //_log.Debug("No data available ...");
                         }
 
                         var timeSpan = Math.Abs((DateTime.Now - startTime).TotalSeconds);
@@ -415,29 +416,25 @@ namespace DVBTTelevizor
 
                     if (!readingStream)
                     {
-                        status = "Waiting for stream";
+                        status = "Not reading stream";
                         System.Threading.Thread.Sleep(200);
                     }
                     else
                     {
-                        status = "Reading stream";
+                        status = "Reading";
 
                         if (_lastTunedFreq >= 0)
                         {
-                            status += $" ({_lastTunedFreq / 1000000} Mhz)";
+                            status += $" freq {_lastTunedFreq / 1000000} Mhz";
                         }
 
                         if (rec)
                         {
-                            status += ", recording";
-                            if (recordFileStream != null)
-                            {
-                                status += $" ({System.IO.Path.GetFileName(recordingFileName)})";
-                            }
+                            status += ", recording";                            
                         }
                         if (readingBuffer)
                         {
-                            status += ", reading Buffer";
+                            status += ", bufferring";
                         }
 
                         if (_transferClient.Available > 0)
@@ -445,14 +442,12 @@ namespace DVBTTelevizor
                             var bytesRead = _transferStream.Read(buffer, 0, buffer.Length);
                             bytesReadFromLastMeasureStartTime += bytesRead;
 
-                            _log.Debug($"Bytes read: {bytesRead} ...");
+                            //_log.Debug($"Bytes read: {bytesRead} ...");
 
                             if (rec)
                             {
                                 if (recordFileStream == null)
                                 {
-                                    // todo: clear old records
-
                                     recordingFileName = RecordFileName;
 
                                     if (File.Exists(recordingFileName))
@@ -493,15 +488,15 @@ namespace DVBTTelevizor
 
                         if (bytesPerSec > 1000000)
                         {
-                            speed = $", {Convert.ToInt32(bytesPerSec / 1000000.0).ToString("N2")} Mb/sec";
+                            speed = $", {Convert.ToInt32(8*(bytesPerSec / 1000000.0)).ToString("N2")} Mb/sec";
                         }
                         else if (bytesPerSec > 1000)
                         {
-                            speed = $", {Convert.ToInt32(bytesPerSec / 1000.0).ToString("N2")} Kb/sec";
+                            speed = $", {Convert.ToInt32(8*(bytesPerSec / 1000.0)).ToString("N2")} Kb/sec";
                         }
                         else
                         {
-                            speed = $", {bytesPerSec} b/sec";
+                            speed = $", {8*bytesPerSec} b/sec";
                         }
 
                         status += speed;
@@ -720,6 +715,17 @@ namespace DVBTTelevizor
             };
         }
 
+        private void SaveBuffer(string namePrefix, byte[] buffer)
+        {
+            var fileName = Path.Combine(_config.StorageFolder, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
+            using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
+                fs.Write(buffer, 0, buffer.Length);
+                fs.Flush();
+                fs.Close();
+            }
+        }
+
         public async Task<DVBTCapabilities> GetCapabalities()
         {
             _log.Debug($"Getting capabilities");
@@ -812,6 +818,8 @@ namespace DVBTTelevizor
 
                 // parsing PMT table to get PIDs:
                 var pmtTable = PMTTable.Parse(pmtPacketBytes);
+
+                //SaveBuffer($"ProgramPID.{MapPID.ToString()}", pmtPacketBytes.ToArray());
 
                 res.Result = SearchProgramResultEnum.OK;
 
@@ -921,6 +929,11 @@ namespace DVBTTelevizor
 
                 res.ServiceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
                 res.Result = SearchProgramResultEnum.OK;
+
+                //if (sdtBytes != null)
+                //    SaveBuffer($"ProgramMapPIDs.SDT.{frequency}", sdtBytes.ToArray());
+                //if (psiBytes != null)
+                //    SaveBuffer($"ProgramMapPIDs.PSI.{frequency}", psiBytes.ToArray());
 
                 _log.Debug($"Searching Program Map PIDS response: {res}");
 
