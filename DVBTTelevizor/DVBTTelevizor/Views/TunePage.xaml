@@ -95,6 +95,7 @@
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
                                             <RowDefinition Height="1" />
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
@@ -106,8 +107,8 @@
                                         <Label Grid.Row="0" Grid.Column="0" Text="{Binding Number}" TextColor="White" />
                                         <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
                                         <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
-
-                                        <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding ServiceType}" TextColor="White"/>
+                                        <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
                                     </Grid>
 
                                 </ViewCell.View>

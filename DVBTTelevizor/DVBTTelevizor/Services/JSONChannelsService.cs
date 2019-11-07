@@ -30,7 +30,7 @@ namespace DVBTTelevizor
         {
             return await Task.Run(() =>
             {
-                var res = new ObservableCollection<DVBTChannel>();
+                var res = new ObservableCollection<DVBTChannel>();                
 
                 if (File.Exists(DBPath))
                 {
@@ -39,7 +39,18 @@ namespace DVBTTelevizor
                     res = JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(jsonFromFile);
                 }
 
-                return res;
+                // radio channels filter 
+
+                var filteredRes = new ObservableCollection<DVBTChannel>();
+                foreach (var ch in res)
+                {
+                    if (ch.ServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
+                        continue;
+
+                    filteredRes.Add(ch);
+                }
+
+                return filteredRes;
             });
         }
 

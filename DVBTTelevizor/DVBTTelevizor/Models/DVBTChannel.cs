@@ -15,11 +15,13 @@ namespace DVBTTelevizor
 
         public long ProgramMapPID { get; set; }
 
+        public DVBTServiceType ServiceType { get; set; }
+
         public string FrequencyLabel
         {
             get
             {
-                return "Freq: " + Frequency/1000000 + " Mhz";
+                return Frequency/1000000 + " Mhz";
             }
         }
 
@@ -48,16 +50,17 @@ namespace DVBTTelevizor
         {
             get
             {
+                var res = String.Empty;
                 if (DVBTType == 0)
                 {
-                    return "DVBT";
+                    res = "DVBT";
                 }
                 if (DVBTType == 1)
                 {
-                    return "DVBT2";
+                    res = "DVBT2";
                 }
 
-                return "?";
+                return $"{res} {ServiceType}";
             }
         }
 

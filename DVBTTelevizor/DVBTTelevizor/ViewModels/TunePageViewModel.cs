@@ -389,6 +389,19 @@ namespace DVBTTelevizor
                                 ch.Number = alreadySavedChannelsCount + TunedChannels.Count + 1;
                                 ch.DVBTType = dvbtTypeIndex;
 
+                                if (sDescriptor.Key.ServisType == 1 ||
+                                    sDescriptor.Key.ServisType == 2)
+                                {
+                                    ch.ServiceType = (DVBTServiceType)sDescriptor.Key.ServisType;
+                                } else
+                                if (sDescriptor.Key.ServisType == 31)
+                                {
+                                    ch.ServiceType = DVBTServiceType.TV; // DVBT2 video
+                                } else
+                                {
+                                    ch.ServiceType = DVBTServiceType.NotSupported;
+                                }
+
                                 TunedChannels.Add(ch);
 
                                 Status = $"Found channel \"{sDescriptor.Key.ServiceName}\"";

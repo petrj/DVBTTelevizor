@@ -30,6 +30,7 @@ namespace DVBTTelevizor
         private NetworkStream _transferStream;
         private DVBTTelevizorConfiguration _config;
         private long _lastTunedFreq = -1;
+        private long _lastTunedDeliverySystem = -1;
 
         private bool _readingStream = true;
         private bool _recording = false;
@@ -130,6 +131,7 @@ namespace DVBTTelevizor
             _controlStream = _controlClient.GetStream();
 
             _lastTunedFreq = -1;
+            _lastTunedDeliverySystem = -1;
 
             //_client.NoDelay = true;
             //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -233,11 +235,11 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<bool> Play(long frequency, long bandwidth, int deliverySyetem, List<long> PIDs)
+        public async Task<bool> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs)
         {
-            _log.Debug($"Playing {frequency} Mhz, type: {deliverySyetem}, PIDs: {String.Join(",", PIDs)}");
+            _log.Debug($"Playing {frequency} Mhz, type: {deliverySystem}, PIDs: {String.Join(",", PIDs)}");
 
-            var tunedRes = await Tune(frequency, bandwidth, deliverySyetem);
+            var tunedRes = await Tune(frequency, bandwidth, deliverySystem);
             if (!tunedRes.SuccessFlag)
                 return false;
 
@@ -619,7 +621,7 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning {frequency} Mhz, type: {deliverySyetem}");
 
-            if (frequency == _lastTunedFreq)
+            if (frequency == _lastTunedFreq && deliverySyetem == _lastTunedDeliverySystem)
             {
                 _log.Debug($"Frequency already tuned");
 
@@ -657,6 +659,7 @@ namespace DVBTTelevizor
             if (successFlag == 1)
             {
                 _lastTunedFreq = frequency;
+                _lastTunedDeliverySystem = deliverySyetem;
             }
 
             _log.Debug($"Tune response: {successFlag}");

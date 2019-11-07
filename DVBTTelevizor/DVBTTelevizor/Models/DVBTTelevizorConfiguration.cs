@@ -58,5 +58,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("AutoInitAfterStart", value);
             }
         }
+
+        public bool ShowRadioChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowRadioChannels");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowRadioChannels", value);
+            }
+        }
     }
 }

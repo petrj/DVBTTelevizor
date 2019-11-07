@@ -73,6 +73,10 @@ namespace DVBTTelevizor
             {
                 _viewModel.RefreshCommand.Execute(null);
             };
+            _settingsPage.Disappearing += delegate
+            {
+                _viewModel.RefreshCommand.Execute(null);
+            };
 
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
