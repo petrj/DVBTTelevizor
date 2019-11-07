@@ -16,6 +16,8 @@ namespace DVBTTelevizor
 {
     public class MainPageViewModel : BaseViewModel
     {
+        ChannelService _channelService;
+
         public Command RefreshCommand { get; set; }
 
 
@@ -23,9 +25,11 @@ namespace DVBTTelevizor
 
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
-        public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(loggingService, dialogService, driver, config)
         {
+            _channelService = channelService;
+
            RefreshCommand = new Command(async () => await Refresh());
 
            RefreshCommand.Execute(null);
@@ -41,7 +45,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Debug($"Selected channel {value}");
 
-                _selectedChannel = value;                
+                _selectedChannel = value;
 
                 OnPropertyChanged(nameof(SelectedChannel));
 
@@ -81,14 +85,12 @@ namespace DVBTTelevizor
 
                Channels.Clear();
 
-                var chService = new JSONChannelsService(_loggingService, _config);
-
                 ObservableCollection<DVBTChannel> channels = null;
 
                 await RunWithStoragePermission(
                     async () =>
                     {
-                        channels = await chService.LoadChannels();
+                        channels = await _channelService.LoadChannels();
                     }, _dialogService);
 
                 // adding one by one

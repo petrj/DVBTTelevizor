@@ -13,15 +13,21 @@ namespace DVBTTelevizor
     {
         private bool _manualTuning = true;
         private bool _tuningAborted = false;
-        private string _tuneFrequency = "730";
+        private string _tuneFrequency ;
         private long _tuneBandwidth = 8;
 
         private bool _DVBTTuning = true;
         private bool _DVBT2Tuning = true;
 
+        ChannelService _channelService;
+
+        DVBTFrequencyChannel _selectedFrequencyChannel = null;
+
         private TuneState _tuneState = TuneState.Ready;
 
         public ObservableCollection<DVBTChannel> TunedChannels { get; set;  } = new ObservableCollection<DVBTChannel>();
+
+        public ObservableCollection<DVBTFrequencyChannel> FrequencyChannels { get; set; } = new ObservableCollection<DVBTFrequencyChannel>();
 
         public Command TuneCommand { get; set; }
         public Command AbortTuneCommand { get; set; }
@@ -35,15 +41,56 @@ namespace DVBTTelevizor
             TuneFinished = 2
         }
 
-        public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
          : base(loggingService, dialogService, driver, config)
         {
+            _channelService = channelService;
+
             TuneCommand = new Command(async () => await Tune());
             AbortTuneCommand = new Command(async () => await AbortTune());
             SaveTunedChannelsCommand = new Command(async () => await SaveTunedChannels());
             FinishTunedCommand = new Command(async () => await FinishTune());
+
+            FillFrequencyChannels();
         }
-               
+
+        private void FillFrequencyChannels()
+        {
+            FrequencyChannels.Clear();
+
+            for (var i=21;i<=69;i++)
+            {
+                var freqMhz = (474 + 8 * (i - 21));
+                var fc = new DVBTFrequencyChannel()
+                {
+                    FrequencyMhZ = freqMhz,
+                    ChannelNumber = i
+                };
+
+                FrequencyChannels.Add(fc);
+            }
+        }
+
+        public DVBTFrequencyChannel SelectedFrequencyChannelItem
+        {
+            get
+            {
+                return _selectedFrequencyChannel;
+            }
+            set
+            {
+                _selectedFrequencyChannel = value;
+
+                if (value != null)
+                {
+                    TuneFrequency = (_selectedFrequencyChannel.FrequencyMhZ).ToString();
+                }
+
+                OnPropertyChanged(nameof(SelectedFrequencyChannelItem));
+                OnPropertyChanged(nameof(TuneFrequency));
+            }
+        }
+
         public bool TuneReady
         {
             get
@@ -139,7 +186,17 @@ namespace DVBTTelevizor
             {
                 _tuneFrequency = value;
 
+                foreach (var f in FrequencyChannels)
+                {
+                    if (f.FrequencyMhZ.ToString() == value)
+                    {
+                        _selectedFrequencyChannel = f;
+                        break;
+                    }
+                }
+
                 OnPropertyChanged(nameof(TuneFrequency));
+                OnPropertyChanged(nameof(SelectedFrequencyChannelItem));
             }
         }
 
@@ -300,9 +357,7 @@ namespace DVBTTelevizor
 
                     // searching PIDs
 
-                    var chService = new JSONChannelsService(_loggingService, _config);
-                    var alreadySavedChannels = await chService.LoadChannels();
-                    var alreadySavedChannelsCount = alreadySavedChannels.Count;
+                    var alreadySavedChannelsCount = (await _channelService.LoadChannels()).Count;
 
                     foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
                     {
@@ -382,9 +437,7 @@ namespace DVBTTelevizor
             {
                 var c = 0;
 
-                var channelService = new JSONChannelsService(_loggingService, _config);
-
-                var channels = await channelService.LoadChannels();
+                var channels = await _channelService.LoadChannels();
                 if (channels == null) channels = new ObservableCollection<DVBTChannel>();
 
                 foreach (var ch in TunedChannels)
@@ -396,7 +449,7 @@ namespace DVBTTelevizor
                     }
                 }
 
-                await channelService.SaveChannels(channels);
+                await _channelService.SaveChannels(channels);
 
                 TunedChannels.Clear();
 

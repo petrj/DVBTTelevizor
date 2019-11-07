@@ -51,7 +51,7 @@ namespace DVBTTelevizor
                 {
                     if (File.Exists(DBPath))
                     {
-                        File.Delete(DBPath);                        
+                        File.Delete(DBPath);
                     }
 
                     File.WriteAllText(DBPath, JsonConvert.SerializeObject(channels));

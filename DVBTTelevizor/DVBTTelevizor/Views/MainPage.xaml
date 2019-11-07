@@ -77,9 +77,10 @@
     </Grid>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Name="ToolbarRefresh" Text="Refresh" Clicked="ToolbarRefresh_Clicked" Icon="Refresh.png" />
-        <ToolbarItem Name="ToolbarTune" Text="Tune" Clicked="ToolbarTune_Clicked" Icon="Tune.png"  />
-        <ToolbarItem Name="ToolbarServicePage" Text="Service menu" Clicked="ToolbarServicePage_Clicked" Icon="Settings.png" />
+        <!--ToolbarItem Name="ToolRefresh" Text="Refresh" Clicked="ToolRefresh_Clicked" Icon="Refresh.png" /-->
+        <ToolbarItem Name="ToolTune" Text="Tune" Clicked="ToolTune_Clicked" Icon="Tune.png"  />
+        <ToolbarItem Name="ToolServicePage" Text="Service menu" Clicked="ToolServicePage_Clicked" Icon="Tools.png" />
+        <ToolbarItem Name="ToolSettingsPage" Text="Settings" Clicked="ToolSettingsPage_Clicked" Icon="Settings.png" />
     </ContentPage.ToolbarItems>
 
 </ContentPage>

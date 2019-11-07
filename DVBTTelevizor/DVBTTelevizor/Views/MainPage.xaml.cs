@@ -31,6 +31,8 @@ namespace DVBTTelevizor
         PlayerPage _playerPage;
         ServicePage _servicePage;
         TunePage _tunePage;
+        SettingsPage _settingsPage;
+        ChannelService _channelService;
 
         public MainPage(ILoggingService loggingService)
         {
@@ -44,7 +46,7 @@ namespace DVBTTelevizor
             {
                 AutoInitAfterStart = true
             };
-            
+
             _driver = new DVBTDriverManager(_loggingService, _config);
 
             try
@@ -55,10 +57,13 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex, "Error while initializing player page");
             }
 
-            _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config);
-            _servicePage = new ServicePage(_loggingService, _dlgService,_driver,_config, _playerPage);
+            _channelService = new JSONChannelsService(_loggingService, _config);
 
-            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config);
+            _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
+            _servicePage = new ServicePage(_loggingService, _dlgService,_driver,_config, _playerPage);
+            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config);
+
+            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
 
             _servicePage.Disappearing += delegate
              {
@@ -67,7 +72,7 @@ namespace DVBTTelevizor
             _tunePage.Disappearing += delegate
             {
                 _viewModel.RefreshCommand.Execute(null);
-            };            
+            };
 
             MessagingCenter.Subscribe<string>(this, "PlayStream", (message) =>
             {
@@ -83,7 +88,7 @@ namespace DVBTTelevizor
                             {
                                 await _dlgService.Error("Player not initialized");
                             }
-                       );                         
+                       );
                      }
                  }));
             });
@@ -100,20 +105,25 @@ namespace DVBTTelevizor
                        MessagingCenter.Send("", "Init");
                    }));
                });
-            }            
+            }
         }
 
-        private void ToolbarServicePage_Clicked(object sender, EventArgs e)
+        private void ToolServicePage_Clicked(object sender, EventArgs e)
         {
             Navigation.PushAsync(_servicePage);
         }
 
-        private void ToolbarTune_Clicked(object sender, EventArgs e)
+        private void ToolSettingsPage_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(_settingsPage);
+        }
+
+        private void ToolTune_Clicked(object sender, EventArgs e)
         {
             Navigation.PushAsync(_tunePage);
         }
 
-        private void ToolbarRefresh_Clicked(object sender, EventArgs e)
+        private void ToolRefresh_Clicked(object sender, EventArgs e)
         {
             _viewModel.RefreshCommand.Execute(null);
         }

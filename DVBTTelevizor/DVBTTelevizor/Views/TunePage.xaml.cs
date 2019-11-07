@@ -19,7 +19,7 @@ namespace DVBTTelevizor
         protected DVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
 
-        public TunePage(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public TunePage(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
@@ -28,7 +28,8 @@ namespace DVBTTelevizor
             _driver = driver;
             _config = config;
 
-            BindingContext = _viewModel = new TunePageViewModel(_loggingService, _dialogService, _driver, _config);
+            BindingContext = _viewModel = new TunePageViewModel(_loggingService, _dialogService, _driver, _config, channelService);
+            _viewModel.TuneFrequency = "730";
         }
     }
 }
