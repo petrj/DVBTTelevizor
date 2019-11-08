@@ -65,11 +65,7 @@ namespace DVBTTelevizor
 
                 if (!_driver.Started)
                 {
-                    _loggingService.Debug($"Starting driver");
-
-                    _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
-                    Status = $"Initialized ({_driver.Configuration.DeviceName})";
-                    _driver.Start();
+                    ConnectDriver(message);
                 }
             });
 
@@ -98,11 +94,60 @@ namespace DVBTTelevizor
             }).Start();
         }
 
+        protected void ConnectDriver(string message)
+        {
+            _loggingService.Debug($"Starting driver");
+
+            _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
+            Status = $"Initialized ({_driver.Configuration.DeviceName})";
+            _driver.Start();
+
+            OnPropertyChanged(nameof(DriverConnected));
+            OnPropertyChanged(nameof(DriverDisConnected));
+            OnPropertyChanged(nameof(DriverConnectedIcon));
+        }
+
+        public async Task DisconnectDriver()
+        {
+            await _driver.Disconnect();
+
+            OnPropertyChanged(nameof(DriverConnected));
+            OnPropertyChanged(nameof(DriverDisConnected));
+            OnPropertyChanged(nameof(DriverConnectedIcon));
+        }
+
         public string DataStreamInfo
         {
             get
             {
                 return _driver.DataStreamInfo;
+            }
+        }
+
+        public bool DriverConnected
+        {
+            get
+            {
+                return _driver.Started;
+            }
+        }
+
+        public string DriverConnectedIcon
+        {
+            get
+            {
+                if (DriverConnected)
+                    return "Connected.png";
+
+                return "Disconnected.png";
+            }
+        }
+
+        public bool DriverDisConnected
+        {
+            get
+            {
+                return !DriverConnected;
             }
         }
 
@@ -170,7 +215,7 @@ namespace DVBTTelevizor
                 }
             }
             catch (Exception ex)
-            {                
+            {
                 return false;
             }
         }

@@ -112,6 +112,17 @@ namespace DVBTTelevizor
             }
         }
 
+        private void ToolConnect_Clicked(object sender, EventArgs e)
+        {
+            if (!_viewModel.DriverConnected)
+            {
+                MessagingCenter.Send("", "Init");
+            } else
+            {
+                Task.Run( async ()=> await _viewModel.DisconnectDriver());
+            }
+        }
+
         private void ToolServicePage_Clicked(object sender, EventArgs e)
         {
             Navigation.PushAsync(_servicePage);
