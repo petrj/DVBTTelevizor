@@ -17,6 +17,7 @@ using Plugin.Permissions;
 using LoggerService;
 using Plugin.Permissions.Abstractions;
 using Plugin.CurrentActivity;
+using Plugin.Toast;
 
 namespace DVBTTelevizor.Droid
 {
@@ -52,7 +53,7 @@ namespace DVBTTelevizor.Droid
             var app = new App(_loggingService);
             LoadApplication(app);
 
-            MessagingCenter.Subscribe<string>(this, "Init", (message) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_Init, (message) =>
             {
                 try
                 {
@@ -73,7 +74,7 @@ namespace DVBTTelevizor.Droid
                         {
                             _waitingForInit = false;
                             _loggingService.Error("Driver response timeout");
-                            MessagingCenter.Send("Driver response timeout", "DVBTDriverConfigurationFailed");
+                            MessagingCenter.Send("Driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                         }
 
                     });
@@ -84,8 +85,13 @@ namespace DVBTTelevizor.Droid
                 {
                     _waitingForInit = false;
                     _loggingService.Error(ex,"Driver initializing failed");
-                    MessagingCenter.Send(ex.ToString(), "DVBTDriverConfigurationFailed");
+                    MessagingCenter.Send(ex.ToString(), BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToastMessage, (message) =>
+            {
+                CrossToastPopUp.Current.ShowCustomToast(message, "#0000FF", "#FFFFFF");
             });
         }
 
@@ -116,10 +122,10 @@ namespace DVBTTelevizor.Droid
 
                     _loggingService.Info($"Received DVBT driver configuration: {cfg}");
 
-                    MessagingCenter.Send(cfg.ToString(), "DVBTDriverConfiguration");
+                    MessagingCenter.Send(cfg.ToString(), BaseViewModel.MSG_DVBTDriverConfiguration);
                 } else
                 {
-                    MessagingCenter.Send("No response from driver", "DVBTDriverConfigurationFailed");
+                    MessagingCenter.Send("No response from driver", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
             }
         }
@@ -144,6 +150,13 @@ namespace DVBTTelevizor.Droid
 
                 _loggingService.Debug("File logger initialized");
             }
+        }
+
+        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
+        {
+            MessagingCenter.Send(keyCode.ToString(), BaseViewModel.MSG_KeyDown);
+
+            return base.OnKeyDown(keyCode, e);
         }
     }
 }

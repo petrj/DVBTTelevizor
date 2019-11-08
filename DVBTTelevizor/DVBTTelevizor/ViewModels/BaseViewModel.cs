@@ -21,6 +21,13 @@ namespace DVBTTelevizor
         protected DVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
 
+        public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
+        public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
+        public const string MSG_PlayStream = "PlayStream";
+        public const string MSG_Init = "Init";
+        public const string MSG_KeyDown = "KeyDown";
+        public const string MSG_ToastMessage = "ShowToastMessage";
+
         private string _status;
 
         bool isBusy = false;
@@ -59,7 +66,7 @@ namespace DVBTTelevizor
             _driver = driver;
             _config = config;
 
-            MessagingCenter.Subscribe<string>(this, "DVBTDriverConfiguration", (message) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration, (message) =>
             {
                 _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");
 
@@ -69,7 +76,7 @@ namespace DVBTTelevizor
                 }
             });
 
-            MessagingCenter.Subscribe<string>(this, "DVBTDriverConfigurationFailed", (message) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
             {
                 Status = $"Initialization failed ({message})";
             });

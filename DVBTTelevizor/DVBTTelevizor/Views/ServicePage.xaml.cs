@@ -58,7 +58,7 @@ namespace DVBTTelevizor
 
         private void InitButton_Clicked(object sender, EventArgs e)
         {
-            MessagingCenter.Send("", "Init");
+            MessagingCenter.Send("", BaseViewModel.MSG_Init);
         }
 
         private void DisconnectButton_Clicked(object sender, EventArgs e)
