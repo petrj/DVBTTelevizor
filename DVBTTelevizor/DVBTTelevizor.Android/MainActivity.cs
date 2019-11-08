@@ -20,7 +20,7 @@ using Plugin.CurrentActivity;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Label = "DVBTTelevizor", Icon = "@mipmap/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "DVBTTelevizor", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         private const int StartRequestCode = 1000;
@@ -32,7 +32,7 @@ namespace DVBTTelevizor.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
-            _loggingService = new BasicLoggingService();            
+            _loggingService = new BasicLoggingService();
 
             base.OnCreate(savedInstanceState);
 
@@ -47,11 +47,11 @@ namespace DVBTTelevizor.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-                       
+
             InitLogging();
             var app = new App(_loggingService);
             LoadApplication(app);
-            
+
             MessagingCenter.Subscribe<string>(this, "Init", (message) =>
             {
                 try
@@ -86,7 +86,7 @@ namespace DVBTTelevizor.Droid
                     _loggingService.Error(ex,"Driver initializing failed");
                     MessagingCenter.Send(ex.ToString(), "DVBTDriverConfigurationFailed");
                 }
-            });            
+            });
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
@@ -143,7 +143,7 @@ namespace DVBTTelevizor.Droid
                 };
 
                 _loggingService.Debug("File logger initialized");
-            } 
+            }
         }
     }
 }
