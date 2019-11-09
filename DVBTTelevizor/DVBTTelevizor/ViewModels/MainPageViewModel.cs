@@ -37,6 +37,27 @@ namespace DVBTTelevizor
             ShortPressCommand = new Command(ShortPress);
 
             RefreshCommand.Execute(null);
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration, (message) =>
+            {
+                _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");
+
+                if (!_driver.Started)
+                {
+                    ConnectDriver(message);
+                }
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
+            {
+                UpdateDriverState();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
+            {
+                Status = $"Initialization failed ({message})";
+            });
+
         }
 
         private void LongPress(object item)

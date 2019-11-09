@@ -69,7 +69,7 @@ namespace DVBTTelevizor
             {
                 try
                 {
-                    await _viewModel.DisconnectDriver();
+                    await _viewModel.DisconnectDriver();                    
 
                     Device.BeginInvokeOnMainThread(() =>
                     {

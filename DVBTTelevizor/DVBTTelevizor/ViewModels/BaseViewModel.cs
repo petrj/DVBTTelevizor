@@ -24,6 +24,7 @@ namespace DVBTTelevizor
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
         public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
         public const string MSG_PlayStream = "PlayStream";
+        public const string MSG_UpdateDriverState = "UpdateDriverState";
         public const string MSG_Init = "Init";
         public const string MSG_KeyDown = "KeyDown";
         public const string MSG_ToastMessage = "ShowToastMessage";
@@ -66,21 +67,6 @@ namespace DVBTTelevizor
             _driver = driver;
             _config = config;
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration, (message) =>
-            {
-                _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");
-
-                if (!_driver.Started)
-                {
-                    ConnectDriver(message);
-                }
-            });
-
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
-            {
-                Status = $"Initialization failed ({message})";
-            });
-
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
@@ -101,23 +87,27 @@ namespace DVBTTelevizor
             }).Start();
         }
 
+        // cannot run async!
         protected void ConnectDriver(string message)
         {
-            _loggingService.Debug($"Starting driver");
-
-            _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
-            Status = $"Initialized ({_driver.Configuration.DeviceName})";
+            _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);            
             _driver.Start();
+            Status = $"Initialized ({_driver.Configuration.DeviceName})";
 
-            OnPropertyChanged(nameof(DriverConnected));
-            OnPropertyChanged(nameof(DriverDisConnected));
-            OnPropertyChanged(nameof(DriverConnectedIcon));
+            MessagingCenter.Send("", BaseViewModel.MSG_UpdateDriverState);
         }
 
         public async Task DisconnectDriver()
         {
             await _driver.Disconnect();
+            Status = $"Not initialized";
 
+            UpdateDriverState();            
+        }
+
+        public void UpdateDriverState()
+        {            
+            OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(DriverConnected));
             OnPropertyChanged(nameof(DriverDisConnected));
             OnPropertyChanged(nameof(DriverConnectedIcon));

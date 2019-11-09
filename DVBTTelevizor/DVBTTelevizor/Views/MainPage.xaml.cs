@@ -64,7 +64,7 @@ namespace DVBTTelevizor
 
             _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
             _servicePage = new ServicePage(_loggingService, _dlgService,_driver,_config, _playerPage);
-            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config);
+            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
 
             BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
 
@@ -290,7 +290,11 @@ namespace DVBTTelevizor
                 MessagingCenter.Send("", BaseViewModel.MSG_Init);
             } else
             {
-                Task.Run( async ()=> await _viewModel.DisconnectDriver());
+                Task.Run( async ()=>
+                {
+                    await _viewModel.DisconnectDriver();                    
+                }
+                );
             }
         }
 

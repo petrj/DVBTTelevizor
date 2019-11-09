@@ -183,8 +183,24 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Dsconnecting");
 
-            await SendCloseConnection();
-            _controlClient.Close();
+            try
+            {
+                await SendCloseConnection();                
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "Error while sending close connection");
+            }
+
+            try
+            {
+                _controlClient.Close();
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "Error while closing control client");
+            }            
+
             StopBackgroundReading();
         }
 

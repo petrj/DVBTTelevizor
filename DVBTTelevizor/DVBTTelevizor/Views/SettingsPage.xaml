@@ -45,6 +45,8 @@
 
                 </Grid>
 
+                <Button Text="Clear all channels" Command="{Binding ClearChannelsCommand}"/>
+
             </StackLayout>
 
         </ScrollView>

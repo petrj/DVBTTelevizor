@@ -17,14 +17,14 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
 
-        public SettingsPage(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config)
+        public SettingsPage(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
             _loggingService = loggingService;
             _dialogService = dialogService;
 
-            BindingContext = _viewModel = new SettingsPageViewModel(_loggingService, _dialogService, config);
+            BindingContext = _viewModel = new SettingsPageViewModel(_loggingService, _dialogService, config, channelService);
         }
     }
 }

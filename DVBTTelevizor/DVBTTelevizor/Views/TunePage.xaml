@@ -42,12 +42,9 @@
                     <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
                 </Grid>
 
-                <Grid x:Name="OptionsGrid" IsVisible="{Binding TuneOptionsVisible}">
+                <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}">
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
@@ -65,17 +62,34 @@
                             SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
                             ItemsSource="{Binding FrequencyChannels}"
                             ItemDisplayBinding="{Binding Description}"/>
-
-                    <Label Grid.Row="2" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
-                    <Entry Grid.Row="2" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
-
-                    <Label Grid.Row="3" Grid.Column="0" Text="DVBT" TextColor="White"/>
-                    <CheckBox Grid.Row="3" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End" VerticalOptions="Center" />
-
-                    <Label Grid.Row="4" Grid.Column="0" Text="DVBT2" TextColor="White"/>
-                    <CheckBox Grid.Row="4" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
                 </Grid>
 
+                <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />                        
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60*" />
+                        <ColumnDefinition Width="40*" />
+                    </Grid.ColumnDefinitions>
+ 
+                    <Label Grid.Row="0" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="DVBT" TextColor="White"/>
+                    <CheckBox Grid.Row="1" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End" VerticalOptions="Center" />
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" TextColor="White"/>
+                    <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
+                </Grid>
+
+                <StackLayout IsVisible="{Binding AutomaticTuningInProgress}">
+                    <Label Text="{Binding AutomaticTuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White"/>
+                    <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />
+                </StackLayout>
 
             </StackLayout>
 
