@@ -92,9 +92,8 @@
                 </StackLayout>
 
                 <StackLayout IsVisible="{Binding TuningInProgress}">
-                    <Label Text="Signal strength" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White"/>
-                    <ProgressBar Progress="{Binding SignalStrengthProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />
-                    <ActivityIndicator IsRunning="{Binding TuningInProgress}" />
+                    <Label Text="Signal strength" VerticalOptions="Start" TextColor="White" HorizontalOptions="Center"/>
+                    <ProgressBar Progress="{Binding SignalStrengthProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />                    
                 </StackLayout>
 
             </StackLayout>
@@ -142,6 +141,8 @@
             <!-- bottom controls -->
             <StackLayout VerticalOptions="End" Spacing="0" Margin="10,10,10,0">
 
+                <ActivityIndicator IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True"/>
+
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
@@ -155,7 +156,7 @@
                     <Button Grid.Row="1" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save"  IsVisible="{Binding AddChannelsVisible}" />
                     <Button Grid.Row="1" Grid.Column="1" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
                 </Grid>
-
+                
                 <Label Text="{Binding Status}"  x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
                 <!--Label Text="{Binding DataStreamInfo}"  Style="{DynamicResource InfoLabelStyle}"/-->
 

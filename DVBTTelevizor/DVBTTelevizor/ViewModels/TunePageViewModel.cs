@@ -534,8 +534,11 @@ namespace DVBTTelevizor
                                 _loggingService.Debug($"Found channel \"{sDescriptor.Key.ServiceName}\"");
 
                                 Status = $"Tuning {freq / 1000000} Mhz ({dvbtTypeAsString}), channels found: {TunedChannels.Count}";
-                                
-                                MessagingCenter.Send($"Found channel \"{sDescriptor.Key.ServiceName}\" ({ch.ServiceType})", BaseViewModel.MSG_ToastMessage);
+
+                                Device.BeginInvokeOnMainThread(delegate
+                                {
+                                    MessagingCenter.Send($"Found channel \"{sDescriptor.Key.ServiceName}\" ({ch.ServiceType})", BaseViewModel.MSG_ToastMessage);
+                                });
 
                                 break;
                         }
