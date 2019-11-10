@@ -90,26 +90,26 @@ namespace DVBTTelevizor
             {
                 Device.BeginInvokeOnMainThread(
                  new Action(() =>
-                {
-                if (_playerPage != null)
-                {
-                        if (_playerPage.Playing)
-                        {
-                            _playerPage.StopPlay();
-                            _playerPage.StartPlay();
-                        }
-
-                        if (!_playerPage.Playing)
-                        {
-                            Navigation.PushModalAsync(_playerPage);
-                        }
-                } else
-                {
-                    Task.Run(async() =>
-                            {
-                                await _dlgService.Error("Player not initialized");
-                            }
-                       );
+                 {
+                     if (_playerPage != null)
+                     {
+                         if (_playerPage.Playing)
+                         {
+                             _playerPage.StopPlay();
+                             _playerPage.StartPlay();
+                         }
+                         else
+                         {
+                             Navigation.PushModalAsync(_playerPage);                          
+                         }
+                     }
+                     else
+                     {
+                         Task.Run(async () =>
+                         {
+                             await _dlgService.Error("Player not initialized");
+                         }
+                            );
                      }
                  }));
             });

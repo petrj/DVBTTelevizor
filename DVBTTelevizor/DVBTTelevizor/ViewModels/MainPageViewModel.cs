@@ -144,7 +144,7 @@ namespace DVBTTelevizor
                 channel = SelectedChannel;
                 if (channel == null)
                     return;
-            }
+            }            
 
             _loggingService.Debug($"Playing channel {channel}");
 
