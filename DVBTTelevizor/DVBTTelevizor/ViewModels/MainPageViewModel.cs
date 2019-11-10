@@ -25,6 +25,8 @@ namespace DVBTTelevizor
 
         private DVBTChannel _selectedChannel;
 
+        public bool DoNotScrollToChannel { get; set; } = false;
+
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
@@ -56,15 +58,15 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
             {
                 Status = $"Initialization failed ({message})";
-            });
+            });            
 
-        }
+        }        
 
         private void LongPress(object item)
         {
             if (item != null && item is DVBTChannel)
             {
-                var ch = item as DVBTChannel;
+                var ch = item as DVBTChannel;                
 
                 _loggingService.Info($"Long press on channel {ch.Name})");
 
@@ -77,6 +79,8 @@ namespace DVBTTelevizor
             if (item != null && item is DVBTChannel)
             {
                 // select and play
+
+                DoNotScrollToChannel = true;
 
                 var ch = item as DVBTChannel;
 

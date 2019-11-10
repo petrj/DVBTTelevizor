@@ -91,6 +91,12 @@
                     <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />
                 </StackLayout>
 
+                <StackLayout IsVisible="{Binding TuningInProgress}">
+                    <Label Text="Signal strength" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White"/>
+                    <ProgressBar Progress="{Binding SignalStrengthProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />
+                    <ActivityIndicator IsRunning="{Binding TuningInProgress}" />
+                </StackLayout>
+
             </StackLayout>
 
             <!-- middle controls -->
@@ -151,7 +157,7 @@
                 </Grid>
 
                 <Label Text="{Binding Status}"  x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
-                <Label Text="{Binding DataStreamInfo}"  Style="{DynamicResource InfoLabelStyle}"/>
+                <!--Label Text="{Binding DataStreamInfo}"  Style="{DynamicResource InfoLabelStyle}"/-->
 
             </StackLayout>
 

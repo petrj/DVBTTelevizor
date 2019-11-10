@@ -83,7 +83,7 @@
         <StackLayout VerticalOptions="End" Spacing="0" Margin="10,10,10,0">
 
             <Label Text="{Binding Status}" x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
-            <Label Text="{Binding DataStreamInfo}" x:Name="DataStreamInfoLabel" Style="{DynamicResource InfoLabelStyle}"/>
+            <!--Label Text="{Binding DataStreamInfo}" x:Name="DataStreamInfoLabel" Style="{DynamicResource InfoLabelStyle}"/-->
 
         </StackLayout>
 

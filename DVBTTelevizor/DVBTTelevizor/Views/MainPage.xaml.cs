@@ -93,7 +93,10 @@ namespace DVBTTelevizor
                 {
                 if (_playerPage != null)
                 {
-                    Navigation.PushModalAsync(_playerPage);
+                        if (!_playerPage.Playing)
+                        {
+                            Navigation.PushModalAsync(_playerPage);
+                        }
                 } else
                 {
                     Task.Run(async() =>
@@ -118,6 +121,8 @@ namespace DVBTTelevizor
                    }));
                });
             }
+
+            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
         }
 
         public void OnKeyDown(string key)
@@ -261,8 +266,7 @@ namespace DVBTTelevizor
 
             }).Start();
         }
-
-
+        
         private async Task OnKeyLeft()
         {
             await _viewModel.SelectPreviousChannel(10);
@@ -318,6 +322,15 @@ namespace DVBTTelevizor
             _viewModel.RefreshCommand.Execute(null);
         }
 
+        private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+            if (!_viewModel.DoNotScrollToChannel)
+            {
+                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+            }
+
+            _viewModel.DoNotScrollToChannel = false;
+        }
 
     }
 }

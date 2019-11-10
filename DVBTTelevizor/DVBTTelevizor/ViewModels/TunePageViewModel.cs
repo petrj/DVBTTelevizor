@@ -29,6 +29,8 @@ namespace DVBTTelevizor
         public long AutomaticTuningLastChannel { get; set; } = 69;
         private long AutomaticTuningActualChannel = -1;
 
+        private double _signalStrengthProgress = 0;
+
         public ObservableCollection<DVBTChannel> TunedChannels { get; set;  } = new ObservableCollection<DVBTChannel>();
 
         public ObservableCollection<DVBTFrequencyChannel> FrequencyChannels { get; set; } = new ObservableCollection<DVBTFrequencyChannel>();
@@ -179,6 +181,20 @@ namespace DVBTTelevizor
 
                 var perc = (AutomaticTuningActualChannel - AutomaticTuningFirstChannel) / onePerc;
                 return perc / 100.0;
+            }
+        }
+
+        public double SignalStrengthProgress
+        {
+            get
+            {
+                return _signalStrengthProgress;
+            }
+            set
+            {
+                _signalStrengthProgress = value;
+
+                OnPropertyChanged(nameof(SignalStrengthProgress));
             }
         }
 
@@ -406,32 +422,6 @@ namespace DVBTTelevizor
 
         private async Task Tune(long freq, long bandWidth)
         {
-            /* //debug
-            await Task.Run(() =>
-            {
-                _tuningAborted = false;
-                for (var i = 0; i < 15; i++)
-                {
-                    System.Threading.Thread.Sleep(1000);
-
-                    if (_tuningAborted)
-                        break;
-
-                    var ch = new DVBTChannel();
-                    ch.PIDs = "0,16,17";
-                    ch.ProgramMapPID = 0;
-                    ch.Name = $"Test {i}";
-                    ch.ProviderName = "Mux  1";
-                    ch.Frequency = 730000000;
-                    ch.Bandwdith = 8000000;
-                    ch.Number = i+1;
-                    ch.DVBTType = 0;
-
-                    TunedChannels.Add(ch);
-                }
-            });
-            */
-
             try
             {
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
@@ -440,31 +430,44 @@ namespace DVBTTelevizor
                         continue;
                     if (!DVBT2Tuning && dvbtTypeIndex == 1)
                         continue;
+                    
+                    var dvbtTypeAsString = dvbtTypeIndex == 0 ? "DVBT" : "DVTB2";
+                    Status = $"Tuning {freq / 1000000} Mhz ({dvbtTypeAsString}), channels found: {TunedChannels.Count}";
 
-                    var tuneRes = await _driver.Tune(freq, bandWidth, dvbtTypeIndex);
-
-                    Status = $"Tuning freq. {TuneFrequency} Mhz (type {dvbtTypeIndex}) ...";
+                    _loggingService.Debug(Status);
 
                     var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(freq, bandWidth, dvbtTypeIndex);
 
                     switch (searchMapPIDsResult.Result)
                     {
                         case SearchProgramResultEnum.Error:
-                            Status = "Search error";
+                            _loggingService.Debug("Search error");
+
+                            SignalStrengthProgress = 0;
+
                             break;
                         case SearchProgramResultEnum.NoSignal:
-                            Status = "No signal";
+                            _loggingService.Debug("No signal");
+
+                            SignalStrengthProgress = 0;
+
                             break;
                         case SearchProgramResultEnum.NoProgramFound:
-                            Status = "No program found";
+                            _loggingService.Debug("No program found");
+
+                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength / 100.0;
+
                             break;
                         case SearchProgramResultEnum.OK:
+
+                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength / 100.0;
+
                             var mapPIDs = new List<long>();
                             foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
                             {
                                 mapPIDs.Add(sd.Value);
                             }
-                            Status = $"Program MAP PIDs found: {String.Join(",", mapPIDs)}";
+                            _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
                             break;
                     }
 
@@ -475,7 +478,7 @@ namespace DVBTTelevizor
 
                     if (_tuningAborted)
                     {
-                        Status = $"Tuning aborted";
+                        _loggingService.Debug($"Tuning aborted");
                         return;
                     }
 
@@ -485,20 +488,20 @@ namespace DVBTTelevizor
 
                     foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
                     {
-                        Status = $"Searching Map PID {sDescriptor.Value}";
+                        _loggingService.Debug($"Searching Map PID {sDescriptor.Value}");
 
                         var searchPIDsResult = await _driver.SearchProgramPIDs(Convert.ToInt32(sDescriptor.Value));
 
                         switch (searchPIDsResult.Result)
                         {
                             case SearchProgramResultEnum.Error:
-                                Status = $"Error scanning Map PID {sDescriptor.Value}";
+                                _loggingService.Debug($"Error scanning Map PID {sDescriptor.Value}");
                                 break;
                             case SearchProgramResultEnum.NoSignal:
-                                Status = "No signal";
+                                _loggingService.Debug("No signal");
                                 break;
                             case SearchProgramResultEnum.NoProgramFound:
-                                Status = "No program found";
+                                _loggingService.Debug("No program found");
                                 break;
                             case SearchProgramResultEnum.OK:
                                 var pids = string.Join(",", searchPIDsResult.PIDs);
@@ -528,14 +531,18 @@ namespace DVBTTelevizor
 
                                 TunedChannels.Add(ch);
 
-                                Status = $"Found channel \"{sDescriptor.Key.ServiceName}\"";
+                                _loggingService.Debug($"Found channel \"{sDescriptor.Key.ServiceName}\"");
+
+                                Status = $"Tuning {freq / 1000000} Mhz ({dvbtTypeAsString}), channels found: {TunedChannels.Count}";
+                                
+                                MessagingCenter.Send($"Found channel \"{sDescriptor.Key.ServiceName}\" ({ch.ServiceType})", BaseViewModel.MSG_ToastMessage);
 
                                 break;
                         }
 
                         if (_tuningAborted)
                         {
-                            Status = $"Tuning aborted";
+                            _loggingService.Debug($"Tuning aborted");
                             return;
                         }
                     }

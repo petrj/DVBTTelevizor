@@ -11,5 +11,7 @@ namespace DVBTTelevizor
         /// Service descriptor => Map PID
         /// </summary>
         public Dictionary<ServiceDescriptor, long> ServiceDescriptors {get; set;}
+
+        public long SingalPercentStrength { get; set; }
     }
 }

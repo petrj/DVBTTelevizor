@@ -896,6 +896,8 @@ namespace DVBTTelevizor
                     return res;
                 }
 
+                res.SingalPercentStrength = status.rfStrengthPercentage;
+
                 // waiting
                 System.Threading.Thread.Sleep(1000);
 

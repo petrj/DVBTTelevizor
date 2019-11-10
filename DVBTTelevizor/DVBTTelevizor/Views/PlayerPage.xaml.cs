@@ -32,6 +32,14 @@ namespace DVBTTelevizor
             videoView.MediaPlayer = _mediaPlayer;          
         }
 
+        public bool Playing
+        {
+            get
+            {
+                return videoView.MediaPlayer.IsPlaying;
+            }
+        }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -43,7 +51,7 @@ namespace DVBTTelevizor
             
             videoView.MediaPlayer.Play(_media);
             
-        }
+        }        
 
         protected override void OnDisappearing()
         {
