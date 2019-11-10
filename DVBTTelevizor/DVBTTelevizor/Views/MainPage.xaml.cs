@@ -93,6 +93,12 @@ namespace DVBTTelevizor
                 {
                 if (_playerPage != null)
                 {
+                        if (_playerPage.Playing)
+                        {
+                            _playerPage.StopPlay();
+                            _playerPage.StartPlay();
+                        }
+
                         if (!_playerPage.Playing)
                         {
                             Navigation.PushModalAsync(_playerPage);
@@ -123,6 +129,15 @@ namespace DVBTTelevizor
             }
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
+        }
+
+        public void StopPLayback()
+        {
+            if (_playerPage != null && _playerPage.Playing)
+            {
+                _playerPage.StopPlay();
+                Navigation.PopModalAsync();
+            }
         }
 
         public void OnKeyDown(string key)

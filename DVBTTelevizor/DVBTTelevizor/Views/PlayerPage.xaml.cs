@@ -64,5 +64,16 @@ namespace DVBTTelevizor
                await _driver.Stop();
            });            
         }
+
+        public void StopPlay()
+        {
+            videoView.MediaPlayer.Stop();
+        }
+
+        public void StartPlay()
+        {
+            _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+            videoView.MediaPlayer.Play(_media);
+        }
     }
 }

@@ -27,8 +27,11 @@ namespace DVBTTelevizor
 
         protected override void OnSleep()
         {
-            // Handle when your app sleeps
+            _loggingService.Info($"OnSleep");
+
+            _mainPage.StopPLayback();
         }
+
 
         protected override void OnResume()
         {
