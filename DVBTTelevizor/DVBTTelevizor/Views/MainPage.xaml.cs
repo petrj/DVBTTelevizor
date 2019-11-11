@@ -131,7 +131,7 @@ namespace DVBTTelevizor
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
         }
 
-        public void StopPLayback()
+        public void StopPlayback()
         {
             if (_playerPage != null && _playerPage.Playing)
             {

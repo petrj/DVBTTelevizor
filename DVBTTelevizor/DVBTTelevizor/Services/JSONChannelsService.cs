@@ -38,19 +38,8 @@ namespace DVBTTelevizor
 
                     res = JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(jsonFromFile);
                 }
-
-                // radio channels filter 
-
-                var filteredRes = new ObservableCollection<DVBTChannel>();
-                foreach (var ch in res)
-                {
-                    if (ch.ServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
-                        continue;
-
-                    filteredRes.Add(ch);
-                }
-
-                return filteredRes;
+                
+                return res;
             });
         }
 

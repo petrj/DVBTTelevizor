@@ -29,7 +29,7 @@ namespace DVBTTelevizor
         {
             _loggingService.Info($"OnSleep");
 
-            _mainPage.StopPLayback();
+            _mainPage.StopPlayback();
         }
 
 

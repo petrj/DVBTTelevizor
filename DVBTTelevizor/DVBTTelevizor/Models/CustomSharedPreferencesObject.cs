@@ -48,9 +48,9 @@ namespace DVBTTelevizor
             }
         }
 
-        protected T GetPersistingSettingValue<T>(string key)
+        protected T GetPersistingSettingValue<T>(string key, T defaultValue = default(T))
         {
-            T result = default(T);
+            T result = defaultValue;
 
             try
             {

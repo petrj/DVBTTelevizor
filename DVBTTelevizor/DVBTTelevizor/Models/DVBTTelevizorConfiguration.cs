@@ -59,6 +59,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool ShowTVChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowTVChannels", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowTVChannels", value);
+            }
+        }
+
         public bool ShowRadioChannels
         {
             get

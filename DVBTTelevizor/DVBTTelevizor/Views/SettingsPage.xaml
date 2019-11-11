@@ -40,8 +40,11 @@
                         <ColumnDefinition Width="30*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label  Grid.Row="0" Grid.Column="0" Text="Show radio" TextColor="Yellow"/>
+                    <Label  Grid.Row="0" Grid.Column="0" Text="Show radio channels" TextColor="Yellow"/>
                     <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowRadioSwitch" IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
+
+                    <Label  Grid.Row="1" Grid.Column="0" Text="Show TV channels" TextColor="Yellow"/>
+                    <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowTVSwitch" IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
 
                 </Grid>
 

@@ -18,6 +18,24 @@
                 <Setter Property="BackgroundColor" Value="#262626"/>
             </Style>
 
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="True"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+            </Style>
+
+            <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -30,10 +48,10 @@
             <ListView x:Name="ChannelsListView"
                     ItemsSource="{Binding Channels}"
                     CachingStrategy="RecycleElement"
-                    IsPullToRefreshEnabled="True"
                     RefreshCommand="{Binding RefreshCommand}"
                     IsRefreshing="{Binding IsBusy}"
-                    SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+                    Style="{StaticResource ListViewStyle}"
+                    SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">                
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -54,20 +72,22 @@
                                         <RowDefinition Height="1" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="100" />
+                                        <ColumnDefinition Width="20*" />
+                                        <ColumnDefinition Width="50*" />
+                                        <ColumnDefinition Width="25*" />
+                                        <ColumnDefinition Width="5*" />
                                     </Grid.ColumnDefinitions>
 
 
-                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Margin="0,0,0,0" Text="{Binding Number}" TextColor="White" />
-                                    <Label Grid.Row="0" Grid.Column="1" Margin="0,0,0,0" Text="{Binding Name}" TextColor="White"/>
-                                    <Label Grid.Row="0" Grid.Column="2" Margin="0,0,0,0" Text="{Binding FrequencyLabel}" TextColor="White"/>
-
+                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Margin="0,0,0,0" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" />
+                                    
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" LineBreakMode="NoWrap" Style="{DynamicResource ChannelNameTextStyle}"/>
                                     <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Margin="20,0,0,0" TextColor="White"/>
-                                    <Label Grid.Row="1" Grid.Column="2"  Text="{Binding DVBTTypeLabel}" Margin="20,0,0,0" TextColor="White"/>
 
-                                    <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding FrequencyLabel}" TextColor="White" VerticalTextAlignment="Center" HorizontalTextAlignment="End" />
+                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DVBTTypeLabel}" TextColor="White"  VerticalTextAlignment="Center" HorizontalTextAlignment="End" /> 
+
+                                    <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                 </Grid>
 
                             </ViewCell.View>

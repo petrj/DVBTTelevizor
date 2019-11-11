@@ -171,11 +171,18 @@ namespace DVBTTelevizor
                         channels = await _channelService.LoadChannels();
                     }, _dialogService);
 
-                // adding one by one
+                // channels filter 
+
                 foreach (var ch in channels)
                 {
+                    if (ch.ServiceType == DVBTServiceType.TV && !_config.ShowTVChannels)
+                        continue;
+
+                    if (ch.ServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
+                        continue;
+
                     Channels.Add(ch);
-                }
+                } 
 
                 OnPropertyChanged(nameof(Channels));
 
