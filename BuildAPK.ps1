@@ -3,6 +3,11 @@ cd $PSScriptRoot
 ./Clear.ps1
 
 $msbuild = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+if (-not (Test-Path $msbuild))
+{
+    $msbuild = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\amd64\msbuild.exe"
+}
+
 $nugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 $configuration = "Debug"
 $manifestPath = "DVBTTelevizor\DVBTTelevizor.Android\Properties\AndroidManifest.xml" 
