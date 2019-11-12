@@ -63,11 +63,23 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetPersistingSettingValue<bool>("ShowTVChannels", true);
+                return !HideTVChannels;
             }
             set
             {
-                SavePersistingSettingValue<bool>("ShowTVChannels", value);
+                HideTVChannels = !value;
+            }
+        }
+
+        public bool HideTVChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("HideTVChannels", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("HideTVChannels", value);
             }
         }
 

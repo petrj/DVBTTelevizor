@@ -36,14 +36,27 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
             </Style>
 
+            <Style x:Key="ProviderNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="white"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="Margin" Value="20,0,0,0"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="white"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
 
-    <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+    <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
         <!-- middle controls -->
-        <StackLayout VerticalOptions="CenterAndExpand" Margin="10,10,10,0">
+        <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
 
             <ListView x:Name="ChannelsListView"
                     ItemsSource="{Binding Channels}"
@@ -51,7 +64,7 @@
                     RefreshCommand="{Binding RefreshCommand}"
                     IsRefreshing="{Binding IsBusy}"
                     Style="{StaticResource ListViewStyle}"
-                    SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">                
+                    SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -80,12 +93,12 @@
 
 
                                     <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Margin="0,0,0,0" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" />
-                                    
-                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" LineBreakMode="NoWrap" Style="{DynamicResource ChannelNameTextStyle}"/>
-                                    <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Margin="20,0,0,0" TextColor="White"/>
 
-                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding FrequencyLabel}" TextColor="White" VerticalTextAlignment="Center" HorizontalTextAlignment="End" />
-                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DVBTTypeLabel}" TextColor="White"  VerticalTextAlignment="Center" HorizontalTextAlignment="End" /> 
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" LineBreakMode="NoWrap" Style="{DynamicResource ChannelNameTextStyle}"/>
+                                    <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}"/>
+
+                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
+                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DVBTTypeLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
 
                                     <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                 </Grid>
@@ -100,7 +113,7 @@
         </StackLayout>
 
         <!-- bottom controls -->
-        <StackLayout VerticalOptions="End" Spacing="0" Margin="10,10,10,0">
+        <StackLayout VerticalOptions="End" Spacing="0" Margin="0,0,0,0">
 
             <Label Text="{Binding Status}" x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
             <!--Label Text="{Binding DataStreamInfo}" x:Name="DataStreamInfoLabel" Style="{DynamicResource InfoLabelStyle}"/-->

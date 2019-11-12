@@ -58,15 +58,17 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
             {
                 Status = $"Initialization failed ({message})";
-            });            
+            });
 
-        }        
+        }
 
         private void LongPress(object item)
         {
             if (item != null && item is DVBTChannel)
             {
-                var ch = item as DVBTChannel;                
+                var ch = item as DVBTChannel;
+
+                SelectedChannel = ch;
 
                 _loggingService.Info($"Long press on channel {ch.Name})");
 
@@ -144,7 +146,7 @@ namespace DVBTTelevizor
                 channel = SelectedChannel;
                 if (channel == null)
                     return;
-            }            
+            }
 
             _loggingService.Debug($"Playing channel {channel}");
 
@@ -171,7 +173,7 @@ namespace DVBTTelevizor
                         channels = await _channelService.LoadChannels();
                     }, _dialogService);
 
-                // channels filter 
+                // channels filter
 
                 foreach (var ch in channels)
                 {
@@ -182,7 +184,7 @@ namespace DVBTTelevizor
                         continue;
 
                     Channels.Add(ch);
-                } 
+                }
 
                 OnPropertyChanged(nameof(Channels));
 
