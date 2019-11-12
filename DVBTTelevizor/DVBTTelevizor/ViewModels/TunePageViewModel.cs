@@ -120,7 +120,7 @@ namespace DVBTTelevizor
             {
                 return State == TuneState.Ready;
             }
-        }        
+        }
 
 
         public bool ManualTuning
@@ -136,7 +136,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(ManualTuning));
                 OnPropertyChanged(nameof(AutomaticTuning));
                 OnPropertyChanged(nameof(TuneOptionsVisible));
-                OnPropertyChanged(nameof(ManualTuneOptionsVisible));                
+                OnPropertyChanged(nameof(ManualTuneOptionsVisible));
             }
         }
 
@@ -164,11 +164,11 @@ namespace DVBTTelevizor
                 if (State == TuneState.TuningInProgress)
                 {
                     var freqMhz = (474 + 8 * (AutomaticTuningActualChannel - 21));
-                    return $"Tuning channel {AutomaticTuningActualChannel} ({freqMhz} Mhz)";
+                    return $"Tuning channel {AutomaticTuningActualChannel}";
                 }
 
                 return String.Empty;
-            }            
+            }
         }
 
         public double AutomaticTuningProgress
@@ -240,11 +240,11 @@ namespace DVBTTelevizor
             get
             {
                 return (
-                            (State == TuneState.TuneFinishedOK) 
-                            || 
+                            (State == TuneState.TuneFinishedOK)
+                            ||
                             (State == TuneState.TuneFailed)
-                       ) 
-                        && 
+                       )
+                        &&
                             TunedChannels.Count > 0;
             }
         }
@@ -347,13 +347,13 @@ namespace DVBTTelevizor
 
             if (ManualTuning)
             {
-                Status = $"Searching channels on freq {TuneFrequency}...";                
+                Status = $"Searching channels on freq {TuneFrequency}...";
             } else
             {
                 Status = $"Automatic tuning ...";
             }
 
-            TunedChannels.Clear();            
+            TunedChannels.Clear();
 
             OnPropertyChanged(nameof(AutomaticTuningLabel));
             OnPropertyChanged(nameof(AutomaticTuningProgress));
@@ -374,10 +374,10 @@ namespace DVBTTelevizor
                 }
 
                 Status = $"Tune finished. Total tuned channels: {TunedChannels.Count}";
-                State = TuneState.TuneFinishedOK;                
+                State = TuneState.TuneFinishedOK;
             }
             catch (Exception ex)
-            {                
+            {
                 Status = $"Tune finished with error. Total tuned channels: {TunedChannels.Count}";
                 State = TuneState.TuneFailed;
             }
@@ -398,7 +398,7 @@ namespace DVBTTelevizor
             await Task.Run( async () =>
             {
                 _loggingService.Info("Starting automatic tuning");
-              
+
                 for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
                 {
                     AutomaticTuningActualChannel = i;
@@ -416,12 +416,39 @@ namespace DVBTTelevizor
                     await Tune(freq, TuneBandwidth * 1000000);
                     //System.Threading.Thread.Sleep(200);
                 }
-        
-            });           
+
+            });
         }
 
         private async Task Tune(long freq, long bandWidth)
         {
+            /*
+           //debug
+                      await Task.Run(() =>
+                      {
+                          _tuningAborted = false;
+                          for (var i = 0; i < 15; i++)
+                          {
+                              System.Threading.Thread.Sleep(1000);
+
+                              if (_tuningAborted)
+                                  break;
+
+                              var ch = new DVBTChannel();
+                              ch.PIDs = "0,16,17";
+                              ch.ProgramMapPID = 0;
+                              ch.Name = $"Test {i}";
+                              ch.ProviderName = "Mux  1";
+                              ch.Frequency = 730000000;
+                              ch.Bandwdith = 8000000;
+                              ch.Number = i+1;
+                              ch.DVBTType = 0;
+
+                              TunedChannels.Add(ch);
+                          }
+                      });
+              */
+
             try
             {
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
@@ -430,7 +457,7 @@ namespace DVBTTelevizor
                         continue;
                     if (!DVBT2Tuning && dvbtTypeIndex == 1)
                         continue;
-                    
+
                     var dvbtTypeAsString = dvbtTypeIndex == 0 ? "DVBT" : "DVTB2";
                     Status = $"Tuning {freq / 1000000} Mhz ({dvbtTypeAsString}), channels found: {TunedChannels.Count}";
 

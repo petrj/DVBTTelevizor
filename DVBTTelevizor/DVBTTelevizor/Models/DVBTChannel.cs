@@ -60,7 +60,14 @@ namespace DVBTTelevizor
                     res = "DVBT2";
                 }
 
-                return $"{res} {ServiceType}";
+                switch (ServiceType)
+                {
+                    case DVBTServiceType.Radio:
+                    case DVBTServiceType.TV:
+                        return $"{res} {ServiceType}";
+                    default:
+                        return $"{res}";
+                }
             }
         }
 

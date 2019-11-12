@@ -34,6 +34,7 @@
                 <Setter Property="TextColor" Value="#41b3ff"/>
                 <Setter Property="Margin" Value="5,5,5,5"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="ProviderNameTextStyle" TargetType="Label">
@@ -41,6 +42,7 @@
                 <Setter Property="FontAttributes" Value="Italic"/>
                 <Setter Property="Margin" Value="20,0,0,0"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
@@ -92,9 +94,9 @@
                                     </Grid.ColumnDefinitions>
 
 
-                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Margin="0,0,0,0" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" />
+                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" />
 
-                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" LineBreakMode="NoWrap" Style="{DynamicResource ChannelNameTextStyle}"/>
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}"/>
                                     <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}"/>
 
                                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
