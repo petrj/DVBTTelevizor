@@ -458,7 +458,7 @@ namespace DVBTTelevizor
                     if (!DVBT2Tuning && dvbtTypeIndex == 1)
                         continue;
 
-                    var dvbtTypeAsString = dvbtTypeIndex == 0 ? "DVBT" : "DVTB2";
+                    var dvbtTypeAsString = dvbtTypeIndex == 0 ? "DVBT" : "DVBT2";
                     Status = $"Tuning {freq / 1000000} Mhz ({dvbtTypeAsString}), channels found: {TunedChannels.Count}";
 
                     _loggingService.Debug(Status);

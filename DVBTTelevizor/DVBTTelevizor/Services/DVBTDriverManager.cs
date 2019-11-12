@@ -633,11 +633,11 @@ namespace DVBTTelevizor
             return version;
         }
 
-        public async Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySyetem)
+        public async Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySystem)
         {
-            _log.Debug($"Tuning {frequency} Mhz, type: {deliverySyetem}");
+            _log.Debug($"Tuning {frequency} Mhz, type: {deliverySystem}");
 
-            if (frequency == _lastTunedFreq && deliverySyetem == _lastTunedDeliverySystem)
+            if (frequency == _lastTunedFreq && deliverySystem == _lastTunedDeliverySystem)
             {
                 _log.Debug($"Frequency already tuned");
 
@@ -660,7 +660,7 @@ namespace DVBTTelevizor
             //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
             //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
 
-            var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySyetem) };
+            var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySystem) };
 
             var responseSize = 10;
 
@@ -675,7 +675,7 @@ namespace DVBTTelevizor
             if (successFlag == 1)
             {
                 _lastTunedFreq = frequency;
-                _lastTunedDeliverySystem = deliverySyetem;
+                _lastTunedDeliverySystem = deliverySystem;
             }
 
             _log.Debug($"Tune response: {successFlag}");
@@ -876,18 +876,29 @@ namespace DVBTTelevizor
                 }
 
                 // freq tuned
+                              
+                // timeout for get signal:
+                var startTime = DateTime.Now;
 
-                // waiting
-                // System.Threading.Thread.Sleep(1000);
+                DVBTStatus status = new DVBTStatus();
 
-                // getting status
-
-                var status = await GetStatus();
-
-                if (!status.SuccessFlag)
+                while ((DateTime.Now - startTime).TotalSeconds < 3)
                 {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
+                    status = await GetStatus();
+
+                    if (!status.SuccessFlag)
+                    {
+                        res.Result = SearchProgramResultEnum.Error;
+                        return res;
+                    }
+
+                    if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
+                    {
+                        break;
+                    }
+
+                    // waiting
+                    System.Threading.Thread.Sleep(1000);
                 }
 
                 if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
@@ -899,7 +910,7 @@ namespace DVBTTelevizor
                 res.SingalPercentStrength = status.rfStrengthPercentage;
 
                 // waiting
-                //System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(1000);
 
                 // setting PID filter
 
@@ -918,7 +929,7 @@ namespace DVBTTelevizor
                 StartReadBuffer();
 
                 var timeoutForReadingBuffer = 10; //  10 secs
-                var startTime = DateTime.Now;
+                startTime = DateTime.Now;
 
                 List<byte> sdtBytes = new List<byte>();
                 List<byte> psiBytes = new List<byte>();
