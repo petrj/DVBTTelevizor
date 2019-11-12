@@ -48,7 +48,7 @@ namespace DVBTTelevizor
             _log = loggingService;
 
             _log.Debug($"Initializing DVBT driver manager");
-            
+
             _config = config;
         }
 
@@ -185,7 +185,7 @@ namespace DVBTTelevizor
 
             try
             {
-                await SendCloseConnection();                
+                await SendCloseConnection();
             }
             catch (Exception ex)
             {
@@ -199,7 +199,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _log.Error(ex, "Error while closing control client");
-            }            
+            }
 
             StopBackgroundReading();
         }
@@ -271,7 +271,7 @@ namespace DVBTTelevizor
 
                 var statusRes = await GetStatus();
                 if (!tunedRes.SuccessFlag)
-                {                    
+                {
                     return false;
                 }
 
@@ -327,7 +327,7 @@ namespace DVBTTelevizor
                         {
                             //_log.Debug("Reading from stream ...");
 
-                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize);                            
+                            var readByteCount = _controlStream.Read(buffer, 0, bufferSize);
 
                             if (readByteCount > 0)
                             {
@@ -382,7 +382,7 @@ namespace DVBTTelevizor
                 return response;
             });
         }
-        
+
         private string RecordFileName
         {
             get
@@ -398,7 +398,7 @@ namespace DVBTTelevizor
                 return Path.Combine(_config.StorageFolder, $"playlist.m3u8");
             }
         }
-               
+
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             _log.Debug("Starting reader tread");
@@ -448,7 +448,7 @@ namespace DVBTTelevizor
 
                         if (rec)
                         {
-                            status += ", recording";                            
+                            status += ", recording";
                         }
                         if (readingBuffer)
                         {
@@ -878,7 +878,7 @@ namespace DVBTTelevizor
                 // freq tuned
 
                 // waiting
-                System.Threading.Thread.Sleep(1000);
+                // System.Threading.Thread.Sleep(1000);
 
                 // getting status
 
@@ -899,7 +899,7 @@ namespace DVBTTelevizor
                 res.SingalPercentStrength = status.rfStrengthPercentage;
 
                 // waiting
-                System.Threading.Thread.Sleep(1000);
+                //System.Threading.Thread.Sleep(1000);
 
                 // setting PID filter
 
@@ -911,6 +911,9 @@ namespace DVBTTelevizor
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
+
+                // waiting
+                System.Threading.Thread.Sleep(1000);
 
                 StartReadBuffer();
 
@@ -939,6 +942,8 @@ namespace DVBTTelevizor
 
                 if (sdtBytes.Count == 0 || psiBytes.Count == 0)
                 {
+                    _log.Debug($"SDT bytes and PSI bytes are empty");
+
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
@@ -951,12 +956,24 @@ namespace DVBTTelevizor
                 res.ServiceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
                 res.Result = SearchProgramResultEnum.OK;
 
+                _log.Debug($"SDT descriptors:");
+                foreach (var sdt in sdtTable.ServiceDescriptors)
+                {
+                    _log.Debug($"Name: {sdt.ProviderName}, provider: {sdt.ProviderName}, number: {sdt.ProgramNumber}");
+                }
+
+                _log.Debug($"PSI association:");
+                foreach (var pr in psiTable.ProgramAssociations)
+                {
+                    _log.Debug($"MapPID: {pr.ProgramMapPID}, number: {pr.ProgramNumber}");
+                }
+
                 //if (sdtBytes != null)
                 //    SaveBuffer($"ProgramMapPIDs.SDT.{frequency}", sdtBytes.ToArray());
                 //if (psiBytes != null)
                 //    SaveBuffer($"ProgramMapPIDs.PSI.{frequency}", psiBytes.ToArray());
 
-                _log.Debug($"Searching Program Map PIDS response: {res}");
+                _log.Debug($"Searching Program Map PIDS response: {res.Result}");
 
                 return res;
 

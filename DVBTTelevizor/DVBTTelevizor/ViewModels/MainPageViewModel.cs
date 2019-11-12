@@ -57,9 +57,12 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
             {
-                Status = $"Initialization failed ({message})";
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    Status = $"Initialization failed ({message})";
+                    UpdateDriverState();
+                });
             });
-
         }
 
         private void LongPress(object item)

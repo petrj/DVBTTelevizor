@@ -23,7 +23,19 @@ namespace DVBTTelevizor
         public ServicePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
+            {
+                UpdateDriverState();
+            });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    Status = $"Initialization failed ({message})";
+                    UpdateDriverState();
+                });
+            });
         }
 
         public long TuneFrequency

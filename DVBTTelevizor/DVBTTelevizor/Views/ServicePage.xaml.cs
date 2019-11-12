@@ -40,8 +40,6 @@ namespace DVBTTelevizor
 
             BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
 
-            this.InitButton.Clicked += InitButton_Clicked;
-            this.DisconnectButton.Clicked += DisconnectButton_Clicked;
             this.TuneButton.Clicked += TuneButton_Clicked;
             this.GetStatusButton.Clicked += GetStatusButton_Clicked;
             this.GetVersionButton.Clicked += GetVersionButton_Clicked;
@@ -56,34 +54,19 @@ namespace DVBTTelevizor
             DeliverySystemPicker.SelectedIndex = 0;;
         }
 
-        private void InitButton_Clicked(object sender, EventArgs e)
+        private void ToolConnect_Clicked(object sender, EventArgs e)
         {
-            MessagingCenter.Send("", BaseViewModel.MSG_Init);
-        }
-
-        private void DisconnectButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = "Disconnecting driver  ...";
-
-            Task.Run(async () =>
+            if (!_viewModel.DriverConnected)
             {
-                try
+                MessagingCenter.Send("", BaseViewModel.MSG_Init);
+            }
+            else
+            {
+                Task.Run(async () =>
                 {
-                    await _viewModel.DisconnectDriver();                    
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = Environment.NewLine + $"Stopped";
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Request failed ({ex.Message})";
-                    });
-                }
-            });
+                    await _viewModel.DisconnectDriver();
+                });
+            }
         }
 
         private void TuneButton_Clicked(object sender, EventArgs e)
