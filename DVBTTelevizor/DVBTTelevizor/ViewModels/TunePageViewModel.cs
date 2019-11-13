@@ -422,7 +422,7 @@ namespace DVBTTelevizor
 
         private async Task Tune(long freq, long bandWidth)
         {
-            /*
+            
            //debug
                       await Task.Run(() =>
                       {
@@ -447,7 +447,7 @@ namespace DVBTTelevizor
                               TunedChannels.Add(ch);
                           }
                       });
-              */
+            
 
             try
             {
@@ -482,12 +482,12 @@ namespace DVBTTelevizor
                         case SearchProgramResultEnum.NoProgramFound:
                             _loggingService.Debug("No program found");
 
-                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength / 100.0;
+                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength;
 
                             break;
                         case SearchProgramResultEnum.OK:
 
-                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength / 100.0;
+                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength;
 
                             var mapPIDs = new List<long>();
                             foreach (var sd in searchMapPIDsResult.ServiceDescriptors)

@@ -47,8 +47,8 @@ namespace DVBTTelevizor
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
             this.SetPIDsButton.Clicked += SetPIDsButton_Clicked;
-            this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
-            this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
+            //this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
+            //this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
 
             DeliverySystemPicker.SelectedIndex = 0;;
@@ -221,48 +221,22 @@ namespace DVBTTelevizor
             });
         }
 
-        private void StopReadStreamButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = "Stop read stream ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    _driver.StopReadStream();
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Request failed ({ex.Message})";
-                    });
-                }
-            });
-        }
-
-        private void StartReadStreamButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = "Start read stream ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    _driver.StartReadStream();
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Request failed ({ex.Message})";
-                    });
-                }
-            });
-        }
-
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
+            StatusLabel.Text = "Playing stream ...";
+     
+            try
+            {
+                _driver.StopReadStream();
+            }
+            catch (Exception ex)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    StatusLabel.Text = $"Request failed ({ex.Message})";
+                });
+            }
+        
             Navigation.PushModalAsync(_playerPage);
         }
     }

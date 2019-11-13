@@ -119,38 +119,33 @@
                     <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
                 </Grid>
 
-                <Grid VerticalOptions="Start" IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,10,0,10">
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40*" />
-                        <ColumnDefinition Width="60*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding AutomaticTuningLabel}" HorizontalOptions="Start" VerticalOptions="Center" TextColor="White"/>
-                    <ProgressBar Grid.Row="0" Grid.Column="1"  Progress="{Binding AutomaticTuningProgress}" BackgroundColor="DarkGray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,0,0,0" HeightRequest="2" />
-                </Grid>
-
+                <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,10,0,0">
+                    <Label Text="{Binding AutomaticTuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White"/>
+                    <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />
+                </StackLayout>
+                
                 <Grid VerticalOptions="Start" IsVisible="{Binding TuningInProgress}" Margin="0,10,0,10">
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="1" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40*" />
-                        <ColumnDefinition Width="60*" />
+                        <ColumnDefinition Width="80*" />
+                        <ColumnDefinition Width="20*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" VerticalOptions="Center" TextColor="White" HorizontalOptions="Start"  Margin="0,10,0,10"/>
-                    <ProgressBar Grid.Row="0" Grid.Column="1"  Progress="{Binding SignalStrengthProgress}" BackgroundColor="DarkGray" ProgressColor="Blue" HorizontalOptions="FillAndExpand" VerticalOptions="Center" Margin="0,0,0,0" HeightRequest="2" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" TextColor="White" />
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding SignalStrengthProgress}" TextColor="White" HorizontalOptions="End" />
+                    <BoxView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" HeightRequest="5" VerticalOptions="FillAndExpand"  Margin="0,0,0,0"/>
+                    <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="White" HeightRequest="1" VerticalOptions="FillAndExpand"  Margin="0,0,0,0"/>
                 </Grid>
 
             </StackLayout>
 
             <!-- middle controls -->
-            <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
+            <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">                
 
                 <ListView x:Name="ChannelsListView"
                         ItemsSource="{Binding TunedChannels}"

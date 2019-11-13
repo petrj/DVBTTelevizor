@@ -62,7 +62,7 @@
 
                 <Label Text="Stream read control" TextColor="Yellow" FontSize="Medium"/>
 
-                <Grid Margin="0,0,0,0">
+                <!--Grid Margin="0,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
@@ -75,27 +75,59 @@
                     <Button Grid.Row="0" Grid.Column="0"  x:Name="StartReadStreamButton" Text="Start" VerticalOptions="Start"  HeightRequest="60"/>
                     <Button Grid.Row="0" Grid.Column="2"  x:Name="StopReadStreamButton" Text="Stop" VerticalOptions="Start"  HeightRequest="60"/>
 
-                </Grid>
+                </Grid-->
 
                 <Label Text="Tuning" TextColor="Yellow" FontSize="Medium"/>
 
                 <StackLayout Margin="0,10,0,0">
 
-                    <Label Text="Frequency (Mhz)" TextColor="White"/>
-                    <Entry x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End"/>
+                        <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}">
 
-                    <Label Grid.ColumnSpan="2" Text="BandWidth  (Mhz)" TextColor="White"/>
-                    <Entry x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End"/>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60*" />
+                                <ColumnDefinition Width="40*" />
+                            </Grid.ColumnDefinitions>
 
-                    <Label  Grid.ColumnSpan="2" Text="DeliverySystem" TextColor="White"/>
-                    <Picker x:Name="DeliverySystemPicker"
-                            TextColor="White"
-                            HorizontalOptions="End">
-                        <Picker.Items>
-                            <x:String>DVBT</x:String>
-                            <x:String>DVBT2</x:String>
-                        </Picker.Items>
-                    </Picker>
+                            <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
+                            <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Channel)" TextColor="White"/>
+                            <Picker Grid.Row="1" Grid.Column="1" TextColor="White" VerticalOptions="End" HorizontalOptions="End"
+                            Margin="0,0,0,0"
+                            SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
+                            ItemsSource="{Binding FrequencyChannels}"
+                            ItemDisplayBinding="{Binding Description}"/>
+                        </Grid>
+
+                        <Grid x:Name="TuneOptionsGrid">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60*" />
+                                <ColumnDefinition Width="40*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                            <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+
+                            <Label  Grid.Row="1" Grid.Column="0" Text="DeliverySystem" TextColor="White"/>
+                            <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker"
+                                TextColor="White"
+                                HorizontalOptions="End">    
+                                <Picker.Items>
+                                    <x:String>DVBT</x:String>
+                                    <x:String>DVBT2</x:String>
+                                </Picker.Items>
+                            </Picker>
+                        </Grid>            
 
                     <Label Text="PID filter" TextColor="White"/>
                     <Entry Grid.ColumnSpan="2" x:Name="EntryPIDs" Text="768,801,16,17,18,769,785,787,0" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="End"/>
