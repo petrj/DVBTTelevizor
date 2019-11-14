@@ -25,8 +25,9 @@
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
             <ScrollView>
+
             <!-- middle controls -->
-            <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
+            <StackLayout VerticalOptions="CenterAndExpand" Margin="10,10,10,10">
 
                 <Grid Margin="0,0,0,0">
                     <Grid.RowDefinitions>
@@ -60,23 +61,6 @@
 
                 </Grid>
 
-                <Label Text="Stream read control" TextColor="Yellow" FontSize="Medium"/>
-
-                <!--Grid Margin="0,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="33*" />
-                        <ColumnDefinition Width="33*" />
-                        <ColumnDefinition Width="33*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Row="0" Grid.Column="0"  x:Name="StartReadStreamButton" Text="Start" VerticalOptions="Start"  HeightRequest="60"/>
-                    <Button Grid.Row="0" Grid.Column="2"  x:Name="StopReadStreamButton" Text="Stop" VerticalOptions="Start"  HeightRequest="60"/>
-
-                </Grid-->
-
                 <Label Text="Tuning" TextColor="Yellow" FontSize="Medium"/>
 
                 <StackLayout Margin="0,10,0,0">
@@ -97,10 +81,10 @@
 
                             <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Channel)" TextColor="White"/>
                             <Picker Grid.Row="1" Grid.Column="1" TextColor="White" VerticalOptions="End" HorizontalOptions="End"
-                            Margin="0,0,0,0"
-                            SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
-                            ItemsSource="{Binding FrequencyChannels}"
-                            ItemDisplayBinding="{Binding Description}"/>
+                                Margin="0,0,0,0"
+                                SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
+                                ItemsSource="{Binding FrequencyChannels}"
+                                ItemDisplayBinding="{Binding Description}"/>
                         </Grid>
 
                         <Grid x:Name="TuneOptionsGrid">
@@ -119,17 +103,15 @@
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
                             <Label  Grid.Row="1" Grid.Column="0" Text="DeliverySystem" TextColor="White"/>
-                            <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker"
-                                TextColor="White"
-                                HorizontalOptions="End">    
-                                <Picker.Items>
-                                    <x:String>DVBT</x:String>
-                                    <x:String>DVBT2</x:String>
-                                </Picker.Items>
+                            <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker" VerticalOptions="End" HorizontalOptions="End"
+                                    SelectedItem="{Binding SelectedDeliverySystemType, Mode=TwoWay}"
+                                    ItemsSource="{Binding DeliverySystemTypes}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    TextColor="White">
                             </Picker>
-                        </Grid>            
+                        </Grid>
 
-                    <Label Text="PID filter" TextColor="White"/>
+                        <Label Text="PID filter" TextColor="White"/>
                     <Entry Grid.ColumnSpan="2" x:Name="EntryPIDs" Text="768,801,16,17,18,769,785,787,0" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="End"/>
 
                     <Grid Margin="20,10,20,20">

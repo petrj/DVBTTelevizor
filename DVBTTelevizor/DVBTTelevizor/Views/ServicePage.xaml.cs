@@ -39,6 +39,8 @@ namespace DVBTTelevizor
             _playerPage = playerPage;
 
             BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
+            _viewModel.TuneFrequency = "730";
+            _viewModel.SelectedDeliverySystemType = _viewModel.DeliverySystemTypes[0];
 
             this.TuneButton.Clicked += TuneButton_Clicked;
             this.GetStatusButton.Clicked += GetStatusButton_Clicked;
@@ -50,8 +52,6 @@ namespace DVBTTelevizor
             //this.StopReadStreamButton.Clicked += StopReadStreamButton_Clicked;
             //this.StartReadStreamButton.Clicked += StartReadStreamButton_Clicked;
             this.PlayButton.Clicked += PlayButton_Clicked;
-
-            DeliverySystemPicker.SelectedIndex = 0;;
         }
 
         private void ToolConnect_Clicked(object sender, EventArgs e)
@@ -224,7 +224,7 @@ namespace DVBTTelevizor
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = "Playing stream ...";
-     
+
             try
             {
                 _driver.StopReadStream();
@@ -236,7 +236,7 @@ namespace DVBTTelevizor
                     StatusLabel.Text = $"Request failed ({ex.Message})";
                 });
             }
-        
+
             Navigation.PushModalAsync(_playerPage);
         }
     }

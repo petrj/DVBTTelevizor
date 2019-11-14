@@ -11,6 +11,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
+using DVBTTelevizor.Models;
 
 namespace DVBTTelevizor
 {
@@ -90,7 +91,7 @@ namespace DVBTTelevizor
         // cannot run async!
         protected void ConnectDriver(string message)
         {
-            _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);            
+            _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
             _driver.Start();
             Status = $"Initialized ({_driver.Configuration.DeviceName})";
 
@@ -102,11 +103,11 @@ namespace DVBTTelevizor
             await _driver.Disconnect();
             Status = $"Not initialized";
 
-            UpdateDriverState();            
+            UpdateDriverState();
         }
 
         public void UpdateDriverState()
-        {            
+        {
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(DriverConnected));
             OnPropertyChanged(nameof(DriverDisConnected));

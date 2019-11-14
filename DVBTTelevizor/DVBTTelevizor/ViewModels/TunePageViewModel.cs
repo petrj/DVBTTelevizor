@@ -9,19 +9,15 @@ using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {
-    public class TunePageViewModel : BaseViewModel
+    public class TunePageViewModel : TuneViewModel
     {
         private bool _manualTuning = true;
         private bool _tuningAborted = false;
-        private string _tuneFrequency ;
-        private long _tuneBandwidth = 8;
 
         private bool _DVBTTuning = true;
         private bool _DVBT2Tuning = true;
 
         ChannelService _channelService;
-
-        DVBTFrequencyChannel _selectedFrequencyChannel = null;
 
         private TuneState _tuneState = TuneState.Ready;
 
@@ -32,8 +28,6 @@ namespace DVBTTelevizor
         private double _signalStrengthProgress = 0;
 
         public ObservableCollection<DVBTChannel> TunedChannels { get; set;  } = new ObservableCollection<DVBTChannel>();
-
-        public ObservableCollection<DVBTFrequencyChannel> FrequencyChannels { get; set; } = new ObservableCollection<DVBTFrequencyChannel>();
 
         public Command TuneCommand { get; set; }
         public Command AbortTuneCommand { get; set; }
@@ -57,45 +51,6 @@ namespace DVBTTelevizor
             AbortTuneCommand = new Command(async () => await AbortTune());
             SaveTunedChannelsCommand = new Command(async () => await SaveTunedChannels());
             FinishTunedCommand = new Command(async () => await FinishTune());
-
-            FillFrequencyChannels();
-        }
-
-        private void FillFrequencyChannels()
-        {
-            FrequencyChannels.Clear();
-
-            for (var i=21;i<=69;i++)
-            {
-                var freqMhz = (474 + 8 * (i - 21));
-                var fc = new DVBTFrequencyChannel()
-                {
-                    FrequencyMhZ = freqMhz,
-                    ChannelNumber = i
-                };
-
-                FrequencyChannels.Add(fc);
-            }
-        }
-
-        public DVBTFrequencyChannel SelectedFrequencyChannelItem
-        {
-            get
-            {
-                return _selectedFrequencyChannel;
-            }
-            set
-            {
-                _selectedFrequencyChannel = value;
-
-                if (value != null)
-                {
-                    TuneFrequency = (_selectedFrequencyChannel.FrequencyMhZ).ToString();
-                }
-
-                OnPropertyChanged(nameof(SelectedFrequencyChannelItem));
-                OnPropertyChanged(nameof(TuneFrequency));
-            }
         }
 
         public bool TuneReady
@@ -268,44 +223,6 @@ namespace DVBTTelevizor
         }
 
 
-        public string TuneFrequency
-        {
-            get
-            {
-                return _tuneFrequency;
-            }
-            set
-            {
-                _tuneFrequency = value;
-
-                foreach (var f in FrequencyChannels)
-                {
-                    if (f.FrequencyMhZ.ToString() == value)
-                    {
-                        _selectedFrequencyChannel = f;
-                        break;
-                    }
-                }
-
-                OnPropertyChanged(nameof(TuneFrequency));
-                OnPropertyChanged(nameof(SelectedFrequencyChannelItem));
-            }
-        }
-
-        public long TuneBandwidth
-        {
-            get
-            {
-                return _tuneBandwidth;
-            }
-            set
-            {
-                _tuneBandwidth = value;
-
-                OnPropertyChanged(nameof(TuneBandwidth));
-            }
-        }
-
         public bool DVBTTuning
         {
             get
@@ -422,7 +339,7 @@ namespace DVBTTelevizor
 
         private async Task Tune(long freq, long bandWidth)
         {
-            
+
            //debug
                       await Task.Run(() =>
                       {
@@ -447,7 +364,7 @@ namespace DVBTTelevizor
                               TunedChannels.Add(ch);
                           }
                       });
-            
+
 
             try
             {
@@ -615,7 +532,6 @@ namespace DVBTTelevizor
 
             });
         }
-
 
         public async Task<int> SaveTunedChannels()
         {

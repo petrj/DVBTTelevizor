@@ -11,14 +11,17 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
+using DVBTTelevizor.Models;
 
 namespace DVBTTelevizor
 {
-    public class ServicePageViewModel : BaseViewModel
+    public class ServicePageViewModel : TuneViewModel
     {
-        private long _tuneFrequency = 730;
-        private long _tuneBandwidth = 8;
         private int _tuneDVBTType = 0;
+
+        public ObservableCollection<DVBTDeliverySystemType> DeliverySystemTypes { get; set; } = new ObservableCollection<DVBTDeliverySystemType>();
+
+        DVBTDeliverySystemType _selectedDeliverySystemType = null;
 
         public ServicePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
@@ -36,34 +39,27 @@ namespace DVBTTelevizor
                     UpdateDriverState();
                 });
             });
+
+            FillDeliverySystemTypes();
         }
 
-        public long TuneFrequency
+        protected void FillDeliverySystemTypes()
         {
-            get
-            {
-                return _tuneFrequency;
-            }
-            set
-            {
-                _tuneFrequency = value;
+            DeliverySystemTypes.Clear();
 
-                OnPropertyChanged(nameof(TuneFrequency));
-            }
-        }
+            DeliverySystemTypes.Add(
+                new DVBTDeliverySystemType()
+                {
+                    Index = 0,
+                    Name = "DVBT"
+                });
 
-        public long TuneBandwidth
-        {
-            get
-            {
-                return _tuneBandwidth;
-            }
-            set
-            {
-                _tuneBandwidth = value;
-
-                OnPropertyChanged(nameof(TuneBandwidth));
-            }
+            DeliverySystemTypes.Add(
+                new DVBTDeliverySystemType()
+                {
+                    Index = 1,
+                    Name = "DVBT2"
+                });
         }
 
         public int TuneDVBTType
@@ -77,6 +73,40 @@ namespace DVBTTelevizor
                 _tuneDVBTType = value;
 
                 OnPropertyChanged(nameof(TuneDVBTType));
+            }
+        }
+
+        public DVBTDeliverySystemType SelectedDeliverySystemType
+        {
+            get
+            {
+                return _selectedDeliverySystemType;
+            }
+            set
+            {
+                _selectedDeliverySystemType = value;
+
+                OnPropertyChanged(nameof(DeliverySystemTypes));
+                OnPropertyChanged(nameof(SelectedDeliverySystemType));
+            }
+        }
+
+        public int SelectedDeliverySystemTypeIndex
+        {
+            get
+            {
+                return SelectedDeliverySystemType == null ? -1 : SelectedDeliverySystemType.Index;
+            }
+            set
+            {
+                foreach (var ds in DeliverySystemTypes )
+                {
+                    if (ds.Index == value)
+                    {
+                        SelectedDeliverySystemType = ds;
+                        break;
+                    }
+                }
             }
         }
 
