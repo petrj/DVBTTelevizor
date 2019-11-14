@@ -39,8 +39,8 @@
                         <ColumnDefinition Width="33*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0" x:Name="GetStatusButton" Text="Status" VerticalOptions="Start"  HeightRequest="60"></Button>
-                    <Button Grid.Row="0" Grid.Column="1" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start"  HeightRequest="60"></Button>
+                        <Button Grid.Row="0" Grid.Column="0" x:Name="GetStatusButton" Text="Status" VerticalOptions="Start"  HeightRequest="60" Command="{Binding GetStatusCommand}"></Button>
+                    <Button Grid.Row="0" Grid.Column="1" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start" HeightRequest="60"  Command="{Binding GetVersionCommand}"></Button>
                     <Button Grid.Row="0" Grid.Column="2" x:Name="GetCapButton"  Text="Cap." VerticalOptions="Start"  HeightRequest="60"></Button>
                 </Grid>
 
@@ -103,11 +103,12 @@
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
                             <Label  Grid.Row="1" Grid.Column="0" Text="DeliverySystem" TextColor="White"/>
-                            <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker" VerticalOptions="End" HorizontalOptions="End"
+                            <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker" VerticalOptions="Center" HorizontalOptions="End"
                                     SelectedItem="{Binding SelectedDeliverySystemType, Mode=TwoWay}"
                                     ItemsSource="{Binding DeliverySystemTypes}"
                                     ItemDisplayBinding="{Binding Name}"
-                                    TextColor="White">
+                                    TextColor="White"
+                                    Title=" DVBT ">
                             </Picker>
                         </Grid>
 

@@ -43,8 +43,7 @@ namespace DVBTTelevizor
             _viewModel.SelectedDeliverySystemType = _viewModel.DeliverySystemTypes[0];
 
             this.TuneButton.Clicked += TuneButton_Clicked;
-            this.GetStatusButton.Clicked += GetStatusButton_Clicked;
-            this.GetVersionButton.Clicked += GetVersionButton_Clicked;
+            //this.GetStatusButton.Clicked += GetStatusButton_Clicked;
             this.GetCapButton.Clicked += GetCapButton_Clicked;
             this.RecordButton.Clicked += RecordButton_Clicked;
             this.StopRecordButton.Clicked += StopRecordButton_Clicked;
@@ -99,31 +98,6 @@ namespace DVBTTelevizor
             });
         }
 
-        private void GetStatusButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = Environment.NewLine + "Getting status ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var status = await _driver.GetStatus();
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = status.ToString();
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = Environment.NewLine + $"Request failed ({ex.Message})";
-                    });
-                }
-            });
-        }
-
         private void GetCapButton_Clicked(object sender, EventArgs e)
         {
             StatusLabel.Text = "Getting capabilities ...";
@@ -137,31 +111,6 @@ namespace DVBTTelevizor
                     Device.BeginInvokeOnMainThread(() =>
                     {
                         StatusLabel.Text = $"Capabalities: {capabalities.ToString()}";
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Request failed ({ex.Message})";
-                    });
-                }
-            });
-        }
-
-        private void GetVersionButton_Clicked(object sender, EventArgs e)
-        {
-            StatusLabel.Text = "Getting Version ...";
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    var version = await _driver.GetVersion();
-
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        StatusLabel.Text = $"Version: {version.ToString()}";
                     });
                 }
                 catch (Exception ex)

@@ -23,6 +23,10 @@ namespace DVBTTelevizor
 
         DVBTDeliverySystemType _selectedDeliverySystemType = null;
 
+        public Command GetVersionCommand { get; set; }
+
+        public Command GetStatusCommand { get; set; }
+
         public ServicePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
@@ -41,6 +45,67 @@ namespace DVBTTelevizor
             });
 
             FillDeliverySystemTypes();
+
+            GetVersionCommand = new Command(async () => await GetVersion());
+            GetStatusCommand = new Command(async () => await GetStatus());
+        }
+
+        private async Task GetStatus()
+        {
+            try
+            {
+                _loggingService.Info($"Getting Status");
+
+                var status = await _driver.GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    throw new Exception("Response not success");
+                }
+
+                var s = Environment.NewLine;
+
+                s += $"Signal :  {status.hasSignal}";
+                s += Environment.NewLine;
+
+                s += $"Sync :  {status.hasSync}";
+                s += Environment.NewLine;
+
+                s += $"Lock :  {status.hasLock}";
+                s += Environment.NewLine;
+
+                s += $"% :  {status.rfStrengthPercentage}";
+                s += Environment.NewLine;
+
+                await _dialogService.Information(s, "Status");
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while getting status");
+                await _dialogService.Error(ex.Message);
+            }
+        }
+
+        private async Task GetVersion()
+        {
+            try
+            {
+                _loggingService.Info($"Getting version");
+
+                var version = await _driver.GetVersion();
+
+                if (!version.SuccessFlag)
+                {
+                    throw new Exception("Response not success");
+                }
+
+                await _dialogService.Information($"Version: {version.Version.ToString()}.{version.AllRequestsLength.ToString()}", "DVBT Driver version");                
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while getting version");
+                await _dialogService.Error(ex.Message);                
+            }
         }
 
         protected void FillDeliverySystemTypes()
@@ -89,26 +154,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(DeliverySystemTypes));
                 OnPropertyChanged(nameof(SelectedDeliverySystemType));
             }
-        }
-
-        public int SelectedDeliverySystemTypeIndex
-        {
-            get
-            {
-                return SelectedDeliverySystemType == null ? -1 : SelectedDeliverySystemType.Index;
-            }
-            set
-            {
-                foreach (var ds in DeliverySystemTypes )
-                {
-                    if (ds.Index == value)
-                    {
-                        SelectedDeliverySystemType = ds;
-                        break;
-                    }
-                }
-            }
-        }
+        }     
 
     }
 }
