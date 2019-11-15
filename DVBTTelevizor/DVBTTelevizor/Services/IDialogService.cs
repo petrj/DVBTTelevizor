@@ -14,5 +14,7 @@ namespace DVBTTelevizor
         Task<bool> Confirm(string message, string title = "Confirmation");
         Task Information(string message, string title = "Information");
         Task Error(string message, string title = "Error");
+
+        Task<string> DisplayActionSheet(string title, string cancel, List<string> buttonLabels);
     }
 }

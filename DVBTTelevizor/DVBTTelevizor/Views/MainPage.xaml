@@ -22,6 +22,7 @@
                 <Setter Property="HasUnevenRows" Value="True"/>
                 <Setter Property="IsPullToRefreshEnabled" Value="True"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
             </Style>
 
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
@@ -47,6 +48,12 @@
 
             <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="white"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+            </Style>
+
+            <Style x:Key="RecTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="Red"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
@@ -89,18 +96,19 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="20*" />
                                         <ColumnDefinition Width="50*" />
-                                        <ColumnDefinition Width="25*" />
-                                        <ColumnDefinition Width="5*" />
+                                        <ColumnDefinition Width="10*" />
+                                        <ColumnDefinition Width="20*" />
                                     </Grid.ColumnDefinitions>
-
 
                                     <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" />
 
                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}"/>
                                     <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}"/>
 
-                                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
-                                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding DVBTTypeLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
+                                    <Label Grid.Row="1" Grid.Column="2"  Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}"/>
+
+                                    <Label Grid.Row="0" Grid.Column="3" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
+                                    <Label Grid.Row="1" Grid.Column="3" Text="{Binding DVBTTypeLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
 
                                     <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                 </Grid>

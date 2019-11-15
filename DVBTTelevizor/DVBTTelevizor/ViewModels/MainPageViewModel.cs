@@ -24,6 +24,7 @@ namespace DVBTTelevizor
         public Command ShortPressCommand { get; set; }
 
         private DVBTChannel _selectedChannel;
+        private DVBTChannel _recordingChannel;
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
@@ -35,7 +36,7 @@ namespace DVBTTelevizor
             _channelService = channelService;
 
             RefreshCommand = new Command(async () => await Refresh());
-            LongPressCommand = new Command(LongPress);
+            LongPressCommand = new Command(async (itm) => await LongPress(itm));
             ShortPressCommand = new Command(ShortPress);
 
             RefreshCommand.Execute(null);
@@ -65,7 +66,7 @@ namespace DVBTTelevizor
             });
         }
 
-        private void LongPress(object item)
+        private async Task LongPress(object item)
         {
             if (item != null && item is DVBTChannel)
             {
@@ -75,7 +76,32 @@ namespace DVBTTelevizor
 
                 _loggingService.Info($"Long press on channel {ch.Name})");
 
-                _dialogService.Information($"Long press on channel {ch.Name}");
+                var actions = new List<string>();
+                actions.Add("Rename");
+
+                if (ch.Recording)
+                {
+                    actions.Add("Stop record");
+                } else
+                {
+                    actions.Add("Record");
+                }
+
+                actions.Add("Delete");
+
+                var action = await _dialogService.DisplayActionSheet($"{ch.Name}", "Cancel", actions);
+
+                switch (action)
+                {
+                    case "Record":
+                        _recordingChannel = ch;
+                        break;
+                    case "Stop record":
+                        _recordingChannel = null;
+                        break;
+                }
+
+                await Refresh();
             }
         }
 
@@ -166,7 +192,10 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"Refreshing channels");
 
-               Channels.Clear();
+                var selectedChannel = _selectedChannel;
+                DVBTChannel selectChannel = null;
+
+                Channels.Clear();
 
                 ObservableCollection<DVBTChannel> channels = null;
 
@@ -186,10 +215,29 @@ namespace DVBTTelevizor
                     if (ch.ServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
                         continue;
 
+                    if (_recordingChannel != null &&
+                        _recordingChannel.Frequency == ch.Frequency &&
+                        _recordingChannel.Name == ch.Name &&
+                        _recordingChannel.ProgramMapPID == ch.ProgramMapPID)
+                    {
+                        ch.Recording = true;
+                    }
+
+                    if (selectedChannel != null &&
+                        selectedChannel.Frequency == ch.Frequency &&
+                        selectedChannel.Name == ch.Name &&
+                        selectedChannel.ProgramMapPID == ch.ProgramMapPID)
+                    {
+                        selectChannel = ch;
+                    }
+
                     Channels.Add(ch);
                 }
 
                 OnPropertyChanged(nameof(Channels));
+
+                if (selectChannel != null)
+                    SelectedChannel = selectChannel;
 
             } catch (Exception ex)
             {

@@ -6,33 +6,45 @@ using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {
-    class DialogService : IDialogService
+    public class DialogService : IDialogService
     {
+        private Page _page;
+
         public DialogService(Page page = null)
         {
-            DialogPage = page;
+            _page = page;
         }
 
-        public Page DialogPage { get; set; }
+        public Page DialogPage
+        {
+            get
+            {
+                return _page == null ? Application.Current.MainPage : _page;
+            }
+            set
+            {
+                _page = value;
+            }
+       }
 
         public async Task<bool> Confirm(string message, string title = "Confirmation")
         {
-            var dp = DialogPage == null ? Application.Current.MainPage : DialogPage;
-            var result = await dp.DisplayAlert(title, message, "Ano", "Ne");
-
-            return result;
+            return await DialogPage.DisplayAlert(title, message, "Ano", "Ne");
         }
 
         public async Task Information(string message, string title = "Warning")
         {
-            var dp = DialogPage == null ? Application.Current.MainPage : DialogPage;
-            await dp.DisplayAlert(title, message, "OK");
+            await DialogPage.DisplayAlert(title, message, "OK");
         }
 
         public async Task Error(string message, string title = "Error")
         {
-            var dp = DialogPage == null ? Application.Current.MainPage : DialogPage;
-            await dp.DisplayAlert(title, message, "OK");
+            await DialogPage.DisplayAlert(title, message, "OK");
+        }
+
+        public async Task<string> DisplayActionSheet(string title, string cancel, List<string> buttonLabels)
+        {
+            return await DialogPage.DisplayActionSheet(title, cancel, null, buttonLabels.ToArray());
         }
     }
 }

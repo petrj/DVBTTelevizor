@@ -35,6 +35,19 @@ namespace DVBTTelevizor
         //[Column("ProviderName")]
         public string ProviderName { get; set; }
 
+        public bool Recording { get; set; }
+
+        public string RecordingLabel
+        {
+            get
+            {
+                if (Recording)
+                    return "REC";
+
+                return String.Empty;
+            }
+        }
+
         //[Column("PIDs")]
         public string PIDs { get; set; }
 
