@@ -720,6 +720,9 @@ namespace DVBTTelevizor
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_SET_PIDS, PIDs, responseSize);
             var response = await SendRequest(req, 5);
 
+            if (response.Bytes.Count < responseSize)
+                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
+
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
             var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
@@ -755,6 +758,9 @@ namespace DVBTTelevizor
 
             var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_GET_CAPABILITIES, new List<long>(), responseSize);
             var response = await SendRequest(req, 5);
+
+            if (response.Bytes.Count < responseSize)
+                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
 
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
@@ -876,7 +882,7 @@ namespace DVBTTelevizor
                 }
 
                 // freq tuned
-                              
+
                 // timeout for get signal:
                 var startTime = DateTime.Now;
 
