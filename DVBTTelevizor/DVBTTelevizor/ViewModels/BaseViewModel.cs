@@ -29,6 +29,7 @@ namespace DVBTTelevizor
         public const string MSG_Init = "Init";
         public const string MSG_KeyDown = "KeyDown";
         public const string MSG_ToastMessage = "ShowToastMessage";
+        public const string MSG_EditChannel = "EditChannel";
 
         private string _status;
 

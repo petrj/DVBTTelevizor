@@ -1,6 +1,8 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace DVBTTelevizor
@@ -25,7 +27,24 @@ namespace DVBTTelevizor
             }
         }
 
+        public string ChannelLabel
+        {
+            get
+            {
+                var ch = (Convert.ToInt32(Frequency / 1000000) - 306) / 8;
+                return ch.ToString();
+            }
+        }
+
         public long Bandwdith { get; set; }
+
+        public string BandwdithLabel
+        {
+            get
+            {
+                return Bandwdith / 1000000 + " Mhz";
+            }
+        }
 
         public int DVBTType { get; set; }
 
@@ -104,7 +123,7 @@ namespace DVBTTelevizor
 
                 return res;
             }
-        }
+        }  
 
     }
 }

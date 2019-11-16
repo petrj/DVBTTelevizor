@@ -916,7 +916,7 @@ namespace DVBTTelevizor
                 res.SingalPercentStrength = status.rfStrengthPercentage;
 
                 // waiting
-                System.Threading.Thread.Sleep(1000);
+                //System.Threading.Thread.Sleep(1000);
 
                 // setting PID filter
 

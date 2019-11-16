@@ -30,6 +30,7 @@ namespace DVBTTelevizor
         private DVBTTelevizorConfiguration _config;
         private PlayerPage _playerPage;
         private ServicePage _servicePage;
+        private ChannelPage _editChannelPage;
         private TunePage _tunePage;
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
@@ -63,8 +64,9 @@ namespace DVBTTelevizor
             _channelService = new JSONChannelsService(_loggingService, _config);
 
             _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
-            _servicePage = new ServicePage(_loggingService, _dlgService,_driver,_config, _playerPage);
+            _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _playerPage);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
+            _editChannelPage = new ChannelPage(_loggingService,_dlgService, _driver, _config);
 
             BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
 
@@ -80,10 +82,39 @@ namespace DVBTTelevizor
             {
                 _viewModel.RefreshCommand.Execute(null);
             };
+            _editChannelPage.Disappearing += delegate
+            {
+               Task.Run(async () =>
+               {
+                   await _channelService.SaveChannels(_viewModel.Channels);
+
+                   Device.BeginInvokeOnMainThread(
+                       delegate
+                       {
+                           _viewModel.RefreshCommand.Execute(null);
+                       });
+               });
+            };
+
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
             {
                 OnKeyDown(key);
+            });
+
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EditChannel, (message) =>
+            {
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                    delegate
+                    {
+                        var ch = _viewModel.SelectedChannel;
+                        if (ch != null)
+                        {
+                            _editChannelPage.Channel = ch;
+                            Navigation.PushAsync(_editChannelPage);
+                        }
+                    });
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayStream, (message) =>

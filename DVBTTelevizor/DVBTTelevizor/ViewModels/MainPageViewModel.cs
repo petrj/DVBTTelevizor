@@ -77,7 +77,8 @@ namespace DVBTTelevizor
                 _loggingService.Info($"Long press on channel {ch.Name})");
 
                 var actions = new List<string>();
-                actions.Add("Rename");
+                actions.Add("Play");
+                actions.Add("Edit");
 
                 if (ch.Recording)
                 {
@@ -93,15 +94,21 @@ namespace DVBTTelevizor
 
                 switch (action)
                 {
+                    case "Play":
+                        await PlayChannel(ch);
+                        break;
+                    case "Edit":
+                        MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
+                        break;
                     case "Record":
                         _recordingChannel = ch;
+                        await Refresh();
                         break;
                     case "Stop record":
                         _recordingChannel = null;
+                        await Refresh();
                         break;
                 }
-
-                await Refresh();
             }
         }
 
