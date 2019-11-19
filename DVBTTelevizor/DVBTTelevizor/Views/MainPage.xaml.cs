@@ -61,7 +61,7 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex, "Error while initializing player page");
             }
 
-            _channelService = new JSONChannelsService(_loggingService, _config);
+            _channelService = new ConfigChannelService(_loggingService, _config);
 
             _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
             _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _playerPage);

@@ -11,6 +11,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace DVBTTelevizor
 {
@@ -206,11 +207,7 @@ namespace DVBTTelevizor
 
                 ObservableCollection<DVBTChannel> channels = null;
 
-                await RunWithStoragePermission(
-                    async () =>
-                    {
-                        channels = await _channelService.LoadChannels();
-                    }, _dialogService);
+                channels = await _channelService.LoadChannels();                
 
                 // channels filter
 
