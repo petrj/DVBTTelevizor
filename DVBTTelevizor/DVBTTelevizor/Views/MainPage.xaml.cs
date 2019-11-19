@@ -131,7 +131,7 @@ namespace DVBTTelevizor
                          }
                          else
                          {
-                             Navigation.PushModalAsync(_playerPage);                          
+                             Navigation.PushModalAsync(_playerPage);
                          }
                      }
                      else
@@ -302,7 +302,7 @@ namespace DVBTTelevizor
 
                         if (
                                 (_viewModel.SelectedChannel != null) &&
-                                (_numberPressed == _viewModel.SelectedChannel.Number.ToString())
+                                (_numberPressed == _viewModel.SelectedChannel.Number)
                            )
                         {
                             await _viewModel.PlayChannel();
@@ -312,7 +312,7 @@ namespace DVBTTelevizor
 
             }).Start();
         }
-        
+
         private async Task OnKeyLeft()
         {
             await _viewModel.SelectPreviousChannel(10);
@@ -342,7 +342,7 @@ namespace DVBTTelevizor
             {
                 Task.Run( async ()=>
                 {
-                    await _viewModel.DisconnectDriver();                    
+                    await _viewModel.DisconnectDriver();
                 }
                 );
             }

@@ -11,6 +11,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace DVBTTelevizor
 {
@@ -101,14 +102,40 @@ namespace DVBTTelevizor
                         MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
                         break;
                     case "Record":
-                        _recordingChannel = ch;
-                        await Refresh();
+                        await RecordChannel(ch, true);
                         break;
                     case "Stop record":
-                        _recordingChannel = null;
-                        await Refresh();
+                        await RecordChannel(ch, false);
+                        break;
+                    case "Delete":
+                        await DeleteChannel(ch);
                         break;
                 }
+            }
+        }
+
+        private async Task RecordChannel(DVBTChannel channel, bool start)
+        {
+            if (start)
+            {
+                _recordingChannel = channel;
+                await _driver.StartRecording();
+            } else
+            {
+                _recordingChannel = null;
+                _driver.StopRecording();
+            }
+
+            await Refresh();
+        }
+
+        private async Task DeleteChannel(DVBTChannel channel)
+        {
+            if (await _dialogService.Confirm($"Are you sure to delete channel {channel.Name}?"))
+            {
+                Channels.Remove(channel);
+                await _channelService.SaveChannels(Channels);
+                await Refresh();
             }
         }
 
@@ -140,7 +167,7 @@ namespace DVBTTelevizor
                     // looking for channel by its number:
                     foreach (var ch in Channels)
                     {
-                        if (ch.Number.ToString() == number)
+                        if (ch.Number == number)
                         {
                             SelectedChannel = ch;
                             break;
@@ -184,11 +211,32 @@ namespace DVBTTelevizor
                     return;
             }
 
+            if (_recordingChannel != null)
+            {
+                Device.BeginInvokeOnMainThread(async () =>
+                       await _dialogService.Error($"Cannot play {channel.Name}, recording is in progress")
+                    );
+                return;
+            }
+
             _loggingService.Debug($"Playing channel {channel}");
 
-            var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
-            if (!playRes)
+            try
+            {
+                var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
+                if (!playRes)
+                {
+                    throw new Exception("Play returned false");
+                }
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+
+                Device.BeginInvokeOnMainThread(async () =>
+                           await _dialogService.Error($"Cannot play {channel.Name}")
+                        );
                 return;
+            }
 
             MessagingCenter.Send(channel.Name, BaseViewModel.MSG_PlayStream);
         }
@@ -211,6 +259,10 @@ namespace DVBTTelevizor
                     {
                         channels = await _channelService.LoadChannels();
                     }, _dialogService);
+
+                // sort chanels by number
+
+                channels = new ObservableCollection<DVBTChannel>(channels.OrderBy(i => i.Number.PadLeft(4,'0')));
 
                 // channels filter
 

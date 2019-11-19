@@ -8,7 +8,7 @@
              Title="Channel">
     <ContentPage.Content>
         <StackLayout Margin="10,10,10,10">
-            
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -27,7 +27,14 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Text="Number:" TextColor="White" VerticalOptions="Center"/>
-                <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryNumber" Text="{Binding Channel.Number, Mode=TwoWay}" Placeholder="Channel number" TextColor="Yellow" HorizontalOptions="Start" VerticalOptions="Center" />
+                <Entry Grid.Row="0" Grid.Column="1"
+                       x:Name="EntryNumber"
+                       Text="{Binding Channel.Number, Mode=TwoWay}"
+                       Placeholder="Channel number"
+                       TextColor="Yellow"
+                       HorizontalOptions="Start"
+                       VerticalOptions="Center"
+                       Keyboard="Numeric"/>
 
                 <Label Grid.Row="1" Grid.Column="0" Text="Name:" TextColor="White" VerticalOptions="Center"/>
                 <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryName" Text="{Binding Channel.Name, Mode=TwoWay}" Placeholder="Channel name" TextColor="Yellow" HorizontalOptions="Start" VerticalOptions="Center" />
@@ -53,7 +60,7 @@
                 <Label Grid.Row="8" Grid.Column="0" Text="PIDs:" TextColor="White" VerticalOptions="Center"/>
                 <Label Grid.Row="8" Grid.Column="1" Text="{Binding Channel.PIDs}" TextColor="White" VerticalOptions="Center"/>
             </Grid>
-            
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

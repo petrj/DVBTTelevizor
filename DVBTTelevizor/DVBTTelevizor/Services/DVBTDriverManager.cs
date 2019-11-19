@@ -221,10 +221,9 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _log.Debug($"Stopping recording");
-
                 if (Recording)
                 {
+                    _log.Debug($"Stopping recording");
                     _recording = false;
                 }
             }

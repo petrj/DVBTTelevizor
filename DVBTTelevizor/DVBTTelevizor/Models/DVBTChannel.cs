@@ -11,7 +11,7 @@ namespace DVBTTelevizor
     public class DVBTChannel : JSONObject
     {
         [PrimaryKey, Column("Number")]
-        public int Number { get; set; }
+        public string Number { get; set; }
 
         public long Frequency { get; set; }
 
@@ -123,7 +123,7 @@ namespace DVBTTelevizor
 
                 return res;
             }
-        }  
+        }
 
     }
 }

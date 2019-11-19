@@ -358,7 +358,7 @@ namespace DVBTTelevizor
                               ch.ProviderName = "Mux  1";
                               ch.Frequency = 730000000;
                               ch.Bandwdith = 8000000;
-                              ch.Number = i+1;
+                              ch.Number = (i+1).ToString();
                               ch.DVBTType = 0;
 
                               TunedChannels.Add(ch);
@@ -457,7 +457,7 @@ namespace DVBTTelevizor
                                 ch.ProviderName = sDescriptor.Key.ProviderName;
                                 ch.Frequency = freq;
                                 ch.Bandwdith = bandWidth;
-                                ch.Number = alreadySavedChannelsCount + TunedChannels.Count + 1;
+                                ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
                                 ch.DVBTType = dvbtTypeIndex;
 
                                 if (sDescriptor.Key.ServisType == 1 ||
