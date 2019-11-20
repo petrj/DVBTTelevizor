@@ -30,6 +30,7 @@ namespace DVBTTelevizor
         public const string MSG_KeyDown = "KeyDown";
         public const string MSG_ToastMessage = "ShowToastMessage";
         public const string MSG_EditChannel = "EditChannel";
+        public const string MSG_ShareFile = "ShareFile";
 
         private string _status;
 
@@ -219,5 +220,21 @@ namespace DVBTTelevizor
             }
         }
 
+        public static string DownloadDirectory
+        {
+            get
+            {
+                var downloadFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads);
+                return downloadFolderPath.AbsolutePath;
+            }
+        }
+
+        public static string ExternalStorageDirectory
+        {
+            get
+            {
+                return Android.OS.Environment.ExternalStorageDirectory.Path;
+            }
+        }
     }
 }

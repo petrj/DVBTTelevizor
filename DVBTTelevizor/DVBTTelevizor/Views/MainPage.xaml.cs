@@ -38,7 +38,7 @@ namespace DVBTTelevizor
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
 
-        public MainPage(ILoggingService loggingService)
+        public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             InitializeComponent();
 
@@ -46,10 +46,7 @@ namespace DVBTTelevizor
 
             _loggingService = loggingService;
 
-            _config = new DVBTTelevizorConfiguration()
-            {
-                AutoInitAfterStart = true
-            };
+            _config = config;
 
             _driver = new DVBTDriverManager(_loggingService, _config);
 
@@ -160,6 +157,23 @@ namespace DVBTTelevizor
             }
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
+
+            Appearing += delegate
+            {
+               if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
+                {
+                    ToolbarItems.Remove(ToolServicePage);
+                }
+
+               if (_config.ShowServiceMenu && !ToolbarItems.Contains(ToolServicePage))
+                {
+                    // adding before settings
+                    ToolbarItems.Remove(ToolSettingsPage);
+
+                    ToolbarItems.Add(ToolServicePage);
+                    ToolbarItems.Add(ToolSettingsPage);
+                }
+            };
         }
 
         public void StopPlayback()
@@ -377,6 +391,5 @@ namespace DVBTTelevizor
 
             _viewModel.DoNotScrollToChannel = false;
         }
-
     }
 }

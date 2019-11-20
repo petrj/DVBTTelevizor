@@ -94,5 +94,29 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("ShowRadioChannels", value);
             }
         }
+
+        public bool ShowServiceMenu
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowServiceMenu");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowServiceMenu", value);
+            }
+        }
+
+        public bool EnableLogging
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("EnableLogging");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("EnableLogging", value);
+            }
+        }
     }
 }

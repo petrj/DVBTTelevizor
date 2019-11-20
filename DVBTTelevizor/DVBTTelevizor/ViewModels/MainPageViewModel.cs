@@ -67,6 +67,14 @@ namespace DVBTTelevizor
             });
         }
 
+        public bool ShowServiceMenuToolItem
+        {
+            get
+            {
+                return _config.ShowServiceMenu;
+            }
+        }
+
         private async Task LongPress(object item)
         {
             if (item != null && item is DVBTChannel)
@@ -254,7 +262,7 @@ namespace DVBTTelevizor
 
                 ObservableCollection<DVBTChannel> channels = null;
 
-                channels = await _channelService.LoadChannels();                
+                channels = await _channelService.LoadChannels();
 
                 // sort chanels by number
 

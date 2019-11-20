@@ -34,6 +34,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="70*" />
@@ -46,7 +48,17 @@
                     <Label  Grid.Row="1" Grid.Column="0" Text="Show TV channels" TextColor="Yellow"/>
                     <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowTVSwitch" IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
 
+                    <Label  Grid.Row="2" Grid.Column="0" Text="Show service menu" TextColor="Yellow"/>
+                    <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowServiceMenuSwitch" IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
+
+                    <Label  Grid.Row="3" Grid.Column="0" Text="Enable logging" TextColor="Yellow" />
+                    <Switch Grid.Row="3" Grid.Column="1" x:Name="EnableLoggingSwitch" IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
+
                 </Grid>
+
+                <StackLayout Margin="0,15,0,0" IsVisible="{Binding EnableLogging}">
+                    <Button Text="Share log file" Command="{Binding ShareLogCommand}" />
+                </StackLayout>
 
                 <StackLayout Margin="0,15,0,0">
                     <Label Text="Channels list" TextColor="Yellow" FontSize="Medium"/>
@@ -54,7 +66,7 @@
                     <Button Text="Clear" Command="{Binding ClearChannelsCommand}" />
                     <Button Text="Export" Command="{Binding ExportChannelsCommand}" />
                     <Button Text="Import" Command="{Binding ImportChannelsCommand}" />
-                </StackLayout>                
+                </StackLayout>
 
             </StackLayout>
 

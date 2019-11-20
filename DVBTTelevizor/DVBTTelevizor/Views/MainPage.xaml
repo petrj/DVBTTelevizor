@@ -135,10 +135,10 @@
     <ContentPage.ToolbarItems>
         <!--ToolbarItem Name="ToolRefresh" Text="Refresh" Clicked="ToolRefresh_Clicked" Icon="Refresh.png" /-->
 
-        <ToolbarItem Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
-        <ToolbarItem Name="ToolTune" Text="Tune" Clicked="ToolTune_Clicked" Icon="Tune.png"  />
-        <ToolbarItem Name="ToolServicePage" Text="Service menu" Clicked="ToolServicePage_Clicked" Icon="Tools.png" />
-        <ToolbarItem Name="ToolSettingsPage" Text="Settings" Clicked="ToolSettingsPage_Clicked" Icon="Settings.png" />
+        <ToolbarItem x:Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
+        <ToolbarItem x:Name="ToolTune" Text="Tune" Clicked="ToolTune_Clicked" Icon="Tune.png"  />
+        <ToolbarItem x:Name="ToolServicePage" Text="Service menu" Clicked="ToolServicePage_Clicked" Icon="Tools.png" />
+        <ToolbarItem x:Name="ToolSettingsPage" Text="Settings" Clicked="ToolSettingsPage_Clicked" Icon="Settings.png" />
     </ContentPage.ToolbarItems>
 
 </ContentPage>

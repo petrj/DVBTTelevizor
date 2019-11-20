@@ -18,6 +18,7 @@ using LoggerService;
 using Plugin.Permissions.Abstractions;
 using Plugin.CurrentActivity;
 using Plugin.Toast;
+using System.IO;
 
 namespace DVBTTelevizor.Droid
 {
@@ -27,13 +28,12 @@ namespace DVBTTelevizor.Droid
         private const int StartRequestCode = 1000;
         bool _waitingForInit = false;
         ILoggingService _loggingService;
+        DVBTTelevizorConfiguration _config;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
-
-            _loggingService = new BasicLoggingService();
 
             base.OnCreate(savedInstanceState);
 
@@ -49,8 +49,10 @@ namespace DVBTTelevizor.Droid
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
+            _config = new DVBTTelevizorConfiguration();
+
             InitLogging();
-            var app = new App(_loggingService);
+            var app = new App(_loggingService, _config);
             LoadApplication(app);
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_Init, (message) =>
@@ -92,6 +94,11 @@ namespace DVBTTelevizor.Droid
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToastMessage, (message) =>
             {
                 CrossToastPopUp.Current.ShowCustomToast(message, "#0000FF", "#FFFFFF");
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
+            {
+                ShareFile(fileName);
             });
         }
 
@@ -141,14 +148,19 @@ namespace DVBTTelevizor.Droid
         {
             var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
-            if (permitted == PermissionStatus.Granted)
+            if (permitted == PermissionStatus.Granted && _config.EnableLogging)
             {
+                var logPath = Path.Combine(BaseViewModel.ExternalStorageDirectory, "DVBTTelevizor.log.txt");
+
                 _loggingService = new FileLoggingService()
                 {
-                    LogFilename = "/storage/emulated/0/Download/DVBTTelevizor.log.txt"
+                    LogFilename = logPath
                 };
 
                 _loggingService.Debug("File logger initialized");
+            } else
+            {
+                _loggingService = new BasicLoggingService();
             }
         }
 
@@ -157,6 +169,27 @@ namespace DVBTTelevizor.Droid
             MessagingCenter.Send(keyCode.ToString(), BaseViewModel.MSG_KeyDown);
 
             return base.OnKeyDown(keyCode, e);
+        }
+
+        private async Task ShareFile(string fileName)
+        {
+            try
+            {
+                var intent = new Intent(Intent.ActionSend);
+                var file = new Java.IO.File(fileName);
+                var uri = Android.Net.Uri.FromFile(file);
+
+                intent.PutExtra(Intent.ExtraStream, uri);
+                intent.SetDataAndType(uri, "text/plain");
+                intent.SetFlags(ActivityFlags.GrantReadUriPermission);
+                intent.SetFlags(ActivityFlags.NewTask);
+
+                Android.App.Application.Context.StartActivity(intent);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
     }
 }

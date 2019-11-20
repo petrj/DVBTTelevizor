@@ -10,13 +10,13 @@ namespace DVBTTelevizor
         MainPage _mainPage;
         ILoggingService _loggingService;
 
-        public App(ILoggingService loggingService)
+        public App(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             InitializeComponent();
 
             _loggingService = loggingService;
 
-            _mainPage = new MainPage(_loggingService);
+            _mainPage = new MainPage(_loggingService, config);
             MainPage = new NavigationPage(_mainPage);
         }
 
