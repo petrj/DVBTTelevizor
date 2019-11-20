@@ -48,7 +48,13 @@
 
                 </Grid>
 
-                <Button Text="Clear all channels" Command="{Binding ClearChannelsCommand}"/>
+                <StackLayout Margin="0,15,0,0">
+                    <Label Text="Channels list" TextColor="Yellow" FontSize="Medium"/>
+
+                    <Button Text="Clear" Command="{Binding ClearChannelsCommand}" />
+                    <Button Text="Export" Command="{Binding ExportChannelsCommand}" />
+                    <Button Text="Import" Command="{Binding ImportChannelsCommand}" />
+                </StackLayout>                
 
             </StackLayout>
 

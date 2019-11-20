@@ -254,11 +254,7 @@ namespace DVBTTelevizor
 
                 ObservableCollection<DVBTChannel> channels = null;
 
-                await RunWithStoragePermission(
-                    async () =>
-                    {
-                        channels = await _channelService.LoadChannels();
-                    }, _dialogService);
+                channels = await _channelService.LoadChannels();                
 
                 // sort chanels by number
 
