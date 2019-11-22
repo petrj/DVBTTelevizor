@@ -12,6 +12,7 @@ using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
 using DVBTTelevizor.Models;
+using System.IO;
 
 namespace DVBTTelevizor
 {
@@ -225,7 +226,24 @@ namespace DVBTTelevizor
             get
             {
                 var downloadFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads);
+                if (!Directory.Exists(downloadFolderPath.AbsolutePath))
+                {
+                    Directory.CreateDirectory(downloadFolderPath.AbsolutePath);
+                }
                 return downloadFolderPath.AbsolutePath;
+            }
+        }
+
+        public static string MovieDirectory
+        {
+            get
+            {
+                var folderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryMovies);
+                if (!Directory.Exists(folderPath.AbsolutePath))
+                {
+                    Directory.CreateDirectory(folderPath.AbsolutePath);
+                }
+                return folderPath.AbsolutePath;
             }
         }
 

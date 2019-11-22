@@ -13,23 +13,6 @@ namespace DVBTTelevizor
 {
     public class DVBTTelevizorConfiguration : CustomSharedPreferencesObject
     {
-        public string StorageFolder
-        {
-            get
-            {
-                var val = GetPersistingSettingValue<string>("StorageFolder");
-                if (string.IsNullOrEmpty(val))
-                {
-                    val = "/storage/emulated/0/Download/";
-                }
-                return val;
-            }
-            set
-            {
-                SavePersistingSettingValue<string>("StorageFolder", value);
-            }
-        }
-
         public ObservableCollection<DVBTChannel> Channels
         {
             get
@@ -51,13 +34,27 @@ namespace DVBTTelevizor
         {
             get
             {
-               return GetPersistingSettingValue<bool>("AutoInitAfterStart");
+               return !DoNotAutoInitAfterStart;
             }
             set
             {
-                SavePersistingSettingValue<bool>("AutoInitAfterStart", value);
+                DoNotAutoInitAfterStart = value;
             }
         }
+
+
+        public bool DoNotAutoInitAfterStart
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("DoNotAutoInitAfterStart");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("DoNotAutoInitAfterStart", value);
+            }
+        }
+
 
         public bool ShowTVChannels
         {

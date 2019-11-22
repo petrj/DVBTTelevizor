@@ -124,14 +124,42 @@ namespace DVBTTelevizor
 
         private async Task RecordChannel(DVBTChannel channel, bool start)
         {
-            if (start)
+            if (channel == null)
             {
-                _recordingChannel = channel;
-                await _driver.StartRecording();
-            } else
+                channel = SelectedChannel;
+                if (channel == null)
+                    return;
+            }
+
+            _loggingService.Debug($"Recording channel {channel}");
+
+            try
             {
-                _recordingChannel = null;
-                _driver.StopRecording();
+                if (start)
+                {
+                    var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
+                    if (!playRes)
+                    {
+                        throw new Exception("Play returned false");
+                    }
+
+                    _recordingChannel = channel;
+                    await _driver.StartRecording();
+                } else
+                {
+                    _driver.StopRecording();
+                    await _driver.Stop();
+                    _recordingChannel = null;                    
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+
+                Device.BeginInvokeOnMainThread(async () =>
+                           await _dialogService.Error($"Start/stop rec error")
+                        );
+                return;
             }
 
             await Refresh();

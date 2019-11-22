@@ -50,6 +50,10 @@
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
+            <Style x:Key="ButtonStyle" TargetType="Label">
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -58,9 +62,7 @@
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
             <!-- top controls -->
-            <StackLayout VerticalOptions="Start" Margin="10,0,10,0">
-
-                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}"  Margin="0,10,0,10"/>
+            <StackLayout VerticalOptions="Start" Margin="10,20,10,0">                
 
                 <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}">
 
@@ -119,12 +121,14 @@
                     <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
                 </Grid>
 
-                <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,10,0,0">
+                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}" />
+
+                <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,0,0,0">
                     <Label Text="{Binding AutomaticTuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White"/>
                     <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,0,0,0" HeightRequest="2" />
                 </StackLayout>
                 
-                <Grid VerticalOptions="Start" IsVisible="{Binding TuningInProgress}" Margin="0,10,0,10">
+                <Grid VerticalOptions="Start" IsVisible="{Binding TuningInProgress}" Margin="0,0,0,0">
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />

@@ -341,6 +341,7 @@ namespace DVBTTelevizor
         {
 
            //debug
+           /*
                       await Task.Run(() =>
                       {
                           _tuningAborted = false;
@@ -364,7 +365,7 @@ namespace DVBTTelevizor
                               TunedChannels.Add(ch);
                           }
                       });
-
+             */
 
             try
             {

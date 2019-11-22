@@ -6,14 +6,37 @@
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.SettingsPage"
              Title="Settings">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="Margin" Value="20,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Left"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">                
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="FontSize" Value="Medium"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Label">
+                <Setter Property="Margin" Value="20,0,0,0"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ContentPage.Content>
 
         <ScrollView>
 
                 <StackLayout Margin="10,20,10,20">
 
-                    <Label  Text="Storage folder" TextColor="Yellow"/>
-                    <Entry Text="{Binding Config.StorageFolder, Mode=TwoWay}" TextColor="White" VerticalOptions="End" VerticalTextAlignment="End" />
+                    <Label Text="Channels list" Style="{DynamicResource CaptionStyle}"/>
 
                     <Grid Margin="0,0,0,0">
                         <Grid.RowDefinitions>
@@ -25,50 +48,60 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Initialize tuner after start" TextColor="Yellow"/>
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="AutoInitAfterStartSwitch" IsToggled="{Binding Config.AutoInitAfterStart, Mode=TwoWay}"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Show TV channels" Style="{DynamicResource LabelStyle}" />
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch" IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
+
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" />
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch" IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <Button Text="Clear" Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" />
+                    <Button Text="Export" Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" />
+                    <Button Text="Import" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" />
+
+
+
+                    <Label Text="System settings" Style="{DynamicResource CaptionStyle}"/>
+
+                    <Grid Margin="0,0,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" />
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch" IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
+
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Disable tuner init after start" Style="{DynamicResource LabelStyle}" />
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="DoNotAutoInitAfterStartSwitch" IsToggled="{Binding Config.DoNotAutoInitAfterStart, Mode=TwoWay}"/>
 
                     </Grid>
 
-                <Grid Margin="0,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="70*" />
-                        <ColumnDefinition Width="30*" />
-                    </Grid.ColumnDefinitions>
+                    
+                    <Label Text="Logging" Style="{DynamicResource CaptionStyle}"/>
 
-                    <Label  Grid.Row="0" Grid.Column="0" Text="Show radio channels" TextColor="Yellow"/>
-                    <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowRadioSwitch" IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
+                    <Grid Margin="0,0,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>             
 
-                    <Label  Grid.Row="1" Grid.Column="0" Text="Show TV channels" TextColor="Yellow"/>
-                    <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowTVSwitch" IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" />
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch" IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
 
-                    <Label  Grid.Row="2" Grid.Column="0" Text="Show service menu" TextColor="Yellow"/>
-                    <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowServiceMenuSwitch" IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
+                    </Grid>
 
-                    <Label  Grid.Row="3" Grid.Column="0" Text="Enable logging" TextColor="Yellow" />
-                    <Switch Grid.Row="3" Grid.Column="1" x:Name="EnableLoggingSwitch" IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
-
-                </Grid>
-
-                <StackLayout Margin="0,15,0,0" IsVisible="{Binding EnableLogging}">
-                    <Button Text="Share log file" Command="{Binding ShareLogCommand}" />
+                    <Button Text="Share log file" IsVisible="{Binding EnableLogging}" Command="{Binding ShareLogCommand}" Style="{DynamicResource ButtonStyle}" />                
+                
+               
                 </StackLayout>
-
-                <StackLayout Margin="0,15,0,0">
-                    <Label Text="Channels list" TextColor="Yellow" FontSize="Medium"/>
-
-                    <Button Text="Clear" Command="{Binding ClearChannelsCommand}" />
-                    <Button Text="Export" Command="{Binding ExportChannelsCommand}" />
-                    <Button Text="Import" Command="{Binding ImportChannelsCommand}" />
-                </StackLayout>
-
-            </StackLayout>
 
         </ScrollView>
 

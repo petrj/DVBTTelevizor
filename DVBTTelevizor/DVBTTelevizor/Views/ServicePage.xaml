@@ -17,6 +17,24 @@
                 <Setter Property="BackgroundColor" Value="#262626"/>
             </Style>
 
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="Margin" Value="20,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Left"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="FontSize" Value="Medium"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Label">
+                <Setter Property="Margin" Value="20,0,0,0"/>
+            </Style>
+
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -29,24 +47,26 @@
                 <!-- middle controls -->
                 <StackLayout VerticalOptions="CenterAndExpand" Margin="10,10,10,10">
 
-                    <Label Text="Driver requests" TextColor="Yellow" FontSize="Medium"/>
+                    <Label Text="Driver requests" Style="{DynamicResource CaptionStyle}" />
+
+                    <Button x:Name="GetStatusButton" Text="Status" VerticalOptions="Start"  Command="{Binding GetStatusCommand}" Style="{DynamicResource ButtonStyle}" />
 
                     <Grid Margin="0,0,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="33*" />
-                            <ColumnDefinition Width="34*" />
-                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="50*" />
+                            <ColumnDefinition Width="50*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Row="0" Grid.Column="0" x:Name="GetStatusButton" Text="Status" VerticalOptions="Start"   Command="{Binding GetStatusCommand}" />
-                        <Button Grid.Row="0" Grid.Column="1" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start"   Command="{Binding GetVersionCommand}" />
-                        <Button Grid.Row="0" Grid.Column="2" x:Name="GetCapButton"  Text="Cap." VerticalOptions="Start"   Command="{Binding GetCapabilitiesCommand}" />
+
+                        <Button Grid.Row="0" Grid.Column="0" x:Name="GetVersionButton" Text="Version" VerticalOptions="Start"   Command="{Binding GetVersionCommand}" Style="{DynamicResource ButtonStyle}"/>
+                        <Button Grid.Row="0" Grid.Column="1" x:Name="GetCapButton"  Text="Cap." VerticalOptions="Start"   Command="{Binding GetCapabilitiesCommand}" Style="{DynamicResource ButtonStyle}"/>
+                        
                     </Grid>
 
-                    <Label Text="Tuning" TextColor="Yellow" FontSize="Medium"/>
+                    <Label Text="Tuning" Style="{DynamicResource CaptionStyle}" />
 
                     <StackLayout Margin="0,10,0,0">
 
@@ -61,10 +81,10 @@
                                 <ColumnDefinition Width="40*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
+                            <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource LabelStyle}" />
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
-                            <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Channel)" TextColor="White"/>
+                            <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Channel)" Style="{DynamicResource LabelStyle}" />
                             <Picker Grid.Row="1" Grid.Column="1" TextColor="White" VerticalOptions="End" HorizontalOptions="End"
                                 Margin="0,0,0,0"
                                 SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
@@ -84,10 +104,10 @@
                                 <ColumnDefinition Width="40*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
+                            <Label Grid.Row="0" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White" Style="{DynamicResource LabelStyle}"/>
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
-                            <Label  Grid.Row="1" Grid.Column="0" Text="DeliverySystem" TextColor="White"/>
+                            <Label  Grid.Row="1" Grid.Column="0" Text="DeliverySystem" Style="{DynamicResource LabelStyle}"/>
                             <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker" VerticalOptions="Center" HorizontalOptions="End"
                                     SelectedItem="{Binding SelectedDeliverySystemType, Mode=TwoWay}"
                                     ItemsSource="{Binding DeliverySystemTypes}"
@@ -97,43 +117,42 @@
                             </Picker>
                         </Grid>
 
-                        <Button x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" />
+                        <Button x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" Style="{DynamicResource ButtonStyle}"/>
 
                     </StackLayout>
 
                     <StackLayout Margin="0,10,0,0">
 
-                        <Label Text="PID filter" TextColor="Yellow" FontSize="Medium"/>
+                        <Label Text="PID filter" Style="{DynamicResource CaptionStyle}"/>
 
                         <Entry x:Name="EntryPIDs" Text="{Binding PIDs}" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="End"/>
 
-                        <Button x:Name="SetPIDsButton" Text="Set PID filter"   Command="{Binding SetPIDsCommand}"/>
+                        <Button x:Name="SetPIDsButton" Text="Set PID filter"   Command="{Binding SetPIDsCommand}" Style="{DynamicResource ButtonStyle}"/>
                     </StackLayout>
 
                     <StackLayout Margin="0,10,0,0">
 
-                        <Label Text="Playing" TextColor="Yellow" FontSize="Medium"/>
+                        <Label Text="Playing" Style="{DynamicResource CaptionStyle}"/>
 
-                        <Button x:Name="PlayButton" Text="Play"   Command="{Binding PlayCommand}"/>
+                        <Button x:Name="PlayButton" Text="Play"   Command="{Binding PlayCommand}" Style="{DynamicResource ButtonStyle}"/>
 
                     </StackLayout>
 
                     <StackLayout Margin="0,10,0,0">
 
-                        <Label Text="Recording" TextColor="Yellow" FontSize="Medium"/>
+                        <Label Text="Recording" Style="{DynamicResource CaptionStyle}"/>
 
                         <Grid Margin="0,0,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="33*" />
-                                <ColumnDefinition Width="33*" />
-                                <ColumnDefinition Width="33*" />
+                                <ColumnDefinition Width="50*" />
+                                <ColumnDefinition Width="50*" />                                
                             </Grid.ColumnDefinitions>
 
-                            <Button Grid.Row="0" Grid.Column="0"  x:Name="RecordButton" Text="Start" VerticalOptions="Start"  Command="{Binding StartRecordCommand}"/>
-                            <Button Grid.Row="0" Grid.Column="2"  x:Name="StopRecordButton" Text="Stop" VerticalOptions="Start"  Command="{Binding StopRecordCommand}"/>
+                            <Button Grid.Row="0" Grid.Column="0"  x:Name="RecordButton" Text="Start" VerticalOptions="Start"  Command="{Binding StartRecordCommand}" Style="{DynamicResource ButtonStyle}"/>
+                            <Button Grid.Row="0" Grid.Column="1"  x:Name="StopRecordButton" Text="Stop" VerticalOptions="Start"  Command="{Binding StopRecordCommand}" Style="{DynamicResource ButtonStyle}"/>
 
                         </Grid>
 

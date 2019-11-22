@@ -39,7 +39,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(_config.StorageFolder, "channels");
+                return Path.Combine(BaseViewModel.DownloadDirectory, "channels.sqllite");
             }
         }
     }

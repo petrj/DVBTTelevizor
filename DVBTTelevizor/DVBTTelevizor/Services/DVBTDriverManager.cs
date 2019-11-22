@@ -56,7 +56,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (_readingStream)
+                if (ReadingStream)
                     return null;
 
                 return _transferStream;
@@ -250,7 +250,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<bool> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs)
+        public async Task<bool> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs, bool stopReadStream = true)
         {
             _log.Debug($"Playing {frequency} Mhz, type: {deliverySystem}, PIDs: {String.Join(",", PIDs)}");
 
@@ -278,7 +278,9 @@ namespace DVBTTelevizor
                 {
                     _log.Debug($"Signal found");
 
-                    StopReadStream();
+                    if (stopReadStream)
+                        StopReadStream();
+
                     return true;
                 }
 
@@ -386,15 +388,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(_config.StorageFolder, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.ts");
-            }
-        }
-
-        public string PlaylistFileName
-        {
-            get
-            {
-                return Path.Combine(_config.StorageFolder, $"playlist.m3u8");
+                return Path.Combine(BaseViewModel.MovieDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.ts");
             }
         }
 
@@ -738,7 +732,7 @@ namespace DVBTTelevizor
 
         private void SaveBuffer(string namePrefix, byte[] buffer)
         {
-            var fileName = Path.Combine(_config.StorageFolder, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
+            var fileName = Path.Combine(BaseViewModel.DownloadDirectory, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
                 fs.Write(buffer, 0, buffer.Length);
