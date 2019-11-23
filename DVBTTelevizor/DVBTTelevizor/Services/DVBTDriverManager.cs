@@ -804,29 +804,36 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                // waiting
-                System.Threading.Thread.Sleep(1000);
-
-                StartReadBuffer();
-
-                var timeoutForReadingBuffer = 10; //  10 secs
-                var startTime = DateTime.Now;
 
                 List<byte> pmtPacketBytes = new List<byte>();
 
-                while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
+                try
                 {
-                    pmtPacketBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, MapPID);
+                    StartReadBuffer();
 
-                    if (pmtPacketBytes.Count > 0)
+                    // waiting
+                    System.Threading.Thread.Sleep(1000);
+
+                    var timeoutForReadingBuffer = 15; //  15 secs
+                    var startTime = DateTime.Now;
+                    
+
+                    while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
                     {
-                        break;
+                        pmtPacketBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, MapPID);
+
+                        if (pmtPacketBytes.Count > 0)
+                        {
+                            break;
+                        }
+
+                        System.Threading.Thread.Sleep(500);
                     }
-
-                    System.Threading.Thread.Sleep(500);
                 }
-
-                StopReadBuffer();
+                finally 
+                {
+                    StopReadBuffer();
+                }                
 
                 if (pmtPacketBytes.Count == 0)
                 {
@@ -881,7 +888,7 @@ namespace DVBTTelevizor
 
                 DVBTStatus status = new DVBTStatus();
 
-                while ((DateTime.Now - startTime).TotalSeconds < 3)
+                while ((DateTime.Now - startTime).TotalSeconds < 10) 
                 {
                     status = await GetStatus();
 
@@ -889,6 +896,11 @@ namespace DVBTTelevizor
                     {
                         res.Result = SearchProgramResultEnum.Error;
                         return res;
+                    }
+
+                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > 5)
+                    {
+                        break;
                     }
 
                     if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
@@ -923,11 +935,11 @@ namespace DVBTTelevizor
                 }
 
                 // waiting
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(1500);
 
                 StartReadBuffer();
 
-                var timeoutForReadingBuffer = 10; //  10 secs
+                var timeoutForReadingBuffer = 15; //  15 secs
                 startTime = DateTime.Now;
 
                 List<byte> sdtBytes = new List<byte>();

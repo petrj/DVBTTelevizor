@@ -36,6 +36,13 @@ namespace LoggerService
         {
             try
             {
+                string msg = $"[{DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss")}] {level} {message}";
+
+#if DEBUG
+    System.Diagnostics.Debug.WriteLine(msg);
+    Console.WriteLine(msg);
+#endif
+
                 var logFolder = System.IO.Path.GetDirectoryName(LogFilename);
                 if(string.IsNullOrEmpty(logFolder))
                 {
@@ -47,9 +54,7 @@ namespace LoggerService
                     Directory.CreateDirectory(logFolder);
 
                 if ((int)level < (int)MinLevel)
-                    return;
-
-                string msg = $"[{DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss")}] {level} {message}";
+                    return;             
 
                 using (var fs = new FileStream(LogFilename, FileMode.Append, FileAccess.Write))
                 {
