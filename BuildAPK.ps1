@@ -1,3 +1,5 @@
+Param($configuration)
+
 cd $PSScriptRoot
 
 ./Clear.ps1
@@ -8,8 +10,12 @@ if (-not (Test-Path $msbuild))
     $msbuild = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\amd64\msbuild.exe"
 }
 
+if ([String]::IsNullOrEmpty($configuration))
+{
+	$configuration = "Debug"
+}
+
 $nugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-$configuration = "Debug"
 $manifestPath = "DVBTTelevizor\DVBTTelevizor.Android\Properties\AndroidManifest.xml" 
 
 $slnFileName = Join-Path -Path $PSScriptRoot -ChildPath "DVBTTelevizor.sln"
@@ -40,7 +46,7 @@ try
 
     & $msbuild $slnFileName /t:SignAndroidPackage /p:Configuration="$configuration" /v:d | Out-Host
 
-    $apk = "DVBTTelevizor\DVBTTelevizor.Android\bin\Debug\net.petrjanousek.DVBTTelevizor-Signed.apk"
+    $apk = "DVBTTelevizor\DVBTTelevizor.Android\bin\$configuration\net.petrjanousek.DVBTTelevizor-Signed.apk"
 
     if (Test-Path -Path $apk)
     {
