@@ -284,7 +284,8 @@ namespace DVBTTelevizor
                     long freq = Convert.ToInt64(TuneFrequency) * 1000000;
                     long bandWidth = TuneBandwidth * 1000000;
 
-                    await Tune(freq, bandWidth);
+                    if (DVBTTuning) await Tune(freq, bandWidth, 0);
+                    if (DVBT2Tuning) await Tune(freq, bandWidth, 1);
                 } else
                 {
                     await AutomaticTune();
@@ -316,28 +317,36 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info("Starting automatic tuning");
 
-                for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
-                {
-                    AutomaticTuningActualChannel = i;
-                    var freqMHz = (474 + 8 * (AutomaticTuningActualChannel - 21));
-                    var freq = freqMHz * 1000000;
+                for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
+                {                    
+                        if (!DVBTTuning && dvbtTypeIndex == 0)
+                            continue;
+                        if (!DVBT2Tuning && dvbtTypeIndex == 1)
+                            continue;
 
-                    if (_tuningAborted)
+                    for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
                     {
-                        return;
+                        AutomaticTuningActualChannel = i;
+                        var freqMHz = (474 + 8 * (AutomaticTuningActualChannel - 21));
+                        var freq = freqMHz * 1000000;
+
+                        if (_tuningAborted)
+                        {
+                            return;
+                        }
+
+                        OnPropertyChanged(nameof(AutomaticTuningLabel));
+                        OnPropertyChanged(nameof(AutomaticTuningProgress));
+
+                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
+                        //System.Threading.Thread.Sleep(200);
                     }
-
-                    OnPropertyChanged(nameof(AutomaticTuningLabel));
-                    OnPropertyChanged(nameof(AutomaticTuningProgress));
-
-                    await Tune(freq, TuneBandwidth * 1000000);
-                    //System.Threading.Thread.Sleep(200);
                 }
 
             });
         }
 
-        private async Task Tune(long freq, long bandWidth)
+        private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
         {
 
            //debug
@@ -369,13 +378,6 @@ namespace DVBTTelevizor
 
             try
             {
-                for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
-                {
-                    if (!DVBTTuning && dvbtTypeIndex == 0)
-                        continue;
-                    if (!DVBT2Tuning && dvbtTypeIndex == 1)
-                        continue;
-
                     var dvbtTypeAsString = dvbtTypeIndex == 0 ? "DVBT" : "DVBT2";
                     Status = $"Tuning {freq / 1000000} Mhz ({dvbtTypeAsString}), channels found: {TunedChannels.Count}";
 
@@ -418,7 +420,7 @@ namespace DVBTTelevizor
 
                     if (searchMapPIDsResult.Result != SearchProgramResultEnum.OK)
                     {
-                        continue;
+                        return;
                     }
 
                     if (_tuningAborted)
@@ -493,8 +495,7 @@ namespace DVBTTelevizor
                             _loggingService.Debug($"Tuning aborted");
                             return;
                         }
-                    }
-                }
+                    }                
 
             }
             catch (Exception ex)

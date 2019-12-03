@@ -10,7 +10,7 @@ namespace DVBTTelevizor.Models
         {
             get
             {
-                return $"{ChannelNumber.ToString()}";
+                return $"{ChannelNumber.ToString()} ({FrequencyMhZ} MHz)";
             }
         }
         public long FrequencyMhZ { get; set; }
