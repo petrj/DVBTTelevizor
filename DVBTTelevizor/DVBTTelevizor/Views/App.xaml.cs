@@ -32,10 +32,14 @@ namespace DVBTTelevizor
             _mainPage.StopPlayback();
         }
 
-
         protected override void OnResume()
         {
             // Handle when your app resumes
+        }
+
+        public void DisconnectDriver()
+        {
+            _mainPage.DisconnectDriver();
         }
     }
 }

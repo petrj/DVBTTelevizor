@@ -65,40 +65,74 @@ namespace DVBTTelevizor
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
             _editChannelPage = new ChannelPage(_loggingService,_dlgService, _driver, _config);
 
-            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
-
-            _servicePage.Disappearing += delegate
-             {
-                 _viewModel.RefreshCommand.Execute(null);
-             };
-            _tunePage.Disappearing += delegate
+            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);        
+         
+            if (_config.AutoInitAfterStart)
             {
-                _viewModel.RefreshCommand.Execute(null);
-            };
-            _settingsPage.Disappearing += delegate
-            {
-                _viewModel.RefreshCommand.Execute(null);
-            };
-            _editChannelPage.Disappearing += delegate
-            {
-               Task.Run(async () =>
-               {
-                   await _channelService.SaveChannels(_viewModel.Channels);
+                Task.Run(() =>
+                {
+                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
+                    new Action(
+                    delegate
+                    {
+                        MessagingCenter.Send("", BaseViewModel.MSG_Init);
+                    }));
+                });
+            }
 
-                   Device.BeginInvokeOnMainThread(
-                       delegate
-                       {
-                           _viewModel.RefreshCommand.Execute(null);
-                       });
-               });
-            };
+            _servicePage.Disappearing += anyPage_Disappearing;
+            _servicePage.Disappearing += anyPage_Disappearing;
+            _tunePage.Disappearing += anyPage_Disappearing;
+            _settingsPage.Disappearing += anyPage_Disappearing;
+            _editChannelPage.Disappearing += _editChannelPage_Disappearing;
+            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
+            Appearing += MainPage_Appearing;
+        }
 
+        private void MainPage_Appearing(object sender, EventArgs e)
+        {
+            if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
+            {
+                ToolbarItems.Remove(ToolServicePage);
+            }
+
+            if (_config.ShowServiceMenu && !ToolbarItems.Contains(ToolServicePage))
+            {
+                // adding before settings
+                ToolbarItems.Remove(ToolSettingsPage);
+
+                ToolbarItems.Add(ToolServicePage);
+                ToolbarItems.Add(ToolSettingsPage);
+            }
+        }
+
+        private void _editChannelPage_Disappearing(object sender, EventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await _channelService.SaveChannels(_viewModel.Channels);
+
+                Device.BeginInvokeOnMainThread(
+                    delegate
+                    {
+                        _viewModel.RefreshCommand.Execute(null);
+                    });
+            });
+        }
+
+        private void anyPage_Disappearing(object sender, EventArgs e)
+        {
+            _viewModel.RefreshCommand.Execute(null);
+        }
+        
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
             {
                 OnKeyDown(key);
             });
-
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EditChannel, (message) =>
             {
@@ -142,38 +176,57 @@ namespace DVBTTelevizor
                  }));
             });
 
-
-            if (_config.AutoInitAfterStart)
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration, (message) =>
             {
-                Task.Run( () =>
-               {
-                   Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                   new Action(
-                   delegate
-                   {
-                       MessagingCenter.Send("", BaseViewModel.MSG_Init);
-                   }));
-               });
-            }
+                _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");
 
-            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
+                if (!_driver.Started)
+                {
+                    _viewModel.ConnectDriver(message);
+                }
+            });
 
-            Appearing += delegate
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
-               if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
-                {
-                    ToolbarItems.Remove(ToolServicePage);
-                }
+                _viewModel.UpdateDriverState();
+            });
 
-               if (_config.ShowServiceMenu && !ToolbarItems.Contains(ToolServicePage))
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
                 {
-                    // adding before settings
-                    ToolbarItems.Remove(ToolSettingsPage);
+                    _viewModel.Status = $"Initialization failed ({message})";
+                    _viewModel.UpdateDriverState();
+                });
+            });
+        }
 
-                    ToolbarItems.Add(ToolServicePage);
-                    ToolbarItems.Add(ToolSettingsPage);
-                }
-            };
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();          
+
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_KeyDown);
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_EditChannel);
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_PlayStream);
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration);
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_UpdateDriverState);
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+
+            //_servicePage.Disappearing -= anyPage_Disappearing;
+            //_servicePage.Disappearing -= anyPage_Disappearing;
+            //_tunePage.Disappearing -= anyPage_Disappearing;
+            //_settingsPage.Disappearing -= anyPage_Disappearing;
+            //_editChannelPage.Disappearing -= _editChannelPage_Disappearing;
+            //ChannelsListView.ItemSelected -= ChannelsListView_ItemSelected;
+            //Appearing -= MainPage_Appearing;
+        }
+
+        public void DisconnectDriver()
+        {
+            Task.Run(async () =>
+            {
+                await _viewModel.DisconnectDriver();
+            });
         }
 
         public void StopPlayback()

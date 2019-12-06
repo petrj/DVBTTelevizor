@@ -30,6 +30,14 @@ namespace DVBTTelevizor
 
             BindingContext = _viewModel = new TunePageViewModel(_loggingService, _dialogService, _driver, _config, channelService);
             _viewModel.TuneFrequency = "730";
+
+            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
         }
+
+        private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {          
+           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, true);
+        }
+
     }
 }

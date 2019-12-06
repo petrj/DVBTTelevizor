@@ -13,6 +13,8 @@ namespace DVBTTelevizor
         protected string _tuneFrequency;
         protected long _tuneBandwidth = 8;
 
+        private DVBTChannel _selectedChannel;
+
         public ObservableCollection<DVBTFrequencyChannel> FrequencyChannels { get; set; } = new ObservableCollection<DVBTFrequencyChannel>();
 
         DVBTFrequencyChannel _selectedFrequencyChannel = null;
@@ -37,6 +39,20 @@ namespace DVBTTelevizor
                 };
 
                 FrequencyChannels.Add(fc);
+            }
+        }
+
+        public DVBTChannel SelectedChannel
+        {
+            get
+            {
+                return _selectedChannel;
+            }
+            set
+            {
+                _selectedChannel = value;
+
+                OnPropertyChanged(nameof(SelectedChannel));
             }
         }
 

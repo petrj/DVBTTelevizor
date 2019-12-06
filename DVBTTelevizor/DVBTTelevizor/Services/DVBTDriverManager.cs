@@ -954,13 +954,23 @@ namespace DVBTTelevizor
 
                     if (sdtBytes.Count> 0 && psiBytes.Count >0)
                     {
+                     
                         break;
                     }
 
                     System.Threading.Thread.Sleep(500);
-                }
+                }                
 
                 StopReadBuffer();
+
+                // debug save buffer
+                //
+                //if (sdtBytes != null)
+                //    SaveBuffer($"ProgramMapPIDs.SDT.{frequency}", sdtBytes.ToArray());
+                //if (psiBytes != null)
+                //    SaveBuffer($"ProgramMapPIDs.PSI.{frequency}", psiBytes.ToArray());
+
+                //SaveBuffer($"Buffer.{frequency}", Buffer.ToArray());
 
                 if (sdtBytes.Count == 0 || psiBytes.Count == 0)
                 {
@@ -988,12 +998,7 @@ namespace DVBTTelevizor
                 foreach (var pr in psiTable.ProgramAssociations)
                 {
                     _log.Debug($"MapPID: {pr.ProgramMapPID}, number: {pr.ProgramNumber}");
-                }
-
-                //if (sdtBytes != null)
-                //    SaveBuffer($"ProgramMapPIDs.SDT.{frequency}", sdtBytes.ToArray());
-                //if (psiBytes != null)
-                //    SaveBuffer($"ProgramMapPIDs.PSI.{frequency}", psiBytes.ToArray());
+                }                
 
                 _log.Debug($"Searching Program Map PIDS response: {res.Result}");
 

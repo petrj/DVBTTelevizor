@@ -29,6 +29,7 @@ namespace DVBTTelevizor.Droid
         bool _waitingForInit = false;
         ILoggingService _loggingService;
         DVBTTelevizorConfiguration _config;
+        App _app;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -52,8 +53,13 @@ namespace DVBTTelevizor.Droid
             _config = new DVBTTelevizorConfiguration();
 
             InitLogging();
-            var app = new App(_loggingService, _config);
-            LoadApplication(app);
+
+            // prevent sleep:
+            Window window = (Forms.Context as Activity).Window;
+            window.AddFlags(WindowManagerFlags.KeepScreenOn);
+
+            _app = new App(_loggingService, _config);
+            LoadApplication(_app);
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_Init, (message) =>
             {
@@ -83,11 +89,20 @@ namespace DVBTTelevizor.Droid
 
                     StartActivityForResult(req, StartRequestCode);
 
-                } catch (Exception ex)
+                }
+                catch (ActivityNotFoundException ex)
+                {
+                    _waitingForInit = false;
+                    _loggingService.Error(ex, "Driver initializing failed");
+
+                    MessagingCenter.Send("DVB-T driver not installed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                }
+                catch (Exception ex)
                 {
                     _waitingForInit = false;
                     _loggingService.Error(ex,"Driver initializing failed");
-                    MessagingCenter.Send(ex.ToString(), BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+
+                    MessagingCenter.Send("Driver initializing failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
             });
 
@@ -190,6 +205,13 @@ namespace DVBTTelevizor.Droid
             {
                 _loggingService.Error(ex);
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            _app.DisconnectDriver();
+
+            base.OnDestroy();
         }
     }
 }

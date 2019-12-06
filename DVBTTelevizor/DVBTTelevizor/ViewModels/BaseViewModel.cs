@@ -92,7 +92,7 @@ namespace DVBTTelevizor
         }
 
         // cannot run async!
-        protected void ConnectDriver(string message)
+        public void ConnectDriver(string message)
         {
             _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
             _driver.Start();

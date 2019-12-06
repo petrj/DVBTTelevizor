@@ -57,5 +57,28 @@ namespace DVBTTelevizor
                 });
             }
         }
+
+        protected override void OnAppearing()
+        {
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
+            {
+                _viewModel.UpdateDriverState();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    _viewModel.Status = $"Initialization failed ({message})";
+                    _viewModel.UpdateDriverState();
+                });
+            });
+        }
+
+        protected override void OnDisappearing()
+        {
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_UpdateDriverState);
+            MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+        }
     }
 }
