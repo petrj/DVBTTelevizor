@@ -10,8 +10,24 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
-            AnalyzeMPEGTS(path);
+            var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
+
+            var bytes = LoadBytesFromFile(path);
+            var packets = MPEGTransportStreamPacket.Parse(bytes);
+
+            var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
+            var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
+            foreach (var packet in pid17Packets)
+            {
+                packet.WriteToConsole();
+            }
+
+            Console.WriteLine($"SDT (PID 17) packets found: {pid17Packets.Count}");
+
+            var sDTTable = SDTTable.Parse(sdtBytes);
+            sDTTable.WriteToConsole();
+
+            //AnalyzeMPEGTS(path);
 
             // 33 s video sample:
             //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
