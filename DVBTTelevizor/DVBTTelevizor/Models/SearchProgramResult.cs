@@ -12,6 +12,6 @@ namespace DVBTTelevizor
         /// </summary>
         public Dictionary<ServiceDescriptor, long> ServiceDescriptors {get; set;}
 
-        public long SingalPercentStrength { get; set; }
+        public long SignalPercentStrength { get; set; }
     }
 }

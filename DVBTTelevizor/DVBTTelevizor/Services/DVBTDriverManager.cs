@@ -240,6 +240,16 @@ namespace DVBTTelevizor
             }
         }
 
+        public void ClearReadBuffer()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"clearing buffer");
+
+                _readBuffer.Clear();                
+            }
+        }
+
         public void StopReadBuffer()
         {
             lock (_readThreadLock)
@@ -918,10 +928,7 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                res.SingalPercentStrength = status.rfStrengthPercentage;
-
-                // waiting
-                //System.Threading.Thread.Sleep(1000);
+                res.SignalPercentStrength = status.rfStrengthPercentage;
 
                 // setting PID filter
 
@@ -935,7 +942,11 @@ namespace DVBTTelevizor
                 }
 
                 // waiting
-                System.Threading.Thread.Sleep(1500);
+                //System.Threading.Thread.Sleep(1500);
+
+                // waiting
+                //System.Threading.Thread.Sleep(1000);
+
 
                 StartReadBuffer();
 
@@ -945,6 +956,9 @@ namespace DVBTTelevizor
                 List<byte> sdtBytes = new List<byte>();
                 List<byte> psiBytes = new List<byte>();
 
+                SDTTable sdtTable = null;
+                PSITable psiTable = null;
+                Dictionary<ServiceDescriptor, long> serviceDescriptors = null;
 
                 while ((DateTime.Now-startTime).TotalSeconds < timeoutForReadingBuffer)
                 {
@@ -954,8 +968,20 @@ namespace DVBTTelevizor
 
                     if (sdtBytes.Count> 0 && psiBytes.Count >0)
                     {
-                     
-                        break;
+                        // does SDT table belongs to this frequency?
+                        sdtTable = SDTTable.Parse(sdtBytes);
+                        psiTable = PSITable.Parse(psiBytes);
+
+                        serviceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
+
+                        if (serviceDescriptors.Count > 0)
+                        {
+                            break;
+                        } else
+                        {
+                            _log.Debug($"Wrong SDTTable in buffer!");
+                            ClearReadBuffer();
+                        }
                     }
 
                     System.Threading.Thread.Sleep(500);
@@ -963,29 +989,19 @@ namespace DVBTTelevizor
 
                 StopReadBuffer();
 
-                // debug save buffer
-                //
-                //if (sdtBytes != null)
-                //    SaveBuffer($"ProgramMapPIDs.SDT.{frequency}", sdtBytes.ToArray());
-                //if (psiBytes != null)
-                //    SaveBuffer($"ProgramMapPIDs.PSI.{frequency}", psiBytes.ToArray());
-
+                // debug save buffer                
                 //SaveBuffer($"Buffer.{frequency}", Buffer.ToArray());
 
-                if (sdtBytes.Count == 0 || psiBytes.Count == 0)
+                if (sdtTable == null || psiTable == null)
                 {
-                    _log.Debug($"SDT bytes and PSI bytes are empty");
+                    _log.Debug($"No SDT or PSI table found");
 
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
 
-                // analyze SDT a PSI table
-
-                var sdtTable = SDTTable.Parse(sdtBytes);
-                var psiTable = PSITable.Parse(psiBytes);
-
-                res.ServiceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
+            
+                res.ServiceDescriptors = serviceDescriptors;
                 res.Result = SearchProgramResultEnum.OK;
 
                 _log.Debug($"SDT descriptors:");
@@ -998,7 +1014,7 @@ namespace DVBTTelevizor
                 foreach (var pr in psiTable.ProgramAssociations)
                 {
                     _log.Debug($"MapPID: {pr.ProgramMapPID}, number: {pr.ProgramNumber}");
-                }                
+                }
 
                 _log.Debug($"Searching Program Map PIDS response: {res.Result}");
 

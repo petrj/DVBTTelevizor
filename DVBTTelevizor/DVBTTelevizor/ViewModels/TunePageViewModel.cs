@@ -458,12 +458,12 @@ namespace DVBTTelevizor
                         case SearchProgramResultEnum.NoProgramFound:
                             _loggingService.Debug("No program found");
 
-                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength;
+                            SignalStrengthProgress = searchMapPIDsResult.SignalPercentStrength;
 
                             break;
                         case SearchProgramResultEnum.OK:
 
-                            SignalStrengthProgress = searchMapPIDsResult.SingalPercentStrength;
+                            SignalStrengthProgress = searchMapPIDsResult.SignalPercentStrength;
 
                             var mapPIDs = new List<long>();
                             foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
