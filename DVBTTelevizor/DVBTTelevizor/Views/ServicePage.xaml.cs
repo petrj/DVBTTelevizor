@@ -41,6 +41,20 @@ namespace DVBTTelevizor
             BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
             _viewModel.TuneFrequency = "730";
             _viewModel.SelectedDeliverySystemType = _viewModel.DeliverySystemTypes[0];
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
+            {
+                _viewModel.UpdateDriverState();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    _viewModel.Status = $"Initialization failed ({message})";
+                    _viewModel.UpdateDriverState();
+                });
+            });
         }
 
         private void ToolConnect_Clicked(object sender, EventArgs e)
@@ -60,22 +74,15 @@ namespace DVBTTelevizor
 
         protected override void OnAppearing()
         {
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
-            {
-                _viewModel.UpdateDriverState();
-            });
-
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
-            {
-                Device.BeginInvokeOnMainThread(delegate
-                {
-                    _viewModel.Status = $"Initialization failed ({message})";
-                    _viewModel.UpdateDriverState();
-                });
-            });
+            base.OnAppearing();            
         }
 
         protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+        }        
+
+        public void Done()
         {
             MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_UpdateDriverState);
             MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);

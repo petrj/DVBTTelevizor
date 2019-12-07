@@ -894,7 +894,21 @@ namespace DVBTTelevizor
 
             try
             {
-                var tuneRes = await Tune(frequency, bandWidth, deliverySyetem);
+                DVBTResponse tuneRes = null;
+
+                // five attempts 
+                for (var i = 1; i <= 5; i++)
+                {
+                    tuneRes = await Tune(frequency, bandWidth, deliverySyetem);
+
+                    if (tuneRes.SuccessFlag)
+                    {
+                        break;
+                    } else
+                    {
+                        System.Threading.Thread.Sleep(500);
+                    }
+                }
 
                 if (!tuneRes.SuccessFlag)
                 {
@@ -1017,7 +1031,7 @@ namespace DVBTTelevizor
                 StopReadBuffer();
 
                 // debug save buffer                
-                //SaveBuffer($"Buffer.{frequency}", Buffer.ToArray());
+                //SaveBuffer($"Buffer.{_lastTunedFreq}", Buffer.ToArray());
 
                 if (sdtTable == null || psiTable == null)
                 {

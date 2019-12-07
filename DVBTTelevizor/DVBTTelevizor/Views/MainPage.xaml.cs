@@ -207,7 +207,7 @@ namespace DVBTTelevizor
 
         }
 
-        public void DisconnectDriver()
+        public void Done()
         {
             Task.Run(async () =>
             {
@@ -219,6 +219,8 @@ namespace DVBTTelevizor
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_UpdateDriverState);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+
+                _servicePage.Done();
 
                 //_servicePage.Disappearing -= anyPage_Disappearing;
                 //_servicePage.Disappearing -= anyPage_Disappearing;

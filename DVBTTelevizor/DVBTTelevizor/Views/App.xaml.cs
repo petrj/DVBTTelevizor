@@ -37,9 +37,9 @@ namespace DVBTTelevizor
             // Handle when your app resumes
         }
 
-        public void DisconnectDriver()
+        public void Done()
         {
-            _mainPage.DisconnectDriver();
+            _mainPage.Done();
         }
     }
 }

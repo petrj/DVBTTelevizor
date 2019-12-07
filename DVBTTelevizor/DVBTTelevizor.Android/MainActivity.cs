@@ -209,7 +209,7 @@ namespace DVBTTelevizor.Droid
 
         protected override void OnDestroy()
         {
-            _app.DisconnectDriver();
+            _app.Done();
 
             base.OnDestroy();
         }
