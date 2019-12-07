@@ -789,11 +789,12 @@ namespace DVBTTelevizor
             {
                 // setting PID filter
 
-                var pids = new List<long>() { 0, 16, 17, MapPID };
+                var pids = new List<long>() {  MapPID };
                 var pidRes = await SetPIDs(pids);
 
                 if (!pidRes.SuccessFlag)
                 {
+                    _log.Debug($"Setting PID {MapPID} failed");
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
@@ -804,12 +805,14 @@ namespace DVBTTelevizor
 
                 if (!status.SuccessFlag)
                 {
+                    _log.Debug($"Getting status failed");
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
 
                 if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
                 {
+                    _log.Debug($"No signal");
                     res.Result = SearchProgramResultEnum.NoSignal;
                     return res;
                 }
@@ -824,9 +827,8 @@ namespace DVBTTelevizor
                     // waiting
                     System.Threading.Thread.Sleep(1000);
 
-                    var timeoutForReadingBuffer = 15; //  15 secs
-                    var startTime = DateTime.Now;
-                    
+                    var timeoutForReadingBuffer = 15; //  seconds timeout for getting PMT
+                    var startTime = DateTime.Now;                    
 
                     while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
                     {
@@ -847,6 +849,7 @@ namespace DVBTTelevizor
 
                 if (pmtPacketBytes.Count == 0)
                 {
+                    _log.Debug($"No PMT found");
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
@@ -875,11 +878,19 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<SearchMapPIDsResult> SearchProgramMapPIDs(long frequency, long bandWidth, int deliverySyetem)
+        /// <summary>
+        /// Tuning with timeout
+        /// </summary>
+        /// <param name="frequency"></param>
+        /// <param name="bandWidth"></param>
+        /// <param name="deliverySyetem"></param>
+        /// <returns>Signal strength
+        /// 0 .. no signal</returns>
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySyetem)
         {
-            _log.Debug($"Searching Program Map PIDs: freq: {frequency} Mhz, type: {deliverySyetem}");
+            _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySyetem}");
 
-            var res = new SearchMapPIDsResult();
+            var res = new TuneResult();
 
             try
             {
@@ -898,7 +909,7 @@ namespace DVBTTelevizor
 
                 DVBTStatus status = new DVBTStatus();
 
-                while ((DateTime.Now - startTime).TotalSeconds < 10) 
+                while ((DateTime.Now - startTime).TotalSeconds < 10)
                 {
                     status = await GetStatus();
 
@@ -910,11 +921,13 @@ namespace DVBTTelevizor
 
                     if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > 5)
                     {
+                        res.Result = SearchProgramResultEnum.NoSignal;
                         break;
                     }
 
                     if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
                     {
+                        res.Result = SearchProgramResultEnum.OK;
                         break;
                     }
 
@@ -930,6 +943,27 @@ namespace DVBTTelevizor
 
                 res.SignalPercentStrength = status.rfStrengthPercentage;
 
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }
+       }
+
+       public async Task<SearchMapPIDsResult> SearchProgramMapPIDs()
+        {
+            _log.Debug($"Searching Program Map PIDs");
+
+            var res = new SearchMapPIDsResult();
+
+            try
+            {               
+
                 // setting PID filter
 
                 var pids = new List<long>() { 0, 16, 17 };
@@ -941,17 +975,10 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                // waiting
-                //System.Threading.Thread.Sleep(1500);
-
-                // waiting
-                //System.Threading.Thread.Sleep(1000);
-
-
                 StartReadBuffer();
 
                 var timeoutForReadingBuffer = 15; //  15 secs
-                startTime = DateTime.Now;
+                var startTime = DateTime.Now;
 
                 List<byte> sdtBytes = new List<byte>();
                 List<byte> psiBytes = new List<byte>();

@@ -439,45 +439,59 @@ namespace DVBTTelevizor
 
                     _loggingService.Debug(Status);
 
-                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(freq, bandWidth, dvbtTypeIndex);
+                    var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
 
-                    switch (searchMapPIDsResult.Result)
+                    switch (tuneResult.Result)
                     {
                         case SearchProgramResultEnum.Error:
                             _loggingService.Debug("Search error");
 
                             SignalStrengthProgress = 0;
 
-                            break;
+                            return;
+
                         case SearchProgramResultEnum.NoSignal:
                             _loggingService.Debug("No signal");
 
                             SignalStrengthProgress = 0;
 
-                            break;
+                            return;
+                            
+                        case SearchProgramResultEnum.OK:
+
+                            SignalStrengthProgress = tuneResult.SignalPercentStrength/100.0;
+
+                        break;
+                    }
+
+
+                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
+
+                    switch (searchMapPIDsResult.Result)
+                    {
+                        case SearchProgramResultEnum.Error:
+                            _loggingService.Debug("Search error");
+
+                            return;
+
+                        case SearchProgramResultEnum.NoSignal:
+                            _loggingService.Debug("No signal");
+
+                            return;
+
                         case SearchProgramResultEnum.NoProgramFound:
                             _loggingService.Debug("No program found");
 
-                            SignalStrengthProgress = searchMapPIDsResult.SignalPercentStrength;
+                            return;
+                    }                
 
-                            break;
-                        case SearchProgramResultEnum.OK:
-
-                            SignalStrengthProgress = searchMapPIDsResult.SignalPercentStrength;
-
-                            var mapPIDs = new List<long>();
-                            foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
-                            {
-                                mapPIDs.Add(sd.Value);
-                            }
-                            _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
-                            break;
-                    }
-
-                    if (searchMapPIDsResult.Result != SearchProgramResultEnum.OK)
+                    var mapPIDs = new List<long>();
+                    foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
                     {
-                        return;
+                        mapPIDs.Add(sd.Value);
                     }
+                    _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
+      
 
                     if (TuningAborted)
                     {
