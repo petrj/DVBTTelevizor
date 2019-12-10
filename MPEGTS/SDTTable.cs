@@ -112,6 +112,8 @@ namespace MPEGTS
 
                 pos += 2;
 
+                var posAfterThisDescriptor = pos + sDescriptor.Length;
+
                 sDescriptor.Tag = bytes[pos + 0];
 
                 sDescriptor.ServisType = bytes[pos + 2];
@@ -144,9 +146,9 @@ namespace MPEGTS
                     sDescriptor.ServiceName += Convert.ToChar(bytes[pos + i]);
                 }
 
-                pos = pos + sDescriptor.ServiceNameLength;
-
                 res.ServiceDescriptors.Add(sDescriptor);
+
+                pos = posAfterThisDescriptor;
             }
 
             return res;

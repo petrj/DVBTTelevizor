@@ -10,7 +10,8 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
+            //var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
+            var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
 
             var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
