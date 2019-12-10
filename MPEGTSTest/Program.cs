@@ -20,6 +20,8 @@ namespace MPEGTSTest
             var pid17Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 17);
             foreach (var packet in pid17Packets)
             {
+                var crc = ComputeCRC(packet.Payload.ToArray());
+
                 packet.WriteToConsole();
             }
 
@@ -183,5 +185,24 @@ namespace MPEGTSTest
                 mptPacket.WriteToConsole();
             }
         }
+
+        public static uint ComputeCRC(byte[] bytes)
+        {
+            uint crc32 = 0xffffffff;
+            for (int i = 1 + bytes[0]; i < bytes.Length; i++)
+            {
+                byte b = bytes[i];
+                for (int bit = 0; bit < 8; bit++)
+                {
+                    if ((crc32 >= 0x80000000) != (b >= 0x80))
+                        crc32 = (crc32 << 1) ^ 0x04C11DB7;
+                    else
+                        crc32 = (crc32 << 1);
+                    b <<= 1;
+                }
+            }
+            return crc32;
+        }
+
     }
 }
