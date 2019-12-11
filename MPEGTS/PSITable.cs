@@ -36,6 +36,11 @@ namespace MPEGTS
             res.Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
             res.SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
 
+            res.Data = new byte[res.SectionLength];
+            res.CRC = new byte[4];
+            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
+            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
+
             pos = pos + 3;
 
             var posAfterTable = pos + res.SectionLength;
@@ -57,13 +62,6 @@ namespace MPEGTS
                 var programNum = Convert.ToInt32(((bytes[pos+0]) << 8) + (bytes[pos + 1]));
                 var programPID = Convert.ToInt32(((bytes[pos + 2] & 31) << 8) + (bytes[pos + 3]));
 
-                //Console.WriteLine($"0: {bytes[pos + 0]}");
-                //Console.WriteLine($"1: {bytes[pos + 1]}");
-                //Console.WriteLine($"2: {bytes[pos + 2]}");
-                //Console.WriteLine($"3: {bytes[pos + 3]}");
-
-                //Console.WriteLine($"Program test bits: {bytes[pos + 2]}");
-
                 res.ProgramAssociations.Add(new ProgramAssociation()
                 {
                     ProgramNumber = programNum,
@@ -83,14 +81,15 @@ namespace MPEGTS
             Console.WriteLine($"Private               : {Private}");
             Console.WriteLine($"Reserved              : {Reserved}");
             Console.WriteLine($"SectionLength         : {SectionLength}");
+            Console.WriteLine($"CRC OK                : {CRCIsValid()}");
 
             if (SectionSyntaxIndicator)
             {
-                Console.WriteLine($"TableIdExt             : {TableIdExt}");
-                Console.WriteLine($"Version                : {Version}");
-                Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
-                Console.WriteLine($"SectionNumber          : {SectionNumber}");
-                Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
+                Console.WriteLine($"TableIdExt            : {TableIdExt}");
+                Console.WriteLine($"Version               : {Version}");
+                Console.WriteLine($"CurrentIndicator      : {CurrentIndicator}");
+                Console.WriteLine($"SectionNumber         : {SectionNumber}");
+                Console.WriteLine($"LastSectionNumber     : {LastSectionNumber}");
             }
 
             foreach (var programAssociations in ProgramAssociations)

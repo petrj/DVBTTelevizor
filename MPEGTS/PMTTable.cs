@@ -31,6 +31,11 @@ namespace MPEGTS
             res.Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
             res.SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
 
+            res.Data = new byte[res.SectionLength];
+            res.CRC = new byte[4];
+            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
+            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
+
             pos = pos + 3;
 
             res.TableIDExt = (bytes[pos + 0] << 8) + bytes[pos + 1];

@@ -30,6 +30,7 @@ namespace MPEGTS
             Console.WriteLine($"Private               : {Private}");
             Console.WriteLine($"Reserved              : {Reserved}");
             Console.WriteLine($"SectionLength         : {SectionLength}");
+            Console.WriteLine($"CRC OK                : {CRCIsValid()}");
 
             if (SectionSyntaxIndicator)
             {
@@ -78,6 +79,11 @@ namespace MPEGTS
             res.Private = ((bytes[pos + 1] & 64) == 64);
             res.Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);
             res.SectionLength = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
+
+            res.Data = new byte[res.SectionLength];
+            res.CRC = new byte[4];
+            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
+            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
 
             pos = pos + 3;
 
