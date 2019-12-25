@@ -11,7 +11,7 @@ namespace DVBTTelevizor
 {
     public class TunePageViewModel : TuneViewModel
     {
-        private bool _manualTuning = true;
+        private bool _manualTuning = false;
         private bool _tuningAborted = false;
 
         private bool _DVBTTuning = true;

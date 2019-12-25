@@ -9,6 +9,7 @@ namespace DVBTTelevizor
     {
         private DVBTChannel _channel;
 
+
         public DVBTChannel Channel
         {
             get
@@ -23,7 +24,7 @@ namespace DVBTTelevizor
             }
         }
 
-       public ChannelPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public ChannelPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
             :base(loggingService, dialogService, driver, config)
         {
             _loggingService = loggingService;

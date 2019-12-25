@@ -28,7 +28,8 @@
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
             </Style>
 
             <Style x:Key="ChannelNameTextStyle" TargetType="Label">
@@ -58,6 +59,10 @@
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="20,20,20,20"/>
+            </Style>            
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -66,6 +71,8 @@
 
         <!-- middle controls -->
         <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
+
+            <Button  x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
 
             <ListView x:Name="ChannelsListView"
                     ItemsSource="{Binding Channels}"

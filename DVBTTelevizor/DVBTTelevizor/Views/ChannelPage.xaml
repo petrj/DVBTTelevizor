@@ -6,8 +6,17 @@
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.ChannelPage"
              Title="Channel">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
     <ContentPage.Content>
-        <StackLayout Margin="10,10,10,10">
+        <StackLayout Margin="10,10,10,10">            
 
             <Grid>
                 <Grid.RowDefinitions>

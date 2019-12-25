@@ -22,7 +22,7 @@ namespace DVBTTelevizor
         public Command RefreshCommand { get; set; }
 
         public Command LongPressCommand { get; set; }
-        public Command ShortPressCommand { get; set; }
+        public Command ShortPressCommand { get; set; }        
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
@@ -204,6 +204,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool TunningButtonVisible
+        {
+            get
+            {
+                return Channels.Count == 0;
+            }            
+        }
+
         public async Task SaveChannelsToConfig()
         {
             await Task.Run(() =>
@@ -302,6 +310,7 @@ namespace DVBTTelevizor
                 }
 
                 OnPropertyChanged(nameof(Channels));
+                OnPropertyChanged(nameof(TunningButtonVisible));                
 
                 if (selectChannel != null)
                     SelectedChannel = selectChannel;
