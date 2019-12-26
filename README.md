@@ -1,7 +1,6 @@
 # DVBT Televizor
 
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/icon.png" width="320" alt="Icon"/>
-
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
 
 #### CZ
 Android aplikace pro příjem TV pomocí USB DVBT/DVBT2 tuneru 
@@ -19,9 +18,9 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - supporting external keyboards and remote controls connected as keyboard (usb, bluetooth, only Android and UWP)
 
 
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot2.png" width="400" alt="Screenshot2"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot3.png" width="400" alt="Screenshot3"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot4.png" width="400" alt="Screenshot4"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot5.png" width="400" alt="Screenshot5"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot6.png" width="400" alt="Screenshot6"/>
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot1.png")
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot2.png")
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot3.png")
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot4.png")
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot5.png")
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot6.png")
