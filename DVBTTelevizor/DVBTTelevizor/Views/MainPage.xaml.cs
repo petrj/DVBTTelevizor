@@ -158,6 +158,7 @@ namespace DVBTTelevizor
                     _viewModel.UpdateDriverState();
                 });
             });
+            
         }
 
         private void MainPage_Appearing(object sender, EventArgs e)

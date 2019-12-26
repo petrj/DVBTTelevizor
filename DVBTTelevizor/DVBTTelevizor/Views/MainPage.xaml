@@ -5,9 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local2="clr-namespace:DVBTTelevizor"
              mc:Ignorable="d"
-             x:Class="DVBTTelevizor.MainPage"
+             x:Class="DVBTTelevizor.MainPage"             
              Title="DVBT Televizor">
-
+    
     <ContentPage.Resources>
         <ResourceDictionary>
 
@@ -66,6 +66,11 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <NavigationPage.TitleView>
+        <StackLayout Orientation="Horizontal" VerticalOptions="Center" Spacing="10">
+            <Image Source="icon.png" WidthRequest="45" />
+        </StackLayout>
+    </NavigationPage.TitleView>
 
     <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
