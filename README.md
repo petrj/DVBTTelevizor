@@ -18,9 +18,9 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - supporting external keyboards and remote controls connected as keyboard (usb, bluetooth, only Android and UWP)
 
 
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot1.png")
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot2.png")
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot3.png")
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot4.png")
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot5.png")
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot6.png")
+![screenshot1](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot1.png)
+![screenshot2](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot2.png)
+![screenshot3](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot3.png)
+![screenshot4](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot4.png)
+![screenshot5](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot5.png)
+![screenshot6](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/Screenshot6.png)
