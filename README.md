@@ -1,6 +1,6 @@
 # DVBT Televizor
 
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon.png)
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/icon.png" width="320" alt="Icon"/>
 
 
 #### CZ
