@@ -39,8 +39,8 @@ namespace DVBTTelevizor
             _playerPage = playerPage;
 
             BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
-            _viewModel.TuneFrequency = "730";
-            _viewModel.SelectedDeliverySystemType = _viewModel.DeliverySystemTypes[0];
+            _viewModel.TuneFrequency = "626";
+            _viewModel.SelectedDeliverySystemType = _viewModel.DeliverySystemTypes[1];
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {

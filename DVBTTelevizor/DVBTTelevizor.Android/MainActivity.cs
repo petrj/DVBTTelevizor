@@ -52,11 +52,13 @@ namespace DVBTTelevizor.Droid
 
             _config = new DVBTTelevizorConfiguration();
 
+            InitLogging().Wait();
+
 #if DEBUG
             _config.ShowServiceMenu = true;
+            if (_loggingService is BasicLoggingService)
+                (_loggingService as BasicLoggingService).MinLevel = LoggingLevelEnum.Debug;
 #endif
-
-            InitLogging().Wait();
 
             // prevent sleep:
             Window window = (Forms.Context as Activity).Window; 

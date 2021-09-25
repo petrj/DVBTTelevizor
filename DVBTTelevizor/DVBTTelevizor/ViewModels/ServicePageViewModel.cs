@@ -19,6 +19,7 @@ namespace DVBTTelevizor
     {
         private int _tuneDVBTType = 0;
         private string _pids = "768,801,769,785,787,0,16,17,18";
+        private bool _scaningInProgress = false;
 
         public ObservableCollection<DVBTDeliverySystemType> DeliverySystemTypes { get; set; } = new ObservableCollection<DVBTDeliverySystemType>();
 
@@ -30,7 +31,7 @@ namespace DVBTTelevizor
         public Command TuneCommand { get; set; }
         public Command PlayCommand { get; set; }
 
-        public Command ScanPSICommand { get; set; }        
+        public Command ScanPSICommand { get; set; }
 
         public Command StartRecordCommand { get; set; }
         public Command StopRecordCommand { get; set; }
@@ -39,7 +40,7 @@ namespace DVBTTelevizor
 
         public ServicePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
-        {         
+        {
 
             FillDeliverySystemTypes();
 
@@ -52,7 +53,7 @@ namespace DVBTTelevizor
 
             PlayCommand = new Command(async () => await Play());
 
-            ScanPSICommand = new Command(async () => await ScanPSI());            
+            ScanPSICommand = new Command(async () => await ScanPSI());
 
             StartRecordCommand = new Command(async () => await StartRecord());
             StopRecordCommand = new Command(async () => await StopRecord());
@@ -83,6 +84,20 @@ namespace DVBTTelevizor
                 _tuneDVBTType = value;
 
                 OnPropertyChanged(nameof(TuneDVBTType));
+            }
+        }
+
+        public bool ScaningInProgress
+        {
+            get
+            {
+                return _scaningInProgress;
+            }
+            set
+            {
+                _scaningInProgress = value;
+
+                OnPropertyChanged(nameof(ScaningInProgress));
             }
         }
 
@@ -261,7 +276,7 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex, "Error while getting version");
                 await _dialogService.Error(ex.Message);
             }
-        }
+        } 
 
         private async Task ScanPSI()
         {
@@ -269,12 +284,78 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"Scanning PSI");
 
-                await _dialogService.Information("Scanning PSI .....");
+                var res = new System.Text.StringBuilder();
+
+                ScaningInProgress = true;
+
+                var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
+
+                switch (searchMapPIDsResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        await _dialogService.Error("Search error");
+                        return;
+
+                    case SearchProgramResultEnum.NoSignal:
+                        await _dialogService.Error("No signal");
+                        return;
+
+                    case SearchProgramResultEnum.NoProgramFound:
+                        await _dialogService.Error("No program found");
+                        return;
+                }
+
+                var mapPIDs = new List<long>();
+                foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
+                {
+                    mapPIDs.Add(sd.Value);
+                }
+                _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
+
+                // searching PIDs
+
+                foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
+                {
+                    _loggingService.Debug($"Searching Map PID {sDescriptor.Value}");
+
+                    var searchPIDsResult = await _driver.SearchProgramPIDs(Convert.ToInt32(sDescriptor.Value));
+
+                    switch (searchPIDsResult.Result)
+                    {
+                        case SearchProgramResultEnum.Error:
+                            _loggingService.Debug($"Error scanning Map PID {sDescriptor.Value}");
+                            break;
+                        case SearchProgramResultEnum.NoSignal:
+                            _loggingService.Debug("No signal");
+                            break;
+                        case SearchProgramResultEnum.NoProgramFound:
+                            _loggingService.Debug("No program found");
+                            break;
+                        case SearchProgramResultEnum.OK:
+                            var pids = string.Join(",", searchPIDsResult.PIDs);
+
+                            _loggingService.Debug($"Found channel \"{sDescriptor.Key.ServiceName}\"");
+
+                            res.AppendLine($"{sDescriptor.Key.ServiceName}: {pids}");
+
+                            break;
+                    }
+                }
+
+                ScaningInProgress = false;
+
+                Status = "";
+
+                await _dialogService.Information(res.ToString());
             }             
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while scanning PSI");
                 await _dialogService.Error(ex.Message);
+            }
+            finally
+            {
+                ScaningInProgress = false;
             }
         }
 

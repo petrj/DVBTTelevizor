@@ -254,7 +254,7 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _log.Debug($"Stopping read buffer");
+                _log.Debug($"Stopping read buffer (total bytes found: {Buffer.Count})");
 
                 _readingBuffer = false;
             }
@@ -406,6 +406,8 @@ namespace DVBTTelevizor
         {
             _log.Debug("Starting reader tread");
 
+            var totalBytesRead = 0;
+
             try
             {
                 DataStreamInfo = "Reading data ...";
@@ -414,13 +416,13 @@ namespace DVBTTelevizor
 
                 FileStream recordFileStream = null;
                 string recordingFileName = null;
+                long bytesReadFromLastMeasureStartTime = 0;
 
                 bool readingStream = true;
                 bool rec = false;
                 bool readingBuffer = false;
 
-                DateTime lastBitRateMeasureStartTime = DateTime.Now;
-                long bytesReadFromLastMeasureStartTime = 0;
+                DateTime lastBitRateMeasureStartTime = DateTime.Now;                
                 string lastSpeed = "";
 
                 do
@@ -461,6 +463,7 @@ namespace DVBTTelevizor
                         if (_transferClient.Available > 0)
                         {
                             var bytesRead = _transferStream.Read(buffer, 0, buffer.Length);
+                            totalBytesRead += bytesRead;
                             bytesReadFromLastMeasureStartTime += bytesRead;
 
                             //_log.Debug($"Bytes read: {bytesRead} ...");
