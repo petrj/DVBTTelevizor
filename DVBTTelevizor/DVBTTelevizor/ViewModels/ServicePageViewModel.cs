@@ -30,6 +30,8 @@ namespace DVBTTelevizor
         public Command TuneCommand { get; set; }
         public Command PlayCommand { get; set; }
 
+        public Command ScanPSICommand { get; set; }        
+
         public Command StartRecordCommand { get; set; }
         public Command StopRecordCommand { get; set; }
 
@@ -49,6 +51,8 @@ namespace DVBTTelevizor
             SetPIDsCommand = new Command(async () => await SetPIDs());
 
             PlayCommand = new Command(async () => await Play());
+
+            ScanPSICommand = new Command(async () => await ScanPSI());            
 
             StartRecordCommand = new Command(async () => await StartRecord());
             StopRecordCommand = new Command(async () => await StopRecord());
@@ -255,6 +259,21 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while getting version");
+                await _dialogService.Error(ex.Message);
+            }
+        }
+
+        private async Task ScanPSI()
+        {
+            try
+            {
+                _loggingService.Info($"Scanning PSI");
+
+                await _dialogService.Information("Scanning PSI .....");
+            }             
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while scanning PSI");
                 await _dialogService.Error(ex.Message);
             }
         }

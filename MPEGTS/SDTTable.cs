@@ -8,6 +8,9 @@ namespace MPEGTS
     // page 27
     // page 53 - Service Descriptor
 
+    // https://www.etsi.org/deliver/etsi_en/300400_300499/300468/01.15.01_60/en_300468v011501p.pdf
+    // page 26
+
     public class SDTTable : DVBTTable
     {
         public int TableIdExt { get; set; }

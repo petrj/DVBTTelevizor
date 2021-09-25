@@ -42,7 +42,7 @@ namespace DVBTTelevizor.Droid
 
             Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
 
-            // workaround pro ne-pouziti FileProvideru:
+            // workaround for not using FileProvider:
             // https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.SetVmPolicy(builder.Build());
@@ -52,10 +52,14 @@ namespace DVBTTelevizor.Droid
 
             _config = new DVBTTelevizorConfiguration();
 
-            InitLogging();
+#if DEBUG
+            _config.ShowServiceMenu = true;
+#endif
+
+            InitLogging().Wait();
 
             // prevent sleep:
-            Window window = (Forms.Context as Activity).Window;
+            Window window = (Forms.Context as Activity).Window; 
             window.AddFlags(WindowManagerFlags.KeepScreenOn);
 
             _app = new App(_loggingService, _config);

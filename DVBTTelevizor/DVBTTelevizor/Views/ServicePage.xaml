@@ -125,7 +125,19 @@
 
                         <Label Text="PID filter" Style="{DynamicResource CaptionStyle}"/>
 
-                        <Entry x:Name="EntryPIDs" Text="{Binding PIDs}" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="End"/>
+                        <Grid Margin="0,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50*" />
+                                <ColumnDefinition Width="50*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Row="0" Grid.Column="0"  x:Name="ScanPSIButton" Text="Scan PSI" VerticalOptions="Start"  Command="{Binding ScanPSICommand}" Style="{DynamicResource ButtonStyle}"/>
+                            <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryPIDs" Text="{Binding PIDs}" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="End"/>                                                       
+                        </Grid>
+                        
 
                         <Button x:Name="SetPIDsButton" Text="Set PID filter"   Command="{Binding SetPIDsCommand}" Style="{DynamicResource ButtonStyle}"/>
                     </StackLayout>
