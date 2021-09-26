@@ -10,10 +10,11 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
+            //var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
             //var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
+            //ScanPSI(path);
 
-            AnalyzeMPEGTS(path);
+            ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
 
             // 33 s video sample:
             //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
@@ -90,7 +91,30 @@ namespace MPEGTSTest
             return streamBytes;
         }
 
-        public static void AnalyzeMPEGTS(string path)
+        private static void ScanEIT(string path)
+        {
+            var bytes = LoadBytesFromFile(path);
+            var packets = MPEGTransportStreamPacket.Parse(bytes);
+
+            foreach (var packet in packets)
+            {
+                Console.WriteLine(packet.PID);
+            }
+
+            // PID 18 ( EIT )
+
+            var pid18Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 18);
+            foreach (var packet in pid18Packets)
+            {
+                packet.WriteToConsole();
+            }
+
+            Console.WriteLine($"EIT (PID 18) packets found: {pid18Packets.Count}");
+
+            var eitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 18);
+        }
+
+        private static void ScanPSI(string path)
         {
             var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
