@@ -137,9 +137,8 @@
 
                             <Button Grid.Row="0" Grid.Column="0"  x:Name="ScanPSIButton" Text="Scan PSI" VerticalOptions="Start"  Command="{Binding ScanPSICommand}" Style="{DynamicResource ButtonStyle}"/>
                             <ActivityIndicator Grid.Row="0" Grid.Column="1" IsVisible="{Binding ScaningInProgress}" IsRunning="{Binding ScaningInProgress}" IsEnabled="True"/>
-                            <Entry Grid.Row="0" Grid.Column="2" x:Name="EntryPIDs" Text="{Binding PIDs}" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="End"/>                                                       
-                        </Grid>
-                        
+                            <Entry Grid.Row="0" Grid.Column="2" x:Name="EntryPIDs" Text="{Binding PIDs}" TextColor="White" PlaceholderColor="Gray" Placeholder="__PID1,PID2__" HorizontalOptions="FillAndExpand"/>
+                        </Grid>                        
 
                         <Button x:Name="SetPIDsButton" Text="Set PID filter"   Command="{Binding SetPIDsCommand}" Style="{DynamicResource ButtonStyle}"/>
                     </StackLayout>

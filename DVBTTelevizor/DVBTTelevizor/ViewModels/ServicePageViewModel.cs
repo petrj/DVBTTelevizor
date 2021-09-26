@@ -18,7 +18,7 @@ namespace DVBTTelevizor
     public class ServicePageViewModel : TuneViewModel
     {
         private int _tuneDVBTType = 0;
-        private string _pids = "768,801,769,785,787,0,16,17,18";
+        private string _pids = "0,16,17,18";
         private bool _scaningInProgress = false;
 
         public ObservableCollection<DVBTDeliverySystemType> DeliverySystemTypes { get; set; } = new ObservableCollection<DVBTDeliverySystemType>();
@@ -158,6 +158,8 @@ namespace DVBTTelevizor
 
                 _driver.StopReadStream();
 
+                Thread.Sleep(1000);
+
                 MessagingCenter.Send("", BaseViewModel.MSG_PlayStream);
             }
             catch (Exception ex)
@@ -284,7 +286,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"Scanning PSI");
 
-                var res = new System.Text.StringBuilder();
+                var dict = new Dictionary<string, string>();                
 
                 ScaningInProgress = true;
 
@@ -333,10 +335,11 @@ namespace DVBTTelevizor
                             break;
                         case SearchProgramResultEnum.OK:
                             var pids = string.Join(",", searchPIDsResult.PIDs);
+                            pids = sDescriptor.Value.ToString() + "," + pids;  // ProgramMapPID
 
                             _loggingService.Debug($"Found channel \"{sDescriptor.Key.ServiceName}\"");
 
-                            res.AppendLine($"{sDescriptor.Key.ServiceName}: {pids}");
+                            dict.Add(sDescriptor.Key.ServiceName, pids);
 
                             break;
                     }
@@ -346,8 +349,26 @@ namespace DVBTTelevizor
 
                 Status = "";
 
-                await _dialogService.Information(res.ToString());
-            }             
+                var list = new List<string>();
+                foreach (var kvp in dict)
+                {
+                    list.Add($"{kvp.Key}: {kvp.Value}");
+                }
+
+                var res = await _dialogService.DisplayActionSheet("Select PIDs:", "Cancel", list);
+
+                if (res != "Cancel")
+                {
+                    foreach (var kvp in dict)
+                    {
+                        if ($"{kvp.Key}: {kvp.Value}" == res)
+                        {
+                            PIDs = "0,16,17,18," + kvp.Value;
+                            break;
+                        }
+                    }
+                }                    
+           }             
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while scanning PSI");
