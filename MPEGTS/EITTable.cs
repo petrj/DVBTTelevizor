@@ -59,7 +59,24 @@ namespace MPEGTS
 
             pos = pos + 2;
 
-            // TODO - Loop event_ids
+            // pointer + table id + sect.length + descriptors - crc
+            var posAfterDescriptors = 4 + res.SectionLength - 4;
+
+            // reading descriptors
+            while (pos < posAfterDescriptors)
+            {
+                var eventId = (bytes[pos + 0] << 8) + bytes[pos + 1];
+
+                pos = pos + 2;
+
+                var start_time = ParseTime(bytes, pos);
+
+                pos = pos + 5;
+
+                var duration = ParseDuration(bytes, pos);
+
+                break;
+            }
 
             return res;
         }
