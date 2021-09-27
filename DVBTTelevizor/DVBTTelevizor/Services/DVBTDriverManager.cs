@@ -246,7 +246,7 @@ namespace DVBTTelevizor
             {
                 _log.Debug($"clearing buffer");
 
-                _readBuffer.Clear();                
+                _readBuffer.Clear();
             }
         }
 
@@ -422,7 +422,7 @@ namespace DVBTTelevizor
                 bool rec = false;
                 bool readingBuffer = false;
 
-                DateTime lastBitRateMeasureStartTime = DateTime.Now;                
+                DateTime lastBitRateMeasureStartTime = DateTime.Now;
                 string lastSpeed = "";
 
                 do
@@ -831,7 +831,7 @@ namespace DVBTTelevizor
                     System.Threading.Thread.Sleep(1000);
 
                     var timeoutForReadingBuffer = 15; //  seconds timeout for getting PMT
-                    var startTime = DateTime.Now;                    
+                    var startTime = DateTime.Now;
 
                     while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
                     {
@@ -845,10 +845,10 @@ namespace DVBTTelevizor
                         System.Threading.Thread.Sleep(500);
                     }
                 }
-                finally 
+                finally
                 {
                     StopReadBuffer();
-                }                
+                }
 
                 if (pmtPacketBytes.Count == 0)
                 {
@@ -899,7 +899,7 @@ namespace DVBTTelevizor
             {
                 DVBTResponse tuneRes = null;
 
-                // five attempts 
+                // five attempts
                 for (var i = 1; i <= 5; i++)
                 {
                     tuneRes = await Tune(frequency, bandWidth, deliverySyetem);
@@ -979,7 +979,7 @@ namespace DVBTTelevizor
             var res = new SearchMapPIDsResult();
 
             try
-            {               
+            {
 
                 // setting PID filter
 
@@ -1029,11 +1029,11 @@ namespace DVBTTelevizor
                     }
 
                     System.Threading.Thread.Sleep(500);
-                }                
+                }
 
                 StopReadBuffer();
 
-                // debug save buffer                
+                // debug save buffer
                 //SaveBuffer($"Buffer.{_lastTunedFreq}", Buffer.ToArray());
 
                 if (sdtTable == null || psiTable == null)
@@ -1044,7 +1044,7 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-            
+
                 res.ServiceDescriptors = serviceDescriptors;
                 res.Result = SearchProgramResultEnum.OK;
 

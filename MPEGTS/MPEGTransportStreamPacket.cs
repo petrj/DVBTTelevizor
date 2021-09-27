@@ -75,6 +75,53 @@ namespace MPEGTS
             Console.WriteLine(sbc.ToString());
             Console.WriteLine();
         }
+        public static string WriteBytesToString(List<byte> bytes)
+        {
+            var res = new StringBuilder();
+
+            var sb = new StringBuilder();
+            var sbc = new StringBuilder();
+            var sbb = new StringBuilder();
+            int c = 0;
+            int row = 0;
+
+            for (var i = 0; i < bytes.Count; i++)
+            {
+                sbb.Append($"{Convert.ToString(bytes[i], 2).PadLeft(8, '0'),9} ");
+                sb.Append($"{bytes[i].ToString(),9} ");
+
+
+                if (bytes[i] >= 32 && bytes[i] <= 128)
+                {
+                    sbc.Append($"{Convert.ToChar(bytes[i]),9} ");
+                }
+                else
+                {
+                    sbc.Append($"{"",9} ");
+                }
+                c++;
+
+                if (c >= 10)
+                {
+                    res.AppendLine(sbb.ToString());
+                    res.AppendLine(sb.ToString());
+                    res.AppendLine(sbc.ToString());
+                    res.AppendLine();
+                    sb.Clear();
+                    sbb.Clear();
+                    sbc.Clear();
+
+                    c = 0;
+                    row++;
+                }
+            }
+            res.AppendLine(sbb.ToString());
+            res.AppendLine(sb.ToString());
+            res.AppendLine(sbc.ToString());
+            res.AppendLine();
+
+            return res.ToString();
+        }
 
         public static List<MPEGTransportStreamPacket> FindPacketsByPID(List<MPEGTransportStreamPacket> packets, int PID)
         {
@@ -106,6 +153,47 @@ namespace MPEGTS
                         {
                             res.Add(packet);
                         }
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        public static Dictionary<int, List<byte>> GetAllPacketsPayloadBytesByPID(List<MPEGTransportStreamPacket> packets, int PID)
+        {
+            var res = new Dictionary<int, List<byte>>();
+            var firstPacketFound = false;
+            var currentKey = 0;
+
+            foreach (var packet in packets)
+            {
+                if (packet.PID == PID)
+                {
+                    if (!firstPacketFound)
+                    {
+                        if (packet.PayloadUnitStartIndicator)
+                        {
+                            firstPacketFound = true;
+
+                            res.Add(currentKey, new List<byte>());
+
+                            res[currentKey].AddRange(packet.Payload);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (packet.PayloadUnitStartIndicator)
+                        {
+                            currentKey++;
+                            res.Add(currentKey, new List<byte>());
+                        }
+
+                        res[currentKey].AddRange(packet.Payload);
                     }
                 }
             }

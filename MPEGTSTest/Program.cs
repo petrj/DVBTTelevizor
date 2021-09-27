@@ -96,22 +96,17 @@ namespace MPEGTSTest
             var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
 
-            foreach (var packet in packets)
-            {
-                Console.WriteLine(packet.PID);
-            }
-
             // PID 18 ( EIT )
 
-            var pid18Packets = MPEGTransportStreamPacket.FindPacketsByPID(packets, 18);
-            foreach (var packet in pid18Packets)
+            var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
+            foreach (var kvp in eitData)
             {
-                packet.WriteToConsole();
+                Console.WriteLine(MPEGTransportStreamPacket.WriteBytesToString(kvp.Value));
+
+                var eit = EITTable.Parse(kvp.Value);
+
+                break;
             }
-
-            Console.WriteLine($"EIT (PID 18) packets found: {pid18Packets.Count}");
-
-            var eitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 18);
         }
 
         private static void ScanPSI(string path)
