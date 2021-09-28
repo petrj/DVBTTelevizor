@@ -75,7 +75,25 @@ namespace MPEGTS
 
                 var duration = ParseDuration(bytes, pos);
 
-                break;
+                pos = pos + 3;
+
+                var running_status = (bytes[pos + 0] & 224) >> 5;
+                var freeCAMode = (bytes[pos + 0] & 16) >> 4;
+
+                var descriptorLength = ((bytes[pos + 0] & 15) << 8) + bytes[pos + 1];
+
+                pos = pos + 2;
+                
+                var descriptorData = new byte[descriptorLength];
+                bytes.CopyTo(pos, descriptorData, 0, descriptorLength);
+
+                var descriptorTag = descriptorData[0];
+                if (descriptorTag == 77)
+                {
+                    var shortEventDescriptor = ShortEventDescriptor.Parse(descriptorData);
+                }
+
+                pos = pos + descriptorLength;                
             }
 
             return res;

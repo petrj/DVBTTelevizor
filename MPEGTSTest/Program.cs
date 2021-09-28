@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MPEGTS;
 using LoggerService;
+using System.Text;
 
 namespace MPEGTSTest
 {
@@ -10,6 +11,8 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
+            
+
             //var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
             //var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
             //ScanPSI(path);
