@@ -104,10 +104,15 @@ namespace MPEGTSTest
 
             // PID 18 ( EIT )
 
+            var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
+
+            // scanning array of PID 18 packets and creating full table by table_id 
+
+            //var eitTable = new Dictionary<int, EITTable>(); 
+
             var events = new Dictionary<int, List<EventItem>>(); // ServiceID -> eventItems
             var eventsUsed = new Dictionary<int, List<int>>(); // ServiceID -> eventIDs
-
-            var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
+            
             foreach (var kvp in eitData)
             {
                 //Console.WriteLine(MPEGTransportStreamPacket.WriteBytesToString(kvp.Value));
@@ -116,12 +121,24 @@ namespace MPEGTSTest
                 {
                     var eit = EITTable.Parse(kvp.Value);
 
+
+
+                    if (eit.ID == 78)
+                    {
+                        Console.WriteLine($" {eit.ServiceId,6} {eit.ID,4}/{eit.LastTableID,4}  {eit.SectionNumber}/{eit.LastSectionNumber} {eit.SegmentLastSectionNumber}");
+                        foreach (var item in eit.EventItems)
+                        {
+                            Console.WriteLine($"    {item.WriteToString()}");
+                        }
+                    }
+
                     foreach (var item in eit.EventItems)
                     {
+
                         if (
-                          item.StartTime >= DateTime.Now.AddHours(-10) &&
-                          item.StartTime < DateTime.Now.AddHours(10))
-                        {
+                          //item.StartTime >= DateTime.Now.AddHours(-10) &&
+                          item.FinishTime > DateTime.Now)
+                         {
                             if (!events.ContainsKey(eit.ServiceId))
                             {
                                 events[eit.ServiceId] = new List<EventItem>();
