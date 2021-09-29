@@ -13,6 +13,13 @@ namespace MPEGTS
         public byte SegmentLastSectionNumber { get; set; }
         public byte LastTableID { get; set; }
 
+        public DateTime StartTime { get; set; }
+        public DateTime FinishTime { get; set; }
+        public int Duration { get; set; }
+        public int EventId { get; set; }
+
+        public List<EventDescriptor> EventDescriptors { get; set; } = new List<EventDescriptor>();
+
         public static EITTable Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
@@ -35,6 +42,17 @@ namespace MPEGTS
 
             res.Data = new byte[res.SectionLength];
             res.CRC = new byte[4];
+
+            //if (!DVBTTable.CRCIsValid(1,1))
+            //{
+            //    return null;
+            //}
+
+            if (bytes.Count < res.SectionLength + 4)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
             bytes.CopyTo(0, res.Data, 0, res.SectionLength);
             bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
 
@@ -65,15 +83,17 @@ namespace MPEGTS
             // reading descriptors
             while (pos < posAfterDescriptors)
             {
-                var eventId = (bytes[pos + 0] << 8) + bytes[pos + 1];
+               res.EventId = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
                 pos = pos + 2;
 
-                var start_time = ParseTime(bytes, pos);
+                res.StartTime = ParseTime(bytes, pos);
 
                 pos = pos + 5;
 
-                var duration = ParseDuration(bytes, pos);
+                res.Duration = ParseDuration(bytes, pos);
+
+                res.FinishTime = res.StartTime.AddSeconds(res.Duration);
 
                 pos = pos + 3;
 
@@ -83,20 +103,63 @@ namespace MPEGTS
                 var descriptorLength = ((bytes[pos + 0] & 15) << 8) + bytes[pos + 1];
 
                 pos = pos + 2;
-                
+
                 var descriptorData = new byte[descriptorLength];
                 bytes.CopyTo(pos, descriptorData, 0, descriptorLength);
 
                 var descriptorTag = descriptorData[0];
                 if (descriptorTag == 77)
                 {
-                    var shortEventDescriptor = ShortEventDescriptor.Parse(descriptorData);
+                    res.EventDescriptors.Add(ShortEventDescriptor.Parse(descriptorData));
+                } else
+                {
+
                 }
 
-                pos = pos + descriptorLength;                
+                pos = pos + descriptorLength;
             }
 
             return res;
+        }
+
+
+        public void WriteToConsole(bool detailed = true)
+        {
+            Console.WriteLine(WriteToString(detailed));
+        }
+
+        public string WriteToString(bool detailed = true)
+        {
+            var sb = new StringBuilder();
+
+            if (detailed)
+            {
+                sb.AppendLine($"ID                    : {ID}");
+                sb.AppendLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
+                sb.AppendLine($"Private               : {Private}");
+                sb.AppendLine($"Reserved              : {Reserved}");
+                sb.AppendLine($"SectionLength         : {SectionLength}");
+                sb.AppendLine($"CRC OK                : {CRCIsValid()}");
+
+                sb.AppendLine($"__________________");
+            }
+
+            sb.AppendLine($"NetworkID              : {NetworkID}");
+            sb.AppendLine($"ServiceId              : {ServiceId}");
+            sb.AppendLine($"EventId                : {EventId}");
+
+            foreach (var desc in EventDescriptors)
+            {
+                if (desc is ShortEventDescriptor sed)
+                {
+                    sb.AppendLine($"{StartTime.ToString("HH:mm")}-{FinishTime.ToString("HH:mm")} {sed.EventName} ({sed.Text })");
+
+                    //if (!detailed)
+                      //  break;
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

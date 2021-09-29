@@ -11,7 +11,7 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            
+
 
             //var path = "TestData" + Path.DirectorySeparatorChar + "SDTTable.dat";
             //var path = "TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts";
@@ -96,6 +96,9 @@ namespace MPEGTSTest
 
         private static void ScanEIT(string path)
         {
+            var logger = new FileLoggingService(LoggingLevelEnum.Debug);
+            logger.LogFilename = "Log.log";
+
             var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
 
@@ -104,11 +107,27 @@ namespace MPEGTSTest
             var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
             foreach (var kvp in eitData)
             {
-                Console.WriteLine(MPEGTransportStreamPacket.WriteBytesToString(kvp.Value));
+                //Console.WriteLine(MPEGTransportStreamPacket.WriteBytesToString(kvp.Value));
 
-                var eit = EITTable.Parse(kvp.Value);
+                try
+                {
+                    var eit = EITTable.Parse(kvp.Value);
 
-                break;
+                    //if (eit.StartTime >= DateTime.Now.AddHours(-3) &&
+                        //eit.StartTime < DateTime.Now.AddHours(3))
+                     if (eit.ServiceId == 793 &&
+                        eit.StartTime >= DateTime.Now.AddHours(-5) &&
+                        eit.StartTime < DateTime.Now.AddHours(5))
+                    {
+                        logger.Info(eit.WriteToString(false));
+                        eit.WriteToConsole();
+                    }
+                } catch (Exception ex)
+                {
+                    Console.WriteLine($"Bad data ! {ex}");
+                }
+
+                //break;
             }
         }
 

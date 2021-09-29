@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MPEGTS
 {
-    public class ShortEventDescriptor
+    public class ShortEventDescriptor : EventDescriptor
     {
         public byte Tag { get; set; }
         public byte Length { get; set; }
@@ -13,30 +13,22 @@ namespace MPEGTS
         public string EventName { get; set; }
         public string Text { get; set; }
 
-        public static ShortEventDescriptor Parse(IList<byte> bytes)
-        {          
+        public static ShortEventDescriptor Parse(byte[] bytes)
+        {
+            var enc = new ISO6937Encoding();
 
             var res = new ShortEventDescriptor();
 
             res.Tag = bytes[0];
             res.Length = bytes[1];
 
-            for (var i=2;i<=4;i++)
-            {
-                res.LanguageCode += Convert.ToChar(bytes[i]);
-            }                        
+            res.LanguageCode = enc.GetString(bytes, 2, 3);
 
             var eventNameLength = bytes[5];
 
             var pos = 6;
 
-            for (var i = pos; i < pos + eventNameLength; i++)
-            {
-                res.EventName += Convert.ToChar(bytes[i]);
-            }
-
-            // // ISO/IEC 6937
-            // var eventNameUTF8 = System.Text.Encoding.GetEncoding("20269").GetString(eventNameBytes, 0, eventNameLength);
+            res.EventName = enc.GetString(bytes, pos, eventNameLength);
 
             pos = pos + eventNameLength;
 
@@ -44,11 +36,7 @@ namespace MPEGTS
 
             pos++;
 
-            for (var i = pos; i <= pos + textLength; i++)
-            {
-                res.Text += Convert.ToChar(bytes[i]);
-            }
-
+            res.Text = enc.GetString(bytes, pos, textLength);
 
             return res;
         }
