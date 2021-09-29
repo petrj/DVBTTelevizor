@@ -13,12 +13,8 @@ namespace MPEGTS
         public byte SegmentLastSectionNumber { get; set; }
         public byte LastTableID { get; set; }
 
-        public DateTime StartTime { get; set; }
-        public DateTime FinishTime { get; set; }
-        public int Duration { get; set; }
-        public int EventId { get; set; }
 
-        public List<EventDescriptor> EventDescriptors { get; set; } = new List<EventDescriptor>();
+        public List<EventItem> EventItems { get; set; } = new List<EventItem>();
 
         public static EITTable Parse(List<byte> bytes)
         {
@@ -83,17 +79,17 @@ namespace MPEGTS
             // reading descriptors
             while (pos < posAfterDescriptors)
             {
-               res.EventId = (bytes[pos + 0] << 8) + bytes[pos + 1];
+                var eventId = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
                 pos = pos + 2;
 
-                res.StartTime = ParseTime(bytes, pos);
+                var startTime = ParseTime(bytes, pos);
 
                 pos = pos + 5;
 
-                res.Duration = ParseDuration(bytes, pos);
+                var duration = ParseDuration(bytes, pos);
 
-                res.FinishTime = res.StartTime.AddSeconds(res.Duration);
+                var finishTime = startTime.AddSeconds(duration);
 
                 pos = pos + 3;
 
@@ -110,10 +106,12 @@ namespace MPEGTS
                 var descriptorTag = descriptorData[0];
                 if (descriptorTag == 77)
                 {
-                    res.EventDescriptors.Add(ShortEventDescriptor.Parse(descriptorData));
+                    var shortDescriptor = ShortEventDescriptor.Parse(descriptorData);
+                    var eventItem = EventItem.Create(eventId, res.ServiceId, startTime, finishTime, shortDescriptor);
+                    res.EventItems.Add(eventItem);
                 } else
                 {
-
+                    // TODO: read other descriptors
                 }
 
                 pos = pos + descriptorLength;
@@ -121,7 +119,6 @@ namespace MPEGTS
 
             return res;
         }
-
 
         public void WriteToConsole(bool detailed = true)
         {
@@ -146,16 +143,12 @@ namespace MPEGTS
 
             sb.AppendLine($"NetworkID              : {NetworkID}");
             sb.AppendLine($"ServiceId              : {ServiceId}");
-            sb.AppendLine($"EventId                : {EventId}");
 
-            foreach (var desc in EventDescriptors)
+            foreach (var desc in EventItems)
             {
-                if (desc is ShortEventDescriptor sed)
+                if (desc is EventItem ev)
                 {
-                    sb.AppendLine($"{StartTime.ToString("HH:mm")}-{FinishTime.ToString("HH:mm")} {sed.EventName} ({sed.Text })");
-
-                    //if (!detailed)
-                      //  break;
+                    sb.AppendLine(ev.WriteToString());
                 }
             }
 

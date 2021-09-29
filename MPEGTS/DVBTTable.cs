@@ -79,7 +79,9 @@ namespace MPEGTS
             var minute = Convert.ToInt32(hexaNumber.Substring(2, 2));
             var second = Convert.ToInt32(hexaNumber.Substring(4, 2));
 
-            return new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day), hour, minute, second);
+            var utcTime = new DateTime(Convert.ToInt32(year), Convert.ToInt32(month), Convert.ToInt32(day), hour, minute, second, DateTimeKind.Utc);
+
+            return utcTime.ToLocalTime();
         }
 
         /// <summary>

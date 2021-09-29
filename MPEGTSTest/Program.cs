@@ -104,6 +104,9 @@ namespace MPEGTSTest
 
             // PID 18 ( EIT )
 
+            var events = new Dictionary<int, List<EventItem>>(); // ServiceID -> eventItems
+            var eventsUsed = new Dictionary<int, List<int>>(); // ServiceID -> eventIDs
+
             var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
             foreach (var kvp in eitData)
             {
@@ -113,21 +116,42 @@ namespace MPEGTSTest
                 {
                     var eit = EITTable.Parse(kvp.Value);
 
-                    //if (eit.StartTime >= DateTime.Now.AddHours(-3) &&
-                        //eit.StartTime < DateTime.Now.AddHours(3))
-                     if (eit.ServiceId == 793 &&
-                        eit.StartTime >= DateTime.Now.AddHours(-5) &&
-                        eit.StartTime < DateTime.Now.AddHours(5))
+                    foreach (var item in eit.EventItems)
                     {
-                        logger.Info(eit.WriteToString(false));
-                        eit.WriteToConsole();
+                        if (
+                          item.StartTime >= DateTime.Now.AddHours(-10) &&
+                          item.StartTime < DateTime.Now.AddHours(10))
+                        {
+                            if (!events.ContainsKey(eit.ServiceId))
+                            {
+                                events[eit.ServiceId] = new List<EventItem>();
+                                eventsUsed[eit.ServiceId] = new List<int>();
+                            }
+
+                            if (!eventsUsed[eit.ServiceId].Contains(item.EventId))
+                            {
+                                eventsUsed[eit.ServiceId].Add(item.EventId);
+
+                                events[eit.ServiceId].Add(item);
+                            }
+                        }
                     }
+
                 } catch (Exception ex)
                 {
                     Console.WriteLine($"Bad data ! {ex}");
                 }
+            }
 
-                //break;
+            foreach (var kvp in events)
+            {
+                kvp.Value.Sort();
+
+                logger.Info($"Service id: {kvp.Key}");
+                foreach (var ev in kvp.Value)
+                {
+                    logger.Info(ev.WriteToString());
+                }
             }
         }
 
