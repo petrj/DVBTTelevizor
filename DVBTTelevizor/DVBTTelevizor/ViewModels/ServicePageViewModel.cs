@@ -278,7 +278,7 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex, "Error while getting version");
                 await _dialogService.Error(ex.Message);
             }
-        } 
+        }
 
         private async Task ScanPSI()
         {
@@ -286,7 +286,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"Scanning PSI");
 
-                var dict = new Dictionary<string, string>();                
+                var dict = new Dictionary<string, string>();
 
                 ScaningInProgress = true;
 
@@ -367,8 +367,8 @@ namespace DVBTTelevizor
                             break;
                         }
                     }
-                }                    
-           }             
+                }
+           }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while scanning PSI");

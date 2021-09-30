@@ -103,7 +103,6 @@ namespace MPEGTS
                 Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
             }
 
-
             Console.WriteLine($"---- Stream:-----------------------");
             foreach (var stream in Streams)
             {
