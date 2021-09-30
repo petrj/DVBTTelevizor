@@ -95,29 +95,42 @@ namespace DVBTTelevizor
 
         private async Task Export()
         {
-            _loggingService.Info($"Exporting channels");
+            await BaseViewModel.RunWithStoragePermission(
+                 async () =>
+                 {
+                     try
+                     {
+                         _loggingService.Info($"Exporting channels");
 
-            var chs = await _channelService.LoadChannels();
-            if (chs.Count == 0)
-            {
-                await _dialogService.Information("Channel list is empty");
-                return;
-            }
+                         var chs = await _channelService.LoadChannels();
+                         if (chs.Count == 0)
+                         {
+                             await _dialogService.Information("Channel list is empty");
+                             return;
+                         }
 
-            var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
-            if (File.Exists(path))
-            {
-                if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
-                {
-                    return;
-                }
+                         var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
+                         if (File.Exists(path))
+                         {
+                             if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
+                             {
+                                 return;
+                             }
 
-                File.Delete(path);
-            }
+                             File.Delete(path);
+                         }
 
-            File.WriteAllText(path, JsonConvert.SerializeObject(chs));
+                         File.WriteAllText(path, JsonConvert.SerializeObject(chs));
 
-            await _dialogService.Information($"File {path} exported.");
+                         await _dialogService.Information($"File {path} exported.");
+
+                     }
+                     catch (Exception ex)
+                     {
+                         await _dialogService.Error("Export failed");
+                     }
+
+                 }, _dialogService); 
         }
 
         private async Task Import()

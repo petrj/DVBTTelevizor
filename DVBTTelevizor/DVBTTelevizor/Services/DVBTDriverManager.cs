@@ -43,6 +43,8 @@ namespace DVBTTelevizor
 
         private string _dataStreamInfo  = "Data reading not initialized";
 
+        private EITManager _eitManager = new EITManager();
+
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             _log = loggingService;
@@ -119,6 +121,14 @@ namespace DVBTTelevizor
             get
             {
                 return _controlClient != null && _controlClient.Connected;
+            }
+        }
+
+        public Dictionary<int,EventItem> CurrentEvents
+        {
+            get
+            {
+                return _eitManager.CurrentEvents;
             }
         }
 
@@ -972,7 +982,47 @@ namespace DVBTTelevizor
             }
        }
 
-       public async Task<SearchMapPIDsResult> SearchProgramMapPIDs()
+        public async Task<bool> ScanEPG()
+        {
+            _log.Debug($"Scanning EPG");
+
+            //_eitManager.
+
+            try
+            {
+                // setting PID filter
+                /*
+                var pids = new List<long>() { 18 };
+                var pidRes = await SetPIDs(pids);
+
+                if (!pidRes.SuccessFlag)
+                {                    
+                    return false;
+                }
+                */
+                StartReadBuffer();
+
+                System.Threading.Thread.Sleep(5000);
+                
+                // searching for PID 18 (EIT) packets ..
+                if (_eitManager.Scan(Buffer))
+                {
+                  
+                }                    
+
+                StopReadBuffer();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+               
+                return false;
+            }
+        }
+
+        public async Task<SearchMapPIDsResult> SearchProgramMapPIDs()
         {
             _log.Debug($"Searching Program Map PIDs");
 

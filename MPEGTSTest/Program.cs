@@ -11,7 +11,7 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
+            //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
 
             ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
 
@@ -110,6 +110,7 @@ namespace MPEGTSTest
                 Console.WriteLine(kvp.Value.WriteToString());
             }
 
+            /*
             Console.WriteLine();
             Console.WriteLine("---------------------------------------------------------------");
             Console.WriteLine("Scheduled events:");
@@ -124,6 +125,7 @@ namespace MPEGTSTest
                     }
                 }
             }
+            */
         }
 
         private static void ScanPSI(string path)

@@ -33,6 +33,8 @@ namespace DVBTTelevizor
 
         public Command ScanPSICommand { get; set; }
 
+        public Command ScanEITCommand { get; set; }
+
         public Command StartRecordCommand { get; set; }
         public Command StopRecordCommand { get; set; }
 
@@ -54,6 +56,7 @@ namespace DVBTTelevizor
             PlayCommand = new Command(async () => await Play());
 
             ScanPSICommand = new Command(async () => await ScanPSI());
+            ScanEITCommand = new Command(async () => await ScanEIT());
 
             StartRecordCommand = new Command(async () => await StartRecord());
             StopRecordCommand = new Command(async () => await StopRecord());
@@ -277,6 +280,46 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex, "Error while getting version");
                 await _dialogService.Error(ex.Message);
+            }
+        }
+
+        private async Task ScanEIT()
+        {
+            try
+            {
+                _loggingService.Info($"Scanning EIT");
+                
+                ScaningInProgress = true;
+
+                var res = await _driver.ScanEPG();
+
+                ScaningInProgress = false;
+
+                if (res)
+                {
+                    var txt = String.Empty;
+                    foreach (var kvp in _driver.CurrentEvents)
+                    {
+                        txt += $"Service: {kvp.Key}  Event: {kvp.Value.TextValue} {Environment.NewLine}";
+                    }
+
+                    await _dialogService.Information(txt);
+
+                } else
+                {
+                    await _dialogService.Error("Scan error");
+                }                
+
+                Status = "";
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while scanning PSI");
+                await _dialogService.Error(ex.Message);
+            }
+            finally
+            {
+                ScaningInProgress = false;
             }
         }
 

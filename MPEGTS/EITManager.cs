@@ -13,15 +13,26 @@ namespace MPEGTS
 
         public Dictionary<int, List<EventItem>> ScheduledEvents { get; set; } = new Dictionary<int, List<EventItem>>();
 
+        public bool Scan(List<byte> bytes)
+        {
+            if (bytes == null || bytes.Count == 0)
+            {
+                return false;
+            }
+
+            var packets = MPEGTransportStreamPacket.Parse(bytes);
+            return Scan(packets);
+        }
+
         /// <summary>
         /// Scanning actual and scheduled events for actual TS
         /// </summary>
         /// <param name="packets"></param>
-        public void Scan(List<MPEGTransportStreamPacket> packets)
-        {
+        public bool Scan(List<MPEGTransportStreamPacket> packets)
+        {          
             var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
 
-            var eventIDs = new Dictionary<int, Dictionary<int,EventItem>>(); // ServiceID -> (event id -> event item )
+            var eventIDs = new Dictionary<int, Dictionary<int, EventItem>>(); // ServiceID -> (event id -> event item )
 
             foreach (var kvp in eitData)
             {
@@ -40,7 +51,8 @@ namespace MPEGTS
 
                             break; // reading only the first one
                         }
-                    } else
+                    }
+                    else
                     if (eit.ID >= 80 && eit.ID <= 95) // actual TS, event schedule information = table_id = 0x50 to 0x5F;
                     {
                         foreach (var item in eit.EventItems)
@@ -72,7 +84,8 @@ namespace MPEGTS
                 if (ScheduledEvents.ContainsKey(kvp.Key))
                 {
                     ScheduledEvents[kvp.Key].Clear();
-                } else
+                }
+                else
                 {
                     ScheduledEvents[kvp.Key] = new List<EventItem>();
                 }
@@ -81,6 +94,8 @@ namespace MPEGTS
 
                 ScheduledEvents[kvp.Key].Sort();
             }
+
+            return true;          
         }
     }
 }
