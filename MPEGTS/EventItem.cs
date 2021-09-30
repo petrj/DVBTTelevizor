@@ -16,6 +16,30 @@ namespace MPEGTS
         public string EventName { get; set; }
         public string Text { get; set; }
 
+        public string TextValue
+        {
+            get
+            {
+                var res = string.Empty;
+                if (!String.IsNullOrEmpty(EventName))
+                {
+                    res += EventName;
+                }
+                if (!string.IsNullOrEmpty(Text))
+                {
+                    if (!string.IsNullOrEmpty(res))
+                    {
+                        res += $" ({Text})";
+                    } else
+                    {
+                        res = Text;
+                    }
+                }
+
+                return res;
+            }
+        }
+
         public int CompareTo(object obj)
         {
             if (!(obj is EventItem))
@@ -34,7 +58,7 @@ namespace MPEGTS
 
         public string WriteToString()
         {
-            return ($"[{ServiceId}/{EventId}]: {StartTime.ToString("dd.MM.yyyy")} {StartTime.ToString("HH:mm")}-{FinishTime.ToString("HH:mm")} {EventName} ({Text })");
+            return ($"[{EventId,5}]: {StartTime.ToString("dd.MM.yyyy")} {StartTime.ToString("HH:mm")}-{FinishTime.ToString("HH:mm")} {TextValue}");
         }
 
         public static EventItem Create(int eventId, int serviceId, DateTime start, DateTime finish, ShortEventDescriptor shortEventDescriptor)

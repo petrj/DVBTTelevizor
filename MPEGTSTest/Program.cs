@@ -102,72 +102,30 @@ namespace MPEGTSTest
             var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
 
-            // PID 18 ( EIT )
+            var eitManager = new EITManager();
+            eitManager.Scan(packets);
 
-            var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
-
-            // scanning array of PID 18 packets and creating full table by table_id 
-
-            //var eitTable = new Dictionary<int, EITTable>(); 
-
-            var events = new Dictionary<int, List<EventItem>>(); // ServiceID -> eventItems
-            var eventsUsed = new Dictionary<int, List<int>>(); // ServiceID -> eventIDs
-            
-            foreach (var kvp in eitData)
+            Console.WriteLine();
+            Console.WriteLine("---------------------------------------------------------------");
+            Console.WriteLine("Current events:");
+            foreach (var kvp in eitManager.CurrentEvents)
             {
-                //Console.WriteLine(MPEGTransportStreamPacket.WriteBytesToString(kvp.Value));
-
-                try
-                {
-                    var eit = EITTable.Parse(kvp.Value);
-
-
-
-                    if (eit.ID == 78)
-                    {
-                        Console.WriteLine($" {eit.ServiceId,6} {eit.ID,4}/{eit.LastTableID,4}  {eit.SectionNumber}/{eit.LastSectionNumber} {eit.SegmentLastSectionNumber}");
-                        foreach (var item in eit.EventItems)
-                        {
-                            Console.WriteLine($"    {item.WriteToString()}");
-                        }
-                    }
-
-                    foreach (var item in eit.EventItems)
-                    {
-
-                        if (
-                          //item.StartTime >= DateTime.Now.AddHours(-10) &&
-                          item.FinishTime > DateTime.Now)
-                         {
-                            if (!events.ContainsKey(eit.ServiceId))
-                            {
-                                events[eit.ServiceId] = new List<EventItem>();
-                                eventsUsed[eit.ServiceId] = new List<int>();
-                            }
-
-                            if (!eventsUsed[eit.ServiceId].Contains(item.EventId))
-                            {
-                                eventsUsed[eit.ServiceId].Add(item.EventId);
-
-                                events[eit.ServiceId].Add(item);
-                            }
-                        }
-                    }
-
-                } catch (Exception ex)
-                {
-                    Console.WriteLine($"Bad data ! {ex}");
-                }
+                Console.WriteLine($"ServiceId: {kvp.Key}");
+                Console.WriteLine(kvp.Value.WriteToString());
             }
 
-            foreach (var kvp in events)
+            Console.WriteLine();
+            Console.WriteLine("---------------------------------------------------------------");
+            Console.WriteLine("Scheduled events:");
+            foreach (var kvp in eitManager.ScheduledEvents)
             {
-                kvp.Value.Sort();
-
-                logger.Info($"Service id: {kvp.Key}");
+                Console.WriteLine($"ServiceId: {kvp.Key}");
                 foreach (var ev in kvp.Value)
                 {
-                    logger.Info(ev.WriteToString());
+                    if (ev.FinishTime >= DateTime.Now)
+                    {
+                        Console.WriteLine(ev.WriteToString());
+                    }
                 }
             }
         }
