@@ -13,11 +13,11 @@ namespace MPEGTSTest
         {
             //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
 
-            //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+            ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
 
             //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
             //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
-            AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
+            //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
 
             // 33 s video sample:
             //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";

@@ -15,20 +15,20 @@ namespace MPEGTS
 
         public static ShortEventDescriptor Parse(byte[] bytes)
         {
-            var enc = new ISO6937Encoding();
+            //var enc = new ISO6937Encoding();
 
             var res = new ShortEventDescriptor();
 
             res.Tag = bytes[0];
             res.Length = bytes[1];
 
-            res.LanguageCode = enc.GetString(bytes, 2, 3);
+            res.LanguageCode = Encoding.GetEncoding("iso-8859-1").GetString(bytes, 2, 3);
 
             var eventNameLength = bytes[5];
 
             var pos = 6;
 
-            res.EventName = enc.GetString(bytes, pos, eventNameLength);
+            res.EventName = MPEGTSESICharReader.ReadString(bytes, pos, eventNameLength);
 
             pos = pos + eventNameLength;
 
@@ -36,7 +36,7 @@ namespace MPEGTS
 
             pos++;
 
-            res.Text = enc.GetString(bytes, pos, textLength);
+            res.Text = MPEGTSESICharReader.ReadString(bytes, pos, textLength);
 
             return res;
         }
