@@ -13,7 +13,11 @@ namespace MPEGTSTest
         {
             //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
 
-            ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+            //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+
+            //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
+            AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
+            //AnalyzeMPEGTSPackets(@"C:\temp\stream.ts");
 
             // 33 s video sample:
             //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
@@ -21,6 +25,37 @@ namespace MPEGTSTest
 
             Console.WriteLine("Press Enter");
             Console.ReadLine();
+        }
+
+        public static void AnalyzeMPEGTSPackets(string path)
+        {
+            var logger = new FileLoggingService(LoggingLevelEnum.Debug);
+            logger.LogFilename = "Log.log";
+
+            var bytes = LoadBytesFromFile(path);
+            var packets = MPEGTransportStreamPacket.Parse(bytes);
+
+            Console.WriteLine($"Total packets found: {packets.Count}");
+
+            var packetsByPIDCount = new Dictionary<int, int>();
+
+            foreach (var packet in packets)
+            {
+                if (!packetsByPIDCount.ContainsKey(packet.PID))
+                {
+                    packetsByPIDCount.Add(packet.PID, 0);
+                }
+
+                packetsByPIDCount[packet.PID]++;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("PID: Pakcets count");
+            Console.WriteLine("----------");
+            foreach (var kvp in packetsByPIDCount)
+            {
+                Console.WriteLine($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value,8}");
+            }
         }
 
         public static void RecordMpegTS(string path)
