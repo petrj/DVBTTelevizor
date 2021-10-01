@@ -16,8 +16,8 @@ namespace MPEGTSTest
             //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
 
             //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
+            //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
             AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
-            //AnalyzeMPEGTSPackets(@"C:\temp\stream.ts");
 
             // 33 s video sample:
             //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
@@ -55,6 +55,35 @@ namespace MPEGTSTest
             foreach (var kvp in packetsByPIDCount)
             {
                 Console.WriteLine($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value,8}");
+            }
+
+            if (packetsByPIDCount.ContainsKey(17))
+            {
+                var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
+                var sDTTable = SDTTable.Parse(sdtBytes);
+                sDTTable.WriteToConsole();
+            }
+
+            if (packetsByPIDCount.ContainsKey(0))
+            {
+                var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 0);
+                var psiTable = PSITable.Parse(psiBytes);
+                psiTable.WriteToConsole();
+            }
+
+            if (packetsByPIDCount.ContainsKey(18))
+            {
+                var eitManager = new EITManager();
+                eitManager.Scan(packets);
+
+                Console.WriteLine();
+                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine("Current events:");
+                foreach (var kvp in eitManager.CurrentEvents)
+                {
+                    Console.WriteLine($"ServiceId: {kvp.Key}");
+                    Console.WriteLine(kvp.Value.WriteToString());
+                }
             }
         }
 
