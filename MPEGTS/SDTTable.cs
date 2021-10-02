@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace MPEGTS
 {
@@ -26,41 +27,65 @@ namespace MPEGTS
 
         public List<byte> TableData = new List<byte>();
 
-        public void WriteToConsole()
+        public void WriteToConsole(bool detailed = false)
         {
-            Console.WriteLine($"ID                    : {ID}");
-            Console.WriteLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
-            Console.WriteLine($"Private               : {Private}");
-            Console.WriteLine($"Reserved              : {Reserved}");
-            Console.WriteLine($"SectionLength         : {SectionLength}");
-            Console.WriteLine($"CRC OK                : {CRCIsValid()}");
+            Console.WriteLine(WriteToString(detailed));
+        }
 
-            if (SectionSyntaxIndicator)
+        public string WriteToString(bool detailed = false)
+        {
+            var sb = new StringBuilder();
+
+            if (detailed)
             {
-                Console.WriteLine($"TableIdExt             : {TableIdExt}");
-                Console.WriteLine($"ReservedExt            : {ReservedExt}");
-                Console.WriteLine($"Version                : {Version}");
-                Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
-                Console.WriteLine($"SectionNumber          : {SectionNumber}");
-                Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
+                sb.AppendLine($"ID                    : {ID}");
+                sb.AppendLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
+                sb.AppendLine($"Private               : {Private}");
+                sb.AppendLine($"Reserved              : {Reserved}");
+                sb.AppendLine($"SectionLength         : {SectionLength}");
+                sb.AppendLine($"CRC OK                : {CRCIsValid()}");            
+
+                if (SectionSyntaxIndicator)
+                {
+                    sb.AppendLine($"TableIdExt             : {TableIdExt}");
+                    sb.AppendLine($"ReservedExt            : {ReservedExt}");
+                    sb.AppendLine($"Version                : {Version}");
+                    sb.AppendLine($"CurrentIndicator       : {CurrentIndicator}");
+                    sb.AppendLine($"SectionNumber          : {SectionNumber}");
+                    sb.AppendLine($"LastSectionNumber      : {LastSectionNumber}");
+                }
+
+                sb.AppendLine($"DescriptorsLoopLength  : {DescriptorsLoopLength}");
             }
 
-            Console.WriteLine($"NetworkID              : {NetworkID}");
-            Console.WriteLine($"ServiceId              : {ServiceId}");
-            Console.WriteLine($"DescriptorsLoopLength  : {DescriptorsLoopLength}");
+            sb.AppendLine($"NetworkID              : {NetworkID}");
+            sb.AppendLine($"ServiceId              : {ServiceId}");
 
-            foreach (var desc in ServiceDescriptors)
+            sb.AppendLine();
+
+            if (detailed)
             {
-                Console.WriteLine($"");
-                Console.WriteLine($"Service descriptor");
-                Console.WriteLine($"__________________");
-                Console.WriteLine($"Tag           : {desc.Tag}");
-                Console.WriteLine($"Length        : {desc.Length}");
-                Console.WriteLine($"ServisType    : {desc.ServisType}");
-                Console.WriteLine($"ProviderName  : {desc.ProviderName}");
-                Console.WriteLine($"ServiceName   : {desc.ServiceName}");
-                Console.WriteLine($"ProgramNumber : {desc.ProgramNumber}");
+                foreach (var desc in ServiceDescriptors)
+                {
+                    sb.AppendLine($"__________________");
+                    sb.AppendLine($"Tag           : {desc.Tag}");
+                    sb.AppendLine($"Length        : {desc.Length}");
+                    sb.AppendLine($"ServisType    : {desc.ServisType}");
+                    sb.AppendLine($"ProviderName  : {desc.ProviderName}");
+                    sb.AppendLine($"ServiceName   : {desc.ServiceName}");
+                    sb.AppendLine($"ProgramNumber : {desc.ProgramNumber}");
+                }
+            } else
+            {
+                sb.AppendLine($"{"Type",4} {"Provider".PadRight(20, ' '),20} {"ServiceName".PadRight(20, ' '),20} {"Program Number",6}");
+                sb.AppendLine($"{"----",4} {"--------".PadRight(20, '-'),20} {"-----------".PadRight(20, '-'),20} {"--------------",6}");
+                foreach (var desc in ServiceDescriptors)
+                {
+                    sb.AppendLine($"{desc.ServisType,4} {desc.ProviderName.PadRight(20, ' '),20} {desc.ServiceName.PadRight(20,' '),20} {desc.ProgramNumber,6}");                 
+                }
             }
+
+            return sb.ToString();
         }
 
         public static SDTTable Parse(List<byte> bytes)

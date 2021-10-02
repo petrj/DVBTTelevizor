@@ -11,20 +11,26 @@ namespace MPEGTSTest
     {
         public static void Main(string[] args)
         {
-            //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
+            if (args != null &&
+                args.Length == 1 &&
+                File.Exists(args[0]))
+            {
+                AnalyzeMPEGTSPackets(args[0]);
+            }
+            else
+            {
+                //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
+                //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
+                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
 
-            ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+                // 33 s video sample:
+                //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
+                //RecordMpegTS(path);
 
-            //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
-            //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
-            //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
-
-            // 33 s video sample:
-            //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
-            //RecordMpegTS(path);
-
-            Console.WriteLine("Press Enter");
-            Console.ReadLine();
+                Console.WriteLine("Press Enter");
+                Console.ReadLine();
+            }
         }
 
         public static void AnalyzeMPEGTSPackets(string path)
@@ -32,12 +38,14 @@ namespace MPEGTSTest
             var logger = new FileLoggingService(LoggingLevelEnum.Debug);
             logger.LogFilename = "Log.log";
 
+            Console.Write($"Reading ....... ");
+
             var bytes = LoadBytesFromFile(path);
             var packets = MPEGTransportStreamPacket.Parse(bytes);
 
-            Console.WriteLine($"Total packets found: {packets.Count}");
+            Console.WriteLine($" {packets.Count} packets found");
 
-            var packetsByPIDCount = new Dictionary<int, int>();
+            var packetsByPIDCount = new SortedDictionary<int, int>();
 
             foreach (var packet in packets)
             {
@@ -50,8 +58,9 @@ namespace MPEGTSTest
             }
 
             Console.WriteLine();
-            Console.WriteLine("PID: Pakcets count");
-            Console.WriteLine("----------");
+            Console.WriteLine($"PID:             Packets count");
+            Console.WriteLine("-------------------------------");
+
             foreach (var kvp in packetsByPIDCount)
             {
                 Console.WriteLine($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value,8}");
@@ -59,32 +68,73 @@ namespace MPEGTSTest
 
             if (packetsByPIDCount.ContainsKey(17))
             {
+                Console.WriteLine();
+                Console.WriteLine($"Service Description Table(SDT):");
+                Console.WriteLine($"------------------------------");
+
                 var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
                 var sDTTable = SDTTable.Parse(sdtBytes);
                 sDTTable.WriteToConsole();
             }
 
+            if (packetsByPIDCount.ContainsKey(16))
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Network Information Table (NIT):");
+                Console.WriteLine($"--------------------------------");
+
+                var nitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 16);
+                var niTable = NITTable.Parse(nitBytes);
+                niTable.WriteToConsole();
+            }
+
+
             if (packetsByPIDCount.ContainsKey(0))
             {
+                Console.WriteLine();
+                Console.WriteLine($"Program Specific Information(PSI):");
+                Console.WriteLine($"----------------------------------");
+
                 var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 0);
                 var psiTable = PSITable.Parse(psiBytes);
+
                 psiTable.WriteToConsole();
             }
 
             if (packetsByPIDCount.ContainsKey(18))
             {
+                Console.WriteLine();
+                Console.WriteLine($"Event Information Table (EIT):");
+                Console.WriteLine($"------------------------------");
+
                 var eitManager = new EITManager();
                 eitManager.Scan(packets);
 
                 Console.WriteLine();
-                Console.WriteLine("---------------------------------------------------------------");
-                Console.WriteLine("Current events:");
+                Console.WriteLine("Current events");
+                Console.WriteLine();
+
+                Console.WriteLine($"{"Program number",14}: {"From".PadRight(10,' '),10} {"HH:mm"}-{"HH:mm"}");
+
                 foreach (var kvp in eitManager.CurrentEvents)
                 {
-                    Console.WriteLine($"ServiceId: {kvp.Key}");
                     Console.WriteLine(kvp.Value.WriteToString());
                 }
-            }
+
+                /*
+                Console.WriteLine();
+                Console.WriteLine("Scheduled events");
+                Console.WriteLine();
+
+                foreach (var kvp in eitManager.ScheduledEvents)
+                {
+                    foreach (var ev in kvp.Value)
+                    {
+                        Console.WriteLine(ev.WriteToString());
+                    }
+                }
+                */
+            }        
         }
 
         public static void RecordMpegTS(string path)

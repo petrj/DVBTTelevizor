@@ -58,7 +58,7 @@ namespace MPEGTS
 
         public string WriteToString()
         {
-            return ($"[{EventId,5}]: {StartTime.ToString("dd.MM.yyyy")} {StartTime.ToString("HH:mm")}-{FinishTime.ToString("HH:mm")} {TextValue}");
+            return ($"{ServiceId,14}: {StartTime.ToString("dd.MM.yyyy")} {StartTime.ToString("HH:mm")}-{FinishTime.ToString("HH:mm")} {TextValue}");
         }
 
         public static EventItem Create(int eventId, int serviceId, DateTime start, DateTime finish, ShortEventDescriptor shortEventDescriptor)

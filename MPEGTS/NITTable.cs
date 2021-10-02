@@ -90,8 +90,9 @@ namespace MPEGTS
 
             while (pos < posAfterTransportStreams)
             {
-                var transportStreamId = Convert.ToInt32(((bytes[pos + 0]) << 8) + bytes[pos + 1]);
-                var originalNetworkId = Convert.ToInt32(((bytes[pos + 2]) << 8) + bytes[pos + 3]);
+                res.TransportStreamId = Convert.ToInt32(((bytes[pos + 0]) << 8) + bytes[pos + 1]);
+                res.OriginalNetworkId = Convert.ToInt32(((bytes[pos + 2]) << 8) + bytes[pos + 3]);
+
                 var transportDescriptorsLength = Convert.ToInt32(((bytes[pos + 4] & 15) << 8) + bytes[pos + 5]);
 
                 pos += 6;
@@ -103,10 +104,10 @@ namespace MPEGTS
                     var descriptorTag = bytes[pos + 0];
                     var descriptorLength = bytes[pos + 1];
 
-                    Console.WriteLine($"Found descriptor: {descriptorTag}");
-                    Console.WriteLine($"          length: {descriptorLength}");
-                    Console.WriteLine($"        position: {pos + 2}");
-                    Console.WriteLine($"------------------------------------");
+                    //Console.WriteLine($"Found descriptor: {descriptorTag}");
+                    //Console.WriteLine($"          length: {descriptorLength}");
+                    //Console.WriteLine($"        position: {pos + 2}");
+                    //Console.WriteLine($"------------------------------------");
 
                     // TODO: read descriptors of given descriptorTag
                     // 90 (dec) 5A (hex)  - terrestrial_delivery_system_descriptor
@@ -119,29 +120,40 @@ namespace MPEGTS
             return res;
          }
 
-        public void WriteToConsole()
+        public void WriteToConsole(bool detailed = false)
         {
-            Console.WriteLine($"ID                    : {ID}");
-            Console.WriteLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
-            Console.WriteLine($"Private               : {Private}");
-            Console.WriteLine($"Reserved              : {Reserved}");
-            Console.WriteLine($"SectionLength         : {SectionLength}");
-
-            if (SectionSyntaxIndicator)
+            Console.WriteLine(WriteToString(detailed));
+        }
+    
+        public string WriteToString(bool detailed = false)
+        {
+            var sb = new StringBuilder();
+        
+            if (detailed)
             {
-                Console.WriteLine($"Version                : {Version}");
-                Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
-                Console.WriteLine($"SectionNumber          : {SectionNumber}");
-                Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
+                sb.AppendLine($"ID                    : {ID}");
+                sb.AppendLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
+                sb.AppendLine($"Private               : {Private}");
+                sb.AppendLine($"Reserved              : {Reserved}");
+                sb.AppendLine($"SectionLength         : {SectionLength}");
+
+                if (SectionSyntaxIndicator)
+                {
+                    sb.AppendLine($"Version                : {Version}");
+                    sb.AppendLine($"CurrentIndicator       : {CurrentIndicator}");
+                    sb.AppendLine($"SectionNumber          : {SectionNumber}");
+                    sb.AppendLine($"LastSectionNumber      : {LastSectionNumber}");
+                }
+
+                sb.AppendLine($"LinkageType            : {LinkageType}");
             }
 
-            Console.WriteLine($"NetworkName            : {NetworkName}");
+            sb.AppendLine($"NetworkName            : {NetworkName}");
+            sb.AppendLine($"TransportStreamId      : {TransportStreamId}");
+            sb.AppendLine($"OriginalNetworkId      : {OriginalNetworkId}");
+            sb.AppendLine($"ServiceId              : {ServiceId}");
 
-            Console.WriteLine($"TransportStreamId      : {TransportStreamId}");
-            Console.WriteLine($"OriginalNetworkId      : {OriginalNetworkId}");
-            Console.WriteLine($"ServiceId              : {ServiceId}");
-            Console.WriteLine($"LinkageType            : {LinkageType}");
-
+            return sb.ToString();
         }
     }
 }

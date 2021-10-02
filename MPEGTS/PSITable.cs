@@ -74,31 +74,44 @@ namespace MPEGTS
             return res;
         }
 
-        public void WriteToConsole()
+        public void WriteToConsole(bool detailed = false)
         {
-            Console.WriteLine($"ID                    : {ID}");
-            Console.WriteLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
-            Console.WriteLine($"Private               : {Private}");
-            Console.WriteLine($"Reserved              : {Reserved}");
-            Console.WriteLine($"SectionLength         : {SectionLength}");
-            Console.WriteLine($"CRC OK                : {CRCIsValid()}");
+            Console.WriteLine(WriteToString(detailed));
+        }
 
-            if (SectionSyntaxIndicator)
+        public string WriteToString(bool detailed = false)
+        {
+            var sb = new StringBuilder();
+
+            if (detailed)
             {
-                Console.WriteLine($"TableIdExt            : {TableIdExt}");
-                Console.WriteLine($"Version               : {Version}");
-                Console.WriteLine($"CurrentIndicator      : {CurrentIndicator}");
-                Console.WriteLine($"SectionNumber         : {SectionNumber}");
-                Console.WriteLine($"LastSectionNumber     : {LastSectionNumber}");
+                sb.AppendLine($"ID                    : {ID}");
+                sb.AppendLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
+                sb.AppendLine($"Private               : {Private}");
+                sb.AppendLine($"Reserved              : {Reserved}");
+                sb.AppendLine($"SectionLength         : {SectionLength}");
+                sb.AppendLine($"CRC OK                : {CRCIsValid()}");
+
+                if (SectionSyntaxIndicator)
+                {
+                    sb.AppendLine($"TableIdExt            : {TableIdExt}");
+                    sb.AppendLine($"Version               : {Version}");
+                    sb.AppendLine($"CurrentIndicator      : {CurrentIndicator}");
+                    sb.AppendLine($"SectionNumber         : {SectionNumber}");
+                    sb.AppendLine($"LastSectionNumber     : {LastSectionNumber}");
+                }
             }
 
+            sb.AppendLine();
+
+            sb.AppendLine($"{"Program number",14} {" (Map) PID".PadRight(10, ' '),10}");
+            sb.AppendLine($"{"--------------",14} {"---".PadRight(10, '-'),10}");
             foreach (var programAssociations in ProgramAssociations)
             {
-                Console.WriteLine($"Program:");
-                Console.WriteLine($"   Number: {programAssociations.ProgramNumber}");
-                Console.WriteLine($"   PID: {programAssociations.ProgramMapPID}");
-                Console.WriteLine($"------------------------------------");
+                sb.AppendLine($"{programAssociations.ProgramNumber,14} {programAssociations.ProgramMapPID,10}");
             }
+
+            return sb.ToString();
         }
     }
 }
