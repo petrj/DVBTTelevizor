@@ -45,76 +45,113 @@ namespace MPEGTSTest
 
             Console.WriteLine($" {packets.Count} packets found");
 
-            var packetsByPIDCount = new SortedDictionary<int, int>();
+            var packetsByPID = new SortedDictionary<int, List<MPEGTransportStreamPacket>>();
 
             foreach (var packet in packets)
             {
-                if (!packetsByPIDCount.ContainsKey(packet.PID))
+                if (!packetsByPID.ContainsKey(packet.PID))
                 {
-                    packetsByPIDCount.Add(packet.PID, 0);
+                    packetsByPID.Add(packet.PID, new List<MPEGTransportStreamPacket>());
                 }
 
-                packetsByPIDCount[packet.PID]++;
+                packetsByPID[packet.PID].Add(packet);
             }
 
             Console.WriteLine();
             Console.WriteLine($"PID:             Packets count");
             Console.WriteLine("-------------------------------");
 
-            foreach (var kvp in packetsByPIDCount)
+            SDTTable sDTTable = null;
+            PSITable psiTable = null;
+
+            foreach (var kvp in packetsByPID)
             {
-                Console.WriteLine($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value,8}");
+                Console.WriteLine($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value.Count,8}");
             }
 
-            if (packetsByPIDCount.ContainsKey(17))
+            if (packetsByPID.ContainsKey(17))
             {
                 Console.WriteLine();
                 Console.WriteLine($"Service Description Table(SDT):");
                 Console.WriteLine($"------------------------------");
 
-                var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
-                var sDTTable = SDTTable.Parse(sdtBytes);
+                var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[17]);
+                sDTTable = SDTTable.Parse(sdtBytes);
                 sDTTable.WriteToConsole();
             }
 
-            if (packetsByPIDCount.ContainsKey(16))
+            if (packetsByPID.ContainsKey(16))
             {
                 Console.WriteLine();
                 Console.WriteLine($"Network Information Table (NIT):");
                 Console.WriteLine($"--------------------------------");
 
-                var nitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 16);
+                var nitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[16]);
                 var niTable = NITTable.Parse(nitBytes);
                 niTable.WriteToConsole();
             }
 
 
-            if (packetsByPIDCount.ContainsKey(0))
+            if (packetsByPID.ContainsKey(0))
             {
                 Console.WriteLine();
                 Console.WriteLine($"Program Specific Information(PSI):");
                 Console.WriteLine($"----------------------------------");
 
-                var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 0);
-                var psiTable = PSITable.Parse(psiBytes);
+                var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[0]);
+                psiTable = PSITable.Parse(psiBytes);
 
                 psiTable.WriteToConsole();
             }
 
-            if (packetsByPIDCount.ContainsKey(18))
+
+            if ((psiTable != null) &&
+                (sDTTable != null))
+            {
+                Console.WriteLine();
+                Console.WriteLine($"Program Map Table (PMT):");
+                Console.WriteLine($"----------------------------------");
+                Console.WriteLine();
+
+                var servicesMapPIDs = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sDTTable, psiTable);
+
+                Console.WriteLine($"{"Program name".PadRight(40,' '),40} {"    PID",20}");
+                Console.WriteLine($"{"------------".PadRight(40,' '),40} {"-------",20}");
+
+                // scan PMT for each program number
+                foreach (var kvp in servicesMapPIDs)
+                {
+                    Console.WriteLine($"{kvp.Key.ServiceName.PadRight(40, ' ')} {kvp.Value,20}");
+
+                    if (packetsByPID.ContainsKey(Convert.ToInt32(kvp.Value)))
+                    {
+                        // stream contains this Map PID
+
+                        if (packetsByPID.ContainsKey(Convert.ToInt32(kvp.Value)))
+                        {
+                            var pmtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[Convert.ToInt32(kvp.Value)]);
+                            var mptPacket = PMTTable.Parse(pmtBytes);
+                            mptPacket.WriteToConsole();
+                        }
+                    }
+                }
+            }
+
+            if (packetsByPID.ContainsKey(18))
             {
                 Console.WriteLine();
                 Console.WriteLine($"Event Information Table (EIT):");
                 Console.WriteLine($"------------------------------");
 
                 var eitManager = new EITManager();
-                eitManager.Scan(packets);
+                eitManager.Scan(packetsByPID[18]);
 
                 Console.WriteLine();
                 Console.WriteLine("Current events");
                 Console.WriteLine();
 
-                Console.WriteLine($"{"Program number",14}: {"From".PadRight(10,' '),10} {"HH:mm"}-{"HH:mm"}");
+                Console.WriteLine($"{"Program number",14} {"Date".PadRight(10,' '),10} {"From "}-{" To  "} Text");
+                Console.WriteLine($"{"--------------",14} {"----".PadRight(10,'-'),10} {"-----"}-{"-----"} -------------------------------");
 
                 foreach (var kvp in eitManager.CurrentEvents)
                 {

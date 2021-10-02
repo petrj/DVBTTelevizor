@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace MPEGTS
 {
@@ -87,30 +88,48 @@ namespace MPEGTS
             return res;
         }
 
-        public void WriteToConsole()
+        public void WriteToConsole(bool detailed = false)
         {
-            Console.WriteLine($"ID                    : {ID}");
-            Console.WriteLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
-            Console.WriteLine($"Private               : {Private}");
-            Console.WriteLine($"Reserved              : {Reserved}");
-            Console.WriteLine($"SectionLength         : {SectionLength}");
+            Console.WriteLine(WriteToString(detailed));
+        }
 
-            if (SectionSyntaxIndicator)
+        public string WriteToString(bool detailed = false)
+        {
+            var sb = new StringBuilder();
+
+            if (detailed)
             {
-                Console.WriteLine($"Version                : {Version}");
-                Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
-                Console.WriteLine($"SectionNumber          : {SectionNumber}");
-                Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
+                Console.WriteLine($"ID                    : {ID}");
+                Console.WriteLine($"SectionSyntaxIndicator: {SectionSyntaxIndicator}");
+                Console.WriteLine($"Private               : {Private}");
+                Console.WriteLine($"Reserved              : {Reserved}");
+                Console.WriteLine($"SectionLength         : {SectionLength}");
+
+                if (SectionSyntaxIndicator)
+                {
+                    Console.WriteLine($"Version                : {Version}");
+                    Console.WriteLine($"CurrentIndicator       : {CurrentIndicator}");
+                    Console.WriteLine($"SectionNumber          : {SectionNumber}");
+                    Console.WriteLine($"LastSectionNumber      : {LastSectionNumber}");
+                }
+
+                Console.WriteLine($"---- Stream:-----------------------");
+                foreach (var stream in Streams)
+                {
+                    Console.WriteLine($"PID                    : {stream.PID}");
+                    Console.WriteLine($"StreamType (byte)      : {stream.StreamType}");
+                    Console.WriteLine($"StreamType (enum)      : {stream.StreamTypeDesc}");
+                    Console.WriteLine($"-----------------------------------");
+                }
+            } else
+            {
+                foreach (var stream in Streams)
+                {
+                    Console.WriteLine($"  {stream.StreamTypeDesc.ToString().PadRight(38, ' '),38} {stream.PID,20}");
+                }
             }
 
-            Console.WriteLine($"---- Stream:-----------------------");
-            foreach (var stream in Streams)
-            {
-                Console.WriteLine($"PID                    : {stream.PID}");
-                Console.WriteLine($"StreamType (byte)      : {stream.StreamType}");
-                Console.WriteLine($"StreamType (enum)      : {stream.StreamTypeDesc}");
-                Console.WriteLine($"-----------------------------------");
-            }
+            return sb.ToString();
         }
     }
 }

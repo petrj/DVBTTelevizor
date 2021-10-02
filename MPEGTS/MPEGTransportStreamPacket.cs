@@ -201,6 +201,18 @@ namespace MPEGTS
             return res;
         }
 
+        public static List<byte> GetPacketPayloadBytes(List<MPEGTransportStreamPacket> packets)
+        {
+            var result = new List<byte>();
+
+            foreach (var packet in packets)
+            {
+                result.AddRange(packet.Payload);
+            }
+
+            return result;
+        }
+
         public static List<byte> GetPacketPayloadBytesByPID(List<byte> bytes, int PID)
         {
             var packets = Parse(bytes);
