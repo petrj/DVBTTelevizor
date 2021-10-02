@@ -125,7 +125,7 @@ namespace MPEGTS
             {
                 foreach (var stream in Streams)
                 {
-                    Console.WriteLine($"  {stream.StreamTypeDesc.ToString().PadRight(38, ' '),38} {stream.PID,20}");
+                    Console.WriteLine($"  {stream.StreamTypeDesc.ToString().PadRight(38, ' '),38} {"".PadRight(14,' '),14} {stream.PID,8}");
                 }
             }
 

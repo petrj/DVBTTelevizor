@@ -115,13 +115,13 @@ namespace MPEGTSTest
 
                 var servicesMapPIDs = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sDTTable, psiTable);
 
-                Console.WriteLine($"{"Program name".PadRight(40,' '),40} {"    PID",20}");
-                Console.WriteLine($"{"------------".PadRight(40,' '),40} {"-------",20}");
+                Console.WriteLine($"{"Program name".PadRight(40,' '),40} {"Program number",14} {"     PID",8}");
+                Console.WriteLine($"{"------------".PadRight(40,' '),40} {"--------------",14} {"--------"}");
 
                 // scan PMT for each program number
                 foreach (var kvp in servicesMapPIDs)
                 {
-                    Console.WriteLine($"{kvp.Key.ServiceName.PadRight(40, ' ')} {kvp.Value,20}");
+                    Console.WriteLine($"{kvp.Key.ServiceName.PadRight(40, ' ')} {kvp.Key.ProgramNumber,14} {kvp.Value,8}");
 
                     if (packetsByPID.ContainsKey(Convert.ToInt32(kvp.Value)))
                     {
