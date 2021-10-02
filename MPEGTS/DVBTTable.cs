@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MPEGTS
 {
-    public class DVBTTable
+    public abstract class DVBTTable
     {
         public byte ID { get; set; }
         public bool SectionSyntaxIndicator { get; set; }
@@ -22,6 +22,41 @@ namespace MPEGTS
 
         public byte[] Data { get; set; }
         public byte[] CRC { get; set; }
+
+        public abstract void Parse(List<byte> bytes);
+
+        public static T CreateFromPackets<T>(List<MPEGTransportStreamPacket> packets, int PID) where T : DVBTTable, new()
+        {
+            var filteredPackets = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, PID);
+
+            foreach (var kvp in filteredPackets)
+            {
+                var t = new T();
+
+                try
+                {
+                    t.Parse(kvp.Value);
+
+                    if (t.CRCIsValid())
+                    {
+                        return t;
+                    } 
+
+                } catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+
+            return null;
+        }
+
+        public static T Create<T>(List<byte> bytes) where T : DVBTTable, new()
+        {
+            var t = new T();
+            t.Parse(bytes);
+            return t;
+        }
 
         public static string GetStringFromByteArray(byte[] bytes, int pos, int length)
         {
@@ -126,7 +161,7 @@ namespace MPEGTS
             return crc32;
         }
 
-        public bool CRCIsValid()
+        public virtual bool CRCIsValid()
         {
             var computedCRC = BitConverter.GetBytes(ComputeCRC(Data));
 

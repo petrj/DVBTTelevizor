@@ -38,7 +38,7 @@ namespace MPEGTS
             {
                 try
                 {
-                    var eit = EITTable.Parse(kvp.Value);
+                    var eit = DVBTTable.Create<EITTable>(kvp.Value);
 
                     if (eit == null)
                         continue;

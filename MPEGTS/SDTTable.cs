@@ -88,54 +88,52 @@ namespace MPEGTS
             return sb.ToString();
         }
 
-        public static SDTTable Parse(List<byte> bytes)
+        public override void Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
-                return null;
-
-            var res = new SDTTable();
+                return;
 
             var pointerFiled = bytes[0];
             var pos = 1 + pointerFiled;
 
-            if (bytes.Count < pos+2)
-                return null;
+            if (bytes.Count < pos + 2)
+                return;
 
-            res.ID = bytes[pos];
+            ID = bytes[pos];
 
-            res.SectionSyntaxIndicator = ((bytes[pos + 1] & 128)==128);
-            res.Private = ((bytes[pos + 1] & 64) == 64);
-            res.Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);
-            res.SectionLength = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
+            SectionSyntaxIndicator = ((bytes[pos + 1] & 128) == 128);
+            Private = ((bytes[pos + 1] & 64) == 64);
+            Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);
+            SectionLength = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
 
-            res.Data = new byte[res.SectionLength];
-            res.CRC = new byte[4];
-            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
-            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
+            Data = new byte[SectionLength];
+            CRC = new byte[4];
+            bytes.CopyTo(0, Data, 0, SectionLength);
+            bytes.CopyTo(SectionLength, CRC, 0, 4);
 
             pos = pos + 3;
 
-            if (res.SectionSyntaxIndicator)
+            if (SectionSyntaxIndicator)
             {
-                res.TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
-                res.ReservedExt = Convert.ToByte((bytes[pos + 2] & 192) >> 6);
-                res.Version = Convert.ToByte((bytes[pos + 2] & 62) >> 1);
-                res.CurrentIndicator = (bytes[pos + 2] & 1) == 1;
-                res.SectionNumber = bytes[pos + 3];
-                res.LastSectionNumber = bytes[pos + 4];
+                TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
+                ReservedExt = Convert.ToByte((bytes[pos + 2] & 192) >> 6);
+                Version = Convert.ToByte((bytes[pos + 2] & 62) >> 1);
+                CurrentIndicator = (bytes[pos + 2] & 1) == 1;
+                SectionNumber = bytes[pos + 3];
+                LastSectionNumber = bytes[pos + 4];
 
                 pos = pos + 5;
             }
 
-            res.NetworkID = (bytes[pos+0] << 8) + bytes[pos + 1]; // original network Id
-            res.ServiceId = (bytes[pos+3] << 8) + bytes[pos + 4];
+            NetworkID = (bytes[pos + 0] << 8) + bytes[pos + 1]; // original network Id
+            ServiceId = (bytes[pos + 3] << 8) + bytes[pos + 4];
             pos += 3;
 
-                // pointer + table id + sect.length + descriptors - crc
-            var posAfterDescriptors = 4 + res.SectionLength - 4;
+            // pointer + table id + sect.length + descriptors - crc
+            var posAfterDescriptors = 4 + SectionLength - 4;
 
             // reading descriptors
-            while (pos< posAfterDescriptors)
+            while (pos < posAfterDescriptors)
             {
                 var sDescriptor = new ServiceDescriptor();
                 sDescriptor.ProgramNumber = ((bytes[pos + 0]) << 8) + bytes[pos + 1];
@@ -180,12 +178,11 @@ namespace MPEGTS
                     sDescriptor.ServiceName += Convert.ToChar(bytes[pos + i]);
                 }
 
-                res.ServiceDescriptors.Add(sDescriptor);
+                ServiceDescriptors.Add(sDescriptor);
 
                 pos = posAfterThisDescriptor;
-            }
-
-            return res;
+            }         
         }
+       
     }
 }

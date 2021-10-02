@@ -8,10 +8,10 @@ namespace MPEGTS
     {
         public List<ElementaryStreamSpecificData> Streams { get; set; } = new List<ElementaryStreamSpecificData>();
 
-        public static PMTTable Parse(List<byte> bytes)
+        public override void Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
-                return null;
+                return;
 
             var res = new PMTTable();
 
@@ -19,35 +19,35 @@ namespace MPEGTS
             var pos = 1 + pointerFiled;
 
             if (bytes.Count < pos + 2)
-                return null;
+                return;
 
-            res.ID = bytes[pos];
+            ID = bytes[pos];
 
             // read next 2 bytes
             var tableHeader1 = bytes[pos + 1];
             var tableHeader2 = bytes[pos + 2];
 
-            res.SectionSyntaxIndicator = ((tableHeader1 & 128) == 128);
-            res.Private = ((tableHeader1 & 64) == 64);
-            res.Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
-            res.SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
+            SectionSyntaxIndicator = ((tableHeader1 & 128) == 128);
+            Private = ((tableHeader1 & 64) == 64);
+            Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
+            SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
 
-            res.Data = new byte[res.SectionLength];
-            res.CRC = new byte[4];
-            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
-            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
+            Data = new byte[SectionLength];
+            CRC = new byte[4];
+            bytes.CopyTo(0, Data, 0, SectionLength);
+            bytes.CopyTo(SectionLength, CRC, 0, 4);
 
             pos = pos + 3;
 
-            res.TableIDExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
+            TableIDExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
             pos = pos + 2;
 
-            res.Version = Convert.ToByte((bytes[pos + 0] & 64) >> 1);
-            res.CurrentIndicator = (bytes[pos + 0] & 1) == 1;
+            Version = Convert.ToByte((bytes[pos + 0] & 64) >> 1);
+            CurrentIndicator = (bytes[pos + 0] & 1) == 1;
 
-            res.SectionNumber = bytes[pos + 1];
-            res.LastSectionNumber = bytes[pos + 2];
+            SectionNumber = bytes[pos + 1];
+            LastSectionNumber = bytes[pos + 2];
 
             pos = pos + 3;
 
@@ -63,7 +63,7 @@ namespace MPEGTS
             pos += programInfoLength;
 
             // 2 (pointer and Table Id) + 2 (Section Length) + length  - CRC - Program Info Length
-            var posAfterElementaryStreamSpecificData = 4 + res.SectionLength - 4 - programInfoLength;
+            var posAfterElementaryStreamSpecificData = 4 + SectionLength - 4 - programInfoLength;
 
             while (pos < posAfterElementaryStreamSpecificData)
             {
@@ -73,7 +73,7 @@ namespace MPEGTS
                 stream.PID = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
                 stream.ESInfoLength = Convert.ToInt32(((bytes[pos + 3] & 15) << 8) + bytes[pos + 4]);
 
-                res.Streams.Add(stream);
+                Streams.Add(stream);
 
                 pos += 5;
 
@@ -84,8 +84,6 @@ namespace MPEGTS
 
                 pos += stream.ESInfoLength;
             }
-
-            return res;
         }
 
         public void WriteToConsole(bool detailed = false)

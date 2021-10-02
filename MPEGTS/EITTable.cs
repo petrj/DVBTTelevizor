@@ -22,65 +22,63 @@ namespace MPEGTS
 
         public List<EventItem> EventItems { get; set; } = new List<EventItem>();
 
-        public static EITTable Parse(List<byte> bytes)
+        public override void Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
-                return null;
-
-            var res = new EITTable();
+                return;
 
             var pointerFiled = bytes[0];
             var pos = 1 + pointerFiled;
 
             if (bytes.Count < pos + 2)
-                return null;
+                return;
 
-            res.ID = bytes[pos];
+            ID = bytes[pos];
 
-            res.SectionSyntaxIndicator = ((bytes[pos + 1] & 128) == 128);
-            res.Private = ((bytes[pos + 1] & 64) == 64);
-            res.Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);
-            res.SectionLength = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
+            SectionSyntaxIndicator = ((bytes[pos + 1] & 128) == 128);
+            Private = ((bytes[pos + 1] & 64) == 64);
+            Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);
+            SectionLength = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
 
-            res.Data = new byte[res.SectionLength];
-            res.CRC = new byte[4];
+            Data = new byte[SectionLength];
+            CRC = new byte[4];
 
             //if (!DVBTTable.CRCIsValid(1,1))
             //{
             //    return null;
             //}
 
-            if (bytes.Count < res.SectionLength + 4)
+            if (bytes.Count < SectionLength + 4)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
-            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
+            bytes.CopyTo(0, Data, 0, SectionLength);
+            bytes.CopyTo(SectionLength, CRC, 0, 4);
 
             pos = pos + 3;
 
-            res.ServiceId = (bytes[pos + 0] << 8) + bytes[pos + 1];
+            ServiceId = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
-            res.Version = Convert.ToByte((bytes[pos + 2] & 62) >> 1);
-            res.CurrentIndicator = (bytes[pos + 2] & 1) == 1;
-            res.SectionNumber = bytes[pos + 3];
-            res.LastSectionNumber = bytes[pos + 4];
+            Version = Convert.ToByte((bytes[pos + 2] & 62) >> 1);
+            CurrentIndicator = (bytes[pos + 2] & 1) == 1;
+            SectionNumber = bytes[pos + 3];
+            LastSectionNumber = bytes[pos + 4];
 
             pos = pos + 5;
 
-            res.TransportStreamID = (bytes[pos + 0] << 8) + bytes[pos + 1];
-            res.OriginalNetworkID = (bytes[pos + 2] << 8) + bytes[pos + 3];
+            TransportStreamID = (bytes[pos + 0] << 8) + bytes[pos + 1];
+            OriginalNetworkID = (bytes[pos + 2] << 8) + bytes[pos + 3];
 
             pos = pos + 4;
 
-            res.SegmentLastSectionNumber = bytes[pos + 0];
-            res.LastTableID = bytes[pos + 1];
+            SegmentLastSectionNumber = bytes[pos + 0];
+            LastTableID = bytes[pos + 1];
 
             pos = pos + 2;
 
             // pointer + table id + sect.length + descriptors - crc
-            var posAfterDescriptors = 4 + res.SectionLength - 4;
+            var posAfterDescriptors = 4 + SectionLength - 4;
 
             // reading descriptors
             while (pos < posAfterDescriptors)
@@ -113,8 +111,8 @@ namespace MPEGTS
                 if (descriptorTag == 77)
                 {
                     var shortDescriptor = ShortEventDescriptor.Parse(descriptorData);
-                    var eventItem = EventItem.Create(eventId, res.ServiceId, startTime, finishTime, shortDescriptor);
-                    res.EventItems.Add(eventItem);
+                    var eventItem = EventItem.Create(eventId, ServiceId, startTime, finishTime, shortDescriptor);
+                    EventItems.Add(eventItem);
                 } else
                 {
                     // TODO: read other descriptors
@@ -123,7 +121,6 @@ namespace MPEGTS
                 pos = pos + descriptorLength;
             }
 
-            return res;
         }
 
         public void WriteToConsole(bool detailed = true)

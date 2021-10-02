@@ -12,48 +12,46 @@ namespace MPEGTS
 
         public List<ProgramAssociation> ProgramAssociations { get; set; } = new List<ProgramAssociation>();
 
-        public static PSITable Parse(List<byte> bytes)
+        public override void Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
-                return null;
-
-            var res = new PSITable();
+                return;
 
             var pointerFiled = bytes[0];
             var pos = 1 + pointerFiled;
 
             if (bytes.Count < pos + 2)
-                return null;
+                return;
 
-            res.ID = bytes[pos];
+            ID = bytes[pos];
 
             // read next 2 bytes
             var tableHeader1 = bytes[pos + 1];
             var tableHeader2 = bytes[pos + 2];
 
-            res.SectionSyntaxIndicator = ((tableHeader1 & 128) == 128);
-            res.Private = ((tableHeader1 & 64) == 64);
-            res.Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
-            res.SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
+            SectionSyntaxIndicator = ((tableHeader1 & 128) == 128);
+            Private = ((tableHeader1 & 64) == 64);
+            Reserved = Convert.ToByte((tableHeader1 & 48) >> 4);
+            SectionLength = Convert.ToInt32(((tableHeader1 & 15) << 8) + tableHeader2);
 
-            res.Data = new byte[res.SectionLength];
-            res.CRC = new byte[4];
-            bytes.CopyTo(0, res.Data, 0, res.SectionLength);
-            bytes.CopyTo(res.SectionLength, res.CRC, 0, 4);
+            Data = new byte[SectionLength];
+            CRC = new byte[4];
+            bytes.CopyTo(0, Data, 0, SectionLength);
+            bytes.CopyTo(SectionLength, CRC, 0, 4);
 
             pos = pos + 3;
 
-            var posAfterTable = pos + res.SectionLength;
+            var posAfterTable = pos + SectionLength;
 
-            res.TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
+            TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
             pos = pos + 2;
 
-            res.Version = Convert.ToByte((bytes[pos + 0] & 64) >> 1);
-            res.CurrentIndicator = (bytes[pos + 0] & 1) == 1;
+            Version = Convert.ToByte((bytes[pos + 0] & 64) >> 1);
+            CurrentIndicator = (bytes[pos + 0] & 1) == 1;
 
-            res.SectionNumber = bytes[pos + 1];
-            res.LastSectionNumber = bytes[pos + 2];
+            SectionNumber = bytes[pos + 1];
+            LastSectionNumber = bytes[pos + 2];
 
             pos = pos + 3;
 
@@ -62,7 +60,7 @@ namespace MPEGTS
                 var programNum = Convert.ToInt32(((bytes[pos+0]) << 8) + (bytes[pos + 1]));
                 var programPID = Convert.ToInt32(((bytes[pos + 2] & 31) << 8) + (bytes[pos + 3]));
 
-                res.ProgramAssociations.Add(new ProgramAssociation()
+                ProgramAssociations.Add(new ProgramAssociation()
                 {
                     ProgramNumber = programNum,
                     ProgramMapPID = programPID
@@ -71,7 +69,6 @@ namespace MPEGTS
                 pos +=4;
             }
 
-            return res;
         }
 
         public void WriteToConsole(bool detailed = false)

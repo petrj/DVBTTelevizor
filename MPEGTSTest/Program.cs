@@ -75,8 +75,7 @@ namespace MPEGTSTest
                 Console.WriteLine($"Service Description Table(SDT):");
                 Console.WriteLine($"------------------------------");
 
-                var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[17]);
-                sDTTable = SDTTable.Parse(sdtBytes);
+                sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17],17);
                 sDTTable.WriteToConsole();
             }
 
@@ -86,11 +85,10 @@ namespace MPEGTSTest
                 Console.WriteLine($"Network Information Table (NIT):");
                 Console.WriteLine($"--------------------------------");
 
-                var nitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[16]);
-                var niTable = NITTable.Parse(nitBytes);
+
+                var niTable = DVBTTable.CreateFromPackets<NITTable>(packetsByPID[16], 16);
                 niTable.WriteToConsole();
             }
-
 
             if (packetsByPID.ContainsKey(0))
             {
@@ -98,12 +96,9 @@ namespace MPEGTSTest
                 Console.WriteLine($"Program Specific Information(PSI):");
                 Console.WriteLine($"----------------------------------");
 
-                var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[0]);
-                psiTable = PSITable.Parse(psiBytes);
-
+                psiTable = DVBTTable.CreateFromPackets<PSITable>(packetsByPID[0], 0);
                 psiTable.WriteToConsole();
             }
-
 
             if ((psiTable != null) &&
                 (sDTTable != null))
@@ -129,8 +124,7 @@ namespace MPEGTSTest
 
                         if (packetsByPID.ContainsKey(Convert.ToInt32(kvp.Value)))
                         {
-                            var pmtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytes(packetsByPID[Convert.ToInt32(kvp.Value)]);
-                            var mptPacket = PMTTable.Parse(pmtBytes);
+                            var mptPacket = DVBTTable.CreateFromPackets<PMTTable>(packetsByPID[Convert.ToInt32(kvp.Value)], Convert.ToInt32(kvp.Value));
                             mptPacket.WriteToConsole();
                         }
                     }
@@ -289,7 +283,7 @@ namespace MPEGTSTest
             // PID 17 ( SDT )
 
             var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
-            var sDTTable = SDTTable.Parse(sdtBytes);
+            var sDTTable = DVBTTable.Create<SDTTable>(sdtBytes);
             sDTTable.WriteToConsole();
 
             /*
@@ -304,7 +298,7 @@ namespace MPEGTSTest
             // PID 0 ( PSI )
 
             var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 0);
-            var psiTable = PSITable.Parse(psiBytes);
+            var psiTable = DVBTTable.Create<PSITable>(psiBytes);
             psiTable.WriteToConsole();
 
             // step 2: find map PIDs from SDT a PSI
@@ -325,7 +319,7 @@ namespace MPEGTSTest
             // step 3: reading packets with PID 0, 17 (16) and map PID packet of given service
 
             var pmtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 768);
-            var mptPacket = PMTTable.Parse(pmtBytes);
+            var mptPacket = DVBTTable.Create<PMTTable>(pmtBytes);
             mptPacket.WriteToConsole();
         }
     }
