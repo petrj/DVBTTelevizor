@@ -329,8 +329,6 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"Scanning PSI");
 
-                var dict = new Dictionary<string, string>();
-
                 ScaningInProgress = true;
 
                 var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
@@ -351,62 +349,50 @@ namespace DVBTTelevizor
                 }
 
                 var mapPIDs = new List<long>();
+                var mapPIDToName = new Dictionary<long,string>();
                 foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
                 {
                     mapPIDs.Add(sd.Value);
+                    mapPIDToName.Add(sd.Value, sd.Key.ServiceName);
                 }
                 _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
 
                 // searching PIDs
 
-                foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
-                {
-                    _loggingService.Debug($"Searching Map PID {sDescriptor.Value}");
-
-                    var searchPIDsResult = await _driver.SearchProgramPIDs(Convert.ToInt32(sDescriptor.Value));
-
-                    switch (searchPIDsResult.Result)
-                    {
-                        case SearchProgramResultEnum.Error:
-                            _loggingService.Debug($"Error scanning Map PID {sDescriptor.Value}");
-                            break;
-                        case SearchProgramResultEnum.NoSignal:
-                            _loggingService.Debug("No signal");
-                            break;
-                        case SearchProgramResultEnum.NoProgramFound:
-                            _loggingService.Debug("No program found");
-                            break;
-                        case SearchProgramResultEnum.OK:
-                            var pids = string.Join(",", searchPIDsResult.PIDs);
-                            pids = sDescriptor.Value.ToString() + "," + pids;  // ProgramMapPID
-
-                            _loggingService.Debug($"Found channel \"{sDescriptor.Key.ServiceName}\"");
-
-                            dict.Add(sDescriptor.Key.ServiceName, pids);
-
-                            break;
-                    }
-                }
+                var searchProgramPIDsResult = await _driver.SearchProgramPIDsEnhanced(mapPIDs);
 
                 ScaningInProgress = false;
+
+                switch (searchProgramPIDsResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:                        
+                         await _dialogService.Error("Error scanning Map PIDs");
+                        return;                        
+                    case SearchProgramResultEnum.NoSignal:
+                        await _dialogService.Error("No signal");
+                        return;
+                    case SearchProgramResultEnum.NoProgramFound:
+                        await _dialogService.Error("No program found");
+                        return;                    
+                }                                
 
                 Status = "";
 
                 var list = new List<string>();
-                foreach (var kvp in dict)
+                foreach (var kvp in searchProgramPIDsResult.PIDs)
                 {
-                    list.Add($"{kvp.Key}: {kvp.Value}");
+                    list.Add($"{mapPIDToName[kvp.Key]}: {string.Join(",",kvp.Value)}");
                 }
 
                 var res = await _dialogService.DisplayActionSheet("Select PIDs:", "Cancel", list);
 
                 if (res != "Cancel")
                 {
-                    foreach (var kvp in dict)
+                    foreach (var kvp in searchProgramPIDsResult.PIDs)
                     {
-                        if ($"{kvp.Key}: {kvp.Value}" == res)
+                        if ($"{mapPIDToName[kvp.Key]}: {string.Join(",", kvp.Value)}" == res)
                         {
-                            PIDs = "0,16,17,18," + kvp.Value;
+                            PIDs = "0,16,17,18," + kvp.Key + "," + string.Join(",", kvp.Value);
                             break;
                         }
                     }

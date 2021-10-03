@@ -15,6 +15,7 @@ using System.IO;
 using LoggerService;
 using System.Runtime.InteropServices;
 using MPEGTS;
+using DVBTTelevizor.Models;
 
 namespace DVBTTelevizor
 {
@@ -790,6 +791,115 @@ namespace DVBTTelevizor
             _log.Debug($"Capabilities response: {cap.ToString()}");
 
             return cap;
+        }
+
+        public async Task<SearchAllPIDsResult> SearchProgramPIDsEnhanced(List<long> MapPIDs)
+        {
+            var PIDsAsString = String.Join(",", MapPIDs);
+            _log.Debug($"Searching PIDS of Map PIDs: {PIDsAsString}");
+
+            var res = new SearchAllPIDsResult();
+
+            try
+            {
+                // setting PIDs filter
+
+                var pidRes = await SetPIDs(MapPIDs);
+
+                if (!pidRes.SuccessFlag)
+                {
+                    _log.Debug($"Setting PIDs {PIDsAsString} failed");
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // getting status
+
+                var status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    _log.Debug($"Getting status failed");
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+                {
+                    _log.Debug($"No signal");
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    return res;
+                }
+
+                var pmtTables = new Dictionary<long,PMTTable>();
+
+                try
+                {
+                    StartReadBuffer();
+
+                    // waiting
+                    System.Threading.Thread.Sleep(1000);
+
+                    var timeoutForReadingBuffer = 15; //  seconds timeout for getting PMT
+                    var startTime = DateTime.Now;
+
+                    while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
+                    {
+                        var allPackets = MPEGTransportStreamPacket.Parse(Buffer);
+
+                        foreach (var mapPID in MapPIDs)
+                        {
+                            var tbl = DVBTTable.CreateFromPackets<PMTTable>(allPackets, mapPID);
+                            if (tbl != null)
+                            {
+                                pmtTables[mapPID] = tbl;
+                            }
+                        }                        
+
+                        if (pmtTables.Count == MapPIDs.Count)
+                        {
+                            break;
+                        }
+
+                        System.Threading.Thread.Sleep(500);
+                    }
+                }
+                finally
+                {
+                    StopReadBuffer();
+                }
+
+                if (pmtTables.Count == 0)
+                {
+                    _log.Debug($"No PMT found");
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }          
+
+                //SaveBuffer($"ProgramPID.{MapPID.ToString()}", pmtPacketBytes.ToArray());
+
+                res.Result = SearchProgramResultEnum.OK;
+
+                foreach (var kvp in pmtTables)
+                {
+                    res.PIDs[kvp.Key] = new List<long>();
+
+                    foreach (var stream in kvp.Value.Streams)
+                    {
+                        res.PIDs[kvp.Key].Add(stream.PID);
+                    }
+                }                
+
+                _log.Debug($"Searching PIDS response: {res}");
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }            
         }
 
         public async Task<SearchPIDsResult> SearchProgramPIDs(int MapPID)

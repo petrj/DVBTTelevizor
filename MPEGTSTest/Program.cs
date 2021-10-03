@@ -22,7 +22,9 @@ namespace MPEGTSTest
                 //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
                 //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
-                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
+                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");                
 
                 // 33 s video sample:
                 //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
@@ -87,7 +89,8 @@ namespace MPEGTSTest
 
 
                 var niTable = DVBTTable.CreateFromPackets<NITTable>(packetsByPID[16], 16);
-                niTable.WriteToConsole();
+                if (niTable != null)
+                    niTable.WriteToConsole();
             }
 
             if (packetsByPID.ContainsKey(0))

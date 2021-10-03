@@ -160,7 +160,7 @@ namespace MPEGTS
             return res;
         }
 
-        public static Dictionary<int, List<byte>> GetAllPacketsPayloadBytesByPID(List<MPEGTransportStreamPacket> packets, int PID)
+        public static Dictionary<int, List<byte>> GetAllPacketsPayloadBytesByPID(List<MPEGTransportStreamPacket> packets, long PID)
         {
             var res = new Dictionary<int, List<byte>>();
             var firstPacketFound = false;
