@@ -72,6 +72,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestData\PID_0_16_17_18_410.ts">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestData\PMTs.ts">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -24,7 +24,12 @@ namespace MPEGTSTest
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
-                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");                
+
+                // Prima Zoom (PID 410) 
+                // - actual EIT events time? - recorded 3.10.2021 19:58!
+                // - bad PIDS 5,6,15,16? Cannot play! 
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
+                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
 
                 // 33 s video sample:
                 //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
