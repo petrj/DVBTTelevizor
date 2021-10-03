@@ -1,5 +1,6 @@
 ﻿using DVBTTelevizor.Models;
 using LoggerService;
+using MPEGTS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -404,37 +405,8 @@ namespace DVBTTelevizor
 
         private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
         {
-
-           //debug
-           /*
-                      await Task.Run(() =>
-                      {
-                          _tuningAborted = false;
-                          for (var i = 0; i < 15; i++)
-                          {
-                              System.Threading.Thread.Sleep(1000);
-
-                              if (_tuningAborted)
-                                  break;
-
-                              var ch = new DVBTChannel();
-                              ch.PIDs = "0,16,17";
-                              ch.ProgramMapPID = 0;
-                              ch.Name = $"Test {i}";
-                              ch.ProviderName = "Mux  1";
-                              ch.Frequency = 730000000;
-                              ch.Bandwdith = 8000000;
-                              ch.Number = (i+1).ToString();
-                              ch.DVBTType = 0;
-
-                              TunedChannels.Add(ch);
-                          }
-                      });
-             */
-
             try
             {
-
                     Status = GetTuningStatusText();
 
                     _loggingService.Debug(Status);
@@ -464,7 +436,6 @@ namespace DVBTTelevizor
                         break;
                     }
 
-
                     var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
 
                     switch (searchMapPIDsResult.Result)
@@ -486,9 +457,12 @@ namespace DVBTTelevizor
                     }                
 
                     var mapPIDs = new List<long>();
+                    var mapPIDToServiceDescriptor = new Dictionary<long, ServiceDescriptor>();
+
                     foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
                     {
                         mapPIDs.Add(sd.Value);
+                        mapPIDToServiceDescriptor.Add(sd.Value, sd.Key);
                     }
                     _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
       
@@ -501,47 +475,48 @@ namespace DVBTTelevizor
 
                     // searching PIDs
 
+                    var searchProgramPIDsResult = await _driver.SearchProgramPIDs(mapPIDs);
+
                     var alreadySavedChannelsCount = (await _channelService.LoadChannels()).Count;
 
-                    foreach (var sDescriptor in searchMapPIDsResult.ServiceDescriptors)
+                    switch (searchProgramPIDsResult.Result)
                     {
-                        _loggingService.Debug($"Searching Map PID {sDescriptor.Value}");
-
-                        var searchPIDsResult = await _driver.SearchProgramPIDs(Convert.ToInt32(sDescriptor.Value));
-
-                        switch (searchPIDsResult.Result)
-                        {
-                            case SearchProgramResultEnum.Error:
-                                _loggingService.Debug($"Error scanning Map PID {sDescriptor.Value}");
-                                break;
-                            case SearchProgramResultEnum.NoSignal:
-                                _loggingService.Debug("No signal");
-                                break;
-                            case SearchProgramResultEnum.NoProgramFound:
-                                _loggingService.Debug("No program found");
-                                break;
-                            case SearchProgramResultEnum.OK:
-                                var pids = string.Join(",", searchPIDsResult.PIDs);
+                        case SearchProgramResultEnum.Error:
+                            _loggingService.Debug($"Error scanning Map PIDs");
+                            break;
+                        case SearchProgramResultEnum.NoSignal:
+                            _loggingService.Debug("No signal");
+                            break;
+                        case SearchProgramResultEnum.NoProgramFound:
+                            _loggingService.Debug("No program found");
+                            break;
+                        case SearchProgramResultEnum.OK:
+                            foreach (var kvp in searchProgramPIDsResult.PIDs)
+                            {
+                                var pids = string.Join(",", kvp.Value);
+                                var sDescriptor = mapPIDToServiceDescriptor[kvp.Key];
 
                                 var ch = new DVBTChannel();
                                 ch.PIDs = pids;
-                                ch.ProgramMapPID = sDescriptor.Value;
-                                ch.Name = sDescriptor.Key.ServiceName;
-                                ch.ProviderName = sDescriptor.Key.ProviderName;
+                                ch.ProgramMapPID = kvp.Key;
+                                ch.Name = sDescriptor.ServiceName;
+                                ch.ProviderName = sDescriptor.ProviderName;
                                 ch.Frequency = freq;
                                 ch.Bandwdith = bandWidth;
                                 ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
                                 ch.DVBTType = dvbtTypeIndex;
 
-                                if (sDescriptor.Key.ServisType == 1 ||
-                                    sDescriptor.Key.ServisType == 2)
+                                if (sDescriptor.ServisType == 1 ||
+                                    sDescriptor.ServisType == 2)
                                 {
-                                    ch.ServiceType = (DVBTServiceType)sDescriptor.Key.ServisType;
-                                } else
-                                if (sDescriptor.Key.ServisType == 31)
+                                    ch.ServiceType = (DVBTServiceType)sDescriptor.ServisType;
+                                }
+                                else
+                                if (sDescriptor.ServisType == 31)
                                 {
                                     ch.ServiceType = DVBTServiceType.TV; // DVBT2 video
-                                } else
+                                }
+                                else
                                 {
                                     ch.ServiceType = DVBTServiceType.NotSupported;
                                 }
@@ -549,25 +524,12 @@ namespace DVBTTelevizor
                                 TunedChannels.Add(ch);
                                 SelectedChannel = ch;
 
-                                _loggingService.Debug($"Found channel \"{sDescriptor.Key.ServiceName}\"");
+                                _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
 
                                 Status = GetTuningStatusText();
-
-                                //Device.BeginInvokeOnMainThread(delegate
-                                //{
-                                //    MessagingCenter.Send($"Found channel \"{sDescriptor.Key.ServiceName}\" ({ch.ServiceType})", BaseViewModel.MSG_ToastMessage);
-                                //});
-
-                                break;
-                        }
-
-                        if (TuningAborted)
-                        {
-                            _loggingService.Debug($"Tuning aborted");
-                            return;
-                        }
-                    }                
-
+                            }
+                        break;
+                    }
             }
             catch (Exception ex)
             {

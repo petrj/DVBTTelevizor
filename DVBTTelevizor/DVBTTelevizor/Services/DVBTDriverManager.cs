@@ -793,7 +793,7 @@ namespace DVBTTelevizor
             return cap;
         }
 
-        public async Task<SearchAllPIDsResult> SearchProgramPIDsEnhanced(List<long> MapPIDs)
+        public async Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs)
         {
             var PIDsAsString = String.Join(",", MapPIDs);
             _log.Debug($"Searching PIDS of Map PIDs: {PIDsAsString}");
@@ -901,105 +901,7 @@ namespace DVBTTelevizor
                 return res;
             }            
         }
-
-        public async Task<SearchPIDsResult> SearchProgramPIDs(int MapPID)
-        {
-            _log.Debug($"Searching PIDS of Map PID: {MapPID}");
-
-            var res = new SearchPIDsResult();
-
-            try
-            {
-                // setting PID filter
-
-                var pids = new List<long>() {  MapPID };
-                var pidRes = await SetPIDs(pids);
-
-                if (!pidRes.SuccessFlag)
-                {
-                    _log.Debug($"Setting PID {MapPID} failed");
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // getting status
-
-                var status = await GetStatus();
-
-                if (!status.SuccessFlag)
-                {
-                    _log.Debug($"Getting status failed");
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
-                {
-                    _log.Debug($"No signal");
-                    res.Result = SearchProgramResultEnum.NoSignal;
-                    return res;
-                }
-
-                var pmtPackets = new List<MPEGTransportStreamPacket>();
-
-                try
-                {
-                    StartReadBuffer();
-
-                    // waiting
-                    System.Threading.Thread.Sleep(1000);
-
-                    var timeoutForReadingBuffer = 15; //  seconds timeout for getting PMT
-                    var startTime = DateTime.Now;
-
-                    while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
-                    {
-                        pmtPackets = MPEGTransportStreamPacket.Parse(Buffer, MapPID);
-
-                        if (pmtPackets.Count > 0)
-                        {
-                            break;
-                        }
-
-                        System.Threading.Thread.Sleep(500);
-                    }
-                }
-                finally
-                {
-                    StopReadBuffer();
-                }
-
-                if (pmtPackets.Count == 0)
-                {
-                    _log.Debug($"No PMT found");
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // parsing PMT table to get PIDs:
-                var pmtTable = DVBTTable.CreateFromPackets<PMTTable>(pmtPackets, MapPID);
-
-                //SaveBuffer($"ProgramPID.{MapPID.ToString()}", pmtPacketBytes.ToArray());
-
-                res.Result = SearchProgramResultEnum.OK;
-
-                foreach (var stream in pmtTable.Streams)
-                {
-                    res.PIDs.Add(stream.PID);
-                }
-
-                _log.Debug($"Searching PIDS response: {res}");
-
-                return res;
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex);
-                res.Result = SearchProgramResultEnum.Error;
-                return res;
-            }
-        }
-
+            
         /// <summary>
         /// Tuning with timeout
         /// </summary>

@@ -359,7 +359,7 @@ namespace DVBTTelevizor
 
                 // searching PIDs
 
-                var searchProgramPIDsResult = await _driver.SearchProgramPIDsEnhanced(mapPIDs);
+                var searchProgramPIDsResult = await _driver.SearchProgramPIDs(mapPIDs);
 
                 ScaningInProgress = false;
 
