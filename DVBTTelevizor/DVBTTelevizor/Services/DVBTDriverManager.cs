@@ -830,8 +830,7 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-
-                List<byte> pmtPacketBytes = new List<byte>();
+                var pmtPackets = new List<MPEGTransportStreamPacket>();
 
                 try
                 {
@@ -845,9 +844,9 @@ namespace DVBTTelevizor
 
                     while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
                     {
-                        pmtPacketBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, MapPID);
+                        pmtPackets = MPEGTransportStreamPacket.Parse(Buffer, MapPID);
 
-                        if (pmtPacketBytes.Count > 0)
+                        if (pmtPackets.Count > 0)
                         {
                             break;
                         }
@@ -860,7 +859,7 @@ namespace DVBTTelevizor
                     StopReadBuffer();
                 }
 
-                if (pmtPacketBytes.Count == 0)
+                if (pmtPackets.Count == 0)
                 {
                     _log.Debug($"No PMT found");
                     res.Result = SearchProgramResultEnum.Error;
@@ -868,7 +867,7 @@ namespace DVBTTelevizor
                 }
 
                 // parsing PMT table to get PIDs:
-                var pmtTable = PMTTable.Parse(pmtPacketBytes);
+                var pmtTable = DVBTTable.CreateFromPackets<PMTTable>(pmtPackets, MapPID);
 
                 //SaveBuffer($"ProgramPID.{MapPID.ToString()}", pmtPacketBytes.ToArray());
 
@@ -1046,9 +1045,9 @@ namespace DVBTTelevizor
 
                 var timeoutForReadingBuffer = 15; //  15 secs
                 var startTime = DateTime.Now;
-
-                List<byte> sdtBytes = new List<byte>();
-                List<byte> psiBytes = new List<byte>();
+                
+                //var sdtPackets = new List<MPEGTransportStreamPacket>();
+                //var psiPackets = new List<MPEGTransportStreamPacket>();
 
                 SDTTable sdtTable = null;
                 PSITable psiTable = null;
@@ -1057,15 +1056,15 @@ namespace DVBTTelevizor
                 while ((DateTime.Now-startTime).TotalSeconds < timeoutForReadingBuffer)
                 {
                     // searching for PID 0 (PSI) and 17 (SDT) packets ..
-                    sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 17);
-                    psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(Buffer, 0);
 
-                    if (sdtBytes.Count> 0 && psiBytes.Count >0)
+                    var packets = MPEGTransportStreamPacket.Parse(Buffer);
+
+                    sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
+                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);                    
+
+                    if (sdtTable != null && psiTable != null)
                     {
-                        // does SDT table belongs to this frequency?
-                        sdtTable = SDTTable.Parse(sdtBytes);
-                        psiTable = PSITable.Parse(psiBytes);
-
+                        // does SDT table belongs to this frequency?                       
                         serviceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
 
                         if (serviceDescriptors.Count > 0)

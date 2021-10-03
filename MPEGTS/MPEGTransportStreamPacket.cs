@@ -298,7 +298,7 @@ namespace MPEGTS
             return -1;
         }
 
-        public static List<MPEGTransportStreamPacket> Parse(List<byte> bytes)
+        public static List<MPEGTransportStreamPacket> Parse(List<byte> bytes, int PIDFilter = -1)
         {
             var pos = FindSyncBytePosition(bytes);
 
@@ -322,7 +322,14 @@ namespace MPEGTS
 
                 //Console.WriteLine($"Adding packet PID {packet.PID}");
 
-                res.Add(packet);
+                if (
+                        (PIDFilter == -1)  // add all packets
+                        ||
+                        ((PIDFilter != -1) && (packet.PID == PIDFilter))
+                   )
+                {
+                    res.Add(packet);
+                }
 
                 pos += 188;
             }
@@ -350,3 +357,4 @@ namespace MPEGTS
         }
     }
 }
+
