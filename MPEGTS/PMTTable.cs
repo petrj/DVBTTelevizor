@@ -4,6 +4,8 @@ using System.Text;
 
 namespace MPEGTS
 {
+    // https://en.wikipedia.org/wiki/Program-specific_information#PAT_(Program_association_specific_data
+
     public class PMTTable : DVBTTable
     {
         public List<ElementaryStreamSpecificData> Streams { get; set; } = new List<ElementaryStreamSpecificData>();
@@ -12,8 +14,6 @@ namespace MPEGTS
         {
             if (bytes == null || bytes.Count < 5)
                 return;
-
-            var res = new PMTTable();
 
             var pointerFiled = bytes[0];
             var pos = 1 + pointerFiled;
@@ -70,7 +70,7 @@ namespace MPEGTS
                 // reading elementary stream info data until end of section
                 var stream = new ElementaryStreamSpecificData();
                 stream.StreamType = bytes[pos + 0];
-                stream.PID = Convert.ToInt32(((bytes[pos + 1] & 15) << 8) + bytes[pos + 2]);
+                stream.PID = Convert.ToInt32(((bytes[pos + 1] & 31) << 8) + bytes[pos + 2]);
                 stream.ESInfoLength = Convert.ToInt32(((bytes[pos + 3] & 15) << 8) + bytes[pos + 4]);
 
                 Streams.Add(stream);
@@ -79,8 +79,6 @@ namespace MPEGTS
 
                 // Elementary stream descriptors folow
                 // TODO: read stream descriptor from bytes[pos + 0] position
-
-                //Console.WriteLine($"Reading Es Info from position {pos} (byte 0: {bytes[pos + 0]}, byte 1: {bytes[pos + 1]})");
 
                 pos += stream.ESInfoLength;
             }

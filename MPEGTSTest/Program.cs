@@ -25,9 +25,9 @@ namespace MPEGTSTest
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
 
-                // Prima Zoom (PID 410) 
+                // Prima Zoom (PID 410)
                 // - actual EIT events time? - recorded 3.10.2021 19:58!
-                // - bad PIDS 5,6,15,16? Cannot play! 
+                // - bad PIDS 5,6,15,16? Cannot play!
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
                 AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
 
@@ -52,7 +52,7 @@ namespace MPEGTSTest
 
             Console.WriteLine($" {packets.Count} packets found");
 
-            var packetsByPID = new SortedDictionary<int, List<MPEGTransportStreamPacket>>();
+            var packetsByPID = new SortedDictionary<long, List<MPEGTransportStreamPacket>>();
 
             foreach (var packet in packets)
             {
@@ -130,9 +130,9 @@ namespace MPEGTSTest
                     {
                         // stream contains this Map PID
 
-                        if (packetsByPID.ContainsKey(Convert.ToInt32(kvp.Value)))
+                        if (packetsByPID.ContainsKey(kvp.Value))
                         {
-                            var mptPacket = DVBTTable.CreateFromPackets<PMTTable>(packetsByPID[Convert.ToInt32(kvp.Value)], Convert.ToInt32(kvp.Value));
+                            var mptPacket = DVBTTable.CreateFromPackets<PMTTable>(packetsByPID[kvp.Value], kvp.Value);
                             mptPacket.WriteToConsole();
                         }
                     }
@@ -173,7 +173,7 @@ namespace MPEGTSTest
                     }
                 }
                 */
-            }        
+            }
         }
 
         public static void RecordMpegTS(string path)
