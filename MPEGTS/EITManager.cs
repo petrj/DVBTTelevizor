@@ -7,7 +7,7 @@ namespace MPEGTS
     public class EITManager
     {
         /// <summary>
-        /// ServiceID -> current event
+        /// ServiceID (program number) -> current event
         /// </summary>
         public Dictionary<int, EventItem> CurrentEvents { get; set; }  = new Dictionary<int, EventItem>();
 
@@ -29,7 +29,7 @@ namespace MPEGTS
         /// </summary>
         /// <param name="packets"></param>
         public bool Scan(List<MPEGTransportStreamPacket> packets)
-        {          
+        {
             var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
 
             var eventIDs = new Dictionary<int, Dictionary<int, EventItem>>(); // ServiceID -> (event id -> event item )
@@ -40,7 +40,7 @@ namespace MPEGTS
                 {
                     var eit = DVBTTable.Create<EITTable>(kvp.Value);
 
-                    if (eit == null)
+                    if (eit == null || !eit.CRCIsValid())
                         continue;
 
                     if (eit.ID == 78) // actual TS, present/following event information = table_id = 0x4E;
@@ -95,7 +95,66 @@ namespace MPEGTS
                 ScheduledEvents[kvp.Key].Sort();
             }
 
-            return true;          
+            return true;
+        }
+
+
+        /// <summary>
+        ///  Scheduled events supplemented with actual events
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public Dictionary<int, List<EventItem>> GetEvents(DateTime date, int count = 2)
+        {
+            var res = new Dictionary<int, List<EventItem>>();
+
+            // scheduled events
+
+            foreach (var serviceId in ScheduledEvents.Keys)
+            {
+                res[serviceId] = new List<EventItem>();
+
+                int actualCount = 0;
+                foreach (var ev in ScheduledEvents[serviceId])
+                {
+                    if (actualCount == 0 &&
+                        ev.StartTime <=date &&
+                        ev.FinishTime >= date)
+                    {
+                        // actual running event
+                        res[serviceId].Add(ev);
+                        actualCount++;
+                        continue;
+                    }
+
+                    if (actualCount >= count)
+                    {
+                        break;
+                    }
+
+                    if (actualCount >= 1)
+                    {
+                        res[serviceId].Add(ev);
+                        actualCount++;
+                    }
+                }
+            }
+
+            // adding current events when scheduled not exists
+
+            foreach (var kvp in CurrentEvents)
+            {
+                if (!res.ContainsKey(kvp.Key) &&
+                    kvp.Value.StartTime <= date &&
+                    kvp.Value.FinishTime >= date)
+                {
+                    res[kvp.Key] = new List<EventItem>();
+                    res[kvp.Key].Add(kvp.Value);
+                }
+            }
+
+            return res;
         }
     }
 }

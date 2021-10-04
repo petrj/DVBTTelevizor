@@ -29,7 +29,8 @@ namespace MPEGTSTest
                 // - actual EIT events time? - recorded 3.10.2021 19:58!
                 // - bad PIDS 5,6,15,16? Cannot play!
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
-                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
+                AnalyzeMPEGTSPackets("c:\\temp\\stream.ts");
 
                 // 33 s video sample:
                 //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
@@ -160,19 +161,18 @@ namespace MPEGTSTest
                     Console.WriteLine(kvp.Value.WriteToString());
                 }
 
-                /*
+
                 Console.WriteLine();
                 Console.WriteLine("Scheduled events");
                 Console.WriteLine();
 
-                foreach (var kvp in eitManager.ScheduledEvents)
+                foreach (var kvp in eitManager.GetEvents(DateTime.Now))
                 {
                     foreach (var ev in kvp.Value)
                     {
                         Console.WriteLine(ev.WriteToString());
                     }
                 }
-                */
             }
         }
 

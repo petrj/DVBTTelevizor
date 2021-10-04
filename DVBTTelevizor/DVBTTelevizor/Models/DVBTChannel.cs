@@ -109,9 +109,10 @@ namespace DVBTTelevizor
             {
                 var res = new List<long>();
                 res.Add(ProgramMapPID);
-                res.Add(0);
-                res.Add(16);
-                res.Add(17);
+                res.Add(0);  // PSI
+                res.Add(16); // NIT
+                res.Add(17); // SDT
+                res.Add(18); // EIT
 
                 if (!String.IsNullOrEmpty(PIDs))
                 {
