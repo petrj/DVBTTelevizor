@@ -17,8 +17,9 @@ using Plugin.Permissions;
 using LoggerService;
 using Plugin.Permissions.Abstractions;
 using Plugin.CurrentActivity;
-using Plugin.Toast;
 using System.IO;
+using Android.Support.Design.Widget;
+using Xamarin.Essentials;
 
 namespace DVBTTelevizor.Droid
 {
@@ -113,8 +114,8 @@ namespace DVBTTelevizor.Droid
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToastMessage, (message) =>
-            {
-                CrossToastPopUp.Current.ShowCustomToast(message, "#0000FF", "#FFFFFF");
+            {                
+                ShowToastMessage(message);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
@@ -169,7 +170,7 @@ namespace DVBTTelevizor.Droid
         {
             var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
-            if (permitted == PermissionStatus.Granted && _config.EnableLogging)
+            if (permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted && _config.EnableLogging)
             {
                 var logPath = Path.Combine(BaseViewModel.ExternalStorageDirectory, "DVBTTelevizor.log.txt");
 
@@ -206,6 +207,70 @@ namespace DVBTTelevizor.Droid
                 intent.SetFlags(ActivityFlags.NewTask);
 
                 Android.App.Application.Context.StartActivity(intent);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void ShowToastMessage(string message)
+        {
+            try
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Activity activity = CrossCurrentActivity.Current.Activity;
+                    var view = activity.FindViewById(Android.Resource.Id.Content);
+
+                    var snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
+
+                    var textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
+
+                    var minTextSize = textView.TextSize; // 16
+
+                    textView.SetTextColor(Android.Graphics.Color.White);
+
+                    var screenHeightRate = 0;
+
+                    /*
+                            appFontSize:
+
+                            Normal = 0,
+                            AboveNormal = 1,
+                            Big = 2,
+                            Biger = 3,
+                            VeryBig = 4,
+                            Huge = 5
+
+                          */
+
+                    var appFontSize = 0;
+
+                    if (DeviceDisplay.MainDisplayInfo.Height < DeviceDisplay.MainDisplayInfo.Width)
+                    {
+                        // Landscape
+
+                        screenHeightRate = Convert.ToInt32(DeviceDisplay.MainDisplayInfo.Height / 16.0);
+                        textView.SetMaxLines(2);
+                    }
+                    else
+                    {
+                        // Portrait
+
+                        screenHeightRate = Convert.ToInt32(DeviceDisplay.MainDisplayInfo.Height / 32.0);
+                        textView.SetMaxLines(4);
+                    }
+
+                    var fontSizeRange = screenHeightRate - minTextSize;
+                    var fontSizePerValue = fontSizeRange / 5;
+
+                    var fontSize = minTextSize + (int)appFontSize * fontSizePerValue;
+
+                    textView.SetTextSize(Android.Util.ComplexUnitType.Px, Convert.ToSingle(fontSize));
+
+                    snackBar.Show();
+                });
             }
             catch (Exception ex)
             {
