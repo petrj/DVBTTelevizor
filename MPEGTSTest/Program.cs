@@ -30,7 +30,7 @@ namespace MPEGTSTest
                 // - bad PIDS 5,6,15,16? Cannot play!
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
-                AnalyzeMPEGTSPackets("c:\\temp\\stream.ts");
+                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "CTS.ts");
 
                 // 33 s video sample:
                 //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
