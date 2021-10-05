@@ -85,6 +85,7 @@ namespace MPEGTSTest
 
                 sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17],17);
                 sDTTable.WriteToConsole();
+                logger.Info(sDTTable.WriteToString());
             }
 
             if (packetsByPID.ContainsKey(16))

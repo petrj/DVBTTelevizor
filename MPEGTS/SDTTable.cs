@@ -43,7 +43,7 @@ namespace MPEGTS
                 sb.AppendLine($"Private               : {Private}");
                 sb.AppendLine($"Reserved              : {Reserved}");
                 sb.AppendLine($"SectionLength         : {SectionLength}");
-                sb.AppendLine($"CRC OK                : {CRCIsValid()}");            
+                sb.AppendLine($"CRC OK                : {CRCIsValid()}");
 
                 if (SectionSyntaxIndicator)
                 {
@@ -81,7 +81,7 @@ namespace MPEGTS
                 sb.AppendLine($"{"----",4} {"--------".PadRight(20, '-'),20} {"-----------".PadRight(20, '-'),20} {"--------------",6}");
                 foreach (var desc in ServiceDescriptors)
                 {
-                    sb.AppendLine($"{desc.ServisType,4} {desc.ProviderName.PadRight(20, ' '),20} {desc.ServiceName.PadRight(20,' '),20} {desc.ProgramNumber,6}");                 
+                    sb.AppendLine($"{desc.ServisType,4} {desc.ProviderName.PadRight(20, ' '),20} {desc.ServiceName.PadRight(20,' '),20} {desc.ProgramNumber,6}");
                 }
             }
 
@@ -156,9 +156,11 @@ namespace MPEGTS
                 if (bytes.Count < pos + sDescriptor.ProviderNameLength)
                     break;
 
-                for (var i = 0; i < sDescriptor.ProviderNameLength; i++)
+                sDescriptor.ProviderName = MPEGTSESICharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ProviderNameLength);
+                if (String.IsNullOrEmpty(sDescriptor.ProviderName))
                 {
-                    sDescriptor.ProviderName += Convert.ToChar(bytes[pos + i]);
+                    // not supported encoding ?
+                    sDescriptor.ProviderName = $"ServiceId ID {ServiceId}";
                 }
 
                 pos = pos + sDescriptor.ProviderNameLength;
@@ -173,16 +175,19 @@ namespace MPEGTS
 
                 pos++;
 
-                for (var i = 0; i < sDescriptor.ServiceNameLength; i++)
+                sDescriptor.ServiceName = MPEGTSESICharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ServiceNameLength);
+
+                if (String.IsNullOrEmpty(sDescriptor.ServiceName))
                 {
-                    sDescriptor.ServiceName += Convert.ToChar(bytes[pos + i]);
+                    // not supported encoding ?
+                    sDescriptor.ServiceName = $"Channel {sDescriptor.ProgramNumber}";
                 }
 
                 ServiceDescriptors.Add(sDescriptor);
 
                 pos = posAfterThisDescriptor;
-            }         
+            }
         }
-       
+
     }
 }

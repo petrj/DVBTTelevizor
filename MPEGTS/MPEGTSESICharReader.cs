@@ -79,9 +79,15 @@ namespace MPEGTS
                 return String.Empty;
             }
 
-            if (bytes[0]<0x20)
+            if (bytes[index]<0x20)
             {
-                // not default encoding not supported yet
+                // not default encoding
+
+                if (bytes[index] == 0x14)
+                {
+                    // Big5 subset of ISO/IEC 10646 [16] Traditional Chinese
+                }
+
                 return String.Empty;
             }
 

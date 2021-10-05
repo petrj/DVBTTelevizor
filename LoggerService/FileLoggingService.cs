@@ -54,7 +54,7 @@ namespace LoggerService
                     Directory.CreateDirectory(logFolder);
 
                 if ((int)level < (int)MinLevel)
-                    return;             
+                    return;
 
                 using (var fs = new FileStream(LogFilename, FileMode.Append, FileAccess.Write))
                 {
@@ -68,7 +68,7 @@ namespace LoggerService
             {
                 System.Diagnostics.Debug.WriteLine($"Error while writing log to {LogFilename} ({ex})");
             }
-        }      
+        }
 
         public void Debug(string message)
         {
