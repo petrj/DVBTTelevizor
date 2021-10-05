@@ -6,9 +6,55 @@
              xmlns:vlc="clr-namespace:LibVLCSharp.Forms.Shared;assembly=LibVLCSharp.Forms"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.PlayerPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="ChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+
+            <Style x:Key="AudioImageStyle" TargetType="Label">
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="2,2,2,2"/>
+                <Setter Property="HeightRequest" Value="30"/>
+                <Setter Property="MinimumHeightRequest" Value="30"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ContentPage.Content>
-        <StackLayout>
-            <vlc:VideoView HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView"  />
+        <StackLayout x:Name="VideoStackLayout" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <vlc:VideoView IsVisible="{Binding VideoViewVisible}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView"  />
+            <StackLayout x:Name="AudioOnlyStackLayout" IsVisible="{Binding AudioViewVisible}" Margin="20,20,20,20" >
+
+                <Label x:Name="AudioOnlyText" Text="{Binding Title}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding FontSizeForChannel}" />             
+
+                <ScrollView>
+                    <StackLayout>
+
+                        <StackLayout
+                            Orientation="Horizontal"
+                            HorizontalOptions="Center">
+                            <Image Source="{Binding AudioIcon}" x:Name="AudioOnlyImage" Style="{DynamicResource AudioImageStyle}" />
+                        </StackLayout>
+
+                    </StackLayout>
+                </ScrollView>
+
+            </StackLayout>
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnDoubleTapped" NumberOfTapsRequired="2" />
+                <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
+                <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
+            </StackLayout.GestureRecognizers>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

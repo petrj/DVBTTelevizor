@@ -34,7 +34,7 @@
 
             <Style x:Key="ChannelNameTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
-                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="Margin" Value="0,5,5,5"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
@@ -107,8 +107,8 @@
                                         <RowDefinition Height="1" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="10*" />
-                                        <ColumnDefinition Width="60*" />
+                                        <ColumnDefinition Width="08*" />
+                                        <ColumnDefinition Width="62*" />
                                         <ColumnDefinition Width="10*" />
                                         <ColumnDefinition Width="20*" />
                                     </Grid.ColumnDefinitions>

@@ -107,7 +107,7 @@ namespace DVBTTelevizor
                     });
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayStream, (message) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayStream, (channelName) =>
             {
                 Device.BeginInvokeOnMainThread(
                  new Action(() =>
@@ -123,14 +123,15 @@ namespace DVBTTelevizor
                          {
                              Navigation.PushModalAsync(_playerPage);
                          }
+
+                         _playerPage.Title = channelName;
                      }
                      else
                      {
                          Task.Run(async () =>
                          {
                              await _dlgService.Error("Player not initialized");
-                         }
-                            );
+                         });
                      }
                  }));
             });

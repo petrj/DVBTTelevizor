@@ -233,10 +233,7 @@ namespace DVBTTelevizor
 
             if (_recordingChannel != null)
             {
-                Device.BeginInvokeOnMainThread(async () =>
-                       await _dialogService.Error($"Cannot play {channel.Name}, recording is in progress")
-                    );
-                return;
+                MessagingCenter.Send($"Playing {channel.Name} failed, recording in progress", BaseViewModel.MSG_ToastMessage);
             }
 
             _loggingService.Debug($"Playing channel {channel}");
@@ -248,17 +245,19 @@ namespace DVBTTelevizor
                 {
                     throw new Exception("Play returned false");
                 }
+
+                MessagingCenter.Send(channel.Name, BaseViewModel.MSG_PlayStream);
+
             } catch (Exception ex)
             {
                 _loggingService.Error(ex);
 
-                Device.BeginInvokeOnMainThread(async () =>
-                           await _dialogService.Error($"Cannot play {channel.Name}")
-                        );
-                return;
-            }
+                MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
 
-            MessagingCenter.Send(channel.Name, BaseViewModel.MSG_PlayStream);
+#if DEBUG
+    MessagingCenter.Send(channel.Name, BaseViewModel.MSG_PlayStream);
+#endif
+            }            
         }
 
         private async Task Refresh()

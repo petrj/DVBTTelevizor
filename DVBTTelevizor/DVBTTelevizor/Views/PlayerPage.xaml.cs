@@ -19,9 +19,15 @@ namespace DVBTTelevizor
         DVBTDriverManager _driver;
         Media _media = null;
 
+        private PlayerPageViewModel _viewModel;
+
+        public Command CheckStreamCommand { get; set; }
+
         public PlayerPage(DVBTDriverManager driver)
         {
             InitializeComponent();
+
+            BindingContext = _viewModel = new PlayerPageViewModel();
 
             _driver = driver;
          
@@ -29,7 +35,11 @@ namespace DVBTTelevizor
 
             _libVLC = new LibVLC();
             _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
-            videoView.MediaPlayer = _mediaPlayer;          
+            videoView.MediaPlayer = _mediaPlayer;
+
+            CheckStreamCommand = new Command(async () => await CheckStream());
+
+            BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
         }
 
         public bool Playing
@@ -40,11 +50,44 @@ namespace DVBTTelevizor
             }
         }
 
+        public string Title
+        {
+            get
+            {
+                return _viewModel.Title;
+            }
+            set
+            {
+                _viewModel.Title = value;
+            }
+        }
+
+        public void OnDoubleTapped(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
+        {
+            // go back
+            Navigation.PopModalAsync();
+        }
+
+        private void SwipeGestureRecognizer_Up(object sender, SwipedEventArgs e)
+        {
+            
+        }
+
+        private void SwipeGestureRecognizer_Down(object sender, SwipedEventArgs e)
+        {
+            
+        }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
 
-            if (_media == null)
+            if (_media == null && _driver.VideoStream != null)
             {
                 _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
             }
@@ -75,5 +118,28 @@ namespace DVBTTelevizor
             _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
             videoView.MediaPlayer.Play(_media);
         }
+
+        private async Task CheckStream()
+        {        
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (!videoView.MediaPlayer.IsPlaying)
+                {
+                    videoView.MediaPlayer.Play(_media);
+                }
+
+                if (
+                        (_mediaPlayer.VideoTrackCount <= 0)             
+                   )
+                {
+                    _viewModel.AudioViewVisible = true;
+                }
+                else
+                {
+                    _viewModel.AudioViewVisible = false;
+                }
+            });
+        }
+
     }
 }

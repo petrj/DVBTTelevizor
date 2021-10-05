@@ -16,7 +16,7 @@ using System.IO;
 
 namespace DVBTTelevizor
 {
-    public class BaseViewModel : INotifyPropertyChanged
+    public class BaseViewModel : BaseNotifyPropertyModel
     {
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
@@ -35,34 +35,7 @@ namespace DVBTTelevizor
 
         private string _status;
 
-        bool isBusy = false;
-
-        #region INotifyPropertyChanged
-
-        protected bool SetProperty<T>(ref T backingStore, T value,
-           [CallerMemberName]string propertyName = "",
-           Action onChanged = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return false;
-
-            backingStore = value;
-            onChanged?.Invoke();
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
-
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion
+        bool isBusy = false;        
 
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {

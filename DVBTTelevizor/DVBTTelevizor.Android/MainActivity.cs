@@ -88,8 +88,11 @@ namespace DVBTTelevizor.Droid
                         if (_waitingForInit)
                         {
                             _waitingForInit = false;
-                            _loggingService.Error("Driver response timeout");
-                            MessagingCenter.Send("Driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+
+                            _loggingService.Error("DVB-T driver response timeout");
+
+                            ShowToastMessage("DVB-T driver response timeout");                            
+                            MessagingCenter.Send("DVB-T driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                         }
 
                     });
@@ -102,6 +105,7 @@ namespace DVBTTelevizor.Droid
                     _waitingForInit = false;
                     _loggingService.Error(ex, "Driver initializing failed");
 
+                    ShowToastMessage("DVB-T driver not installed");
                     MessagingCenter.Send("DVB-T driver not installed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
                 catch (Exception ex)
@@ -109,7 +113,8 @@ namespace DVBTTelevizor.Droid
                     _waitingForInit = false;
                     _loggingService.Error(ex,"Driver initializing failed");
 
-                    MessagingCenter.Send("Driver initializing failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                    ShowToastMessage("DVB-T driver connection failed");
+                    MessagingCenter.Send("DVB-T sriver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
             });
 
