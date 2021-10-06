@@ -21,16 +21,15 @@ namespace MPEGTSTest
             {
                 //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
                 //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
-
-                // Prima Zoom (PID 410)
-                // - actual EIT events time? - recorded 3.10.2021 19:58!
-                // - bad PIDS 5,6,15,16? Cannot play!
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
-                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
-                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "CTS.ts");
+                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
+
+                // chinese encoding:
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "CTS.ts");
 
                 // 33 s video sample:
                 //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
@@ -84,6 +83,11 @@ namespace MPEGTSTest
                 Console.WriteLine($"------------------------------");
 
                 sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17],17);
+
+                var sDTTables = DVBTTable.CreateAllFromPackets<SDTTable>(packetsByPID[17], 17, 0x42);  // PID 0x11, Service Description Table (SDT)
+                if (sDTTables.Count > 0)
+                    sDTTable = sDTTables[0];
+
                 sDTTable.WriteToConsole();
                 logger.Info(sDTTable.WriteToString());
             }

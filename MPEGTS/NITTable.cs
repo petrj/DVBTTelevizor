@@ -13,6 +13,8 @@ namespace MPEGTS
         public int ServiceId { get; set; }
         public byte LinkageType { get; set; }
 
+        public ServiceListDescriptor ServiceList { get; set; } = null;
+
         public override void Parse(List<byte> bytes)
         {
             if (bytes == null || bytes.Count < 5)
@@ -107,14 +109,19 @@ namespace MPEGTS
                     var descriptorTag = bytes[pos + 0];
                     var descriptorLength = bytes[pos + 1];
 
-                    //Console.WriteLine($"Found descriptor: {descriptorTag}");
-                    //Console.WriteLine($"          length: {descriptorLength}");
-                    //Console.WriteLine($"        position: {pos + 2}");
-                    //Console.WriteLine($"------------------------------------");
+                    if (descriptorTag == 0x41)
+                    {
+                        // Service list descriptor
+                        var descriptorBytes = new byte[descriptorLength];
+                        bytes.CopyTo(0, Data, pos, descriptorLength);
 
-                    // TODO: read descriptors of given descriptorTag
-                    // 90 (dec) 5A (hex)  - terrestrial_delivery_system_descriptor
-                    // 98 (dec) 62 (hex) - frequency_list_descriptor
+                        ServiceList = new ServiceListDescriptor(bytes);
+
+                    }
+                    else
+                    {
+                        //Console.WriteLine($"Found NIT descriptor: {descriptorTag} ({Convert.ToString(descriptorTag,16)})");
+                    }
 
                     pos += descriptorLength + 2;
                 }

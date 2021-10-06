@@ -51,6 +51,41 @@ namespace MPEGTS
             return null;
         }
 
+        public static List<T> CreateAllFromPackets<T>(List<MPEGTransportStreamPacket> packets, long PID, int tableId) where T : DVBTTable, new()
+        {
+            var res = new List<T>();
+
+            var filteredPackets = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, PID);
+
+            foreach (var kvp in filteredPackets)
+            {
+                var t = new T();
+
+                try
+                {
+                    t.Parse(kvp.Value);
+
+                    if (t.CRCIsValid())
+                    {
+                        if (t.ID == tableId)
+                        {
+                            res.Add(t);
+                        } else
+                        {
+                            // not SDT table
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+
+            return res;
+        }
+
         public static T Create<T>(List<byte> bytes) where T : DVBTTable, new()
         {
             var t = new T();
