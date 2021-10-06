@@ -27,10 +27,12 @@ namespace DVBTTelevizor.Droid
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         private const int StartRequestCode = 1000;
-        bool _waitingForInit = false;
-        ILoggingService _loggingService;
-        DVBTTelevizorConfiguration _config;
-        App _app;
+        private bool _waitingForInit = false;
+        private ILoggingService _loggingService;
+        private DVBTTelevizorConfiguration _config;
+        private int _fullscreenUiOptions;
+        private int _defaultUiOptions;
+        private App _app;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -62,8 +64,17 @@ namespace DVBTTelevizor.Droid
 #endif
 
             // prevent sleep:
-            Window window = (Forms.Context as Activity).Window; 
+            Window window = (Forms.Context as Activity).Window;
             window.AddFlags(WindowManagerFlags.KeepScreenOn);
+
+            // https://stackoverflow.com/questions/39248138/how-to-hide-bottom-bar-of-android-back-home-in-xamarin-forms
+            _defaultUiOptions = (int)Window.DecorView.SystemUiVisibility;
+
+            _fullscreenUiOptions = _defaultUiOptions;
+            _fullscreenUiOptions |= (int)SystemUiFlags.LowProfile;
+            _fullscreenUiOptions |= (int)SystemUiFlags.Fullscreen;
+            _fullscreenUiOptions |= (int)SystemUiFlags.HideNavigation;
+            _fullscreenUiOptions |= (int)SystemUiFlags.ImmersiveSticky;
 
             _app = new App(_loggingService, _config);
             LoadApplication(_app);
@@ -91,7 +102,7 @@ namespace DVBTTelevizor.Droid
 
                             _loggingService.Error("DVB-T driver response timeout");
 
-                            ShowToastMessage("DVB-T driver response timeout");                            
+                            ShowToastMessage("DVB-T driver response timeout");
                             MessagingCenter.Send("DVB-T driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                         }
 
@@ -119,13 +130,22 @@ namespace DVBTTelevizor.Droid
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToastMessage, (message) =>
-            {                
+            {
                 ShowToastMessage(message);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
             {
-                ShareFile(fileName);
+                ShareFile(fileName).Wait();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EnableFullScreen, (msg) =>
+            {
+                SetFullScreen(true);
+            });
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DisableFullScreen, (msg) =>
+            {
+                SetFullScreen(false);
             });
         }
 
@@ -212,6 +232,25 @@ namespace DVBTTelevizor.Droid
                 intent.SetFlags(ActivityFlags.NewTask);
 
                 Android.App.Application.Context.StartActivity(intent);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void SetFullScreen(bool on)
+        {
+            try
+            {
+                if (on)
+                {
+                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)_fullscreenUiOptions;
+                }
+                else
+                {
+                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)_defaultUiOptions;
+                };
             }
             catch (Exception ex)
             {

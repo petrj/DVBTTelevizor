@@ -25,6 +25,8 @@ namespace DVBTTelevizor
 
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
         public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
+        public const string MSG_EnableFullScreen = "EnableFullScreen";
+        public const string MSG_DisableFullScreen = "DisableFullScreen";
         public const string MSG_PlayStream = "PlayStream";
         public const string MSG_UpdateDriverState = "UpdateDriverState";
         public const string MSG_Init = "Init";
@@ -35,7 +37,7 @@ namespace DVBTTelevizor
 
         private string _status;
 
-        bool isBusy = false;        
+        bool isBusy = false;
 
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
