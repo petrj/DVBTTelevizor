@@ -103,6 +103,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public string DVBTTypeLabelWithFrequencyLabel
+        {
+            get
+            {
+                return DVBTTypeLabel + ", " + FrequencyLabel;
+            }
+        }
+
         public List<long> PIDsArary
         {
             get

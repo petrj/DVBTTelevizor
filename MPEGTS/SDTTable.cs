@@ -159,11 +159,11 @@ namespace MPEGTS
                 if (bytes.Count < pos + sDescriptor.ProviderNameLength)
                     break;
 
-                sDescriptor.ProviderName = MPEGTSESICharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ProviderNameLength);
+                sDescriptor.ProviderName = MPEGTSCharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ProviderNameLength);
                 if (String.IsNullOrEmpty(sDescriptor.ProviderName))
                 {
                     // not supported encoding ?
-                    sDescriptor.ProviderName = $"ServiceId ID {ServiceId}";
+                    sDescriptor.ProviderName = $"ServiceId #{ServiceId}";
                 }
 
                 pos = pos + sDescriptor.ProviderNameLength;
@@ -178,12 +178,12 @@ namespace MPEGTS
 
                 pos++;
 
-                sDescriptor.ServiceName = MPEGTSESICharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ServiceNameLength);
+                sDescriptor.ServiceName = MPEGTSCharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ServiceNameLength);
 
                 if (String.IsNullOrEmpty(sDescriptor.ServiceName))
                 {
                     // not supported encoding ?
-                    sDescriptor.ServiceName = $"Channel {sDescriptor.ProgramNumber}";
+                    sDescriptor.ServiceName = $"Channel #{sDescriptor.ProgramNumber}";
                 }
 
                 ServiceDescriptors.Add(sDescriptor);

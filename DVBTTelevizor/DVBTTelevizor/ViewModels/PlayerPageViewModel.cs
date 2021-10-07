@@ -6,7 +6,7 @@ using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {
-    public class PlayerPageViewModel : BaseNotifyPropertyModel
+    public class PlayerPageViewModel : ConfigViewModel
     {
         private bool _videoViewVisible = true;
         private string _title = String.Empty;
@@ -33,14 +33,6 @@ namespace DVBTTelevizor
             {
                 _title = value;
                 OnPropertyChanged(nameof(Title));
-            }
-        }
-
-        public string FontSizeForChannel
-        {
-            get
-            {
-                return "22";
             }
         }
 

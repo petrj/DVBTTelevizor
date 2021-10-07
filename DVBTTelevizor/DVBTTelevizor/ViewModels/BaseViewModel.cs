@@ -16,7 +16,7 @@ using System.IO;
 
 namespace DVBTTelevizor
 {
-    public class BaseViewModel : BaseNotifyPropertyModel
+    public class BaseViewModel : ConfigViewModel
     {
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;

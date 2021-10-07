@@ -26,7 +26,8 @@
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
             </Style>
 
             <Style x:Key="ChannelNameTextStyle" TargetType="Label">
@@ -148,8 +149,8 @@
                                             <RowDefinition Height="1" />
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="20*" />
-                                            <ColumnDefinition Width="50*" />
+                                            <ColumnDefinition Width="8*" />
+                                            <ColumnDefinition Width="62*" />
                                             <ColumnDefinition Width="25*" />
                                             <ColumnDefinition Width="5*" />
                                         </Grid.ColumnDefinitions>

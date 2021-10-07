@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MPEGTS
 {
-    public class MPEGTSESICharReader
+    public class MPEGTSCharReader
     {
         /// <summary>
         ///  https://en.wikipedia.org/wiki/T.51/ISO/IEC_6937

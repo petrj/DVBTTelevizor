@@ -28,7 +28,7 @@ namespace MPEGTS
 
             var pos = 6;
 
-            res.EventName = MPEGTSESICharReader.ReadString(bytes, pos, eventNameLength);
+            res.EventName = MPEGTSCharReader.ReadString(bytes, pos, eventNameLength);
 
             pos = pos + eventNameLength;
 
@@ -36,7 +36,7 @@ namespace MPEGTS
 
             pos++;
 
-            res.Text = MPEGTSESICharReader.ReadString(bytes, pos, textLength);
+            res.Text = MPEGTSCharReader.ReadString(bytes, pos, textLength);
 
             return res;
         }

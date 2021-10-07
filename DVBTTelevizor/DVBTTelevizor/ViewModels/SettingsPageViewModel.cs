@@ -11,7 +11,7 @@ using Android.Content;
 
 namespace DVBTTelevizor
 {
-    public class SettingsPageViewModel : BaseNotifyPropertyModel
+    public class SettingsPageViewModel : ConfigViewModel
     {
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
@@ -50,28 +50,7 @@ namespace DVBTTelevizor
             ShareLogCommand = new Command(() => { ShareLog(); });
         }
 
-        public void NotifyFontSizeChange()
-        {
-            OnPropertyChanged(nameof(FontSizeForCaption));
-            OnPropertyChanged(nameof(FontSizeForPicker));
-        }
-
-
-        public string FontSizeForCaption
-        {
-            get
-            {
-                return GetScaledSize(14).ToString();
-            }
-        }
-
-        public string FontSizeForPicker
-        {
-            get
-            {
-                return GetScaledSize(12).ToString();
-            }
-        }
+      
 
         public int AppFontSizeIndex
         {

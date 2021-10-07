@@ -22,6 +22,7 @@ namespace DVBTTelevizor
 
         private PlayerPageViewModel _viewModel;
         bool _fullscreen = false;
+        bool _playInProgress = false;
 
         public Command CheckStreamCommand { get; set; }
 
@@ -39,7 +40,7 @@ namespace DVBTTelevizor
             _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
             videoView.MediaPlayer = _mediaPlayer;
 
-            CheckStreamCommand = new Command(async () => await CheckStream());
+            CheckStreamCommand = new Command(async () => await CheckStream());            
 
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
         }
@@ -48,7 +49,13 @@ namespace DVBTTelevizor
         {
             get
             {
-                return videoView.MediaPlayer.IsPlaying;
+                return _playInProgress;
+
+                //videoView.MediaPlayer.IsPlaying can be false in case of internet disconnection
+            }
+            set
+            {
+                _playInProgress = value;
             }
         }
 
@@ -118,28 +125,41 @@ namespace DVBTTelevizor
             }
         }
 
+        public void StartPlay()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (_driver.VideoStream != null)
+                {
+                    _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+                    videoView.MediaPlayer.Play(_media);
+                }
+                
+                Playing = true;
+            });            
+        }
+
         public void StopPlay()
         {
-            videoView.MediaPlayer.Stop();
-
-            Task.Run(async () =>
+            Device.BeginInvokeOnMainThread(() =>
             {
-                await _driver.Stop();
+                Playing = false;
+                videoView.MediaPlayer.Stop();
+                Task.Run(async () =>
+                {
+                    await _driver.Stop();
+                });
             });
         }
 
-        public void StartPlay()
-        {
-            if (_media == null && _driver.VideoStream != null)
-            {
-                _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
-            }
-
-            videoView.MediaPlayer.Play(_media);
-        }
 
         private async Task CheckStream()
         {
+            if (!Playing)
+            {
+                return;
+            }
+
             Device.BeginInvokeOnMainThread(() =>
             {
                 if (!videoView.MediaPlayer.IsPlaying)

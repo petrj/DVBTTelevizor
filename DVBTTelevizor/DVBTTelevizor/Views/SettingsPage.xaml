@@ -18,7 +18,7 @@
             </Style>
 
             <Style x:Key="CaptionStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Label">
@@ -39,13 +39,15 @@
 
     <ContentPage.Content>
 
-        <ScrollView>
+        <ScrollView Margin="20,10,20,0">
 
-                <StackLayout Margin="10,20,10,20">
+            <StackLayout>
 
-                    <Label Text="Channels list" Style="{DynamicResource CaptionStyle}"/>
+            <StackLayout Margin="0,0,0,30">
 
-                    <Grid Margin="0,0,0,0">
+                    <Label Text="Channels list" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                    <Grid Margin="20,10,20,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -55,22 +57,24 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Show TV channels" Style="{DynamicResource LabelStyle}" />
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Show TV channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch" IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
 
-                        <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" />
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch" IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
                     </Grid>
 
-                    <Button Text="Clear" Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" />
-                    <Button Text="Export" Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" />
-                    <Button Text="Import" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" />
+                    <Button Text="Clear" Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Button Text="Export" Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Button Text="Import" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
+            </StackLayout>
 
+            <StackLayout Margin="0,0,0,30">
 
-                    <Label Text="System settings" Style="{DynamicResource CaptionStyle}"/>
+                    <Label Text="System settings" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-                    <Grid Margin="0,0,0,0">
+                    <Grid Margin="20,10,20,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -80,18 +84,22 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" />
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch" IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
 
-                        <Label  Grid.Row="1" Grid.Column="0" Text="Disable tuner init after start" Style="{DynamicResource LabelStyle}" />
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Disable tuner init after start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="DoNotAutoInitAfterStartSwitch" IsToggled="{Binding Config.DoNotAutoInitAfterStart, Mode=TwoWay}"/>
+
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="FullscreenSwitch" IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+                        <Label  Grid.Row="3" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="3" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
 
-
-
-                <StackLayout Margin="20,10,0,0">
-                    <Label  Text="Font size:" x:Name="FontSizeLabel" Style="{StaticResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <StackLayout Margin="20,0,20,0">
+                    <Label  Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                     <Picker
                             x:Name="FontSizePicker"
                             Margin="20,0,0,0"
@@ -109,30 +117,13 @@
                     </Picker>
                 </StackLayout>
 
-                <Grid Margin="20,10,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="70*" />
-                        <ColumnDefinition Width="30*" />
-                    </Grid.ColumnDefinitions>
+            </StackLayout>
 
-                    <Label  Grid.Row="0" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch" IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+            <StackLayout Margin="0,0,0,30">
 
-                    <Label  Grid.Row="1" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                    <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-                </Grid>
-
-
-
-
-                <Label Text="Logging" Style="{DynamicResource CaptionStyle}"/>
-
-                    <Grid Margin="0,0,0,0">
+                    <Grid Margin="20,10,20,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -141,18 +132,19 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" />
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch" IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
 
                     </Grid>
 
-                    <Button Text="Share log file" IsVisible="{Binding EnableLogging}" Command="{Binding ShareLogCommand}" Style="{DynamicResource ButtonStyle}" />
+                    <Button Text="Share log file" IsVisible="{Binding EnableLogging}" Command="{Binding ShareLogCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
 
-                </StackLayout>
+             </StackLayout>
+
+            </StackLayout>
 
         </ScrollView>
-
 
     </ContentPage.Content>
 </ContentPage>
