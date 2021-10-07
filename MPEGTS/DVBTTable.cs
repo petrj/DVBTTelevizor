@@ -40,7 +40,7 @@ namespace MPEGTS
                     if (t.CRCIsValid())
                     {
                         return t;
-                    } 
+                    }
 
                 } catch (Exception ex)
                 {
@@ -198,6 +198,10 @@ namespace MPEGTS
 
         public virtual bool CRCIsValid()
         {
+            if (Data == null || Data.Length == 0 ||
+                CRC == null || CRC.Length == 0)
+                return false;
+
             var computedCRC = BitConverter.GetBytes(ComputeCRC(Data));
 
             return

@@ -101,6 +101,9 @@ namespace MPEGTS
 
             ID = bytes[pos];
 
+            if (ID != 0x42)
+                return;
+
             SectionSyntaxIndicator = ((bytes[pos + 1] & 128) == 128);
             Private = ((bytes[pos + 1] & 64) == 64);
             Reserved = Convert.ToByte((bytes[pos + 1] & 48) >> 4);

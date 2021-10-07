@@ -84,9 +84,7 @@ namespace MPEGTSTest
 
                 sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17],17);
 
-                var sDTTables = DVBTTable.CreateAllFromPackets<SDTTable>(packetsByPID[17], 17, 0x42);  // PID 0x11, Service Description Table (SDT)
-                if (sDTTables.Count > 0)
-                    sDTTable = sDTTables[0];
+                sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17], 17);  // PID 0x11, Service Description Table (SDT)
 
                 sDTTable.WriteToConsole();
                 logger.Info(sDTTable.WriteToString());
