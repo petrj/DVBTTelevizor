@@ -11,7 +11,7 @@ using Android.Content;
 
 namespace DVBTTelevizor
 {
-    public class SettingsPageViewModel
+    public class SettingsPageViewModel : BaseNotifyPropertyModel
     {
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
@@ -25,12 +25,13 @@ namespace DVBTTelevizor
         public Command ShareLogCommand { get; set; }
 
         public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
+            :base(config)
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
             _channelService = channelService;
 
-            Config = config;
+            _config = config;
 
             ClearChannelsCommand = new Command(async () => await ClearChannels());
 
@@ -49,19 +50,55 @@ namespace DVBTTelevizor
             ShareLogCommand = new Command(() => { ShareLog(); });
         }
 
-        public DVBTTelevizorConfiguration Config { get; set; }
+        public void NotifyFontSizeChange()
+        {
+            OnPropertyChanged(nameof(FontSizeForCaption));
+            OnPropertyChanged(nameof(FontSizeForPicker));
+        }
+
+
+        public string FontSizeForCaption
+        {
+            get
+            {
+                return GetScaledSize(14).ToString();
+            }
+        }
+
+        public string FontSizeForPicker
+        {
+            get
+            {
+                return GetScaledSize(12).ToString();
+            }
+        }
+
+        public int AppFontSizeIndex
+        {
+            get
+            {
+                return (int)_config.AppFontSize;
+            }
+            set
+            {
+                _config.AppFontSize = (AppFontSizeEnum)value;
+
+                OnPropertyChanged(nameof(AppFontSizeIndex));
+                NotifyFontSizeChange();
+            }
+        }
 
         public bool EnableLogging
         {
             get
             {
-                return Config.EnableLogging;
+                return _config.EnableLogging;
             }
             set
             {
                 if (!value)
                 {
-                    Config.EnableLogging = false;
+                    _config.EnableLogging = false;
                 } else
                 {
                     ActivateLogging();
@@ -83,9 +120,9 @@ namespace DVBTTelevizor
                     await BaseViewModel.RunWithStoragePermission(
                          async () =>
                          {
-                             if (!Config.EnableLogging)
+                             if (!_config.EnableLogging)
                              {
-                                 Config.EnableLogging = true;
+                                 _config.EnableLogging = true;
                                  await _dialogService.Information("Logging will be enabled after application restart");
                              }
 
@@ -130,7 +167,7 @@ namespace DVBTTelevizor
                          await _dialogService.Error("Export failed");
                      }
 
-                 }, _dialogService); 
+                 }, _dialogService);
         }
 
         private async Task Import()

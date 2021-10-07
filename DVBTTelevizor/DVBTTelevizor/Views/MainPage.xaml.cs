@@ -52,7 +52,7 @@ namespace DVBTTelevizor
 
             try
             {
-                _playerPage = new PlayerPage(_driver);
+                _playerPage = new PlayerPage(_driver, _config);
             } catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while initializing player page");
@@ -65,8 +65,8 @@ namespace DVBTTelevizor
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
             _editChannelPage = new ChannelPage(_loggingService,_dlgService, _driver, _config);
 
-            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);        
-         
+            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
+
             if (_config.AutoInitAfterStart)
             {
                 Task.Run(() =>
@@ -159,7 +159,7 @@ namespace DVBTTelevizor
                     _viewModel.UpdateDriverState();
                 });
             });
-            
+
         }
 
         private void MainPage_Appearing(object sender, EventArgs e)
@@ -197,15 +197,15 @@ namespace DVBTTelevizor
         {
             _viewModel.RefreshCommand.Execute(null);
         }
-        
+
         protected override void OnAppearing()
         {
-            base.OnAppearing();          
+            base.OnAppearing();
         }
 
         protected override void OnDisappearing()
         {
-            base.OnDisappearing();         
+            base.OnDisappearing();
 
         }
 

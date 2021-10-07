@@ -21,7 +21,6 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         protected DVBTDriverManager _driver;
-        protected DVBTTelevizorConfiguration _config;
 
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
         public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
@@ -40,11 +39,11 @@ namespace DVBTTelevizor
         bool isBusy = false;
 
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+              : base(config)
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
             _driver = driver;
-            _config = config;
 
             new Thread(() =>
             {

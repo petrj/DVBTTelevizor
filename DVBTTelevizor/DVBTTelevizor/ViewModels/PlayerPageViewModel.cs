@@ -15,7 +15,8 @@ namespace DVBTTelevizor
 
         public Command AnimeIconCommand { get; set; }
 
-        public PlayerPageViewModel()
+        public PlayerPageViewModel(DVBTTelevizorConfiguration config)
+            :base(config)
         {
             AnimeIconCommand = new Command(Anime);
 
@@ -102,8 +103,8 @@ namespace DVBTTelevizor
                     _animePosIncreasing = !_animePosIncreasing;
                 }
             }
-           
-            OnPropertyChanged(nameof(AudioIcon));           
+
+            OnPropertyChanged(nameof(AudioIcon));
         }
 
     }

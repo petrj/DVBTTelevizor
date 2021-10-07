@@ -115,5 +115,42 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("EnableLogging", value);
             }
         }
+
+        public AppFontSizeEnum AppFontSize
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("AppFontSize");
+                return (AppFontSizeEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("AppFontSize", (int)value);
+            }
+        }
+
+        public bool Fullscreen
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("Fullscreen");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("Fullscreen", value);
+            }
+        }
+
+        public bool PlayOnBackground
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("PlayOnBackground");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("PlayOnBackground", value);
+            }
+        }
     }
 }

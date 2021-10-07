@@ -25,11 +25,11 @@ namespace DVBTTelevizor
 
         public Command CheckStreamCommand { get; set; }
 
-        public PlayerPage(DVBTDriverManager driver)
+        public PlayerPage(DVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
             InitializeComponent();
 
-            BindingContext = _viewModel = new PlayerPageViewModel();
+            BindingContext = _viewModel = new PlayerPageViewModel(config);
 
             _driver = driver;
 

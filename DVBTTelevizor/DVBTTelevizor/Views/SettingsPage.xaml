@@ -13,18 +13,25 @@
             <Style x:Key="LabelStyle" TargetType="Label">
                 <!--Setter Property="TextColor" Value="#41b3ff"/-->
                 <Setter Property="TextColor" Value="White"/>
-                <Setter Property="Margin" Value="20,0,0,0"/>
                 <Setter Property="HorizontalTextAlignment" Value="Left"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
             </Style>
 
-            <Style x:Key="CaptionStyle" TargetType="Label">                
+            <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="Yellow"/>
-                <Setter Property="FontSize" Value="Medium"/>
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Label">
                 <Setter Property="Margin" Value="20,0,0,0"/>
+            </Style>
+
+            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+            </Style>
+
+            <Style x:Key="CommonSwitchTextStyle" TargetType="Switch">
+                <Setter Property="HorizontalOptions" Value="End"/>
             </Style>
 
         </ResourceDictionary>
@@ -81,8 +88,49 @@
 
                     </Grid>
 
-                    
-                    <Label Text="Logging" Style="{DynamicResource CaptionStyle}"/>
+
+
+                <StackLayout Margin="20,10,0,0">
+                    <Label  Text="Font size:" x:Name="FontSizeLabel" Style="{StaticResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                    <Picker
+                            x:Name="FontSizePicker"
+                            Margin="20,0,0,0"
+                            FontSize="{Binding FontSizeForPicker}"
+                            Style="{StaticResource CommonPickerTextStyle}"
+                            SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}" >
+                        <Picker.Items>
+                            <x:String>Normal</x:String>
+                            <x:String>Above normal</x:String>
+                            <x:String>Big</x:String>
+                            <x:String>Bigger</x:String>
+                            <x:String>Very big</x:String>
+                            <x:String>Huge</x:String>
+                        </Picker.Items>
+                    </Picker>
+                </StackLayout>
+
+                <Grid Margin="20,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label  Grid.Row="0" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch" IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+                    <Label  Grid.Row="1" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+                </Grid>
+
+
+
+
+                <Label Text="Logging" Style="{DynamicResource CaptionStyle}"/>
 
                     <Grid Margin="0,0,0,0">
                         <Grid.RowDefinitions>
@@ -91,16 +139,16 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
                             <ColumnDefinition Width="30*" />
-                        </Grid.ColumnDefinitions>             
+                        </Grid.ColumnDefinitions>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" />
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch" IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
 
                     </Grid>
 
-                    <Button Text="Share log file" IsVisible="{Binding EnableLogging}" Command="{Binding ShareLogCommand}" Style="{DynamicResource ButtonStyle}" />                
-                
-               
+                    <Button Text="Share log file" IsVisible="{Binding EnableLogging}" Command="{Binding ShareLogCommand}" Style="{DynamicResource ButtonStyle}" />
+
+
                 </StackLayout>
 
         </ScrollView>
