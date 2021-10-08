@@ -22,7 +22,7 @@ namespace DVBTTelevizor
         public Command RefreshCommand { get; set; }
 
         public Command LongPressCommand { get; set; }
-        public Command ShortPressCommand { get; set; }        
+        public Command ShortPressCommand { get; set; }
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
@@ -125,7 +125,7 @@ namespace DVBTTelevizor
                 {
                     _driver.StopRecording();
                     await _driver.Stop();
-                    _recordingChannel = null;                    
+                    _recordingChannel = null;
                 }
             }
             catch (Exception ex)
@@ -209,7 +209,7 @@ namespace DVBTTelevizor
             get
             {
                 return Channels.Count == 0;
-            }            
+            }
         }
 
         public async Task SaveChannelsToConfig()
@@ -253,11 +253,7 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex);
 
                 MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
-
-#if DEBUG
-    MessagingCenter.Send(channel.Name, BaseViewModel.MSG_PlayStream);
-#endif
-            }            
+            }
         }
 
         private async Task Refresh()
@@ -309,7 +305,7 @@ namespace DVBTTelevizor
                 }
 
                 OnPropertyChanged(nameof(Channels));
-                OnPropertyChanged(nameof(TunningButtonVisible));                
+                OnPropertyChanged(nameof(TunningButtonVisible));
 
                 if (selectChannel != null)
                     SelectedChannel = selectChannel;

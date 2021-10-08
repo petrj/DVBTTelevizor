@@ -79,6 +79,7 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(FontSizeForLabel));
             OnPropertyChanged(nameof(FontSizeForChannelNumber));
             OnPropertyChanged(nameof(FontSizeForDetailNote));
+            OnPropertyChanged(nameof(FontSizeForEntry));
         }
 
         public string FontSizeForCaption
@@ -90,6 +91,14 @@ namespace DVBTTelevizor
         }
 
         public string FontSizeForLabel
+        {
+            get
+            {
+                return GetScaledSize(12).ToString();
+            }
+        }
+
+        public string FontSizeForEntry
         {
             get
             {

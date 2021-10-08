@@ -308,7 +308,7 @@ namespace DVBTTelevizor
             {
                 if (ManualTuning)
                 {
-                   
+
                     long freq = Convert.ToInt64(TuneFrequency) * 1000000;
                     long bandWidth = TuneBandwidth * 1000000;
 
@@ -357,7 +357,7 @@ namespace DVBTTelevizor
                 _loggingService.Info("Starting automatic tuning");
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
-                {                    
+                {
                         if (!DVBTTuning && dvbtTypeIndex == 0)
                             continue;
                         if (!DVBT2Tuning && dvbtTypeIndex == 1)
@@ -407,129 +407,147 @@ namespace DVBTTelevizor
         {
             try
             {
-                    Status = GetTuningStatusText();
+                Status = GetTuningStatusText();
 
-                    _loggingService.Debug(Status);
+                _loggingService.Debug(Status);
 
-                    var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
+                var alreadySavedChannelsCount = (await _channelService.LoadChannels()).Count;
 
-                    switch (tuneResult.Result)
-                    {
-                        case SearchProgramResultEnum.Error:
-                            _loggingService.Debug("Search error");
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
 
-                            SignalStrengthProgress = 0;
+                switch (tuneResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        _loggingService.Debug("Search error");
 
-                            return;
+                        SignalStrengthProgress = 0;
 
-                        case SearchProgramResultEnum.NoSignal:
-                            _loggingService.Debug("No signal");
+#if DEBUG
+                        var ch = new DVBTChannel()
+                        {
+                            PIDs = "0,16,17",
+                            ProgramMapPID = -1,
+                            Name = "Not existing channel (debug mode)",
+                            ProviderName = "DVBT Televizor",
+                            Frequency = freq,
+                            Bandwdith = bandWidth,
+                            DVBTType = dvbtTypeIndex,
+                            ServiceType = DVBTServiceType.TV,
+                            Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString()
+                        };
 
-                            SignalStrengthProgress = 0;
+                        TunedChannels.Add(ch);
+                        SelectedChannel = ch;
+#endif
 
-                            return;
-                            
-                        case SearchProgramResultEnum.OK:
-
-                            SignalStrengthProgress = tuneResult.SignalPercentStrength/100.0;
-
-                        break;
-                    }
-
-                    var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
-
-                    switch (searchMapPIDsResult.Result)
-                    {
-                        case SearchProgramResultEnum.Error:
-                            _loggingService.Debug("Search error");
-
-                            return;
-
-                        case SearchProgramResultEnum.NoSignal:
-                            _loggingService.Debug("No signal");
-
-                            return;
-
-                        case SearchProgramResultEnum.NoProgramFound:
-                            _loggingService.Debug("No program found");
-
-                            return;
-                    }                
-
-                    var mapPIDs = new List<long>();
-                    var mapPIDToServiceDescriptor = new Dictionary<long, ServiceDescriptor>();
-
-                    foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
-                    {
-                        mapPIDs.Add(sd.Value);
-                        mapPIDToServiceDescriptor.Add(sd.Value, sd.Key);
-                    }
-                    _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
-      
-
-                    if (TuningAborted)
-                    {
-                        _loggingService.Debug($"Tuning aborted");
                         return;
-                    }
 
-                    // searching PIDs
+                    case SearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
 
-                    var searchProgramPIDsResult = await _driver.SearchProgramPIDs(mapPIDs);
+                        SignalStrengthProgress = 0;
 
-                    var alreadySavedChannelsCount = (await _channelService.LoadChannels()).Count;
+                        return;
 
-                    switch (searchProgramPIDsResult.Result)
-                    {
-                        case SearchProgramResultEnum.Error:
-                            _loggingService.Debug($"Error scanning Map PIDs");
-                            break;
-                        case SearchProgramResultEnum.NoSignal:
-                            _loggingService.Debug("No signal");
-                            break;
-                        case SearchProgramResultEnum.NoProgramFound:
-                            _loggingService.Debug("No program found");
-                            break;
-                        case SearchProgramResultEnum.OK:
-                            foreach (var kvp in searchProgramPIDsResult.PIDs)
-                            {
-                                var pids = string.Join(",", kvp.Value);
-                                var sDescriptor = mapPIDToServiceDescriptor[kvp.Key];
+                    case SearchProgramResultEnum.OK:
 
-                                var ch = new DVBTChannel();
-                                ch.PIDs = pids;
-                                ch.ProgramMapPID = kvp.Key;
-                                ch.Name = sDescriptor.ServiceName;
-                                ch.ProviderName = sDescriptor.ProviderName;
-                                ch.Frequency = freq;
-                                ch.Bandwdith = bandWidth;
-                                ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
-                                ch.DVBTType = dvbtTypeIndex;
+                        SignalStrengthProgress = tuneResult.SignalPercentStrength / 100.0;
 
-                                if (sDescriptor.ServisType == 1 ||
-                                    sDescriptor.ServisType == 2)
-                                {
-                                    ch.ServiceType = (DVBTServiceType)sDescriptor.ServisType;
-                                }
-                                else
-                                if (sDescriptor.ServisType == 31)
-                                {
-                                    ch.ServiceType = DVBTServiceType.TV; // DVBT2 video
-                                }
-                                else
-                                {
-                                    ch.ServiceType = DVBTServiceType.NotSupported;
-                                }
-
-                                TunedChannels.Add(ch);
-                                SelectedChannel = ch;
-
-                                _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
-
-                                Status = GetTuningStatusText();
-                            }
                         break;
-                    }
+                }
+
+                var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
+
+                switch (searchMapPIDsResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        _loggingService.Debug("Search error");
+
+                        return;
+
+                    case SearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+
+                        return;
+
+                    case SearchProgramResultEnum.NoProgramFound:
+                        _loggingService.Debug("No program found");
+
+                        return;
+                }
+
+                var mapPIDs = new List<long>();
+                var mapPIDToServiceDescriptor = new Dictionary<long, ServiceDescriptor>();
+
+                foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
+                {
+                    mapPIDs.Add(sd.Value);
+                    mapPIDToServiceDescriptor.Add(sd.Value, sd.Key);
+                }
+                _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
+
+
+                if (TuningAborted)
+                {
+                    _loggingService.Debug($"Tuning aborted");
+                    return;
+                }
+
+                // searching PIDs
+
+                var searchProgramPIDsResult = await _driver.SearchProgramPIDs(mapPIDs);
+
+                switch (searchProgramPIDsResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        _loggingService.Debug($"Error scanning Map PIDs");
+                        break;
+                    case SearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+                        break;
+                    case SearchProgramResultEnum.NoProgramFound:
+                        _loggingService.Debug("No program found");
+                        break;
+                    case SearchProgramResultEnum.OK:
+                        foreach (var kvp in searchProgramPIDsResult.PIDs)
+                        {
+                            var pids = string.Join(",", kvp.Value);
+                            var sDescriptor = mapPIDToServiceDescriptor[kvp.Key];
+
+                            var ch = new DVBTChannel();
+                            ch.PIDs = pids;
+                            ch.ProgramMapPID = kvp.Key;
+                            ch.Name = sDescriptor.ServiceName;
+                            ch.ProviderName = sDescriptor.ProviderName;
+                            ch.Frequency = freq;
+                            ch.Bandwdith = bandWidth;
+                            ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
+                            ch.DVBTType = dvbtTypeIndex;
+
+                            if (sDescriptor.ServisType == 1 ||
+                                sDescriptor.ServisType == 2)
+                            {
+                                ch.ServiceType = (DVBTServiceType)sDescriptor.ServisType;
+                            }
+                            else
+                            if (sDescriptor.ServisType == 31)
+                            {
+                                ch.ServiceType = DVBTServiceType.TV; // DVBT2 video
+                            }
+                            else
+                            {
+                                ch.ServiceType = DVBTServiceType.NotSupported;
+                            }
+
+                            TunedChannels.Add(ch);
+                            SelectedChannel = ch;
+
+                            _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
+
+                            Status = GetTuningStatusText();
+                        }
+                        break;
+                }
             }
             catch (Exception ex)
             {

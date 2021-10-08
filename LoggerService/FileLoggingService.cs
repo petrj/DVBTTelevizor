@@ -38,10 +38,10 @@ namespace LoggerService
             {
                 string msg = $"[{DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss")}] {level} {message}";
 
-#if DEBUG
-    System.Diagnostics.Debug.WriteLine(msg);
-    Console.WriteLine(msg);
-#endif
+                #if DEBUG
+                    System.Diagnostics.Debug.WriteLine(msg);
+                    Console.WriteLine(msg);
+                #endif
 
                 var logFolder = System.IO.Path.GetDirectoryName(LogFilename);
                 if(string.IsNullOrEmpty(logFolder))

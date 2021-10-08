@@ -115,7 +115,7 @@
                                         <ColumnDefinition Width="20*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
 
                                     <Label Grid.Row="0" Grid.Column="1"  Grid.RowSpan="3" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
 

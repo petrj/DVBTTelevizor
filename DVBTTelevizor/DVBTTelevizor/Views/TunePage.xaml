@@ -32,27 +32,56 @@
 
             <Style x:Key="ChannelNameTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
-                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="Margin" Value="0,5,5,5"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="ProviderNameTextStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="white"/>
+                <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
                 <Setter Property="Margin" Value="20,0,0,0"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="white"/>
+                <Setter Property="TextColor" Value="LightGray"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Label">
                 <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
+
+            <Style x:Key="EntryStyle" TargetType="Entry">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="Keyboard" Value="Numeric"/>
+            </Style>
+
+            <Style x:Key="PickerStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
         </ResourceDictionary>
@@ -74,7 +103,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" TextColor="White"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
                 </Grid>
 
@@ -82,22 +111,34 @@
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60*" />
                         <ColumnDefinition Width="40*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" TextColor="White"/>
-                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Channel)" TextColor="White"/>
-                    <Picker Grid.Row="1" Grid.Column="1" TextColor="White" VerticalOptions="End" HorizontalOptions="End"
-                            Margin="0,0,0,0"
+                </Grid>
+
+                <Grid x:Name="ManualTuneOptionsChannelGrid" IsVisible="{Binding ManualTuneOptionsVisible}">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50*" />
+                        <ColumnDefinition Width="50*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Picker Grid.Row="0" Grid.Column="1"
+                            Style="{StaticResource PickerStyle}"
                             SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
                             ItemsSource="{Binding FrequencyChannels}"
-                            ItemDisplayBinding="{Binding Description}"/>
+                            ItemDisplayBinding="{Binding Description}"
+                            FontSize="{Binding FontSizeForPicker}"/>
                 </Grid>
 
                 <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}">
@@ -112,30 +153,30 @@
                         <ColumnDefinition Width="40*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White"/>
-                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="BandWidth (Mhz)" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" Style="{DynamicResource EntryStyle}"  FontSize="{Binding FontSizeForEntry}"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="DVBT" TextColor="White"/>
+                    <Label Grid.Row="1" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                     <CheckBox Grid.Row="1" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End" VerticalOptions="Center" />
 
-                    <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" TextColor="White"/>
+                    <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
                 </Grid>
 
-                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}" />         
+                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  FontSize="{Binding FontSizeForLabel}"/>
 
 
             </StackLayout>
 
             <!-- middle controls -->
-            <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">                
+            <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
 
                 <ListView x:Name="ChannelsListView"
                         ItemsSource="{Binding TunedChannels}"
                         CachingStrategy="RecycleElement"
                         HasUnevenRows="True"
                         Style="{StaticResource ListViewStyle}"
-                        VerticalOptions="StartAndExpand" 
+                        VerticalOptions="StartAndExpand"
                         SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
 
                     <ListView.ItemTemplate>
@@ -146,24 +187,24 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
                                             <RowDefinition Height="1" />
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="8*" />
+                                            <ColumnDefinition Width="08*" />
                                             <ColumnDefinition Width="62*" />
-                                            <ColumnDefinition Width="25*" />
-                                            <ColumnDefinition Width="5*" />
+                                            <ColumnDefinition Width="10*" />
+                                            <ColumnDefinition Width="20*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" />
+                                        <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
 
-                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}"/>
-                                        <Label Grid.Row="1" Grid.Column="1"  Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}"/>
+                                        <Label Grid.Row="0" Grid.Column="1"  Grid.RowSpan="3" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
 
-                                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
-                                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding DVBTTypeLabel}" Style="{DynamicResource DetailLabelsTextStyle}" />
+                                        <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
+                                        <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                        <BoxView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
+                                        <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                     </Grid>
 
                                 </ViewCell.View>
@@ -191,7 +232,7 @@
 
                 <Label IsVisible="{Binding TuningInProgress}" Text="{Binding TuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White"/>
 
-                <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,0,0,0">                    
+                <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,0,0,0">
                     <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="2" />
                 </StackLayout>
 
@@ -210,10 +251,10 @@
                         <ColumnDefinition Width="50*" />
                         <ColumnDefinition Width="50*" />
                     </Grid.ColumnDefinitions>
-                    
+
                     <Button Grid.Row="0" Grid.Column="0" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding AbortedButtonVisible}"/>
                     <ActivityIndicator Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True"/>
-                    
+
                     <Button Grid.Row="1" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save"  IsVisible="{Binding AddChannelsVisible}" />
                     <Button Grid.Row="1" Grid.Column="1" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
                 </Grid>

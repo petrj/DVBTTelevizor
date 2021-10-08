@@ -28,7 +28,7 @@ namespace DVBTTelevizor
             :base(loggingService, dialogService, driver, config)
         {
             _loggingService = loggingService;
-            _dialogService = dialogService;            
+            _dialogService = dialogService;
         }
     }
 }

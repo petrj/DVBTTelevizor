@@ -9,67 +9,89 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
 
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
+
+            <Style x:Key="EntryStyle" TargetType="Entry">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
 
         </ResourceDictionary>
     </ContentPage.Resources>
 
-
     <ContentPage.Content>
-        <StackLayout Margin="10,10,10,10">            
+        <ScrollView Margin="20,10,20,0">
+            <StackLayout Margin="0,0,0,0">
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30*" />
-                    <ColumnDefinition Width="70*" />
-                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35*" />
+                        <ColumnDefinition Width="65*" />
+                    </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Text="Number:" TextColor="White" VerticalOptions="Center"/>
-                <Entry Grid.Row="0" Grid.Column="1"
+                    <Label Grid.Row="0" Grid.Column="0" Text="Number" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                    <Entry Grid.Row="0" Grid.Column="1"
                        x:Name="EntryNumber"
                        Text="{Binding Channel.Number, Mode=TwoWay}"
                        Placeholder="Channel number"
-                       TextColor="Yellow"
-                       HorizontalOptions="Start"
-                       VerticalOptions="Center"
-                       Keyboard="Numeric"/>
+                       Style="{DynamicResource EntryStyle}"
+                       Keyboard="Numeric"
+                       FontSize="{Binding FontSizeForEntry}"/>
 
-                <Label Grid.Row="1" Grid.Column="0" Text="Name:" TextColor="White" VerticalOptions="Center"/>
-                <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryName" Text="{Binding Channel.Name, Mode=TwoWay}" Placeholder="Channel name" TextColor="Yellow" HorizontalOptions="Start" VerticalOptions="Center" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Entry Grid.Row="1" Grid.Column="1"
+                       x:Name="EntryName"
+                       Text="{Binding Channel.Name, Mode=TwoWay}"
+                       Placeholder="Channel name"
+                       Style="{DynamicResource EntryStyle}"
+                       FontSize="{Binding FontSizeForEntry}" />
 
-                <Label Grid.Row="2" Grid.Column="0" Text="Provider:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="2" Grid.Column="1" Text="{Binding Channel.ProviderName}" TextColor="White" VerticalOptions="Center"/>
+                    <Label Grid.Row="2" Grid.Column="0" Text="Provider" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Channel.ProviderName}"  Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
 
-                <Label Grid.Row="3" Grid.Column="0" Text="Channel:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="3" Grid.Column="1" Text="{Binding Channel.ChannelLabel}" TextColor="White" VerticalOptions="Center"/>
+                    <Label Grid.Row="3" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Channel.ChannelLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                <Label Grid.Row="4" Grid.Column="0" Text="Frequency:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="4" Grid.Column="1" Text="{Binding Channel.FrequencyLabel}" TextColor="White" VerticalOptions="Center"/>
+                    <Label Grid.Row="4" Grid.Column="0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="4" Grid.Column="1" Text="{Binding Channel.FrequencyLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                <Label Grid.Row="5" Grid.Column="0" Text="Bandwidth:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="5" Grid.Column="1" Text="{Binding Channel.BandwdithLabel}" TextColor="White" VerticalOptions="Center"/>
+                    <Label Grid.Row="5" Grid.Column="0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                <Label Grid.Row="6" Grid.Column="0" Text="Type:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="6" Grid.Column="1" Text="{Binding Channel.DVBTTypeLabel}" TextColor="White" VerticalOptions="Center"/>
+                    <Label Grid.Row="6" Grid.Column="0" Text="Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="6" Grid.Column="1" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                <Label Grid.Row="7" Grid.Column="0" Text="Map PID:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="7" Grid.Column="1" Text="{Binding Channel.ProgramMapPID}" TextColor="White" VerticalOptions="Center"/>
+                    <Label Grid.Row="7" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="7" Grid.Column="1" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                <Label Grid.Row="8" Grid.Column="0" Text="PIDs:" TextColor="White" VerticalOptions="Center"/>
-                <Label Grid.Row="8" Grid.Column="1" Text="{Binding Channel.PIDs}" TextColor="White" VerticalOptions="Center"/>
-            </Grid>
+                    <Label Grid.Row="8" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="8" Grid.Column="1" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                </Grid>
 
-        </StackLayout>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>
