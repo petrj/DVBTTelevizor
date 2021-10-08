@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -23,7 +24,19 @@ namespace DVBTTelevizor
             }
         }
 
+        public static bool ChannelExists(ObservableCollection<DVBTChannel> channels, long frequency, long ProgramMapPID)
+        {
+            foreach (var ch in channels)
+            {
+                if (ch.Frequency == frequency &&
+                    ch.ProgramMapPID == ProgramMapPID)
+                {
+                    return true;
+                }
+            }
 
+            return false;
+        }
 
         #region INotifyPropertyChanged
 

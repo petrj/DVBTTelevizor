@@ -49,6 +49,7 @@ namespace DVBTTelevizor
 
             ShareLogCommand = new Command(() => { ShareLog(); });
         }
+
         public bool IsFullScreen
         {
             get
@@ -189,7 +190,7 @@ namespace DVBTTelevizor
             var count = 0;
             foreach (var ch in importedChannels)
             {
-                if (!BaseViewModel.ChannelExists(chs, ch.Frequency, ch.Name, ch.ProgramMapPID))
+                if (!ConfigViewModel.ChannelExists(chs,ch.Frequency, ch.ProgramMapPID))
                 {
                     count++;
                     chs.Add(ch);

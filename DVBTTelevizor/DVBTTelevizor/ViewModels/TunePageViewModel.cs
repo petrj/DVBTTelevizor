@@ -22,6 +22,8 @@ namespace DVBTTelevizor
 
         private TuneState _tuneState = TuneState.Ready;
 
+        private ObservableCollection<DVBTChannel> _channels = null;
+
         public long AutomaticTuningFirstChannel { get; set; } = 21;
         public long AutomaticTuningLastChannel { get; set; } = 69;
         private long _actualTunningChannel = -1;
@@ -33,7 +35,6 @@ namespace DVBTTelevizor
 
         public Command TuneCommand { get; set; }
         public Command AbortTuneCommand { get; set; }
-        public Command SaveTunedChannelsCommand { get; set; }
         public Command FinishTunedCommand { get; set; }
 
         public enum TuneState
@@ -51,7 +52,6 @@ namespace DVBTTelevizor
 
             TuneCommand = new Command(async () => await Tune());
             AbortTuneCommand = new Command(async () => await AbortTune());
-            SaveTunedChannelsCommand = new Command(async () => await SaveTunedChannels());
             FinishTunedCommand = new Command(async () => await FinishTune());
         }
 
@@ -299,6 +299,10 @@ namespace DVBTTelevizor
 
             TunedChannels.Clear();
 
+                            
+            await _channelService.LoadChannels();
+            if (_channels == null) _channels = new ObservableCollection<DVBTChannel>();
+
             OnPropertyChanged(nameof(TuningLabel));
             OnPropertyChanged(nameof(AutomaticTuningProgress));
 
@@ -379,8 +383,7 @@ namespace DVBTTelevizor
                         OnPropertyChanged(nameof(TuningLabel));
                         OnPropertyChanged(nameof(AutomaticTuningProgress));
 
-                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
-                        //System.Threading.Thread.Sleep(200);
+                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);  
                     }
                 }
 
@@ -509,6 +512,9 @@ namespace DVBTTelevizor
                         _loggingService.Debug("No program found");
                         break;
                     case SearchProgramResultEnum.OK:
+
+                        var totalChannelsAddedCount = 0;
+
                         foreach (var kvp in searchProgramPIDsResult.PIDs)
                         {
                             var pids = string.Join(",", kvp.Value);
@@ -544,8 +550,28 @@ namespace DVBTTelevizor
 
                             _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
 
+                            // automatically adding new tuned channel if does not exist
+                            if (!ConfigViewModel.ChannelExists(_channels,ch.Frequency, ch.ProgramMapPID))
+                            {
+                                _channels.Add(ch);
+                                await _channelService.SaveChannels(_channels);
+                                totalChannelsAddedCount++;                                
+                            } 
+
                             Status = GetTuningStatusText();
                         }
+
+                        if (totalChannelsAddedCount>0)
+                        {
+                            if (totalChannelsAddedCount > 1)
+                            {
+                                MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);                                
+                            } else
+                            {
+                                MessagingCenter.Send($"Channel saved", BaseViewModel.MSG_ToastMessage);
+                            }
+                        }
+
                         break;
                 }
             }
@@ -586,47 +612,5 @@ namespace DVBTTelevizor
 
             });
         }
-
-        public async Task<int> SaveTunedChannels()
-        {
-            try
-            {
-                var c = 0;
-
-                var channels = await _channelService.LoadChannels();
-                if (channels == null) channels = new ObservableCollection<DVBTChannel>();
-
-                foreach (var ch in TunedChannels)
-                {
-                    if (!BaseViewModel.ChannelExists(channels, ch.Frequency, ch.Name, ch.ProgramMapPID))
-                    {
-                        c++;
-                        channels.Add(ch);
-                    }
-                }
-
-                await _channelService.SaveChannels(channels);
-
-                TunedChannels.Clear();
-
-                await FinishTune();
-
-                return c;
-            }
-            catch (Exception ex)
-            {
-                Status = $"Error ({ex.Message})";
-                return 0;
-            }
-            finally
-            {
-                IsBusy = false;
-
-                OnPropertyChanged(nameof(TuningFinished));
-                OnPropertyChanged(nameof(TunedChannels));
-                OnPropertyChanged(nameof(AddChannelsVisible));
-            }
-        }
-
     }
 }

@@ -125,6 +125,30 @@ namespace DVBTTelevizor
             }
         }
 
+        public void Resume()
+        {
+            if (Playing)
+            {
+                // workaround for black screen after resume (only audio is playing)
+                // TODO: resume video without reinitializing
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    if (_mediaPlayer.VideoTrack != -1)
+                    {
+                        //var pos = videoView.MediaPlayer.Position;
+                        videoView.MediaPlayer.Stop();
+
+                        VideoStackLayout.Children.Remove(videoView);
+                        VideoStackLayout.Children.Add(videoView);
+
+                        videoView.MediaPlayer.Play();
+                        //videoView.MediaPlayer.Position = pos;
+                    }
+                });
+            }
+        }
+
         public void StartPlay()
         {
             Device.BeginInvokeOnMainThread(() =>

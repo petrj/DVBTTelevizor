@@ -327,7 +327,6 @@ namespace DVBTTelevizor.Droid
 
                           */
 
-                    var appFontSize = 0;
 
                     if (DeviceDisplay.MainDisplayInfo.Height < DeviceDisplay.MainDisplayInfo.Width)
                     {
@@ -347,7 +346,7 @@ namespace DVBTTelevizor.Droid
                     var fontSizeRange = screenHeightRate - minTextSize;
                     var fontSizePerValue = fontSizeRange / 5;
 
-                    var fontSize = minTextSize + (int)appFontSize * fontSizePerValue;
+                    var fontSize = minTextSize + (int)_config.AppFontSize * fontSizePerValue;
 
                     textView.SetTextSize(Android.Util.ComplexUnitType.Px, Convert.ToSingle(fontSize));
 

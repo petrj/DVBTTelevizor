@@ -39,7 +39,12 @@ namespace DVBTTelevizor
 
         protected override void OnResume()
         {
-            // Handle when your app resumes
+            _loggingService.Info($"OnResume");
+
+            if (_config.PlayOnBackground)
+            {
+                _mainPage.ResumePlayback();
+            }
         }
 
         public void Done()

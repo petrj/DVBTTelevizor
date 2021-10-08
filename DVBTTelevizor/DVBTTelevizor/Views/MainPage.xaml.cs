@@ -179,6 +179,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public void ResumePlayback()
+        {
+            if (_playerPage != null && _playerPage.Playing)
+            {
+                _playerPage.Resume();
+            }
+        }
+
         private void _editChannelPage_Disappearing(object sender, EventArgs e)
         {
             Task.Run(async () =>

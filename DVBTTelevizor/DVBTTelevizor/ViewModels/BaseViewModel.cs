@@ -150,21 +150,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public static bool ChannelExists(ObservableCollection<DVBTChannel> channels, long frequency, string name, long ProgramMapPID)
-        {
-            foreach (var ch in channels)
-            {
-                if (ch.Frequency == frequency &&
-                    ch.Name == name &&
-                    ch.ProgramMapPID == ProgramMapPID)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public static async Task<bool> RunWithStoragePermission(Func<Task> action, IDialogService dialogService)
         {
             try

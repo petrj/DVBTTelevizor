@@ -255,8 +255,7 @@
                     <Button Grid.Row="0" Grid.Column="0" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding AbortedButtonVisible}"/>
                     <ActivityIndicator Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True"/>
 
-                    <Button Grid.Row="1" Grid.Column="0" x:Name="SaveChannelsButton" Command="{Binding SaveTunedChannelsCommand}" Text="Save"  IsVisible="{Binding AddChannelsVisible}" />
-                    <Button Grid.Row="1" Grid.Column="1" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
+                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" />
                 </Grid>
 
                 <Label Text="{Binding Status}"  x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>

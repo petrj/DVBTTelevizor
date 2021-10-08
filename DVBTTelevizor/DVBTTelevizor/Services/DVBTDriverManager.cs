@@ -970,7 +970,7 @@ namespace DVBTTelevizor
                     }
 
                     // waiting
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(500);
                 }
 
                 if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
