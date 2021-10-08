@@ -5,9 +5,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local2="clr-namespace:DVBTTelevizor"
              mc:Ignorable="d"
-             x:Class="DVBTTelevizor.MainPage"             
+             x:Class="DVBTTelevizor.MainPage"
              Title="DVBT Televizor">
-    
+
     <ContentPage.Resources>
         <ResourceDictionary>
 
@@ -44,9 +44,9 @@
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
                 <Setter Property="Margin" Value="20,0,0,0"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalTextAlignment" Value="End"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
-                <Setter Property="LineBreakMode" Value="NoWrap"/>                
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
@@ -63,7 +63,7 @@
 
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="20,20,20,20"/>
-            </Style>            
+            </Style>
 
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -118,11 +118,11 @@
                                     <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
 
                                     <Label Grid.Row="0" Grid.Column="1"  Grid.RowSpan="3" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
-                                  
+
                                     <Label Grid.Row="1" Grid.Column="2"  Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}"/>
 
-                                    <Label Grid.Row="0" Grid.Column="3" Text="{Binding DVBTTypeLabelWithFrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
-                                    <Label Grid.Row="2" Grid.Column="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
+                                    <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                     <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                 </Grid>

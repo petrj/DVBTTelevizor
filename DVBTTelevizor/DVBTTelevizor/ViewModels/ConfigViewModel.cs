@@ -77,6 +77,8 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(FontSizeForCaption));
             OnPropertyChanged(nameof(FontSizeForPicker));
             OnPropertyChanged(nameof(FontSizeForLabel));
+            OnPropertyChanged(nameof(FontSizeForChannelNumber));
+            OnPropertyChanged(nameof(FontSizeForDetailNote));
         }
 
         public string FontSizeForCaption

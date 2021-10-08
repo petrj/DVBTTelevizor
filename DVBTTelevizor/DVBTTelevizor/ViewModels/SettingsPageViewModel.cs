@@ -49,8 +49,28 @@ namespace DVBTTelevizor
 
             ShareLogCommand = new Command(() => { ShareLog(); });
         }
+        public bool IsFullScreen
+        {
+            get
+            {
+                return Config.Fullscreen;
+            }
+            set
+            {
+                Config.Fullscreen = value;
+                if (value)
+                {
+                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableFullScreen);
+                }
+                else
+                {
+                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                }
 
-      
+                OnPropertyChanged(nameof(IsFullScreen));
+            }
+        }
+
 
         public int AppFontSizeIndex
         {

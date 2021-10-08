@@ -76,6 +76,11 @@ namespace DVBTTelevizor.Droid
             _fullscreenUiOptions |= (int)SystemUiFlags.HideNavigation;
             _fullscreenUiOptions |= (int)SystemUiFlags.ImmersiveSticky;
 
+            if (_config.Fullscreen)
+            {
+                SetFullScreen(true);
+            }
+
             _app = new App(_loggingService, _config);
             LoadApplication(_app);
 
