@@ -134,6 +134,39 @@ namespace DVBTTelevizor.Droid
                 }
             });
 
+            MessagingCenter.Subscribe<SettingsPage>(this, BaseViewModel.MSG_CheckBatterySettings, (sender) =>
+            {
+                try
+                {
+                    var pm = (PowerManager)Android.App.Application.Context.GetSystemService(Context.PowerService);
+                    bool ignoring = pm.IsIgnoringBatteryOptimizations(AppInfo.PackageName);
+
+                    if (!ignoring)
+                    {
+                        MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_RequestBatterySettings);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+            });
+
+            MessagingCenter.Subscribe<SettingsPage>(this, BaseViewModel.MSG_SetBatterySettings, (sender) =>
+            {
+                try
+                {
+                    var intent = new Intent();
+                    intent.SetAction(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                    intent.SetFlags(ActivityFlags.NewTask);
+                    Android.App.Application.Context.StartActivity(intent);
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+            });
+
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToastMessage, (message) =>
             {
                 ShowToastMessage(message);

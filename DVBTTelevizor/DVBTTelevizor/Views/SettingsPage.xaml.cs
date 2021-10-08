@@ -25,6 +25,24 @@ namespace DVBTTelevizor
             _dialogService = dialogService;
 
             BindingContext = _viewModel = new SettingsPageViewModel(_loggingService, _dialogService, config, channelService);
+
+            PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_RequestBatterySettings, async (sender) =>
+            {
+                if (await _dialogService.Confirm("You should manually turn battery optimization off for DVBT Televizor. Open settings?"))
+                {
+                    MessagingCenter.Send<SettingsPage>(this, BaseViewModel.MSG_SetBatterySettings);
+                }
+            });
+        }
+
+        private void PlayOnBackgroundSwitch_Toggled(object sender, ToggledEventArgs e)
+        {
+            if (_viewModel.Config.PlayOnBackground)
+            {
+                MessagingCenter.Send<SettingsPage>(this, BaseViewModel.MSG_CheckBatterySettings);
+            }
         }
     }
 }

@@ -33,6 +33,9 @@ namespace DVBTTelevizor
         public const string MSG_ToastMessage = "ShowToastMessage";
         public const string MSG_EditChannel = "EditChannel";
         public const string MSG_ShareFile = "ShareFile";
+        public const string MSG_CheckBatterySettings = "CheckBatterySettings";
+        public const string MSG_RequestBatterySettings = "RequestBatterySettings";
+        public const string MSG_SetBatterySettings = "SetBatterySettings ";
 
         private string _status;
 

@@ -9,12 +9,14 @@ namespace DVBTTelevizor
     {
         MainPage _mainPage;
         ILoggingService _loggingService;
+        DVBTTelevizorConfiguration _config;
 
         public App(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             InitializeComponent();
 
             _loggingService = loggingService;
+            _config = config;
 
             _mainPage = new MainPage(_loggingService, config);
             MainPage = new NavigationPage(_mainPage);
@@ -29,7 +31,10 @@ namespace DVBTTelevizor
         {
             _loggingService.Info($"OnSleep");
 
-            _mainPage.StopPlayback();
+            if (!_config.PlayOnBackground)
+            {
+                _mainPage.StopPlayback();
+            }
         }
 
         protected override void OnResume()
