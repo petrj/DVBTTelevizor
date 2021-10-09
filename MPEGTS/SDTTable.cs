@@ -17,8 +17,6 @@ namespace MPEGTS
         public int TableIdExt { get; set; }
         public byte ReservedExt { get; set; }
 
-        public int ServiceId { get; set; }
-
         public byte RunningStatus { get; set; }
         public int DescriptorsLoopLength { get; set; }
 
@@ -59,7 +57,6 @@ namespace MPEGTS
             }
 
             sb.AppendLine($"NetworkID              : {NetworkID}");
-            sb.AppendLine($"ServiceId              : {ServiceId}");
 
             sb.AppendLine();
 
@@ -77,11 +74,11 @@ namespace MPEGTS
                 }
             } else
             {
-                sb.AppendLine($"{"Type",4} {"Provider".PadRight(20, ' '),20} {"ServiceName".PadRight(20, ' '),20} {"Program Number",6}");
-                sb.AppendLine($"{"----",4} {"--------".PadRight(20, '-'),20} {"-----------".PadRight(20, '-'),20} {"--------------",6}");
+                sb.AppendLine($"{"Type",4} {"Provider".PadRight(20, ' '),20} {"ServiceName".PadRight(40, ' '),40} {"Program Number"}");
+                sb.AppendLine($"{"----",4} {"--------".PadRight(20, '-'),20} {"-----------".PadRight(40, '-'),40} {"--------------"}");
                 foreach (var desc in ServiceDescriptors)
                 {
-                    sb.AppendLine($"{desc.ServisType,4} {desc.ProviderName.PadRight(20, ' '),20} {desc.ServiceName.PadRight(20,' '),20} {desc.ProgramNumber,6}");
+                    sb.AppendLine($"{desc.ServisType,4} {desc.ProviderName.PadRight(20, ' '),20} {desc.ServiceName.PadRight(40,' '),40} {desc.ProgramNumber,14}");
                 }
             }
 
@@ -129,67 +126,47 @@ namespace MPEGTS
             }
 
             NetworkID = (bytes[pos + 0] << 8) + bytes[pos + 1]; // original network Id
-            ServiceId = (bytes[pos + 3] << 8) + bytes[pos + 4];
-            pos += 3;
 
-            // pointer + table id + sect.length + descriptors - crc
-            var posAfterDescriptors = 4 + SectionLength - 4;
+            pos = pos + 3;  // reserved_future_use byte
 
-            // reading descriptors
-            while (pos < posAfterDescriptors)
+            while (pos< SectionLength)
             {
-                var sDescriptor = new ServiceDescriptor();
-                sDescriptor.ProgramNumber = ((bytes[pos + 0]) << 8) + bytes[pos + 1];
+                var programNumber = ((bytes[pos + 0]) << 8) + bytes[pos + 1];
 
-                pos += 3;
+                // reserved_future_use
+                // EIT_schedule_flag
+                // EIT_present_following_flag
+                // unning_status 3 uimsbf 
+                // free_CA_mode
 
-                sDescriptor.Length = ((bytes[pos + 0] & 7) << 8) + bytes[pos + 1];
+                pos = pos + 3;
 
-                pos += 2;
+                var descriptorLoopLength = ((bytes[pos + 0] & 15) << 8) + bytes[pos + 1];
 
-                var posAfterThisDescriptor = pos + sDescriptor.Length;
+                pos = pos + 2;
 
-                sDescriptor.Tag = bytes[pos + 0];
+                var posAfterdescriptorLoopLength = pos + descriptorLoopLength;
 
-                sDescriptor.ServisType = bytes[pos + 2];
-                sDescriptor.ProviderNameLength = bytes[pos + 3];
-
-                pos = pos + 4;
-
-                if (bytes.Count < pos + sDescriptor.ProviderNameLength)
-                    break;
-
-                sDescriptor.ProviderName = MPEGTSCharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ProviderNameLength);
-                if (String.IsNullOrEmpty(sDescriptor.ProviderName))
+                while (pos < posAfterdescriptorLoopLength)
                 {
-                    // not supported encoding ?
-                    sDescriptor.ProviderName = $"ServiceId #{ServiceId}";
-                }
 
-                pos = pos + sDescriptor.ProviderNameLength;
+                    var descriptorTag = bytes[pos + 0];
+                    var descriptorLength = bytes[pos + 1];
+                    var descriptorBytes = new byte[descriptorLength + 2]; // descriptorLength + descriptorTag + descriptorLength
+                    bytes.CopyTo(pos, descriptorBytes, 0, descriptorLength + 2);
 
-                if (bytes.Count < pos)
-                    break;
+                    if (descriptorTag == 0x48) // service_descriptor
+                    {
+                        var serviceDescriptor = new ServiceDescriptor(descriptorBytes, programNumber, NetworkID);
+                        ServiceDescriptors.Add(serviceDescriptor);
+                    } else
+                    {
 
-                sDescriptor.ServiceNameLength = bytes[pos + 0];
+                    }
 
-                if (bytes.Count < pos + 1 + sDescriptor.ServiceNameLength)
-                    break;
-
-                pos++;
-
-                sDescriptor.ServiceName = MPEGTSCharReader.ReadString(bytes.ToArray(), pos, sDescriptor.ServiceNameLength);
-
-                if (String.IsNullOrEmpty(sDescriptor.ServiceName))
-                {
-                    // not supported encoding ?
-                    sDescriptor.ServiceName = $"Channel #{sDescriptor.ProgramNumber}";
-                }
-
-                ServiceDescriptors.Add(sDescriptor);
-
-                pos = posAfterThisDescriptor;
-            }
+                    pos = pos + descriptorLength +2;
+                }                
+            }            
         }
 
     }

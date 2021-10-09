@@ -82,12 +82,9 @@ namespace MPEGTSTest
                 Console.WriteLine($"Service Description Table(SDT):");
                 Console.WriteLine($"------------------------------");
 
-                sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17],17);
-
                 sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17], 17);  // PID 0x11, Service Description Table (SDT)
 
-                sDTTable.WriteToConsole();
-                logger.Info(sDTTable.WriteToString());
+                sDTTable.WriteToConsole();                
             }
 
             if (packetsByPID.ContainsKey(16))
