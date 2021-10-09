@@ -121,7 +121,7 @@
 
                                     <Label Grid.Row="1" Grid.Column="2"  Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}"/>
 
-                                    <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
+                                    <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding ServiceTypelWithChannelLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
                                     <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                     <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>

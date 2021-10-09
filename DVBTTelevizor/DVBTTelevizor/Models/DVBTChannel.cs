@@ -35,7 +35,7 @@ namespace DVBTTelevizor
             get
             {
                 var ch = (Convert.ToInt32(Frequency / 1000000) - 306) / 8;
-                return ch.ToString();
+                return "CH #" + ch.ToString();
             }
         }
 
@@ -106,11 +106,20 @@ namespace DVBTTelevizor
             }
         }
 
-        public string DVBTTypeLabelWithFrequencyLabel
+        public string DVBTChannelNubmer
         {
             get
             {
-                return DVBTTypeLabel + ", " + FrequencyLabel;
+                return (((Frequency / 1000000) - 306) / 8).ToString();
+            }
+        }
+
+
+        public string ServiceTypelWithChannelLabel
+        {
+            get
+            {
+                return SimplifiedServiceType + ", " + ChannelLabel;
             }
         }
 
