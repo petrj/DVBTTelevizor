@@ -82,7 +82,7 @@
                     <Label Grid.Row="5" Grid.Column="1" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     <Label Grid.Row="6" Grid.Column="0" Text="Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="6" Grid.Column="1" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="6" Grid.Column="1" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     <Label Grid.Row="7" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                     <Label Grid.Row="7" Grid.Column="1" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>

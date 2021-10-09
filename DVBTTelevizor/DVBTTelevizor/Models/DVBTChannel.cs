@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using MPEGTS;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,9 +16,11 @@ namespace DVBTTelevizor
 
         public long Frequency { get; set; }
 
-        public long ProgramMapPID { get; set; }
+        public long ProgramMapPID { get; set; }        
 
-        public DVBTServiceType ServiceType { get; set; }
+        public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
+
+        public DVBTServiceType ServiceType { get; set; } = DVBTServiceType.Other;        
 
         public string FrequencyLabel
         {
@@ -92,7 +95,7 @@ namespace DVBTTelevizor
                     res = "DVBT2";
                 }
 
-                switch (ServiceType)
+                switch (SimplifiedServiceType)
                 {
                     case DVBTServiceType.Radio:
                     case DVBTServiceType.TV:
@@ -131,6 +134,91 @@ namespace DVBTTelevizor
                 }
 
                 return res;
+            }
+        }
+
+        public DVBTServiceType SimplifiedServiceType
+        {
+            get
+            {
+                if (Type == ServiceTypeEnum.Other)
+                {
+                    return ServiceType;
+                }
+
+                switch (Type)
+                {
+                    case ServiceTypeEnum.DigitalRadioSoundService:
+                    case ServiceTypeEnum.AdvancedCodecDigitalRadioSoundService:
+                        return DVBTServiceType.Radio;
+                    case ServiceTypeEnum.DigitalTelevisionService:
+                    case ServiceTypeEnum.NVODReferenceService:
+                    case ServiceTypeEnum.NVODTimeShiftedService:
+                    case ServiceTypeEnum.MPEG2HDDigitalTelevisionService:
+                    case ServiceTypeEnum.H264AVCSDDigitalTelevisionService:
+                    case ServiceTypeEnum.H264AVCSDNVODReferenceService:
+                    case ServiceTypeEnum.H264AVCSDNVODTimeShiftedService:
+                    case ServiceTypeEnum.H264AVCHDDigitalTelevisionService:                    
+                    case ServiceTypeEnum.H264AVCHDNVODReferenceService:
+                    case ServiceTypeEnum.H264AVCHDNVODRTimeShiftedService:
+                    case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDNVODTimeShiftedService:
+                    case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDNVODReferenceService:
+                    case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDDigitalTelevisionService:
+                    case ServiceTypeEnum.HEVCDigitalTelevisionService:
+                        return DVBTServiceType.TV;
+                }
+
+                return DVBTServiceType.Other;
+            }
+        }
+
+        public string ServiceTypeLabel
+        {
+            get
+            {
+                if (Type == ServiceTypeEnum.Other)
+                {
+                    switch (ServiceType)
+                    {
+                        case DVBTServiceType.TV:
+                            return "TV";
+                        case DVBTServiceType.Radio:
+                            return "Radio";                            
+                    }
+
+                    return "Other/unknown";
+                }
+
+                switch (Type)
+                {
+                    case ServiceTypeEnum.DigitalRadioSoundService:
+                        return "Radio";
+                    case ServiceTypeEnum.AdvancedCodecDigitalRadioSoundService:
+                        return "Advanced codec radio";
+                    case ServiceTypeEnum.DigitalTelevisionService:
+                        return "TV";
+                    case ServiceTypeEnum.NVODReferenceService:
+                    case ServiceTypeEnum.NVODTimeShiftedService:
+                        return "NVOD";
+                    case ServiceTypeEnum.MPEG2HDDigitalTelevisionService:
+                        return "MPEG2 HD TV";
+                    case ServiceTypeEnum.H264AVCSDDigitalTelevisionService:
+                    case ServiceTypeEnum.H264AVCSDNVODReferenceService:
+                    case ServiceTypeEnum.H264AVCSDNVODTimeShiftedService:
+                        return "H.264/AVC SD TV";
+                    case ServiceTypeEnum.H264AVCHDDigitalTelevisionService:
+                    case ServiceTypeEnum.H264AVCHDNVODReferenceService:
+                    case ServiceTypeEnum.H264AVCHDNVODRTimeShiftedService:
+                        return "H.264/AVC HD TV";
+                    case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDNVODTimeShiftedService:
+                    case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDNVODReferenceService:
+                    case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDDigitalTelevisionService:
+                        return "H.264/AVC stereoscopic TV";
+                    case ServiceTypeEnum.HEVCDigitalTelevisionService:
+                        return "HEVC TV";
+                }
+
+                return "Other/unknown";
             }
         }
 

@@ -397,9 +397,9 @@ namespace DVBTTelevizor
             var tv = 0;
             foreach (var c in TunedChannels)
             {
-                if (c.ServiceType == DVBTServiceType.TV)
+                if (c.SimplifiedServiceType == DVBTServiceType.TV)
                     tv++;
-                if (c.ServiceType == DVBTServiceType.Radio)
+                if (c.SimplifiedServiceType == DVBTServiceType.Radio)
                     radio++;
             }
 
@@ -435,7 +435,7 @@ namespace DVBTTelevizor
                             Frequency = freq,
                             Bandwdith = bandWidth,
                             DVBTType = dvbtTypeIndex,
-                            ServiceType = DVBTServiceType.TV,
+                            Type = ServiceTypeEnum.DigitalTelevisionService,
                             Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString()
                         };
 
@@ -529,21 +529,7 @@ namespace DVBTTelevizor
                             ch.Bandwdith = bandWidth;
                             ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
                             ch.DVBTType = dvbtTypeIndex;
-
-                            if (sDescriptor.ServisType == 1 ||
-                                sDescriptor.ServisType == 2)
-                            {
-                                ch.ServiceType = (DVBTServiceType)sDescriptor.ServisType;
-                            }
-                            else
-                            if (sDescriptor.ServisType == 31)
-                            {
-                                ch.ServiceType = DVBTServiceType.TV; // DVBT2 video
-                            }
-                            else
-                            {
-                                ch.ServiceType = DVBTServiceType.NotSupported;
-                            }
+                            ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;                           
 
                             TunedChannels.Add(ch);
                             SelectedChannel = ch;

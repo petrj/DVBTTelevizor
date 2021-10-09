@@ -279,10 +279,10 @@ namespace DVBTTelevizor
 
                 foreach (var ch in channels)
                 {
-                    if (ch.ServiceType == DVBTServiceType.TV && !_config.ShowTVChannels)
+                    if (ch.SimplifiedServiceType == DVBTServiceType.TV && !_config.ShowTVChannels)
                         continue;
 
-                    if (ch.ServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
+                    if (ch.SimplifiedServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
                         continue;
 
                     if (_recordingChannel != null &&

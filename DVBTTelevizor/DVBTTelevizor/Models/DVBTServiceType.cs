@@ -6,7 +6,7 @@ namespace DVBTTelevizor
 {
     public enum DVBTServiceType
     {
-        NotSupported = 0,
+        Other = 0,
         TV = 1,
         Radio = 2
     }
