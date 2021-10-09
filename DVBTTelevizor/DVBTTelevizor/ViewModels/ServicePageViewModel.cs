@@ -291,7 +291,7 @@ namespace DVBTTelevizor
                 
                 ScaningInProgress = true;
 
-                var res = await _driver.ScanEPG();
+                var res = await _driver.ScanEPG(5000);
 
                 ScaningInProgress = false;
 

@@ -152,5 +152,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("PlayOnBackground", value);
             }
         }
+
+        public bool ScanEPG
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ScanEPG");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ScanEPG", value);
+            }
+        }
     }
 }

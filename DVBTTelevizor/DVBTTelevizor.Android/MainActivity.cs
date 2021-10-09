@@ -59,6 +59,7 @@ namespace DVBTTelevizor.Droid
 
 #if DEBUG
             _config.ShowServiceMenu = true;
+            _config.ScanEPG = true;
             if (_loggingService is BasicLoggingService)
                 (_loggingService as BasicLoggingService).MinLevel = LoggingLevelEnum.Debug;
 #endif

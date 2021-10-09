@@ -299,6 +299,22 @@ namespace DVBTTelevizor
                 {
                     _log.Debug($"Signal found");
 
+                    /*
+                    if (_config.ScanEPG && PIDs.Count>0)
+                    {
+                        var eitscanned = await ScanEPG(500);
+                        if (eitscanned)
+                        {
+                            var events = _eitManager.GetEvents(DateTime.Now, 1);
+                            var mapPID = PIDs[0];
+                            if (events.ContainsKey((int)mapPID))
+                            {
+                                var ev = events[(int)mapPID];
+                            }
+                        }
+                    }
+                    */
+
                     if (stopReadStream)
                         StopReadStream();
 
@@ -993,27 +1009,15 @@ namespace DVBTTelevizor
             }
        }
 
-        public async Task<bool> ScanEPG()
+        public async Task<bool> ScanEPG(int msTimeout = 2000)
         {
-            _log.Debug($"Scanning EPG");
-
-            //_eitManager.
+            _log.Debug($"Scanning EPG");    
 
             try
             {
-                // setting PID filter
-                /*
-                var pids = new List<long>() { 18 };
-                var pidRes = await SetPIDs(pids);
-
-                if (!pidRes.SuccessFlag)
-                {                    
-                    return false;
-                }
-                */
                 StartReadBuffer();
 
-                System.Threading.Thread.Sleep(5000);
+                System.Threading.Thread.Sleep(msTimeout);
                 
                 // searching for PID 18 (EIT) packets ..
                 if (_eitManager.Scan(Buffer))
