@@ -37,6 +37,7 @@ namespace DVBTTelevizor
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
+        private bool _firstStartup = true;
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -86,6 +87,7 @@ namespace DVBTTelevizor
             _settingsPage.Disappearing += anyPage_Disappearing;
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
+
             Appearing += MainPage_Appearing;
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
@@ -116,8 +118,8 @@ namespace DVBTTelevizor
                      {
                          if (_playerPage.Playing)
                          {
-                             _playerPage.StopPlay();
-                             _playerPage.StartPlay();
+                             //_playerPage.StopPlay();
+                             _playerPage.StartPlay();                             
                          }
                          else
                          {
@@ -166,6 +168,15 @@ namespace DVBTTelevizor
                 });
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayPreviousChannel, (msg) =>
+            {
+                OnKeyUp();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayNextChannel, (msg) =>
+            {
+                OnKeyDown();
+            });
         }
 
         private void MainPage_Appearing(object sender, EventArgs e)
@@ -215,6 +226,14 @@ namespace DVBTTelevizor
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            // workaround for nont selected channel at startup
+            if (_firstStartup)
+            {
+                _firstStartup = false;                
+
+                _viewModel.RefreshCommand.Execute(null);
+            }
         }
 
         protected override void OnDisappearing()
@@ -411,12 +430,32 @@ namespace DVBTTelevizor
 
         private async Task OnKeyDown()
         {
+            var currentChannel = _viewModel.SelectedChannel;
+
             await _viewModel.SelectNextChannel();
+
+            if (currentChannel == _viewModel.SelectedChannel)
+                return; // no channel chaned
+
+            if (_playerPage != null && _playerPage.Playing)
+            {
+                await _viewModel.PlayChannel(_viewModel.SelectedChannel);
+            }
         }
 
         private async Task OnKeyUp()
         {
+            var currentChannel = _viewModel.SelectedChannel;
+
             await _viewModel.SelectPreviousChannel();
+
+            if (currentChannel == _viewModel.SelectedChannel)
+                return; // no channel chaned
+
+            if (_playerPage != null && _playerPage.Playing)
+            {
+                await _viewModel.PlayChannel(_viewModel.SelectedChannel);
+            }
         }
 
         private void ToolConnect_Clicked(object sender, EventArgs e)
@@ -451,7 +490,10 @@ namespace DVBTTelevizor
 
         private void ToolRefresh_Clicked(object sender, EventArgs e)
         {
-            _viewModel.RefreshCommand.Execute(null);
+            if (_firstStartup)
+            {
+                _viewModel.RefreshCommand.Execute(null);
+            }
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

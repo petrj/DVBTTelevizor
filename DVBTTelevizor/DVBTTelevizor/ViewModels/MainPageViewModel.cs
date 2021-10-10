@@ -38,9 +38,7 @@ namespace DVBTTelevizor
 
             RefreshCommand = new Command(async () => await Refresh());
             LongPressCommand = new Command(async (itm) => await LongPress(itm));
-            ShortPressCommand = new Command(ShortPress);
-
-            RefreshCommand.Execute(null);
+            ShortPressCommand = new Command(ShortPress);            
         }
 
         public bool ShowServiceMenuToolItem
@@ -277,12 +275,21 @@ namespace DVBTTelevizor
 
         private async Task Refresh()
         {
+            string selectedChannelNumber = null;
+
             try
             {
-                _loggingService.Info($"Refreshing channels");
+                IsBusy = true;
 
-                var selectedChannel = _selectedChannel;
-                DVBTChannel selectChannel = null;
+                _loggingService.Info($"Refreshing channels");                
+
+                if (SelectedChannel == null)
+                {
+                    selectedChannelNumber = "1";
+                } else
+                {
+                    selectedChannelNumber = SelectedChannel.Number;
+                }
 
                 Channels.Clear();
 
@@ -312,26 +319,22 @@ namespace DVBTTelevizor
                         ch.Recording = true;
                     }
 
-                    if (selectedChannel != null &&
-                        selectedChannel.Frequency == ch.Frequency &&
-                        selectedChannel.Name == ch.Name &&
-                        selectedChannel.ProgramMapPID == ch.ProgramMapPID)
-                    {
-                        selectChannel = ch;
-                    }
-
                     Channels.Add(ch);
                 }
-
-                OnPropertyChanged(nameof(Channels));
-                OnPropertyChanged(nameof(TunningButtonVisible));
-
-                if (selectChannel != null)
-                    SelectedChannel = selectChannel;
+              
 
             } catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while loading channels");
+            }
+            finally
+            {
+                IsBusy = false;
+
+                OnPropertyChanged(nameof(Channels));
+                OnPropertyChanged(nameof(TunningButtonVisible));
+
+                await SelectChannelByNumber(selectedChannelNumber);
             }
         }
 

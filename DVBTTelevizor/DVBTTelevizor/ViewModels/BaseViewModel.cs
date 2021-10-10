@@ -36,6 +36,8 @@ namespace DVBTTelevizor
         public const string MSG_CheckBatterySettings = "CheckBatterySettings";
         public const string MSG_RequestBatterySettings = "RequestBatterySettings";
         public const string MSG_SetBatterySettings = "SetBatterySettings ";
+        public const string MSG_PlayNextChannel = "PlayNextChannel";
+        public const string MSG_PlayPreviousChannel = "PlayPreviousChannel";
 
         private string _status;
 

@@ -55,7 +55,7 @@ namespace DVBTTelevizor.Droid
 
             _config = new DVBTTelevizorConfiguration();
 
-            InitLogging().Wait();
+            InitLogging();
 
 #if DEBUG
             _config.ShowServiceMenu = true;
@@ -175,7 +175,7 @@ namespace DVBTTelevizor.Droid
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
             {
-                ShareFile(fileName).Wait();
+                ShareFile(fileName);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EnableFullScreen, (msg) =>

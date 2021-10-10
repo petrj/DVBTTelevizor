@@ -92,13 +92,13 @@ namespace DVBTTelevizor
         }
 
         private void SwipeGestureRecognizer_Up(object sender, SwipedEventArgs e)
-        {
-
+        {            
+            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_PlayNextChannel);
         }
 
         private void SwipeGestureRecognizer_Down(object sender, SwipedEventArgs e)
         {
-
+            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_PlayPreviousChannel);
         }
 
         protected override void OnAppearing()
