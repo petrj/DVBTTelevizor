@@ -13,6 +13,8 @@ namespace MPEGTS
 
         public Dictionary<int, List<EventItem>> ScheduledEvents { get; set; } = new Dictionary<int, List<EventItem>>();
 
+        public Dictionary<int, int> ProgramNumberToMapPID { get; set; } = new Dictionary<int, int>();
+
         public bool Scan(List<byte> bytes)
         {
             if (bytes == null || bytes.Count == 0)
@@ -95,6 +97,15 @@ namespace MPEGTS
                 ScheduledEvents[kvp.Key].Sort();
             }
 
+            var psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
+            if (psiTable != null && psiTable.ProgramAssociations!= null)
+            {
+                foreach (var kvp in psiTable.ProgramAssociations)
+                {
+                    ProgramNumberToMapPID[kvp.ProgramNumber] = kvp.ProgramMapPID;
+                }
+            }
+
             return true;
         }
 
@@ -104,7 +115,7 @@ namespace MPEGTS
         /// </summary>
         /// <param name="date"></param>
         /// <param name="count"></param>
-        /// <returns></returns>
+        /// <returns>Key: Program MapPID</returns>
         public Dictionary<int, List<EventItem>> GetEvents(DateTime date, int count = 2)
         {
             var res = new Dictionary<int, List<EventItem>>();
@@ -113,7 +124,12 @@ namespace MPEGTS
 
             foreach (var serviceId in ScheduledEvents.Keys)
             {
-                res[serviceId] = new List<EventItem>();
+                if (!ProgramNumberToMapPID.ContainsKey(serviceId))
+                    continue;
+
+                var programMpaPID = ProgramNumberToMapPID[serviceId];
+
+                res[programMpaPID] = new List<EventItem>();
 
                 int actualCount = 0;
                 foreach (var ev in ScheduledEvents[serviceId])
@@ -123,7 +139,7 @@ namespace MPEGTS
                         ev.FinishTime >= date)
                     {
                         // actual running event
-                        res[serviceId].Add(ev);
+                        res[programMpaPID].Add(ev);
                         actualCount++;
                         continue;
                     }
@@ -135,7 +151,7 @@ namespace MPEGTS
 
                     if (actualCount >= 1)
                     {
-                        res[serviceId].Add(ev);
+                        res[programMpaPID].Add(ev);
                         actualCount++;
                     }
                 }
@@ -149,8 +165,13 @@ namespace MPEGTS
                     kvp.Value.StartTime <= date &&
                     kvp.Value.FinishTime >= date)
                 {
-                    res[kvp.Key] = new List<EventItem>();
-                    res[kvp.Key].Add(kvp.Value);
+                    if (!ProgramNumberToMapPID.ContainsKey(kvp.Key))
+                        continue;
+
+                    var programMpaPID = ProgramNumberToMapPID[kvp.Key];
+
+                    res[programMpaPID] = new List<EventItem>();
+                    res[programMpaPID].Add(kvp.Value);
                 }
             }
 

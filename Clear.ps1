@@ -11,8 +11,8 @@ foreach ($folder in `
 		"LoggerService\obj",
 		"MPEGTS\bin",
 		"MPEGTS\obj",
-		"MPEGTSConsole\bin",
-		"MPEGTSConsole\obj"
+		"MPEGTSAnalyzator\bin",
+		"MPEGTSAnalyzator\obj"
      ))
 {
     $fullPath = [System.IO.Path]::Combine($scriptPath,$folder)

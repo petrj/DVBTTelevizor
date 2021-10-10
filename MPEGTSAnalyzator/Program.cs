@@ -5,7 +5,7 @@ using MPEGTS;
 using LoggerService;
 using System.Text;
 
-namespace MPEGTSTest
+namespace MPEGTSAnalyzator
 {
     class MainClass
     {
@@ -19,24 +19,26 @@ namespace MPEGTSTest
             }
             else
             {
-                //ScanPSI("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
-                //ScanEIT("TestData" + Path.DirectorySeparatorChar + "PID_18.ts");
+                Console.WriteLine("MPEGTSAnalyzator");
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Usage:");
+                Console.WriteLine();
+                Console.WriteLine("MPEGTSAnalyzator.exe file.ts");
+                Console.WriteLine();
+                Console.WriteLine();
 
+#if DEBUG
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
                 AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
 
-                // chinese encoding:
-                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "CTS.ts");
-
-                // 33 s video sample:
-                //var path = "TestData" + Path.DirectorySeparatorChar + "stream.ts";
-                //RecordMpegTS(path);
-
                 Console.WriteLine("Press Enter");
                 Console.ReadLine();
+#endif
+
             }
         }
 
@@ -147,7 +149,16 @@ namespace MPEGTSTest
                 Console.WriteLine($"------------------------------");
 
                 var eitManager = new EITManager();
-                eitManager.Scan(packetsByPID[18]);
+
+                var packetsEITwithSDT = new List<MPEGTransportStreamPacket>();
+                packetsEITwithSDT.AddRange(packetsByPID[18]);
+
+                if (packetsByPID.ContainsKey(0))
+                {
+                    packetsEITwithSDT.AddRange(packetsByPID[0]);
+                }                    
+
+                eitManager.Scan(packetsEITwithSDT);
 
                 Console.WriteLine();
                 Console.WriteLine("Current events");
@@ -166,59 +177,27 @@ namespace MPEGTSTest
                 Console.WriteLine("Scheduled events");
                 Console.WriteLine();
 
+                foreach (var programNumber in eitManager.ScheduledEvents.Keys)
+                {
+                    foreach (var ev in eitManager.ScheduledEvents[programNumber])
+                    { 
+                        Console.WriteLine(ev.WriteToString());
+                    }
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Present Events");
+                Console.WriteLine();
+
                 foreach (var kvp in eitManager.GetEvents(DateTime.Now))
                 {
+                    Console.WriteLine($"Program Map PID: {kvp.Key}");
+
                     foreach (var ev in kvp.Value)
                     {
                         Console.WriteLine(ev.WriteToString());
                     }
-                }
-            }
-        }
-
-        public static void RecordMpegTS(string path)
-        {
-            try
-            {
-                var recBuffer = new RecordBuffer(new BasicLoggingService());
-
-                var bufferLength = 4096;
-                byte[] buffer = new byte[bufferLength];
-                long totalBytesRead = 0;
-
-                var startTime = DateTime.Now;
-
-                // reading bytes from file - simulation of HW byte stream
-
-                using (var fs = new FileStream(path, FileMode.Open))
-                {
-                    fs.Read(new byte[1024], 0, 10); // simulate bad stream begin
-
-                    while (fs.Position + bufferLength < fs.Length)
-                    {
-                        var bytesRead = fs.Read(buffer, 0, bufferLength);
-                        totalBytesRead += bytesRead;
-
-                        recBuffer.AddBytes(buffer, bytesRead);
-                        //Console.WriteLine($"Read {bytesRead} bytes (total: {totalBytesRead})");
-                    }
-                    fs.Close();
-                }
-
-                var totalSeconds = (DateTime.Now - startTime).TotalSeconds;
-                var bitRate = (totalBytesRead * 8 / totalSeconds) / 1000000.00;
-
-                Console.WriteLine($"Total time: {totalSeconds}");
-                Console.WriteLine($"Bitrate: { bitRate} Mb/sec");
-
-                Console.WriteLine($"RecordFileName: { recBuffer.RecordFileName}");
-
-
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                }                
             }
         }
 
@@ -229,9 +208,6 @@ namespace MPEGTSTest
 
             using (var fs = new FileStream(path, FileMode.Open))
             {
-                // testing finding sync byte:
-                //fs.Read(buffer, 0, 12);
-
                 while (fs.Position + 188 < fs.Length)
                 {
                     fs.Read(buffer, 0, 188);
@@ -241,94 +217,6 @@ namespace MPEGTSTest
             }
 
             return streamBytes;
-        }
-
-        private static void ScanEIT(string path)
-        {
-            var logger = new FileLoggingService(LoggingLevelEnum.Debug);
-            logger.LogFilename = "Log.log";
-
-            var bytes = LoadBytesFromFile(path);
-            var packets = MPEGTransportStreamPacket.Parse(bytes);
-
-            var eitManager = new EITManager();
-            eitManager.Scan(packets);
-
-            Console.WriteLine();
-            Console.WriteLine("---------------------------------------------------------------");
-            Console.WriteLine("Current events:");
-            foreach (var kvp in eitManager.CurrentEvents)
-            {
-                Console.WriteLine($"ServiceId: {kvp.Key}");
-                Console.WriteLine(kvp.Value.WriteToString());
-            }
-
-            /*
-            Console.WriteLine();
-            Console.WriteLine("---------------------------------------------------------------");
-            Console.WriteLine("Scheduled events:");
-            foreach (var kvp in eitManager.ScheduledEvents)
-            {
-                Console.WriteLine($"ServiceId: {kvp.Key}");
-                foreach (var ev in kvp.Value)
-                {
-                    if (ev.FinishTime >= DateTime.Now)
-                    {
-                        Console.WriteLine(ev.WriteToString());
-                    }
-                }
-            }
-            */
-        }
-
-        private static void ScanPSI(string path)
-        {
-            var bytes = LoadBytesFromFile(path);
-            var packets = MPEGTransportStreamPacket.Parse(bytes);
-
-            // step 1: reading packets with PID 0, 17 (16)
-
-            // PID 17 ( SDT )
-
-            var sdtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 17);
-            var sDTTable = DVBTTable.Create<SDTTable>(sdtBytes);
-            sDTTable.WriteToConsole();
-
-            /*
-            // PID 16 ( NIT )
-
-            var nitBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 16);
-
-            var niTable = NITTable.Parse(nitBytes);
-            niTable.WriteToConsole();
-            */
-
-            // PID 0 ( PSI )
-
-            var psiBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 0);
-            var psiTable = DVBTTable.Create<PSITable>(psiBytes);
-            psiTable.WriteToConsole();
-
-            // step 2: find map PIDs from SDT a PSI
-
-            // list of services and PMT PIDs:
-
-            Console.WriteLine("----- Services ---------------");
-            var services = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sDTTable, psiTable);
-
-            foreach (var service in services)
-            {
-                Console.WriteLine($"Map PID  : {service.Value}");
-                Console.WriteLine($"Provider : {service.Key.ProviderName}");
-                Console.WriteLine($"Name     : {service.Key.ServiceName}");
-                Console.WriteLine("--------------------------------------------------");
-            }
-
-            // step 3: reading packets with PID 0, 17 (16) and map PID packet of given service
-
-            var pmtBytes = MPEGTransportStreamPacket.GetPacketPayloadBytesByPID(bytes, 768);
-            var mptPacket = DVBTTable.Create<PMTTable>(pmtBytes);
-            mptPacket.WriteToConsole();
         }
     }
 }
