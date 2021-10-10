@@ -163,7 +163,7 @@ namespace DVBTTelevizor
 
                 Thread.Sleep(1000);
 
-                MessagingCenter.Send("", BaseViewModel.MSG_PlayStream);
+                MessagingCenter.Send(new PlayStreamInfo(), BaseViewModel.MSG_PlayStream);
             }
             catch (Exception ex)
             {
@@ -298,7 +298,7 @@ namespace DVBTTelevizor
                 if (res)
                 {
                     var txt = String.Empty;
-                    foreach (var kvp in _driver.CurrentEvents)
+                    foreach (var kvp in _driver.EITManager.CurrentEvents)
                     {
                         txt += $"Service: {kvp.Key}  Event: {kvp.Value.TextValue} {Environment.NewLine}";
                     }

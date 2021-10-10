@@ -78,6 +78,9 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
@@ -90,11 +93,14 @@
                         <Label  Grid.Row="1" Grid.Column="0" Text="Disable tuner init after start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="DoNotAutoInitAfterStartSwitch" IsToggled="{Binding Config.DoNotAutoInitAfterStart, Mode=TwoWay}"/>
 
-                        <Label  Grid.Row="2" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="2" Grid.Column="1" x:Name="FullscreenSwitch" IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ScanEPGSwitch" IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
 
-                        <Label  Grid.Row="3" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="3" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                        <Label  Grid.Row="3" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="3" Grid.Column="1" x:Name="FullscreenSwitch" IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+                        <Label  Grid.Row="4" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="4" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
 

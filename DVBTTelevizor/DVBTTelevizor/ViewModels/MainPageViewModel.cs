@@ -246,7 +246,26 @@ namespace DVBTTelevizor
                     throw new Exception("Play returned false");
                 }
 
-                MessagingCenter.Send(channel.Name, BaseViewModel.MSG_PlayStream);
+                var playInfo = new PlayStreamInfo
+                {
+                    Channel = channel
+                };
+
+                if (_driver.EITManager != null)
+                {
+                    var events = _driver.EITManager.GetEvents(DateTime.Now, 1);
+                    var mapPID = channel.ProgramMapPID;
+                    if (events.ContainsKey((int)mapPID))
+                    {
+                        var evs = events[(int)mapPID];
+                        if (evs != null && evs.Count > 0)
+                        {
+                            playInfo.CurrentEvent = evs[0];
+                        }
+                    }
+                }
+
+                MessagingCenter.Send(playInfo, BaseViewModel.MSG_PlayStream);
 
             } catch (Exception ex)
             {

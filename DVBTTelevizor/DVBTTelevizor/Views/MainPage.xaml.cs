@@ -107,7 +107,7 @@ namespace DVBTTelevizor
                     });
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayStream, (channelName) =>
+            MessagingCenter.Subscribe<PlayStreamInfo> (this, BaseViewModel.MSG_PlayStream, (playStreamInfo) =>
             {
                 Device.BeginInvokeOnMainThread(
                  new Action(() =>
@@ -124,7 +124,13 @@ namespace DVBTTelevizor
                              Navigation.PushModalAsync(_playerPage);
                          }
 
-                         _playerPage.Title = channelName;
+                         _playerPage.Title = playStreamInfo.Channel.Name;
+
+                         var msg = playStreamInfo.Channel.Name;
+                         if (playStreamInfo.CurrentEvent != null)
+                             msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+
+                         MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
                      }
                      else
                      {
@@ -225,7 +231,7 @@ namespace DVBTTelevizor
 
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_KeyDown);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_EditChannel);
-                MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_PlayStream);
+                MessagingCenter.Unsubscribe<PlayStreamInfo>(this, BaseViewModel.MSG_PlayStream);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_UpdateDriverState);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);

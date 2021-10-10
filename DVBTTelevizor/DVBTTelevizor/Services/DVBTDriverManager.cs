@@ -125,11 +125,11 @@ namespace DVBTTelevizor
             }
         }
 
-        public Dictionary<int,EventItem> CurrentEvents
+        public EITManager EITManager
         {
             get
             {
-                return _eitManager.CurrentEvents;
+                return _eitManager;
             }
         }
 
@@ -298,22 +298,11 @@ namespace DVBTTelevizor
                 if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
                 {
                     _log.Debug($"Signal found");
-
-                    /*
+                  
                     if (_config.ScanEPG && PIDs.Count>0)
                     {
-                        var eitscanned = await ScanEPG(500);
-                        if (eitscanned)
-                        {
-                            var events = _eitManager.GetEvents(DateTime.Now, 1);
-                            var mapPID = PIDs[0];
-                            if (events.ContainsKey((int)mapPID))
-                            {
-                                var ev = events[(int)mapPID];
-                            }
-                        }
-                    }
-                    */
+                        await ScanEPG(500);                        
+                    }                    
 
                     if (stopReadStream)
                         StopReadStream();
@@ -1019,7 +1008,7 @@ namespace DVBTTelevizor
 
                 System.Threading.Thread.Sleep(msTimeout);
                 
-                // searching for PID 18 (EIT) packets ..
+                // searching for PID 18 (EIT) + PSI packets ..
                 if (_eitManager.Scan(Buffer))
                 {
                   
