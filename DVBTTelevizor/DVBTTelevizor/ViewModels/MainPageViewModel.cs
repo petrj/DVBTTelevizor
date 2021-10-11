@@ -38,7 +38,7 @@ namespace DVBTTelevizor
 
             RefreshCommand = new Command(async () => await Refresh());
             LongPressCommand = new Command(async (itm) => await LongPress(itm));
-            ShortPressCommand = new Command(ShortPress);            
+            ShortPressCommand = new Command(ShortPress);
         }
 
         public bool ShowServiceMenuToolItem
@@ -109,8 +109,15 @@ namespace DVBTTelevizor
 
             try
             {
+
                 if (start)
                 {
+                    if (!_driver.Started)
+                    {
+                        MessagingCenter.Send($"Recording failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                        return;
+                    }
+
                     var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
                     if (!playRes)
                     {
@@ -121,6 +128,12 @@ namespace DVBTTelevizor
                     await _driver.StartRecording();
                 } else
                 {
+                    if (!_driver.Started)
+                    {
+                        MessagingCenter.Send($"Stop recording failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                        return;
+                    }
+
                     _driver.StopRecording();
                     await _driver.Stop();
                     _recordingChannel = null;
@@ -130,9 +143,8 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex);
 
-                Device.BeginInvokeOnMainThread(async () =>
-                           await _dialogService.Error($"Start/stop rec error")
-                        );
+                MessagingCenter.Send($"Start/stop recording failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+
                 return;
             }
 
@@ -231,13 +243,20 @@ namespace DVBTTelevizor
 
             if (_recordingChannel != null)
             {
-                MessagingCenter.Send($"Playing {channel.Name} failed, recording in progress", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                return;
             }
 
             _loggingService.Debug($"Playing channel {channel}");
 
             try
             {
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send($"Playing {channel.Name} failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
                 if (!playRes)
                 {
@@ -281,7 +300,7 @@ namespace DVBTTelevizor
             {
                 IsBusy = true;
 
-                _loggingService.Info($"Refreshing channels");                
+                _loggingService.Info($"Refreshing channels");
 
                 if (SelectedChannel == null)
                 {
@@ -321,7 +340,7 @@ namespace DVBTTelevizor
 
                     Channels.Add(ch);
                 }
-              
+
 
             } catch (Exception ex)
             {

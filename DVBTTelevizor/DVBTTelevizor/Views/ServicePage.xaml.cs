@@ -51,7 +51,7 @@ namespace DVBTTelevizor
             {
                 Device.BeginInvokeOnMainThread(delegate
                 {
-                    MessagingCenter.Send($"Tuner Initialization failed ({message})", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send($"Tuner connection error ({message})", BaseViewModel.MSG_ToastMessage);
                     _viewModel.UpdateDriverState();
                 });
             });
