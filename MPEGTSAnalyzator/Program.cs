@@ -86,7 +86,8 @@ namespace MPEGTSAnalyzator
 
                 sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17], 17);  // PID 0x11, Service Description Table (SDT)
 
-                sDTTable.WriteToConsole();                
+                if (sDTTable != null)                
+                    sDTTable.WriteToConsole();
             }
 
             if (packetsByPID.ContainsKey(16))
@@ -97,6 +98,7 @@ namespace MPEGTSAnalyzator
 
 
                 var niTable = DVBTTable.CreateFromPackets<NITTable>(packetsByPID[16], 16);
+
                 if (niTable != null)
                     niTable.WriteToConsole();
             }
@@ -108,7 +110,9 @@ namespace MPEGTSAnalyzator
                 Console.WriteLine($"----------------------------------");
 
                 psiTable = DVBTTable.CreateFromPackets<PSITable>(packetsByPID[0], 0);
-                psiTable.WriteToConsole();
+
+                if (psiTable != null)
+                    psiTable.WriteToConsole();
             }
 
             if ((psiTable != null) &&

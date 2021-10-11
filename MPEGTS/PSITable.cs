@@ -55,7 +55,7 @@ namespace MPEGTS
 
             pos = pos + 3;
 
-            while (pos< posAfterTable)
+            while (pos< SectionLength)
             {
                 var programNum = Convert.ToInt32(((bytes[pos+0]) << 8) + (bytes[pos + 1]));
                 var programPID = Convert.ToInt32(((bytes[pos + 2] & 31) << 8) + (bytes[pos + 3]));
