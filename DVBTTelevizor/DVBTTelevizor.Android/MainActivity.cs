@@ -20,6 +20,7 @@ using Plugin.CurrentActivity;
 using System.IO;
 using Android.Support.Design.Widget;
 using Xamarin.Essentials;
+using Android.Hardware.Usb;
 
 namespace DVBTTelevizor.Droid
 {
@@ -81,6 +82,13 @@ namespace DVBTTelevizor.Droid
             {
                 SetFullScreen(true);
             }
+
+            UsbManager manager = (UsbManager)GetSystemService(Context.UsbService);
+
+            var usbReciever = new BroacastReceiverSystem();
+            var intentFilter = new IntentFilter(UsbManager.ActionUsbDeviceAttached);
+            RegisterReceiver(usbReciever, intentFilter);
+            usbReciever.UsbAttached += UsbAttached;
 
             _app = new App(_loggingService, _config);
             LoadApplication(_app);
@@ -186,6 +194,13 @@ namespace DVBTTelevizor.Droid
             {
                 SetFullScreen(false);
             });
+        }
+
+        private void UsbAttached(object sender, EventArgs e)
+        {
+            // TODO: detect what device has been attached
+
+            MessagingCenter.Send("", BaseViewModel.MSG_Init);
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
