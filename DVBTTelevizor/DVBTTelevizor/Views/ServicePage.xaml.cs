@@ -51,7 +51,7 @@ namespace DVBTTelevizor
             {
                 Device.BeginInvokeOnMainThread(delegate
                 {
-                    _viewModel.Status = $"Initialization failed ({message})";
+                    MessagingCenter.Send($"Tuner Initialization failed ({message})", BaseViewModel.MSG_ToastMessage);
                     _viewModel.UpdateDriverState();
                 });
             });
@@ -74,13 +74,13 @@ namespace DVBTTelevizor
 
         protected override void OnAppearing()
         {
-            base.OnAppearing();            
+            base.OnAppearing();
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-        }        
+        }
 
         public void Done()
         {

@@ -136,7 +136,7 @@ namespace MPEGTS
                 // reserved_future_use
                 // EIT_schedule_flag
                 // EIT_present_following_flag
-                // unning_status 3 uimsbf 
+                // unning_status 3 uimsbf
                 // free_CA_mode
 
                 pos = pos + 3;
@@ -165,8 +165,8 @@ namespace MPEGTS
                     }
 
                     pos = pos + descriptorLength +2;
-                }                
-            }            
+                }
+            }
         }
 
     }

@@ -252,12 +252,13 @@ namespace DVBTTelevizor
                 s += $"% :  {status.rfStrengthPercentage}";
                 s += Environment.NewLine;
 
-                await _dialogService.Information(s, "Status");
+                MessagingCenter.Send(s, BaseViewModel.MSG_ToastMessage);
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while getting status");
-                await _dialogService.Error(ex.Message);
+
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -274,12 +275,14 @@ namespace DVBTTelevizor
                     throw new Exception("Response not success");
                 }
 
-                await _dialogService.Information($"Version: {version.Version.ToString()}.{version.AllRequestsLength.ToString()}", "DVBT Driver version");
+                var s = $"Version: {version.Version.ToString()}.{version.AllRequestsLength.ToString()}";
+                MessagingCenter.Send(s, BaseViewModel.MSG_ToastMessage);
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while getting version");
-                await _dialogService.Error(ex.Message);
+
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -288,7 +291,7 @@ namespace DVBTTelevizor
             try
             {
                 _loggingService.Info($"Scanning EIT");
-                
+
                 ScaningInProgress = true;
 
                 var res = await _driver.ScanEPG(5000);
@@ -308,9 +311,8 @@ namespace DVBTTelevizor
                 } else
                 {
                     await _dialogService.Error("Scan error");
-                }                
+                }
 
-                Status = "";
             }
             catch (Exception ex)
             {
@@ -365,18 +367,16 @@ namespace DVBTTelevizor
 
                 switch (searchProgramPIDsResult.Result)
                 {
-                    case SearchProgramResultEnum.Error:                        
+                    case SearchProgramResultEnum.Error:
                          await _dialogService.Error("Error scanning Map PIDs");
-                        return;                        
+                        return;
                     case SearchProgramResultEnum.NoSignal:
                         await _dialogService.Error("No signal");
                         return;
                     case SearchProgramResultEnum.NoProgramFound:
                         await _dialogService.Error("No program found");
-                        return;                    
-                }                                
-
-                Status = "";
+                        return;
+                }
 
                 var list = new List<string>();
                 foreach (var kvp in searchProgramPIDsResult.PIDs)

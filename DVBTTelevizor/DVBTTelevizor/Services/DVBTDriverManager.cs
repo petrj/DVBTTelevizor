@@ -298,11 +298,11 @@ namespace DVBTTelevizor
                 if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
                 {
                     _log.Debug($"Signal found");
-                  
+
                     if (_config.ScanEPG && PIDs.Count>0)
                     {
-                        await ScanEPG(500);                        
-                    }                    
+                        await ScanEPG(500);
+                    }
 
                     if (stopReadStream)
                         StopReadStream();
@@ -859,7 +859,7 @@ namespace DVBTTelevizor
                             {
                                 pmtTables[mapPID] = tbl;
                             }
-                        }                        
+                        }
 
                         if (pmtTables.Count == MapPIDs.Count)
                         {
@@ -879,7 +879,7 @@ namespace DVBTTelevizor
                     _log.Debug($"No PMT found");
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
-                }          
+                }
 
                 //SaveBuffer($"ProgramPID.{MapPID.ToString()}", pmtPacketBytes.ToArray());
 
@@ -893,7 +893,7 @@ namespace DVBTTelevizor
                     {
                         res.PIDs[kvp.Key].Add(stream.PID);
                     }
-                }                
+                }
 
                 _log.Debug($"Searching PIDS response: {res}");
 
@@ -904,9 +904,9 @@ namespace DVBTTelevizor
                 _log.Error(ex);
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
-            }            
+            }
         }
-            
+
         /// <summary>
         /// Tuning with timeout
         /// </summary>
@@ -1000,19 +1000,19 @@ namespace DVBTTelevizor
 
         public async Task<bool> ScanEPG(int msTimeout = 2000)
         {
-            _log.Debug($"Scanning EPG");    
+            _log.Debug($"Scanning EPG");
 
             try
             {
                 StartReadBuffer();
 
                 System.Threading.Thread.Sleep(msTimeout);
-                
+
                 // searching for PID 18 (EIT) + PSI packets ..
                 if (_eitManager.Scan(Buffer))
                 {
-                  
-                }                    
+
+                }
 
                 StopReadBuffer();
 
@@ -1021,7 +1021,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _log.Error(ex);
-               
+
                 return false;
             }
         }
@@ -1050,7 +1050,7 @@ namespace DVBTTelevizor
 
                 var timeoutForReadingBuffer = 15; //  15 secs
                 var startTime = DateTime.Now;
-                
+
                 //var sdtPackets = new List<MPEGTransportStreamPacket>();
                 //var psiPackets = new List<MPEGTransportStreamPacket>();
 
@@ -1065,11 +1065,11 @@ namespace DVBTTelevizor
                     var packets = MPEGTransportStreamPacket.Parse(Buffer);
 
                     sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
-                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);                    
+                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
 
                     if (sdtTable != null && psiTable != null)
                     {
-                        // does SDT table belongs to this frequency?                       
+                        // does SDT table belongs to this frequency?
                         serviceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
 
                         if (serviceDescriptors.Count > 0)

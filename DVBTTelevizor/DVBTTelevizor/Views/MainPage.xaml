@@ -11,13 +11,6 @@
     <ContentPage.Resources>
         <ResourceDictionary>
 
-            <Style x:Key="InfoLabelStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="#41b3ff"/>
-                <Setter Property="Margin" Value="0,0,0,0"/>
-                <Setter Property="HorizontalTextAlignment" Value="Center"/>
-                <Setter Property="BackgroundColor" Value="#262626"/>
-            </Style>
-
             <Style x:Key="ListViewStyle" TargetType="ListView">
                 <Setter Property="HasUnevenRows" Value="True"/>
                 <Setter Property="IsPullToRefreshEnabled" Value="True"/>
@@ -133,14 +126,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-        </StackLayout>
-
-        <!-- bottom controls -->
-        <StackLayout VerticalOptions="End" Spacing="0" Margin="0,0,0,0">
-
-            <Label Text="{Binding Status}" x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
-            <!--Label Text="{Binding DataStreamInfo}" x:Name="DataStreamInfoLabel" Style="{DynamicResource InfoLabelStyle}"/-->
 
         </StackLayout>
 

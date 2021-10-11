@@ -119,7 +119,7 @@ namespace DVBTTelevizor
                          if (_playerPage.Playing)
                          {
                              //_playerPage.StopPlay();
-                             _playerPage.StartPlay();                             
+                             _playerPage.StartPlay();
                          }
                          else
                          {
@@ -163,7 +163,8 @@ namespace DVBTTelevizor
             {
                 Device.BeginInvokeOnMainThread(delegate
                 {
-                    _viewModel.Status = $"Initialization failed ({message})";
+                    MessagingCenter.Send($"Tuner Initialization failed ({message})", BaseViewModel.MSG_ToastMessage);
+
                     _viewModel.UpdateDriverState();
                 });
             });
@@ -230,7 +231,7 @@ namespace DVBTTelevizor
             // workaround for nont selected channel at startup
             if (_firstStartup)
             {
-                _firstStartup = false;                
+                _firstStartup = false;
 
                 _viewModel.RefreshCommand.Execute(null);
             }

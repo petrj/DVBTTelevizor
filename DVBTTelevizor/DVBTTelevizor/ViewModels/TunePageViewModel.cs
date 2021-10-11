@@ -289,17 +289,9 @@ namespace DVBTTelevizor
 
             State = TuneState.TuningInProgress;
 
-            if (ManualTuning)
-            {
-                Status = $"Searching channels on freq {TuneFrequency}...";
-            } else
-            {
-                Status = $"Automatic tuning ...";
-            }
-
             TunedChannels.Clear();
 
-                            
+
             await _channelService.LoadChannels();
             if (_channels == null) _channels = new ObservableCollection<DVBTChannel>();
 
@@ -334,12 +326,10 @@ namespace DVBTTelevizor
                     await AutomaticTune();
                 }
 
-                Status = $"Tune finished. Total tuned channels: {TunedChannels.Count}";
                 State = TuneState.TuneFinishedOK;
             }
             catch (Exception ex)
             {
-                Status = $"Tune finished with error. Total tuned channels: {TunedChannels.Count}";
                 State = TuneState.TuneFailed;
             }
             finally
@@ -383,7 +373,7 @@ namespace DVBTTelevizor
                         OnPropertyChanged(nameof(TuningLabel));
                         OnPropertyChanged(nameof(AutomaticTuningProgress));
 
-                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);  
+                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
                     }
                 }
 
@@ -391,29 +381,10 @@ namespace DVBTTelevizor
         }
 
 
-        private string GetTuningStatusText()
-        {
-            var radio = 0;
-            var tv = 0;
-            foreach (var c in TunedChannels)
-            {
-                if (c.SimplifiedServiceType == DVBTServiceType.TV)
-                    tv++;
-                if (c.SimplifiedServiceType == DVBTServiceType.Radio)
-                    radio++;
-            }
-
-            return $"Channels found: {TunedChannels.Count} (TV: {tv}, Radio: {radio})";
-        }
-
         private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
         {
             try
             {
-                Status = GetTuningStatusText();
-
-                _loggingService.Debug(Status);
-
                 var alreadySavedChannelsCount = (await _channelService.LoadChannels()).Count;
 
                 var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
@@ -529,7 +500,7 @@ namespace DVBTTelevizor
                             ch.Bandwdith = bandWidth;
                             ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
                             ch.DVBTType = dvbtTypeIndex;
-                            ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;                           
+                            ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;
 
                             TunedChannels.Add(ch);
                             SelectedChannel = ch;
@@ -541,17 +512,15 @@ namespace DVBTTelevizor
                             {
                                 _channels.Add(ch);
                                 await _channelService.SaveChannels(_channels);
-                                totalChannelsAddedCount++;                                
-                            } 
-
-                            Status = GetTuningStatusText();
+                                totalChannelsAddedCount++;
+                            }
                         }
 
                         if (totalChannelsAddedCount>0)
                         {
                             if (totalChannelsAddedCount > 1)
                             {
-                                MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);                                
+                                MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);
                             } else
                             {
                                 MessagingCenter.Send($"Channel saved", BaseViewModel.MSG_ToastMessage);
@@ -578,12 +547,11 @@ namespace DVBTTelevizor
                     _actualTuningDVBTType = -1;
                     _actualTunningChannel = -1;
 
-                    Status = "";
                     State = TuneState.Ready;
                 }
                 catch (Exception ex)
                 {
-                    Status = $"Error ({ex.Message})";
+                    _loggingService.Error(ex);
                 }
                 finally
                 {

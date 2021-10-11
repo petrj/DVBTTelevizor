@@ -75,7 +75,8 @@ namespace DVBTTelevizor
         {
             _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
             _driver.Start();
-            Status = $"Initialized ({_driver.Configuration.DeviceName})";
+
+            MessagingCenter.Send($"{_driver.Configuration.DeviceName} connected", BaseViewModel.MSG_ToastMessage);
 
             MessagingCenter.Send("", BaseViewModel.MSG_UpdateDriverState);
         }
@@ -83,14 +84,14 @@ namespace DVBTTelevizor
         public async Task DisconnectDriver()
         {
             await _driver.Disconnect();
-            Status = $"Not initialized";
+
+            MessagingCenter.Send($"{_driver.Configuration.DeviceName} disconnected", BaseViewModel.MSG_ToastMessage);
 
             UpdateDriverState();
         }
 
         public void UpdateDriverState()
         {
-            OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(DriverConnected));
             OnPropertyChanged(nameof(DriverDisConnected));
             OnPropertyChanged(nameof(DriverConnectedIcon));
@@ -139,16 +140,6 @@ namespace DVBTTelevizor
                 //SetProperty(ref isBusy, value);
                 //isBusy = value;
                 OnPropertyChanged(nameof(IsBusy));
-            }
-        }
-
-        public string Status
-        {
-            get { return _status; }
-            set
-            {
-                _status = value;
-                OnPropertyChanged(nameof(Status));
             }
         }
 
