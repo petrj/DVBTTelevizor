@@ -924,6 +924,7 @@ namespace DVBTTelevizor
             try
             {
                 DVBTResponse tuneRes = null;
+                DVBTResponse setPIDres = null;
 
                 // five attempts
                 for (var i = 1; i <= 5; i++)
@@ -940,6 +941,27 @@ namespace DVBTTelevizor
                 }
 
                 if (!tuneRes.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // set PIDs 0 and 17
+                for (var i = 1; i <= 5; i++)
+                {
+                    setPIDres = await SetPIDs( new List<long>() { 0,17 });
+
+                    if (setPIDres.SuccessFlag)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        System.Threading.Thread.Sleep(100);
+                    }
+                }
+
+                if (!setPIDres.SuccessFlag)
                 {
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
@@ -975,7 +997,7 @@ namespace DVBTTelevizor
                     }
 
                     // waiting
-                    System.Threading.Thread.Sleep(500);
+                    System.Threading.Thread.Sleep(850);
                 }
 
                 if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
@@ -1026,7 +1048,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<SearchMapPIDsResult> SearchProgramMapPIDs()
+        public async Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
             _log.Debug($"Searching Program Map PIDs");
 
@@ -1034,16 +1056,18 @@ namespace DVBTTelevizor
 
             try
             {
-
-                // setting PID filter
-
-                var pids = new List<long>() { 0, 16, 17 };
-                var pidRes = await SetPIDs(pids);
-
-                if (!pidRes.SuccessFlag)
+                if (tunePID0and17)
                 {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
+                    // setting PID filter
+
+                    var pids = new List<long>() { 0, 16, 17 };
+                    var pidRes = await SetPIDs(pids);
+
+                    if (!pidRes.SuccessFlag)
+                    {
+                        res.Result = SearchProgramResultEnum.Error;
+                        return res;
+                    }
                 }
 
                 StartReadBuffer();

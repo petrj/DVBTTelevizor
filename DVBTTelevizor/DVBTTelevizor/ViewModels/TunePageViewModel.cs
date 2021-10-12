@@ -385,8 +385,6 @@ namespace DVBTTelevizor
         {
             try
             {
-                var alreadySavedChannelsCount = (await _channelService.LoadChannels()).Count;
-
                 var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
 
                 switch (tuneResult.Result)
@@ -395,42 +393,21 @@ namespace DVBTTelevizor
                         _loggingService.Debug("Search error");
 
                         SignalStrengthProgress = 0;
-
-#if DEBUG
-                        var ch = new DVBTChannel()
-                        {
-                            PIDs = "0,16,17",
-                            ProgramMapPID = -1,
-                            Name = "Not existing channel (debug mode)",
-                            ProviderName = "DVBT Televizor",
-                            Frequency = freq,
-                            Bandwdith = bandWidth,
-                            DVBTType = dvbtTypeIndex,
-                            Type = ServiceTypeEnum.DigitalTelevisionService,
-                            Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString()
-                        };
-
-                        TunedChannels.Add(ch);
-                        SelectedChannel = ch;
-#endif
-
                         return;
 
                     case SearchProgramResultEnum.NoSignal:
                         _loggingService.Debug("No signal");
 
                         SignalStrengthProgress = 0;
-
                         return;
 
                     case SearchProgramResultEnum.OK:
 
                         SignalStrengthProgress = tuneResult.SignalPercentStrength / 100.0;
-
                         break;
                 }
 
-                var searchMapPIDsResult = await _driver.SearchProgramMapPIDs();
+                var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(false);
 
                 switch (searchMapPIDsResult.Result)
                 {
@@ -498,19 +475,26 @@ namespace DVBTTelevizor
                             ch.ProviderName = sDescriptor.ProviderName;
                             ch.Frequency = freq;
                             ch.Bandwdith = bandWidth;
-                            ch.Number = (alreadySavedChannelsCount + TunedChannels.Count + 1).ToString();
+                            ch.Number = String.Empty;
                             ch.DVBTType = dvbtTypeIndex;
                             ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;
-
+                            
                             TunedChannels.Add(ch);
-                            SelectedChannel = ch;
+
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                SelectedChannel = ch;
+                            });
 
                             _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
 
                             // automatically adding new tuned channel if does not exist
                             if (!ConfigViewModel.ChannelExists(_channels,ch.Frequency, ch.ProgramMapPID))
                             {
+                                ch.Number = (_channels.Count + 1).ToString();
+
                                 _channels.Add(ch);
+
                                 await _channelService.SaveChannels(_channels);
                                 totalChannelsAddedCount++;
                             }
@@ -547,7 +531,7 @@ namespace DVBTTelevizor
                     _actualTuningDVBTType = -1;
                     _actualTunningChannel = -1;
 
-                    State = TuneState.Ready;
+                    State = TuneState.Ready;               
                 }
                 catch (Exception ex)
                 {

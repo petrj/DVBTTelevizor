@@ -159,7 +159,7 @@ namespace DVBTTelevizor
 
                          File.WriteAllText(path, JsonConvert.SerializeObject(chs));
 
-                         await _dialogService.Information($"File {path} exported.");
+                         MessagingCenter.Send($"File {path} exported.", BaseViewModel.MSG_ToastMessage);
 
                      }
                      catch (Exception ex)
@@ -199,7 +199,7 @@ namespace DVBTTelevizor
 
             await _channelService.SaveChannels(chs);
 
-            await _dialogService.Information($"Imported channels count: {count}");
+            MessagingCenter.Send($"Imported channels count: {count}", BaseViewModel.MSG_ToastMessage);            
         }
 
         private async Task ClearChannels()
@@ -217,7 +217,7 @@ namespace DVBTTelevizor
             {
                 await _channelService.SaveChannels(new System.Collections.ObjectModel.ObservableCollection<DVBTChannel>());
 
-                await _dialogService.Information($"Channels cleared");
+                MessagingCenter.Send("Channels cleared", BaseViewModel.MSG_ToastMessage);
             }
         }
     }
