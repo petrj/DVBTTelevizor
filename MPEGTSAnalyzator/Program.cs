@@ -16,6 +16,10 @@ namespace MPEGTSAnalyzator
                 File.Exists(args[0]))
             {
                 AnalyzeMPEGTSPackets(args[0]);
+#if DEBUG
+                Console.WriteLine("Press Enter");
+                Console.ReadLine();
+#endif
             }
             else
             {
@@ -30,10 +34,10 @@ namespace MPEGTSAnalyzator
 
 #if DEBUG
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_768_16_17_00.ts");
-                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "badSDT.ts");
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "CTS.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
-                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
+                //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
 
                 Console.WriteLine("Press Enter");
                 Console.ReadLine();
@@ -86,7 +90,7 @@ namespace MPEGTSAnalyzator
 
                 sDTTable = DVBTTable.CreateFromPackets<SDTTable>(packetsByPID[17], 17);  // PID 0x11, Service Description Table (SDT)
 
-                if (sDTTable != null)                
+                if (sDTTable != null)
                     sDTTable.WriteToConsole();
             }
 
@@ -160,7 +164,7 @@ namespace MPEGTSAnalyzator
                 if (packetsByPID.ContainsKey(0))
                 {
                     packetsEITwithSDT.AddRange(packetsByPID[0]);
-                }                    
+                }
 
                 eitManager.Scan(packetsEITwithSDT);
 
@@ -184,7 +188,7 @@ namespace MPEGTSAnalyzator
                 foreach (var programNumber in eitManager.ScheduledEvents.Keys)
                 {
                     foreach (var ev in eitManager.ScheduledEvents[programNumber])
-                    { 
+                    {
                         Console.WriteLine(ev.WriteToString());
                     }
                 }
@@ -201,7 +205,7 @@ namespace MPEGTSAnalyzator
                     {
                         Console.WriteLine(ev.WriteToString());
                     }
-                }                
+                }
             }
         }
 

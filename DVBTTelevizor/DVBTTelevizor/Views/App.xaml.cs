@@ -11,14 +11,14 @@ namespace DVBTTelevizor
         ILoggingService _loggingService;
         DVBTTelevizorConfiguration _config;
 
-        public App(ILoggingService loggingService, DVBTTelevizorConfiguration config)
+        public App(ILoggingService loggingService, DVBTTelevizorConfiguration config, DVBTDriverManager driverManager)
         {
             InitializeComponent();
 
             _loggingService = loggingService;
             _config = config;
 
-            _mainPage = new MainPage(_loggingService, config);
+            _mainPage = new MainPage(_loggingService, config, driverManager);
             MainPage = new NavigationPage(_mainPage);
         }
 

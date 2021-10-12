@@ -16,7 +16,11 @@ namespace MPEGTS
                 return;
 
             var pointerFiled = bytes[0];
-            var pos = 1 + pointerFiled;
+            var pos = 1;
+            if (pointerFiled != 0)
+            {
+                pos = pos + pointerFiled + 1;
+            }
 
             if (bytes.Count < pos + 2)
                 return;
@@ -38,6 +42,8 @@ namespace MPEGTS
             bytes.CopyTo(SectionLength, CRC, 0, 4);
 
             pos = pos + 3;
+
+            var posAfterTable = pos + SectionLength - 4;
 
             TableIDExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
@@ -63,9 +69,9 @@ namespace MPEGTS
             pos += programInfoLength;
 
             // 2 (pointer and Table Id) + 2 (Section Length) + length  - CRC - Program Info Length
-            var posAfterElementaryStreamSpecificData = 4 + SectionLength - 4 - programInfoLength;
+            //var posAfterElementaryStreamSpecificData = 4 + SectionLength - 4 - programInfoLength;
 
-            while (pos < posAfterElementaryStreamSpecificData)
+            while (pos < posAfterTable)
             {
                 // reading elementary stream info data until end of section
                 var stream = new ElementaryStreamSpecificData();

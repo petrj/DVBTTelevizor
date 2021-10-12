@@ -82,12 +82,16 @@ namespace MPEGTS
             var sb = new StringBuilder();
             var sbc = new StringBuilder();
             var sbb = new StringBuilder();
+            var sbp = new StringBuilder();
+            var sbh = new StringBuilder();
             int c = 0;
             int row = 0;
 
             for (var i = 0; i < bytes.Count; i++)
             {
+                sbp.Append($"{("["+Convert.ToString(i)+"]").PadLeft(8, ' '),9} ");
                 sbb.Append($"{Convert.ToString(bytes[i], 2).PadLeft(8, '0'),9} ");
+                sbh.Append($"{("0x" + Convert.ToString(bytes[i], 16)).PadLeft(8, ' '),9} ");
                 sb.Append($"{bytes[i].ToString(),9} ");
 
 
@@ -103,18 +107,23 @@ namespace MPEGTS
 
                 if (c >= 10)
                 {
+                    res.AppendLine(sbp.ToString());
                     res.AppendLine(sbb.ToString());
                     res.AppendLine(sb.ToString());
+                    res.AppendLine(sbh.ToString());
                     res.AppendLine(sbc.ToString());
                     res.AppendLine();
                     sb.Clear();
                     sbb.Clear();
                     sbc.Clear();
+                    sbp.Clear();
+                    sbh.Clear();
 
                     c = 0;
                     row++;
                 }
             }
+            res.AppendLine(sbp.ToString());
             res.AppendLine(sbb.ToString());
             res.AppendLine(sb.ToString());
             res.AppendLine(sbc.ToString());
@@ -280,7 +289,8 @@ namespace MPEGTS
                 if (bytes[pos] != MPEGTSSyncByte)
                 {
                     // bad position
-                    Console.WriteLine("Looking for sync byte .....");
+                    //Console.WriteLine("Looking for sync byte .....");
+
                     pos++;
                     continue;
                 }

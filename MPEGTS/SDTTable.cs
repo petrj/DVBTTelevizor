@@ -87,11 +87,17 @@ namespace MPEGTS
 
         public override void Parse(List<byte> bytes)
         {
+            //Console.WriteLine(MPEGTransportStreamPacket.WriteBytesToString(bytes));
+
             if (bytes == null || bytes.Count < 5)
                 return;
 
             var pointerFiled = bytes[0];
-            var pos = 1 + pointerFiled;
+            var pos = 1;
+            if (pointerFiled != 0)
+            {
+                pos = pos + pointerFiled + 1;
+            }
 
             if (bytes.Count < pos + 2)
                 return;
@@ -113,6 +119,8 @@ namespace MPEGTS
 
             pos = pos + 3;
 
+            var posAfterTable = pos + SectionLength - 4;
+
             if (SectionSyntaxIndicator)
             {
                 TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
@@ -129,7 +137,7 @@ namespace MPEGTS
 
             pos = pos + 3;  // reserved_future_use byte
 
-            while (pos< SectionLength)
+            while (pos< posAfterTable)
             {
                 var programNumber = ((bytes[pos + 0]) << 8) + bytes[pos + 1];
 

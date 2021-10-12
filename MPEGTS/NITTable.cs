@@ -21,7 +21,11 @@ namespace MPEGTS
                 return;
 
             var pointerFiled = bytes[0];
-            var pos = 1 + pointerFiled;
+            var pos = 1;
+            if (pointerFiled != 0)
+            {
+                pos = pos + pointerFiled + 1;
+            }
 
             if (bytes.Count < pos + 2)
                 return;

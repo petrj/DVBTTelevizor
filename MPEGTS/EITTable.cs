@@ -6,10 +6,10 @@ namespace MPEGTS
 {
     public class EITTable : DVBTTable
     {
-        // ID: 
-        // 78     0x4E event_information_section - actual_transport_stream, present/following 
-        // 79     0x4F event_information_section - other_transport_stream, present/following 
-        // 80-95  0x50 to 0x5F event_information_section - actual_transport_stream, schedule 
+        // ID:
+        // 78     0x4E event_information_section - actual_transport_stream, present/following
+        // 79     0x4F event_information_section - other_transport_stream, present/following
+        // 80-95  0x50 to 0x5F event_information_section - actual_transport_stream, schedule
         // 96-111 0x60 to 0x6F event_information_section - other_transport_stream, schedule
 
         public int ServiceId { get; set; }
@@ -28,7 +28,11 @@ namespace MPEGTS
                 return;
 
             var pointerFiled = bytes[0];
-            var pos = 1 + pointerFiled;
+            var pos = 1;
+            if (pointerFiled != 0)
+            {
+                pos = pos + pointerFiled + 1;
+            }
 
             if (bytes.Count < pos + 2)
                 return;

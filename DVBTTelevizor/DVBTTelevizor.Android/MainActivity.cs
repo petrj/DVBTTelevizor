@@ -34,6 +34,7 @@ namespace DVBTTelevizor.Droid
         private int _fullscreenUiOptions;
         private int _defaultUiOptions;
         private App _app;
+        private DVBTDriverManager _driverManager;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -90,57 +91,14 @@ namespace DVBTTelevizor.Droid
             RegisterReceiver(usbReciever, intentFilter);
             usbReciever.UsbAttached += UsbAttached;
 
-            _app = new App(_loggingService, _config);
+            _driverManager = new DVBTDriverManager(_loggingService, _config);
+
+            _app = new App(_loggingService, _config, _driverManager);
             LoadApplication(_app);
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_Init, (message) =>
             {
-                try
-                {
-
-                    _loggingService.Info("Initializing DVBT driver");
-
-                    var req = new Intent(Intent.ActionView);
-                    req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
-                    req.PutExtra(Intent.ExtraReturnResult, true);
-
-                    _waitingForInit = true;
-
-                    Task.Run( () =>
-                    {
-                        System.Threading.Thread.Sleep(5000); // wait 5 secs;
-
-                        if (_waitingForInit)
-                        {
-                            _waitingForInit = false;
-
-                            _loggingService.Error("DVB-T driver response timeout");
-
-                            ShowToastMessage("DVB-T driver response timeout");
-                            MessagingCenter.Send("DVB-T driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
-                        }
-
-                    });
-
-                    StartActivityForResult(req, StartRequestCode);
-
-                }
-                catch (ActivityNotFoundException ex)
-                {
-                    _waitingForInit = false;
-                    _loggingService.Error(ex, "Driver initializing failed");
-
-                    ShowToastMessage("DVB-T driver not installed");
-                    MessagingCenter.Send("DVB-T driver not installed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
-                }
-                catch (Exception ex)
-                {
-                    _waitingForInit = false;
-                    _loggingService.Error(ex,"Driver initializing failed");
-
-                    ShowToastMessage("DVB-T driver connection failed");
-                    MessagingCenter.Send("DVB-T sriver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
-                }
+                InitDriver();
             });
 
             MessagingCenter.Subscribe<SettingsPage>(this, BaseViewModel.MSG_CheckBatterySettings, (sender) =>
@@ -196,11 +154,68 @@ namespace DVBTTelevizor.Droid
             });
         }
 
+        private void InitDriver()
+        {
+            try
+            {
+                if (_driverManager.Started)
+                {
+                    return;
+                }
+
+                _loggingService.Info("Initializing DVBT driver");
+
+                var req = new Intent(Intent.ActionView);
+                req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
+                req.PutExtra(Intent.ExtraReturnResult, true);
+
+                _waitingForInit = true;
+
+                Task.Run(() =>
+                {
+                    System.Threading.Thread.Sleep(5000); // wait 5 secs;
+
+                    if (_waitingForInit)
+                    {
+                        _waitingForInit = false;
+
+                        _loggingService.Error("DVB-T driver response timeout");
+
+                        ShowToastMessage("DVB-T driver response timeout");
+                        MessagingCenter.Send("DVB-T driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                    }
+
+                });
+
+                StartActivityForResult(req, StartRequestCode);
+
+            }
+            catch (ActivityNotFoundException ex)
+            {
+                _waitingForInit = false;
+                _loggingService.Error(ex, "Driver initializing failed");
+
+                ShowToastMessage("DVB-T driver not installed");
+                MessagingCenter.Send("DVB-T driver not installed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+            }
+            catch (Exception ex)
+            {
+                _waitingForInit = false;
+                _loggingService.Error(ex, "Driver initializing failed");
+
+                ShowToastMessage("DVB-T driver connection failed");
+                MessagingCenter.Send("DVB-T sriver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+            }
+        }
+
         private void UsbAttached(object sender, EventArgs e)
         {
-            // TODO: detect what device has been attached
+            // TODO: detect device that has been attached
 
-            MessagingCenter.Send("", BaseViewModel.MSG_Init);
+            if (!_driverManager.Started)
+            {
+                InitDriver();
+            }
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)

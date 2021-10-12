@@ -18,7 +18,11 @@ namespace MPEGTS
                 return;
 
             var pointerFiled = bytes[0];
-            var pos = 1 + pointerFiled;
+            var pos = 1;
+            if (pointerFiled != 0)
+            {
+                pos = pos + pointerFiled + 1;
+            }
 
             if (bytes.Count < pos + 2)
                 return;
@@ -41,7 +45,7 @@ namespace MPEGTS
 
             pos = pos + 3;
 
-            var posAfterTable = pos + SectionLength;
+            var posAfterTable = pos + SectionLength - 4;
 
             TableIdExt = (bytes[pos + 0] << 8) + bytes[pos + 1];
 
@@ -55,7 +59,7 @@ namespace MPEGTS
 
             pos = pos + 3;
 
-            while (pos< SectionLength)
+            while (pos< posAfterTable)
             {
                 var programNum = Convert.ToInt32(((bytes[pos+0]) << 8) + (bytes[pos + 1]));
                 var programPID = Convert.ToInt32(((bytes[pos + 2] & 31) << 8) + (bytes[pos + 3]));

@@ -39,7 +39,7 @@ namespace DVBTTelevizor
         private string _numberPressed = String.Empty;
         private bool _firstStartup = true;
 
-        public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config)
+        public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, DVBTDriverManager driverManager)
         {
             InitializeComponent();
 
@@ -49,7 +49,7 @@ namespace DVBTTelevizor
 
             _config = config;
 
-            _driver = new DVBTDriverManager(_loggingService, _config);
+            _driver = driverManager;
 
             try
             {
