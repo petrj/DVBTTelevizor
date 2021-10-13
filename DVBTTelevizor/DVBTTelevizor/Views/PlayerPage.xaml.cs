@@ -24,6 +24,8 @@ namespace DVBTTelevizor
         bool _fullscreen = false;
         bool _playInProgress = false;
 
+        private PlayStreamInfo _playStreamInfo;
+
         public Command CheckStreamCommand { get; set; }
 
         public PlayerPage(DVBTDriverManager driver, DVBTTelevizorConfiguration config)
@@ -70,6 +72,8 @@ namespace DVBTTelevizor
                 _viewModel.ChannelTitle = value;
             }
         }
+
+        public PlayStreamInfo PlayStreamInfo { get => _playStreamInfo; set => _playStreamInfo = value; }
 
         public void OnDoubleTapped(object sender, EventArgs e)
         {
@@ -153,6 +157,12 @@ namespace DVBTTelevizor
         {
             Device.BeginInvokeOnMainThread(() =>
             {
+                
+                if ( (_playStreamInfo != null) &&  (!String.IsNullOrEmpty(_playStreamInfo.RecordingStream)))
+                {
+                    _media = new Media(_libVLC, _playStreamInfo.RecordingStream);
+                    videoView.MediaPlayer.Play(_media);
+                } else
                 if (_driver.VideoStream != null)
                 {
                     _media = new Media(_libVLC, _driver.VideoStream, new string[] { });

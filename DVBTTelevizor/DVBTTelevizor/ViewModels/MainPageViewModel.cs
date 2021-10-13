@@ -61,16 +61,16 @@ namespace DVBTTelevizor
 
                 var actions = new List<string>();
                 actions.Add("Play");
-                actions.Add("Edit");
-
-                if (ch.Recording)
+                if (!ch.Recording)
                 {
-                    actions.Add("Stop record");
-                } else
-                {
+                    actions.Add("Play and record");
                     actions.Add("Record");
                 }
-
+                else
+                {                 
+                    actions.Add("Stop record");
+                }
+                actions.Add("Edit");
                 actions.Add("Delete");
 
                 var action = await _dialogService.DisplayActionSheet($"{ch.Name}", "Cancel", actions);
@@ -85,6 +85,10 @@ namespace DVBTTelevizor
                         break;
                     case "Record":
                         await RecordChannel(ch, true);
+                        break;
+                    case "Play and record":
+                        await RecordChannel(ch, true);
+                        MessagingCenter.Send(new PlayStreamInfo() { RecordingStream = _driver.RecordFileName}, BaseViewModel.MSG_PlayStream);
                         break;
                     case "Stop record":
                         await RecordChannel(ch, false);

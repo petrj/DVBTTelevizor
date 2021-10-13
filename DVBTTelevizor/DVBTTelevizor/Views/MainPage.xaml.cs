@@ -34,6 +34,7 @@ namespace DVBTTelevizor
         private TunePage _tunePage;
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
+        
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
@@ -111,6 +112,8 @@ namespace DVBTTelevizor
                  {
                      if (_playerPage != null)
                      {
+                         _playerPage.PlayStreamInfo = playStreamInfo;
+
                          if (_playerPage.Playing)
                          {
                              //_playerPage.StopPlay();

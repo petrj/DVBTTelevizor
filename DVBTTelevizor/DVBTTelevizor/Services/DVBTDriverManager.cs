@@ -410,11 +410,11 @@ namespace DVBTTelevizor
             });
         }
 
-        private string RecordFileName
+        public string RecordFileName
         {
             get
             {
-                return Path.Combine(BaseViewModel.MovieDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.ts");
+                return Path.Combine(BaseViewModel.MovieDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
             }
         }
 
