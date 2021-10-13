@@ -40,7 +40,7 @@ namespace DVBTTelevizor
             _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
             videoView.MediaPlayer = _mediaPlayer;
 
-            CheckStreamCommand = new Command(async () => await CheckStream());            
+            CheckStreamCommand = new Command(async () => await CheckStream());
 
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
         }
@@ -59,15 +59,15 @@ namespace DVBTTelevizor
             }
         }
 
-        public string Title
+        public string ChannelTitle
         {
             get
             {
-                return _viewModel.Title;
+                return _viewModel.ChannelTitle;
             }
             set
             {
-                _viewModel.Title = value;
+                _viewModel.ChannelTitle = value;
             }
         }
 
@@ -92,7 +92,7 @@ namespace DVBTTelevizor
         }
 
         private void SwipeGestureRecognizer_Up(object sender, SwipedEventArgs e)
-        {            
+        {
             MessagingCenter.Send(String.Empty, BaseViewModel.MSG_PlayNextChannel);
         }
 
@@ -158,9 +158,9 @@ namespace DVBTTelevizor
                     _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
                     videoView.MediaPlayer.Play(_media);
                 }
-                
+
                 Playing = true;
-            });            
+            });
         }
 
         public void StopPlay()

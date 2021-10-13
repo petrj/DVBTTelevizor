@@ -16,10 +16,6 @@ namespace MPEGTSAnalyzator
                 File.Exists(args[0]))
             {
                 AnalyzeMPEGTSPackets(args[0]);
-#if DEBUG
-                Console.WriteLine("Press Enter");
-                Console.ReadLine();
-#endif
             }
             else
             {

@@ -121,11 +121,16 @@ namespace DVBTTelevizor
                              Navigation.PushModalAsync(_playerPage);
                          }
 
-                         _playerPage.Title = playStreamInfo.Channel.Name;
+                         _playerPage.ChannelTitle = playStreamInfo.Channel.Name;
 
                          var msg = playStreamInfo.Channel.Name;
                          if (playStreamInfo.CurrentEvent != null)
                              msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+
+                         if (_config.PlayOnBackground)
+                         {
+                             MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playStreamInfo);
+                         }
 
                          MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
                      }
@@ -172,6 +177,11 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayNextChannel, (msg) =>
             {
                 OnKeyDown();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopStream, (msg) =>
+            {
+                StopPlayback();
             });
         }
 
@@ -268,6 +278,7 @@ namespace DVBTTelevizor
         {
             if (_playerPage != null && _playerPage.Playing)
             {
+                MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
                 _playerPage.StopPlay();
                 Navigation.PopModalAsync();
             }
@@ -414,7 +425,7 @@ namespace DVBTTelevizor
 
             if (_playerPage != null && _playerPage.Playing)
             {
-                var msg = $"\u25B6  {_playerPage.Title}";
+                var msg = $"\u25B6  {_playerPage.ChannelTitle}";
 
                 MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
             }

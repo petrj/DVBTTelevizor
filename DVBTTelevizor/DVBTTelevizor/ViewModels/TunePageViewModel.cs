@@ -391,34 +391,6 @@ namespace DVBTTelevizor
                 {
                     case SearchProgramResultEnum.Error:
                         _loggingService.Debug("Search error");
-/*
-#if DEBUG
-if (!_driver.Started)
-{
-                            await Task.Run(() =>
-                            {
-                                System.Threading.Thread.Sleep(500);
-                            });
-
-
-                            var ch = new DVBTChannel();
-                            ch.PIDs = "0,17";
-                            ch.ProgramMapPID = 0;
-                            ch.Name = "Channel #" + TunedChannels.Count.ToString();
-                            ch.ProviderName = "Tune Debug";
-                            ch.Frequency = freq;
-                            ch.Bandwdith = bandWidth;
-                            ch.Number = String.Empty;
-                            ch.DVBTType = dvbtTypeIndex;
-                            ch.Type = ServiceTypeEnum.Other;
-
-                            TunedChannels.Add(ch);
-
-                            SelectedChannel = ch;
-}
-#endif
-*/
-
 
                         SignalStrengthProgress = 0;
                         return;

@@ -35,6 +35,7 @@ namespace DVBTTelevizor.Droid
         private int _defaultUiOptions;
         private App _app;
         private DVBTDriverManager _driverManager;
+        NotificationHelper _notificationHelper;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -86,12 +87,14 @@ namespace DVBTTelevizor.Droid
 
             UsbManager manager = (UsbManager)GetSystemService(Context.UsbService);
 
-            var usbReciever = new BroacastReceiverSystem();
+            var usbReciever = new USBBroadcastReceiverSystem();
             var intentFilter = new IntentFilter(UsbManager.ActionUsbDeviceAttached);
             RegisterReceiver(usbReciever, intentFilter);
             usbReciever.UsbAttached += UsbAttached;
 
             _driverManager = new DVBTDriverManager(_loggingService, _config);
+
+            _notificationHelper = new NotificationHelper(this);
 
             _app = new App(_loggingService, _config, _driverManager);
             LoadApplication(_app);
@@ -152,6 +155,23 @@ namespace DVBTTelevizor.Droid
             {
                 SetFullScreen(false);
             });
+
+            MessagingCenter.Subscribe<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, (sender, playStreamInfo) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShowPlayingNotification(playStreamInfo));
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopPlayInBackgroundNotification, (sender) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    StopPlayingNotification();
+                });
+            });
+
         }
 
         private void InitDriver()
@@ -383,6 +403,30 @@ namespace DVBTTelevizor.Droid
 
                     snackBar.Show();
                 });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task ShowPlayingNotification(PlayStreamInfo playStreamInfo)
+        {
+            try
+            {
+                _notificationHelper.ShowNotification(String.Empty, $"Playing {playStreamInfo.Channel.Name}", String.Empty);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void StopPlayingNotification()
+        {
+            try
+            {
+                _notificationHelper.CloseNotification();
             }
             catch (Exception ex)
             {

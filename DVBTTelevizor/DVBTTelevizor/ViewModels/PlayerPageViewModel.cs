@@ -23,7 +23,7 @@ namespace DVBTTelevizor
             BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
         }
 
-        public string Title
+        public string ChannelTitle
         {
             get
             {
@@ -32,7 +32,7 @@ namespace DVBTTelevizor
             set
             {
                 _title = value;
-                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(ChannelTitle));
             }
         }
 

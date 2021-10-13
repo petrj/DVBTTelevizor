@@ -27,13 +27,13 @@
 
         </ResourceDictionary>
     </ContentPage.Resources>
-    
+
     <ContentPage.Content>
         <StackLayout x:Name="VideoStackLayout" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
             <vlc:VideoView IsVisible="{Binding VideoViewVisible}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView"  />
             <StackLayout x:Name="AudioOnlyStackLayout" IsVisible="{Binding AudioViewVisible}" Margin="20,20,20,20" >
 
-                <Label x:Name="AudioOnlyText" Text="{Binding Title}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />             
+                <Label x:Name="AudioOnlyText" Text="{Binding ChannelTitle}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />
 
                 <ScrollView>
                     <StackLayout>
