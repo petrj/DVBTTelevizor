@@ -221,6 +221,7 @@ namespace DVBTTelevizor
 
         private void anyPage_Disappearing(object sender, EventArgs e)
         {
+            _viewModel.NotifyFontSizeChange();
             _viewModel.RefreshCommand.Execute(null);
         }
 

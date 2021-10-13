@@ -15,7 +15,7 @@
                 <Setter Property="HasUnevenRows" Value="True"/>
                 <Setter Property="IsPullToRefreshEnabled" Value="True"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
-                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
