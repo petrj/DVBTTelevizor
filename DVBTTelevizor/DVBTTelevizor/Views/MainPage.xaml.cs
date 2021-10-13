@@ -100,12 +100,7 @@ namespace DVBTTelevizor
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(
                     delegate
                     {
-                        var ch = _viewModel.SelectedChannel;
-                        if (ch != null)
-                        {
-                            _editChannelPage.Channel = ch;
-                            Navigation.PushAsync(_editChannelPage);
-                        }
+                        EditSelectedChannel();
                     });
             });
 
@@ -297,24 +292,34 @@ namespace DVBTTelevizor
                 case "buttonr1":
                 case "down":
                 case "s":
+                case "numpad2":
                     Task.Run(async () => await OnKeyDown());
                     break;
                 case "dpadup":
                 case "buttonl1":
                 case "up":
                 case "w":
+                case "numpad8":
                     Task.Run(async () => await OnKeyUp());
                     break;
                 case "dpadleft":
                 case "pageup":
                 case "left":
                 case "a":
+                case "b":
+                case "mediaplayprevious":
+                case "mediaprevious":
+                case "numpad4":
                     Task.Run(async () => await OnKeyLeft());
                     break;
                 case "pagedown":
                 case "dpadright":
                 case "right":
                 case "d":
+                case "f":
+                case "mediaplaynext":
+                case "medianext":
+                case "numpad6":
                     Task.Run(async () => await OnKeyRight());
                     break;
                 case "dpadcenter":
@@ -322,9 +327,19 @@ namespace DVBTTelevizor
                 case "buttonr2":
                 case "mediaplaypause":
                 case "enter":
+                case "numpad5":
+                case "buttona":
+                case "buttonstart":
                     Task.Run(async () => await _viewModel.PlayChannel());
                     break;
-                case "back":
+                case "f4":
+                case "escape":
+                case "mediaplaystop":
+                case "mediastop":
+                case "numpadsubtract":
+                case "del":
+                case "buttonx":
+                    StopPlayback();
                     break;
                 case "num0":
                 case "number0":
@@ -367,14 +382,45 @@ namespace DVBTTelevizor
                     HandleNumKey(9);
                     break;
                 case "f5":
-                case "del":
+                case "numpad0":
+                case "ctrlleft":
                     _viewModel.RefreshCommand.Execute(null);
+                    break;
+                case "buttonl2":
+                case "info":
+                case "guide":
+                case "i":
+                case "g":
+                case "numpadadd":
+                case "buttonthumbl":
+                case "tab":
+                case "f1":
+                    Detail_Clicked(this, null);
                     break;
                 default:
                     {
-                        _loggingService.Debug($"Unbound key down: {key}");
+                        _loggingService.Debug($"Unbound key: {key}");
+#if DEBUG
+                        MessagingCenter.Send($"Unbound key: {key}", BaseViewModel.MSG_ToastMessage);
+#endif
                     }
                     break;
+            }
+        }
+
+        private async void Detail_Clicked(object sender, EventArgs e)
+        {
+            _loggingService.Info($"Detail_Clicked");
+
+            if (_playerPage != null && _playerPage.Playing)
+            {
+                var msg = $"\u25B6  {_playerPage.Title}";
+
+                MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+            }
+            else
+            {
+                EditSelectedChannel();
             }
         }
 
@@ -457,6 +503,16 @@ namespace DVBTTelevizor
             if (_playerPage != null && _playerPage.Playing)
             {
                 await _viewModel.PlayChannel(_viewModel.SelectedChannel);
+            }
+        }
+
+        private void EditSelectedChannel()
+        {
+            var ch = _viewModel.SelectedChannel;
+            if (ch != null)
+            {
+                _editChannelPage.Channel = ch;
+                Navigation.PushAsync(_editChannelPage);
             }
         }
 
