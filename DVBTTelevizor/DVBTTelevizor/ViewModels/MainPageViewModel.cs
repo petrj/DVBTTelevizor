@@ -198,6 +198,40 @@ namespace DVBTTelevizor
                 });
         }
 
+        public async Task SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
+        {
+            _loggingService.Info($"Selecting channel by frequency and mapPID {frequencyAndMapPID}");
+
+            await Task.Run(
+                () =>
+                {
+                    DVBTChannel firstChannel = null;
+                    DVBTChannel selectChannel = null;
+
+                    if (Channels.Count == 0)
+                        return;
+
+                    foreach (var ch in Channels)
+                    {
+                        if (firstChannel == null)
+                        {
+                            firstChannel = ch;
+                        }
+
+                        if (ch.Frequency.ToString() + ch.ProgramMapPID.ToString() == frequencyAndMapPID)
+                        {
+                            selectChannel = ch;
+                            break;
+                        }
+                    }
+
+                    if (selectChannel == null)
+                        selectChannel = firstChannel;
+
+                    SelectedChannel = selectChannel;
+                });
+        }
+
         public DVBTChannel SelectedChannel
         {
             get
@@ -294,7 +328,7 @@ namespace DVBTTelevizor
 
         private async Task Refresh()
         {
-            string selectedChannelNumber = null;
+            string selectedChanneFrequencyAndMapPID= null;
 
             try
             {
@@ -302,12 +336,9 @@ namespace DVBTTelevizor
 
                 _loggingService.Info($"Refreshing channels");
 
-                if (SelectedChannel == null)
+                if (SelectedChannel != null)
                 {
-                    selectedChannelNumber = "1";
-                } else
-                {
-                    selectedChannelNumber = SelectedChannel.Number;
+                    selectedChanneFrequencyAndMapPID = SelectedChannel.Frequency.ToString() + SelectedChannel.ProgramMapPID.ToString();
                 }
 
                 Channels.Clear();
@@ -328,6 +359,9 @@ namespace DVBTTelevizor
                         continue;
 
                     if (ch.SimplifiedServiceType == DVBTServiceType.Radio && !_config.ShowRadioChannels)
+                        continue;
+
+                    if (ch.SimplifiedServiceType == DVBTServiceType.Other && !_config.ShowOtherChannels)
                         continue;
 
                     if (_recordingChannel != null &&
@@ -353,7 +387,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(TunningButtonVisible));
 
-                await SelectChannelByNumber(selectedChannelNumber);
+                await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
             }
         }
 

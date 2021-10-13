@@ -92,6 +92,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool ShowOtherChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowOtherChannels");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowOtherChannels", value);
+            }
+        }
+
         public bool ShowServiceMenu
         {
             get

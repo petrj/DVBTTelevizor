@@ -22,19 +22,19 @@
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
-                <Setter Property="Margin" Value="5,0,0,0"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
             </Style>
 
             <Style x:Key="ChannelNameTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
                 <Setter Property="Margin" Value="0,5,5,5"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="ProviderNameTextStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="TextColor" Value="White"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
                 <Setter Property="Margin" Value="20,0,0,0"/>
                 <Setter Property="VerticalTextAlignment" Value="End"/>
@@ -102,20 +102,15 @@
                                         <RowDefinition Height="1" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="12*" />
+                                        <ColumnDefinition Width="78*" />
                                         <ColumnDefinition Width="10*" />
-                                        <ColumnDefinition Width="60*" />
-                                        <ColumnDefinition Width="10*" />
-                                        <ColumnDefinition Width="20*" />
                                     </Grid.ColumnDefinitions>
 
                                     <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
-
                                     <Label Grid.Row="0" Grid.Column="1"  Grid.RowSpan="3" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
-
-                                    <Label Grid.Row="1" Grid.Column="2"  Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}"/>
-
-                                    <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding ServiceTypelWithChannelLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
-                                    <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="0" Grid.Column="2"  Grid.RowSpan="3" Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}"/>
+                                    <Label Grid.Row="2" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                     <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                 </Grid>

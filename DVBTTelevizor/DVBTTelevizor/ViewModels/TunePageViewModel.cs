@@ -122,7 +122,7 @@ namespace DVBTTelevizor
                 {
                     var freqMhz = (474 + 8 * (_actualTunningChannel - 21));
                     var t = _actualTuningDVBTType == 0 ? "DVBT" : "DVBT2";
-                    return $"Tuning channel {_actualTunningChannel} ({freqMhz} MHz {t})";
+                    return $"Tuning CH #{_actualTunningChannel} ({freqMhz} MHz {t})";
                 }
 
                 return String.Empty;
@@ -391,6 +391,34 @@ namespace DVBTTelevizor
                 {
                     case SearchProgramResultEnum.Error:
                         _loggingService.Debug("Search error");
+/*
+#if DEBUG
+if (!_driver.Started)
+{
+                            await Task.Run(() =>
+                            {
+                                System.Threading.Thread.Sleep(500);
+                            });
+
+
+                            var ch = new DVBTChannel();
+                            ch.PIDs = "0,17";
+                            ch.ProgramMapPID = 0;
+                            ch.Name = "Channel #" + TunedChannels.Count.ToString();
+                            ch.ProviderName = "Tune Debug";
+                            ch.Frequency = freq;
+                            ch.Bandwdith = bandWidth;
+                            ch.Number = String.Empty;
+                            ch.DVBTType = dvbtTypeIndex;
+                            ch.Type = ServiceTypeEnum.Other;
+
+                            TunedChannels.Add(ch);
+
+                            SelectedChannel = ch;
+}
+#endif
+*/
+
 
                         SignalStrengthProgress = 0;
                         return;
@@ -478,7 +506,7 @@ namespace DVBTTelevizor
                             ch.Number = String.Empty;
                             ch.DVBTType = dvbtTypeIndex;
                             ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;
-                            
+
                             TunedChannels.Add(ch);
 
                             Device.BeginInvokeOnMainThread(() =>
@@ -531,7 +559,7 @@ namespace DVBTTelevizor
                     _actualTuningDVBTType = -1;
                     _actualTunningChannel = -1;
 
-                    State = TuneState.Ready;               
+                    State = TuneState.Ready;
                 }
                 catch (Exception ex)
                 {

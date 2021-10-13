@@ -16,11 +16,11 @@ namespace DVBTTelevizor
 
         public long Frequency { get; set; }
 
-        public long ProgramMapPID { get; set; }        
+        public long ProgramMapPID { get; set; }
 
         public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
 
-        public DVBTServiceType ServiceType { get; set; } = DVBTServiceType.Other;        
+        public DVBTServiceType ServiceType { get; set; } = DVBTServiceType.Other;
 
         public string FrequencyLabel
         {
@@ -119,7 +119,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return SimplifiedServiceType + ", " + ChannelLabel;
+                return ChannelLabel + ", " + SimplifiedServiceType;
             }
         }
 
@@ -167,7 +167,7 @@ namespace DVBTTelevizor
                     case ServiceTypeEnum.H264AVCSDDigitalTelevisionService:
                     case ServiceTypeEnum.H264AVCSDNVODReferenceService:
                     case ServiceTypeEnum.H264AVCSDNVODTimeShiftedService:
-                    case ServiceTypeEnum.H264AVCHDDigitalTelevisionService:                    
+                    case ServiceTypeEnum.H264AVCHDDigitalTelevisionService:
                     case ServiceTypeEnum.H264AVCHDNVODReferenceService:
                     case ServiceTypeEnum.H264AVCHDNVODRTimeShiftedService:
                     case ServiceTypeEnum.H264AVCFrameCompatiblePlanoStereoscopicHDNVODTimeShiftedService:
@@ -192,7 +192,7 @@ namespace DVBTTelevizor
                         case DVBTServiceType.TV:
                             return "TV";
                         case DVBTServiceType.Radio:
-                            return "Radio";                            
+                            return "Radio";
                     }
 
                     return "Other/unknown";

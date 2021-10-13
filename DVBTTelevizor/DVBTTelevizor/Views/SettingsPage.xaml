@@ -51,6 +51,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
@@ -62,6 +63,9 @@
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch" IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
+
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Show other channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowOtherSwitch" IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}"/>
                     </Grid>
 
                     <Button Text="Clear" Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
