@@ -527,18 +527,22 @@ namespace DVBTTelevizor
             }
         }
 
-        private void ToolConnect_Clicked(object sender, EventArgs e)
+        private async void ToolConnect_Clicked(object sender, EventArgs e)
         {
-            if (!_viewModel.DriverConnected)
-            {
-                MessagingCenter.Send("", BaseViewModel.MSG_Init);
-            } else
-            {
-                Task.Run( async ()=>
+            if (_driver.Started)
+            {                
+                if (!(await _dlgService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"DVBT Tuner status", "Back", "Disconnect")))
                 {
                     await _viewModel.DisconnectDriver();
-                }
-                );
+                }                
+
+            } else
+            {          
+
+                if (await _dlgService.Confirm($"Disconnected.", $"DVBT Tuner status", "Connect", "Back"))
+                {
+                    MessagingCenter.Send("", BaseViewModel.MSG_Init);
+                }             
             }
         }
 

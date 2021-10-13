@@ -232,13 +232,13 @@
                 <Label IsVisible="{Binding TuningInProgress}" Text="{Binding TuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
 
                 <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,0,0,0">
-                    <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Gray" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="2" />
+                    <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Black" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
                 </StackLayout>
 
 
                 <StackLayout IsVisible="{Binding TuningInProgress}" Margin="0,5,0,0">
                     <Label Text="Signal strength" HorizontalOptions="Center" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-                    <ProgressBar Progress="{Binding SignalStrengthProgress}" HorizontalOptions="Fill" BackgroundColor="Gray" ProgressColor="Blue" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="2" />
+                    <ProgressBar Progress="{Binding SignalStrengthProgress}" HorizontalOptions="Fill" BackgroundColor="Black" ProgressColor="Blue" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
                 </StackLayout>
 
                 <Grid Margin="10,10,10,10">
@@ -256,9 +256,6 @@
 
                     <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
-
-                <Label Text="{Binding Status}"  x:Name="StatusLabel" Style="{DynamicResource InfoLabelStyle}"/>
-
             </StackLayout>
 
         </StackLayout>

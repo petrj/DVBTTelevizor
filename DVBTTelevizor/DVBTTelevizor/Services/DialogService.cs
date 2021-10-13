@@ -27,9 +27,9 @@ namespace DVBTTelevizor
             }
        }
 
-        public async Task<bool> Confirm(string message, string title = "Confirmation")
+        public async Task<bool> Confirm(string message, string title = "Confirmation", string positiveText="Yes", string negativeText = "No")
         {
-            return await DialogPage.DisplayAlert(title, message, "Yes", "No");
+            return await DialogPage.DisplayAlert(title, message, positiveText, negativeText);
         }
 
         public async Task Information(string message, string title = "Warning")
