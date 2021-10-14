@@ -9,7 +9,7 @@ using System.Text;
 namespace DVBTTelevizor
 {
     [Table("Channels")]
-    public class DVBTChannel : JSONObject
+    public class DVBTChannel : JSONObject, INotifyPropertyChanged
     {
         [PrimaryKey, Column("Number")]
         public string Number { get; set; }
@@ -21,6 +21,9 @@ namespace DVBTTelevizor
         public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
 
         public DVBTServiceType ServiceType { get; set; } = DVBTServiceType.Other;
+
+        public EventItem CurrentEventItem { get; set; }
+        public EventItem NextEventItem { get; set; }
 
         public string FrequencyLabel
         {
@@ -48,7 +51,7 @@ namespace DVBTTelevizor
                 return Bandwdith / 1000000 + " Mhz";
             }
         }
-
+        
         public int DVBTType { get; set; }
 
         //[Column("Name")]
@@ -113,7 +116,6 @@ namespace DVBTTelevizor
                 return (((Frequency / 1000000) - 306) / 8).ToString();
             }
         }
-
 
         public string ServiceTypelWithChannelLabel
         {
@@ -230,6 +232,87 @@ namespace DVBTTelevizor
                 return "Other/unknown";
             }
         }
+
+        public string CurrentEPGEventTitle
+        {
+            get
+            {
+                if (CurrentEventItem == null)
+                    return string.Empty;
+
+                return CurrentEventItem.EventName;
+            }
+        }
+
+        public string CurrentEPGEventTime
+        {
+            get
+            {
+                if (CurrentEventItem == null ||
+                    CurrentEventItem.StartTime > DateTime.Now ||
+                    CurrentEventItem.FinishTime < DateTime.Now)
+                    return string.Empty;
+
+                return CurrentEventItem.StartTime.ToString("HH:mm") + " - " + CurrentEventItem.FinishTime.ToString("HH:mm");
+            }
+        }
+
+        public string NextEPGEventTitle
+        {
+            get
+            {
+                if (NextEventItem == null)
+                    return string.Empty;
+
+                return "-> " + NextEventItem.EventName;
+            }
+        }
+
+        public void NotifyChange()
+        {
+
+        }
+
+        public void ClearEPG()
+        {
+            CurrentEventItem = null;
+            NextEventItem = null;
+        }
+
+        public void NotifyEPGChanges()
+        {
+            OnPropertyChanged(nameof(CurrentEPGEventTitle));
+            OnPropertyChanged(nameof(NextEPGEventTitle));
+            OnPropertyChanged(nameof(CurrentEPGEventTime));
+        }
+
+
+        #region INotifyPropertyChanged
+
+        protected bool SetProperty<T>(ref T backingStore, T value,
+           [CallerMemberName] string propertyName = "",
+           Action onChanged = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(backingStore, value))
+                return false;
+
+            backingStore = value;
+            onChanged?.Invoke();
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            var changed = PropertyChanged;
+            if (changed == null)
+                return;
+
+            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
 
     }
 }

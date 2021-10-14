@@ -30,6 +30,11 @@ namespace DVBTTelevizor
         {
             return await Task.Run(() =>
             {                
+                foreach (var ch in channels)
+                {
+                    ch.ClearEPG();
+                }
+
                 _config.Channels = channels;
                 return true;
             });

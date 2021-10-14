@@ -576,7 +576,7 @@ namespace DVBTTelevizor
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            if (!_viewModel.DoNotScrollToChannel)
+            if (!_viewModel. DoNotScrollToChannel)
             {
                 ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
             }

@@ -19,7 +19,10 @@ namespace DVBTTelevizor
     {
         ChannelService _channelService;
 
+        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+
         public Command RefreshCommand { get; set; }
+        public Command RefreshEPGCommand { get; set; }
 
         public Command LongPressCommand { get; set; }
         public Command ShortPressCommand { get; set; }
@@ -29,7 +32,7 @@ namespace DVBTTelevizor
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
-        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
+        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();        
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(loggingService, dialogService, driver, config)
@@ -37,8 +40,11 @@ namespace DVBTTelevizor
             _channelService = channelService;
 
             RefreshCommand = new Command(async () => await Refresh());
+            RefreshEPGCommand = new Command(async () => await RefreshEPG());
             LongPressCommand = new Command(async (itm) => await LongPress(itm));
             ShortPressCommand = new Command(ShortPress);
+
+            BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 5, 5);
         }
 
         public bool ShowServiceMenuToolItem
@@ -244,9 +250,9 @@ namespace DVBTTelevizor
 
                 _selectedChannel = value;
 
-                OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SelectedChannel));                
             }
-        }
+        }     
 
         public bool TunningButtonVisible
         {
@@ -296,6 +302,8 @@ namespace DVBTTelevizor
                     return;
                 }
 
+                IsBusy = true;
+
                 var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
                 if (!playRes)
                 {
@@ -315,7 +323,11 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex);
 
                 MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
+            } finally
+            {
+                IsBusy = false;
             }
+
         }
 
         private async Task Refresh()
@@ -325,6 +337,10 @@ namespace DVBTTelevizor
             try
             {
                 IsBusy = true;
+
+                await _semaphoreSlim.WaitAsync();
+
+                DoNotScrollToChannel = true;
 
                 _loggingService.Info($"Refreshing channels");
 
@@ -362,11 +378,10 @@ namespace DVBTTelevizor
                         _recordingChannel.ProgramMapPID == ch.ProgramMapPID)
                     {
                         ch.Recording = true;
-                    }
-
+                    }                    
+            
                     Channels.Add(ch);
                 }
-
 
             } catch (Exception ex)
             {
@@ -376,10 +391,64 @@ namespace DVBTTelevizor
             {
                 IsBusy = false;
 
+                _semaphoreSlim.Release();
+
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(TunningButtonVisible));
 
                 await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
+
+                DoNotScrollToChannel = false;
+            }
+        }
+
+        private async Task RefreshEPG()
+        {
+            if (!_config.ScanEPG)
+                return;
+
+            _loggingService.Info($"RefreshEPG");
+
+            try
+            {  
+                await _semaphoreSlim.WaitAsync();
+
+                IsBusy = true;
+
+                foreach (var channel in Channels)
+                {
+                    channel.ClearEPG();
+
+                    var eitM = _driver.GetEITManager(channel.Frequency);
+
+                    if (eitM != null)
+                    {
+                        var evs = eitM.GetEvents(DateTime.Now, 2);
+                        var programMapPID = Convert.ToInt32(channel.ProgramMapPID);
+                        if (evs != null && evs.ContainsKey(programMapPID))
+                        {
+                            if (evs[programMapPID] != null)
+                            {
+                                if (evs[programMapPID].Count > 0)
+                                    channel.CurrentEventItem = evs[programMapPID][0];
+
+                                if (evs[programMapPID].Count > 1)
+                                    channel.NextEventItem = evs[programMapPID][1];
+
+                                channel.NotifyEPGChanges();
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                IsBusy = false;
+
+                _semaphoreSlim.Release();
+
+                OnPropertyChanged(nameof(Channels));
+                OnPropertyChanged(nameof(SelectedChannel));
             }
         }
 

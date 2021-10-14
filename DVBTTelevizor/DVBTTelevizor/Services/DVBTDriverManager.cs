@@ -307,7 +307,7 @@ namespace DVBTTelevizor
 
                     if (_config.ScanEPG && PIDs.Count>0)
                     {
-                        await ScanEPGForChannel(frequency, Convert.ToInt32(PIDs[0]), 750);
+                        await ScanEPGForChannel(frequency, Convert.ToInt32(PIDs[0]), 1000);
                     }
 
                     if (stopReadStream)

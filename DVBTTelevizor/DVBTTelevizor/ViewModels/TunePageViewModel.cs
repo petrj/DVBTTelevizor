@@ -292,7 +292,7 @@ namespace DVBTTelevizor
             TunedChannels.Clear();
 
 
-            await _channelService.LoadChannels();
+            _channels = await _channelService.LoadChannels();
             if (_channels == null) _channels = new ObservableCollection<DVBTChannel>();
 
             OnPropertyChanged(nameof(TuningLabel));
