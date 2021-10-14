@@ -44,7 +44,8 @@ namespace DVBTTelevizor
 
         private string _dataStreamInfo  = "Data reading not initialized";
 
-        private EITManager _eitManager = new EITManager();
+        private Dictionary<long,EITManager> _eitManagers = new Dictionary<long, EITManager>();  // frequency -> EITManager
+        
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -60,7 +61,9 @@ namespace DVBTTelevizor
             get
             {
                 if (ReadingStream)
+                {
                     return null;
+                }
 
                 return _transferStream;
             }
@@ -125,12 +128,15 @@ namespace DVBTTelevizor
             }
         }
 
-        public EITManager EITManager
+        public EITManager GetEITManager(long freq)
         {
-            get
-            {
-                return _eitManager;
-            }
+            if (_eitManagers.ContainsKey(freq))
+                return _eitManagers[freq];
+
+            var eitManager = new EITManager();
+            _eitManagers.Add(freq, eitManager);
+
+            return eitManager;
         }
 
         public void Start()
@@ -223,7 +229,7 @@ namespace DVBTTelevizor
 
                 if (!Recording)
                 {
-                    _recording = true;
+                    _recording = true;                  
                 }
             }
         }
@@ -301,7 +307,7 @@ namespace DVBTTelevizor
 
                     if (_config.ScanEPG && PIDs.Count>0)
                     {
-                        await ScanEPG(500);
+                        await ScanEPGForChannel(frequency, Convert.ToInt32(PIDs[0]), 750);
                     }
 
                     if (stopReadStream)
@@ -1020,9 +1026,42 @@ namespace DVBTTelevizor
             }
        }
 
-        public async Task<bool> ScanEPG(int msTimeout = 2000)
+        public async Task<bool> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
         {
-            _log.Debug($"Scanning EPG");
+            _log.Debug($"Scanning EPG for freq {freq} ");
+
+            try
+            {
+                var eitManager = GetEITManager(freq);
+                var ev = eitManager.GetEvent(DateTime.Now, programMapPID);
+                if (ev != null)
+                {
+                    return true; // already cached 
+                }
+
+                // searching for PID 18 (EIT) + PSI packets ..
+
+                StartReadBuffer();
+
+                System.Threading.Thread.Sleep(msTimeout);
+
+                eitManager.Scan(Buffer);
+
+                StopReadBuffer();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+
+                return false;
+            }
+        }
+
+        public async Task<bool> ScanEPG(long freq, int msTimeout = 2000)
+        {
+            _log.Debug($"Scanning EPG for freq {freq}");
 
             try
             {
@@ -1030,11 +1069,11 @@ namespace DVBTTelevizor
 
                 System.Threading.Thread.Sleep(msTimeout);
 
-                // searching for PID 18 (EIT) + PSI packets ..
-                if (_eitManager.Scan(Buffer))
-                {
+                var eitManager = GetEITManager(freq);
 
-                }
+                // searching for PID 18 (EIT) + PSI packets ..
+
+                eitManager.Scan(Buffer);
 
                 StopReadBuffer();
 

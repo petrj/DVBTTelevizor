@@ -173,7 +173,10 @@ namespace DVBTTelevizor
                 videoView.MediaPlayer.Stop();
                 Task.Run(async () =>
                 {
-                    await _driver.Stop();
+                    if (!_driver.Recording)
+                    {
+                        await _driver.Stop();
+                    }
                 });
             });
         }

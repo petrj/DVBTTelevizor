@@ -294,14 +294,14 @@ namespace DVBTTelevizor
 
                 ScaningInProgress = true;
 
-                var res = await _driver.ScanEPG(5000);
+                var res = await _driver.ScanEPG(Convert.ToInt64(TuneFrequency) * 1000000,  5000);
 
                 ScaningInProgress = false;
 
                 if (res)
                 {
                     var txt = String.Empty;
-                    foreach (var kvp in _driver.EITManager.CurrentEvents)
+                    foreach (var kvp in _driver.GetEITManager(Convert.ToInt64(TuneFrequency) * 1000000).CurrentEvents)
                     {
                         txt += $"Service: {kvp.Key}  Event: {kvp.Value.TextValue} {Environment.NewLine}";
                     }

@@ -63,7 +63,6 @@ namespace DVBTTelevizor
                 actions.Add("Play");
                 if (!ch.Recording)
                 {
-                    actions.Add("Play and record");
                     actions.Add("Record");
                 }
                 else
@@ -86,9 +85,6 @@ namespace DVBTTelevizor
                     case "Record":
                         await RecordChannel(ch, true);
                         break;
-                    case "Play and record":
-                        await RecordChannel(ch, true);
-                        MessagingCenter.Send(new PlayStreamInfo() { RecordingStream = _driver.RecordFileName}, BaseViewModel.MSG_PlayStream);
                         break;
                     case "Stop record":
                         await RecordChannel(ch, false);
@@ -279,6 +275,11 @@ namespace DVBTTelevizor
                     return;
             }
 
+            var playInfo = new PlayStreamInfo
+            {
+                Channel = channel
+            };
+
             if (_recordingChannel != null)
             {
                 MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
@@ -301,23 +302,10 @@ namespace DVBTTelevizor
                     throw new Exception("Play returned false");
                 }
 
-                var playInfo = new PlayStreamInfo
+                var eitManager = _driver.GetEITManager(channel.Frequency);
+                if (eitManager != null)
                 {
-                    Channel = channel
-                };
-
-                if (_driver.EITManager != null)
-                {
-                    var events = _driver.EITManager.GetEvents(DateTime.Now, 1);
-                    var mapPID = channel.ProgramMapPID;
-                    if (events.ContainsKey((int)mapPID))
-                    {
-                        var evs = events[(int)mapPID];
-                        if (evs != null && evs.Count > 0)
-                        {
-                            playInfo.CurrentEvent = evs[0];
-                        }
-                    }
+                    playInfo.CurrentEvent = eitManager.GetEvent(DateTime.Now, Convert.ToInt32(channel.ProgramMapPID));
                 }
 
                 MessagingCenter.Send(playInfo, BaseViewModel.MSG_PlayStream);

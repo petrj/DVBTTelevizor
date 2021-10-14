@@ -109,6 +109,18 @@ namespace MPEGTS
             return true;
         }
 
+        public EventItem GetEvent(DateTime date, int programMapPID)
+        {
+            var events = GetEvents(date, 1);
+
+            if (events.ContainsKey(programMapPID) &&
+                events[programMapPID].Count>0)
+            {
+                return events[programMapPID][0];
+            }
+
+            return null;
+        }
 
         /// <summary>
         ///  Scheduled events supplemented with actual events
