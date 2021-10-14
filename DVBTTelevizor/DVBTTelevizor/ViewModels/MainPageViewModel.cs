@@ -67,7 +67,7 @@ namespace DVBTTelevizor
                     actions.Add("Record");
                 }
                 else
-                {                 
+                {
                     actions.Add("Stop record");
                 }
                 actions.Add("Edit");

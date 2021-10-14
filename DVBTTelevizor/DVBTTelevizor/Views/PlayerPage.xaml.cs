@@ -24,7 +24,7 @@ namespace DVBTTelevizor
         bool _fullscreen = false;
         bool _playInProgress = false;
 
-        private PlayStreamInfo _playStreamInfo;
+
 
         public Command CheckStreamCommand { get; set; }
 
@@ -61,19 +61,17 @@ namespace DVBTTelevizor
             }
         }
 
-        public string ChannelTitle
+        public PlayStreamInfo PlayStreamInfo
         {
             get
             {
-                return _viewModel.ChannelTitle;
+                return _viewModel.PlayStreamInfo;
             }
             set
             {
-                _viewModel.ChannelTitle = value;
+                _viewModel.PlayStreamInfo = value;
             }
         }
-
-        public PlayStreamInfo PlayStreamInfo { get => _playStreamInfo; set => _playStreamInfo = value; }
 
         public void OnDoubleTapped(object sender, EventArgs e)
         {
@@ -157,12 +155,6 @@ namespace DVBTTelevizor
         {
             Device.BeginInvokeOnMainThread(() =>
             {
-                
-                if ( (_playStreamInfo != null) &&  (!String.IsNullOrEmpty(_playStreamInfo.RecordingStream)))
-                {
-                    _media = new Media(_libVLC, _playStreamInfo.RecordingStream);
-                    videoView.MediaPlayer.Play(_media);
-                } else
                 if (_driver.VideoStream != null)
                 {
                     _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
@@ -211,8 +203,10 @@ namespace DVBTTelevizor
                 {
                     _viewModel.AudioViewVisible = false;
                 }
+
+                // updating EPG
+                _viewModel.NotifyEPGChange();
             });
         }
-
     }
 }

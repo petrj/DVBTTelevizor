@@ -9,9 +9,9 @@ namespace DVBTTelevizor
     public class PlayerPageViewModel : ConfigViewModel
     {
         private bool _videoViewVisible = true;
-        private string _title = String.Empty;
         private int _animePos = 2;
         private bool _animePosIncreasing = true;
+        private PlayStreamInfo _playStreamInfo;
 
         public Command AnimeIconCommand { get; set; }
 
@@ -23,19 +23,124 @@ namespace DVBTTelevizor
             BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
         }
 
+        public void NotifyEPGChange()
+        {
+            OnPropertyChanged(nameof(ChannelTitle));
+            OnPropertyChanged(nameof(ProviderName));
+            OnPropertyChanged(nameof(EPGProgress));
+            OnPropertyChanged(nameof(EPGTimeStart));
+            OnPropertyChanged(nameof(EPGTimeFinish));
+            OnPropertyChanged(nameof(EPGTitle));
+            OnPropertyChanged(nameof(EPGDescription));
+        }
+
+        public PlayStreamInfo PlayStreamInfo
+        {
+            get
+            {
+                return _playStreamInfo;
+            }
+            set
+            {
+                _playStreamInfo = value;
+
+                NotifyEPGChange();
+            }
+        }
+
         public string ChannelTitle
         {
             get
             {
-                return _title;
-            }
-            set
-            {
-                _title = value;
-                OnPropertyChanged(nameof(ChannelTitle));
+                return (_playStreamInfo == null) || (_playStreamInfo.Channel == null) ? String.Empty : _playStreamInfo.Channel.Name;
             }
         }
 
+        public string ProviderName
+        {
+            get
+            {
+                return (_playStreamInfo == null) || (_playStreamInfo.Channel == null) ? String.Empty : _playStreamInfo.Channel.ProviderName;
+            }
+        }
+
+        public double EPGProgress
+        {
+            get
+            {
+                if (_playStreamInfo == null ||
+                    _playStreamInfo.CurrentEvent == null)
+                {
+                    return 0;
+                }
+
+                return _playStreamInfo.CurrentEvent.Progress;
+            }
+        }
+
+        public string EPGTimeStart
+        {
+            get
+            {
+                if (_playStreamInfo == null ||
+                    _playStreamInfo.CurrentEvent == null ||
+                    _playStreamInfo.CurrentEvent.StartTime > DateTime.Now ||
+                    _playStreamInfo.CurrentEvent.FinishTime < DateTime.Now )
+                {
+                    return String.Empty;
+                }
+
+                return _playStreamInfo.CurrentEvent.EPGTimeStartDescription;
+            }
+        }
+
+        public string EPGTimeFinish
+        {
+            get
+            {
+                if (_playStreamInfo == null ||
+                    _playStreamInfo.CurrentEvent == null ||
+                    _playStreamInfo.CurrentEvent.StartTime > DateTime.Now ||
+                    _playStreamInfo.CurrentEvent.FinishTime < DateTime.Now)
+                {
+                    return String.Empty;
+                }
+
+                return _playStreamInfo.CurrentEvent.EPGTimeFinishDescription;
+            }
+        }
+
+        public string EPGTitle
+        {
+            get
+            {
+                if (_playStreamInfo == null ||
+                    _playStreamInfo.CurrentEvent == null ||
+                    _playStreamInfo.CurrentEvent.StartTime > DateTime.Now ||
+                    _playStreamInfo.CurrentEvent.FinishTime < DateTime.Now)
+                {
+                    return String.Empty;
+                }
+
+                return _playStreamInfo.CurrentEvent.EventName;
+            }
+        }
+
+        public string EPGDescription
+        {
+            get
+            {
+                if (_playStreamInfo == null ||
+                    _playStreamInfo.CurrentEvent == null ||
+                    _playStreamInfo.CurrentEvent.StartTime > DateTime.Now ||
+                    _playStreamInfo.CurrentEvent.FinishTime < DateTime.Now)
+                {
+                    return String.Empty;
+                }
+
+                return _playStreamInfo.CurrentEvent.Text;
+            }
+        }
 
         public bool VideoViewVisible
         {

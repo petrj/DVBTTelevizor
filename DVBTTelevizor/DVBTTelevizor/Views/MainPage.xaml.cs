@@ -34,7 +34,7 @@ namespace DVBTTelevizor
         private TunePage _tunePage;
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
-        
+
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
@@ -123,8 +123,6 @@ namespace DVBTTelevizor
                          {
                              Navigation.PushModalAsync(_playerPage);
                          }
-
-                         _playerPage.ChannelTitle = playStreamInfo.Channel.Name;
 
                          var msg = playStreamInfo.Channel.Name;
                          if (playStreamInfo.CurrentEvent != null)
@@ -428,9 +426,13 @@ namespace DVBTTelevizor
 
             if (_playerPage != null && _playerPage.Playing)
             {
-                var msg = $"\u25B6  {_playerPage.ChannelTitle}";
+                if (_playerPage.PlayStreamInfo != null &&
+                    _playerPage.PlayStreamInfo.Channel != null)
+                {
+                    var msg = $"\u25B6  {_playerPage.PlayStreamInfo.Channel.Name}";
 
-                MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                }
             }
             else
             {
@@ -533,19 +535,19 @@ namespace DVBTTelevizor
         private async void ToolConnect_Clicked(object sender, EventArgs e)
         {
             if (_driver.Started)
-            {                
+            {
                 if (!(await _dlgService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"DVBT Tuner status", "Back", "Disconnect")))
                 {
                     await _viewModel.DisconnectDriver();
-                }                
+                }
 
             } else
-            {          
+            {
 
                 if (await _dlgService.Confirm($"Disconnected.", $"DVBT Tuner status", "Connect", "Back"))
                 {
                     MessagingCenter.Send("", BaseViewModel.MSG_Init);
-                }             
+                }
             }
         }
 

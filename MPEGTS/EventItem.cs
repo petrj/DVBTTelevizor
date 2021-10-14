@@ -77,5 +77,59 @@ namespace MPEGTS
 
             return res;
         }
+
+        public double Progress
+        {
+            get
+            {
+                if (FinishTime == DateTime.MinValue || StartTime == DateTime.MinValue ||
+                    FinishTime == DateTime.MaxValue || FinishTime == DateTime.MaxValue ||
+                    StartTime > DateTime.Now || StartTime > FinishTime)
+                    return 0;
+
+                if (FinishTime < DateTime.Now)
+                    return 0;
+
+                var totalSecs = (FinishTime - StartTime).TotalSeconds;
+                var futureSecs = (FinishTime - DateTime.Now).TotalSeconds;
+
+                return 1 - futureSecs / totalSecs;
+            }
+        }
+
+        public string TimeDescription
+        {
+            get
+            {
+                if (FinishTime == DateTime.MinValue || StartTime == DateTime.MinValue ||
+                    FinishTime == DateTime.MaxValue || StartTime == DateTime.MaxValue)
+                    return String.Empty;
+
+                return StartTime.ToString("HH:mm") + " - " + FinishTime.ToString("HH:mm");
+            }
+        }
+
+        public string EPGTimeStartDescription
+        {
+            get
+            {
+                if (StartTime == DateTime.MinValue || StartTime == DateTime.MaxValue)
+                    return String.Empty;
+
+                return StartTime.ToString("HH:mm");
+            }
+        }
+
+        public string EPGTimeFinishDescription
+        {
+            get
+            {
+                if (FinishTime == DateTime.MinValue || FinishTime == DateTime.MaxValue)
+                    return String.Empty;
+
+                return FinishTime.ToString("HH:mm");
+            }
+        }
+
     }
 }
