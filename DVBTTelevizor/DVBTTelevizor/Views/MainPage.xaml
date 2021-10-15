@@ -18,7 +18,6 @@
                 <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
-            
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
@@ -53,7 +52,8 @@
                 <Setter Property="TextColor" Value="DarkRed"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
@@ -64,7 +64,8 @@
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
-                <Setter Property="LineBreakMode" Value="TailTruncation"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
             </Style>
 
             <Style x:Key="NextTitleTextStyle" TargetType="Label">
@@ -72,8 +73,15 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalOptions" Value="EndAndExpand"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
-                <Setter Property="LineBreakMode" Value="WordWrap"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
                 <Setter Property="Margin" Value="0,0,5,0"/>
+            </Style>
+
+            <Style x:Key="IconStyle" TargetType="Image">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Margin" Value="0,5,0,0"/>
+                <Setter Property="HeightRequest" Value="50"/>
+                <Setter Property="VerticalOptions" Value="Start"/>
             </Style>
 
         </ResourceDictionary>
@@ -129,7 +137,9 @@
 
                                     <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
                                     <Label Grid.Row="0" Grid.Column="1"                   Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
-                                    <Label Grid.Row="0" Grid.Column="3"  Grid.RowSpan="2" Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+
+                                    <Label Grid.Row="1" Grid.Column="3"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
+                                    <Image Grid.Row="0" Grid.Column="3"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" />
 
                                     <Label Grid.Row="1" Grid.Column="1"                   Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
                                     <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>

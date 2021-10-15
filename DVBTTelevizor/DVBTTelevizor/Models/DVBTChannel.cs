@@ -51,7 +51,7 @@ namespace DVBTTelevizor
                 return Bandwdith / 1000000 + " Mhz";
             }
         }
-        
+
         public int DVBTType { get; set; }
 
         //[Column("Name")]
@@ -67,7 +67,7 @@ namespace DVBTTelevizor
             get
             {
                 if (Recording)
-                    return "REC";
+                    return "\u25CF";
 
                 return String.Empty;
             }
@@ -268,11 +268,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public void NotifyChange()
-        {
-
-        }
-
         public void ClearEPG()
         {
             CurrentEventItem = null;
@@ -286,6 +281,19 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(CurrentEPGEventTime));
         }
 
+        public string Icon
+        {
+            get
+            {
+                switch (SimplifiedServiceType)
+                {
+                    case DVBTServiceType.TV: return "TV.png";
+                    case DVBTServiceType.Radio: return "Radio.png";
+                }
+
+                return null;
+            }
+        }
 
         #region INotifyPropertyChanged
 

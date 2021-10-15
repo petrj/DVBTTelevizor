@@ -17468,31 +17468,37 @@ namespace DVBTTelevizor.Droid
 			public const int Quit = 2131165542;
 			
 			// aapt resource value: 0x7F070167
-			public const int Refresh = 2131165543;
+			public const int Radio = 2131165543;
 			
 			// aapt resource value: 0x7F070168
-			public const int Settings = 2131165544;
+			public const int Refresh = 2131165544;
 			
 			// aapt resource value: 0x7F070169
-			public const int SmallIcon = 2131165545;
+			public const int Settings = 2131165545;
 			
 			// aapt resource value: 0x7F07016A
-			public const int Stop = 2131165546;
+			public const int SmallIcon = 2131165546;
 			
 			// aapt resource value: 0x7F07016B
-			public const int test_custom_background = 2131165547;
+			public const int Stop = 2131165547;
 			
 			// aapt resource value: 0x7F07016C
-			public const int Tools = 2131165548;
+			public const int test_custom_background = 2131165548;
 			
 			// aapt resource value: 0x7F07016D
-			public const int tooltip_frame_dark = 2131165549;
+			public const int Tools = 2131165549;
 			
 			// aapt resource value: 0x7F07016E
-			public const int tooltip_frame_light = 2131165550;
+			public const int tooltip_frame_dark = 2131165550;
 			
 			// aapt resource value: 0x7F07016F
-			public const int Tune = 2131165551;
+			public const int tooltip_frame_light = 2131165551;
+			
+			// aapt resource value: 0x7F070170
+			public const int Tune = 2131165552;
+			
+			// aapt resource value: 0x7F070171
+			public const int TV = 2131165553;
 			
 			static Drawable()
 			{

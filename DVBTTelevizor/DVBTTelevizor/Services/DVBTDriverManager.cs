@@ -45,7 +45,7 @@ namespace DVBTTelevizor
         private string _dataStreamInfo  = "Data reading not initialized";
 
         private Dictionary<long,EITManager> _eitManagers = new Dictionary<long, EITManager>();  // frequency -> EITManager
-        
+
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -229,7 +229,7 @@ namespace DVBTTelevizor
 
                 if (!Recording)
                 {
-                    _recording = true;                  
+                    _recording = true;
                 }
             }
         }
@@ -1036,7 +1036,7 @@ namespace DVBTTelevizor
                 var ev = eitManager.GetEvent(DateTime.Now, programMapPID);
                 if (ev != null)
                 {
-                    return true; // already cached 
+                    return true; // already cached
                 }
 
                 // searching for PID 18 (EIT) + PSI packets ..
