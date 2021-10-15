@@ -349,7 +349,7 @@ namespace DVBTTelevizor
                     return;
                 }
 
-                IsBusy = true;
+                IsRefreshing = true;
 
                 var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
                 if (!playRes)
@@ -374,7 +374,7 @@ namespace DVBTTelevizor
             }
             finally
             {
-                IsBusy = false;
+                IsRefreshing = false;
             }
 
         }
@@ -385,7 +385,7 @@ namespace DVBTTelevizor
 
             try
             {
-                IsBusy = true;
+                IsRefreshing = true;
 
                 await _semaphoreSlim.WaitAsync();
 
@@ -439,9 +439,9 @@ namespace DVBTTelevizor
             }
             finally
             {
-                IsBusy = false;
-
                 _semaphoreSlim.Release();
+
+                IsRefreshing = false;
 
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(TunningButtonVisible));
@@ -462,8 +462,6 @@ namespace DVBTTelevizor
             try
             {
                 await _semaphoreSlim.WaitAsync();
-
-                IsBusy = true;
 
                 foreach (var channel in Channels)
                 {
@@ -493,8 +491,6 @@ namespace DVBTTelevizor
             }
             finally
             {
-                IsBusy = false;
-
                 _semaphoreSlim.Release();
 
                 OnPropertyChanged(nameof(Channels));

@@ -104,7 +104,7 @@
                     ItemsSource="{Binding Channels}"
                     CachingStrategy="RecycleElement"
                     RefreshCommand="{Binding RefreshCommand}"
-                    IsRefreshing="{Binding IsBusy}"
+                    IsRefreshing="{Binding IsRefreshing}"
                     Style="{StaticResource ListViewStyle}"
                     SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
 

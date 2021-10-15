@@ -21,6 +21,7 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         protected DVBTDriverManager _driver;
+        protected bool _isRefreshing = false;
 
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
         public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
@@ -43,10 +44,6 @@ namespace DVBTTelevizor
 
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";
         public const string MSG_StopPlayInBackgroundNotification = "StopPlayInBackgroundNotification";
-
-        private string _status;
-
-        bool isBusy = false;
 
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
               : base(config)
@@ -137,13 +134,12 @@ namespace DVBTTelevizor
             }
         }
 
-        public bool IsBusy
+        public bool IsRefreshing
         {
-            get { return isBusy; }
+            get { return _isRefreshing; }
             set
             {
-                isBusy = value;
-                OnPropertyChanged(nameof(IsBusy));
+                OnPropertyChanged(nameof(IsRefreshing));
             }
         }
 

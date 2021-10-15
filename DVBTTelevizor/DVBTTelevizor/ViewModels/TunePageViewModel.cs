@@ -541,15 +541,12 @@ namespace DVBTTelevizor
                }
                finally
                {
-                   IsBusy = false;
-
                    OnPropertyChanged(nameof(TuningLabel));
                    OnPropertyChanged(nameof(AutomaticTuningProgress));
                    OnPropertyChanged(nameof(TuningFinished));
                    OnPropertyChanged(nameof(TunedChannels));
                    OnPropertyChanged(nameof(AddChannelsVisible));
                }
-
            });
         }
     }
