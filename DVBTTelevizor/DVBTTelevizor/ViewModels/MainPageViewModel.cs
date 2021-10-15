@@ -32,7 +32,7 @@ namespace DVBTTelevizor
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
-        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();        
+        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(loggingService, dialogService, driver, config)
@@ -66,17 +66,19 @@ namespace DVBTTelevizor
                 _loggingService.Info($"Long press on channel {ch.Name})");
 
                 var actions = new List<string>();
-                actions.Add("Play");
+
                 if (!ch.Recording)
                 {
+                    actions.Add("Play");
+                    actions.Add("Scan EPG");
                     actions.Add("Record");
+                    actions.Add("Edit");
+                    actions.Add("Delete");
                 }
                 else
                 {
                     actions.Add("Stop record");
                 }
-                actions.Add("Edit");
-                actions.Add("Delete");
 
                 var action = await _dialogService.DisplayActionSheet($"{ch.Name}", "Cancel", actions);
 
@@ -85,12 +87,14 @@ namespace DVBTTelevizor
                     case "Play":
                         await PlayChannel(ch);
                         break;
+                    case "Scan EPG":
+                        await ScanEPG(ch);
+                        break;
                     case "Edit":
                         MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
                         break;
                     case "Record":
                         await RecordChannel(ch, true);
-                        break;
                         break;
                     case "Stop record":
                         await RecordChannel(ch, false);
@@ -250,9 +254,9 @@ namespace DVBTTelevizor
 
                 _selectedChannel = value;
 
-                OnPropertyChanged(nameof(SelectedChannel));                
+                OnPropertyChanged(nameof(SelectedChannel));
             }
-        }     
+        }
 
         public bool TunningButtonVisible
         {
@@ -270,6 +274,48 @@ namespace DVBTTelevizor
 
                 _config.Channels = Channels;
             });
+        }
+
+        public async Task ScanEPG(DVBTChannel channel)
+        {
+            if (channel == null)
+            {
+                channel = SelectedChannel;
+                if (channel == null)
+                    return;
+            }
+
+            if (_recordingChannel != null)
+            {
+                MessagingCenter.Send($"Cannot scan EPG (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                return;
+            }
+
+            _loggingService.Debug($"Scanning EPG for channel {channel}");
+
+            try
+            {
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send($"Cannot scan EPG (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
+                await Task.Run(async () =>
+                   {
+                       MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
+
+                       await _driver.ScanEPG(channel.Frequency, 5000);
+
+                       await RefreshEPG();
+                   });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+
+                MessagingCenter.Send($"EPG scan failed", BaseViewModel.MSG_ToastMessage);
+            }
         }
 
         public async Task PlayChannel(DVBTChannel channel = null)
@@ -378,8 +424,8 @@ namespace DVBTTelevizor
                         _recordingChannel.ProgramMapPID == ch.ProgramMapPID)
                     {
                         ch.Recording = true;
-                    }                    
-            
+                    }
+
                     Channels.Add(ch);
                 }
 
@@ -410,7 +456,7 @@ namespace DVBTTelevizor
             _loggingService.Info($"RefreshEPG");
 
             try
-            {  
+            {
                 await _semaphoreSlim.WaitAsync();
 
                 IsBusy = true;

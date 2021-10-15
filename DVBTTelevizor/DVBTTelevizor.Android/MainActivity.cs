@@ -142,6 +142,11 @@ namespace DVBTTelevizor.Droid
                 ShowToastMessage(message);
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_LongToastMessage, (message) =>
+            {
+                ShowToastMessage(message, 5000);
+            });
+
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
             {
                 ShareFile(fileName);
@@ -347,7 +352,7 @@ namespace DVBTTelevizor.Droid
             }
         }
 
-        private void ShowToastMessage(string message)
+        private void ShowToastMessage(string message, int duration = 0)
         {
             try
             {
@@ -400,6 +405,11 @@ namespace DVBTTelevizor.Droid
                     var fontSize = minTextSize + (int)_config.AppFontSize * fontSizePerValue;
 
                     textView.SetTextSize(Android.Util.ComplexUnitType.Px, Convert.ToSingle(fontSize));
+
+                    if (duration != 0)
+                    {
+                        snackBar.SetDuration(duration);
+                    }
 
                     snackBar.Show();
                 });

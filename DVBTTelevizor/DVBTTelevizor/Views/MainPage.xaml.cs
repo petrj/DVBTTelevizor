@@ -124,7 +124,7 @@ namespace DVBTTelevizor
                              Navigation.PushModalAsync(_playerPage);
                          }
 
-                         var msg = playStreamInfo.Channel.Name;
+                         var msg = "\u25B6 " + playStreamInfo.Channel.Name;
                          if (playStreamInfo.CurrentEvent != null)
                              msg += $" - {playStreamInfo.CurrentEvent.EventName}";
 
