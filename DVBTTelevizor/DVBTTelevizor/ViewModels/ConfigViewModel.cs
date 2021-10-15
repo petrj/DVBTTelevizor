@@ -99,7 +99,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetScaledSize(14).ToString();
+                return GetScaledSize(15).ToString();
             }
         }
 

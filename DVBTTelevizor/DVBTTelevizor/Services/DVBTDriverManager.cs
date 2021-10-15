@@ -290,7 +290,7 @@ namespace DVBTTelevizor
 
             for (var i=0;i<5;i++)
             {
-                _log.Debug($"Getting status {i+1}/{5}");
+                _log.Debug($"Getting status {i+1}/{10}");
 
                 var statusRes = await GetStatus();
                 if (!tunedRes.SuccessFlag)
@@ -313,9 +313,10 @@ namespace DVBTTelevizor
                     return true;
                 }
 
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(500);
             }
 
+            _log.Debug($"Signal not found");
             return false;
         }
 

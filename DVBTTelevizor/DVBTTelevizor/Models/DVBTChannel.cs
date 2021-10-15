@@ -99,7 +99,7 @@ namespace DVBTTelevizor
                 {
                     case DVBTServiceType.Radio:
                     case DVBTServiceType.TV:
-                        return $"{res} {ServiceType}";
+                        return $"{res} {SimplifiedServiceType}";
                     default:
                         return $"{res}";
                 }
