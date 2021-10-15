@@ -306,7 +306,19 @@ namespace DVBTTelevizor
                    {
                        MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
 
+                       var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType);
+
+                       if (tuned.Result != SearchProgramResultEnum.OK )
+                       {
+                           MessagingCenter.Send($"Scanning EPG failed", BaseViewModel.MSG_ToastMessage);
+                           return;
+                       }
+
+                       // setting PID 18 + PSI for each channel in the same multiplex:    
+
                        await _driver.ScanEPG(channel.Frequency, 5000);
+
+                       await _driver.Stop();
 
                        await RefreshEPG();
                    });

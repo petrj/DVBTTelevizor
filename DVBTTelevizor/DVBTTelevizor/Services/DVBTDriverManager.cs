@@ -952,7 +952,7 @@ namespace DVBTTelevizor
                 // set PIDs 0 and 17
                 for (var i = 1; i <= 5; i++)
                 {
-                    setPIDres = await SetPIDs( new List<long>() { 0,17 });
+                    setPIDres = await SetPIDs( new List<long>() { 0,17,18 });
 
                     if (setPIDres.SuccessFlag)
                     {
@@ -1059,7 +1059,7 @@ namespace DVBTTelevizor
         public async Task<bool> ScanEPG(long freq, int msTimeout = 2000)
         {
             _log.Debug($"Scanning EPG for freq {freq}");
-
+            
             try
             {
                 StartReadBuffer();

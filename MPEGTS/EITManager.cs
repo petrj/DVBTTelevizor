@@ -36,6 +36,8 @@ namespace MPEGTS
 
             var eventIDs = new Dictionary<int, Dictionary<int, EventItem>>(); // ServiceID -> (event id -> event item )
 
+            var alreadytReadEventItemIDs = new Dictionary<int, int>();
+
             foreach (var kvp in eitData)
             {
                 try
