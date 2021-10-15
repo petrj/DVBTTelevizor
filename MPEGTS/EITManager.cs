@@ -11,6 +11,9 @@ namespace MPEGTS
         /// </summary>
         public Dictionary<int, EventItem> CurrentEvents { get; set; }  = new Dictionary<int, EventItem>();
 
+        /// <summary>
+        /// ServiceID (program number) -> List of events
+        /// </summary>
         public Dictionary<int, List<EventItem>> ScheduledEvents { get; set; } = new Dictionary<int, List<EventItem>>();
 
         public Dictionary<int, int> ProgramNumberToMapPID { get; set; } = new Dictionary<int, int>();
@@ -35,8 +38,6 @@ namespace MPEGTS
             var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
 
             var eventIDs = new Dictionary<int, Dictionary<int, EventItem>>(); // ServiceID -> (event id -> event item )
-
-            var alreadytReadEventItemIDs = new Dictionary<int, int>();
 
             foreach (var kvp in eitData)
             {
@@ -85,13 +86,10 @@ namespace MPEGTS
 
             foreach (var kvp in eventIDs)
             {
-                if (!ScheduledEvents.ContainsKey(kvp.Key))
+                foreach (var eventItem in kvp.Value)
                 {
-                    ScheduledEvents[kvp.Key] = new List<EventItem>();
+                    AddScheduledEventItem(kvp.Key, eventItem.Value);
                 }
-
-                ScheduledEvents[kvp.Key].AddRange(kvp.Value.Values);
-
                 ScheduledEvents[kvp.Key].Sort();
             }
 
@@ -105,6 +103,24 @@ namespace MPEGTS
             }
 
             return true;
+        }
+
+        public void AddScheduledEventItem(int serviceId, EventItem eventItem)
+        {
+            if (!ScheduledEvents.ContainsKey(serviceId))
+            {
+                ScheduledEvents[serviceId] = new List<EventItem>();
+            }
+
+            foreach (var item in ScheduledEvents[serviceId])
+            {
+                if (item.EventId == eventItem.EventId)
+                {
+                    return;
+                }                    
+            }
+
+            ScheduledEvents[serviceId].Add(eventItem);
         }
 
         public EventItem GetEvent(DateTime date, int programMapPID)
