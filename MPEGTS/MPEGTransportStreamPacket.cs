@@ -317,8 +317,6 @@ namespace MPEGTS
             if (pos == -1)
                 return res;
 
-            //Console.WriteLine($"TS packet position : {pos}");
-
             while (pos + 188 < bytes.Count)
             {
                 var buff = new byte[188];
@@ -329,8 +327,6 @@ namespace MPEGTS
 
                 var packet = new MPEGTransportStreamPacket();
                 packet.Parse(buff);
-
-                //Console.WriteLine($"Adding packet PID {packet.PID}");
 
                 if (
                         (PIDFilter == -1)  // add all packets

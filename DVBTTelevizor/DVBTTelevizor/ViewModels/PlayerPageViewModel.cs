@@ -16,7 +16,7 @@ namespace DVBTTelevizor
         public Command AnimeIconCommand { get; set; }
 
         public PlayerPageViewModel(DVBTTelevizorConfiguration config)
-            :base(config)
+            : base(config)
         {
             AnimeIconCommand = new Command(Anime);
 
@@ -85,7 +85,7 @@ namespace DVBTTelevizor
                 if (_playStreamInfo == null ||
                     _playStreamInfo.CurrentEvent == null ||
                     _playStreamInfo.CurrentEvent.StartTime > DateTime.Now ||
-                    _playStreamInfo.CurrentEvent.FinishTime < DateTime.Now )
+                    _playStreamInfo.CurrentEvent.FinishTime < DateTime.Now)
                 {
                     return String.Empty;
                 }
@@ -203,6 +203,5 @@ namespace DVBTTelevizor
 
             OnPropertyChanged(nameof(AudioIcon));
         }
-
     }
 }

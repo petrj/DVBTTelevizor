@@ -15,10 +15,8 @@ namespace MPEGTS
         public int ServiceId { get; set; }
         public int TransportStreamID { get; set; }
         public int OriginalNetworkID { get; set; }
-
         public byte SegmentLastSectionNumber { get; set; }
         public byte LastTableID { get; set; }
-
 
         public List<EventItem> EventItems { get; set; } = new List<EventItem>();
 
@@ -124,7 +122,6 @@ namespace MPEGTS
 
                 pos = pos + descriptorLength;
             }
-
         }
 
         public void WriteToConsole(bool detailed = true)

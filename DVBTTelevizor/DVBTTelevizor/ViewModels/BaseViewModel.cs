@@ -142,8 +142,7 @@ namespace DVBTTelevizor
             get { return isBusy; }
             set
             {
-                //SetProperty(ref isBusy, value);
-                //isBusy = value;
+                isBusy = value;
                 OnPropertyChanged(nameof(IsBusy));
             }
         }

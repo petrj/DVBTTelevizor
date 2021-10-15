@@ -17,8 +17,6 @@ using LoggerService;
 
 namespace DVBTTelevizor
 {
-    // Learn more about making custom code visible in the Xamarin.Forms previewer
-    // by visiting https://aka.ms/xamarinforms-previewer
     [DesignTimeVisible(false)]
     public partial class MainPage : ContentPage
     {
@@ -34,7 +32,6 @@ namespace DVBTTelevizor
         private TunePage _tunePage;
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
-
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;

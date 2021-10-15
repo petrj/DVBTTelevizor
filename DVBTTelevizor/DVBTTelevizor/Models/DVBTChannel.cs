@@ -54,10 +54,8 @@ namespace DVBTTelevizor
 
         public int DVBTType { get; set; }
 
-        //[Column("Name")]
         public string Name { get; set; }
 
-        //[Column("ProviderName")]
         public string ProviderName { get; set; }
 
         public bool Recording { get; set; }
@@ -73,7 +71,6 @@ namespace DVBTTelevizor
             }
         }
 
-        //[Column("PIDs")]
         public string PIDs { get; set; }
 
         public string PIDsLabel
@@ -321,6 +318,5 @@ namespace DVBTTelevizor
         }
 
         #endregion
-
     }
 }

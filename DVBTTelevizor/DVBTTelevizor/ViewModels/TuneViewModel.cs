@@ -113,6 +113,5 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(TuneBandwidth));
             }
         }
-
     }
 }

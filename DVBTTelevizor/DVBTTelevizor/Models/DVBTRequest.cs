@@ -10,26 +10,7 @@ namespace DVBTTelevizor
         public DVBTDriverRequestTypeEnum DVBTDriverRequestType;
         public List<long> Payload = new List<long>();
 
-        //public List<byte> Bytes { get; set; } = new List<byte>();
         public int ResponseBytesExpectedCount { get; set; }
-
-        /*
-        public char[] BytesAsCharArray
-        {
-            get
-            {
-                if (Bytes.Count>0)
-                {
-                    var res = new char[Bytes.Count];
-                    for (var i = 0; i < Bytes.Count; i++) res[i] = Convert.ToChar(Bytes[i]);
-                    return res;
-                } else
-                {
-                    return new char[0];
-                }
-            }
-        }
-        */
 
         public DVBTRequest(DVBTDriverRequestTypeEnum requestType, List<long> payload, int responseBytesExpectedCount)
         {

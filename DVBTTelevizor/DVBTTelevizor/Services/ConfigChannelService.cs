@@ -29,7 +29,7 @@ namespace DVBTTelevizor
         public override async Task<bool> SaveChannels(ObservableCollection<DVBTChannel> channels)
         {
             return await Task.Run(() =>
-            {                
+            {
                 foreach (var ch in channels)
                 {
                     ch.ClearEPG();

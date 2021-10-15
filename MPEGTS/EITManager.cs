@@ -84,7 +84,7 @@ namespace MPEGTS
             foreach (var kvp in eventIDs)
             {
                 if (!ScheduledEvents.ContainsKey(kvp.Key))
-                {                    
+                {
                     ScheduledEvents[kvp.Key] = new List<EventItem>();
                 }
 

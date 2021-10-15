@@ -15,8 +15,6 @@ namespace DVBTTelevizor
         public static bool HasValue(this JObject obj, string key)
         {
             // ContainsKey method of JObject is not implemented in Xamarine Live Player!
-            // Error in Xamarine Live Player:  'JObject' does not contain a definition for 'ContainsKey' and no extension method 'ContainsKey' accepting a first argument of type 'JObject' could be found(are you missing a using directive or an assembly reference ?)		Z:\SledovaniTVPlayer\SledovaniTVApi\ParsableJObject.cs  1
-
             return obj.TryGetValue(key, StringComparison.CurrentCulture, out JToken value);
         }
     }

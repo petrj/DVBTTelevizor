@@ -199,7 +199,7 @@ namespace DVBTTelevizor
 
             await _channelService.SaveChannels(chs);
 
-            MessagingCenter.Send($"Imported channels count: {count}", BaseViewModel.MSG_ToastMessage);            
+            MessagingCenter.Send($"Imported channels count: {count}", BaseViewModel.MSG_ToastMessage);
         }
 
         private async Task ClearChannels()

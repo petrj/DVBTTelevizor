@@ -31,7 +31,7 @@ namespace DVBTTelevizor
 
         private double _signalStrengthProgress = 0;
 
-        public ObservableCollection<DVBTChannel> TunedChannels { get; set;  } = new ObservableCollection<DVBTChannel>();
+        public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         public Command TuneCommand { get; set; }
         public Command AbortTuneCommand { get; set; }
@@ -42,7 +42,7 @@ namespace DVBTTelevizor
             Ready = 0,
             TuningInProgress = 1,
             TuneFinishedOK = 2,
-            TuneFailed= 3
+            TuneFailed = 3
         }
 
         public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
@@ -308,7 +308,7 @@ namespace DVBTTelevizor
                     long freq = Convert.ToInt64(TuneFrequency) * 1000000;
                     long bandWidth = TuneBandwidth * 1000000;
 
-                    var ch = Convert.ToInt32( (Convert.ToInt64(TuneFrequency) - 474 + 8 * 21) / 8);
+                    var ch = Convert.ToInt32((Convert.ToInt64(TuneFrequency) - 474 + 8 * 21) / 8);
 
                     _actualTunningChannel = ch;
                     _actualTuningDVBTType = 0;
@@ -321,7 +321,8 @@ namespace DVBTTelevizor
                     OnPropertyChanged(nameof(TuningLabel));
 
                     if (DVBT2Tuning) await Tune(freq, bandWidth, 1);
-                } else
+                }
+                else
                 {
                     await AutomaticTune();
                 }
@@ -346,38 +347,38 @@ namespace DVBTTelevizor
 
         private async Task AutomaticTune()
         {
-            await Task.Run( async () =>
-            {
-                _loggingService.Info("Starting automatic tuning");
+            await Task.Run(async () =>
+           {
+               _loggingService.Info("Starting automatic tuning");
 
-                for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
-                {
-                        if (!DVBTTuning && dvbtTypeIndex == 0)
-                            continue;
-                        if (!DVBT2Tuning && dvbtTypeIndex == 1)
-                            continue;
+               for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
+               {
+                   if (!DVBTTuning && dvbtTypeIndex == 0)
+                       continue;
+                   if (!DVBT2Tuning && dvbtTypeIndex == 1)
+                       continue;
 
-                    _actualTuningDVBTType = dvbtTypeIndex;
+                   _actualTuningDVBTType = dvbtTypeIndex;
 
-                    for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
-                    {
-                        _actualTunningChannel = i;
-                        var freqMHz = (474 + 8 * (_actualTunningChannel - 21));
-                        var freq = freqMHz * 1000000;
+                   for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
+                   {
+                       _actualTunningChannel = i;
+                       var freqMHz = (474 + 8 * (_actualTunningChannel - 21));
+                       var freq = freqMHz * 1000000;
 
-                        if (TuningAborted)
-                        {
-                            return;
-                        }
+                       if (TuningAborted)
+                       {
+                           return;
+                       }
 
-                        OnPropertyChanged(nameof(TuningLabel));
-                        OnPropertyChanged(nameof(AutomaticTuningProgress));
+                       OnPropertyChanged(nameof(TuningLabel));
+                       OnPropertyChanged(nameof(AutomaticTuningProgress));
 
-                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
-                    }
-                }
+                       await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
+                   }
+               }
 
-            });
+           });
         }
 
 
@@ -489,7 +490,7 @@ namespace DVBTTelevizor
                             _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
 
                             // automatically adding new tuned channel if does not exist
-                            if (!ConfigViewModel.ChannelExists(_channels,ch.Frequency, ch.ProgramMapPID))
+                            if (!ConfigViewModel.ChannelExists(_channels, ch.Frequency, ch.ProgramMapPID))
                             {
                                 ch.Number = (_channels.Count + 1).ToString();
 
@@ -500,12 +501,13 @@ namespace DVBTTelevizor
                             }
                         }
 
-                        if (totalChannelsAddedCount>0)
+                        if (totalChannelsAddedCount > 0)
                         {
                             if (totalChannelsAddedCount > 1)
                             {
                                 MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);
-                            } else
+                            }
+                            else
                             {
                                 MessagingCenter.Send($"Channel saved", BaseViewModel.MSG_ToastMessage);
                             }
@@ -522,33 +524,33 @@ namespace DVBTTelevizor
 
         public async Task FinishTune()
         {
-            await Task.Run( () =>
-            {
-                try
-                {
-                    TunedChannels.Clear();
+            await Task.Run(() =>
+           {
+               try
+               {
+                   TunedChannels.Clear();
 
-                    _actualTuningDVBTType = -1;
-                    _actualTunningChannel = -1;
+                   _actualTuningDVBTType = -1;
+                   _actualTunningChannel = -1;
 
-                    State = TuneState.Ready;
-                }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex);
-                }
-                finally
-                {
-                    IsBusy = false;
+                   State = TuneState.Ready;
+               }
+               catch (Exception ex)
+               {
+                   _loggingService.Error(ex);
+               }
+               finally
+               {
+                   IsBusy = false;
 
-                    OnPropertyChanged(nameof(TuningLabel));
-                    OnPropertyChanged(nameof(AutomaticTuningProgress));
-                    OnPropertyChanged(nameof(TuningFinished));
-                    OnPropertyChanged(nameof(TunedChannels));
-                    OnPropertyChanged(nameof(AddChannelsVisible));
-                }
+                   OnPropertyChanged(nameof(TuningLabel));
+                   OnPropertyChanged(nameof(AutomaticTuningProgress));
+                   OnPropertyChanged(nameof(TuningFinished));
+                   OnPropertyChanged(nameof(TunedChannels));
+                   OnPropertyChanged(nameof(AddChannelsVisible));
+               }
 
-            });
+           });
         }
     }
 }

@@ -133,7 +133,6 @@ namespace MPEGTS
 
                     //Console.WriteLine($"Found NIT transport descriptor: {descriptorTag} ({Convert.ToString(descriptorTag,16)})");
 
-
                     pos += descriptorLength + 2;
                 }
             }

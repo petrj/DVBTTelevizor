@@ -82,7 +82,7 @@ namespace MPEGTS
             }
 
             if (_syncPos == -1)
-                return; 
+                return;
 
             // writting bytes
             if (_fs == null)
@@ -109,7 +109,7 @@ namespace MPEGTS
                 if (cutSyncPos == -1)
                 {
                     // bad data ?
-                    _logger.Info($"Data sync error");                 
+                    _logger.Info($"Data sync error");
                 }
                 else
                 {

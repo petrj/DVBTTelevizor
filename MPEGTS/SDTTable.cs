@@ -22,7 +22,6 @@ namespace MPEGTS
 
         public List<ServiceDescriptor> ServiceDescriptors { get; set; } = new List<ServiceDescriptor>();
 
-
         public List<byte> TableData = new List<byte>();
 
         public void WriteToConsole(bool detailed = false)

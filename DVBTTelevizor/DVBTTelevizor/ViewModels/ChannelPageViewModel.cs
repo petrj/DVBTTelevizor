@@ -9,7 +9,6 @@ namespace DVBTTelevizor
     {
         private DVBTChannel _channel;
 
-
         public DVBTChannel Channel
         {
             get

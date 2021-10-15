@@ -19,7 +19,6 @@ namespace MPEGTS
         public byte Version { get; set; }
         public bool CurrentIndicator { get; set; }
 
-
         public byte[] Data { get; set; }
         public byte[] CRC { get; set; }
 

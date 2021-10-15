@@ -130,6 +130,5 @@ namespace MPEGTS
                 return FinishTime.ToString("HH:mm");
             }
         }
-
     }
 }

@@ -15,7 +15,7 @@ namespace DVBTTelevizor
         /// <param name="repeatIntervalSeconds">0 and negative for no repeat</param>
         /// <param name="delaySeconds">start delay</param>
         public static void RunInBackground(Command command, int repeatIntervalSeconds = 5, int delaySeconds = 0)
-        {           
+        {
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
@@ -35,7 +35,7 @@ namespace DVBTTelevizor
                         Thread.Sleep(repeatIntervalSeconds * 1000);
                     }
                 } while (true);
-            }).Start();         
+            }).Start();
         }
     }
 }

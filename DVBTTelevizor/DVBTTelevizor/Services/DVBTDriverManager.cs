@@ -150,9 +150,6 @@ namespace DVBTTelevizor
             _lastTunedFreq = -1;
             _lastTunedDeliverySystem = -1;
 
-            //_client.NoDelay = true;
-            //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-
             StartBackgroundReading();
         }
 
@@ -1024,7 +1021,7 @@ namespace DVBTTelevizor
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
             }
-       }
+        }
 
         public async Task<bool> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
         {
@@ -1113,9 +1110,6 @@ namespace DVBTTelevizor
 
                 var timeoutForReadingBuffer = 15; //  15 secs
                 var startTime = DateTime.Now;
-
-                //var sdtPackets = new List<MPEGTransportStreamPacket>();
-                //var psiPackets = new List<MPEGTransportStreamPacket>();
 
                 SDTTable sdtTable = null;
                 PSITable psiTable = null;

@@ -72,7 +72,6 @@ namespace MPEGTS
 
                 pos +=4;
             }
-
         }
 
         public void WriteToConsole(bool detailed = false)

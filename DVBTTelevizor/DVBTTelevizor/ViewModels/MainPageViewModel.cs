@@ -35,7 +35,7 @@ namespace DVBTTelevizor
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
-            :base(loggingService, dialogService, driver, config)
+            : base(loggingService, dialogService, driver, config)
         {
             _channelService = channelService;
 
@@ -136,7 +136,8 @@ namespace DVBTTelevizor
 
                     _recordingChannel = channel;
                     await _driver.StartRecording();
-                } else
+                }
+                else
                 {
                     if (!_driver.Started)
                     {
@@ -364,12 +365,14 @@ namespace DVBTTelevizor
 
                 MessagingCenter.Send(playInfo, BaseViewModel.MSG_PlayStream);
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _loggingService.Error(ex);
 
                 MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
-            } finally
+            }
+            finally
             {
                 IsBusy = false;
             }
@@ -378,7 +381,7 @@ namespace DVBTTelevizor
 
         private async Task Refresh()
         {
-            string selectedChanneFrequencyAndMapPID= null;
+            string selectedChanneFrequencyAndMapPID = null;
 
             try
             {
@@ -403,7 +406,7 @@ namespace DVBTTelevizor
 
                 // sort chanels by number
 
-                channels = new ObservableCollection<DVBTChannel>(channels.OrderBy(i => i.Number.PadLeft(4,'0')));
+                channels = new ObservableCollection<DVBTChannel>(channels.OrderBy(i => i.Number.PadLeft(4, '0')));
 
                 // channels filter
 
@@ -429,7 +432,8 @@ namespace DVBTTelevizor
                     Channels.Add(ch);
                 }
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while loading channels");
             }
@@ -553,43 +557,42 @@ namespace DVBTTelevizor
                 () =>
                 {
 
-                        if (Channels.Count == 0)
-                            return;
+                    if (Channels.Count == 0)
+                        return;
 
-                        if (SelectedChannel == null)
-                        {
-                            SelectedChannel = Channels[Channels.Count - 1];
-                        }
-                        else
-                        {
-                            bool previous = false;
-                            var previousCount = 1;
+                    if (SelectedChannel == null)
+                    {
+                        SelectedChannel = Channels[Channels.Count - 1];
+                    }
+                    else
+                    {
+                        bool previous = false;
+                        var previousCount = 1;
 
-                            for (var i = Channels.Count - 1; i >= 0; i--)
+                        for (var i = Channels.Count - 1; i >= 0; i--)
+                        {
+                            if (previous)
                             {
-                                if (previous)
+                                if (previousCount == step || i == 0)
                                 {
-                                    if (previousCount == step || i == 0)
-                                    {
-                                        SelectedChannel = Channels[i];
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        previousCount++;
-                                    }
+                                    SelectedChannel = Channels[i];
+                                    break;
                                 }
                                 else
                                 {
-                                    if (Channels[i] == SelectedChannel)
-                                    {
-                                        previous = true;
-                                    }
+                                    previousCount++;
+                                }
+                            }
+                            else
+                            {
+                                if (Channels[i] == SelectedChannel)
+                                {
+                                    previous = true;
                                 }
                             }
                         }
+                    }
                 });
         }
-
     }
 }

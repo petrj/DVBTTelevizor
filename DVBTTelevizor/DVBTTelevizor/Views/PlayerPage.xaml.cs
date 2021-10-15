@@ -24,8 +24,6 @@ namespace DVBTTelevizor
         bool _fullscreen = false;
         bool _playInProgress = false;
 
-
-
         public Command CheckStreamCommand { get; set; }
 
         public PlayerPage(DVBTDriverManager driver, DVBTTelevizorConfiguration config)
@@ -138,14 +136,12 @@ namespace DVBTTelevizor
                 {
                     if (_mediaPlayer.VideoTrack != -1)
                     {
-                        //var pos = videoView.MediaPlayer.Position;
                         videoView.MediaPlayer.Stop();
 
                         VideoStackLayout.Children.Remove(videoView);
                         VideoStackLayout.Children.Add(videoView);
 
                         videoView.MediaPlayer.Play();
-                        //videoView.MediaPlayer.Position = pos;
                     }
                 });
             }
@@ -180,7 +176,6 @@ namespace DVBTTelevizor
                 });
             });
         }
-
 
         private async Task CheckStream()
         {

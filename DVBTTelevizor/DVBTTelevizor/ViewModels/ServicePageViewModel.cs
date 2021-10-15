@@ -294,7 +294,7 @@ namespace DVBTTelevizor
 
                 ScaningInProgress = true;
 
-                var res = await _driver.ScanEPG(Convert.ToInt64(TuneFrequency) * 1000000,  5000);
+                var res = await _driver.ScanEPG(Convert.ToInt64(TuneFrequency) * 1000000, 5000);
 
                 ScaningInProgress = false;
 
@@ -308,7 +308,8 @@ namespace DVBTTelevizor
 
                     await _dialogService.Information(txt);
 
-                } else
+                }
+                else
                 {
                     await _dialogService.Error("Scan error");
                 }
@@ -351,7 +352,7 @@ namespace DVBTTelevizor
                 }
 
                 var mapPIDs = new List<long>();
-                var mapPIDToName = new Dictionary<long,string>();
+                var mapPIDToName = new Dictionary<long, string>();
                 foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
                 {
                     mapPIDs.Add(sd.Value);
@@ -368,7 +369,7 @@ namespace DVBTTelevizor
                 switch (searchProgramPIDsResult.Result)
                 {
                     case SearchProgramResultEnum.Error:
-                         await _dialogService.Error("Error scanning Map PIDs");
+                        await _dialogService.Error("Error scanning Map PIDs");
                         return;
                     case SearchProgramResultEnum.NoSignal:
                         await _dialogService.Error("No signal");
@@ -381,7 +382,7 @@ namespace DVBTTelevizor
                 var list = new List<string>();
                 foreach (var kvp in searchProgramPIDsResult.PIDs)
                 {
-                    list.Add($"{mapPIDToName[kvp.Key]}: {string.Join(",",kvp.Value)}");
+                    list.Add($"{mapPIDToName[kvp.Key]}: {string.Join(",", kvp.Value)}");
                 }
 
                 var res = await _dialogService.DisplayActionSheet("Select PIDs:", "Cancel", list);
@@ -397,7 +398,7 @@ namespace DVBTTelevizor
                         }
                     }
                 }
-           }
+            }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while scanning PSI");
@@ -433,7 +434,7 @@ namespace DVBTTelevizor
                 s += $"Frequency step size:  {cap.frequencyStepSize}";
                 s += Environment.NewLine;
 
-                s += $"Frequency minimum:  {cap.minFrequency/1000000}";
+                s += $"Frequency minimum:  {cap.minFrequency / 1000000}";
                 s += Environment.NewLine;
 
                 s += $"Frequency maximum:  {cap.maxFrequency / 1000000}";
@@ -447,7 +448,8 @@ namespace DVBTTelevizor
                 if (cap.supportedDeliverySystems % 1 == 1)
                 {
                     s += $"YES";
-                } else
+                }
+                else
                 {
                     s += $"NO";
                 }

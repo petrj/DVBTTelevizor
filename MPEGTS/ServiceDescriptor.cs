@@ -39,7 +39,7 @@ namespace MPEGTS
             pos = pos + ProviderNameLength;
 
             ServiceNameLength = bytes[pos + 0];
-            
+
             pos = pos +1;
 
             ServiceName = MPEGTSCharReader.ReadString(bytes, pos, ServiceNameLength);
