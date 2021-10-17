@@ -131,75 +131,79 @@ namespace DVBTTelevizor
         }
 
         private async Task Export()
-        {
-            await BaseViewModel.RunWithStoragePermission(
-                 async () =>
-                 {
-                     try
-                     {
-                         _loggingService.Info($"Exporting channels");
+        {          
+            try
+            {
+                _loggingService.Info($"Exporting channels");
 
-                         var chs = await _channelService.LoadChannels();
-                         if (chs.Count == 0)
-                         {
-                             await _dialogService.Information("Channel list is empty");
-                             return;
-                         }
+                var chs = await _channelService.LoadChannels();
+                if (chs.Count == 0)
+                {
+                    await _dialogService.Information("Channel list is empty");
+                    return;
+                }
 
-                         var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
-                         if (File.Exists(path))
-                         {
-                             if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
-                             {
-                                 return;
-                             }
+                var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
+                if (File.Exists(path))
+                {
+                    if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
+                    {
+                        return;
+                    }
 
-                             File.Delete(path);
-                         }
+                    File.Delete(path);
+                }
 
-                         File.WriteAllText(path, JsonConvert.SerializeObject(chs));
+                File.WriteAllText(path, JsonConvert.SerializeObject(chs));
 
-                         MessagingCenter.Send($"File {path} exported.", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"File {path} exported.", BaseViewModel.MSG_ToastMessage);
 
-                     }
-                     catch (Exception ex)
-                     {
-                         await _dialogService.Error("Export failed");
-                     }
-
-                 }, _dialogService);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Export failed");                
+                await _dialogService.Error($"Export failed");
+            }              
         }
 
         private async Task Import()
         {
-            _loggingService.Info($"Importing channels");
-
-            var chs = await _channelService.LoadChannels();
-
-            var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
-            if (!File.Exists(path))
+            try
             {
-                await _dialogService.Error($"File {path} does not exist.");
-                return;
-            }
+                _loggingService.Info($"Importing channels");
 
-            var jsonFromFile = File.ReadAllText(path);
+                var chs = await _channelService.LoadChannels();
 
-            var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(jsonFromFile);
-
-            var count = 0;
-            foreach (var ch in importedChannels)
-            {
-                if (!ConfigViewModel.ChannelExists(chs,ch.Frequency, ch.ProgramMapPID))
+                var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
+                if (!File.Exists(path))
                 {
-                    count++;
-                    chs.Add(ch);
+                    await _dialogService.Error($"File {path} does not exist.");
+                    return;
                 }
+
+                var jsonFromFile = File.ReadAllText(path);
+
+                var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(jsonFromFile);
+
+                var count = 0;
+                foreach (var ch in importedChannels)
+                {
+                    if (!ConfigViewModel.ChannelExists(chs, ch.Frequency, ch.ProgramMapPID))
+                    {
+                        count++;
+                        chs.Add(ch);
+                    }
+                }
+
+                await _channelService.SaveChannels(chs);
+
+                MessagingCenter.Send($"Imported channels count: {count}", BaseViewModel.MSG_ToastMessage);
             }
-
-            await _channelService.SaveChannels(chs);
-
-            MessagingCenter.Send($"Imported channels count: {count}", BaseViewModel.MSG_ToastMessage);
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Import failed");
+                await _dialogService.Error($"Import failed");
+            }
         }
 
         private async Task ClearChannels()
