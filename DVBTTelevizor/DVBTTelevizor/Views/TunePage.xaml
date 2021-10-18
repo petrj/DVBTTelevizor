@@ -81,8 +81,6 @@
             <Style x:Key="PickerStyle" TargetType="Picker">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
             <Style x:Key="IconStyle" TargetType="Image">
