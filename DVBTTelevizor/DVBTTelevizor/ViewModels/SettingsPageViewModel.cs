@@ -108,7 +108,7 @@ namespace DVBTTelevizor
 
         private void ShareLog()
         {
-            var logPath = Path.Combine(BaseViewModel.ExternalStorageDirectory, "DVBTTelevizor.log.txt");
+            var logPath = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.log.txt");
             MessagingCenter.Send(logPath, BaseViewModel.MSG_ShareFile);
         }
 
@@ -131,7 +131,7 @@ namespace DVBTTelevizor
         }
 
         private async Task Export()
-        {          
+        {
             try
             {
                 _loggingService.Info($"Exporting channels");
@@ -143,7 +143,7 @@ namespace DVBTTelevizor
                     return;
                 }
 
-                var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
+                var path = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.channels.json");
                 if (File.Exists(path))
                 {
                     if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
@@ -161,9 +161,9 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex, "Export failed");                
+                _loggingService.Error(ex, "Export failed");
                 await _dialogService.Error($"Export failed");
-            }              
+            }
         }
 
         private async Task Import()
@@ -174,7 +174,7 @@ namespace DVBTTelevizor
 
                 var chs = await _channelService.LoadChannels();
 
-                var path = Path.Combine(BaseViewModel.DownloadDirectory, "DVBTTelevizor.channels.json");
+                var path = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.channels.json");
                 if (!File.Exists(path))
                 {
                     await _dialogService.Error($"File {path} does not exist.");

@@ -115,7 +115,7 @@ namespace DVBTTelevizor
                     return;
             }
 
-            _loggingService.Debug($"Recording channel {channel}");
+            _loggingService.Debug($"Recording channel {channel}: {start}");
 
             try
             {
@@ -166,6 +166,8 @@ namespace DVBTTelevizor
         {
             if (await _dialogService.Confirm($"Are you sure to delete channel {channel.Name}?"))
             {
+                _loggingService.Info($"Deleting channel {channel.Name})");
+
                 Channels.Remove(channel);
                 await _channelService.SaveChannels(Channels);
                 await Refresh();
@@ -251,7 +253,7 @@ namespace DVBTTelevizor
             }
             set
             {
-                _loggingService.Debug($"Selected channel {value}");
+                //_loggingService.Debug($"Selected channel {value}");
 
                 _selectedChannel = value;
 
@@ -265,16 +267,6 @@ namespace DVBTTelevizor
             {
                 return Channels.Count == 0;
             }
-        }
-
-        public async Task SaveChannelsToConfig()
-        {
-            await Task.Run(() =>
-            {
-                _loggingService.Debug($"Saving channels to config");
-
-                _config.Channels = Channels;
-            });
         }
 
         public async Task ScanEPG(DVBTChannel channel)
@@ -314,7 +306,7 @@ namespace DVBTTelevizor
                            return;
                        }
 
-                       // setting PID 18 + PSI for each channel in the same multiplex:    
+                       // setting PID 18 + PSI for each channel in the same multiplex:
 
                        await _driver.ScanEPG(channel.Frequency, 5000);
 
@@ -325,7 +317,7 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex);
+                _loggingService.Error(ex, $"EPG scan failed");
 
                 MessagingCenter.Send($"EPG scan failed", BaseViewModel.MSG_ToastMessage);
             }
@@ -380,7 +372,7 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex);
+                _loggingService.Error(ex, $"Playing {channel.Name} failed");
 
                 MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
             }
@@ -447,7 +439,7 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex, "Error while loading channels");
+                _loggingService.Error(ex, "Error while refreshing channels");
             }
             finally
             {
@@ -469,7 +461,7 @@ namespace DVBTTelevizor
             if (!_config.ScanEPG)
                 return;
 
-            _loggingService.Info($"RefreshEPG");
+            _loggingService.Info($"Refreshing EPG");
 
             try
             {
@@ -500,6 +492,10 @@ namespace DVBTTelevizor
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Refreshing EPG failed");
             }
             finally
             {

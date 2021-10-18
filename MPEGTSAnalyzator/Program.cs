@@ -152,7 +152,7 @@ namespace MPEGTSAnalyzator
                 Console.WriteLine($"Event Information Table (EIT):");
                 Console.WriteLine($"------------------------------");
 
-                var eitManager = new EITManager();
+                var eitManager = new EITManager(logger);
 
                 var packetsEITwithSDT = new List<MPEGTransportStreamPacket>();
                 packetsEITwithSDT.AddRange(packetsByPID[18]);

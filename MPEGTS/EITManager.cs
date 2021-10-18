@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LoggerService;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +7,13 @@ namespace MPEGTS
 {
     public class EITManager
     {
+        private ILoggingService _log;
+
+        public EITManager(ILoggingService loggingService)
+        {
+            _log = loggingService;
+        }
+
         /// <summary>
         /// ServiceID (program number) -> current event
         /// </summary>
@@ -35,9 +43,16 @@ namespace MPEGTS
         /// <param name="packets"></param>
         public bool Scan(List<MPEGTransportStreamPacket> packets)
         {
+            _log.Debug($"Scanning EIT from packets");
+
             var eitData = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 18);
 
+            _log.Debug($"EIT packets count: {eitData.Count}");
+
             var eventIDs = new Dictionary<int, Dictionary<int, EventItem>>(); // ServiceID -> (event id -> event item )
+
+            var currentEventsCountFound = 0;
+            var scheduledEventsCountFound = 0;
 
             foreach (var kvp in eitData)
             {
@@ -53,6 +68,8 @@ namespace MPEGTS
                         foreach (var item in eit.EventItems)
                         {
                             CurrentEvents[eit.ServiceId] = item;
+
+                            currentEventsCountFound++;
 
                             break; // reading only the first one
                         }
@@ -72,6 +89,8 @@ namespace MPEGTS
                             if (!serviceItems.ContainsKey(item.EventId))
                             {
                                 serviceItems.Add(item.EventId, item);
+
+                                scheduledEventsCountFound++;
                             }
                         }
                     }
@@ -81,6 +100,9 @@ namespace MPEGTS
                     // Console.WriteLine($"Bad data ! {ex}");
                 }
             }
+
+            _log.Debug($"Scheduled Events found: {scheduledEventsCountFound}");
+            _log.Debug($"Current Events found: {currentEventsCountFound}");
 
             // transform to List and sorting:
 
@@ -98,8 +120,12 @@ namespace MPEGTS
             {
                 foreach (var kvp in psiTable.ProgramAssociations)
                 {
+                    _log.Debug($"Associate  program number {kvp.ProgramNumber} to PID {kvp.ProgramMapPID}");
                     ProgramNumberToMapPID[kvp.ProgramNumber] = kvp.ProgramMapPID;
                 }
+            } else
+            {
+                _log.Debug($"No PSI table found");
             }
 
             return true;
@@ -117,7 +143,7 @@ namespace MPEGTS
                 if (item.EventId == eventItem.EventId)
                 {
                     return;
-                }                    
+                }
             }
 
             ScheduledEvents[serviceId].Add(eventItem);

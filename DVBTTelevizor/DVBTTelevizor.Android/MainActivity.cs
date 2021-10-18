@@ -58,14 +58,13 @@ namespace DVBTTelevizor.Droid
 
             _config = new DVBTTelevizorConfiguration();
 
-            InitLogging();
-
 #if DEBUG
             _config.ShowServiceMenu = true;
             _config.ScanEPG = true;
-            if (_loggingService is BasicLoggingService)
-                (_loggingService as BasicLoggingService).MinLevel = LoggingLevelEnum.Debug;
+            _config.EnableLogging = true;
 #endif
+
+            InitLogging();
 
             // prevent sleep:
             Window window = (Forms.Context as Activity).Window;
@@ -144,7 +143,7 @@ namespace DVBTTelevizor.Droid
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_LongToastMessage, (message) =>
             {
-                ShowToastMessage(message, 5000);
+                ShowToastMessage(message, 8000);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
@@ -291,7 +290,7 @@ namespace DVBTTelevizor.Droid
 
             if (permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted && _config.EnableLogging)
             {
-                var logPath = Path.Combine(BaseViewModel.ExternalStorageDirectory, "DVBTTelevizor.log.txt");
+                var logPath = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.log.txt");
 
                 _loggingService = new FileLoggingService()
                 {

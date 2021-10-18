@@ -133,7 +133,7 @@ namespace DVBTTelevizor
             if (_eitManagers.ContainsKey(freq))
                 return _eitManagers[freq];
 
-            var eitManager = new EITManager();
+            var eitManager = new EITManager(_log);
             _eitManagers.Add(freq, eitManager);
 
             return eitManager;
@@ -418,7 +418,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(BaseViewModel.MovieDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                return Path.Combine(BaseViewModel.AndroidMediaDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
             }
         }
 
@@ -765,7 +765,7 @@ namespace DVBTTelevizor
 
         private void SaveBuffer(string namePrefix, byte[] buffer)
         {
-            var fileName = Path.Combine(BaseViewModel.DownloadDirectory, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
+            var fileName = Path.Combine(BaseViewModel.AndroidMediaDirectory, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
                 fs.Write(buffer, 0, buffer.Length);
@@ -1060,7 +1060,7 @@ namespace DVBTTelevizor
         public async Task<bool> ScanEPG(long freq, int msTimeout = 2000)
         {
             _log.Debug($"Scanning EPG for freq {freq}");
-            
+
             try
             {
                 StartReadBuffer();

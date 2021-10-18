@@ -176,37 +176,16 @@ namespace DVBTTelevizor
             }
         }
 
-        public static string DownloadDirectory
+        public static string AndroidMediaDirectory
         {
             get
             {
-                var downloadFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads);
-                if (!Directory.Exists(downloadFolderPath.AbsolutePath))
-                {
-                    Directory.CreateDirectory(downloadFolderPath.AbsolutePath);
-                }
-                return downloadFolderPath.AbsolutePath;
-            }
-        }
+                var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
 
-        public static string MovieDirectory
-        {
-            get
-            {
-                var folderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryMovies);
-                if (!Directory.Exists(folderPath.AbsolutePath))
-                {
-                    Directory.CreateDirectory(folderPath.AbsolutePath);
-                }
-                return folderPath.AbsolutePath;
-            }
-        }
+                if (pathToExternalMediaDirs.Length == 0)
+                    throw new DirectoryNotFoundException("No external media directory found");
 
-        public static string ExternalStorageDirectory
-        {
-            get
-            {
-                return Android.OS.Environment.ExternalStorageDirectory.Path;
+                return pathToExternalMediaDirs[0].AbsolutePath;
             }
         }
     }
