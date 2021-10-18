@@ -285,7 +285,7 @@ namespace DVBTTelevizor.Droid
 
             if (permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted && _config.EnableLogging)
             {
-                var logPath = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.log.txt");
+                var logPath = Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "DVBTTelevizor.log.txt");
 
                 _loggingService = new FileLoggingService()
                 {

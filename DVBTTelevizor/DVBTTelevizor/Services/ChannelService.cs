@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DVBTTelevizor 
+namespace DVBTTelevizor
 {
     public abstract class ChannelService
     {
@@ -39,7 +39,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(BaseViewModel.AndroidMediaDirectory, "channels.sqllite");
+                return Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "channels.sqllite");
             }
         }
     }

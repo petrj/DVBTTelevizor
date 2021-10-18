@@ -133,7 +133,7 @@ namespace DVBTTelevizor
                     return;
                 }
 
-                var path = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.channels.json");
+                var path = Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "DVBTTelevizor.channels.json");
                 if (File.Exists(path))
                 {
                     if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
@@ -164,7 +164,7 @@ namespace DVBTTelevizor
 
                 var chs = await _channelService.LoadChannels();
 
-                var path = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.channels.json");
+                var path = Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "DVBTTelevizor.channels.json");
                 if (!File.Exists(path))
                 {
                     await _dialogService.Error($"File {path} does not exist.");

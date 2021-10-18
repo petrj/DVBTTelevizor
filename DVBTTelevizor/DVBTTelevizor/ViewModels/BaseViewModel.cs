@@ -175,17 +175,20 @@ namespace DVBTTelevizor
             }
         }
 
-        public static string AndroidMediaDirectory
+        public static string GetAndroidMediaDirectory(DVBTTelevizorConfiguration config)
         {
-            get
+            var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
+
+            if (pathToExternalMediaDirs.Length == 0)
+                throw new DirectoryNotFoundException("No external media directory found");
+
+            if (config.PreferExternalStorage && pathToExternalMediaDirs.Length == 2)
             {
-                var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
-
-                if (pathToExternalMediaDirs.Length == 0)
-                    throw new DirectoryNotFoundException("No external media directory found");
-
-                return pathToExternalMediaDirs[0].AbsolutePath;
+                // external storage second?
+                return pathToExternalMediaDirs[1].AbsolutePath;
             }
+
+            return pathToExternalMediaDirs[0].AbsolutePath;
         }
     }
 }

@@ -123,6 +123,12 @@ namespace DVBTTelevizor
         {
             try
             {
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 await BaseViewModel.RunWithStoragePermission(
                   async () =>
                   {
@@ -140,6 +146,12 @@ namespace DVBTTelevizor
         {
             try
             {
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 _driver.StopRecording();
             }
             catch (Exception ex)
@@ -155,7 +167,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    await _dialogService.Error($"Driver not initialized");
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -176,6 +188,12 @@ namespace DVBTTelevizor
         {
             try
             {
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 var pids = new List<long>();
 
                 foreach (var PIDAsString in PIDs.Split(','))
@@ -203,6 +221,12 @@ namespace DVBTTelevizor
         {
             try
             {
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 var freq = Convert.ToInt64(TuneFrequency) * 1000000;
                 var bandWidth = Convert.ToInt64(TuneBandwidth) * 1000000;
                 var type = SelectedDeliverySystemType == null ? 0 : SelectedDeliverySystemType.Index;
@@ -230,6 +254,12 @@ namespace DVBTTelevizor
             try
             {
                 _loggingService.Info($"Getting Status");
+
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
 
                 var status = await _driver.GetStatus();
 
@@ -268,6 +298,12 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"Getting version");
 
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 var version = await _driver.GetVersion();
 
                 if (!version.SuccessFlag)
@@ -291,6 +327,12 @@ namespace DVBTTelevizor
             try
             {
                 _loggingService.Info($"Scanning EIT");
+
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
 
                 ScaningInProgress = true;
 
@@ -331,6 +373,12 @@ namespace DVBTTelevizor
             try
             {
                 _loggingService.Info($"Scanning PSI");
+
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
 
                 ScaningInProgress = true;
 
@@ -415,6 +463,12 @@ namespace DVBTTelevizor
             try
             {
                 _loggingService.Info($"Getting Capabilities");
+
+                if (!_driver.Started)
+                {
+                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
 
                 var cap = await _driver.GetCapabalities();
 
