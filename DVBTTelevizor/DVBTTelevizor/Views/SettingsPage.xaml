@@ -17,6 +17,12 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
             </Style>
 
+            <Style x:Key="DetailLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+            </Style>
+
             <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
@@ -72,6 +78,8 @@
                     <Button Text="Export" Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Button Text="Import" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
+                    <Label Text="{Binding MediaFilesPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+                
             </StackLayout>
 
             <StackLayout Margin="0,0,0,30">
@@ -80,7 +88,6 @@
 
                     <Grid Margin="20,10,20,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -106,9 +113,6 @@
 
                         <Label  Grid.Row="4" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Switch Grid.Row="4" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
-
-                        <Label  Grid.Row="5" Grid.Column="0" Text="Prefer external storage" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="5" Grid.Column="1" x:Name="PreferExternalStorageSwitch" IsToggled="{Binding Config.PreferExternalStorage, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
 

@@ -146,6 +146,9 @@ namespace DVBTTelevizor
         {
             try
             {
+                // version 2 uses GetExternalMediaDirs
+
+                /*
                 var status = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
                 if (status != PermissionStatus.Granted)
@@ -160,14 +163,17 @@ namespace DVBTTelevizor
 
                 if (status == PermissionStatus.Granted)
                 {
+                */
                     await action();
                     return true;
+                /*
                 }
                 else
                 {
                     await dialogService.Error("Storage permission not granted", "Error");
                     return false;
                 }
+                */
             }
             catch (Exception ex)
             {
@@ -177,18 +183,27 @@ namespace DVBTTelevizor
 
         public static string GetAndroidMediaDirectory(DVBTTelevizorConfiguration config)
         {
-            var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
-
-            if (pathToExternalMediaDirs.Length == 0)
-                throw new DirectoryNotFoundException("No external media directory found");
-
-            if (config.PreferExternalStorage && pathToExternalMediaDirs.Length == 2)
+            try
             {
-                // external storage second?
-                return pathToExternalMediaDirs[1].AbsolutePath;
-            }
+                try
+                {
+                    var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
 
-            return pathToExternalMediaDirs[0].AbsolutePath;
+                    if (pathToExternalMediaDirs.Length == 0)
+                        throw new DirectoryNotFoundException("No external media directory found");
+
+                    return pathToExternalMediaDirs[0].AbsolutePath;
+                }
+                catch 
+                {
+                    var dir = Android.App.Application.Context.GetExternalFilesDir(null);
+
+                    return dir.AbsolutePath;
+                }
+            } catch 
+            {
+                return null;
+            }
         }
     }
 }

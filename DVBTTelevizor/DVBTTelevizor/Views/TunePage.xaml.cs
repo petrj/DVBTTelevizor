@@ -37,7 +37,7 @@ namespace DVBTTelevizor
         }
 
         private void TunePage_Appearing(object sender, EventArgs e)
-        {
+        {            
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

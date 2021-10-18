@@ -176,17 +176,5 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("ScanEPG", value);
             }
         }
-
-        public bool PreferExternalStorage
-        {
-            get
-            {
-                return GetPersistingSettingValue<bool>("PreferExternalStorage");
-            }
-            set
-            {
-                SavePersistingSettingValue<bool>("PreferExternalStorage", value);
-            }
-        }
     }
 }

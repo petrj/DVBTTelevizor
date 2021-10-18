@@ -46,6 +46,14 @@ namespace DVBTTelevizor
                 }, _dialogService));
         }
 
+        public string MediaFilesPath
+        {
+            get
+            {
+                return BaseViewModel.GetAndroidMediaDirectory(_config);
+            }            
+        }
+
         public bool IsFullScreen
         {
             get

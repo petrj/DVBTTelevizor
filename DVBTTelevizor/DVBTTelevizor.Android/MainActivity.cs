@@ -281,9 +281,9 @@ namespace DVBTTelevizor.Droid
 
         private async Task InitLogging()
         {
-            var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
+            //var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
-            if (permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted && _config.EnableLogging)
+            if (/*permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted &&*/ _config.EnableLogging)
             {
                 var logPath = Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "DVBTTelevizor.log.txt");
 

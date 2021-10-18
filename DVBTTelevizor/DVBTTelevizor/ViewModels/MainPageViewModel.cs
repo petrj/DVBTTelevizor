@@ -44,7 +44,7 @@ namespace DVBTTelevizor
             LongPressCommand = new Command(async (itm) => await LongPress(itm));
             ShortPressCommand = new Command(ShortPress);
 
-            BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 5, 5);
+            BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
         }
 
         public bool ShowServiceMenuToolItem
@@ -458,9 +458,6 @@ namespace DVBTTelevizor
 
         private async Task RefreshEPG()
         {
-            if (!_config.ScanEPG)
-                return;
-
             _loggingService.Info($"Refreshing EPG");
 
             try
