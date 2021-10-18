@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {
@@ -65,7 +66,7 @@ namespace DVBTTelevizor
 
         #endregion
 
-        #region Font Size
+        #region Font & Image Size
 
         public int GetScaledSize(int normalSize)
         {
@@ -87,19 +88,31 @@ namespace DVBTTelevizor
 
         public void NotifyFontSizeChange()
         {
-            OnPropertyChanged(nameof(FontSizeForCaption));
-            OnPropertyChanged(nameof(FontSizeForPicker));
-            OnPropertyChanged(nameof(FontSizeForLabel));
-            OnPropertyChanged(nameof(FontSizeForChannelNumber));
-            OnPropertyChanged(nameof(FontSizeForDetailNote));
-            OnPropertyChanged(nameof(FontSizeForEntry));
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                OnPropertyChanged(nameof(FontSizeForCaption));
+                OnPropertyChanged(nameof(FontSizeForPicker));
+                OnPropertyChanged(nameof(FontSizeForLabel));
+                OnPropertyChanged(nameof(FontSizeForChannelNumber));
+                OnPropertyChanged(nameof(FontSizeForDetailNote));
+                OnPropertyChanged(nameof(FontSizeForEntry));
+                OnPropertyChanged(nameof(ImageIconSize));
+            });
+        }
+
+        public string ImageIconSize
+        {
+            get
+            {
+                return GetScaledSize(20).ToString();
+            }
         }
 
         public string FontSizeForCaption
         {
             get
             {
-                return GetScaledSize(15).ToString();
+                return GetScaledSize(17).ToString();
             }
         }
 

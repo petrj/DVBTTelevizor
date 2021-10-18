@@ -22,8 +22,6 @@ namespace DVBTTelevizor
         public Command ExportChannelsCommand { get; set; }
         public Command ImportChannelsCommand { get; set; }
 
-        public Command ShareLogCommand { get; set; }
-
         public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(config)
         {
@@ -46,8 +44,6 @@ namespace DVBTTelevizor
                 {
                     await Import();
                 }, _dialogService));
-
-            ShareLogCommand = new Command(() => { ShareLog(); });
         }
 
         public bool IsFullScreen
@@ -104,12 +100,6 @@ namespace DVBTTelevizor
                     ActivateLogging();
                 }
             }
-        }
-
-        private void ShareLog()
-        {
-            var logPath = Path.Combine(BaseViewModel.AndroidMediaDirectory, "DVBTTelevizor.log.txt");
-            MessagingCenter.Send(logPath, BaseViewModel.MSG_ShareFile);
         }
 
         private void ActivateLogging()

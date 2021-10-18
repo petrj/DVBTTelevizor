@@ -36,7 +36,7 @@
             <Style x:Key="ProviderNameTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
-                <Setter Property="Margin" Value="20,0,0,0"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
                 <Setter Property="VerticalTextAlignment" Value="End"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
@@ -79,9 +79,9 @@
 
             <Style x:Key="IconStyle" TargetType="Image">
                 <Setter Property="BackgroundColor" Value="Transparent"/>
-                <Setter Property="Margin" Value="0,5,0,0"/>
-                <Setter Property="HeightRequest" Value="50"/>
-                <Setter Property="VerticalOptions" Value="Start"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
             </Style>
 
         </ResourceDictionary>
@@ -96,7 +96,7 @@
     <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
         <!-- middle controls -->
-        <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
+        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
             <Button  x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
 
@@ -122,32 +122,31 @@
                                         <local2:PressedEffect />
                                     </Grid.Effects>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
                                         <RowDefinition Height="1" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="12*" />
-                                        <ColumnDefinition Width="39*" />
-                                        <ColumnDefinition Width="39*" />
+                                        <ColumnDefinition Width="78*" />
                                         <ColumnDefinition Width="10*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
                                     <Label Grid.Row="0" Grid.Column="1"                   Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
 
-                                    <Label Grid.Row="1" Grid.Column="3"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
-                                    <Image Grid.Row="0" Grid.Column="3"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" />
+                                    <Image Grid.Row="0" Grid.Column="2"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+                                    <Label Grid.Row="1" Grid.Column="2"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
 
                                     <Label Grid.Row="1" Grid.Column="1"                   Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
                                     <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-                                    <Label Grid.Row="2" Grid.Column="2"  Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                    <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                    <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
+                                    <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
                                 </Grid>
 
                             </ViewCell.View>

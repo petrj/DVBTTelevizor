@@ -146,11 +146,6 @@ namespace DVBTTelevizor.Droid
                 ShowToastMessage(message, 8000);
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
-            {
-                ShareFile(fileName);
-            });
-
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EnableFullScreen, (msg) =>
             {
                 SetFullScreen(true);
@@ -309,27 +304,6 @@ namespace DVBTTelevizor.Droid
             MessagingCenter.Send(keyCode.ToString(), BaseViewModel.MSG_KeyDown);
 
             return base.OnKeyDown(keyCode, e);
-        }
-
-        private async Task ShareFile(string fileName)
-        {
-            try
-            {
-                var intent = new Intent(Intent.ActionSend);
-                var file = new Java.IO.File(fileName);
-                var uri = Android.Net.Uri.FromFile(file);
-
-                intent.PutExtra(Intent.ExtraStream, uri);
-                intent.SetDataAndType(uri, "text/plain");
-                intent.SetFlags(ActivityFlags.GrantReadUriPermission);
-                intent.SetFlags(ActivityFlags.NewTask);
-
-                Android.App.Application.Context.StartActivity(intent);
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
         }
 
         private void SetFullScreen(bool on)

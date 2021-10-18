@@ -147,9 +147,6 @@
 
                     </Grid>
 
-                    <Button Text="Share log file" IsVisible="{Binding EnableLogging}" Command="{Binding ShareLogCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-
              </StackLayout>
 
             </StackLayout>
