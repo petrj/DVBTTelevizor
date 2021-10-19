@@ -13,10 +13,7 @@ using Android.Net.Wifi;
 
 using VideoView = LibVLCSharp.Platforms.Android.VideoView;
 using LibVLCSharp.Shared;
-using Plugin.Permissions;
 using LoggerService;
-using Plugin.Permissions.Abstractions;
-using Plugin.CurrentActivity;
 using System.IO;
 using Android.Support.Design.Widget;
 using Xamarin.Essentials;
@@ -24,10 +21,12 @@ using Android.Hardware.Usb;
 using Android.Support.V4.Content;
 using Android;
 using Android.Support.V4.App;
+using System.Text;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Label = "DVBTTelevizor", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "DVBTTelevizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         private const int StartRequestCode = 1000;
@@ -45,11 +44,7 @@ namespace DVBTTelevizor.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
-            base.OnCreate(savedInstanceState);
-
-            CrossCurrentActivity.Current.Activity = this;
-
-            Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
+            base.OnCreate(savedInstanceState);  
 
             // workaround for not using FileProvider:
             // https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
@@ -174,6 +169,47 @@ namespace DVBTTelevizor.Droid
                 });
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ShareFile, (fileName) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShareFile(fileName));
+                });                
+            });
+
+            if (Intent != null &&
+                (Intent.Action == Intent.ActionView ||
+                Intent.Action == Intent.ActionSend))
+            {
+                HandleImportFile(Intent);
+            }            
+        }
+
+        private void HandleImportFile(Intent intent)
+        {
+            try
+            {
+                using (var inputStream = ContentResolver.OpenInputStream(intent.Data))
+                {
+                    using (var memStream = new System.IO.MemoryStream())
+                    {
+                        inputStream.CopyTo(memStream);
+
+                        memStream.Seek(0, SeekOrigin.Begin);
+
+                        using (var streamReader = new StreamReader(memStream))
+                        {
+                            string json = streamReader.ReadToEnd();
+                            MessagingCenter.Send(json, BaseViewModel.MSG_ImportChannelsList);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                ShowToastMessage("json import error");
+            }
         }
 
         private void InitDriver()
@@ -275,18 +311,9 @@ namespace DVBTTelevizor.Droid
             }
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Android.Content.PM.Permission[] grantResults)
-        {
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-
-        private async Task InitLogging()
-        {
-            var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
-
-            if (permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted && _config.EnableLogging)
+        private void InitLogging()
+        {   
+            if (_config.EnableLogging)
             {
                 var logPath = Path.Combine(BaseViewModel.AndroidAppDirectory, "DVBTTelevizor.log.txt");
 
@@ -294,8 +321,7 @@ namespace DVBTTelevizor.Droid
                 {
                     LogFilename = logPath
                 };
-
-                _loggingService.Debug("File logger initialized");
+                
             } else
             {
                 _loggingService = new BasicLoggingService();
@@ -334,8 +360,7 @@ namespace DVBTTelevizor.Droid
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    Activity activity = CrossCurrentActivity.Current.Activity;
-                    var view = activity.FindViewById(Android.Resource.Id.Content);
+                    var view = FindViewById(Android.Resource.Id.Content);
 
                     var snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
 
@@ -389,6 +414,27 @@ namespace DVBTTelevizor.Droid
 
                     snackBar.Show();
                 });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task ShareFile(string fileName)
+        {
+            try
+            {
+                var intent = new Intent(Intent.ActionSend);
+                var file = new Java.IO.File(fileName);
+                var uri = Android.Net.Uri.FromFile(file);
+
+                intent.PutExtra(Intent.ExtraStream, uri);
+                intent.SetDataAndType(uri, "text/plain");
+                intent.SetFlags(ActivityFlags.GrantReadUriPermission);
+                intent.SetFlags(ActivityFlags.NewTask);
+
+                Android.App.Application.Context.StartActivity(intent);
             }
             catch (Exception ex)
             {

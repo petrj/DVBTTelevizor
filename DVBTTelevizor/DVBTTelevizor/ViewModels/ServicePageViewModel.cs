@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using LoggerService;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
 using DVBTTelevizor.Models;
@@ -128,12 +126,8 @@ namespace DVBTTelevizor
                     MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
-
-                await BaseViewModel.RunWithStoragePermission(
-                  async () =>
-                  {
-                      await _driver.StartRecording();
-                  }, _dialogService);
+                
+                await _driver.StartRecording();
             }
             catch (Exception ex)
             {

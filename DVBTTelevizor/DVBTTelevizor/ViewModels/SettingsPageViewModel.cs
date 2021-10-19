@@ -21,6 +21,7 @@ namespace DVBTTelevizor
         public Command ClearChannelsCommand { get; set; }
         public Command ExportChannelsCommand { get; set; }
         public Command ImportChannelsCommand { get; set; }
+        public Command ShareChannelsCommand { get; set; }
 
         public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(config)
@@ -33,27 +34,25 @@ namespace DVBTTelevizor
 
             ClearChannelsCommand = new Command(async () => await ClearChannels());
 
-            ExportChannelsCommand = new Command(async () => await BaseViewModel.RunWithStoragePermission(
-                async () =>
-                {
-                    await Export();
-                    }, _dialogService));
+            ExportChannelsCommand = new Command(async () => await Export());
 
-            ImportChannelsCommand = new Command(async () => await BaseViewModel.RunWithStoragePermission(
-                async () =>
-                {
-                    await Import();
-                }, _dialogService));
+            ImportChannelsCommand = new Command(async () => await Import());
+
+            ShareChannelsCommand = new Command(() => { ShareLog(); });
         }
 
-        public string MediaFilesPath
+        public string AndroidChannelsListPath
         {
             get
             {
-                return BaseViewModel.AndroidDownloadDirectory;
+                return Path.Combine(BaseViewModel.AndroidAppDirectory, "DVBTTelevizor.channels.json");
             }
         }
 
+        private void ShareLog()
+        {
+            MessagingCenter.Send(AndroidChannelsListPath, BaseViewModel.MSG_ShareFile);
+        }
 
         public bool IsFullScreen
         {
@@ -115,17 +114,11 @@ namespace DVBTTelevizor
         {
             Task.Run(async ()=>
             {
-                return
-                    await BaseViewModel.RunWithStoragePermission(
-                         async () =>
-                         {
-                             if (!_config.EnableLogging)
-                             {
-                                 _config.EnableLogging = true;
-                                 await _dialogService.Information("Logging will be enabled after application restart");
-                             }
-
-                         }, _dialogService);
+                if (!_config.EnableLogging)
+                {
+                    _config.EnableLogging = true;
+                    await _dialogService.Information("Logging will be enabled after application restart");
+                }
             });
         }
 
@@ -141,21 +134,20 @@ namespace DVBTTelevizor
                     await _dialogService.Information("Channel list is empty");
                     return;
                 }
-
-                var path = Path.Combine(BaseViewModel.AndroidDownloadDirectory, "DVBTTelevizor.channels.json");
-                if (File.Exists(path))
+                
+                if (File.Exists(AndroidChannelsListPath))
                 {
-                    if (!await _dialogService.Confirm($"File {path} exists. Overwite?"))
+                    if (!await _dialogService.Confirm($"File {AndroidChannelsListPath} exists. Overwite?"))
                     {
                         return;
                     }
 
-                    File.Delete(path);
+                    File.Delete(AndroidChannelsListPath);
                 }
 
-                File.WriteAllText(path, JsonConvert.SerializeObject(chs));
+                File.WriteAllText(AndroidChannelsListPath, JsonConvert.SerializeObject(chs));
 
-                MessagingCenter.Send($"File {path} exported.", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"File {AndroidChannelsListPath} exported.", BaseViewModel.MSG_ToastMessage);
 
             }
             catch (Exception ex)
@@ -169,18 +161,17 @@ namespace DVBTTelevizor
         {
             try
             {
-                _loggingService.Info($"Importing channels");
+                _loggingService.Info($"Importing channels from file");
 
                 var chs = await _channelService.LoadChannels();
-
-                var path = Path.Combine(BaseViewModel.AndroidDownloadDirectory, "DVBTTelevizor.channels.json");
-                if (!File.Exists(path))
+                
+                if (!File.Exists(AndroidChannelsListPath))
                 {
-                    await _dialogService.Error($"File {path} does not exist.");
+                    await _dialogService.Error($"File {AndroidChannelsListPath} not found");
                     return;
                 }
 
-                var jsonFromFile = File.ReadAllText(path);
+                var jsonFromFile = File.ReadAllText(AndroidChannelsListPath);
 
                 var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(jsonFromFile);
 

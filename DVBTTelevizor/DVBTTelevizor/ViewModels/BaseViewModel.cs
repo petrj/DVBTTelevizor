@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using LoggerService;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
 using DVBTTelevizor.Models;
@@ -40,9 +38,12 @@ namespace DVBTTelevizor
         public const string MSG_SetBatterySettings = "SetBatterySettings ";
         public const string MSG_PlayNextChannel = "PlayNextChannel";
         public const string MSG_PlayPreviousChannel = "PlayPreviousChannel";
+        public const string MSG_ShareFile = "ShareFile";
 
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";
         public const string MSG_StopPlayInBackgroundNotification = "StopPlayInBackgroundNotification";
+
+        public const string MSG_ImportChannelsList = "ImportChannelsList";
 
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
               : base(config)
@@ -142,47 +143,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public static async Task<bool> RunWithStoragePermission(Func<Task> action, IDialogService dialogService)
-        {
-            try
-            {
-                var status = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
-
-                if (status != PermissionStatus.Granted)
-                {
-                    if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Storage))
-                    {
-                        await dialogService.Information("Application requires storage permission", "Information");
-                    }
-
-                    status = await CrossPermissions.Current.RequestPermissionAsync<StoragePermission>();
-                }
-
-                if (status == PermissionStatus.Granted)
-                {
-                    await action();
-                    return true;
-                }
-                else
-                {
-                    await dialogService.Error("Storage permission not granted", "Error");
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public static string AndroidMoviesDirectory
-        {
-            get
-            {
-                return GetAndroidDirectory(Android.OS.Environment.DirectoryMovies);
-            }
-        }
-
         public static string AndroidAppDirectory
         {
             get
@@ -191,15 +151,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public static string AndroidDownloadDirectory
-        {
-            get
-            {
-                return GetAndroidDirectory(Android.OS.Environment.DirectoryDownloads);
-            }
-        }
-
-        public static string GetAndroidDirectory(string specialFolder)
+        private static string GetAndroidDirectory(string specialFolder)
         {
             try
             {

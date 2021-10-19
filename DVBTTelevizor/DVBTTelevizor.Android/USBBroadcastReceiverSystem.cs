@@ -5,7 +5,6 @@ using Android.Runtime;
 using Android.Support.Design.Widget;
 using Android.Views;
 using Android.Widget;
-using Plugin.CurrentActivity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

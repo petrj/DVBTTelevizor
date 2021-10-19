@@ -9,8 +9,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using System.IO;
 using System.Threading;
 using LoggerService;
@@ -180,6 +178,11 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopStream, (msg) =>
             {
                 StopPlayback();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ImportChannelsList, (message) =>
+            {
+                _viewModel.ImportCommand.Execute(message);
             });
         }
 

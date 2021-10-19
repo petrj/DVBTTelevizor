@@ -7,8 +7,6 @@ using System.Runtime.CompilerServices;
 using LoggerService;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Linq;
@@ -23,6 +21,7 @@ namespace DVBTTelevizor
 
         public Command RefreshCommand { get; set; }
         public Command RefreshEPGCommand { get; set; }
+        public Command ImportCommand { get; set; }
 
         public Command LongPressCommand { get; set; }
         public Command ShortPressCommand { get; set; }
@@ -43,6 +42,7 @@ namespace DVBTTelevizor
             RefreshEPGCommand = new Command(async () => await RefreshEPG());
             LongPressCommand = new Command(async (itm) => await LongPress(itm));
             ShortPressCommand = new Command(ShortPress);
+            ImportCommand = new Command(async (json) => await ImportList(json));
 
             BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
         }
@@ -52,6 +52,44 @@ namespace DVBTTelevizor
             get
             {
                 return _config.ShowServiceMenu;
+            }
+        }
+
+        private async Task ImportList(object json)
+        {
+            if (!(await _dialogService.Confirm("Are you sure to import channels list?")))
+            {
+                return;
+            }
+
+            try
+            {
+                _loggingService.Info($"Importing channels");
+
+                var chs = await _channelService.LoadChannels();
+
+                var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<DVBTChannel>>(json as string);
+
+                var count = 0;
+                foreach (var ch in importedChannels)
+                {
+                    if (!ConfigViewModel.ChannelExists(chs, ch.Frequency, ch.ProgramMapPID))
+                    {
+                        count++;
+                        chs.Add(ch);
+                    }
+                }
+
+                await _channelService.SaveChannels(chs);
+
+                MessagingCenter.Send($"Imported channels count: {count}", BaseViewModel.MSG_ToastMessage);
+
+                await Refresh();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Import failed");
+                await _dialogService.Error($"Import failed");
             }
         }
 

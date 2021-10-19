@@ -9,8 +9,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using System.IO;
 using LoggerService;
 using System.Runtime.InteropServices;
@@ -418,7 +416,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(BaseViewModel.AndroidMoviesDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                return Path.Combine(BaseViewModel.AndroidAppDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
             }
         }
 
