@@ -201,17 +201,11 @@ namespace DVBTTelevizor
 
         public static string GetAndroidDirectory(string specialFolder)
         {
-            // TODO: Android 11 still raises Unauthorized exception!
-            if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.P)
-            {
-                specialFolder = null;
-            }
-
             try
             {
                 if (specialFolder == null)
                 {
-                    // always writable directory
+                    // internal storage - always writable directory
                     try
                     {
                         var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
@@ -223,15 +217,29 @@ namespace DVBTTelevizor
                     }
                     catch
                     {
-                        var dir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+                        // fallback for older API:
 
-                        return dir.AbsolutePath;
+                        var internalStorageDir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+
+                        return internalStorageDir.AbsolutePath;
                     }
                 }
                 else
                 {
-                    var externalFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(specialFolder);
-                    return externalFolderPath.AbsolutePath;
+                    // external storage
+
+                    // Android 11 has no access to external files -> using internal storage
+                    if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.P)
+                    {
+                        var internalStorageDir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+                        return internalStorageDir.AbsolutePath;
+                    }
+                    else
+                    {
+
+                        var externalFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(specialFolder);
+                        return externalFolderPath.AbsolutePath;
+                    }
                 }
 
             } catch
