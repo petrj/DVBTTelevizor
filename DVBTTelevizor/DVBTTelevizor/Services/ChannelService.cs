@@ -39,7 +39,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "channels.sqllite");
+                return Path.Combine(BaseViewModel.AndroidAppDirectory, "channels.sqllite");
             }
         }
     }

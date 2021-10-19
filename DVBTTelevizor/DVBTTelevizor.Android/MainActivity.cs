@@ -21,6 +21,9 @@ using System.IO;
 using Android.Support.Design.Widget;
 using Xamarin.Essentials;
 using Android.Hardware.Usb;
+using Android.Support.V4.Content;
+using Android;
+using Android.Support.V4.App;
 
 namespace DVBTTelevizor.Droid
 {
@@ -281,11 +284,11 @@ namespace DVBTTelevizor.Droid
 
         private async Task InitLogging()
         {
-            //var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
+            var permitted = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
-            if (/*permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted &&*/ _config.EnableLogging)
+            if (permitted == Plugin.Permissions.Abstractions.PermissionStatus.Granted && _config.EnableLogging)
             {
-                var logPath = Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), "DVBTTelevizor.log.txt");
+                var logPath = Path.Combine(BaseViewModel.AndroidAppDirectory, "DVBTTelevizor.log.txt");
 
                 _loggingService = new FileLoggingService()
                 {

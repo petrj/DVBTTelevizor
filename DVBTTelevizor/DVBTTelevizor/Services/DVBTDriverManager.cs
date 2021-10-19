@@ -418,7 +418,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                return Path.Combine(BaseViewModel.AndroidMoviesDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
             }
         }
 
@@ -765,7 +765,7 @@ namespace DVBTTelevizor
 
         private void SaveBuffer(string namePrefix, byte[] buffer)
         {
-            var fileName = Path.Combine(BaseViewModel.GetAndroidMediaDirectory(_config), $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
+            var fileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
             using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
                 fs.Write(buffer, 0, buffer.Length);

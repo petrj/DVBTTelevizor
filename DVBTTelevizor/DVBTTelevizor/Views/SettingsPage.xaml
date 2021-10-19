@@ -79,7 +79,7 @@
                     <Button Text="Import" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     <Label Text="{Binding MediaFilesPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-                
+
             </StackLayout>
 
             <StackLayout Margin="0,0,0,30">

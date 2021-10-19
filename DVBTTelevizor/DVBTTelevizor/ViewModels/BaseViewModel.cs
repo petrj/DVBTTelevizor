@@ -146,9 +146,6 @@ namespace DVBTTelevizor
         {
             try
             {
-                // version 2 uses GetExternalMediaDirs
-
-                /*
                 var status = await CrossPermissions.Current.CheckPermissionStatusAsync<StoragePermission>();
 
                 if (status != PermissionStatus.Granted)
@@ -163,17 +160,14 @@ namespace DVBTTelevizor
 
                 if (status == PermissionStatus.Granted)
                 {
-                */
                     await action();
                     return true;
-                /*
                 }
                 else
                 {
                     await dialogService.Error("Storage permission not granted", "Error");
                     return false;
                 }
-                */
             }
             catch (Exception ex)
             {
@@ -181,28 +175,70 @@ namespace DVBTTelevizor
             }
         }
 
-        public static string GetAndroidMediaDirectory(DVBTTelevizorConfiguration config)
+        public static string AndroidMoviesDirectory
         {
+            get
+            {
+                return GetAndroidDirectory(Android.OS.Environment.DirectoryMovies);
+            }
+        }
+
+        public static string AndroidAppDirectory
+        {
+            get
+            {
+                return GetAndroidDirectory(null);
+            }
+        }
+
+        public static string AndroidDownloadDirectory
+        {
+            get
+            {
+                return GetAndroidDirectory(Android.OS.Environment.DirectoryDownloads);
+            }
+        }
+
+        public static string GetAndroidDirectory(string specialFolder)
+        {
+            // TODO: Android 11 still raises Unauthorized exception!
+            if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.P)
+            {
+                specialFolder = null;
+            }
+
             try
             {
-                try
+                if (specialFolder == null)
                 {
-                    var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
+                    // always writable directory
+                    try
+                    {
+                        var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
 
-                    if (pathToExternalMediaDirs.Length == 0)
-                        throw new DirectoryNotFoundException("No external media directory found");
+                        if (pathToExternalMediaDirs.Length == 0)
+                            throw new DirectoryNotFoundException("No external media directory found");
 
-                    return pathToExternalMediaDirs[0].AbsolutePath;
+                        return pathToExternalMediaDirs[0].AbsolutePath;
+                    }
+                    catch
+                    {
+                        var dir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+
+                        return dir.AbsolutePath;
+                    }
                 }
-                catch 
+                else
                 {
-                    var dir = Android.App.Application.Context.GetExternalFilesDir(null);
-
-                    return dir.AbsolutePath;
+                    var externalFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(specialFolder);
+                    return externalFolderPath.AbsolutePath;
                 }
-            } catch 
+
+            } catch
             {
-                return null;
+                var dir = Android.App.Application.Context.GetExternalFilesDir("");
+
+                return dir.AbsolutePath;
             }
         }
     }
