@@ -31,18 +31,50 @@ namespace DVBTTelevizor
             BindingContext = _viewModel = new TunePageViewModel(_loggingService, _dialogService, _driver, _config, channelService);
             _viewModel.TuneFrequency = "730";
 
-            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;            
+            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
             Appearing += TunePage_Appearing;
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
+            {
+                _viewModel.UpdateDriverState();
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    MessagingCenter.Send($"Tuner connection error ({message})", BaseViewModel.MSG_ToastMessage);
+                    _viewModel.UpdateDriverState();
+                });
+            });
         }
 
         private void TunePage_Appearing(object sender, EventArgs e)
-        {            
+        {
         }
 
+        private async void ToolConnect_Clicked(object sender, EventArgs e)
+        {
+            if (_driver.Started)
+            {
+                if (!(await _dialogService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"DVBT Tuner status", "Back", "Disconnect")))
+                {
+                    await _viewModel.DisconnectDriver();
+                }
+            }
+            else
+            {
+
+                if (await _dialogService.Confirm($"Disconnected.", $"DVBT Tuner status", "Connect", "Back"))
+                {
+                    MessagingCenter.Send("", BaseViewModel.MSG_Init);
+                }
+            }
+        }
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, true);
+           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
         }
     }
 }

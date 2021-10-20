@@ -19,13 +19,13 @@
             <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
             <Style x:Key="EntryStyle" TargetType="Entry">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
             </Style>
 
         </ResourceDictionary>
@@ -92,7 +92,7 @@
                     <Label Grid.Row="8" Grid.Column="1" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     <Label Grid.Row="9" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="9" Grid.Column="1" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>                    
+                    <Label Grid.Row="9" Grid.Column="1" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
 
             </StackLayout>

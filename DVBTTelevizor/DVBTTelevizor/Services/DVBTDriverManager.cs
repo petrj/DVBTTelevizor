@@ -291,7 +291,7 @@ namespace DVBTTelevizor
                 _log.Debug($"Getting status {i+1}/{10}");
 
                 var statusRes = await GetStatus();
-                if (!tunedRes.SuccessFlag)
+                if (!statusRes.SuccessFlag)
                 {
                     return false;
                 }
@@ -585,6 +585,31 @@ namespace DVBTTelevizor
             set
             {
                 _driverConfiguration = value;
+            }
+        }
+
+        public async Task<bool> CheckStatus()
+        {
+            _log.Debug("Checking status");
+
+            try
+            {
+                if (!Started)
+                    return false;
+
+                var status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    return false;
+                }
+
+                return true;
+
+             } catch (Exception ex)
+            {
+                _log.Error(ex, "Error while checking status");
+                return false;
             }
         }
 

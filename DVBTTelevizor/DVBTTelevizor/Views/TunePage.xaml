@@ -74,7 +74,7 @@
             <Style x:Key="EntryStyle" TargetType="Entry">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>                
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="Keyboard" Value="Numeric"/>
                 <Setter Property="WidthRequest" Value="30"/>
             </Style>
@@ -271,4 +271,9 @@
         </StackLayout>
 
     </ContentPage.Content>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
+    </ContentPage.ToolbarItems>
+
 </ContentPage>

@@ -18,10 +18,10 @@ namespace DVBTTelevizor.Droid
     public class USBBroadcastReceiverSystem : BroadcastReceiver
     {
         public USBBroadcastReceiverSystem() { }
-        public event EventHandler UsbAttached;
+        public event EventHandler UsbAttachedOrDetached;
         public override void OnReceive(Context c, Intent i)
         {
-            UsbAttached(this, EventArgs.Empty);
+            UsbAttachedOrDetached(this, EventArgs.Empty);
         }
     }
 }

@@ -86,8 +86,10 @@ namespace DVBTTelevizor.Droid
 
             var usbReciever = new USBBroadcastReceiverSystem();
             var intentFilter = new IntentFilter(UsbManager.ActionUsbDeviceAttached);
+            var intentFilter2 = new IntentFilter(UsbManager.ActionUsbDeviceDetached);
             RegisterReceiver(usbReciever, intentFilter);
-            usbReciever.UsbAttached += UsbAttached;
+            RegisterReceiver(usbReciever, intentFilter2);
+            usbReciever.UsbAttachedOrDetached += CheckIfUsbAttachedOrDetached;
 
             _driverManager = new DVBTDriverManager(_loggingService, _config);
 
@@ -262,17 +264,27 @@ namespace DVBTTelevizor.Droid
                 _loggingService.Error(ex, "Driver initializing failed");
 
                 ShowToastMessage("DVB-T driver connection failed");
-                MessagingCenter.Send("DVB-T sriver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                MessagingCenter.Send("DVB-T driver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
             }
         }
 
-        private void UsbAttached(object sender, EventArgs e)
+        private async void CheckIfUsbAttachedOrDetached(object sender, EventArgs e)
         {
             // TODO: detect device that has been attached
 
             if (!_driverManager.Started)
             {
                 InitDriver();
+            } else
+            {
+                var status = await _driverManager.CheckStatus();
+
+                if (!status)
+                {
+                    await _driverManager.Disconnect();
+
+                    MessagingCenter.Send("DVB-T driver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                }
             }
         }
 

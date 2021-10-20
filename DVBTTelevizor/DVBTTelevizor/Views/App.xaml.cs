@@ -10,6 +10,7 @@ namespace DVBTTelevizor
         MainPage _mainPage;
         ILoggingService _loggingService;
         DVBTTelevizorConfiguration _config;
+        DVBTDriverManager _driver;
 
         public App(ILoggingService loggingService, DVBTTelevizorConfiguration config, DVBTDriverManager driverManager)
         {
@@ -17,6 +18,7 @@ namespace DVBTTelevizor
 
             _loggingService = loggingService;
             _config = config;
+            _driver = driverManager;
 
             _mainPage = new MainPage(_loggingService, config, driverManager);
             MainPage = new NavigationPage(_mainPage);
@@ -37,13 +39,29 @@ namespace DVBTTelevizor
             }
         }
 
-        protected override void OnResume()
+        protected override async void OnResume()
         {
             _loggingService.Info($"OnResume");
 
             if (_config.PlayOnBackground)
             {
                 _mainPage.ResumePlayback();
+            }
+
+            if (!_driver.Started)
+            {
+                MessagingCenter.Send("", BaseViewModel.MSG_Init);
+            }
+            else
+            {
+                var status = await _driver.CheckStatus();
+
+                if (!status)
+                {
+                    await _driver.Disconnect();
+
+                    MessagingCenter.Send("DVB-T driver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                }
             }
         }
 

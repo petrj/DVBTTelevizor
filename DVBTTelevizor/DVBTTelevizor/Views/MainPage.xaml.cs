@@ -235,7 +235,7 @@ namespace DVBTTelevizor
         {
             base.OnAppearing();
 
-            // workaround for nont selected channel at startup
+            // workaround for non selected channel at startup
             if (_firstStartup)
             {
                 _firstStartup = false;
@@ -264,14 +264,6 @@ namespace DVBTTelevizor
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);
 
                 _servicePage.Done();
-
-                //_servicePage.Disappearing -= anyPage_Disappearing;
-                //_servicePage.Disappearing -= anyPage_Disappearing;
-                //_tunePage.Disappearing -= anyPage_Disappearing;
-                //_settingsPage.Disappearing -= anyPage_Disappearing;
-                //_editChannelPage.Disappearing -= _editChannelPage_Disappearing;
-                //ChannelsListView.ItemSelected -= ChannelsListView_ItemSelected;
-                //Appearing -= MainPage_Appearing;
             });
         }
 
