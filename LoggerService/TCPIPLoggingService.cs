@@ -38,7 +38,7 @@ namespace LoggerService
                 sb.Append($"&level={level}");
 
                 var data = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
-      
+
                 HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(Url);
                 webRequest.Method = "POST";
                 webRequest.ContentType = "application/x-www-form-urlencoded";

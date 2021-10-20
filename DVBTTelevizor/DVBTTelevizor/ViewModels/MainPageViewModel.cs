@@ -496,7 +496,7 @@ namespace DVBTTelevizor
 
         private async Task RefreshEPG()
         {
-            _loggingService.Info($"Refreshing EPG");
+            //_loggingService.Info($"Refreshing EPG");
 
             try
             {

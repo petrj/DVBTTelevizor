@@ -26,7 +26,7 @@ using System.Text;
 namespace DVBTTelevizor.Droid
 {
     [Activity(Label = "DVBTTelevizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
+    [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         private const int StartRequestCode = 1000;
@@ -44,7 +44,7 @@ namespace DVBTTelevizor.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
-            base.OnCreate(savedInstanceState);  
+            base.OnCreate(savedInstanceState);
 
             // workaround for not using FileProvider:
             // https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
@@ -174,7 +174,7 @@ namespace DVBTTelevizor.Droid
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     Task.Run(async () => await ShareFile(fileName));
-                });                
+                });
             });
 
             if (Intent != null &&
@@ -182,7 +182,7 @@ namespace DVBTTelevizor.Droid
                 Intent.Action == Intent.ActionSend))
             {
                 HandleImportFile(Intent);
-            }            
+            }
         }
 
         private void HandleImportFile(Intent intent)
@@ -231,7 +231,7 @@ namespace DVBTTelevizor.Droid
 
                 Task.Run(() =>
                 {
-                    System.Threading.Thread.Sleep(5000); // wait 5 secs;
+                    System.Threading.Thread.Sleep(3000); // wait 3 secs;
 
                     if (_waitingForInit)
                     {
@@ -312,7 +312,7 @@ namespace DVBTTelevizor.Droid
         }
 
         private void InitLogging()
-        {   
+        {
             if (_config.EnableLogging)
             {
                 var logPath = Path.Combine(BaseViewModel.AndroidAppDirectory, "DVBTTelevizor.log.txt");
@@ -321,7 +321,7 @@ namespace DVBTTelevizor.Droid
                 {
                     LogFilename = logPath
                 };
-                
+
             } else
             {
                 _loggingService = new BasicLoggingService();

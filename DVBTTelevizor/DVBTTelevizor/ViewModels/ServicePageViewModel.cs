@@ -126,7 +126,7 @@ namespace DVBTTelevizor
                     MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
-                
+
                 await _driver.StartRecording();
             }
             catch (Exception ex)
@@ -167,7 +167,7 @@ namespace DVBTTelevizor
 
                 _driver.StopReadStream();
 
-                Thread.Sleep(1000);
+                await Task.Delay(500);
 
                 MessagingCenter.Send(new PlayStreamInfo(), BaseViewModel.MSG_PlayStream);
             }

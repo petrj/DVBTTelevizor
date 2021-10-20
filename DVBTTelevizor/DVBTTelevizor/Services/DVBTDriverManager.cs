@@ -311,7 +311,7 @@ namespace DVBTTelevizor
                     return true;
                 }
 
-                System.Threading.Thread.Sleep(500);
+                await Task.Delay(500);
             }
 
             _log.Debug($"Signal not found");
@@ -338,7 +338,7 @@ namespace DVBTTelevizor
             var startTime = DateTime.Now;
             var bufferSize = 1024;
 
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
                 var _responseBuffer = new List<byte>();
 
@@ -383,7 +383,7 @@ namespace DVBTTelevizor
                             throw new TimeoutException("TimeOut");
                         }
 
-                        System.Threading.Thread.Sleep(200);
+                        await Task.Delay(200);
                     }
                     while (reading);
 
@@ -845,7 +845,7 @@ namespace DVBTTelevizor
                     StartReadBuffer();
 
                     // waiting
-                    System.Threading.Thread.Sleep(1000);
+                    await Task.Delay(1000);
 
                     var timeoutForReadingBuffer = 15; //  seconds timeout for getting PMT
                     var startTime = DateTime.Now;
@@ -868,7 +868,7 @@ namespace DVBTTelevizor
                             break;
                         }
 
-                        System.Threading.Thread.Sleep(500);
+                        await Task.Delay(500);
                     }
                 }
                 finally
@@ -938,7 +938,7 @@ namespace DVBTTelevizor
                         break;
                     } else
                     {
-                        System.Threading.Thread.Sleep(500);
+                        await Task.Delay(500);
                     }
                 }
 
@@ -959,7 +959,7 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        System.Threading.Thread.Sleep(100);
+                        await Task.Delay(100);
                     }
                 }
 
@@ -999,7 +999,7 @@ namespace DVBTTelevizor
                     }
 
                     // waiting
-                    System.Threading.Thread.Sleep(850);
+                    await Task.Delay(850);
                 }
 
                 if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
@@ -1039,7 +1039,7 @@ namespace DVBTTelevizor
 
                 StartReadBuffer();
 
-                System.Threading.Thread.Sleep(msTimeout);
+                await Task.Delay(msTimeout);
 
                 eitManager.Scan(Buffer);
 
@@ -1063,7 +1063,7 @@ namespace DVBTTelevizor
             {
                 StartReadBuffer();
 
-                System.Threading.Thread.Sleep(msTimeout);
+                await Task.Delay(msTimeout);
 
                 var eitManager = GetEITManager(freq);
 
@@ -1138,7 +1138,7 @@ namespace DVBTTelevizor
                         }
                     }
 
-                    System.Threading.Thread.Sleep(500);
+                    await Task.Delay(500);
                 }
 
                 StopReadBuffer();

@@ -16,7 +16,7 @@ namespace LoggerService
         {
             MinLevel = minLevel;
         }
-        
+
         public LoggingLevelEnum MinLevel { get => _minLevel; set => _minLevel = value; }
 
         private void Write(LoggingLevelEnum level, string message)
@@ -26,7 +26,7 @@ namespace LoggerService
                 if ((int)level < (int)MinLevel)
                     return;
 
-                string msg = $"[{DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss")}] {level} {message}";
+                string msg = $"[{DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss")}] [{level}] {message}";
 
                 //System.Diagnostics.Debug.WriteLine(msg);
 
@@ -36,7 +36,7 @@ namespace LoggerService
             {
                 // log failed
             }
-        } 
+        }
 
         public void Debug(string message)
         {
