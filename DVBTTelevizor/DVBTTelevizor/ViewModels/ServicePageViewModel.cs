@@ -132,7 +132,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while start recording");
-                await _dialogService.Error(ex.Message);
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -151,7 +151,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while stop recording");
-                await _dialogService.Error(ex.Message);
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -174,7 +174,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while playing");
-                await _dialogService.Error(ex.Message);
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -202,12 +202,12 @@ namespace DVBTTelevizor
                     throw new Exception("Response not success");
                 }
 
-                await _dialogService.Information($"OK", "PID Filter response");
+                MessagingCenter.Send("PID Filter applied", BaseViewModel.MSG_ToastMessage);
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while setting PID filter");
-                await _dialogService.Error(ex.Message);
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -234,12 +234,13 @@ namespace DVBTTelevizor
                     throw new Exception("Response not success");
                 }
 
-                await _dialogService.Information($"OK", "Tune response");
+                MessagingCenter.Send($"Frequency {TuneFrequency} successfully tuned", BaseViewModel.MSG_ToastMessage);
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while tuning");
-                await _dialogService.Error(ex.Message);
+
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -262,19 +263,7 @@ namespace DVBTTelevizor
                     throw new Exception("Response not success");
                 }
 
-                var s = Environment.NewLine;
-
-                s += $"Signal :  {status.hasSignal}";
-                s += Environment.NewLine;
-
-                s += $"Sync :  {status.hasSync}";
-                s += Environment.NewLine;
-
-                s += $"Lock :  {status.hasLock}";
-                s += Environment.NewLine;
-
-                s += $"% :  {status.rfStrengthPercentage}";
-                s += Environment.NewLine;
+                var s = $"Signal: {status.hasSignal}, sync: { status.hasSync}, lock : {status.hasLock}, stregth: {status.rfStrengthPercentage}%";
 
                 MessagingCenter.Send(s, BaseViewModel.MSG_ToastMessage);
             }
@@ -347,14 +336,15 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    await _dialogService.Error("Scan error");
+                    MessagingCenter.Send("Scan error", BaseViewModel.MSG_ToastMessage);
                 }
 
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while scanning PSI");
-                await _dialogService.Error(ex.Message);
+
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
             finally
             {
@@ -381,15 +371,13 @@ namespace DVBTTelevizor
                 switch (searchMapPIDsResult.Result)
                 {
                     case SearchProgramResultEnum.Error:
-                        await _dialogService.Error("Search error");
+                        MessagingCenter.Send("Search error", BaseViewModel.MSG_ToastMessage);
                         return;
-
                     case SearchProgramResultEnum.NoSignal:
-                        await _dialogService.Error("No signal");
+                        MessagingCenter.Send("No signal", BaseViewModel.MSG_ToastMessage);
                         return;
-
                     case SearchProgramResultEnum.NoProgramFound:
-                        await _dialogService.Error("No program found");
+                        MessagingCenter.Send("No program found", BaseViewModel.MSG_ToastMessage);
                         return;
                 }
 
@@ -411,13 +399,13 @@ namespace DVBTTelevizor
                 switch (searchProgramPIDsResult.Result)
                 {
                     case SearchProgramResultEnum.Error:
-                        await _dialogService.Error("Error scanning Map PIDs");
+                        MessagingCenter.Send("Error scanning Map PIDs", BaseViewModel.MSG_ToastMessage);
                         return;
                     case SearchProgramResultEnum.NoSignal:
-                        await _dialogService.Error("No signal");
+                        MessagingCenter.Send("No signal", BaseViewModel.MSG_ToastMessage);
                         return;
                     case SearchProgramResultEnum.NoProgramFound:
-                        await _dialogService.Error("No program found");
+                        MessagingCenter.Send("No program found", BaseViewModel.MSG_ToastMessage);
                         return;
                 }
 
@@ -444,7 +432,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while scanning PSI");
-                await _dialogService.Error(ex.Message);
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
             finally
             {
@@ -508,7 +496,7 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Error while getting capabilities");
-                await _dialogService.Error(ex.Message);
+                MessagingCenter.Send(ex.Message, BaseViewModel.MSG_ToastMessage);
             }
         }
 

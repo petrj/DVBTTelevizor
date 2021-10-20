@@ -119,16 +119,19 @@ namespace DVBTTelevizor
                              Navigation.PushModalAsync(_playerPage);
                          }
 
-                         var msg = "\u25B6 " + playStreamInfo.Channel.Name;
-                         if (playStreamInfo.CurrentEvent != null)
-                             msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+                         if (playStreamInfo != null && playStreamInfo.Channel != null)
+                         {
+                             var msg = "\u25B6 " + playStreamInfo.Channel.Name;
+                             if (playStreamInfo.CurrentEvent != null)
+                                 msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+
+                             MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                         }
 
                          if (_config.PlayOnBackground)
                          {
                              MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playStreamInfo);
                          }
-
-                         MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
                      }
                      else
                      {

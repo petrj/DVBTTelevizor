@@ -458,7 +458,8 @@ namespace DVBTTelevizor.Droid
         {
             try
             {
-                _notificationHelper.ShowNotification(String.Empty, $"Playing {playStreamInfo.Channel.Name}", String.Empty);
+                var msg = playStreamInfo == null || playStreamInfo.Channel == null ? "" : $"Playing {playStreamInfo.Channel.Name}";
+                _notificationHelper.ShowNotification(String.Empty, msg , String.Empty);
             }
             catch (Exception ex)
             {
