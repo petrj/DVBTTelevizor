@@ -147,7 +147,7 @@ namespace DVBTTelevizor
 
                 File.WriteAllText(AndroidChannelsListPath, JsonConvert.SerializeObject(chs));
 
-                MessagingCenter.Send($"File {AndroidChannelsListPath} exported.", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"File exported.", BaseViewModel.MSG_ToastMessage);
 
             }
             catch (Exception ex)

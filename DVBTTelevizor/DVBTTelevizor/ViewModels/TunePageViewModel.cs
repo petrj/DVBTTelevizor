@@ -516,7 +516,7 @@ namespace DVBTTelevizor
                             // automatically adding new tuned channel if does not exist
                             if (!ConfigViewModel.ChannelExists(_channels, ch.Frequency, ch.ProgramMapPID))
                             {
-                                ch.Number = (_channels.Count + 1).ToString();
+                                ch.Number = ConfigViewModel.GetNextChannelNumber(_channels).ToString();
 
                                 _channels.Add(ch);
 

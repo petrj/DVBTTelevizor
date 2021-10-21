@@ -371,7 +371,10 @@ namespace DVBTTelevizor
                            }
                        }
 
-                       MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                       if (!string.IsNullOrEmpty(msg))
+                       {
+                           MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                       }
                    });
             }
             catch (Exception ex)

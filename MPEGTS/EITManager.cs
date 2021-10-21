@@ -48,7 +48,10 @@ namespace MPEGTS
         {
             _log.Debug($"Scanning EIT from packets");
 
-            var res = new EITScanResult();
+            var res = new EITScanResult()
+            {
+                OK = true
+            };
 
             try
             {
@@ -144,7 +147,7 @@ namespace MPEGTS
             {
                 _log.Error(e);
                 res.OK = false;
-            }
+            }            
 
             return res;
         }

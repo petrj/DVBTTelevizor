@@ -40,6 +40,25 @@ namespace DVBTTelevizor
             return false;
         }
 
+        public static int GetNextChannelNumber(ObservableCollection<DVBTChannel> channels)
+        {
+            var res = 0;
+
+            foreach (var ch in channels)
+            {
+                int n;
+                if (int.TryParse(ch.Number, out n))
+                {
+                    if (n>res)
+                    {
+                        res = n;
+                    }
+                }
+            }
+
+            return res +1;
+        }
+
         #region INotifyPropertyChanged
 
         protected bool SetProperty<T>(ref T backingStore, T value,

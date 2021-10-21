@@ -88,7 +88,8 @@
                 <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="Margin" Value="0,0,5,0"/>
                 <Setter Property="VerticalOptions" Value="Center"/>
-                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
             </Style>
 
         </ResourceDictionary>

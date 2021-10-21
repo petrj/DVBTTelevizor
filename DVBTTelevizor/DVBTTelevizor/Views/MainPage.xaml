@@ -15,7 +15,7 @@
                 <Setter Property="HasUnevenRows" Value="True"/>
                 <Setter Property="IsPullToRefreshEnabled" Value="True"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
-                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>                
             </Style>
 
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
@@ -81,7 +81,8 @@
                 <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="Margin" Value="0,0,5,0"/>
                 <Setter Property="VerticalOptions" Value="Center"/>
-                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
             </Style>
 
         </ResourceDictionary>
@@ -146,7 +147,7 @@
                                     <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
                                     <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                    <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="4" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                     <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                 </Grid>
