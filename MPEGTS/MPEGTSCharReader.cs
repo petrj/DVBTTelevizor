@@ -69,7 +69,7 @@ namespace MPEGTS
             return null; // not control code
         }
 
-        public static string ReadString(byte[] bytes, int index, int count)
+        public static string ReadString(byte[] bytes, int index, int count, bool throwErrorWhenUnsupportedEncodingFound = false)
         {
             if (bytes == null ||
                 bytes.Length == 0 ||
@@ -82,6 +82,11 @@ namespace MPEGTS
             if (bytes[index]<0x20)
             {
                 // not default encoding
+
+                if (throwErrorWhenUnsupportedEncodingFound)
+                {
+                    throw new MPEGTSUnsupportedEncodingException();
+                }
 
                 if (bytes[index] == 0x14)
                 {

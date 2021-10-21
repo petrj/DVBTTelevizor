@@ -75,7 +75,14 @@ namespace MPEGTS
 
                 if (descriptorTag == 0x40) // network_name_descriptor
                 {
-                    NetworkName = GetStringFromByteArray(bytes.ToArray(), pos + 2, descriptorLength);
+                    NetworkName = MPEGTSCharReader.ReadString(bytes.ToArray(), pos + 2 , descriptorLength);
+
+                    if (String.IsNullOrEmpty(NetworkName))
+                    {
+                        // bad encoding?
+                        NetworkName = $"Network #{NetworkID}";
+                    }
+
                 } else
                 if (descriptorTag == 0x40) // linkage_descriptor
                 {

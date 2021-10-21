@@ -323,7 +323,7 @@ namespace DVBTTelevizor
 
                 ScaningInProgress = false;
 
-                if (res)
+                if (res.OK)
                 {
                     var txt = String.Empty;
                     foreach (var kvp in _driver.GetEITManager(Convert.ToInt64(TuneFrequency) * 1000000).CurrentEvents)

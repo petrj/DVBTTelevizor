@@ -1047,7 +1047,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<bool> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
+        public async Task<EITScanResult> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
         {
             _log.Debug($"Scanning EPG for freq {freq} ");
 
@@ -1057,7 +1057,10 @@ namespace DVBTTelevizor
                 var ev = eitManager.GetEvent(DateTime.Now, programMapPID);
                 if (ev != null)
                 {
-                    return true; // already cached
+                    return new EITScanResult()
+                    {
+                        OK = true
+                    }; // already cached
                 }
 
                 // searching for PID 18 (EIT) + PSI packets ..
@@ -1066,21 +1069,24 @@ namespace DVBTTelevizor
 
                 await Task.Delay(msTimeout);
 
-                eitManager.Scan(Buffer);
+                var res = eitManager.Scan(Buffer);
 
                 StopReadBuffer();
 
-                return true;
+                return res;
             }
             catch (Exception ex)
             {
                 _log.Error(ex);
 
-                return false;
+                return new EITScanResult()
+                {
+                    OK = false
+                };
             }
         }
 
-        public async Task<bool> ScanEPG(long freq, int msTimeout = 2000)
+        public async Task<EITScanResult> ScanEPG(long freq, int msTimeout = 2000)
         {
             _log.Debug($"Scanning EPG for freq {freq}");
 
@@ -1094,17 +1100,20 @@ namespace DVBTTelevizor
 
                 // searching for PID 18 (EIT) + PSI packets ..
 
-                eitManager.Scan(Buffer);
+                var res = eitManager.Scan(Buffer);
 
                 StopReadBuffer();
 
-                return true;
+                return res;
             }
             catch (Exception ex)
             {
                 _log.Error(ex);
 
-                return false;
+                return new EITScanResult()
+                {
+                    OK = false
+                };
             }
         }
 

@@ -346,11 +346,32 @@ namespace DVBTTelevizor
 
                        // setting PID 18 + PSI for each channel in the same multiplex:
 
-                       await _driver.ScanEPG(channel.Frequency, 5000);
+                       var res = await _driver.ScanEPG(channel.Frequency, 5000);
 
                        await _driver.Stop();
 
                        await RefreshEPG();
+
+                       var msg = String.Empty;
+
+                       if (!res.OK)
+                       {
+                           msg += "EPG scan failed";
+                       }
+
+                       if (res.UnsupportedEncoding)
+                       {
+                           if (msg != String.Empty)
+                           {
+                               msg += ", unsupported encoding found";
+                            }
+                           else
+                           {
+                               msg = "Unsupported encoding found";
+                           }
+                       }
+
+                       MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
                    });
             }
             catch (Exception ex)

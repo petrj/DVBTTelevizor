@@ -92,17 +92,6 @@ namespace MPEGTS
             return t;
         }
 
-        public static string GetStringFromByteArray(byte[] bytes, int pos, int length)
-        {
-            var res = String.Empty;
-            for (var i=pos;i<pos+length;i++)
-            {
-                res += Convert.ToChar(bytes[i]);
-            }
-
-            return res;
-        }
-
         /// <summary>
         /// Parsing DataTime
         /// </summary>
