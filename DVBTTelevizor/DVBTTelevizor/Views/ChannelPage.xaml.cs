@@ -26,6 +26,13 @@ namespace DVBTTelevizor
             _dialogService = dialogService;
 
             BindingContext = _viewModel = new ChannelPageViewModel(_loggingService, _dialogService, driver, config);
+
+            Appearing += ChannelPage_Appearing;
+        }
+
+        private void ChannelPage_Appearing(object sender, EventArgs e)
+        {
+            _viewModel.NotifyFontSizeChange();
         }
 
         public DVBTChannel Channel

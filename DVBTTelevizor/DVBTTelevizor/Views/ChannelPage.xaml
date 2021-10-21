@@ -19,13 +19,13 @@
             <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
             </Style>
 
             <Style x:Key="EntryStyle" TargetType="Entry">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
             </Style>
 
         </ResourceDictionary>
@@ -60,7 +60,8 @@
                        Placeholder="Channel number"
                        Style="{DynamicResource EntryStyle}"
                        Keyboard="Numeric"
-                       FontSize="{Binding FontSizeForEntry}"/>
+                       FontSize="{Binding FontSizeForEntry}"
+                       HorizontalOptions="StartAndExpand" />
 
                     <Label Grid.Row="1" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                     <Entry Grid.Row="1" Grid.Column="1"
@@ -68,31 +69,32 @@
                        Text="{Binding Channel.Name, Mode=TwoWay}"
                        Placeholder="Channel name"
                        Style="{DynamicResource EntryStyle}"
-                       FontSize="{Binding FontSizeForEntry}" />
+                       FontSize="{Binding FontSizeForEntry}" 
+                       HorizontalOptions="Start" />
 
                     <Label Grid.Row="2" Grid.Column="0" Text="Provider" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Channel.ProviderName}"  Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Channel.ProviderName}"  Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="3" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Channel.ChannelLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Channel.ChannelLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="4" Grid.Column="0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="4" Grid.Column="1" Text="{Binding Channel.FrequencyLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="4" Grid.Column="1" Text="{Binding Channel.FrequencyLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="5" Grid.Column="0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="6" Grid.Column="0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="6" Grid.Column="1" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="6" Grid.Column="1" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="7" Grid.Column="0" Text="Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="7" Grid.Column="1" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="7" Grid.Column="1" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="8" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="8" Grid.Column="1" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="8" Grid.Column="1" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
                     <Label Grid.Row="9" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="9" Grid.Column="1" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="9" Grid.Column="1" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
                 </Grid>
 
             </StackLayout>

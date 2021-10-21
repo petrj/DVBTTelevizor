@@ -52,6 +52,7 @@ namespace DVBTTelevizor
 
         private void TunePage_Appearing(object sender, EventArgs e)
         {
+            _viewModel.NotifyFontSizeChange();
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)

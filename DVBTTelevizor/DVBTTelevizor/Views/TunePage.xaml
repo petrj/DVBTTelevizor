@@ -74,14 +74,14 @@
             <Style x:Key="EntryStyle" TargetType="Entry">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
-                <Setter Property="Keyboard" Value="Numeric"/>
-                <Setter Property="WidthRequest" Value="30"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Keyboard" Value="Numeric"/>                
             </Style>
 
             <Style x:Key="PickerStyle" TargetType="Picker">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="IconStyle" TargetType="Image">
@@ -99,80 +99,78 @@
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
             <!-- top controls -->
-            <StackLayout VerticalOptions="Start" Margin="10,0,10,0">
+            <StackLayout VerticalOptions="StartAndExpand" Margin="10,0,10,0">
 
-                <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}" Margin="0,20,0,0">
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                <StackLayout VerticalOptions="StartAndExpand" Spacing="0">
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
-                </Grid>
+                    <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}" Margin="0,20,0,0" RowSpacing="0">
 
-                <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60*" />
-                        <ColumnDefinition Width="40*" />
-                    </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
+                    </Grid>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" />
+                    <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}" RowSpacing="0" Margin="0,0,0,0">
 
-                </Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
 
-                <Grid x:Name="ManualTuneOptionsChannelGrid" IsVisible="{Binding ManualTuneOptionsVisible}">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />                  
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50*" />
-                        <ColumnDefinition Width="50*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <Picker Grid.Row="0" Grid.Column="1"
+                        <Label Grid.Row="1" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        
+                        <Picker Grid.Row="1" Grid.Column="1"
+                            HorizontalOptions="End"                                
+                            x:Name="ChannelPicker"
                             Style="{StaticResource PickerStyle}"
                             SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
                             ItemsSource="{Binding FrequencyChannels}"
                             ItemDisplayBinding="{Binding Description}"
-                            FontSize="{Binding FontSizeForPicker}"/>
-                </Grid>
+                            FontSize="{Binding FontSizeForPicker}" />                        
+                        
+                    </Grid>
 
-                <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}">
+                    <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="1" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="70*" />
-                        <ColumnDefinition Width="30*" />
-                    </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="1" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="BandWidth (Mhz)" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" Style="{DynamicResource EntryStyle}"  FontSize="{Binding FontSizeForEntry}"/>
+                        <Label Grid.Row="0" Grid.Column="0" Text="BandWidth (Mhz)" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" Style="{DynamicResource EntryStyle}"  FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                    <CheckBox Grid.Row="1" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                        <CheckBox Grid.Row="1" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End"  />
 
-                    <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End" VerticalOptions="Center" />
-                </Grid>
+                        <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End"  />
+                    </Grid>
+
+
+                </StackLayout>
 
                 <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-
 
             </StackLayout>
 
