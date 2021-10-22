@@ -60,7 +60,7 @@ namespace DVBTTelevizor
                 {
                     await _driver.Disconnect();
 
-                    MessagingCenter.Send("DVB-T driver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                    MessagingCenter.Send("connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
             }
         }

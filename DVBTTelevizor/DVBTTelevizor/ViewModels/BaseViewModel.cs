@@ -78,7 +78,7 @@ namespace DVBTTelevizor
             _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
             _driver.Start();
 
-            MessagingCenter.Send($"{_driver.Configuration.DeviceName} connected", BaseViewModel.MSG_ToastMessage);
+            MessagingCenter.Send($"Device {_driver.Configuration.DeviceName} connected", BaseViewModel.MSG_ToastMessage);
 
             MessagingCenter.Send("", BaseViewModel.MSG_UpdateDriverState);
         }
@@ -87,7 +87,7 @@ namespace DVBTTelevizor
         {
             await _driver.Disconnect();
 
-            MessagingCenter.Send($"{_driver.Configuration.DeviceName} disconnected", BaseViewModel.MSG_ToastMessage);
+            MessagingCenter.Send($"Device {_driver.Configuration.DeviceName} disconnected", BaseViewModel.MSG_ToastMessage);
 
             UpdateDriverState();
         }

@@ -123,7 +123,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -142,7 +142,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -161,7 +161,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -184,7 +184,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -217,7 +217,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -252,7 +252,7 @@ namespace DVBTTelevizor
 
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -283,7 +283,7 @@ namespace DVBTTelevizor
 
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -313,7 +313,7 @@ namespace DVBTTelevizor
 
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -360,7 +360,7 @@ namespace DVBTTelevizor
 
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -448,7 +448,7 @@ namespace DVBTTelevizor
 
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send("Driver not connected", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Device not connected", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -491,7 +491,7 @@ namespace DVBTTelevizor
                 }
                 s += Environment.NewLine;
 
-                await _dialogService.Information(s, "DVBT Driver capabilities");
+                await _dialogService.Information(s, "Device capabilities");
             }
             catch (Exception ex)
             {

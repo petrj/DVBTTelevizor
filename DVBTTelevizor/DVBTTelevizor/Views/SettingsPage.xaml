@@ -106,7 +106,7 @@
                         <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch" IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
 
-                        <Label  Grid.Row="1" Grid.Column="0" Text="Disable tuner connect after start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Do not connect to device after start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="DoNotAutoInitAfterStartSwitch" IsToggled="{Binding Config.DoNotAutoInitAfterStart, Mode=TwoWay}"/>
 
                         <Label  Grid.Row="2" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />

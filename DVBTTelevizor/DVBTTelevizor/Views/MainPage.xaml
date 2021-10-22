@@ -169,6 +169,7 @@
         <ToolbarItem x:Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
         <ToolbarItem x:Name="ToolTune" Text="Tune" Clicked="ToolTune_Clicked" Icon="Tune.png"  />
         <ToolbarItem x:Name="ToolServicePage" Text="Service menu" Clicked="ToolServicePage_Clicked" Icon="Tools.png" />
+        <ToolbarItem x:Name="ToolMenu" Text="Channel menu" Clicked="ToolMenu_Clicked" Icon="Menu.png" />
         <ToolbarItem x:Name="ToolSettingsPage" Text="Settings" Clicked="ToolSettingsPage_Clicked" Icon="Settings.png" />
     </ContentPage.ToolbarItems>
 

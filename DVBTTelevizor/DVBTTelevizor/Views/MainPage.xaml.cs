@@ -119,14 +119,7 @@ namespace DVBTTelevizor
                              Navigation.PushModalAsync(_playerPage);
                          }
 
-                         if (playStreamInfo != null && playStreamInfo.Channel != null)
-                         {
-                             var msg = "\u25B6 " + playStreamInfo.Channel.Name;
-                             if (playStreamInfo.CurrentEvent != null)
-                                 msg += $" - {playStreamInfo.CurrentEvent.EventName}";
-
-                             MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
-                         }
+                         ShowActualPlayingMessage(playStreamInfo);
 
                          if (_config.PlayOnBackground)
                          {
@@ -162,9 +155,9 @@ namespace DVBTTelevizor
             {
                 Device.BeginInvokeOnMainThread(delegate
                 {
-                    MessagingCenter.Send($"Tuner connection error ({message})", BaseViewModel.MSG_ToastMessage);
-
                     _viewModel.UpdateDriverState();
+
+                    MessagingCenter.Send($"Device connection error ({message})", BaseViewModel.MSG_ToastMessage);
                 });
             });
 
@@ -280,7 +273,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void OnKeyDown(string key)
+        public async void OnKeyDown(string key)
         {
             _loggingService.Debug($"OnKeyDown {key}");
 
@@ -300,14 +293,14 @@ namespace DVBTTelevizor
                 case "down":
                 case "s":
                 case "numpad2":
-                    Task.Run(async () => await OnKeyDown());
+                    await OnKeyDown();
                     break;
                 case "dpadup":
                 case "buttonl1":
                 case "up":
                 case "w":
                 case "numpad8":
-                    Task.Run(async () => await OnKeyUp());
+                    await OnKeyUp();
                     break;
                 case "dpadleft":
                 case "pageup":
@@ -317,7 +310,7 @@ namespace DVBTTelevizor
                 case "mediaplayprevious":
                 case "mediaprevious":
                 case "numpad4":
-                    Task.Run(async () => await OnKeyLeft());
+                    await OnKeyLeft();
                     break;
                 case "pagedown":
                 case "dpadright":
@@ -327,7 +320,7 @@ namespace DVBTTelevizor
                 case "mediaplaynext":
                 case "medianext":
                 case "numpad6":
-                    Task.Run(async () => await OnKeyRight());
+                    await OnKeyRight();
                     break;
                 case "dpadcenter":
                 case "space":
@@ -337,7 +330,7 @@ namespace DVBTTelevizor
                 case "numpad5":
                 case "buttona":
                 case "buttonstart":
-                    Task.Run(async () => await _viewModel.PlayChannel());
+                    await _viewModel.PlayChannel();
                     break;
                 case "f4":
                 case "escape":
@@ -402,7 +395,9 @@ namespace DVBTTelevizor
                 case "buttonthumbl":
                 case "tab":
                 case "f1":
-                    Detail_Clicked(this, null);
+                case "focus":
+                case "camera":
+                    await Detail_Clicked(this,null);
                     break;
                 default:
                     {
@@ -415,24 +410,31 @@ namespace DVBTTelevizor
             }
         }
 
-        private async void Detail_Clicked(object sender, EventArgs e)
+        private async Task Detail_Clicked(object sender, EventArgs e)
         {
             _loggingService.Info($"Detail_Clicked");
 
             if (_playerPage != null && _playerPage.Playing)
             {
-                if (_playerPage.PlayStreamInfo != null &&
-                    _playerPage.PlayStreamInfo.Channel != null)
-                {
-                    var msg = $"\u25B6  {_playerPage.PlayStreamInfo.Channel.Name}";
-
-                    MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
-                }
+                ShowActualPlayingMessage(_playerPage.PlayStreamInfo);
             }
             else
             {
-                EditSelectedChannel();
+                await _viewModel.ShowChannelMenu();
             }
+        }
+
+        private void ShowActualPlayingMessage(PlayStreamInfo playStreamInfo)
+        {
+            if (playStreamInfo == null ||
+                playStreamInfo.Channel == null)
+                return;
+
+            var msg = "\u25B6 " + playStreamInfo.Channel.Name;
+            if (playStreamInfo.CurrentEvent != null)
+                msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+
+            MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
         }
 
         private void HandleNumKey(int number)
@@ -531,7 +533,7 @@ namespace DVBTTelevizor
         {
             if (_driver.Started)
             {
-                if (!(await _dlgService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"DVBT Tuner status", "Back", "Disconnect")))
+                if (!(await _dlgService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"Device status", "Back", "Disconnect")))
                 {
                     await _viewModel.DisconnectDriver();
                 }
@@ -539,7 +541,7 @@ namespace DVBTTelevizor
             } else
             {
 
-                if (await _dlgService.Confirm($"Disconnected.", $"DVBT Tuner status", "Connect", "Back"))
+                if (await _dlgService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
                 {
                     MessagingCenter.Send("", BaseViewModel.MSG_Init);
                 }
@@ -567,6 +569,11 @@ namespace DVBTTelevizor
             {
                 _viewModel.RefreshCommand.Execute(null);
             }
+        }
+
+        private async void ToolMenu_Clicked(object sender, EventArgs e)
+        {
+            await _viewModel.ShowChannelMenu();
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

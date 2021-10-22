@@ -95,53 +95,71 @@ namespace DVBTTelevizor
 
         private async Task LongPress(object item)
         {
-            if (item != null && item is DVBTChannel)
+            var ch = item as DVBTChannel;
+            if (ch == null)
+                return;
+
+            _loggingService.Info($"Long press on channel {ch.Name})");
+
+            SelectedChannel = ch;
+            await ShowChannelMenu(ch);
+        }
+
+        public async Task ShowChannelMenu(DVBTChannel ch = null)
+        {
+            if (ch == null)
             {
-                var ch = item as DVBTChannel;
-
-                SelectedChannel = ch;
-
-                _loggingService.Info($"Long press on channel {ch.Name})");
-
-                var actions = new List<string>();
-
-                if (!ch.Recording)
-                {
-                    actions.Add("Play");
-                    actions.Add("Scan EPG");
-                    actions.Add("Record");
-                    actions.Add("Edit");
-                    actions.Add("Delete");
-                }
-                else
-                {
-                    actions.Add("Stop record");
-                }
-
-                var action = await _dialogService.DisplayActionSheet($"{ch.Name}", "Cancel", actions);
-
-                switch (action)
-                {
-                    case "Play":
-                        await PlayChannel(ch);
-                        break;
-                    case "Scan EPG":
-                        await ScanEPG(ch);
-                        break;
-                    case "Edit":
-                        MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
-                        break;
-                    case "Record":
-                        await RecordChannel(ch, true);
-                        break;
-                    case "Stop record":
-                        await RecordChannel(ch, false);
-                        break;
-                    case "Delete":
-                        await DeleteChannel(ch);
-                        break;
-                }
+                ch = SelectedChannel;
             }
+
+            if (ch == null)
+            {
+                await _dialogService.Information("No channel selected");
+                return;
+            }
+
+            var actions = new List<string>();
+
+            if (!ch.Recording)
+            {
+                actions.Add("Play");
+                actions.Add("Scan EPG");
+                actions.Add("Record");
+                actions.Add("Edit");
+                actions.Add("Delete");
+            }
+            else
+            {
+                actions.Add("Show record location");
+                actions.Add("Stop record");
+            }
+
+            var action = await _dialogService.DisplayActionSheet($"{ch.Name}", "Cancel", actions);
+
+            switch (action)
+            {
+                case "Play":
+                    await PlayChannel(ch);
+                    break;
+                case "Scan EPG":
+                    await ScanEPG(ch);
+                    break;
+                case "Edit":
+                    MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
+                    break;
+                case "Record":
+                    await RecordChannel(ch, true);
+                    break;
+                case "Show record location":
+                    await _dialogService.Information(_driver.RecordFileName);
+                    break;
+                case "Stop record":
+                    await RecordChannel(ch, false);
+                    break;
+                case "Delete":
+                    await DeleteChannel(ch);
+                    break;
+            }            
         }
 
         private async Task RecordChannel(DVBTChannel channel, bool start)
@@ -162,7 +180,7 @@ namespace DVBTTelevizor
                 {
                     if (!_driver.Started)
                     {
-                        MessagingCenter.Send($"Recording failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                        MessagingCenter.Send($"Recording failed (device connection error)", BaseViewModel.MSG_ToastMessage);
                         return;
                     }
 
@@ -179,7 +197,7 @@ namespace DVBTTelevizor
                 {
                     if (!_driver.Started)
                     {
-                        MessagingCenter.Send($"Stop recording failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                        MessagingCenter.Send($"Stop recording failed (device connection error)", BaseViewModel.MSG_ToastMessage);
                         return;
                     }
 
@@ -192,7 +210,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex);
 
-                MessagingCenter.Send($"Start/stop recording failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"Start/stop recording failed (device connection error)", BaseViewModel.MSG_ToastMessage);
 
                 return;
             }
@@ -328,7 +346,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send($"Cannot scan EPG (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send($"Cannot scan EPG (device connection error)", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
@@ -411,7 +429,7 @@ namespace DVBTTelevizor
             {
                 if (!_driver.Started)
                 {
-                    MessagingCenter.Send($"Playing {channel.Name} failed (tuner connection error)", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 

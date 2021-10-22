@@ -43,8 +43,7 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
             {
                 Device.BeginInvokeOnMainThread(delegate
-                {
-                    MessagingCenter.Send($"Tuner connection error ({message})", BaseViewModel.MSG_ToastMessage);
+                {                    
                     _viewModel.UpdateDriverState();
                 });
             });
@@ -59,7 +58,7 @@ namespace DVBTTelevizor
         {
             if (_driver.Started)
             {
-                if (!(await _dialogService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"DVBT Tuner status", "Back", "Disconnect")))
+                if (!(await _dialogService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"Device status", "Back", "Disconnect")))
                 {
                     await _viewModel.DisconnectDriver();
                 }
@@ -67,7 +66,7 @@ namespace DVBTTelevizor
             else
             {
 
-                if (await _dialogService.Confirm($"Disconnected.", $"DVBT Tuner status", "Connect", "Back"))
+                if (await _dialogService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
                 {
                     MessagingCenter.Send("", BaseViewModel.MSG_Init);
                 }

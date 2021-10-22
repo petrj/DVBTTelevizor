@@ -223,7 +223,7 @@ namespace DVBTTelevizor.Droid
                     return;
                 }
 
-                _loggingService.Info("Initializing DVBT driver");
+                _loggingService.Info("Initializing device");
 
                 var req = new Intent(Intent.ActionView);
                 req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
@@ -239,10 +239,9 @@ namespace DVBTTelevizor.Droid
                     {
                         _waitingForInit = false;
 
-                        _loggingService.Error("DVB-T driver response timeout");
+                        _loggingService.Error("Device response timeout");
 
-                        ShowToastMessage("DVB-T driver response timeout");
-                        MessagingCenter.Send("DVB-T driver response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                        MessagingCenter.Send("response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                     }
 
                 });
@@ -253,18 +252,16 @@ namespace DVBTTelevizor.Droid
             catch (ActivityNotFoundException ex)
             {
                 _waitingForInit = false;
-                _loggingService.Error(ex, "Driver initializing failed");
+                _loggingService.Error(ex, "Device initializing failed");
 
-                ShowToastMessage("DVB-T driver not installed");
-                MessagingCenter.Send("DVB-T driver not installed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                MessagingCenter.Send("DVBT driver not installed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
             }
             catch (Exception ex)
             {
                 _waitingForInit = false;
                 _loggingService.Error(ex, "Driver initializing failed");
 
-                ShowToastMessage("DVB-T driver connection failed");
-                MessagingCenter.Send("DVB-T driver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                MessagingCenter.Send("connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
             }
         }
 
@@ -283,7 +280,7 @@ namespace DVBTTelevizor.Droid
                 {
                     await _driverManager.Disconnect();
 
-                    MessagingCenter.Send("DVB-T driver connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                    MessagingCenter.Send("connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
             }
         }
@@ -313,12 +310,12 @@ namespace DVBTTelevizor.Droid
                     if (data.HasExtra("VendorIds"))
                         cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
 
-                    _loggingService.Info($"Received DVBT driver configuration: {cfg}");
+                    _loggingService.Info($"Received device configuration: {cfg}");
 
                     MessagingCenter.Send(cfg.ToString(), BaseViewModel.MSG_DVBTDriverConfiguration);
                 } else
                 {
-                    MessagingCenter.Send("No response from driver", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+                    MessagingCenter.Send("no response", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                 }
             }
         }

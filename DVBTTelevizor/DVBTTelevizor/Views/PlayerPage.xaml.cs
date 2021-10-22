@@ -34,6 +34,8 @@ namespace DVBTTelevizor
 
             _driver = driver;
 
+            Appearing += PlayerPage_Appearing;
+
             Core.Initialize();
 
             _libVLC = new LibVLC();
@@ -43,6 +45,11 @@ namespace DVBTTelevizor
             CheckStreamCommand = new Command(async () => await CheckStream());
 
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
+        }
+
+        private void PlayerPage_Appearing(object sender, EventArgs e)
+        {
+            _viewModel.NotifyFontSizeChange();
         }
 
         public bool Playing
