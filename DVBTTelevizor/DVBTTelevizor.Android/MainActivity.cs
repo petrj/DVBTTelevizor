@@ -82,14 +82,21 @@ namespace DVBTTelevizor.Droid
                 SetFullScreen(true);
             }
 
-            UsbManager manager = (UsbManager)GetSystemService(Context.UsbService);
+            try
+            {
+                UsbManager manager = (UsbManager)GetSystemService(Context.UsbService);
 
-            var usbReciever = new USBBroadcastReceiverSystem();
-            var intentFilter = new IntentFilter(UsbManager.ActionUsbDeviceAttached);
-            var intentFilter2 = new IntentFilter(UsbManager.ActionUsbDeviceDetached);
-            RegisterReceiver(usbReciever, intentFilter);
-            RegisterReceiver(usbReciever, intentFilter2);
-            usbReciever.UsbAttachedOrDetached += CheckIfUsbAttachedOrDetached;
+                var usbReciever = new USBBroadcastReceiverSystem();
+                var intentFilter = new IntentFilter(UsbManager.ActionUsbDeviceAttached);
+                var intentFilter2 = new IntentFilter(UsbManager.ActionUsbDeviceDetached);
+                RegisterReceiver(usbReciever, intentFilter);
+                RegisterReceiver(usbReciever, intentFilter2);
+                usbReciever.UsbAttachedOrDetached += CheckIfUsbAttachedOrDetached;
+
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while initializing UsbManager");
+            }
 
             _driverManager = new DVBTDriverManager(_loggingService, _config);
 
