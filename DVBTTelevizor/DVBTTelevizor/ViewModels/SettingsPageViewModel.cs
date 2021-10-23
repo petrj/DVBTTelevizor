@@ -38,7 +38,7 @@ namespace DVBTTelevizor
 
             ImportChannelsCommand = new Command(async () => await Import());
 
-            ShareChannelsCommand = new Command(() => { ShareLog(); });
+            ShareChannelsCommand = new Command(async  () => { await ShareLog(); });
         }
 
         public string AndroidChannelsListPath
@@ -49,9 +49,41 @@ namespace DVBTTelevizor
             }
         }
 
-        private void ShareLog()
+        private async Task ShareLog()
         {
-            MessagingCenter.Send(AndroidChannelsListPath, BaseViewModel.MSG_ShareFile);
+            try
+            {
+                _loggingService.Info("Sharing channels list");
+
+                var chs = await _channelService.LoadChannels();
+                if (chs.Count == 0)
+                {
+                    await _dialogService.Information("Channel list is empty");
+                    return;
+                }
+
+                var shareDir = Path.Combine(BaseViewModel.AndroidAppDirectory, "shared");
+                if (!Directory.Exists(shareDir))
+                {
+                    Directory.CreateDirectory(shareDir);
+                }
+
+                var listPath = Path.Combine(shareDir, "DVBTTelevizor.channels.json");
+
+                if (File.Exists(listPath))
+                {                    
+                    File.Delete(listPath);
+                }
+
+                File.WriteAllText(listPath, JsonConvert.SerializeObject(chs));
+
+                MessagingCenter.Send(listPath, BaseViewModel.MSG_ShareFile);
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                
+                MessagingCenter.Send($"File sharing failed", BaseViewModel.MSG_ToastMessage);
+            }
         }
 
         public bool IsFullScreen

@@ -194,6 +194,8 @@ namespace DVBTTelevizor
                     channel.Recording = true;
 
                     await _driver.StartRecording();
+
+                    MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
                 }
                 else
                 {
@@ -208,6 +210,8 @@ namespace DVBTTelevizor
 
                     _recordingChannel = null;
                     channel.Recording = false;
+
+                    MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
                 }
             }
             catch (Exception ex)

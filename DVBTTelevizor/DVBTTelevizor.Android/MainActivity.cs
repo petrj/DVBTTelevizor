@@ -59,6 +59,11 @@ namespace DVBTTelevizor.Droid
 
             _loggingService.Info("DVBTTelevizor starting");
 
+            // workaround for not using FileProvider (necessary for file sharing):
+            // https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.SetVmPolicy(builder.Build());
+
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);            
 
