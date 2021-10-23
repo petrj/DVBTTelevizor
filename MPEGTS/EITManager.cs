@@ -77,11 +77,18 @@ namespace MPEGTS
                         {
                             foreach (var item in eit.EventItems)
                             {
-                                CurrentEvents[eit.ServiceId] = item;
+                                if (item.StartTime < DateTime.Now &&
+                                    item.FinishTime > DateTime.Now)
+                                {
+                                    // reading only the actual event
+                                    // there can be event that start in future!
 
-                                currentEventsCountFound++;
+                                    CurrentEvents[eit.ServiceId] = item;                                    
 
-                                break; // reading only the first one
+                                    currentEventsCountFound++;
+
+                                    break; 
+                                }
                             }
                         }
                         else

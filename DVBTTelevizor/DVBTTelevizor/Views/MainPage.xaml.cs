@@ -307,6 +307,7 @@ namespace DVBTTelevizor
                 case "left":
                 case "a":
                 case "b":
+                case "f2":
                 case "mediaplayprevious":
                 case "mediaprevious":
                 case "numpad4":
@@ -317,6 +318,7 @@ namespace DVBTTelevizor
                 case "right":
                 case "d":
                 case "f":
+                case "f3":
                 case "mediaplaynext":
                 case "medianext":
                 case "numpad6":
@@ -326,6 +328,7 @@ namespace DVBTTelevizor
                 case "space":
                 case "buttonr2":
                 case "mediaplaypause":
+                case "mediaplay":
                 case "enter":
                 case "numpad5":
                 case "buttona":
@@ -336,6 +339,7 @@ namespace DVBTTelevizor
                 case "escape":
                 case "mediaplaystop":
                 case "mediastop":
+                case "mediaclose":
                 case "numpadsubtract":
                 case "del":
                 case "buttonx":
@@ -395,6 +399,9 @@ namespace DVBTTelevizor
                 case "buttonthumbl":
                 case "tab":
                 case "f1":
+                case "f6":
+                case "f7":
+                case "f8":
                 case "focus":
                 case "camera":
                     await Detail_Clicked(this,null);

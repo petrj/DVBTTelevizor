@@ -46,23 +46,21 @@ namespace DVBTTelevizor.Droid
 
             base.OnCreate(savedInstanceState);
 
-            // workaround for not using FileProvider:
-            // https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
-            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-            StrictMode.SetVmPolicy(builder.Build());
-
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-
             _config = new DVBTTelevizorConfiguration();
 
 #if DEBUG
             _config.ShowServiceMenu = true;
             _config.ScanEPG = true;
             _config.EnableLogging = true;
+            //_config.AutoInitAfterStart = false;
 #endif
 
             InitLogging();
+
+            _loggingService.Info("DVBTTelevizor starting");
+
+            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);            
 
             // prevent sleep:
             Window window = (Forms.Context as Activity).Window;
@@ -238,9 +236,9 @@ namespace DVBTTelevizor.Droid
 
                 _waitingForInit = true;
 
-                Task.Run(() =>
+                Task.Run(async () =>
                 {
-                    System.Threading.Thread.Sleep(3000); // wait 3 secs;
+                    await Task.Delay(5000); // wait 5 secs;
 
                     if (_waitingForInit)
                     {
