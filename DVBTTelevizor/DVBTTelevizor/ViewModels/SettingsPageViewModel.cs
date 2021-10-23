@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Android.Content;
 using Plugin.InAppBilling;
+using Plugin.InAppBilling.Abstractions;
 
 namespace DVBTTelevizor
 {
@@ -258,7 +259,7 @@ namespace DVBTTelevizor
 
         protected async Task Donate(string productId)
         {
-            try
+           try
             {
                 _loggingService.Debug($"Paying product id: {productId}");
 
@@ -271,7 +272,7 @@ namespace DVBTTelevizor
                     return;
                 }
 
-                var purchase = await CrossInAppBilling.Current.PurchaseAsync(productId, ItemType.InAppPurchase);
+                var purchase = await CrossInAppBilling.Current.PurchaseAsync(productId, ItemType.InAppPurchase, "apppayload");
                 if (purchase == null)
                 {
                     _loggingService.Info($"Not purchased");
@@ -287,37 +288,18 @@ namespace DVBTTelevizor
                     _loggingService.Info($"Purchase Payload: {purchase.Payload}");
                     _loggingService.Info($"Purchase ConsumptionState: {purchase.ConsumptionState.ToString()}");
                     _loggingService.Info($"Purchase AutoRenewing: {purchase.AutoRenewing}");
-
-                    if (purchase.State == PurchaseState.Purchased)
-                    {
-                        var acknowledged = await CrossInAppBilling.Current.AcknowledgePurchaseAsync(purchase.PurchaseToken);
-
-                        if (!acknowledged)
-                        {
-                            await _dialogService.Information($"Payment failed"); 
-                            _loggingService.Info($"Acknowledge failed");
-                        }
-                    }
-                    else if (purchase.State == PurchaseState.PaymentPending)
-                    {
-                        await _dialogService.Information($"Payment failed"); // pending payments not supported
-                    }
-                    else
-                    {
-                        await _dialogService.Information($"Payment failed");
-                    }
                 }
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Payment failed");
 
-                await _dialogService.Information($"Payment failed");
+                //await _dialogService.Information($"Payment failed");
             }
             finally
             {
                 await CrossInAppBilling.Current.DisconnectAsync();
-            }
+            } 
         } 
     }
 }

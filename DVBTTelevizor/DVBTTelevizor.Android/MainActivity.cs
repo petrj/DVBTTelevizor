@@ -22,6 +22,7 @@ using Android.Support.V4.Content;
 using Android;
 using Android.Support.V4.App;
 using System.Text;
+using Plugin.InAppBilling;
 
 namespace DVBTTelevizor.Droid
 {
@@ -46,6 +47,9 @@ namespace DVBTTelevizor.Droid
 
             base.OnCreate(savedInstanceState);
 
+            Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
+            Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
+
             _config = new DVBTTelevizorConfiguration();
 
 #if DEBUG
@@ -66,9 +70,6 @@ namespace DVBTTelevizor.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-
-            var context = Xamarin.Essentials.Platform.AppContext;
-            var activity = Xamarin.Essentials.Platform.CurrentActivity;
 
             // prevent sleep:
             Window window = (Forms.Context as Activity).Window;
@@ -298,8 +299,11 @@ namespace DVBTTelevizor.Droid
             }
         }
 
+
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
+            InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
+
             if (requestCode == StartRequestCode && resultCode == Result.Ok)
             {
                 _waitingForInit = false;
