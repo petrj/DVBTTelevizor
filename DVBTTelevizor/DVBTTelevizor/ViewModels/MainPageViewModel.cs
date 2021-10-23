@@ -144,7 +144,7 @@ namespace DVBTTelevizor
                 case "Scan EPG":
                     await ScanEPG(ch);
                     break;
-                case "Edit":
+                case "Detail & edit":
                     MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
                     break;
                 case "Record":
