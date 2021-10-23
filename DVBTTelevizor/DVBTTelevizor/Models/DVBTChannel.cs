@@ -71,6 +71,11 @@ namespace DVBTTelevizor
             }
         }
 
+        public void NotifyRecordingLabelChange()
+        {
+            OnPropertyChanged(nameof(RecordingLabel));
+        }
+
         public string PIDs { get; set; }
 
         public string PIDsLabel

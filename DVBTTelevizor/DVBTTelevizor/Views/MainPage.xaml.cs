@@ -441,6 +441,13 @@ namespace DVBTTelevizor
             if (playStreamInfo.CurrentEvent != null)
                 msg += $" - {playStreamInfo.CurrentEvent.EventName}";
 
+            // showing signal percents only for the first time
+            if (playStreamInfo.SignalStrengthPercentage > 0)
+            {
+                msg += $" (signal {playStreamInfo.SignalStrengthPercentage}%)";
+                playStreamInfo.SignalStrengthPercentage = 0;
+            }
+
             MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
         }
 

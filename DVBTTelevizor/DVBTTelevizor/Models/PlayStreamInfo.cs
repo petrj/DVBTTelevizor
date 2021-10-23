@@ -10,5 +10,6 @@ namespace DVBTTelevizor
         public DVBTChannel Channel { get; set; }
         public  EventItem CurrentEvent { get; set; }
         public string RecordingStream { get; set; } = null;
+        public int SignalStrengthPercentage { get; set; } = 0;
     }
 }

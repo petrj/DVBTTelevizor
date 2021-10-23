@@ -124,8 +124,8 @@ namespace DVBTTelevizor
             {
                 actions.Add("Play");
                 actions.Add("Scan EPG");
-                actions.Add("Record");
-                actions.Add("Edit");
+                actions.Add("Detail & edit");
+                actions.Add("Record");                
                 actions.Add("Delete");
             }
             else
@@ -185,12 +185,14 @@ namespace DVBTTelevizor
                     }
 
                     var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
-                    if (!playRes)
+                    if (!playRes.OK)
                     {
                         throw new Exception("Play returned false");
                     }
 
                     _recordingChannel = channel;
+                    channel.Recording = true;
+
                     await _driver.StartRecording();
                 }
                 else
@@ -203,7 +205,9 @@ namespace DVBTTelevizor
 
                     _driver.StopRecording();
                     await _driver.Stop();
+
                     _recordingChannel = null;
+                    channel.Recording = false;
                 }
             }
             catch (Exception ex)
@@ -214,8 +218,8 @@ namespace DVBTTelevizor
 
                 return;
             }
-
-            await Refresh();
+            
+            channel.NotifyRecordingLabelChange();
         }
 
         private async Task DeleteChannel(DVBTChannel channel)
@@ -436,10 +440,12 @@ namespace DVBTTelevizor
                 IsRefreshing = true;
 
                 var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
-                if (!playRes)
+                if (!playRes.OK)
                 {
                     throw new Exception("Play returned false");
                 }
+
+                playInfo.SignalStrengthPercentage = playRes.SignalStrengthPercentage;
 
                 var eitManager = _driver.GetEITManager(channel.Frequency);
                 if (eitManager != null)

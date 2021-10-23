@@ -272,17 +272,22 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<bool> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs, bool stopReadStream = true)
+        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs, bool stopReadStream = true)
         {
+            var res = new PlayResult()
+            {
+                OK = false
+            };
+
             _log.Debug($"Playing {frequency} Mhz, type: {deliverySystem}, PIDs: {String.Join(",", PIDs)}");
 
             var tunedRes = await Tune(frequency, bandwidth, deliverySystem);
             if (!tunedRes.SuccessFlag)
-                return false;
+                return res;
 
             var setPIDsRes = await SetPIDs(PIDs);
             if (!setPIDsRes.SuccessFlag)
-                return false;
+                return res;
 
             // wait 5s for signal ......
 
@@ -293,7 +298,7 @@ namespace DVBTTelevizor
                 var statusRes = await GetStatus();
                 if (!statusRes.SuccessFlag)
                 {
-                    return false;
+                    return res;
                 }
 
                 if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
@@ -308,14 +313,17 @@ namespace DVBTTelevizor
                     if (stopReadStream)
                         StopReadStream();
 
-                    return true;
+                    res.OK = true;
+                    res.SignalStrengthPercentage = Convert.ToInt32(statusRes.rfStrengthPercentage);
+
+                    return res;
                 }
 
                 await Task.Delay(500);
             }
 
             _log.Debug($"Signal not found");
-            return false;
+            return res;
         }
 
         public async Task<bool> Stop()
