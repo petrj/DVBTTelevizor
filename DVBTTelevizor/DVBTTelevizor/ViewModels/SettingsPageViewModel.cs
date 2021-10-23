@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Android.Content;
+using Plugin.InAppBilling;
 
 namespace DVBTTelevizor
 {
@@ -22,6 +23,10 @@ namespace DVBTTelevizor
         public Command ExportChannelsCommand { get; set; }
         public Command ImportChannelsCommand { get; set; }
         public Command ShareChannelsCommand { get; set; }
+
+        public Command Donate1command { get; set; }
+        public Command Donate5command { get; set; }
+        public Command Donate10command { get; set; }
 
         public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(config)
@@ -39,6 +44,10 @@ namespace DVBTTelevizor
             ImportChannelsCommand = new Command(async () => await Import());
 
             ShareChannelsCommand = new Command(async  () => { await ShareLog(); });
+
+            Donate1command = new Command(async () => { await Donate("donation1"); });
+            Donate5command = new Command(async () => { await Donate("donation5"); });
+            Donate10command = new Command(async () => { await Donate("donation10"); });
         }
 
         public string AndroidChannelsListPath
@@ -246,5 +255,69 @@ namespace DVBTTelevizor
                 MessagingCenter.Send("Channels cleared", BaseViewModel.MSG_ToastMessage);
             }
         }
+
+        protected async Task Donate(string productId)
+        {
+            try
+            {
+                _loggingService.Debug($"Paying product id: {productId}");
+
+                var connected = await CrossInAppBilling.Current.ConnectAsync();
+
+                if (!connected)
+                {
+                    _loggingService.Info($"Connection to AppBilling service failed");
+                    await _dialogService.Information("Connection to billing service failed");
+                    return;
+                }
+
+                var purchase = await CrossInAppBilling.Current.PurchaseAsync(productId, ItemType.InAppPurchase);
+                if (purchase == null)
+                {
+                    _loggingService.Info($"Not purchased");
+                }
+                else
+                {
+                    _loggingService.Info($"Purchase OK");
+
+                    _loggingService.Info($"Purchase Id: {purchase.Id}");
+                    _loggingService.Info($"Purchase Token: {purchase.PurchaseToken}");
+                    _loggingService.Info($"Purchase State: {purchase.State.ToString()}");
+                    _loggingService.Info($"Purchase Date: {purchase.TransactionDateUtc.ToString()}");
+                    _loggingService.Info($"Purchase Payload: {purchase.Payload}");
+                    _loggingService.Info($"Purchase ConsumptionState: {purchase.ConsumptionState.ToString()}");
+                    _loggingService.Info($"Purchase AutoRenewing: {purchase.AutoRenewing}");
+
+                    if (purchase.State == PurchaseState.Purchased)
+                    {
+                        var acknowledged = await CrossInAppBilling.Current.AcknowledgePurchaseAsync(purchase.PurchaseToken);
+
+                        if (!acknowledged)
+                        {
+                            await _dialogService.Information($"Payment failed"); 
+                            _loggingService.Info($"Acknowledge failed");
+                        }
+                    }
+                    else if (purchase.State == PurchaseState.PaymentPending)
+                    {
+                        await _dialogService.Information($"Payment failed"); // pending payments not supported
+                    }
+                    else
+                    {
+                        await _dialogService.Information($"Payment failed");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Payment failed");
+
+                await _dialogService.Information($"Payment failed");
+            }
+            finally
+            {
+                await CrossInAppBilling.Current.DisconnectAsync();
+            }
+        } 
     }
 }

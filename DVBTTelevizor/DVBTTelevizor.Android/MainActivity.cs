@@ -65,7 +65,10 @@ namespace DVBTTelevizor.Droid
             StrictMode.SetVmPolicy(builder.Build());
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);            
+            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
+            var context = Xamarin.Essentials.Platform.AppContext;
+            var activity = Xamarin.Essentials.Platform.CurrentActivity;
 
             // prevent sleep:
             Window window = (Forms.Context as Activity).Window;

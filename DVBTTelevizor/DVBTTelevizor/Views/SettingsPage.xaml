@@ -21,6 +21,7 @@
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="20,0,20,0"/>
             </Style>
 
             <Style x:Key="CaptionStyle" TargetType="Label">
@@ -28,7 +29,11 @@
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Label">
-                <Setter Property="Margin" Value="20,0,0,0"/>
+                <Setter Property="Margin" Value="20,0,20,0"/>
+            </Style>
+
+            <Style x:Key="DonateButtonStyle" TargetType="Label">
+                <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
@@ -49,7 +54,7 @@
 
             <StackLayout>
 
-            <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,30">
 
                     <Label Text="Channels list" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -80,13 +85,13 @@
 
                     <Button Text="Export to file" Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-                    
+
                     <Button Text="Import from file" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
-            </StackLayout>
+                </StackLayout>
 
-            <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,30">
 
                     <Label Text="System settings" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -120,28 +125,28 @@
 
                     </Grid>
 
-                <StackLayout Margin="20,0,20,0">
-                    <Label  Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                    <Picker
+                    <StackLayout Margin="20,0,20,0">
+                        <Label  Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Picker
                             x:Name="FontSizePicker"
                             Margin="20,0,0,0"
                             FontSize="{Binding FontSizeForPicker}"
                             Style="{StaticResource CommonPickerTextStyle}"
                             SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}" >
-                        <Picker.Items>
-                            <x:String>Normal</x:String>
-                            <x:String>Above normal</x:String>
-                            <x:String>Big</x:String>
-                            <x:String>Bigger</x:String>
-                            <x:String>Very big</x:String>
-                            <x:String>Huge</x:String>
-                        </Picker.Items>
-                    </Picker>
+                            <Picker.Items>
+                                <x:String>Normal</x:String>
+                                <x:String>Above normal</x:String>
+                                <x:String>Big</x:String>
+                                <x:String>Bigger</x:String>
+                                <x:String>Very big</x:String>
+                                <x:String>Huge</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </StackLayout>
+
                 </StackLayout>
 
-            </StackLayout>
-
-            <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,30">
 
                     <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -159,7 +164,29 @@
 
                     </Grid>
 
-             </StackLayout>
+                </StackLayout>
+
+                <StackLayout Margin="0,0,0,30">
+
+                    <Label Text="Donate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+
+                    <Grid Margin="20,10,10,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="34*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Row="0" Grid.Column="0" Text="1$" Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button Grid.Row="0" Grid.Column="1" Text="5$" Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button Grid.Row="0" Grid.Column="2" Text="10$" Command="{Binding Donate10command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                    </Grid>
+
+                </StackLayout>
 
             </StackLayout>
 
