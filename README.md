@@ -29,10 +29,10 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - possibility to export/import tuned channels
 - Android 4.4 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a
 
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot2.png" width="400" alt="Screenshot2"/>
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot3.png" width="400" alt="Screenshot3"/>
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot4.png" width="400" alt="Screenshot4"/>
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot5.png" width="400" alt="Screenshot5"/>
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot6.png" width="400" alt="Screenshot6"/>
-<img src="https://raw.github.com/petrj/OnlineTelevizor/master/Graphics/Screenshot7.png" width="400" alt="Screenshot7"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot2.png" width="400" alt="Screenshot2"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot3.png" width="400" alt="Screenshot3"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot4.png" width="400" alt="Screenshot4"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot5.png" width="400" alt="Screenshot5"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot6.png" width="400" alt="Screenshot6"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot7.png" width="400" alt="Screenshot7"/>
