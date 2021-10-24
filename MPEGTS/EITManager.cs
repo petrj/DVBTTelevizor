@@ -194,11 +194,27 @@ namespace MPEGTS
         ///  Scheduled events supplemented with actual events
         /// </summary>
         /// <param name="date"></param>
-        /// <param name="count"></param>
+        /// <param name="count">only 1 or 2 supporting</param>
         /// <returns>Key: Program MapPID</returns>
         public Dictionary<int, List<EventItem>> GetEvents(DateTime date, int count = 2)
         {
             var res = new Dictionary<int, List<EventItem>>();
+
+            // current events:
+
+            foreach (var kvp in CurrentEvents)
+            {
+                if (kvp.Value.StartTime <= date &&
+                    kvp.Value.FinishTime >= date &&
+                    ProgramNumberToMapPID.ContainsKey(kvp.Key))
+                {
+                    var programMapPID = ProgramNumberToMapPID[kvp.Key];
+
+                    res[programMapPID] = new List<EventItem>();
+                    res[programMapPID].Add(kvp.Value);                    
+                }
+            }
+
 
             // scheduled events
 
@@ -207,53 +223,48 @@ namespace MPEGTS
                 if (!ProgramNumberToMapPID.ContainsKey(serviceId))
                     continue;
 
-                var programMpaPID = ProgramNumberToMapPID[serviceId];
+                var programMapPID = ProgramNumberToMapPID[serviceId];
 
-                res[programMpaPID] = new List<EventItem>();
+                if (!res.ContainsKey(programMapPID))
+                {
+                    res[programMapPID] = new List<EventItem>();
+                }
 
-                int actualCount = 0;
+                EventItem currentEvent = null;
+
                 foreach (var ev in ScheduledEvents[serviceId])
                 {
-                    if (actualCount == 0 &&
-                        ev.StartTime <=date &&
+                    if (ev.StartTime <= date &&
                         ev.FinishTime >= date)
                     {
-                        // actual running event
-                        res[programMpaPID].Add(ev);
-                        actualCount++;
-                        continue;
-                    }
+                        // actual running event found
 
-                    if (actualCount >= count)
+                        if (res[programMapPID].Count == 0)
+                        {
+                            // cuurrent event not added
+                            res[programMapPID].Add(ev);
+                            currentEvent = ev;
+                        }
+                        else 
+                        {
+                            currentEvent = res[programMapPID][0];
+                        }
+
+                        if (count == 1)
+                        {
+                            break; // second event not wanted
+                        }
+                    }
+                    
+                    if (currentEvent != null &&
+                        currentEvent.FinishTime == ev.StartTime )
                     {
+                        // found second event
+                        res[programMapPID].Add(ev);
                         break;
                     }
-
-                    if (actualCount >= 1)
-                    {
-                        res[programMpaPID].Add(ev);
-                        actualCount++;
-                    }
                 }
-            }
-
-            // adding current events when scheduled not exists
-
-            foreach (var kvp in CurrentEvents)
-            {
-                if (!res.ContainsKey(kvp.Key) &&
-                    kvp.Value.StartTime <= date &&
-                    kvp.Value.FinishTime >= date)
-                {
-                    if (!ProgramNumberToMapPID.ContainsKey(kvp.Key))
-                        continue;
-
-                    var programMpaPID = ProgramNumberToMapPID[kvp.Key];
-
-                    res[programMpaPID] = new List<EventItem>();
-                    res[programMpaPID].Add(kvp.Value);
-                }
-            }
+            }           
 
             return res;
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
@@ -10,7 +9,6 @@ using Xamarin.Forms;
 using Android.Content;
 using System.Threading.Tasks;
 using Android.Net.Wifi;
-
 using VideoView = LibVLCSharp.Platforms.Android.VideoView;
 using LibVLCSharp.Shared;
 using LoggerService;
