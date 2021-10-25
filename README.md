@@ -13,6 +13,8 @@ Využívá ovladač "DVB-T Driver": https://play.google.com/store/apps/details?i
 - nahrávání vysílání do interního úložiště
 - automatické i ruční ladění
 - možnost importovat/exportovat naladěné kanály
+- EPG pro právě probíhající/následující program (podporováno pouze kódování Latin alphabet)
+- možnost zvětšení fontu (ideální pro tablety a TV)
 - pro Android 4.4 a vyšší (architektury: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a) 
 
 
@@ -27,6 +29,8 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - recording to internal storage
 - automatic and manual tuning
 - possibility to export/import tuned channels
+- EPG for current/next program (only Latin alphabet support)
+- possibility to enlarge the font (ideal for tablets and TVs)
 - Android 4.4 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a
 
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
