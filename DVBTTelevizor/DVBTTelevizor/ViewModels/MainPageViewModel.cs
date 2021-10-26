@@ -76,6 +76,7 @@ namespace DVBTTelevizor
                     if (!ConfigViewModel.ChannelExists(chs, ch.Frequency, ch.ProgramMapPID))
                     {
                         count++;
+                        ch.Number = ConfigViewModel.GetNextChannelNumber(chs).ToString();
                         chs.Add(ch);
                     }
                 }
@@ -125,7 +126,7 @@ namespace DVBTTelevizor
                 actions.Add("Play");
                 actions.Add("Scan EPG");
                 actions.Add("Detail & edit");
-                actions.Add("Record");                
+                actions.Add("Record");
                 actions.Add("Delete");
             }
             else
@@ -159,7 +160,7 @@ namespace DVBTTelevizor
                 case "Delete":
                     await DeleteChannel(ch);
                     break;
-            }            
+            }
         }
 
         private async Task RecordChannel(DVBTChannel channel, bool start)
@@ -222,7 +223,7 @@ namespace DVBTTelevizor
 
                 return;
             }
-            
+
             channel.NotifyRecordingLabelChange();
         }
 

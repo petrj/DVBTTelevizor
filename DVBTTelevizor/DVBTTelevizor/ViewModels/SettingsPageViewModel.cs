@@ -81,7 +81,7 @@ namespace DVBTTelevizor
                 var listPath = Path.Combine(shareDir, "DVBTTelevizor.channels.json");
 
                 if (File.Exists(listPath))
-                {                    
+                {
                     File.Delete(listPath);
                 }
 
@@ -91,7 +91,7 @@ namespace DVBTTelevizor
             } catch (Exception ex)
             {
                 _loggingService.Error(ex);
-                
+
                 MessagingCenter.Send($"File sharing failed", BaseViewModel.MSG_ToastMessage);
             }
         }
@@ -176,7 +176,7 @@ namespace DVBTTelevizor
                     await _dialogService.Information("Channel list is empty");
                     return;
                 }
-                
+
                 if (File.Exists(AndroidChannelsListPath))
                 {
                     if (!await _dialogService.Confirm($"File {AndroidChannelsListPath} exists. Overwite?"))
@@ -206,7 +206,7 @@ namespace DVBTTelevizor
                 _loggingService.Info($"Importing channels from file");
 
                 var chs = await _channelService.LoadChannels();
-                
+
                 if (!File.Exists(AndroidChannelsListPath))
                 {
                     await _dialogService.Error($"File {AndroidChannelsListPath} not found");
@@ -223,6 +223,7 @@ namespace DVBTTelevizor
                     if (!ConfigViewModel.ChannelExists(chs, ch.Frequency, ch.ProgramMapPID))
                     {
                         count++;
+                        ch.Number = ConfigViewModel.GetNextChannelNumber(chs).ToString();
                         chs.Add(ch);
                     }
                 }
@@ -299,7 +300,7 @@ namespace DVBTTelevizor
             finally
             {
                 await CrossInAppBilling.Current.DisconnectAsync();
-            } 
-        } 
+            }
+        }
     }
 }
