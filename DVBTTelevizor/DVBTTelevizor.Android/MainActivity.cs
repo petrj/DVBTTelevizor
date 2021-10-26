@@ -24,10 +24,12 @@ using Plugin.InAppBilling;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Label = "DVBTTelevizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
+        public static bool InstanceAlreadyStarted = false;
+
         private const int StartRequestCode = 1000;
         private bool _waitingForInit = false;
         private ILoggingService _loggingService;
@@ -44,6 +46,16 @@ namespace DVBTTelevizor.Droid
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
+
+            if (Intent != null &&
+                InstanceAlreadyStarted &&
+                (Intent.Action == Intent.ActionView ||
+                Intent.Action == Intent.ActionSend))
+            {
+                HandleImportFile(Intent);
+                Finish();
+                return;
+            }
 
             Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
             Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
@@ -191,7 +203,10 @@ namespace DVBTTelevizor.Droid
                 });
             });
 
+            InstanceAlreadyStarted = true;
+
             if (Intent != null &&
+                InstanceAlreadyStarted &&
                 (Intent.Action == Intent.ActionView ||
                 Intent.Action == Intent.ActionSend))
             {
@@ -493,7 +508,8 @@ namespace DVBTTelevizor.Droid
 
         protected override void OnDestroy()
         {
-            _app.Done();
+            if (_app != null)
+                _app.Done();
 
             base.OnDestroy();
         }
