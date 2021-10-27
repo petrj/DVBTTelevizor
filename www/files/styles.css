@@ -1,0 +1,161 @@
+<style type="text/css">
+
+html
+{
+  height:100%;
+}
+
+body
+{
+  display: inline-block;
+  width:100%;
+  height:96%;
+  text-align:left;
+  padding:0px;
+  margin:0px;
+  font-family:Tahoma, sans serif;
+  font-size:12px;
+  font-weight:normal;
+
+  background:#5a7486 url('headerbackground.png');  
+  background-repeat: repeat-x;    
+  background-color:#f0f7ff;
+  
+  font-family:Tahoma, sans serif;
+  font-size:16px;
+  font-weight:bold;  
+  text-decoration:none;
+}
+
+div
+{
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;	 
+}
+
+ul
+{
+	text-align:left;        
+}
+
+li
+{
+    margin-bottom: 10px;
+}
+
+.screenshot
+{        
+    float: left;
+    position:relative; 
+    height:500px;
+    margin:20px;
+    
+}
+
+.screenshot img
+{    
+    height:500px;
+    display:block;    
+}
+
+ul
+{
+    width:400px;
+    float:left;
+    position:relative;    
+    list-style-type: square;
+}
+
+li
+{
+  font-family:Tahoma, sans serif;
+  font-size:12px;
+  font-weight:normal;
+}
+
+li a
+{
+  color: #00008B;
+  font-family:Tahoma, sans serif;
+  font-size:14px;
+  font-weight:normal;	
+  text-decoration:none
+}
+
+li a:visited
+{
+  color: #00008B;
+  font-family:Tahoma, sans serif;
+  font-size:14px;
+  font-weight:normal;
+  text-decoration:none	
+}
+
+table
+{
+    width:550px;
+    /*float:left;
+    position:relative; */
+    text-align:left;
+    margin:5px;
+    border-spacing: 10px; 
+}
+
+
+th
+{
+  font-family:Tahoma, sans serif;
+  font-size:12px;
+  font-weight:bold;
+}
+
+td
+{
+  font-family:Tahoma, sans serif;
+  font-size:12px;
+  font-weight:normal;
+}
+
+
+.wrapDiv 
+{
+  display:         flex;
+  flex-wrap:       wrap;
+  justify-content: center;
+}
+
+.stripe
+{
+    width:100%;
+    margin:0px;
+    padding-top:50px;
+    padding-bottom:50px;
+    background-color: #aaccf6;
+}
+
+footer
+{
+    background-color:#412cff;    
+    text-align:right;    
+}
+
+footer a
+{
+    color:white;    
+    font-family:Tahoma, sans serif;
+    font-size:10px;
+    font-weight:normal;
+    text-decoration:none;
+    margin-right:20px;
+}
+
+.language
+{
+    float:right;    
+    margin-right:10px;
+    margin-top:10px;
+    z-index:100;
+}
+
+</style>
