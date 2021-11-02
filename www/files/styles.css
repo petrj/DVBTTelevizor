@@ -34,6 +34,14 @@ div
 	text-align:center;	 
 }
 
+h3
+{
+  margin-top:50px;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;	 
+}
+
 ul
 {
 	text-align:left;        
@@ -136,8 +144,7 @@ td
 
 footer
 {
-    background-color:#412cff;    
-    text-align:right;    
+    background-color:#412cff;            
 }
 
 footer a
@@ -148,6 +155,8 @@ footer a
     font-weight:normal;
     text-decoration:none;
     margin-right:20px;
+    margin-left:20px;
+
 }
 
 .language
@@ -156,6 +165,12 @@ footer a
     margin-right:10px;
     margin-top:10px;
     z-index:100;
+}
+
+.gdprDiv
+{
+  font-weight:normal;
+  font-size:12px;
 }
 
 </style>
