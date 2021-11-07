@@ -33,7 +33,7 @@ namespace MPEGTSAnalyzator
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "CTS.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "stream.ts");
                 //AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PMTs.ts");
-                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "PID_0_16_17_18_410.ts");
+                AnalyzeMPEGTSPackets("TestData" + Path.DirectorySeparatorChar + "ct.ts", false);
 
                 Console.WriteLine("Press Enter");
                 Console.ReadLine();
@@ -42,7 +42,7 @@ namespace MPEGTSAnalyzator
             }
         }
 
-        public static void AnalyzeMPEGTSPackets(string path)
+        public static void AnalyzeMPEGTSPackets(string path, bool includeEIT = true)
         {
             var logger = new FileLoggingService(LoggingLevelEnum.Debug);
             logger.LogFilename = "Log.log";
@@ -146,69 +146,74 @@ namespace MPEGTSAnalyzator
                 }
             }
 
-            if (packetsByPID.ContainsKey(18))
+
+            if (includeEIT)
             {
-                Console.WriteLine();
-                Console.WriteLine($"Event Information Table (EIT):");
-                Console.WriteLine($"------------------------------");
 
-                var eitManager = new EITManager(logger);
-
-                var packetsEITwithSDT = new List<MPEGTransportStreamPacket>();
-                packetsEITwithSDT.AddRange(packetsByPID[18]);
-
-                if (packetsByPID.ContainsKey(0))
-                {
-                    packetsEITwithSDT.AddRange(packetsByPID[0]);
-                }
-
-                var eitScanRes = eitManager.Scan(packetsEITwithSDT);
-
-                if (eitScanRes.UnsupportedEncoding)
+                if (packetsByPID.ContainsKey(18))
                 {
                     Console.WriteLine();
-                    Console.WriteLine("Unsupported encoding");
-                    Console.WriteLine();
-                }
-                else
-                {
+                    Console.WriteLine($"Event Information Table (EIT):");
+                    Console.WriteLine($"------------------------------");
 
-                    Console.WriteLine();
-                    Console.WriteLine("Current events");
-                    Console.WriteLine();
+                    var eitManager = new EITManager(logger);
 
-                    Console.WriteLine($"{"Program number",14} {"Date".PadRight(10, ' '),10} {"From "}-{" To  "} Text");
-                    Console.WriteLine($"{"--------------",14} {"----".PadRight(10, '-'),10} {"-----"}-{"-----"} -------------------------------");
+                    var packetsEITwithSDT = new List<MPEGTransportStreamPacket>();
+                    packetsEITwithSDT.AddRange(packetsByPID[18]);
 
-                    foreach (var kvp in eitManager.CurrentEvents)
+                    if (packetsByPID.ContainsKey(0))
                     {
-                        Console.WriteLine(kvp.Value.WriteToString());
+                        packetsEITwithSDT.AddRange(packetsByPID[0]);
                     }
 
+                    var eitScanRes = eitManager.Scan(packetsEITwithSDT);
 
-                    Console.WriteLine();
-                    Console.WriteLine("Scheduled events");
-                    Console.WriteLine();
-
-                    foreach (var programNumber in eitManager.ScheduledEvents.Keys)
+                    if (eitScanRes.UnsupportedEncoding)
                     {
-                        foreach (var ev in eitManager.ScheduledEvents[programNumber])
+                        Console.WriteLine();
+                        Console.WriteLine("Unsupported encoding");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+
+                        Console.WriteLine();
+                        Console.WriteLine("Current events");
+                        Console.WriteLine();
+
+                        Console.WriteLine($"{"Program number",14} {"Date".PadRight(10, ' '),10} {"From "}-{" To  "} Text");
+                        Console.WriteLine($"{"--------------",14} {"----".PadRight(10, '-'),10} {"-----"}-{"-----"} -------------------------------");
+
+                        foreach (var kvp in eitManager.CurrentEvents)
                         {
-                            Console.WriteLine(ev.WriteToString());
+                            Console.WriteLine(kvp.Value.WriteToString());
                         }
-                    }
 
-                    Console.WriteLine();
-                    Console.WriteLine("Present Events");
-                    Console.WriteLine();
 
-                    foreach (var kvp in eitManager.GetEvents(DateTime.Now))
-                    {
-                        Console.WriteLine($"Program Map PID: {kvp.Key}");
+                        Console.WriteLine();
+                        Console.WriteLine("Scheduled events");
+                        Console.WriteLine();
 
-                        foreach (var ev in kvp.Value)
+                        foreach (var programNumber in eitManager.ScheduledEvents.Keys)
                         {
-                            Console.WriteLine(ev.WriteToString());
+                            foreach (var ev in eitManager.ScheduledEvents[programNumber])
+                            {
+                                Console.WriteLine(ev.WriteToString());
+                            }
+                        }
+
+                        Console.WriteLine();
+                        Console.WriteLine("Present Events");
+                        Console.WriteLine();
+
+                        foreach (var kvp in eitManager.GetEvents(DateTime.Now))
+                        {
+                            Console.WriteLine($"Program Map PID: {kvp.Key}");
+
+                            foreach (var ev in kvp.Value)
+                            {
+                                Console.WriteLine(ev.WriteToString());
+                            }
                         }
                     }
                 }
