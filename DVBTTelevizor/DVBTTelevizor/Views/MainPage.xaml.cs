@@ -20,7 +20,7 @@ namespace DVBTTelevizor
     {
         private MainPageViewModel _viewModel;
 
-        private DVBTDriverManager _driver;
+        private IDVBTDriverManager _driver;
         private DialogService _dlgService;
         private ILoggingService _loggingService;
         private DVBTTelevizorConfiguration _config;
@@ -35,7 +35,7 @@ namespace DVBTTelevizor
         private string _numberPressed = String.Empty;
         private bool _firstStartup = true;
 
-        public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, DVBTDriverManager driverManager)
+        public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
             InitializeComponent();
 

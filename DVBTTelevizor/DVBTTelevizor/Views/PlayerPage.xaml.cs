@@ -17,7 +17,7 @@ namespace DVBTTelevizor
     {
         LibVLC _libVLC = null;
         MediaPlayer _mediaPlayer;
-        DVBTDriverManager _driver;
+        IDVBTDriverManager _driver;
         Media _media = null;
 
         private PlayerPageViewModel _viewModel;
@@ -26,7 +26,7 @@ namespace DVBTTelevizor
 
         public Command CheckStreamCommand { get; set; }
 
-        public PlayerPage(DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public PlayerPage(IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
             InitializeComponent();
 

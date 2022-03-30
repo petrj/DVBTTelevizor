@@ -37,7 +37,7 @@ namespace DVBTTelevizor.Droid
         private int _fullscreenUiOptions;
         private int _defaultUiOptions;
         private App _app;
-        private DVBTDriverManager _driverManager;
+        private IDVBTDriverManager _driverManager;
         NotificationHelper _notificationHelper;
 
         protected override void OnCreate(Bundle savedInstanceState)

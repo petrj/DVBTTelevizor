@@ -16,10 +16,10 @@ namespace DVBTTelevizor
         private TunePageViewModel _viewModel;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
-        protected DVBTDriverManager _driver;
+        protected IDVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
 
-        public TunePage(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public TunePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
@@ -43,7 +43,7 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
             {
                 Device.BeginInvokeOnMainThread(delegate
-                {                    
+                {
                     _viewModel.UpdateDriverState();
                 });
             });

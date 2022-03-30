@@ -18,7 +18,7 @@ namespace DVBTTelevizor
     {
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
-        protected DVBTDriverManager _driver;
+        protected IDVBTDriverManager _driver;
         protected bool _isRefreshing = false;
 
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
@@ -45,7 +45,7 @@ namespace DVBTTelevizor
 
         public const string MSG_ImportChannelsList = "ImportChannelsList";
 
-        public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
               : base(config)
         {
             _loggingService = loggingService;

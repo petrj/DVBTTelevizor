@@ -17,7 +17,7 @@ using DVBTTelevizor.Models;
 
 namespace DVBTTelevizor
 {
-    public class DVBTDriverManager
+    public class DVBTDriverManager : IDVBTDriverManager
     {
         DVBTDriverConfiguration _driverConfiguration;
 
@@ -43,7 +43,6 @@ namespace DVBTTelevizor
         private string _dataStreamInfo  = "Data reading not initialized";
 
         private Dictionary<long,EITManager> _eitManagers = new Dictionary<long, EITManager>();  // frequency -> EITManager
-
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -151,7 +150,7 @@ namespace DVBTTelevizor
             StartBackgroundReading();
         }
 
-        public void StartBackgroundReading()
+        private void StartBackgroundReading()
         {
             _log.Debug($"Starting background reading");
 
@@ -164,14 +163,14 @@ namespace DVBTTelevizor
             recordBackgroundWorker.RunWorkerAsync();
         }
 
-        public void StopBackgroundReading()
+        private void StopBackgroundReading()
         {
             _log.Debug($"Stopping background reading");
 
             _transferClient.Close();
         }
 
-        public void StartReadStream()
+        private void StartReadStream()
         {
             lock (_readThreadLock)
             {
@@ -241,7 +240,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void StartReadBuffer()
+        private void StartReadBuffer()
         {
             lock (_readThreadLock)
             {
@@ -252,7 +251,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void ClearReadBuffer()
+        private void ClearReadBuffer()
         {
             lock (_readThreadLock)
             {
@@ -262,7 +261,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void StopReadBuffer()
+        private void StopReadBuffer()
         {
             lock (_readThreadLock)
             {
@@ -339,7 +338,7 @@ namespace DVBTTelevizor
             return true;
         }
 
-        public async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
+        private async Task<DVBTResponse> SendRequest(DVBTRequest request, int secondsTimeout = 20)
         {
             _log.Debug($"Sending request {request}");
 
@@ -745,7 +744,7 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task<DVBTResponse> SendCloseConnection()
+        private async Task<DVBTResponse> SendCloseConnection()
         {
             _log.Debug($"Closing connection");
 

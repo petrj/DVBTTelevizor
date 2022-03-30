@@ -10,9 +10,9 @@ namespace DVBTTelevizor
         MainPage _mainPage;
         ILoggingService _loggingService;
         DVBTTelevizorConfiguration _config;
-        DVBTDriverManager _driver;
+        IDVBTDriverManager _driver;
 
-        public App(ILoggingService loggingService, DVBTTelevizorConfiguration config, DVBTDriverManager driverManager)
+        public App(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
             InitializeComponent();
 

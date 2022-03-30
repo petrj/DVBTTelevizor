@@ -45,7 +45,7 @@ namespace DVBTTelevizor
             TuneFailed = 3
         }
 
-        public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
          : base(loggingService, dialogService, driver, config)
         {
             _channelService = channelService;

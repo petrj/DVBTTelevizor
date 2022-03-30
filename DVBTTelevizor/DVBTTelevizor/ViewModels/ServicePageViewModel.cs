@@ -38,7 +38,7 @@ namespace DVBTTelevizor
 
         public Command SetPIDsCommand { get; set; }
 
-        public ServicePageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public ServicePageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
 

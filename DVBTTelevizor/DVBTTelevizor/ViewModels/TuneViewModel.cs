@@ -19,7 +19,7 @@ namespace DVBTTelevizor
 
         DVBTFrequencyChannel _selectedFrequencyChannel = null;
 
-        public TuneViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public TuneViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
             FillFrequencyChannels();
