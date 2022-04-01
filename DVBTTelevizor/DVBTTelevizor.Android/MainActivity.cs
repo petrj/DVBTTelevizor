@@ -115,7 +115,18 @@ namespace DVBTTelevizor.Droid
                 _loggingService.Error(ex, "Error while initializing UsbManager");
             }
 
+#if TestingDVBTDriverManager
+
+            _driverManager = new TestingDVBTDriverManager()
+            {
+                Configuration = new DVBTDriverConfiguration()
+                {
+                    DeviceName = "Test device"
+                }
+            };
+#else
             _driverManager = new DVBTDriverManager(_loggingService, _config);
+#endif
 
             _notificationHelper = new NotificationHelper(this);
 
@@ -274,6 +285,16 @@ namespace DVBTTelevizor.Droid
                 });
 
                 StartActivityForResult(req, StartRequestCode);
+
+#if TestingDVBTDriverManager
+
+                var cfg = new DVBTDriverConfiguration()
+                {
+                    DeviceName = "Testing device"
+                };
+
+                MessagingCenter.Send(cfg.ToString(), BaseViewModel.MSG_DVBTDriverConfiguration);
+#endif
 
             }
             catch (ActivityNotFoundException ex)
