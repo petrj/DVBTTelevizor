@@ -946,12 +946,12 @@ namespace DVBTTelevizor
         /// </summary>
         /// <param name="frequency"></param>
         /// <param name="bandWidth"></param>
-        /// <param name="deliverySyetem"></param>
+        /// <param name="deliverySystem"></param>
         /// <returns>Signal strength
         /// 0 .. no signal</returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySyetem)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem)
         {
-            _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySyetem}");
+            _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySystem}");
 
             var res = new TuneResult();
 
@@ -963,7 +963,7 @@ namespace DVBTTelevizor
                 // five attempts
                 for (var i = 1; i <= 5; i++)
                 {
-                    tuneRes = await Tune(frequency, bandWidth, deliverySyetem);
+                    tuneRes = await Tune(frequency, bandWidth, deliverySystem);
 
                     if (tuneRes.SuccessFlag)
                     {

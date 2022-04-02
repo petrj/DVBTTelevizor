@@ -51,7 +51,7 @@ namespace DVBTTelevizor
         Task<DVBTResponse> SetPIDs(List<long> PIDs);
         Task<DVBTCapabilities> GetCapabalities();
         Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs);
-        Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySyetem);
+        Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem);
         Task<EITScanResult> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000);
         Task<EITScanResult> ScanEPG(long freq, int msTimeout = 2000);
         Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true);

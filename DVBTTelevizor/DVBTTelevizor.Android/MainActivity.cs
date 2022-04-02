@@ -117,13 +117,7 @@ namespace DVBTTelevizor.Droid
 
 #if TestingDVBTDriverManager
 
-            _driverManager = new TestingDVBTDriverManager()
-            {
-                Configuration = new DVBTDriverConfiguration()
-                {
-                    DeviceName = "Test device"
-                }
-            };
+            _driverManager = new TestingDVBTDriverManager();
 #else
             _driverManager = new DVBTDriverManager(_loggingService, _config);
 #endif
@@ -287,6 +281,8 @@ namespace DVBTTelevizor.Droid
                 StartActivityForResult(req, StartRequestCode);
 
 #if TestingDVBTDriverManager
+
+                _waitingForInit = false;
 
                 var cfg = new DVBTDriverConfiguration()
                 {

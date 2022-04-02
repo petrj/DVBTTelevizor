@@ -16,6 +16,10 @@ namespace MPEGTS
 
         public int ProgramNumber { get; set; } = -1;
 
+        public ServiceDescriptor()
+        {
+        }
+
         public ServiceDescriptor(byte[] bytes, int programNumber, int networkId)
         {
             ProgramNumber = programNumber;
