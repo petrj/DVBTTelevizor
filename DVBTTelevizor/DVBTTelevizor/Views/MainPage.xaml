@@ -15,7 +15,7 @@
                 <Setter Property="HasUnevenRows" Value="True"/>
                 <Setter Property="IsPullToRefreshEnabled" Value="True"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
-                <Setter Property="Margin" Value="0,0,0,0"/>                
+                <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
@@ -85,6 +85,47 @@
                 <Setter Property="Margin" Value="0,0,5,0"/>
             </Style>
 
+            <Style x:Key="LayoutGridStyle" TargetType="Grid">
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+            </Style>
+
+            <Style x:Key="TitleTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="MaxLines" Value="2"/>
+            </Style>
+
+            <Style x:Key="TimeFromTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="Start"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="TimeToTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="DescriptionTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="Margin" Value="0,20,0,0"/>
+                <Setter Property="Padding" Value="5,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -94,14 +135,25 @@
         </StackLayout>
     </NavigationPage.TitleView>
 
-    <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
+    <AbsoluteLayout x:Name="absoluteLayout">
 
-        <!-- middle controls -->
-        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
+        <Grid
+            x:Name="LayoutGrid"
+            Style="{DynamicResource LayoutGridStyle}"
+            AbsoluteLayout.LayoutBounds="0,0,1,1"
+            AbsoluteLayout.LayoutFlags="All" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
 
-            <Button  x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
-
-            <ListView x:Name="ChannelsListView"
+            <ListView
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    x:Name="ChannelsListView"
                     ItemsSource="{Binding Channels}"
                     CachingStrategy="RecycleElement"
                     RefreshCommand="{Binding RefreshCommand}"
@@ -117,7 +169,7 @@
                                     local2:PressedEffect.LongPressCommand="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.LongPressCommand}"
                                     local2:PressedEffect.LongPressCommandParameter="{Binding .}"
                                     local2:PressedEffect.ShortPressCommand="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ShortPressCommand}"
-                                    local2:PressedEffect.ShortPressCommandParameter="{Binding .}" 
+                                    local2:PressedEffect.ShortPressCommandParameter="{Binding .}"
                                     RowSpacing="0">
 
                                     <Grid.Effects>
@@ -144,7 +196,7 @@
                                     <Label Grid.Row="1" Grid.Column="3"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
 
                                     <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-                                    <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
                                     <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                     <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
@@ -159,9 +211,63 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-        </StackLayout>
+            <Grid Grid.Column="1" Grid.Row="0"
+                        x:Name="StackLayoutEPGDetail"
+                        Margin="0,0,0,0"
+                        Padding="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="40*" />
+                    <RowDefinition Height="40*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
 
-    </StackLayout>
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
+
+                <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
+                <Label Grid.Row="1" Grid.Column="1"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
+
+                <Grid Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="2" Margin="0,0,0,0" x:Name="ProgresssBarGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
+                </Grid>
+
+                <ScrollView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="StartAndExpand" VerticalOptions="Start"  Margin="5,5,5,5">
+                    <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" />
+                </ScrollView>
+
+            </Grid>
+        </Grid>
+
+        <Button AbsoluteLayout.LayoutBounds="1.0,0.2,0.5,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
+
+
+
+        <!-- debug arrows -->
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.5,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+                    Text="&#x20;&#x21D1;&#x20;" Command="{Binding UpCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0" TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
+
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.65,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+                    Text="&#x20;&#x21D3;&#x20;" Command="{Binding DownCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
+
+        <Button AbsoluteLayout.LayoutBounds="0.57,0.6,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+                    Text="&#x21D2;" Command="{Binding RightCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0" Margin="0,0,0,0"/>
+
+        <Button AbsoluteLayout.LayoutBounds="0.43,0.6,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+                    Text="&#x21D0;" Command="{Binding LeftCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
+
+    </AbsoluteLayout>
 
     <ContentPage.ToolbarItems>
         <!--ToolbarItem Name="ToolRefresh" Text="Refresh" Clicked="ToolRefresh_Clicked" Icon="Refresh.png" /-->

@@ -13,6 +13,7 @@ namespace DVBTTelevizor
     {
         private long LastFreq { get; set; }
         private long LastPID { get; set; }
+        private bool Freq626Loaded { get; set; } = false;
 
         public DVBTDriverConfiguration Configuration { get; set; } = new DVBTDriverConfiguration();
 
@@ -68,6 +69,8 @@ namespace DVBTTelevizor
         {
             return new DVBTCapabilities()
             {
+                SuccessFlag = true,
+
                 supportedDeliverySystems = 3,
                 minFrequency = 0,
                 maxFrequency = 0,
@@ -82,6 +85,10 @@ namespace DVBTTelevizor
             var eit = new EITManager(new BasicLoggingService());
 
             var timeAfterTenMinutes = DateTime.Now.AddMinutes(10);
+            var timeBefore5Minutes = DateTime.Now.AddMinutes(-5);
+            var timeBefore50Minutes = DateTime.Now.AddMinutes(-50);
+
+            var loremIpsumText = "Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
             if (freq == 490000000)
             {
@@ -91,7 +98,8 @@ namespace DVBTTelevizor
                     {
                         EventId = 0,
                         EventName = "Advertisment - current program name",
-                        StartTime = DateTime.Now.AddDays(-1),
+                        Text = $"Fructies, Garnier and other ... {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
                         FinishTime = timeAfterTenMinutes
                     },
                     new EventItem()
@@ -114,7 +122,8 @@ namespace DVBTTelevizor
                     {
                         EventId = 0,
                         EventName = "Sport - current program name",
-                        StartTime = DateTime.Now.AddDays(-1),
+                        Text = $"Figure skating {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
                         FinishTime = timeAfterTenMinutes
                     },
                     new EventItem()
@@ -132,7 +141,8 @@ namespace DVBTTelevizor
                     {
                         EventId = 2,
                         EventName = "News - current program name",
-                        StartTime = DateTime.Now.AddDays(-1),
+                        Text = $"War map sitiation{Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore50Minutes,
                         FinishTime = timeAfterTenMinutes
                     },
                     new EventItem()
@@ -151,7 +161,8 @@ namespace DVBTTelevizor
                     {
                         EventId = 4,
                         EventName = "Radio - current program name",
-                        StartTime = DateTime.Now.AddDays(-1),
+                        Text = $"Audio book reading {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
                         FinishTime = timeAfterTenMinutes
                     },
                     new EventItem()
@@ -168,6 +179,22 @@ namespace DVBTTelevizor
                 eit.ProgramNumberToMapPID.Add(2, 7070);
             }
 
+            if (freq == 626000000 && Freq626Loaded)
+            {
+                eit.ScheduledEvents.Add(0, new List<EventItem>()
+                {
+                    new EventItem()
+                    {
+                        EventId = 0,
+                        EventName = "Informations",
+                        StartTime = timeBefore5Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    }
+                });
+
+                eit.ProgramNumberToMapPID.Add(0, 8888);
+            }
+
             return eit;
         }
 
@@ -175,6 +202,8 @@ namespace DVBTTelevizor
         {
             return new DVBTStatus()
             {
+                SuccessFlag = true,
+
                 snr = 0,
                 bitErrorRate  = 0,
                 droppedUsbFps  = 0,
@@ -190,6 +219,8 @@ namespace DVBTTelevizor
         {
             return new DVBTVersion()
             {
+                SuccessFlag = true,
+
                 Version = 1,
                 AllRequestsLength = 0
             };
@@ -211,6 +242,11 @@ namespace DVBTTelevizor
 
         public async Task<EITScanResult> ScanEPG(long freq, int msTimeout = 2000)
         {
+            if (freq == 626000000)
+            {
+                Freq626Loaded = true;
+            }
+
             return new EITScanResult()
             {
                 OK = true,
@@ -229,7 +265,7 @@ namespace DVBTTelevizor
 
         public async Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            if ((LastFreq == 490000000) || (LastFreq == 514000000))
+            if ((LastFreq == 490000000) || (LastFreq == 514000000) || (LastFreq == 626000000))
             {
                 var serviceDescriptors = new Dictionary<ServiceDescriptor, long>();
 
@@ -263,6 +299,16 @@ namespace DVBTTelevizor
                         ServiceName = "Radio",
                         ServisType = (byte)DVBTServiceType.Radio
                     }, 7070);
+                }
+
+                if (LastFreq == 626000000)
+                {
+                    serviceDescriptors.Add(new ServiceDescriptor()
+                    {
+                        ProviderName = "Multiplex C",
+                        ServiceName = "INFO CHANNEL",
+                        ServisType = (byte)DVBTServiceType.TV
+                    }, 8888);
                 }
 
                 return new SearchMapPIDsResult()
@@ -301,6 +347,11 @@ namespace DVBTTelevizor
             if (MapPIDs.Contains(7070))
             {
                 res.Add(7070, new List<long>() { 7072, 7076 });
+            }
+
+            if (MapPIDs.Contains(8888))
+            {
+                res.Add(8888, new List<long>() { 8889 });
             }
 
             if (res.Count > 0)
@@ -348,7 +399,7 @@ namespace DVBTTelevizor
 
             if (
                 (
-                    (frequency == 490000000) || (frequency == 514000000)
+                    (frequency == 490000000) || (frequency == 514000000) || (frequency == 626000000)
                 ) &&
                 (bandWidth == 8000000) &&
                 (deliverySystem == 1)

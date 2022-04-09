@@ -23,6 +23,11 @@ namespace DVBTTelevizor
         public Command RefreshEPGCommand { get; set; }
         public Command ImportCommand { get; set; }
 
+        public Command UpCommand { get; set; }
+        public Command DownCommand { get; set; }
+        public Command LeftCommand { get; set; }
+        public Command RightCommand { get; set; }
+
         public Command LongPressCommand { get; set; }
         public Command ShortPressCommand { get; set; }
 
@@ -32,6 +37,9 @@ namespace DVBTTelevizor
         public bool DoNotScrollToChannel { get; set; } = false;
 
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
+
+        private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
+
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             : base(loggingService, dialogService, driver, config)
@@ -44,7 +52,90 @@ namespace DVBTTelevizor
             ShortPressCommand = new Command(ShortPress);
             ImportCommand = new Command(async (json) => await ImportList(json));
 
+            UpCommand = new Command(async (key) => await AnyKeyPressed("up"));
+            DownCommand = new Command(async (key) => await AnyKeyPressed("down"));
+            LeftCommand = new Command(async (key) => await AnyKeyPressed("left"));
+            RightCommand = new Command(async (key) => await AnyKeyPressed("right"));
+
             BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
+        }
+
+        public PlayingStateEnum PlayingState
+        {
+            get
+            {
+                return _playingState;
+            }
+            set
+            {
+                _playingState = value;
+            }
+        }
+
+        public string SelectedChannelEPGTitle
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return String.Empty;
+
+                return SelectedChannel.CurrentEventItem.EventName;
+            }
+        }
+
+        public string SelectedChannelEPGDescription
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return String.Empty;
+
+                return SelectedChannel.CurrentEventItem.Text;
+            }
+        }
+
+        public string SelectedChannelEPGTimeStart
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return String.Empty;
+
+                return SelectedChannel.CurrentEventItem.EPGTimeStartDescription;
+            }
+        }
+
+        public string SelectedChannelEPGTimeFinish
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return String.Empty;
+
+                return SelectedChannel.CurrentEventItem.EPGTimeFinishDescription;
+            }
+        }
+
+        public double SelectedChannelEPGProgress
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return 0;
+
+                return SelectedChannel.CurrentEventItem.Progress;
+            }
+        }
+
+        public Color EPGProgressBackgroundColor
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return Color.Black;
+
+                return Color.White;
+            }
         }
 
         public bool ShowServiceMenuToolItem
@@ -104,6 +195,11 @@ namespace DVBTTelevizor
 
             SelectedChannel = ch;
             await ShowChannelMenu(ch);
+        }
+
+        private async Task AnyKeyPressed(string key)
+        {
+            MessagingCenter.Send(key, BaseViewModel.MSG_KeyDown);
         }
 
         public async Task ShowChannelMenu(DVBTChannel ch = null)
@@ -323,6 +419,14 @@ namespace DVBTTelevizor
                 _selectedChannel = value;
 
                 OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+
+
             }
         }
 
@@ -540,6 +644,12 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(TunningButtonVisible));
+                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
 
                 await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
 
@@ -591,6 +701,12 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
             }
         }
 

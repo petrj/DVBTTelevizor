@@ -257,12 +257,6 @@ namespace DVBTTelevizor
         {
             get
             {
-//#if DEBUG
-//                if (CurrentEventItem == null)
-//                {
-//                    return "00:00 - 23:59";
-//                }
-//#endif
                 if (CurrentEventItem == null ||
                     CurrentEventItem.StartTime > DateTime.Now ||
                     CurrentEventItem.FinishTime < DateTime.Now)
@@ -276,12 +270,6 @@ namespace DVBTTelevizor
         {
             get
             {
-//#if DEBUG
-//                if (NextEventItem == null)
-//                {
-//                    return "\u2192 Next event title description";
-//                }
-//#endif
                 if (NextEventItem == null)
                     return string.Empty;
 
