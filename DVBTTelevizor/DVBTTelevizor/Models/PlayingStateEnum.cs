@@ -8,6 +8,7 @@ namespace DVBTTelevizor
     {
         Stopped = 0,
         Playing = 1,
-        PlayingInPreview = 2
+        PlayingInPreview = 2,
+        Recording = 3
     }
 }

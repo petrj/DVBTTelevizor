@@ -12,6 +12,7 @@ using Xamarin.Forms;
 using System.IO;
 using System.Threading;
 using LoggerService;
+using LibVLCSharp.Shared;
 
 namespace DVBTTelevizor
 {
@@ -34,6 +35,13 @@ namespace DVBTTelevizor
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
         private bool _firstStartup = true;
+        private Size _lastAllocatedSize = new Size(-1, -1);
+
+        public bool IsPortrait { get; private set; } = false;
+
+        private LibVLC _libVLC = null;
+        private MediaPlayer _mediaPlayer;
+        private Media _media = null;
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
@@ -61,6 +69,12 @@ namespace DVBTTelevizor
             _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _playerPage);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
             _editChannelPage = new ChannelPage(_loggingService,_dlgService, _driver, _config);
+
+            Core.Initialize();
+
+            _libVLC = new LibVLC();
+            _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+            videoView.MediaPlayer = _mediaPlayer;
 
             BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
 
@@ -182,6 +196,20 @@ namespace DVBTTelevizor
             });
         }
 
+        public PlayingStateEnum PlayingState
+        {
+            get
+            {
+                return _viewModel.PlayingState;
+            }
+            set
+            {
+                _viewModel.PlayingState = value;
+
+                RefreshGUI();
+            }
+        }
+
         private void MainPage_Appearing(object sender, EventArgs e)
         {
             if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
@@ -243,7 +271,6 @@ namespace DVBTTelevizor
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
         }
 
         public void Done()
@@ -333,7 +360,8 @@ namespace DVBTTelevizor
                 case "numpad5":
                 case "buttona":
                 case "buttonstart":
-                    await _viewModel.PlayChannel();
+                    //await _viewModel.PlayChannel();
+                    await ActionPlay();
                     break;
                 case "f4":
                 case "escape":
@@ -343,7 +371,8 @@ namespace DVBTTelevizor
                 case "numpadsubtract":
                 case "del":
                 case "buttonx":
-                    StopPlayback();
+                    //StopPlayback();
+                    await ActionStop(false);
                     break;
                 case "num0":
                 case "number0":
@@ -415,40 +444,6 @@ namespace DVBTTelevizor
                     }
                     break;
             }
-        }
-
-        private async Task Detail_Clicked(object sender, EventArgs e)
-        {
-            _loggingService.Info($"Detail_Clicked");
-
-            if (_playerPage != null && _playerPage.Playing)
-            {
-                ShowActualPlayingMessage(_playerPage.PlayStreamInfo);
-            }
-            else
-            {
-                await _viewModel.ShowChannelMenu();
-            }
-        }
-
-        private void ShowActualPlayingMessage(PlayStreamInfo playStreamInfo)
-        {
-            if (playStreamInfo == null ||
-                playStreamInfo.Channel == null)
-                return;
-
-            var msg = "\u25B6 " + playStreamInfo.Channel.Name;
-            if (playStreamInfo.CurrentEvent != null)
-                msg += $" - {playStreamInfo.CurrentEvent.EventName}";
-
-            // showing signal percents only for the first time
-            if (playStreamInfo.SignalStrengthPercentage > 0)
-            {
-                msg += $" (signal {playStreamInfo.SignalStrengthPercentage}%)";
-                playStreamInfo.SignalStrengthPercentage = 0;
-            }
-
-            MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
         }
 
         private void HandleNumKey(int number)
@@ -543,6 +538,40 @@ namespace DVBTTelevizor
             }
         }
 
+        private void ShowActualPlayingMessage(PlayStreamInfo playStreamInfo)
+        {
+            if (playStreamInfo == null ||
+                playStreamInfo.Channel == null)
+                return;
+
+            var msg = "\u25B6 " + playStreamInfo.Channel.Name;
+            if (playStreamInfo.CurrentEvent != null)
+                msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+
+            // showing signal percents only for the first time
+            if (playStreamInfo.SignalStrengthPercentage > 0)
+            {
+                msg += $" (signal {playStreamInfo.SignalStrengthPercentage}%)";
+                playStreamInfo.SignalStrengthPercentage = 0;
+            }
+
+            MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+        }
+
+        private async Task Detail_Clicked(object sender, EventArgs e)
+        {
+            _loggingService.Info($"Detail_Clicked");
+
+            if (_playerPage != null && _playerPage.Playing)
+            {
+                ShowActualPlayingMessage(_playerPage.PlayStreamInfo);
+            }
+            else
+            {
+                await _viewModel.ShowChannelMenu();
+            }
+        }
+
         private async void ToolConnect_Clicked(object sender, EventArgs e)
         {
             if (_driver.Started)
@@ -599,5 +628,219 @@ namespace DVBTTelevizor
 
             _viewModel.DoNotScrollToChannel = false;
         }
+
+        private void OnVideoSingleTapped(object sender, EventArgs e)
+        {
+
+        }
+
+        public void OnVideoDoubleTapped(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
+        {
+            if (e.Direction == SwipeDirection.Left)
+            {
+                Task.Run(async () => await ActionStop(true));
+            }
+            else
+            {
+                Task.Run(async () => await ActionStop(false));
+            }
+        }
+
+        private void SwipeGestureRecognizer_Up(object sender, SwipedEventArgs e)
+        {
+
+        }
+
+        private void SwipeGestureRecognizer_Down(object sender, SwipedEventArgs e)
+        {
+
+        }
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            System.Diagnostics.Debug.WriteLine($"OnSizeAllocated: {width}/{height}");
+
+            base.OnSizeAllocated(width, height);
+
+            if (_lastAllocatedSize.Width == width &&
+                _lastAllocatedSize.Height == height)
+            {
+                // no size changed
+                return;
+            }
+
+            if (width > height)
+            {
+                IsPortrait = false;
+            }
+            else
+            {
+                IsPortrait = true;
+            }
+
+            _lastAllocatedSize.Width = width;
+            _lastAllocatedSize.Height = height;
+
+            //_viewModel.NotifyToolBarChange();
+
+            RefreshGUI();
+        }
+
+        public void RefreshGUI()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                switch (PlayingState)
+                {
+                    case PlayingStateEnum.Playing:
+
+                        // turn off tool bar
+                        NavigationPage.SetHasNavigationBar(this, false);
+
+                        MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableFullScreen);
+
+                        // VideoStackLayout must be visible before changing Layout
+                        VideoStackLayout.IsVisible = true;
+                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
+
+                        break;
+                    case PlayingStateEnum.PlayingInPreview:
+
+                        NavigationPage.SetHasNavigationBar(this, true);
+
+                        if (!_config.Fullscreen)
+                        {
+                            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                        }
+
+                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(1, 1, 0.5, 0.35));
+
+                        //CheckStreamCommand.Execute(null);
+
+                        break;
+                    case PlayingStateEnum.Stopped:
+                    case PlayingStateEnum.Recording:
+
+                        NavigationPage.SetHasNavigationBar(this, true);
+
+                        if (!_config.Fullscreen)
+                        {
+                            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                        }
+
+                        VideoStackLayout.IsVisible = false;
+
+                        break;
+                }
+            });
+        }
+
+        public async Task ActionPlay(DVBTChannel channel = null)
+        {
+            if (channel == null)
+                channel = _viewModel.SelectedChannel;
+
+            if (channel == null)
+                return;
+
+            if (PlayingState == PlayingStateEnum.Recording)
+            {
+                MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                return;
+            }
+
+            if (PlayingState == PlayingStateEnum.PlayingInPreview && _viewModel.PlayingChannel == channel)
+            {
+                PlayingState = PlayingStateEnum.Playing;
+                return;
+            }
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview)
+                {
+                    videoView.MediaPlayer.Stop();
+                }
+            });
+
+            if (!_driver.Started)
+            {
+                MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
+                return;
+            }
+
+            var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
+            if (!playRes.OK)
+            {
+                MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
+                return;
+            }
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (_driver.VideoStream != null)
+                {
+                    _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+                    videoView.MediaPlayer.Play(_media);
+                }
+            });
+
+            var playInfo = new PlayStreamInfo
+            {
+                Channel = channel,
+                SignalStrengthPercentage = playRes.SignalStrengthPercentage
+            };
+
+            var eitManager = _driver.GetEITManager(channel.Frequency);
+            if (eitManager != null)
+            {
+                playInfo.CurrentEvent = eitManager.GetEvent(DateTime.Now, Convert.ToInt32(channel.ProgramMapPID));
+            }
+
+            ShowActualPlayingMessage(playInfo);
+
+            if (_config.PlayOnBackground)
+            {
+                MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playInfo);
+            }
+
+            _viewModel.PlayingChannel = channel;
+            PlayingState = PlayingStateEnum.Playing;
+
+        }
+
+        public async Task ActionStop(bool force)
+        {
+            if (_media == null || videoView == null || videoView.MediaPlayer == null)
+                return;
+
+            if (!force && (PlayingState == PlayingStateEnum.Playing))
+            {
+                PlayingState = PlayingStateEnum.PlayingInPreview;
+            }
+            else
+            if (force || (PlayingState == PlayingStateEnum.PlayingInPreview))
+            {
+                Device.BeginInvokeOnMainThread(async () =>
+                {
+                    videoView.MediaPlayer.Stop();
+                });
+                PlayingState = PlayingStateEnum.Stopped;
+                _viewModel.PlayingChannel = null;
+
+                if (!_driver.Recording)
+                {
+                    await _driver.Stop();
+                }
+            }
+        }
+
     }
 }

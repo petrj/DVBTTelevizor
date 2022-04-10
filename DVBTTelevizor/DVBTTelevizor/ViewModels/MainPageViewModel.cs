@@ -27,6 +27,8 @@ namespace DVBTTelevizor
         public Command DownCommand { get; set; }
         public Command LeftCommand { get; set; }
         public Command RightCommand { get; set; }
+        public Command OKCommand { get; set; }
+        public Command BackCommand { get; set; }
 
         public Command LongPressCommand { get; set; }
         public Command ShortPressCommand { get; set; }
@@ -39,6 +41,7 @@ namespace DVBTTelevizor
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
+        private DVBTChannel _playingChannel = null;
 
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
@@ -57,6 +60,9 @@ namespace DVBTTelevizor
             LeftCommand = new Command(async (key) => await AnyKeyPressed("left"));
             RightCommand = new Command(async (key) => await AnyKeyPressed("right"));
 
+            OKCommand = new Command(async () => await AnyKeyPressed("enter"));
+            BackCommand = new Command(async () => await AnyKeyPressed("escape"));
+
             BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
         }
 
@@ -71,6 +77,17 @@ namespace DVBTTelevizor
                 _playingState = value;
             }
         }
+
+
+        public DVBTChannel PlayingChannel
+        {
+            get { return _playingChannel; }
+            set
+            {
+                _playingChannel = value;
+            }
+        }
+
 
         public string SelectedChannelEPGTitle
         {

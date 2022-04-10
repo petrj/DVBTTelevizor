@@ -4,6 +4,7 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local2="clr-namespace:DVBTTelevizor"
+             xmlns:vlc="clr-namespace:LibVLCSharp.Forms.Shared;assembly=LibVLCSharp.Forms"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.MainPage"
              Title="DVBT Televizor">
@@ -250,22 +251,41 @@
             </Grid>
         </Grid>
 
+        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.5,0.35" AbsoluteLayout.LayoutFlags="All"
+                     local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
+            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0"  />
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
+                <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
+                <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
+                <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
+            </StackLayout.GestureRecognizers>
+        </StackLayout>
+
         <Button AbsoluteLayout.LayoutBounds="1.0,0.2,0.5,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
 
 
 
         <!-- debug arrows -->
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.5,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.2,0.5,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
                     Text="&#x20;&#x21D1;&#x20;" Command="{Binding UpCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0" TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.65,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.2,0.65,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
                     Text="&#x20;&#x21D3;&#x20;" Command="{Binding DownCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.57,0.6,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.27,0.6,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
                     Text="&#x21D2;" Command="{Binding RightCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0" Margin="0,0,0,0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.43,0.6,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.13,0.6,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
                     Text="&#x21D0;" Command="{Binding LeftCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
+
+        <Button AbsoluteLayout.LayoutBounds="0.13,0.8,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+                    Text="OK" Command="{Binding OKCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
+
+        <Button AbsoluteLayout.LayoutBounds="0.27,0.8,0.05,0.1" AbsoluteLayout.LayoutFlags="All"
+                    Text="&lt;&lt;" Command="{Binding BackCommand}" FontSize="40" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
 
     </AbsoluteLayout>
 
