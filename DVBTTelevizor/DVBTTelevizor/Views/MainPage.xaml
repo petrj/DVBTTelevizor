@@ -122,7 +122,7 @@
 
             <Style x:Key="DescriptionTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
-                <Setter Property="Margin" Value="0,20,0,0"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Padding" Value="5,5,5,5"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
             </Style>
@@ -138,22 +138,10 @@
 
     <AbsoluteLayout x:Name="absoluteLayout">
 
-        <Grid
-            x:Name="LayoutGrid"
-            Style="{DynamicResource LayoutGridStyle}"
-            AbsoluteLayout.LayoutBounds="0,0,1,1"
-            AbsoluteLayout.LayoutFlags="All" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="100*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
-            </Grid.ColumnDefinitions>
 
             <ListView
-                    Grid.Column="0"
-                    Grid.Row="0"
+                    AbsoluteLayout.LayoutBounds="0,0,1,1"
+                    AbsoluteLayout.LayoutFlags="All"
                     x:Name="ChannelsListView"
                     ItemsSource="{Binding Channels}"
                     CachingStrategy="RecycleElement"
@@ -212,15 +200,18 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <Grid Grid.Column="1" Grid.Row="0"
-                        x:Name="StackLayoutEPGDetail"
-                        Margin="0,0,0,0"
-                        Padding="0,0,0,0">
+            <Grid
+                    AbsoluteLayout.LayoutBounds="0.9,0.05,0.4,0.45"
+                    AbsoluteLayout.LayoutFlags="All"
+                    x:Name="StackLayoutEPGDetail"
+                    BackgroundColor="#262626"
+                    Margin="0,0,0,0"
+                    Padding="0,0,0,0"
+                    IsVisible="{Binding EPGDetailVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="1*" />
-                    <RowDefinition Height="40*" />
                     <RowDefinition Height="40*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -249,7 +240,6 @@
                 </ScrollView>
 
             </Grid>
-        </Grid>
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.5,0.35" AbsoluteLayout.LayoutFlags="All"
                      local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">

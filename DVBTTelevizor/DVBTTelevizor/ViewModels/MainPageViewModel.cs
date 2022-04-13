@@ -88,6 +88,17 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool EPGDetailVisible
+        {
+            get
+            {
+                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
+                    return false;
+
+                return true;
+            }
+        }
+
 
         public string SelectedChannelEPGTitle
         {
@@ -442,6 +453,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                OnPropertyChanged(nameof(EPGDetailVisible));
 
 
             }
@@ -667,6 +679,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                OnPropertyChanged(nameof(EPGDetailVisible));
 
                 await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
 
@@ -724,6 +737,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                OnPropertyChanged(nameof(EPGDetailVisible));
             }
         }
 
