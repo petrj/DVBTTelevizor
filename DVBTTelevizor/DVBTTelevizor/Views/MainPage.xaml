@@ -34,6 +34,14 @@
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
+            <Style x:Key="NoVideoChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
             <Style x:Key="ProviderNameTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
@@ -241,10 +249,22 @@
 
             </Grid>
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.5,0.35" AbsoluteLayout.LayoutFlags="All"
-                     local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
-            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0"  />
-            <StackLayout.GestureRecognizers>
+        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.5,0.35" AbsoluteLayout.LayoutFlags="All">
+            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0"/>
+            <StackLayout.GestureRecognizers local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
+                <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
+                <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
+                <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
+                <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
+            </StackLayout.GestureRecognizers>
+        </StackLayout>
+
+        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black">
+            <Label Text="{Binding SelectedChannelName}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />
+            <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
+            <StackLayout.GestureRecognizers local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
                 <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
                 <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
@@ -257,22 +277,22 @@
         <Button AbsoluteLayout.LayoutBounds="1.0,0.2,0.5,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
 
         <!-- debug arrows -->
-        <Button AbsoluteLayout.LayoutBounds="0.1,0.5,0.08,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.1,0.5,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
                     Text="&#x20;&#x21D1;&#x20;" Command="{Binding UpCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0" TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.1,0.7,0.08,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.1,0.7,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
                     Text="&#x20;&#x21D3;&#x20;" Command="{Binding DownCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.05,0.6,0.08,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.05,0.6,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
                     Text="&#x21D0;" Command="{Binding LeftCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.15,0.6,0.08,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.15,0.6,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
                     Text="&#x21D2;" Command="{Binding RightCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0" Margin="0,0,0,0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.05,0.85,0.08,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.05,0.85,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
                     Text="OK" Command="{Binding OKCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.15,0.85,0.08,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Button AbsoluteLayout.LayoutBounds="0.15,0.85,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
                     Text="&lt;&lt;" Command="{Binding BackCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
         <!-- /debug arrows -->
 

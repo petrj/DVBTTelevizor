@@ -30,8 +30,12 @@ namespace DVBTTelevizor
         public Command OKCommand { get; set; }
         public Command BackCommand { get; set; }
 
+        public Command AnimeIconCommand { get; set; }
+
         public Command LongPressCommand { get; set; }
         public Command ShortPressCommand { get; set; }
+
+        public Command VideoLongPressCommand { get; set; }
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
@@ -43,6 +47,9 @@ namespace DVBTTelevizor
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
         private DVBTChannel _playingChannel = null;
 
+        private int _animePos = 2;
+        private bool _animePosIncreasing = true;
+
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             : base(loggingService, dialogService, driver, config)
@@ -52,6 +59,7 @@ namespace DVBTTelevizor
             RefreshCommand = new Command(async () => await Refresh());
             RefreshEPGCommand = new Command(async () => await RefreshEPG());
             LongPressCommand = new Command(async (itm) => await LongPress(itm));
+            VideoLongPressCommand = new Command(async (itm) => await VideoLongPress());
             ShortPressCommand = new Command(ShortPress);
             ImportCommand = new Command(async (json) => await ImportList(json));
 
@@ -63,7 +71,10 @@ namespace DVBTTelevizor
             OKCommand = new Command(async () => await AnyKeyPressed("enter"));
             BackCommand = new Command(async () => await AnyKeyPressed("escape"));
 
+            AnimeIconCommand = new Command(async () => await Anime());
+
             BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
+            BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
         }
 
         public PlayingStateEnum PlayingState
@@ -78,6 +89,17 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool DebugArrowVisible
+        {
+            get
+            {
+#if DEBUG
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
 
         public DVBTChannel PlayingChannel
         {
@@ -211,6 +233,11 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex, "Import failed");
                 await _dialogService.Error($"Import failed");
             }
+        }
+
+        private async Task VideoLongPress()
+        {
+
         }
 
         private async Task LongPress(object item)
@@ -434,6 +461,17 @@ namespace DVBTTelevizor
                 });
         }
 
+        public string SelectedChannelName
+        {
+            get
+            {
+                if (SelectedChannel == null)
+                return null;
+
+                return SelectedChannel.Name;
+            }
+        }
+
         public DVBTChannel SelectedChannel
         {
             get
@@ -447,6 +485,7 @@ namespace DVBTTelevizor
                 _selectedChannel = value;
 
                 OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SelectedChannelName));
                 OnPropertyChanged(nameof(SelectedChannelEPGTitle));
                 OnPropertyChanged(nameof(SelectedChannelEPGDescription));
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
@@ -832,6 +871,45 @@ namespace DVBTTelevizor
                         }
                     }
                 });
+        }
+
+        public string AudioIcon
+        {
+            get
+            {
+                return "Audio" + _animePos.ToString();
+            }
+        }
+
+        private async Task Anime()
+        {
+            if (_animePosIncreasing)
+            {
+                _animePos++;
+                if (_animePos > 3)
+                {
+                    _animePos = 2;
+                    _animePosIncreasing = !_animePosIncreasing;
+                }
+            }
+            else
+            {
+                _animePos--;
+                if (_animePos < 0)
+                {
+                    _animePos = 1;
+                    _animePosIncreasing = !_animePosIncreasing;
+                }
+            }
+
+            try
+            {
+                OnPropertyChanged(nameof(AudioIcon));
+            }
+            catch
+            {
+                // UWP platform fix
+            }
         }
     }
 }

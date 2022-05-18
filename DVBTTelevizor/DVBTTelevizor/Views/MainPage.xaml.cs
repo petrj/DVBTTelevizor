@@ -43,6 +43,8 @@ namespace DVBTTelevizor
         private MediaPlayer _mediaPlayer;
         private Media _media = null;
 
+        public Command CheckStreamCommand { get; set; }
+
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
             InitializeComponent();
@@ -91,6 +93,9 @@ namespace DVBTTelevizor
                 });
             }
 
+            CheckStreamCommand = new Command(async () => await CheckStream());
+            BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
+
             _servicePage.Disappearing += anyPage_Disappearing;
             _servicePage.Disappearing += anyPage_Disappearing;
             _tunePage.Disappearing += anyPage_Disappearing;
@@ -116,38 +121,10 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<PlayStreamInfo> (this, BaseViewModel.MSG_PlayStream, (playStreamInfo) =>
             {
-                Device.BeginInvokeOnMainThread(
-                 new Action(() =>
-                 {
-                     if (_playerPage != null)
-                     {
-                         _playerPage.PlayStreamInfo = playStreamInfo;
-
-                         if (_playerPage.Playing)
-                         {
-                             //_playerPage.StopPlay();
-                             _playerPage.StartPlay();
-                         }
-                         else
-                         {
-                             Navigation.PushModalAsync(_playerPage);
-                         }
-
-                         ShowActualPlayingMessage(playStreamInfo);
-
-                         if (_config.PlayOnBackground)
-                         {
-                             MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playStreamInfo);
-                         }
-                     }
-                     else
-                     {
-                         Task.Run(async () =>
-                         {
-                             await _dlgService.Error("Player not initialized");
-                         });
-                     }
-                 }));
+                Task.Run(async () =>
+                {
+                    await ActionPlay();
+                });
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration, (message) =>
@@ -538,11 +515,25 @@ namespace DVBTTelevizor
             }
         }
 
-        private void ShowActualPlayingMessage(PlayStreamInfo playStreamInfo)
+        private void ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)
         {
             if (playStreamInfo == null ||
                 playStreamInfo.Channel == null)
-                return;
+            {
+                if (_viewModel.SelectedChannel == null)
+                    return;
+
+                playStreamInfo = new PlayStreamInfo
+                {
+                    Channel = _viewModel.SelectedChannel
+                };
+
+                var eitManager = _driver.GetEITManager(_viewModel.SelectedChannel.Frequency);
+                if (eitManager != null)
+                {
+                    playStreamInfo.CurrentEvent = eitManager.GetEvent(DateTime.Now, Convert.ToInt32(_viewModel.SelectedChannel.ProgramMapPID));
+                }
+            }
 
             var msg = "\u25B6 " + playStreamInfo.Channel.Name;
             if (playStreamInfo.CurrentEvent != null)
@@ -631,12 +622,20 @@ namespace DVBTTelevizor
 
         private void OnVideoSingleTapped(object sender, EventArgs e)
         {
-
+            ShowActualPlayingMessage();
         }
 
         public void OnVideoDoubleTapped(object sender, EventArgs e)
         {
-
+            if (PlayingState == PlayingStateEnum.PlayingInPreview)
+            {
+                PlayingState = PlayingStateEnum.Playing;
+            }
+            else
+            if (PlayingState == PlayingStateEnum.Playing)
+            {
+                PlayingState = PlayingStateEnum.PlayingInPreview;
+            }
         }
 
         private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
@@ -706,13 +705,23 @@ namespace DVBTTelevizor
 
                         // VideoStackLayout must be visible before changing Layout
                         VideoStackLayout.IsVisible = true;
+                        NoVideoStackLayout.IsVisible = false;
+                        //ChannelsListView.IsVisible = false;
+
                         AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                         AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
+
+                        AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+                        AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(0, 0, 1, 1));
+
+                        CheckStreamCommand.Execute(null);
 
                         break;
                     case PlayingStateEnum.PlayingInPreview:
 
                         NavigationPage.SetHasNavigationBar(this, true);
+
+                        //ChannelsListView.IsVisible = true;
 
                         if (!_config.Fullscreen)
                         {
@@ -722,7 +731,10 @@ namespace DVBTTelevizor
                         AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                         AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(1, 1, 0.5, 0.35));
 
-                        //CheckStreamCommand.Execute(null);
+                        AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+                        AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(1, 1, 0.5, 0.35));
+
+                        CheckStreamCommand.Execute(null);
 
                         break;
                     case PlayingStateEnum.Stopped:
@@ -730,12 +742,15 @@ namespace DVBTTelevizor
 
                         NavigationPage.SetHasNavigationBar(this, true);
 
+                        //ChannelsListView.IsVisible = true;
+
                         if (!_config.Fullscreen)
                         {
                             MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
                         }
 
                         VideoStackLayout.IsVisible = false;
+                        NoVideoStackLayout.IsVisible = false;
 
                         break;
                 }
@@ -818,6 +833,8 @@ namespace DVBTTelevizor
 
         public async Task ActionStop(bool force)
         {
+            _loggingService.Debug($"Calling ActionStop (Force: {force}, PlayingState: {PlayingState})");
+
             if (_media == null || videoView == null || videoView.MediaPlayer == null)
                 return;
 
@@ -839,6 +856,128 @@ namespace DVBTTelevizor
                 {
                     await _driver.Stop();
                 }
+            }
+        }
+
+        private async Task CheckStream()
+        {
+            if (PlayingState == PlayingStateEnum.Stopped)
+            {
+                return;
+            }
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (!videoView.MediaPlayer.IsPlaying)
+                {
+                    videoView.MediaPlayer.Play(_media);
+                }
+
+                if (videoView.MediaPlayer.VideoTrackCount <= 0)
+                {
+                    NoVideoStackLayout.IsVisible = true;
+                    VideoStackLayout.IsVisible = false;
+                }
+                else
+                {
+                    NoVideoStackLayout.IsVisible = false;
+                    VideoStackLayout.IsVisible = true;
+
+                    PreviewVideoBordersFix();
+                }
+            });
+        }
+
+        private MediaTrack? GetVideoTrack()
+        {
+            if (_media.Tracks != null &&
+                _media.Tracks.Length > 0 &&
+                _mediaPlayer.VideoTrackCount > 0 &&
+                _mediaPlayer.VideoTrack != -1)
+            {
+                foreach (var track in _media.Tracks)
+                {
+                    if (track.Data.Video.Width == 0 ||
+                        track.Data.Video.Height == 0)
+                        continue;
+
+                    return track;
+                }
+
+                return null;
+
+            } else
+            {
+                return null;
+            }
+        }
+
+        private void PreviewVideoBordersFix()
+        {
+            try
+            {
+                if (PlayingState == PlayingStateEnum.PlayingInPreview)
+                {
+                    var videoTrack = GetVideoTrack();
+
+                    if (!videoTrack.HasValue)
+                        return;
+
+                    var originalVideoWidth = videoTrack.Value.Data.Video.Width;
+                    var originalVideoHeight = videoTrack.Value.Data.Video.Height;
+
+                    if (IsPortrait)
+                    {
+                        var aspect = (double)originalVideoWidth / (double)originalVideoHeight;
+                        var newVideoHeight = VideoStackLayout.Width / aspect;
+
+                        var borderHeight = (VideoStackLayout.Height - newVideoHeight) / 2.0;
+
+                        var rect = new Rectangle()
+                        {
+                            Left = VideoStackLayout.X,
+                            Top = VideoStackLayout.Y + borderHeight,
+                            Width = VideoStackLayout.Width,
+                            Height = newVideoHeight
+                        };
+
+                        if (rect.X != VideoStackLayout.X ||
+                            rect.Y != VideoStackLayout.Y ||
+                            rect.Width != VideoStackLayout.Width ||
+                            rect.Height != VideoStackLayout.Height)
+                        {
+                            AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.None);
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, rect);
+                        }
+                    } else
+                    {
+                        var aspect = (double)originalVideoHeight / (double)originalVideoWidth;
+                        var newVideoWidth = VideoStackLayout.Height / aspect;
+
+                        var borderWidth = (VideoStackLayout.Width - newVideoWidth) / 2.0;
+
+                        var rect = new Rectangle()
+                        {
+                            Left = VideoStackLayout.X + borderWidth,
+                            Top = VideoStackLayout.Y,
+                            Width = newVideoWidth,
+                            Height = VideoStackLayout.Height
+                        };
+
+                        if (rect.X != VideoStackLayout.X ||
+                            rect.Y != VideoStackLayout.Y ||
+                            rect.Width != VideoStackLayout.Width ||
+                            rect.Height != VideoStackLayout.Height)
+                        {
+                            AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.None);
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, rect);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         }
 
