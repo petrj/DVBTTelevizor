@@ -13,6 +13,7 @@ using System.IO;
 using System.Threading;
 using LoggerService;
 using LibVLCSharp.Shared;
+using static DVBTTelevizor.MainPageViewModel;
 
 namespace DVBTTelevizor
 {
@@ -315,7 +316,7 @@ namespace DVBTTelevizor
                 case "mediaplayprevious":
                 case "mediaprevious":
                 case "numpad4":
-                    await OnKeyLeft();
+                    await ActionKeyLeft();
                     break;
                 case "pagedown":
                 case "dpadright":
@@ -463,6 +464,49 @@ namespace DVBTTelevizor
                 }
 
             }).Start();
+        }
+
+
+        private async Task ActionKeyLeft()
+        {
+            _loggingService.Info($"ActionKeyLeft");
+
+            try
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    // TODO: play last channel
+
+                    if (!_viewModel.StandingOnStart)
+                    {
+                        await _viewModel.SelectPreviousChannel();
+                        await _viewModel.PlayChannel();
+                    }
+                }
+                else
+                {
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    {
+                        _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                        _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
+                        _viewModel.NotifyToolBarChange();
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
+                    {
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
+                    {
+                        //SelecPreviousToolBarItem();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionKeyLeft general error");
+                MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
+            }
         }
 
         private async Task OnKeyLeft()

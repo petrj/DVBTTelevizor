@@ -50,6 +50,16 @@ namespace DVBTTelevizor
         private int _animePos = 2;
         private bool _animePosIncreasing = true;
 
+        public enum SelectedPartEnum
+        {
+            ChannelsList = 0,
+            EPGDetail = 1,
+            ToolBar = 2
+        }
+
+        public string SelectedToolbarItemName { get; set; } = null;
+
+        private SelectedPartEnum _selectedPart = SelectedPartEnum.EPGDetail;
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             : base(loggingService, dialogService, driver, config)
@@ -77,6 +87,46 @@ namespace DVBTTelevizor
             BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
         }
 
+        public SelectedPartEnum SelectedPart
+        {
+            get
+            {
+                return _selectedPart;
+            }
+            set
+            {
+                _selectedPart = value;
+
+                OnPropertyChanged(nameof(EPGDescriptionBackgroundColor));
+                NotifyToolBarChange();
+            }
+        }
+
+        public void NotifyToolBarChange()
+        {
+            _loggingService.Info($"NotifyToolBarChange");
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                /*OnPropertyChanged(nameof(ToolbarItemFilterIcon));
+                OnPropertyChanged(nameof(ToolbarItemHelpIcon));
+                OnPropertyChanged(nameof(ToolbarItemQualityIcon));
+                OnPropertyChanged(nameof(ToolbarItemInfoIcon));*/
+                OnPropertyChanged(nameof(ToolbarItemSettingsIcon));
+            });
+        }
+
+        public Color EPGDescriptionBackgroundColor
+        {
+            get
+            {
+                if (SelectedPart == SelectedPartEnum.EPGDetail)
+                    return Color.FromHex("005996");
+
+                return Color.Black;
+            }
+        }
+
         public PlayingStateEnum PlayingState
         {
             get
@@ -86,6 +136,17 @@ namespace DVBTTelevizor
             set
             {
                 _playingState = value;
+            }
+        }
+
+        public string ToolbarItemSettingsIcon
+        {
+            get
+            {
+                if (SelectedToolbarItemName == "ToolbarItemSettings")
+                    return "SettingsSelected.png";
+
+                return "Settings.png";
             }
         }
 
@@ -777,6 +838,34 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
                 OnPropertyChanged(nameof(EPGDetailVisible));
+            }
+        }
+
+        public bool StandingOnStart
+        {
+            get
+            {
+                try
+                {
+                    _semaphoreSlim.WaitAsync();
+
+                    if (SelectedChannel == null)
+                        return true;
+
+                    foreach (var ch in Channels)
+                    {
+                        if (ch == SelectedChannel)
+                            return true;
+
+                        return false;
+                    }
+
+                    return true;
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                };
             }
         }
 
