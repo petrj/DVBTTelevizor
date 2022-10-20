@@ -57,8 +57,6 @@ namespace DVBTTelevizor
             ToolBar = 2
         }
 
-        public string SelectedToolbarItemName { get; set; } = null;
-
         private SelectedPartEnum _selectedPart = SelectedPartEnum.EPGDetail;
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
@@ -102,20 +100,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public void NotifyToolBarChange()
-        {
-            _loggingService.Info($"NotifyToolBarChange");
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                /*OnPropertyChanged(nameof(ToolbarItemFilterIcon));
-                OnPropertyChanged(nameof(ToolbarItemHelpIcon));
-                OnPropertyChanged(nameof(ToolbarItemQualityIcon));
-                OnPropertyChanged(nameof(ToolbarItemInfoIcon));*/
-                OnPropertyChanged(nameof(ToolbarItemSettingsIcon));
-            });
-        }
-
         public Color EPGDescriptionBackgroundColor
         {
             get
@@ -139,16 +123,38 @@ namespace DVBTTelevizor
             }
         }
 
-        public string ToolbarItemSettingsIcon
+        public bool StandingOnEnd
         {
             get
             {
-                if (SelectedToolbarItemName == "ToolbarItemSettings")
-                    return "SettingsSelected.png";
+                try
+                {
+                    _semaphoreSlim.WaitAsync();
 
-                return "Settings.png";
+                    var item = SelectedChannel;
+
+                    if (item == null)
+                        return true;
+
+                    DVBTChannel lastChannel = null;
+                    foreach (var ch in Channels)
+                    {
+                        lastChannel = ch;
+                    }
+
+                    if (lastChannel == item)
+                        return true;
+
+                    return false;
+
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                };
             }
         }
+
 
         public bool DebugArrowVisible
         {

@@ -327,7 +327,7 @@ namespace DVBTTelevizor
                 case "mediaplaynext":
                 case "medianext":
                 case "numpad6":
-                    await OnKeyRight();
+                    await ActionKeyRight();
                     break;
                 case "dpadcenter":
                 case "space":
@@ -466,6 +466,46 @@ namespace DVBTTelevizor
             }).Start();
         }
 
+        private async Task ActionKeyRight()
+        {
+            _loggingService.Info($"ActionKeyRight");
+
+            try
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    if (!_viewModel.StandingOnEnd)
+                    {
+                        await _viewModel.SelectNextChannel();
+                        await _viewModel.PlayChannel();
+                    }
+                }
+                else
+                {
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    {
+                            _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                            _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+                            _viewModel.NotifyToolBarChange();
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
+                    {
+                        SelecNextToolBarItem();
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
+                    {
+                        _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                        _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+                        _viewModel.NotifyToolBarChange();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionKeyRight general error");
+                MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
+            }
+        }
 
         private async Task ActionKeyLeft()
         {
@@ -498,7 +538,7 @@ namespace DVBTTelevizor
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
-                        //SelecPreviousToolBarItem();
+                        SelecPreviousToolBarItem();
                     }
                 }
             }
@@ -509,15 +549,91 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task OnKeyLeft()
+        private void SelecPreviousToolBarItem()
         {
-            await _viewModel.SelectPreviousChannel(10);
+            _loggingService.Info($"SelecPreviousToolBarItem");
+
+            if (_viewModel.SelectedToolbarItemName == null)
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemSettings")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemMenu";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemMenu")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemTools";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemTools")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemTune";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemTune")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
+            {
+                _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                _viewModel.SelectedToolbarItemName = null;
+            }
+
+            _viewModel.NotifyToolBarChange();
         }
 
-        private async Task OnKeyRight()
+        private void SelecNextToolBarItem()
         {
-            await _viewModel.SelectNextChannel(10);
+            _loggingService.Info($"SelecNextToolBarItem");
+
+            if (_viewModel.SelectedToolbarItemName == null)
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemTune";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemTune")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemTools";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemTools")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemMenu";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemMenu")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemSettings")
+            {
+                _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                _viewModel.SelectedToolbarItemName = null;
+            }
+
+            _viewModel.NotifyToolBarChange();
         }
+
+        //private async Task OnKeyLeft()
+        //{
+        //    await _viewModel.SelectPreviousChannel(10);
+        //}
+
+        //private async Task OnKeyRight()
+        //{
+        //    await _viewModel.SelectNextChannel(10);
+        //}
 
         private async Task OnKeyDown()
         {

@@ -45,6 +45,8 @@ namespace DVBTTelevizor
 
         public const string MSG_ImportChannelsList = "ImportChannelsList";
 
+        public string SelectedToolbarItemName { get; set; } = null;
+
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
               : base(config)
         {
@@ -115,14 +117,90 @@ namespace DVBTTelevizor
             }
         }
 
+        public void NotifyToolBarChange()
+        {
+            _loggingService.Info($"NotifyToolBarChange");
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                OnPropertyChanged(nameof(DriverConnectedIcon));
+                OnPropertyChanged(nameof(ToolbarItemTuneIcon));
+                OnPropertyChanged(nameof(ToolbarItemToolsIcon));
+                OnPropertyChanged(nameof(ToolbarItemMenuIcon));
+                OnPropertyChanged(nameof(ToolbarItemSettingsIcon));
+            });
+        }
+
         public string DriverConnectedIcon
         {
             get
             {
                 if (DriverConnected)
-                    return "Connected.png";
+                {
+                    if (SelectedToolbarItemName == "ToolbarItemDriver")
+                    {
+                        return "ConnectedSelected.png";
+                    }
+                    else
+                    {
+                        return "Connected.png";
+                    }
+                }
+                else
+                {
+                    if (SelectedToolbarItemName == "ToolbarItemDriver")
+                    {
+                        return "DisconnectedSelected.png";
+                    }
+                    else
+                    {
+                        return "Disconnected.png";
+                    }
+                }
+            }
+        }
 
-                return "Disconnected.png";
+        public string ToolbarItemSettingsIcon
+        {
+            get
+            {
+                if (SelectedToolbarItemName == "ToolbarItemSettings")
+                    return "SettingsSelected.png";
+
+                return "Settings.png";
+            }
+        }
+
+        public string ToolbarItemMenuIcon
+        {
+            get
+            {
+                if (SelectedToolbarItemName == "ToolbarItemMenu")
+                    return "MenuSelected.png";
+
+                return "Menu.png";
+            }
+        }
+
+        public string ToolbarItemToolsIcon
+        {
+            get
+            {
+                if (SelectedToolbarItemName == "ToolbarItemTools")
+                    return "ToolsSelected.png";
+
+                return "Tools.png";
+            }
+        }
+
+        public string ToolbarItemTuneIcon
+        {
+            get
+            {
+                if (SelectedToolbarItemName == "ToolbarItemTune")
+                    return "TuneSelected.png";
+
+                return "Tune.png";
             }
         }
 
