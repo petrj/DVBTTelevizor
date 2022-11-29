@@ -560,8 +560,6 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
                 OnPropertyChanged(nameof(EPGDetailVisible));
-
-
             }
         }
 

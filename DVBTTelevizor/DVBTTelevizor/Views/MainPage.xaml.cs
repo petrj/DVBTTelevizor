@@ -155,12 +155,12 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayPreviousChannel, (msg) =>
             {
-                OnKeyUp();
+                ActionUp();
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_PlayNextChannel, (msg) =>
             {
-                OnKeyDown();
+                ActionDown();
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopStream, (msg) =>
@@ -298,14 +298,14 @@ namespace DVBTTelevizor
                 case "down":
                 case "s":
                 case "numpad2":
-                    await OnKeyDown();
+                    await ActionDown();
                     break;
                 case "dpadup":
                 case "buttonl1":
                 case "up":
                 case "w":
                 case "numpad8":
-                    await OnKeyUp();
+                    await ActionUp();
                     break;
                 case "dpadleft":
                 case "pageup":
@@ -316,7 +316,7 @@ namespace DVBTTelevizor
                 case "mediaplayprevious":
                 case "mediaprevious":
                 case "numpad4":
-                    await ActionKeyLeft();
+                    await ActionLeft();
                     break;
                 case "pagedown":
                 case "dpadright":
@@ -327,7 +327,7 @@ namespace DVBTTelevizor
                 case "mediaplaynext":
                 case "medianext":
                 case "numpad6":
-                    await ActionKeyRight();
+                    await ActionRight();
                     break;
                 case "dpadcenter":
                 case "space":
@@ -466,9 +466,9 @@ namespace DVBTTelevizor
             }).Start();
         }
 
-        private async Task ActionKeyRight()
+        private async Task ActionRight()
         {
-            _loggingService.Info($"ActionKeyRight");
+            _loggingService.Debug($"ActionRight");
 
             try
             {
@@ -484,32 +484,43 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
                     {
-                            _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                        if (_viewModel.EPGDetailVisible)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        } else
+                        {
                             _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
-                            _viewModel.NotifyToolBarChange();
+                            _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                        }
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
-                        SelecNextToolBarItem();
+                        if (_viewModel.SelectedToolbarItemName == "ToolbarItemSettings")
+                        {
+                            _viewModel.SelectedToolbarItemName = null;
+                            _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                        }
+                        else
+                        {
+                            SelectNextToolBarItem();
+                        }
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
-                        _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
                         _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
-                        _viewModel.NotifyToolBarChange();
+                        _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
                     }
                 }
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex, "ActionKeyRight general error");
-                MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
+                _loggingService.Error(ex, "ActionRight general error");
             }
         }
 
-        private async Task ActionKeyLeft()
+        private async Task ActionLeft()
         {
-            _loggingService.Info($"ActionKeyLeft");
+            _loggingService.Debug($"ActionLeft");
 
             try
             {
@@ -527,9 +538,9 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
                     {
-                        _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
                         _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
-                        _viewModel.NotifyToolBarChange();
+                        _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
@@ -538,13 +549,103 @@ namespace DVBTTelevizor
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
-                        SelecPreviousToolBarItem();
+                        if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
+                        {
+                            if (_viewModel.EPGDetailVisible)
+                            {
+                                _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                            }
+                            else
+                            {
+                                await ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
+                                _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                            }
+                        }
+                        else
+                        {
+                            SelecPreviousToolBarItem();
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex, "ActionKeyLeft general error");
+                _loggingService.Error(ex, "ActionLeft general error");
+            }
+        }
+
+        private async Task ActionDown()
+        {
+            _loggingService.Info($"ActionDown");
+
+            try
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    if (!_viewModel.StandingOnEnd)
+                    {
+                        await _viewModel.SelectNextChannel();
+                        await _viewModel.PlayChannel();
+                    }
+                }
+                else
+                {
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    {
+                        await _viewModel.SelectNextChannel();
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
+                    {
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + 10 + (int)_config.AppFontSize, false);
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
+                    {
+                        _viewModel.SelectedToolbarItemName = null;
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionDown general error");
+                //MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
+            }
+        }
+
+        private async Task ActionUp()
+        {
+            _loggingService.Info($"ActionUp");
+
+            try
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    if (!_viewModel.StandingOnStart)
+                    {
+                        await _viewModel.SelectPreviousChannel();
+                        await _viewModel.PlayChannel();
+                    }
+                }
+                else
+                {
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    {
+                        await _viewModel.SelectPreviousChannel();
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
+                    {
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
+                    {
+                        _viewModel.SelectedToolbarItemName = null;
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionUp general error");
                 MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
             }
         }
@@ -587,7 +688,7 @@ namespace DVBTTelevizor
             _viewModel.NotifyToolBarChange();
         }
 
-        private void SelecNextToolBarItem()
+        private void SelectNextToolBarItem()
         {
             _loggingService.Info($"SelecNextToolBarItem");
 
@@ -623,46 +724,6 @@ namespace DVBTTelevizor
             }
 
             _viewModel.NotifyToolBarChange();
-        }
-
-        //private async Task OnKeyLeft()
-        //{
-        //    await _viewModel.SelectPreviousChannel(10);
-        //}
-
-        //private async Task OnKeyRight()
-        //{
-        //    await _viewModel.SelectNextChannel(10);
-        //}
-
-        private async Task OnKeyDown()
-        {
-            var currentChannel = _viewModel.SelectedChannel;
-
-            await _viewModel.SelectNextChannel();
-
-            if (currentChannel == _viewModel.SelectedChannel)
-                return; // no channel chaned
-
-            if (_playerPage != null && _playerPage.Playing)
-            {
-                await _viewModel.PlayChannel(_viewModel.SelectedChannel);
-            }
-        }
-
-        private async Task OnKeyUp()
-        {
-            var currentChannel = _viewModel.SelectedChannel;
-
-            await _viewModel.SelectPreviousChannel();
-
-            if (currentChannel == _viewModel.SelectedChannel)
-                return; // no channel chaned
-
-            if (_playerPage != null && _playerPage.Playing)
-            {
-                await _viewModel.PlayChannel(_viewModel.SelectedChannel);
-            }
         }
 
         private void EditSelectedChannel()
