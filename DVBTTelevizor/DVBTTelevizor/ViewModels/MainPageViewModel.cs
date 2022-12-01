@@ -37,6 +37,7 @@ namespace DVBTTelevizor
 
         public Command VideoLongPressCommand { get; set; }
 
+        private DVBTChannel _lastSelectedChannel = null;
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
 
@@ -57,7 +58,7 @@ namespace DVBTTelevizor
             ToolBar = 2
         }
 
-        private SelectedPartEnum _selectedPart = SelectedPartEnum.EPGDetail;
+        private SelectedPartEnum _selectedPart = SelectedPartEnum.ChannelsList;
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             : base(loggingService, dialogService, driver, config)
@@ -93,6 +94,8 @@ namespace DVBTTelevizor
             }
             set
             {
+                // TODO: change ChannelsListView SelectedItem background color
+
                 _selectedPart = value;
 
                 OnPropertyChanged(nameof(EPGDescriptionBackgroundColor));
@@ -543,23 +546,37 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _selectedChannel;
+                _semaphoreSlim.WaitAsync();
+                try
+                {
+                    return _selectedChannel;
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                };
             }
             set
             {
-                //_loggingService.Debug($"Selected channel {value}");
+                _semaphoreSlim.WaitAsync();
+                try
+                {
+                    _selectedChannel = value;
 
-                _selectedChannel = value;
-
-                OnPropertyChanged(nameof(SelectedChannel));
-                OnPropertyChanged(nameof(SelectedChannelName));
-                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
-                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
-                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
-                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
-                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
-                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-                OnPropertyChanged(nameof(EPGDetailVisible));
+                    OnPropertyChanged(nameof(SelectedChannel));
+                    OnPropertyChanged(nameof(SelectedChannelName));
+                    OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                    OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                    OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                    OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                    OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                    OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                    OnPropertyChanged(nameof(EPGDetailVisible));
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                };
             }
         }
 

@@ -71,7 +71,7 @@ namespace DVBTTelevizor
             _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
             _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _playerPage);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
-            _editChannelPage = new ChannelPage(_loggingService,_dlgService, _driver, _config);
+            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config);
 
             Core.Initialize();
 
@@ -120,7 +120,7 @@ namespace DVBTTelevizor
                     });
             });
 
-            MessagingCenter.Subscribe<PlayStreamInfo> (this, BaseViewModel.MSG_PlayStream, (playStreamInfo) =>
+            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_PlayStream, (playStreamInfo) =>
             {
                 Task.Run(async () =>
                 {
@@ -329,18 +329,28 @@ namespace DVBTTelevizor
                 case "numpad6":
                     await ActionRight();
                     break;
+
                 case "dpadcenter":
                 case "space":
                 case "buttonr2":
-                case "mediaplaypause":
                 case "mediaplay":
                 case "enter":
                 case "numpad5":
+                case "numpadenter":
                 case "buttona":
                 case "buttonstart":
-                    //await _viewModel.PlayChannel();
-                    await ActionPlay();
+                case "capslock":
+                case "comma":
+                case "semicolon":
+                case "grave":
+                    await ActionOK();
                     break;
+
+
+                //case "mediaplaypause":
+                //await ActionPlay();
+
+                //break;
                 case "f4":
                 case "escape":
                 case "mediaplaystop":
@@ -349,7 +359,6 @@ namespace DVBTTelevizor
                 case "numpadsubtract":
                 case "del":
                 case "buttonx":
-                    //StopPlayback();
                     await ActionStop(false);
                     break;
                 case "num0":
@@ -411,7 +420,7 @@ namespace DVBTTelevizor
                 case "f8":
                 case "focus":
                 case "camera":
-                    await Detail_Clicked(this,null);
+                    await Detail_Clicked(this, null);
                     break;
                 default:
                     {
@@ -464,6 +473,30 @@ namespace DVBTTelevizor
                 }
 
             }).Start();
+        }
+
+        private async Task ActionOK()
+        {
+            _loggingService.Debug($"ActionOK");
+
+            try
+            {
+                switch (_viewModel.SelectedPart)
+                {
+                    case SelectedPartEnum.ChannelsList:
+                    case SelectedPartEnum.EPGDetail:
+                        await ActionPlay(_viewModel.SelectedChannel);
+                        return;
+
+                    case SelectedPartEnum.ToolBar:
+                        ActionPressToolBar(_viewModel.SelectedToolbarItemName);
+                        return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionOK general error");
+            }
         }
 
         private async Task ActionRight()
@@ -647,6 +680,28 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex, "ActionUp general error");
                 MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
+            }
+        }
+
+        private void ActionPressToolBar(string itemName)
+        {
+            switch (itemName)
+            {
+                case "ToolbarItemDriver":
+                    ToolConnect_Clicked(this, null);
+                    return;
+                case "ToolbarItemTune":
+                    ToolTune_Clicked(this, null);
+                    return;
+                case "ToolbarItemSettings":
+                    ToolSettingsPage_Clicked(this, null);
+                    return;
+                case "ToolbarItemMenu":
+                    ToolMenu_Clicked(this, null);
+                    return;
+                case "ToolbarItemTools":
+                    ToolServicePage_Clicked(this, null);
+                    return;
             }
         }
 
