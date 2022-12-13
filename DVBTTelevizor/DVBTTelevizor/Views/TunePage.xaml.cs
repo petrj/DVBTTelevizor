@@ -11,7 +11,7 @@ using Xamarin.Forms.Xaml;
 namespace DVBTTelevizor
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class TunePage : ContentPage
+    public partial class TunePage : ContentPage, IOnKeyDown
     {
         private TunePageViewModel _viewModel;
         protected ILoggingService _loggingService;
@@ -52,6 +52,7 @@ namespace DVBTTelevizor
         private void TunePage_Appearing(object sender, EventArgs e)
         {
             _viewModel.NotifyFontSizeChange();
+            TuneButton.Focus();
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
@@ -74,7 +75,12 @@ namespace DVBTTelevizor
         }
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+            ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+        }
+
+        public async void OnKeyDown(string key, bool longPress)
+        {
+            _loggingService.Debug($"TunePage OnKeyDown {key}");
         }
     }
 }

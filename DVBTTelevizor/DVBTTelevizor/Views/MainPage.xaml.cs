@@ -18,7 +18,7 @@ using static DVBTTelevizor.MainPageViewModel;
 namespace DVBTTelevizor
 {
     [DesignTimeVisible(false)]
-    public partial class MainPage : ContentPage
+    public partial class MainPage : ContentPage, IOnKeyDown
     {
         private MainPageViewModel _viewModel;
 
@@ -108,7 +108,14 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
             {
-                OnKeyDown(key);
+                var longPress = false;
+                if (key.StartsWith(BaseViewModel.LongPressPrefix))
+                {
+                    longPress = true;
+                    key = key.Substring(BaseViewModel.LongPressPrefix.Length);
+                }
+
+                OnKeyDown(key, longPress);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EditChannel, (message) =>
@@ -278,16 +285,35 @@ namespace DVBTTelevizor
             }
         }
 
-        public async void OnKeyDown(string key)
+        public async void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"OnKeyDown {key}");
 
             // key events can be consumed only on this MainPage
 
+#if DEBUG
+            if (longPress)
+            {
+                MessagingCenter.Send($"Long key: {key}", BaseViewModel.MSG_ToastMessage);
+            }
+            else
+            {
+                MessagingCenter.Send($"key: {key}", BaseViewModel.MSG_ToastMessage);
+            }
+#endif
+
             var stack = Navigation.NavigationStack;
             if (stack[stack.Count - 1].GetType() != typeof(MainPage))
             {
                 // different page on navigation top
+
+                var pageOnTop = stack[stack.Count - 1];
+
+                if (pageOnTop is IOnKeyDown)
+                {
+                    (pageOnTop as IOnKeyDown).OnKeyDown(key, longPress);
+                }
+
                 return;
             }
 
@@ -343,7 +369,7 @@ namespace DVBTTelevizor
                 case "comma":
                 case "semicolon":
                 case "grave":
-                    await ActionOK();
+                    await ActionOK(longPress);
                     break;
 
 
@@ -475,22 +501,44 @@ namespace DVBTTelevizor
             }).Start();
         }
 
-        private async Task ActionOK()
+        private async Task ActionOK(bool longPress)
         {
             _loggingService.Debug($"ActionOK");
 
             try
             {
-                switch (_viewModel.SelectedPart)
+                if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    case SelectedPartEnum.ChannelsList:
-                    case SelectedPartEnum.EPGDetail:
-                        await ActionPlay(_viewModel.SelectedChannel);
-                        return;
+                    if (longPress)
+                    {
+                        ToolMenu_Clicked(this, null);
+                    } else
+                    {
+                        ShowActualPlayingMessage();
+                    }
+                }
+                else
+                {
+                    switch (_viewModel.SelectedPart)
+                    {
+                        case SelectedPartEnum.ChannelsList:
+                            if (longPress)
+                            {
+                                ToolMenu_Clicked(this, null);
+                            }
+                            else
+                            {
+                                await ActionPlay(_viewModel.SelectedChannel);
+                            }
+                            break;
+                        case SelectedPartEnum.EPGDetail:
+                            await ActionPlay(_viewModel.SelectedChannel);
+                            return;
 
-                    case SelectedPartEnum.ToolBar:
-                        ActionPressToolBar(_viewModel.SelectedToolbarItemName);
-                        return;
+                        case SelectedPartEnum.ToolBar:
+                            ActionPressToolBar(_viewModel.SelectedToolbarItemName);
+                            return;
+                    }
                 }
             }
             catch (Exception ex)

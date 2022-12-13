@@ -75,7 +75,7 @@
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
-                <Setter Property="Keyboard" Value="Numeric"/>                
+                <Setter Property="Keyboard" Value="Numeric"/>
             </Style>
 
             <Style x:Key="PickerStyle" TargetType="Picker">
@@ -130,19 +130,19 @@
                         </Grid.ColumnDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />                  
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
 
                         <Label Grid.Row="1" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        
+
                         <Picker Grid.Row="1" Grid.Column="1"
-                            HorizontalOptions="End"                                
+                            HorizontalOptions="End"
                             x:Name="ChannelPicker"
                             Style="{StaticResource PickerStyle}"
                             SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
                             ItemsSource="{Binding FrequencyChannels}"
                             ItemDisplayBinding="{Binding Description}"
-                            FontSize="{Binding FontSizeForPicker}" />                        
-                        
+                            FontSize="{Binding FontSizeForPicker}" />
+
                     </Grid>
 
                     <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">

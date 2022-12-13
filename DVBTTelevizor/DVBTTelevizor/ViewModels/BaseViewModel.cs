@@ -21,6 +21,8 @@ namespace DVBTTelevizor
         protected IDVBTDriverManager _driver;
         protected bool _isRefreshing = false;
 
+        public const string LongPressPrefix = "LongPress:";
+
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
         public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
         public const string MSG_EnableFullScreen = "EnableFullScreen";

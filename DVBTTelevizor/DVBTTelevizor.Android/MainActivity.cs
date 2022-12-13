@@ -386,7 +386,12 @@ namespace DVBTTelevizor.Droid
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
-            MessagingCenter.Send(keyCode.ToString(), BaseViewModel.MSG_KeyDown);
+            var code = keyCode.ToString();
+            if (e.IsLongPress)
+            {
+                code = $"{BaseViewModel.LongPressPrefix}{keyCode}";
+            }
+            MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
 
             return base.OnKeyDown(keyCode, e);
         }
