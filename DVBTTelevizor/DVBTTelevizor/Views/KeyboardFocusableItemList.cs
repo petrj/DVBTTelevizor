@@ -1,0 +1,111 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DVBTTelevizor
+{
+    public class KeyboardFocusableItemList
+    {
+        private KeyboardFocusableItem _focusedItem = null;
+
+        public IList<KeyboardFocusableItem> Items { get; set; }
+
+        public KeyboardFocusableItemList()
+        {
+            Items = new List<KeyboardFocusableItem>();
+        }
+
+        public KeyboardFocusableItemList AddItem(KeyboardFocusableItem item)
+        {
+            Items.Add(item);
+            return this;
+        }
+
+        public KeyboardFocusableItem GetItemByName(string name)
+        {
+            foreach (var item in Items)
+            {
+                if (item.Name == name)
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
+
+        public void FocusNextItem()
+        {
+            if (Items.Count == 0)
+                return;
+
+            if (_focusedItem == null)
+            {
+                FocusItem(Items[0].Name);
+                return;
+            }
+
+            var selectNext = false;
+
+            KeyboardFocusableItem itemToSelect = null;
+            KeyboardFocusableItem firstItem = null;
+
+            foreach (var item in Items)
+            {
+                if (firstItem == null)
+                {
+                    firstItem = item;
+                }
+
+                if (selectNext)
+                {
+                    itemToSelect = item;
+                    break;
+                }
+
+                if (item == _focusedItem)
+                {
+                    selectNext = true;
+                }
+            }
+
+            if (itemToSelect == null)
+            {
+                itemToSelect = firstItem;
+            }
+
+            FocusItem(itemToSelect.Name);
+        }
+
+        public void FocusItem(string name)
+        {
+            _focusedItem = null;
+            DefocusAll();
+
+            var item = GetItemByName(name);
+
+            if (item != null)
+            {
+                _focusedItem = item;
+                item.Focus();
+            }
+        }
+
+        public void DefocusAll()
+        {
+            foreach (var item in Items)
+            {
+                item.DeFocus();
+            }
+        }
+
+        public void FocusAll()
+        {
+            foreach (var item in Items)
+            {
+                item.Focus();
+            }
+        }
+
+    }
+}

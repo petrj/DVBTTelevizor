@@ -102,7 +102,6 @@
             <!-- top controls -->
             <StackLayout VerticalOptions="StartAndExpand" Margin="10,0,10,0">
 
-
                 <StackLayout VerticalOptions="StartAndExpand" Spacing="0">
 
                     <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}" Margin="0,20,0,0" RowSpacing="0">
@@ -114,8 +113,10 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
+                        <BoxView x:Name="ManualTuningBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
                         <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}"  HorizontalOptions="End"/>
+                        <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsChecked="{Binding ManualTuning}" HorizontalOptions="End"/>
                     </Grid>
 
                     <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}" RowSpacing="0" Margin="0,0,0,0">
@@ -129,8 +130,12 @@
                             <ColumnDefinition Width="40*" />
                         </Grid.ColumnDefinitions>
 
+                        <BoxView x:Name="FrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
                         <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+
+                        <BoxView x:Name="ChannelBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label Grid.Row="1" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
@@ -158,20 +163,25 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
+                        <BoxView x:Name="BandWithBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
                         <Label Grid.Row="0" Grid.Column="0" Text="BandWidth (Mhz)" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                         <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" Style="{DynamicResource EntryStyle}"  FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+
+                        <BoxView x:Name="DVBTBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label Grid.Row="1" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                         <CheckBox Grid.Row="1" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsChecked="{Binding DVBTTuning}"  HorizontalOptions="End"  />
 
-                        <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}"  HorizontalOptions="End"  />
-                    </Grid>
+                        <BoxView x:Name="DVBT2BoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
+                        <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsChecked="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
+                    </Grid>
 
                 </StackLayout>
 
-                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
 
             </StackLayout>
 
@@ -203,11 +213,11 @@
                                             <ColumnDefinition Width="10*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+                                        <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
 
                                         <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
 
-                                        <Image Grid.Row="0" Grid.Column="2"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+                                        <Image Grid.Row="0" Grid.Column="2" Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
 
                                         <Label Grid.Row="1" Grid.Column="1" Text="{Binding ServiceTypelWithChannelLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
                                         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>

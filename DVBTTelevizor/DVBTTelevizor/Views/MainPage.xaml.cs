@@ -317,15 +317,13 @@ namespace DVBTTelevizor
                 return;
             }
 
-            switch (key.ToLower())
+            if (KeyboardDeterminer.Down(key))
             {
-                case "dpaddown":
-                case "buttonr1":
-                case "down":
-                case "s":
-                case "numpad2":
-                    await ActionDown();
-                    break;
+                await ActionDown();
+            }
+
+           switch (key.ToLower())
+           {
                 case "dpadup":
                 case "buttonl1":
                 case "up":

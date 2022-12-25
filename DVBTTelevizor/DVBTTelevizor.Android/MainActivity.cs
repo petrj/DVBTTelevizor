@@ -391,6 +391,7 @@ namespace DVBTTelevizor.Droid
             {
                 code = $"{BaseViewModel.LongPressPrefix}{keyCode}";
             }
+
             MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
 
             return base.OnKeyDown(keyCode, e);

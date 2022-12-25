@@ -19,6 +19,8 @@ namespace DVBTTelevizor
         protected IDVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
 
+        private KeyboardFocusableItemList _focusItems;
+
         public TunePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
@@ -47,6 +49,24 @@ namespace DVBTTelevizor
                     _viewModel.UpdateDriverState();
                 });
             });
+
+            BuildFocusableItems();
+        }
+
+        private void BuildFocusableItems()
+        {
+            _focusItems = new KeyboardFocusableItemList();
+
+            _focusItems
+                .AddItem(KeyboardFocusableItem.CreateFrom("ManualTuning", new List<View>() { ManualTuningBoxView, ManualTuningCheckBox }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView, EntryFrequency }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView, ChannelPicker }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("BandWith", new List<View>() { BandWithBoxView, EntryBandWidth }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
+
+            _focusItems.FocusItem("TuneButton");
         }
 
         private void TunePage_Appearing(object sender, EventArgs e)
@@ -81,6 +101,11 @@ namespace DVBTTelevizor
         public async void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"TunePage OnKeyDown {key}");
+
+            if (KeyboardDeterminer.Down(key))
+            {
+                _focusItems.FocusNextItem();
+            }
         }
     }
 }
