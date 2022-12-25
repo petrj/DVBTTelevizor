@@ -10,6 +10,25 @@ namespace DVBTTelevizor
 
         public IList<KeyboardFocusableItem> Items { get; set; }
 
+        public KeyboardFocusableItem FocusedItem
+        {
+            get
+            {
+                return _focusedItem;
+            }
+        }
+
+        public string FocusedItemName
+        {
+            get
+            {
+                if (_focusedItem == null)
+                    return null;
+
+                return _focusedItem.Name;
+            }
+        }
+
         public KeyboardFocusableItemList()
         {
             Items = new List<KeyboardFocusableItem>();
@@ -76,6 +95,74 @@ namespace DVBTTelevizor
 
             FocusItem(itemToSelect.Name);
         }
+
+        public void FocusPreviousItem()
+        {
+            if (Items.Count == 0)
+                return;
+
+            if (_focusedItem == null)
+            {
+                FocusItem(Items[Items.Count-1].Name);
+                return;
+            }
+
+            KeyboardFocusableItem itemToSelect = null;
+            KeyboardFocusableItem prevItem = null;
+
+            foreach (var item in Items)
+            {
+                if (prevItem == null)
+                {
+                    prevItem = item;
+                }
+                else
+                {
+                    if (item == _focusedItem)
+                    {
+                        itemToSelect = prevItem;
+                        break;
+                    }
+                    else
+                    {
+                        prevItem = item;
+                    }
+                }
+            }
+
+            if (itemToSelect == null)
+            {
+                itemToSelect = prevItem; // the last one item in collection
+            }
+
+            /*
+
+
+
+                    if (firstItem == null)
+                {
+                    firstItem = item;
+
+                    //
+                }
+
+                if (selectNext)
+                {
+                    itemToSelect = item;
+                    break;
+                }
+
+                if (item == _focusedItem)
+                {
+                    selectNext = true;
+                }*/
+
+
+
+
+            FocusItem(itemToSelect.Name);
+        }
+
 
         public void FocusItem(string name)
         {

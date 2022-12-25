@@ -137,7 +137,7 @@
 
                         <BoxView x:Name="ChannelBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label Grid.Row="1" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label x:Name="LabelChannel" Grid.Row="1" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                         <Picker Grid.Row="1" Grid.Column="1"
                             HorizontalOptions="End"

@@ -38,7 +38,8 @@ namespace DVBTTelevizor.Droid
         private int _defaultUiOptions;
         private App _app;
         private IDVBTDriverManager _driverManager;
-        NotificationHelper _notificationHelper;
+        private NotificationHelper _notificationHelper;
+        private Tuple<DateTime, string> _lastKeyPressed = null;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -392,7 +393,31 @@ namespace DVBTTelevizor.Droid
                 code = $"{BaseViewModel.LongPressPrefix}{keyCode}";
             }
 
-            MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+            // prevent multiple key press events
+
+            var ignoreEvent = false;
+
+            if (_lastKeyPressed == null)
+            {
+                _lastKeyPressed = new Tuple<DateTime, string>(DateTime.Now, code);
+            } else
+            {
+                _loggingService.Info("Total miliseconds: " + (DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds.ToString());
+                _loggingService.Info($"Code: {_lastKeyPressed.Item2} -> {code}");
+                if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 800 &&
+                    _lastKeyPressed.Item2 == code)
+                {
+                    ignoreEvent = true;
+                } else
+                {
+                    _lastKeyPressed = new Tuple<DateTime, string>(DateTime.Now, code);
+                }
+            }
+
+            if (!ignoreEvent)
+            {
+                MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+            }
 
             return base.OnKeyDown(keyCode, e);
         }

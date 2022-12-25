@@ -41,6 +41,11 @@ namespace DVBTTelevizor
                     button.BackgroundColor = Color.FromHex("#303F9F");
                     button.TextColor = Color.White;
                 } else
+                if (part is Picker picker)
+                {
+                    picker.BackgroundColor = Color.FromHex("#303F9F");
+                }
+                else
                 {
 
                 }
@@ -60,6 +65,11 @@ namespace DVBTTelevizor
                 {
                     button.BackgroundColor = Color.Gray;
                     button.TextColor = Color.Black;
+                }
+                else
+                if (part is Picker picker)
+                {
+                    picker.BackgroundColor = Color.Transparent;
                 }
                 else
                 {

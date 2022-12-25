@@ -281,16 +281,18 @@ namespace DVBTTelevizor
         private async Task AbortTune()
         {
             TuningAborted = true;
+            MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTunePageFocus);
         }
 
         private async Task Tune()
         {
             _loggingService.Info($"Tuning");
 
+            MessagingCenter.Send("AbortButton", BaseViewModel.MSG_UpdateTunePageFocus);
+
             State = TuneState.TuningInProgress;
 
             TunedChannels.Clear();
-
 
             _channels = await _channelService.LoadChannels();
             if (_channels == null) _channels = new ObservableCollection<DVBTChannel>();
@@ -342,6 +344,8 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(TuningLabel));
                 OnPropertyChanged(nameof(AutomaticTuningProgress));
+
+                MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTunePageFocus);
             }
         }
 
@@ -558,6 +562,8 @@ namespace DVBTTelevizor
                    _actualTunningChannel = -1;
 
                    State = TuneState.Ready;
+
+                   MessagingCenter.Send(ManualTuning ? "ManualTuning" : "AutoTuning", BaseViewModel.MSG_UpdateTunePageFocus);
                }
                catch (Exception ex)
                {

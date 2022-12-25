@@ -41,6 +41,7 @@ namespace DVBTTelevizor
         public const string MSG_PlayNextChannel = "PlayNextChannel";
         public const string MSG_PlayPreviousChannel = "PlayPreviousChannel";
         public const string MSG_ShareFile = "ShareFile";
+        public const string MSG_UpdateTunePageFocus = "UpdateTunePageFocus";
 
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";
         public const string MSG_StopPlayInBackgroundNotification = "StopPlayInBackgroundNotification";

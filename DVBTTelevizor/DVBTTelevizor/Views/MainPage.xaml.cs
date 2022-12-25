@@ -46,6 +46,8 @@ namespace DVBTTelevizor
 
         public Command CheckStreamCommand { get; set; }
 
+        private Tuple<DateTime, string> _lastKeyPressed = null;
+
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
             InitializeComponent();
@@ -302,6 +304,27 @@ namespace DVBTTelevizor
             }
 #endif
 
+            // prevent multiple key press events
+
+            var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+            if (_lastKeyPressed == null)
+            {
+                _lastKeyPressed = new Tuple<DateTime, string>(DateTime.Now, keyAction);
+            }
+            else
+            {
+                if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 300 &&
+                    _lastKeyPressed.Item2 == keyAction)
+                {
+                    return; // ignoring event
+                }
+                else
+                {
+                    _lastKeyPressed = new Tuple<DateTime, string>(DateTime.Now, keyAction);
+                }
+            }
+
             var stack = Navigation.NavigationStack;
             if (stack[stack.Count - 1].GetType() != typeof(MainPage))
             {
@@ -317,20 +340,23 @@ namespace DVBTTelevizor
                 return;
             }
 
-            if (KeyboardDeterminer.Down(key))
+            switch (keyAction)
             {
-                await ActionDown();
-            }
+                case "down":
+                    await ActionDown();
+                    break;
 
-           switch (key.ToLower())
-           {
-                case "dpadup":
-                case "buttonl1":
                 case "up":
-                case "w":
-                case "numpad8":
                     await ActionUp();
                     break;
+
+                case "OK":
+                    await ActionOK(longPress);
+                    break;
+            }
+
+            switch (key.ToLower())
+            {
                 case "dpadleft":
                 case "pageup":
                 case "left":
@@ -353,26 +379,6 @@ namespace DVBTTelevizor
                 case "numpad6":
                     await ActionRight();
                     break;
-
-                case "dpadcenter":
-                case "space":
-                case "buttonr2":
-                case "mediaplay":
-                case "enter":
-                case "numpad5":
-                case "numpadenter":
-                case "buttona":
-                case "buttonstart":
-                case "capslock":
-                case "comma":
-                case "semicolon":
-                case "grave":
-                    await ActionOK(longPress);
-                    break;
-
-
-                //case "mediaplaypause":
-                //await ActionPlay();
 
                 //break;
                 case "f4":
