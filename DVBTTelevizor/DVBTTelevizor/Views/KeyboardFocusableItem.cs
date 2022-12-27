@@ -23,9 +23,19 @@ namespace DVBTTelevizor
             foreach (var part in parts)
             {
                 keyboardFocusableItem.Parts.Add(part);
+
+                if (part is Button btn)
+                {
+                    btn.Focused += Btn_Focused;
+                }
             }
 
             return keyboardFocusableItem;
+        }
+
+        private static void Btn_Focused(object sender, FocusEventArgs e)
+        {
+            ///(sender as Button).Id
         }
 
         public void Focus()

@@ -50,7 +50,7 @@
 
     <ContentPage.Content>
 
-        <ScrollView Margin="20,10,20,0" InputTransparent="True">
+        <ScrollView Margin="20,10,20,0" >
 
             <StackLayout>
 
@@ -72,27 +72,27 @@
                         <BoxView x:Name="ShowTVChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Show TV channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch" InputTransparent="True" IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}"/>
 
                         <BoxView x:Name="ShowRadioChannelsBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch" InputTransparent="True" IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch"  IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}"/>
 
                         <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="2" Grid.Column="0" Text="Show other channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowOtherSwitch" InputTransparent="True" IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}"/>
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}"/>
                     </Grid>
 
-                    <Button x:Name="ClearChannelsButton" Text="Clear" InputTransparent="True" Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Button x:Name="ClearChannelsButton" Text="Clear"  Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                    <Button x:Name="ShareChannelsButton" Text="Share" InputTransparent="True" Command="{Binding ShareChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Button x:Name="ShareChannelsButton" Text="Share"  Command="{Binding ShareChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                    <Button x:Name="ExportToFileButton" Text="Export to file" InputTransparent="True" Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Button x:Name="ExportToFileButton" Text="Export to file"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
-                    <Button x:Name="ImportChannelsButton" Text="Import from file" InputTransparent="True" Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Button x:Name="ImportChannelsButton" Text="Import from file"  Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
                 </StackLayout>
@@ -116,22 +116,22 @@
                         <BoxView x:Name="ShowServiceMenuBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch" InputTransparent="True" IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch"  IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
 
                         <BoxView x:Name="ShowEPGBeforePlayBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ScanEPGSwitch" InputTransparent="True" IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ScanEPGSwitch"  IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
 
                         <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="2" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="2" Grid.Column="1" x:Name="FullscreenSwitch" InputTransparent="True" IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                         <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="3" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="3" Grid.Column="1" x:Name="PlayOnBackgroundSwitch" InputTransparent="True" IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                        <Switch Grid.Row="3" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
 
@@ -143,7 +143,7 @@
                             FontSize="{Binding FontSizeForPicker}"
                             Style="{StaticResource CommonPickerTextStyle}"
                             SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}"
-                            InputTransparent="True">
+                            >
                             <Picker.Items>
                                 <x:String>Normal</x:String>
                                 <x:String>Above normal</x:String>
@@ -173,7 +173,7 @@
                         <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch" InputTransparent="True" IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
 
                     </Grid>
 
@@ -193,9 +193,9 @@
                             <ColumnDefinition Width="34*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Row="0" Grid.Column="0" Text="1$" InputTransparent="True" Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button Grid.Row="0" Grid.Column="1" Text="5$" InputTransparent="True" Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button Grid.Row="0" Grid.Column="2" Text="10$" InputTransparent="True" Command="{Binding Donate10command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="1$"  Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="1" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button x:Name="Donate10Button" Grid.Row="0" Grid.Column="2" Text="10$"  Command="{Binding Donate10command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     </Grid>
 

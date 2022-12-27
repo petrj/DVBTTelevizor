@@ -13,14 +13,10 @@ using VideoView = LibVLCSharp.Platforms.Android.VideoView;
 using LibVLCSharp.Shared;
 using LoggerService;
 using System.IO;
-using Android.Support.Design.Widget;
 using Xamarin.Essentials;
 using Android.Hardware.Usb;
-using Android.Support.V4.Content;
-using Android;
-using Android.Support.V4.App;
-using System.Text;
 using Plugin.InAppBilling;
+using Google.Android.Material.Snackbar;
 
 namespace DVBTTelevizor.Droid
 {
@@ -389,12 +385,27 @@ namespace DVBTTelevizor.Droid
             var code = keyCode.ToString();
             if (e.IsLongPress)
             {
-                code = $"{BaseViewModel.LongPressPrefix}{keyCode}";
+                code = $"{BaseViewModel.LongPressPrefix}{keyCode.ToString()}";
             }
+            _loggingService.Debug($"********************************* OnKeyDown: {code}");
 
             MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
 
             return base.OnKeyDown(keyCode, e);
+        }
+
+        public override bool DispatchKeyEvent(KeyEvent e)
+        {
+            var code = e.KeyCode.ToString();
+            if (e.IsLongPress)
+            {
+                code = $"{BaseViewModel.LongPressPrefix}{e.KeyCode.ToString()}";
+            }
+            _loggingService.Debug($"********************************* DispatchKeyEvent: {code}");
+
+            //MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+
+            return base.DispatchKeyEvent(e);
         }
 
         private void SetFullScreen(bool on)
