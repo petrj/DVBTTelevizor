@@ -382,15 +382,6 @@ namespace DVBTTelevizor.Droid
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
-            var code = keyCode.ToString();
-            if (e.IsLongPress)
-            {
-                code = $"{BaseViewModel.LongPressPrefix}{keyCode.ToString()}";
-            }
-            _loggingService.Debug($"********************************* OnKeyDown: {code}");
-
-            MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
-
             return base.OnKeyDown(keyCode, e);
         }
 
@@ -403,9 +394,19 @@ namespace DVBTTelevizor.Droid
             }
             _loggingService.Debug($"********************************* DispatchKeyEvent: {code}");
 
-            //MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+            var keyAction = KeyboardDeterminer.GetKeyAction(code);
+            if (keyAction != KeyboardNavigationActionEnum.Unknown)
+            {
+                // TODO:
+                //  - call base.DispatchKeyEvent(e); when editing TextBox
+                //  - scroll to focused items
 
-            return base.DispatchKeyEvent(e);
+                MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+                return true;
+            } else
+            {
+                return base.DispatchKeyEvent(e);
+            }
         }
 
         private void SetFullScreen(bool on)
