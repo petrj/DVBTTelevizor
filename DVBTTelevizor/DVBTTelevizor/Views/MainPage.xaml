@@ -276,26 +276,6 @@
 
         <Button AbsoluteLayout.LayoutBounds="1.0,0.2,0.5,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
 
-        <!-- debug arrows -->
-        <Button AbsoluteLayout.LayoutBounds="0.1,0.5,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
-                    Text="&#x20;&#x21D1;&#x20;" Command="{Binding UpCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0" TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
-
-        <Button AbsoluteLayout.LayoutBounds="0.1,0.7,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
-                    Text="&#x20;&#x21D3;&#x20;" Command="{Binding DownCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray"  Padding="0"/>
-
-        <Button AbsoluteLayout.LayoutBounds="0.05,0.6,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
-                    Text="&#x21D0;" Command="{Binding LeftCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
-
-        <Button AbsoluteLayout.LayoutBounds="0.15,0.6,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
-                    Text="&#x21D2;" Command="{Binding RightCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0" Margin="0,0,0,0"/>
-
-        <Button AbsoluteLayout.LayoutBounds="0.05,0.85,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
-                    Text="OK" Command="{Binding OKCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
-
-        <Button AbsoluteLayout.LayoutBounds="0.15,0.85,0.08,0.08" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding DebugArrowVisible}"
-                    Text="&lt;&lt;" Command="{Binding BackCommand}" FontSize="20" FontAttributes="Bold" BorderWidth="0"  TextColor="Yellow" BackgroundColor="Gray" Padding="0"  Margin="0,0,0,0"/>
-        <!-- /debug arrows -->
-
     </AbsoluteLayout>
 
     <ContentPage.ToolbarItems>

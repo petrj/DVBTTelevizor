@@ -46,7 +46,7 @@ namespace DVBTTelevizor
 
         public Command CheckStreamCommand { get; set; }
 
-        private Tuple<DateTime, string> _lastKeyPressed = null;
+        private Tuple<DateTime, KeyboardNavigationActionEnum> _lastKeyPressed = null;
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
@@ -310,7 +310,7 @@ namespace DVBTTelevizor
 
             if (_lastKeyPressed == null)
             {
-                _lastKeyPressed = new Tuple<DateTime, string>(DateTime.Now, keyAction);
+                _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
             }
             else
             {
@@ -321,7 +321,7 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    _lastKeyPressed = new Tuple<DateTime, string>(DateTime.Now, keyAction);
+                    _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
                 }
             }
 
@@ -342,45 +342,29 @@ namespace DVBTTelevizor
 
             switch (keyAction)
             {
-                case "down":
+                case KeyboardNavigationActionEnum.Down:
                     await ActionDown();
                     break;
 
-                case "up":
+                case KeyboardNavigationActionEnum.Up:
                     await ActionUp();
                     break;
 
-                case "OK":
+                case KeyboardNavigationActionEnum.Right:
+                    await ActionRight();
+                    break;
+
+                case KeyboardNavigationActionEnum.Left:
+                    await ActionLeft();
+                    break;
+
+                case KeyboardNavigationActionEnum.OK:
                     await ActionOK(longPress);
                     break;
             }
 
             switch (key.ToLower())
             {
-                case "dpadleft":
-                case "pageup":
-                case "left":
-                case "a":
-                case "b":
-                case "f2":
-                case "mediaplayprevious":
-                case "mediaprevious":
-                case "numpad4":
-                    await ActionLeft();
-                    break;
-                case "pagedown":
-                case "dpadright":
-                case "right":
-                case "d":
-                case "f":
-                case "f3":
-                case "mediaplaynext":
-                case "medianext":
-                case "numpad6":
-                    await ActionRight();
-                    break;
-
-                //break;
                 case "f4":
                 case "escape":
                 case "mediaplaystop":

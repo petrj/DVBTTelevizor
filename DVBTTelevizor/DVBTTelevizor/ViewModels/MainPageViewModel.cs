@@ -23,13 +23,6 @@ namespace DVBTTelevizor
         public Command RefreshEPGCommand { get; set; }
         public Command ImportCommand { get; set; }
 
-        public Command UpCommand { get; set; }
-        public Command DownCommand { get; set; }
-        public Command LeftCommand { get; set; }
-        public Command RightCommand { get; set; }
-        public Command OKCommand { get; set; }
-        public Command BackCommand { get; set; }
-
         public Command AnimeIconCommand { get; set; }
 
         public Command LongPressCommand { get; set; }
@@ -71,14 +64,6 @@ namespace DVBTTelevizor
             VideoLongPressCommand = new Command(async (itm) => await VideoLongPress());
             ShortPressCommand = new Command(ShortPress);
             ImportCommand = new Command(async (json) => await ImportList(json));
-
-            UpCommand = new Command(async (key) => await AnyKeyPressed("up"));
-            DownCommand = new Command(async (key) => await AnyKeyPressed("down"));
-            LeftCommand = new Command(async (key) => await AnyKeyPressed("left"));
-            RightCommand = new Command(async (key) => await AnyKeyPressed("right"));
-
-            OKCommand = new Command(async () => await AnyKeyPressed("enter"));
-            BackCommand = new Command(async () => await AnyKeyPressed("escape"));
 
             AnimeIconCommand = new Command(async () => await Anime());
 

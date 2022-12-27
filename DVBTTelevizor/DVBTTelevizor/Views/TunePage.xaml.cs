@@ -19,7 +19,10 @@ namespace DVBTTelevizor
         protected IDVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
 
+        private bool _toolBarFocused = false;
+
         private KeyboardFocusableItemList _focusItems;
+        private string _previousFocusedItemsPart;
 
         private KeyboardFocusableItemList _focusItemsAuto;
         private KeyboardFocusableItemList _focusItemsManual;
@@ -91,7 +94,8 @@ namespace DVBTTelevizor
             _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
             _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
 
-            _focusItems = _focusItemsAuto;
+            UpdateFocusedPart("AutoTuning");
+
             _focusItems.FocusItem("TuneButton");
 
             ChannelPicker.Unfocused += delegate
@@ -133,6 +137,8 @@ namespace DVBTTelevizor
 
         private void UpdateFocusedPart(string part)
         {
+            _previousFocusedItemsPart = part;
+
             switch (part)
             {
                 case "ManualTuning":
@@ -157,63 +163,118 @@ namespace DVBTTelevizor
             }
         }
 
+        private bool ToolBarSelected
+        {
+            get
+            {
+                return _toolBarFocused;
+            }
+            set
+            {
+                if (value)
+                {
+                    _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+                    _focusItems.DeFocusAll();
+                }
+                else
+                {
+                    _viewModel.SelectedToolbarItemName = null;
+
+                    if (_previousFocusedItemsPart.EndsWith("Tuning"))
+                    {
+                        _focusItems.FocusItem("TuneButton");
+                    }
+                    UpdateFocusedPart(_previousFocusedItemsPart);
+                }
+
+                _viewModel.NotifyToolBarChange();
+                _toolBarFocused = value;
+            }
+        }
+
         public async void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"TunePage OnKeyDown {key}");
 
-            if (KeyboardDeterminer.Down(key))
+            var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+            switch (keyAction)
             {
-                _focusItems.FocusNextItem();
-            }
+                case KeyboardNavigationActionEnum.Down:
+                    if (ToolBarSelected)
+                    {
+                        ToolBarSelected = false;
+                    }
+                    else
+                    {
+                        _focusItems.FocusNextItem();
+                    }
+                    break;
 
-            if (KeyboardDeterminer.Up(key))
-            {
-                _focusItems.FocusPreviousItem();
-            }
+                case KeyboardNavigationActionEnum.Up:
+                    if (ToolBarSelected)
+                    {
+                        ToolBarSelected = false;
+                    }
+                    else
+                    {
+                        _focusItems.FocusPreviousItem();
+                    }
+                    break;
 
-            if (KeyboardDeterminer.OK(key))
-            {
-                switch (_focusItems.FocusedItemName)
-                {
-                    case "ManualTuning":
-                        _viewModel.ManualTuning = !_viewModel.ManualTuning;
-                        UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning");
-                        break;
+                case KeyboardNavigationActionEnum.Right:
+                case KeyboardNavigationActionEnum.Left:
+                    ToolBarSelected = !ToolBarSelected;
+                    break;
 
-                    case "TuneButton":
-                        _viewModel.TuneCommand.Execute(null);
-                        break;
+                case KeyboardNavigationActionEnum.OK:
+                    if (ToolBarSelected)
+                    {
+                        ToolConnect_Clicked(this, null);
+                    }
+                    else
+                    {
+                        switch (_focusItems.FocusedItemName)
+                        {
+                            case "ManualTuning":
+                                _viewModel.ManualTuning = !_viewModel.ManualTuning;
+                                UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning");
+                                break;
 
-                    case "AbortButton":
-                        _viewModel.AbortTuneCommand.Execute(null);
-                        break;
+                            case "TuneButton":
+                                _viewModel.TuneCommand.Execute(null);
+                                break;
 
-                    case "FinishButton":
-                        _viewModel.FinishTunedCommand.Execute(null);
-                        break;
+                            case "AbortButton":
+                                _viewModel.AbortTuneCommand.Execute(null);
+                                break;
 
-                    case "Channel":
-                        ChannelPicker.Focus();
-                        break;
+                            case "FinishButton":
+                                _viewModel.FinishTunedCommand.Execute(null);
+                                break;
 
-                    case "Frequency":
-                        EntryFrequency.Focus();
-                        break;
+                            case "Channel":
+                                ChannelPicker.Focus();
+                                break;
 
-                    case "BandWith":
-                        EntryBandWidth.Focus();
-                        break;
+                            case "Frequency":
+                                EntryFrequency.Focus();
+                                break;
 
-                    case "DVBT":
-                        DVBTTuningCheckBox.IsChecked = !DVBTTuningCheckBox.IsChecked;
-                        break;
+                            case "BandWith":
+                                EntryBandWidth.Focus();
+                                break;
 
-                    case "DVBT2":
-                        DVBT2TuningCheckBox.IsChecked = !DVBT2TuningCheckBox.IsChecked;
-                        break;
+                            case "DVBT":
+                                DVBTTuningCheckBox.IsChecked = !DVBTTuningCheckBox.IsChecked;
+                                break;
 
-
-                }
+                            case "DVBT2":
+                                DVBT2TuningCheckBox.IsChecked = !DVBT2TuningCheckBox.IsChecked;
+                                break;
+                        }
+                    }
+                    break;
             }
         }
     }

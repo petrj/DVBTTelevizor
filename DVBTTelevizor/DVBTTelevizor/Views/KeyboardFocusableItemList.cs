@@ -163,11 +163,10 @@ namespace DVBTTelevizor
             FocusItem(itemToSelect.Name);
         }
 
-
         public void FocusItem(string name)
         {
             _focusedItem = null;
-            DefocusAll();
+            DeFocusAll();
 
             var item = GetItemByName(name);
 
@@ -178,7 +177,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void DefocusAll()
+        public void DeFocusAll()
         {
             foreach (var item in Items)
             {
@@ -193,6 +192,5 @@ namespace DVBTTelevizor
                 item.Focus();
             }
         }
-
     }
 }
