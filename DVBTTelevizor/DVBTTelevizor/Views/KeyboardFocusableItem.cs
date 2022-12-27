@@ -35,11 +35,13 @@ namespace DVBTTelevizor
                 if (part is BoxView boxView)
                 {
                     boxView.BackgroundColor = Color.FromHex("#303F9F");
+                    boxView.Focus();
                 } else
                 if (part is Button button)
                 {
                     button.BackgroundColor = Color.FromHex("#303F9F");
                     button.TextColor = Color.White;
+                    button.Focus();
                 } else
                 if (part is Picker picker)
                 {
