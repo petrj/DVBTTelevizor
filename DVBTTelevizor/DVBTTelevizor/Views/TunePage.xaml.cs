@@ -94,22 +94,21 @@ namespace DVBTTelevizor
             _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
             _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
 
-            UpdateFocusedPart("AutoTuning");
+            _focusItemsAuto.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+        }
 
-            _focusItems.FocusItem("TuneButton");
+        private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        {
+            // scroll to element
 
-            ChannelPicker.Unfocused += delegate
-            {
-                // loosing focus after Picker item selected
-                ChannelPicker.IsVisible = false;
-                ChannelPicker.IsVisible = true;
-            };
+            // TODO: scroll only if necessary (  use SettingsScrollView.ScrollY, sccreen Height, ..... )
+            //TuneScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height / 2, false);
         }
 
         private void TunePage_Appearing(object sender, EventArgs e)
         {
-            _viewModel.NotifyFontSizeChange();
-            TuneButton.Focus();
+            UpdateFocusedPart("AutoTuning");
+            _focusItems.FocusItem("TuneButton");
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
@@ -132,7 +131,7 @@ namespace DVBTTelevizor
         }
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
         }
 
         private void UpdateFocusedPart(string part)
@@ -227,6 +226,10 @@ namespace DVBTTelevizor
                     ToolBarSelected = !ToolBarSelected;
                     break;
 
+                case KeyboardNavigationActionEnum.Back:
+                    await Navigation.PopAsync();
+                    break;
+
                 case KeyboardNavigationActionEnum.OK:
                     if (ToolBarSelected)
                     {
@@ -266,11 +269,11 @@ namespace DVBTTelevizor
                                 break;
 
                             case "DVBT":
-                                DVBTTuningCheckBox.IsChecked = !DVBTTuningCheckBox.IsChecked;
+                                DVBTTuningCheckBox.IsToggled = !DVBTTuningCheckBox.IsToggled;
                                 break;
 
                             case "DVBT2":
-                                DVBT2TuningCheckBox.IsChecked = !DVBT2TuningCheckBox.IsChecked;
+                                DVBT2TuningCheckBox.IsToggled = !DVBT2TuningCheckBox.IsToggled;
                                 break;
                         }
                     }

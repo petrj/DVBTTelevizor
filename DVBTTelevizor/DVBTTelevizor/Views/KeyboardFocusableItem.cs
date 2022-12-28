@@ -10,6 +10,8 @@ namespace DVBTTelevizor
         public string Name { get; set; }
         public IList<View> Parts { get; set; }
 
+        private double _maxYPos = -1;
+
         public KeyboardFocusableItem()
         {
             Parts = new List<View>();
@@ -28,7 +30,20 @@ namespace DVBTTelevizor
             return keyboardFocusableItem;
         }
 
-        public double GetMaxYPosition()
+        public double MaxYPosition
+        {
+            get
+            {
+                if (_maxYPos == -1)
+                {
+                    ReComputeMaxYPosition();
+                }
+
+                return _maxYPos;
+            }
+        }
+
+        public double ReComputeMaxYPosition()
         {
             double res = 0;
             foreach (var part in Parts)
@@ -39,7 +54,8 @@ namespace DVBTTelevizor
                     res = y;
             }
 
-            return res;
+            _maxYPos = res;
+            return _maxYPos;
         }
 
         public void Focus()

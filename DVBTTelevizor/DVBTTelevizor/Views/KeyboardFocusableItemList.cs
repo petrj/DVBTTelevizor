@@ -194,6 +194,8 @@ namespace DVBTTelevizor
                 if (OnItemUnFocusedEvent != null)
                     OnItemUnFocusedEvent(new KeyboardFocusableItemEventArgs(item));
             }
+
+            _focusedItem = null;
         }
 
         public void FocusAll()

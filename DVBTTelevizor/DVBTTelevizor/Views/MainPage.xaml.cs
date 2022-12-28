@@ -212,6 +212,10 @@ namespace DVBTTelevizor
                 ToolbarItems.Add(ToolServicePage);
                 ToolbarItems.Add(ToolSettingsPage);
             }
+
+            _viewModel.SelectedToolbarItemName = null;
+            _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+            //ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
         }
 
         public void ResumePlayback()
@@ -314,7 +318,7 @@ namespace DVBTTelevizor
             }
             else
             {
-                if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 300 &&
+                if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 400 &&
                     _lastKeyPressed.Item2 == keyAction)
                 {
                     return; // ignoring event
@@ -358,6 +362,10 @@ namespace DVBTTelevizor
                     await ActionLeft();
                     break;
 
+                case KeyboardNavigationActionEnum.Back:
+                    await ActionStop(false);
+                    break;
+
                 case KeyboardNavigationActionEnum.OK:
                     await ActionOK(longPress);
                     break;
@@ -365,52 +373,52 @@ namespace DVBTTelevizor
 
             switch (key.ToLower())
             {
-                case "f4":
-                case "escape":
-                case "mediaplaystop":
-                case "mediastop":
-                case "mediaclose":
-                case "numpadsubtract":
-                case "del":
-                case "buttonx":
-                    await ActionStop(false);
-                    break;
+                case "0":
                 case "num0":
                 case "number0":
                     HandleNumKey(0);
                     break;
+                case "1":
                 case "num1":
                 case "number1":
                     HandleNumKey(1);
                     break;
+                case "2":
                 case "num2":
                 case "number2":
                     HandleNumKey(2);
                     break;
+                case "3":
                 case "num3":
                 case "number3":
                     HandleNumKey(3);
                     break;
+                case "4":
                 case "num4":
                 case "number4":
                     HandleNumKey(4);
                     break;
+                case "5":
                 case "num5":
                 case "number5":
                     HandleNumKey(5);
                     break;
+                case "6":
                 case "num6":
                 case "number6":
                     HandleNumKey(6);
                     break;
+                case "7":
                 case "num7":
                 case "number7":
                     HandleNumKey(7);
                     break;
+                case "8":
                 case "num8":
                 case "number8":
                     HandleNumKey(8);
                     break;
+                case "9":
                 case "num9":
                 case "number9":
                     HandleNumKey(9);
@@ -620,6 +628,8 @@ namespace DVBTTelevizor
                     {
                         if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
                         {
+                            _viewModel.SelectedToolbarItemName = null;
+
                             if (_viewModel.EPGDetailVisible)
                             {
                                 _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;

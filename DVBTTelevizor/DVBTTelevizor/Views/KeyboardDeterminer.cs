@@ -32,6 +32,9 @@ namespace DVBTTelevizor
             if (Left(key))
                 return KeyboardNavigationActionEnum.Left;
 
+            if (Back(key))
+                return KeyboardNavigationActionEnum.Back;
+
             if (OK(key))
                 return KeyboardNavigationActionEnum.OK;
 
@@ -100,6 +103,27 @@ namespace DVBTTelevizor
                 case "mediaplayprevious":
                 case "mediaprevious":
                 case "numpad4":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool Back(string key)
+        {
+            switch (key.ToLower())
+            {
+                case "f4":
+                case "escape":
+                case "mediaplaystop":
+                case "mediastop":
+                case "mediaclose":
+                case "numpadsubtract":
+                case "del":
+                case "buttonx":
+                case "back":
+                case "esc":
+                case "buttonb":
                     return true;
                 default:
                     return false;

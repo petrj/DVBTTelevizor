@@ -39,6 +39,7 @@
             <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="HorizontalTextAlignment" Value="Right"/>
             </Style>
 
             <Style x:Key="CommonSwitchTextStyle" TargetType="Switch">
@@ -118,7 +119,7 @@
                         <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch"  IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
 
-                        <BoxView x:Name="ShowEPGBeforePlayBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ScanEPGBeforePlayBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="ScanEPGSwitch"  IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
@@ -135,15 +136,25 @@
 
                     </Grid>
 
-                    <StackLayout Margin="20,0,20,0">
-                        <Label  Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Grid Margin="20,10,20,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="FontSizeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Picker
+                            Grid.Row="0" Grid.Column="1"
                             x:Name="FontSizePicker"
                             Margin="20,0,0,0"
                             FontSize="{Binding FontSizeForPicker}"
                             Style="{StaticResource CommonPickerTextStyle}"
-                            SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}"
-                            >
+                            SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}">
                             <Picker.Items>
                                 <x:String>Normal</x:String>
                                 <x:String>Above normal</x:String>
@@ -153,7 +164,7 @@
                                 <x:String>Huge</x:String>
                             </Picker.Items>
                         </Picker>
-                    </StackLayout>
+                    </Grid>
 
                 </StackLayout>
 

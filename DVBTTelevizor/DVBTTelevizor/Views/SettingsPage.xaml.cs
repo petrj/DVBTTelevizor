@@ -49,6 +49,13 @@ namespace DVBTTelevizor
             }
         }
 
+        protected override void OnAppearing()
+        {
+            _focusItems.DeFocusAll();
+
+            base.OnAppearing();
+        }
+
         private void BuildFocusableItems()
         {
             _focusItems = new KeyboardFocusableItemList();
@@ -64,18 +71,17 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("ImportChannels", new List<View>() { ImportChannelsButton }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowServiceMenuBoxView", new List<View>() { ShowServiceMenuBoxView, ShowServiceMenuSwitch }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("ShowEPGBeforePlay", new List<View>() { ShowEPGBeforePlayBoxView, ScanEPGSwitch }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("ScanEPGBeforePlay", new List<View>() { ScanEPGBeforePlayBoxView, ScanEPGSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowFullScreen", new List<View>() { ShowFullScreenBoxView, FullscreenSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowPlayOnBackground", new List<View>() { ShowPlayOnBackgroundBoxView, PlayOnBackgroundSwitch }))
 
-                .AddItem(KeyboardFocusableItem.CreateFrom("FontSize", new List<View>() { FontSizePicker }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FontSize", new List<View>() { FontSizeBoxView, FontSizePicker }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate10", new List<View>() { Donate10Button }));
-
 
             _focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
         }
@@ -85,7 +91,7 @@ namespace DVBTTelevizor
             // scroll to element
 
             // TODO: scroll only if necessary (  use SettingsScrollView.ScrollY, sccreen Height, ..... )
-            SettingsScrollView.ScrollToAsync(0, args.FocusedItem.GetMaxYPosition(), false);
+            SettingsScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height/2, false);
         }
 
         public async void OnKeyDown(string key, bool longPress)
@@ -102,6 +108,81 @@ namespace DVBTTelevizor
 
                 case KeyboardNavigationActionEnum.Up:
                     _focusItems.FocusPreviousItem();
+                    break;
+
+                case KeyboardNavigationActionEnum.Back:
+                    await Navigation.PopAsync();
+                    break;
+
+                case KeyboardNavigationActionEnum.OK:
+
+                    switch (_focusItems.FocusedItemName)
+                    {
+                        case "ShowTVChannels":
+                            ShowTVSwitch.IsToggled = !ShowTVSwitch.IsToggled;
+                            break;
+
+                        case "ShowRadioChannels":
+                            ShowRadioSwitch.IsToggled = !ShowRadioSwitch.IsToggled;
+                            break;
+
+                        case "ShowOtherChannels":
+                            ShowOtherSwitch.IsToggled = !ShowOtherSwitch.IsToggled;
+                            break;
+
+                        case "ClearChannels":
+                            _viewModel.ClearChannelsCommand.Execute(null);
+                            break;
+
+                        case "ShareChannels":
+                            _viewModel.ShareChannelsCommand.Execute(null);
+                            break;
+
+                        case "ExportToFile":
+                            _viewModel.ExportChannelsCommand.Execute(null);
+                            break;
+
+                        case "ImportChannels":
+                            _viewModel.ImportChannelsCommand.Execute(null);
+                            break;
+
+                        case "ShowServiceMenuBoxView":
+                            ShowServiceMenuSwitch.IsToggled = !ShowServiceMenuSwitch.IsToggled;
+                            break;
+
+                        case "ScanEPGBeforePlay":
+                            ScanEPGSwitch.IsToggled = !ScanEPGSwitch.IsToggled;
+                            break;
+
+                        case "ShowFullScreen":
+                            FullscreenSwitch.IsToggled = !FullscreenSwitch.IsToggled;
+                            break;
+
+                        case "ShowPlayOnBackground":
+                            PlayOnBackgroundSwitch.IsToggled = !PlayOnBackgroundSwitch.IsToggled;
+                            break;
+
+                        case "FontSize":
+                            FontSizePicker.Focus();
+                            break;
+
+                        case "EnableLogging":
+                            EnableLoggingSwitch.IsToggled = !EnableLoggingSwitch.IsToggled;
+                            break;
+
+                        case "Donate1":
+                            _viewModel.Donate1command.Execute(null);
+                            break;
+
+                        case "Donate5":
+                            _viewModel.Donate5command.Execute(null);
+                            break;
+
+                        case "Donate10":
+                            _viewModel.Donate10command.Execute(null);
+                            break;
+                    }
+
                     break;
             }
         }

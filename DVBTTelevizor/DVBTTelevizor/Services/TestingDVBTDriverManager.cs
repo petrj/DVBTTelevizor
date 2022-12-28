@@ -309,6 +309,16 @@ namespace DVBTTelevizor
                         ServiceName = "INFO CHANNEL",
                         ServisType = (byte)DVBTServiceType.TV
                     }, 8888);
+
+                    for (var i=8889; i<= 8899; i++)
+                    {
+                        serviceDescriptors.Add(new ServiceDescriptor()
+                        {
+                            ProviderName = "Multiplex C",
+                            ServiceName = "INFO CHANNEL " + i.ToString(),
+                            ServisType = (byte)DVBTServiceType.TV
+                        }, i);
+                    }
                 }
 
                 return new SearchMapPIDsResult()
@@ -352,6 +362,14 @@ namespace DVBTTelevizor
             if (MapPIDs.Contains(8888))
             {
                 res.Add(8888, new List<long>() { 8889 });
+            }
+
+            for (var i = 8889; i <= 8899; i++)
+            {
+                if (MapPIDs.Contains(i))
+                {
+                    res.Add(i, new List<long>() { i });
+                }
             }
 
             if (res.Count > 0)
