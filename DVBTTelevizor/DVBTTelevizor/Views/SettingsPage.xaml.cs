@@ -75,6 +75,17 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate10", new List<View>() { Donate10Button }));
+
+
+            _focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
+        }
+
+        private void SettingsPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        {
+            // scroll to element
+
+            // TODO: scroll only if necessary (  use SettingsScrollView.ScrollY, sccreen Height, ..... )
+            SettingsScrollView.ScrollToAsync(0, args.FocusedItem.GetMaxYPosition(), false);
         }
 
         public async void OnKeyDown(string key, bool longPress)

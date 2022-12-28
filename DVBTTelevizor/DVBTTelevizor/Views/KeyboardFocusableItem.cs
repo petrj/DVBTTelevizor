@@ -28,6 +28,20 @@ namespace DVBTTelevizor
             return keyboardFocusableItem;
         }
 
+        public double GetMaxYPosition()
+        {
+            double res = 0;
+            foreach (var part in Parts)
+            {
+                var y = part.Y; var parent = part.ParentView; while (parent != null) { y += parent.Y; parent = parent.ParentView; }
+
+                if (y > res)
+                    res = y;
+            }
+
+            return res;
+        }
+
         public void Focus()
         {
             foreach (var part in Parts)

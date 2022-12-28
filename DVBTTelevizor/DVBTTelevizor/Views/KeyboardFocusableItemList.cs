@@ -10,6 +10,9 @@ namespace DVBTTelevizor
 
         public IList<KeyboardFocusableItem> Items { get; set; }
 
+        public event KeyboardFocusableItemEventDelegate OnItemFocusedEvent;
+        public event KeyboardFocusableItemEventDelegate OnItemUnFocusedEvent;
+
         public KeyboardFocusableItem FocusedItem
         {
             get
@@ -174,6 +177,10 @@ namespace DVBTTelevizor
             {
                 _focusedItem = item;
                 item.Focus();
+
+                // raise event
+                if (OnItemFocusedEvent != null)
+                    OnItemFocusedEvent(new KeyboardFocusableItemEventArgs(item));
             }
         }
 
@@ -182,6 +189,10 @@ namespace DVBTTelevizor
             foreach (var item in Items)
             {
                 item.DeFocus();
+
+                // raise event
+                if (OnItemUnFocusedEvent != null)
+                    OnItemUnFocusedEvent(new KeyboardFocusableItemEventArgs(item));
             }
         }
 
@@ -190,6 +201,10 @@ namespace DVBTTelevizor
             foreach (var item in Items)
             {
                 item.Focus();
+
+                // raise event
+                if (OnItemUnFocusedEvent != null)
+                    OnItemUnFocusedEvent(new KeyboardFocusableItemEventArgs(item));
             }
         }
     }
