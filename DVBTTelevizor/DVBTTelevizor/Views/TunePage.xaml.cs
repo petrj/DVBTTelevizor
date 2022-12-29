@@ -23,6 +23,7 @@ namespace DVBTTelevizor
 
         private KeyboardFocusableItemList _focusItems;
         private string _previousFocusedItemsPart;
+        private string _previousFocusedItem = null;
 
         private KeyboardFocusableItemList _focusItemsAuto;
         private KeyboardFocusableItemList _focusItemsManual;
@@ -60,7 +61,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateTunePageFocus, (name) =>
             {
-                UpdateFocusedPart(name);
+                UpdateFocusedPart(name, null);
             });
 
             BuildFocusableItems();
@@ -93,12 +94,21 @@ namespace DVBTTelevizor
 
             _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
             _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
+
+            _focusItemsAuto.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
+            _focusItemsManual.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
+            _focusItemsAbort.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
+            _focusItemsDone.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
+        }
+
+        private void TunePage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        {
+            _previousFocusedItem = args.FocusedItem.Name;
         }
 
         private void TunePage_Appearing(object sender, EventArgs e)
         {
-            UpdateFocusedPart("AutoTuning");
-            _focusItems.FocusItem("TuneButton");
+            UpdateFocusedPart("AutoTuning", "TuneButton");
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
@@ -124,7 +134,7 @@ namespace DVBTTelevizor
            ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
         }
 
-        private void UpdateFocusedPart(string part)
+        private void UpdateFocusedPart(string part, string itemToFocus)
         {
             _previousFocusedItemsPart = part;
 
@@ -132,12 +142,9 @@ namespace DVBTTelevizor
             {
                 case "ManualTuning":
                     _focusItems = _focusItemsManual;
-                    //_focusItems.FocusItem("TuneButton");
                     break;
-
                 case "AutoTuning":
                     _focusItems = _focusItemsAuto;
-                    //_focusItems.FocusItem("TuneButton");
                     break;
 
                 case "AbortButton":
@@ -149,6 +156,14 @@ namespace DVBTTelevizor
                     _focusItems = _focusItemsDone;
                     _focusItems.FocusItem("FinishButton");
                     break;
+            }
+
+            if (itemToFocus != null)
+            {
+                _focusItems.FocusItem(itemToFocus);
+            } else
+            {
+                _previousFocusedItem = null;
             }
         }
 
@@ -168,12 +183,27 @@ namespace DVBTTelevizor
                 else
                 {
                     _viewModel.SelectedToolbarItemName = null;
+                    UpdateFocusedPart(_previousFocusedItemsPart, _previousFocusedItem);
 
-                    if (_previousFocusedItemsPart.EndsWith("Tuning"))
+                    if (_focusItems.FocusedItem == null)
                     {
-                        _focusItems.FocusItem("TuneButton");
+                        // no item selected
+                        switch (_previousFocusedItemsPart)
+                        {
+                            case "ManualTuning":
+                            case "AutoTuning":
+                                _focusItems.FocusItem("TuneButton");
+                                break;
+
+                            case "AbortButton":
+                                _focusItems.FocusItem("AbortButton");
+                                break;
+
+                            case "FinishButton":
+                                _focusItems.FocusItem("FinishButton");
+                                break;
+                        }
                     }
-                    UpdateFocusedPart(_previousFocusedItemsPart);
                 }
 
                 _viewModel.NotifyToolBarChange();
@@ -231,7 +261,7 @@ namespace DVBTTelevizor
                         {
                             case "ManualTuning":
                                 _viewModel.ManualTuning = !_viewModel.ManualTuning;
-                                UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning");
+                                UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
                                 break;
 
                             case "TuneButton":
