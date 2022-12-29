@@ -32,6 +32,7 @@ namespace DVBTTelevizor
         private TunePage _tunePage;
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
+        private KeyboardFocusableItem _tuneFocusItem = null;
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
@@ -181,6 +182,9 @@ namespace DVBTTelevizor
             {
                 _viewModel.ImportCommand.Execute(message);
             });
+
+            _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
+            _tuneFocusItem.Focus();
         }
 
         public PlayingStateEnum PlayingState
@@ -215,7 +219,10 @@ namespace DVBTTelevizor
 
             _viewModel.SelectedToolbarItemName = null;
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
-            //ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
+            if (_viewModel.TunningButtonVisible)
+                                {
+                _tuneFocusItem.Focus();
+            }
         }
 
         public void ResumePlayback()
@@ -503,6 +510,10 @@ namespace DVBTTelevizor
 
             try
             {
+                if (_viewModel.TunningButtonVisible)
+                {
+                    ToolTune_Clicked(this, null);
+                } else
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
                     if (longPress)
@@ -568,6 +579,7 @@ namespace DVBTTelevizor
                         {
                             _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
                             _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                            _tuneFocusItem.DeFocus();
                         }
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
@@ -576,6 +588,10 @@ namespace DVBTTelevizor
                         {
                             _viewModel.SelectedToolbarItemName = null;
                             _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                            if (_viewModel.TunningButtonVisible)
+                            {
+                                _tuneFocusItem.Focus();
+                            }
                         }
                         else
                         {
@@ -617,6 +633,7 @@ namespace DVBTTelevizor
                     {
                         _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
                         _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                        _tuneFocusItem.DeFocus();
 
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
@@ -638,6 +655,10 @@ namespace DVBTTelevizor
                             {
                                 await ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
                                 _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                                if (_viewModel.TunningButtonVisible)
+                                {
+                                    _tuneFocusItem.Focus();
+                                }
                             }
                         }
                         else
