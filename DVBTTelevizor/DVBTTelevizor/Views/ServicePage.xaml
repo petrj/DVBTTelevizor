@@ -41,7 +41,7 @@
 
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
-            <ScrollView>
+            <ScrollView x:Name="ServicePageScrollView">
 
                 <!-- middle controls -->
                 <StackLayout VerticalOptions="CenterAndExpand" Margin="10,10,10,10">
@@ -79,11 +79,16 @@
                                 <ColumnDefinition Width="40*" />
                             </Grid.ColumnDefinitions>
 
+                            <BoxView x:Name="FrequencyMhzBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
                             <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource LabelStyle}" />
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
 
+                            <BoxView x:Name="FrequencyChannelBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
                             <Label Grid.Row="1" Grid.Column="0" Text="Frequency (Channel)" Style="{DynamicResource LabelStyle}" />
                             <Picker Grid.Row="1" Grid.Column="1" TextColor="White" VerticalOptions="End" HorizontalOptions="End"
+                                x:Name="FrequencyChannelPicker"
                                 Margin="0,0,0,0"
                                 SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
                                 ItemsSource="{Binding FrequencyChannels}"
@@ -102,8 +107,12 @@
                                 <ColumnDefinition Width="40*" />
                             </Grid.ColumnDefinitions>
 
+                            <BoxView x:Name="BandWithBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
                             <Label Grid.Row="0" Grid.Column="0" Text="BandWidth  (Mhz)" TextColor="White" Style="{DynamicResource LabelStyle}"/>
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" TextColor="White" HorizontalOptions="End" VerticalOptions="Center" />
+
+                            <BoxView x:Name="DeliverySystemBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                             <Label  Grid.Row="1" Grid.Column="0" Text="DeliverySystem" Style="{DynamicResource LabelStyle}"/>
                             <Picker Grid.Row="1" Grid.Column="1" x:Name="DeliverySystemPicker" VerticalOptions="Center" HorizontalOptions="End"

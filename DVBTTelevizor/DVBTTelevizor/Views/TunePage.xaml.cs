@@ -93,16 +93,6 @@ namespace DVBTTelevizor
 
             _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
             _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
-
-            _focusItemsAuto.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
-        }
-
-        private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
-        {
-            // scroll to element
-
-            // TODO: scroll only if necessary (  use SettingsScrollView.ScrollY, sccreen Height, ..... )
-            //TuneScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height / 2, false);
         }
 
         private void TunePage_Appearing(object sender, EventArgs e)

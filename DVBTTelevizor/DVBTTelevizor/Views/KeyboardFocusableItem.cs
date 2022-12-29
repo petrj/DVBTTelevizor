@@ -8,8 +8,8 @@ namespace DVBTTelevizor
     public class KeyboardFocusableItem
     {
         public string Name { get; set; }
-        public IList<View> Parts { get; set; }
 
+        private IList<View> Parts { get; set; }
         private double _maxYPos = -1;
 
         public KeyboardFocusableItem()
@@ -25,6 +25,12 @@ namespace DVBTTelevizor
             foreach (var part in parts)
             {
                 keyboardFocusableItem.Parts.Add(part);
+
+                if (part is Entry entry)
+                {
+                    entry.Focused += delegate { MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableDispatchKeyEvent); };
+                    entry.Unfocused += delegate { MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableDispatchKeyEvent); };
+                }
             }
 
             return keyboardFocusableItem;
@@ -77,6 +83,11 @@ namespace DVBTTelevizor
                 {
                     picker.BackgroundColor = Color.FromHex("#303F9F");
                 }
+                else
+                if (part is Entry entry)
+                {
+                    entry.BackgroundColor = Color.FromHex("#303F9F");
+                }
                 else if (part is Switch sw)
                 {
                     sw.Focus();
@@ -106,6 +117,11 @@ namespace DVBTTelevizor
                 if (part is Picker picker)
                 {
                     picker.BackgroundColor = Color.Transparent;
+                }
+                else
+                if (part is Entry entry)
+                {
+                    entry.BackgroundColor = Color.Transparent;
                 }
                 else
                 {

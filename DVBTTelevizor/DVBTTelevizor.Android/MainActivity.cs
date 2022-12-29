@@ -36,6 +36,9 @@ namespace DVBTTelevizor.Droid
         private IDVBTDriverManager _driverManager;
         private NotificationHelper _notificationHelper;
 
+        private bool _dispatchKeyEventEnabled = false;
+        private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -164,6 +167,17 @@ namespace DVBTTelevizor.Droid
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToastMessage, (message) =>
             {
                 ShowToastMessage(message);
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DisableDispatchKeyEvent, (message) =>
+            {
+                _dispatchKeyEventEnabled = false;
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_EnableDispatchKeyEvent, (message) =>
+            {
+                _dispatchKeyEventEnabledAt = DateTime.Now;
+                _dispatchKeyEventEnabled = true;
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_LongToastMessage, (message) =>
@@ -392,21 +406,36 @@ namespace DVBTTelevizor.Droid
             {
                 code = $"{BaseViewModel.LongPressPrefix}{e.KeyCode.ToString()}";
             }
-            _loggingService.Debug($"********************************* DispatchKeyEvent: {code}");
 
             var keyAction = KeyboardDeterminer.GetKeyAction(code);
-            if (keyAction != KeyboardNavigationActionEnum.Unknown)
+
+            if (!_dispatchKeyEventEnabled && keyAction != KeyboardNavigationActionEnum.Unknown)
             {
-                // TODO:
-                //  - call base.DispatchKeyEvent(e); when editing TextBox
-                //  - scroll to focused items
+                _loggingService.Debug($"DispatchKeyEvent thrown out: {code}");
 
                 MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
                 return true;
-            } else
-            {
-                return base.DispatchKeyEvent(e);
             }
+            else
+            {
+                // ignoring ENTER 1 second after DispatchKeyEvent enabled
+
+                var ms = (DateTime.Now - _dispatchKeyEventEnabledAt).TotalMilliseconds;
+
+                if (keyAction == KeyboardNavigationActionEnum.OK && ms<1000)
+                {
+                    _loggingService.Debug($"DispatchKeyEvent: ignoring ENTER");
+
+                    return true;
+                }
+                else
+                {
+                    _loggingService.Debug($"DispatchKeyEvent: {code}");
+
+                    return base.DispatchKeyEvent(e);
+                }
+            }
+
         }
 
         private void SetFullScreen(bool on)

@@ -46,6 +46,9 @@ namespace DVBTTelevizor
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";
         public const string MSG_StopPlayInBackgroundNotification = "StopPlayInBackgroundNotification";
 
+        public const string MSG_EnableDispatchKeyEvent = "EnableDispatchKeyEvent";
+        public const string MSG_DisableDispatchKeyEvent = "DisableDispatchKeyEvent";
+
         public const string MSG_ImportChannelsList = "ImportChannelsList";
 
         public string SelectedToolbarItemName { get; set; } = null;
