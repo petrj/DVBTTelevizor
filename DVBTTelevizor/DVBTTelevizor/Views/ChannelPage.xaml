@@ -32,11 +32,12 @@
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <ScrollView Margin="20,10,20,0">
-            <StackLayout Margin="0,0,0,0">
+        <StackLayout Margin="0,0,0,0">
 
+            <ScrollView Margin="20,10,20,0" x:Name="ChannelPageScrollView">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="1" />
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
@@ -54,51 +55,76 @@
                         <ColumnDefinition Width="64*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Number" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
-                    <Entry Grid.Row="0" Grid.Column="2"
+                    <BoxView x:Name="NumberBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Number" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                    <Entry Grid.Row="1" Grid.Column="2"
                        x:Name="EntryNumber"
                        Text="{Binding Channel.Number, Mode=TwoWay}"
                        Placeholder="Channel number"
                        Style="{DynamicResource EntryStyle}"
                        Keyboard="Numeric"
                        FontSize="{Binding FontSizeForEntry}"
-                       HorizontalOptions="StartAndExpand" />
+                       HorizontalOptions="StartAndExpand"
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Entry Grid.Row="1" Grid.Column="2"
+                       BackgroundColor="Transparent"
+                       />
+
+                    <BoxView x:Name="NameBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Entry Grid.Row="2" Grid.Column="2"
                        x:Name="EntryName"
                        Text="{Binding Channel.Name, Mode=TwoWay}"
                        Placeholder="Channel name"
                        Style="{DynamicResource EntryStyle}"
-                       FontSize="{Binding FontSizeForEntry}" 
-                       HorizontalOptions="Start" />
+                       FontSize="{Binding FontSizeForEntry}"
+                       HorizontalOptions="Start"
 
-                    <Label Grid.Row="2" Grid.Column="0" Text="Provider" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="2" Grid.Column="2" Text="{Binding Channel.ProviderName}"  Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                       BackgroundColor="Transparent"
+                       />
 
-                    <Label Grid.Row="3" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="3" Grid.Column="2" Text="{Binding Channel.ChannelLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <BoxView x:Name="ProviderBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
 
-                    <Label Grid.Row="4" Grid.Column="0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="4" Grid.Column="2" Text="{Binding Channel.FrequencyLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <Label Grid.Row="3" Grid.Column="0" Text="Provider" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="3" Grid.Column="2" Text="{Binding Channel.ProviderName}"  Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
-                    <Label Grid.Row="5" Grid.Column="0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="5" Grid.Column="2" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <BoxView x:Name="ChannelBoxView" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
 
-                    <Label Grid.Row="6" Grid.Column="0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="6" Grid.Column="2" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <Label Grid.Row="4" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="4" Grid.Column="2" Text="{Binding Channel.ChannelLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
-                    <Label Grid.Row="7" Grid.Column="0" Text="Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="7" Grid.Column="2" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <BoxView x:Name="FrequencyBoxView" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
 
-                    <Label Grid.Row="8" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="8" Grid.Column="2" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <Label Grid.Row="5" Grid.Column="0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="5" Grid.Column="2" Text="{Binding Channel.FrequencyLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
-                    <Label Grid.Row="9" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Label Grid.Row="9" Grid.Column="2" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <BoxView x:Name="DVBTTypeView" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="6" Grid.Column="0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="6" Grid.Column="2" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <BoxView x:Name="BandwithBoxView" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="7" Grid.Column="0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="7" Grid.Column="2" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <BoxView x:Name="TypeBoxView" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="8" Grid.Column="0" Text="Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="8" Grid.Column="2" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <BoxView x:Name="MapPIDBoxView" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="9" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="9" Grid.Column="2" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <BoxView x:Name="PIDsBoxView" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="10" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="10" Grid.Column="2" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
                 </Grid>
-
-            </StackLayout>
-        </ScrollView>
+            </ScrollView>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

@@ -220,7 +220,7 @@ namespace DVBTTelevizor
             _viewModel.SelectedToolbarItemName = null;
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
             if (_viewModel.TunningButtonVisible)
-                                {
+            {
                 _tuneFocusItem.Focus();
             }
         }

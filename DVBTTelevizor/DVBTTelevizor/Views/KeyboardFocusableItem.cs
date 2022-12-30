@@ -86,7 +86,7 @@ namespace DVBTTelevizor
                 else
                 if (part is Entry entry)
                 {
-                    entry.BackgroundColor = Color.FromHex("#303F9F");
+                    //entry.BackgroundColor = Color.FromHex("#303F9F");
                 }
                 else if (part is Switch sw)
                 {
@@ -121,7 +121,7 @@ namespace DVBTTelevizor
                 else
                 if (part is Entry entry)
                 {
-                    entry.BackgroundColor = Color.Transparent;
+                    //entry.BackgroundColor = Color.Transparent;
                 }
                 else
                 {
