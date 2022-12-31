@@ -78,6 +78,10 @@ namespace DVBTTelevizor.Droid
             StrictMode.SetVmPolicy(builder.Build());
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+
+            // https://github.com/xamarin/Xamarin.Forms/issues/15582
+            Xamarin.Forms.Forms.SetFlags("Disable_Accessibility_Experimental");
+
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
 
             // prevent sleep:

@@ -18,7 +18,6 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         private KeyboardFocusableItemList _focusItems;
-        private DateTime _appearedAt = DateTime.MinValue;
 
         public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
@@ -32,9 +31,6 @@ namespace DVBTTelevizor
             BuildFocusableItems();
 
             Appearing += ChannelPage_Appearing;
-
-
-
         }
 
         private void BuildFocusableItems()
@@ -55,9 +51,6 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }));*/
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
-
-            //_focusItems.FocusItem("Number");
-
         }
 
         private void ChannelPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
