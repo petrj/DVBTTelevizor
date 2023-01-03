@@ -64,6 +64,14 @@ namespace DVBTTelevizor
                 UpdateFocusedPart(name, null);
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_CloseActualPage, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                   Navigation.PopAsync();
+                });
+            });
+
             BuildFocusableItems();
         }
 

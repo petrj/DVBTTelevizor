@@ -564,6 +564,7 @@ namespace DVBTTelevizor
                    State = TuneState.Ready;
 
                    MessagingCenter.Send(ManualTuning ? "ManualTuning" : "AutoTuning", BaseViewModel.MSG_UpdateTunePageFocus);
+                   MessagingCenter.Send(String.Empty, BaseViewModel.MSG_CloseActualPage);
                }
                catch (Exception ex)
                {
