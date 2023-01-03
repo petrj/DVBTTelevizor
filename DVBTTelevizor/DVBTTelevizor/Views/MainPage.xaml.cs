@@ -1145,7 +1145,7 @@ namespace DVBTTelevizor
             {
                 if (_driver.VideoStream != null)
                 {
-                    _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+                    _media = new Media(_libVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
                     videoView.MediaPlayer.Play(_media);
                 }
             });
