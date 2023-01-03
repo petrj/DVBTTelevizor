@@ -24,12 +24,11 @@ namespace DVBTTelevizor
         protected IDialogService _dialogService;
         protected IDVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
-        protected PlayerPage _playerPage;
         private bool _toolBarFocused = false;
         private string _lastFocusedItem = null;
         private KeyboardFocusableItemList _focusItems;
 
-        public ServicePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, PlayerPage playerPage)
+        public ServicePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
             InitializeComponent();
 
@@ -37,7 +36,6 @@ namespace DVBTTelevizor
             _dialogService = dialogService;
             _driver = driver;
             _config = config;
-            _playerPage = playerPage;
 
             BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
             _viewModel.TuneFrequency = "626";

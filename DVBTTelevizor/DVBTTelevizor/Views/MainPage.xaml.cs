@@ -26,7 +26,6 @@ namespace DVBTTelevizor
         private DialogService _dlgService;
         private ILoggingService _loggingService;
         private DVBTTelevizorConfiguration _config;
-        private PlayerPage _playerPage;
         private ServicePage _servicePage;
         private ChannelPage _editChannelPage;
         private TunePage _tunePage;
@@ -61,18 +60,10 @@ namespace DVBTTelevizor
 
             _driver = driverManager;
 
-            try
-            {
-                _playerPage = new PlayerPage(_driver, _config);
-            } catch (Exception ex)
-            {
-                _loggingService.Error(ex, "Error while initializing player page");
-            }
-
             _channelService = new ConfigChannelService(_loggingService, _config);
 
             _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
-            _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _playerPage);
+            _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
             _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config);
 
@@ -227,9 +218,25 @@ namespace DVBTTelevizor
 
         public void ResumePlayback()
         {
-            if (_playerPage != null && _playerPage.Playing)
+            _loggingService.Info("ResumePlayback");
+
+            if ((PlayingState == PlayingStateEnum.Playing) || (PlayingState == PlayingStateEnum.PlayingInPreview))
             {
-                _playerPage.Resume();
+                // workaround for black screen after resume (only audio is playing)
+                // TODO: resume video without reinitializing
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    if (_mediaPlayer.VideoTrack != -1)
+                    {
+                        videoView.MediaPlayer.Stop();
+
+                        VideoStackLayout.Children.Remove(videoView);
+                        VideoStackLayout.Children.Add(videoView);
+
+                        videoView.MediaPlayer.Play();
+                    }
+                });
             }
         }
 
@@ -290,11 +297,18 @@ namespace DVBTTelevizor
 
         public void StopPlayback()
         {
-            if (_playerPage != null && _playerPage.Playing)
+            if (PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview)
             {
                 MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
-                _playerPage.StopPlay();
-                Navigation.PopModalAsync();
+
+                videoView.MediaPlayer.Stop();
+                Task.Run(async () =>
+                {
+                    if (!_driver.Recording)
+                    {
+                        await _driver.Stop();
+                    }
+                });
             }
         }
 
@@ -896,9 +910,9 @@ namespace DVBTTelevizor
         {
             _loggingService.Info($"Detail_Clicked");
 
-            if (_playerPage != null && _playerPage.Playing)
+            if ((PlayingState ==  PlayingStateEnum.Playing) || (PlayingState == PlayingStateEnum.PlayingInPreview))
             {
-                ShowActualPlayingMessage(_playerPage.PlayStreamInfo);
+                ShowActualPlayingMessage();
             }
             else
             {
