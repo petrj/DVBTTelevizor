@@ -48,6 +48,12 @@ namespace DVBTTelevizor
 
         private Tuple<DateTime, KeyboardNavigationActionEnum> _lastKeyPressed = null;
 
+        private Rectangle PortraitVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 1.0, 0.5, 0.5);
+        private Rectangle LandscapeVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 1.0, 0.5, 0.5);
+
+        private Rectangle PortraitEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.5);
+        private Rectangle LandscapeEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.5);
+
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
             InitializeComponent();
@@ -1051,6 +1057,18 @@ namespace DVBTTelevizor
         {
             Device.BeginInvokeOnMainThread(() =>
             {
+                AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+
+                if (IsPortrait)
+                {
+                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
+                }
+                else
+                {
+                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
+                }
+
                 switch (PlayingState)
                 {
                     case PlayingStateEnum.Playing:
@@ -1065,10 +1083,7 @@ namespace DVBTTelevizor
                         NoVideoStackLayout.IsVisible = false;
                         //ChannelsListView.IsVisible = false;
 
-                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                         AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
-
-                        AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
                         AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(0, 0, 1, 1));
 
                         CheckStreamCommand.Execute(null);
@@ -1085,11 +1100,15 @@ namespace DVBTTelevizor
                             MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
                         }
 
-                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(1, 1, 0.5, 0.35));
-
-                        AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
-                        AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(1, 1, 0.5, 0.35));
+                        if (IsPortrait)
+                        {
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitVideoStackLayoutPosition);
+                        } else
+                        {
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapeVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeVideoStackLayoutPosition);
+                        }
 
                         CheckStreamCommand.Execute(null);
 
@@ -1286,14 +1305,17 @@ namespace DVBTTelevizor
                     if (IsPortrait)
                     {
                         var aspect = (double)originalVideoWidth / (double)originalVideoHeight;
+
+                        // TODO: get REAL video aspect, MPEGTS returns width 720 despite the real width is 1024!
+
                         var newVideoHeight = VideoStackLayout.Width / aspect;
 
-                        var borderHeight = (VideoStackLayout.Height - newVideoHeight) / 2.0;
+                        var borderTopHeight = (VideoStackLayout.Height - newVideoHeight);
 
                         var rect = new Rectangle()
                         {
                             Left = VideoStackLayout.X,
-                            Top = VideoStackLayout.Y + borderHeight,
+                            Top = VideoStackLayout.Y + borderTopHeight,
                             Width = VideoStackLayout.Width,
                             Height = newVideoHeight
                         };
@@ -1301,7 +1323,7 @@ namespace DVBTTelevizor
                         if (rect.X != VideoStackLayout.X ||
                             rect.Y != VideoStackLayout.Y ||
                             rect.Width != VideoStackLayout.Width ||
-                            rect.Height != VideoStackLayout.Height)
+                            rect.Height != newVideoHeight)
                         {
                             AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.None);
                             AbsoluteLayout.SetLayoutBounds(VideoStackLayout, rect);
@@ -1311,11 +1333,11 @@ namespace DVBTTelevizor
                         var aspect = (double)originalVideoHeight / (double)originalVideoWidth;
                         var newVideoWidth = VideoStackLayout.Height / aspect;
 
-                        var borderWidth = (VideoStackLayout.Width - newVideoWidth) / 2.0;
+                        var borderLeftWidth = (VideoStackLayout.Width - newVideoWidth);
 
                         var rect = new Rectangle()
                         {
-                            Left = VideoStackLayout.X + borderWidth,
+                            Left = VideoStackLayout.X + borderLeftWidth,
                             Top = VideoStackLayout.Y,
                             Width = newVideoWidth,
                             Height = VideoStackLayout.Height
@@ -1323,7 +1345,7 @@ namespace DVBTTelevizor
 
                         if (rect.X != VideoStackLayout.X ||
                             rect.Y != VideoStackLayout.Y ||
-                            rect.Width != VideoStackLayout.Width ||
+                            rect.Width != newVideoWidth ||
                             rect.Height != VideoStackLayout.Height)
                         {
                             AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.None);
