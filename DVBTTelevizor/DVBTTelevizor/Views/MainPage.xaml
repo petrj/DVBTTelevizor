@@ -114,7 +114,7 @@
                 <Setter Property="HorizontalOptions" Value="Start"/>
                 <Setter Property="FontAttributes" Value="None"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
-                <Setter Property="Margin" Value="5,0,0,0"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
 
@@ -124,7 +124,7 @@
                 <Setter Property="HorizontalOptions" Value="End"/>
                 <Setter Property="FontAttributes" Value="None"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
-                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
 
@@ -218,20 +218,20 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="1*" />
-                <RowDefinition Height="40*" />
+                <RowDefinition Height="60*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
 
             <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
-            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
+            <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
 
-            <Grid Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="2" Margin="0,0,0,0" x:Name="ProgresssBarGrid">
+            <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" x:Name="ProgresssBarGrid" BackgroundColor="Aqua" VerticalOptions="CenterAndExpand">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1" />
                 </Grid.RowDefinitions>
@@ -242,7 +242,7 @@
                 <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
             </Grid>
 
-            <ScrollView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="StartAndExpand" VerticalOptions="Start"  Margin="5,5,5,5">
+            <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="StartAndExpand" VerticalOptions="Start"  Margin="5,5,5,5">
                 <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" />
             </ScrollView>
 
