@@ -144,7 +144,7 @@
         </StackLayout>
     </NavigationPage.TitleView>
 
-    <AbsoluteLayout x:Name="absoluteLayout">
+    <AbsoluteLayout x:Name="MainLayout">
 
         <ListView
                 AbsoluteLayout.LayoutBounds="0,0,1,1"

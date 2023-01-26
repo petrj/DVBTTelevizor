@@ -44,6 +44,8 @@ namespace DVBTTelevizor
         private int _animePos = 2;
         private bool _animePosIncreasing = true;
 
+        private bool _EPGDetailVisible = false;
+
         public enum SelectedPartEnum
         {
             ChannelsList = 0,
@@ -169,10 +171,14 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
-                    return false;
-
-                return true;
+                return
+                    _EPGDetailVisible &&
+                    SelectedChannel != null &&
+                    SelectedChannel.CurrentEventItem != null;
+            }
+            set
+            {
+                _EPGDetailVisible = value;
             }
         }
 

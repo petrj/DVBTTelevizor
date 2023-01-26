@@ -44,6 +44,8 @@ namespace DVBTTelevizor
         private MediaPlayer _mediaPlayer;
         private Media _media = null;
 
+        private DateTime _lastActionOKTime = DateTime.MinValue;
+
         public Command CheckStreamCommand { get; set; }
 
         private Tuple<DateTime, KeyboardNavigationActionEnum> _lastKeyPressed = null;
@@ -53,6 +55,9 @@ namespace DVBTTelevizor
 
         private Rectangle PortraitEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.5);
         private Rectangle LandscapeEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.5);
+
+        private Rectangle PlayingEPGDetailGridPosition { get; set; } = new Rectangle(0.90, 0.90, 0.95, 0.25);
+
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
@@ -528,6 +533,9 @@ namespace DVBTTelevizor
         {
             _loggingService.Debug($"ActionOK");
 
+            var firstOKActionWithinLast5Secs = (DateTime.Now - _lastActionOKTime).TotalSeconds > 5;
+            _lastActionOKTime = DateTime.Now;
+
             try
             {
                 if (_viewModel.TunningButtonVisible)
@@ -541,7 +549,17 @@ namespace DVBTTelevizor
                         ToolMenu_Clicked(this, null);
                     } else
                     {
-                        ShowActualPlayingMessage();
+                        // first action in 5 s --> show actual playing message
+                        // second action in 5 s --> show EPGDetail
+
+                        if (firstOKActionWithinLast5Secs)
+                        {
+                            ShowActualPlayingMessage();
+                        } else
+                        {
+                            _viewModel.EPGDetailVisible = true;
+                            RefreshGUI();
+                        }
                     }
                 }
                 else
@@ -985,7 +1003,10 @@ namespace DVBTTelevizor
 
         private void OnVideoSingleTapped(object sender, EventArgs e)
         {
-            ShowActualPlayingMessage();
+            Task.Run(async () =>
+            {
+                await ActionOK(false);
+            });
         }
 
         public void OnVideoDoubleTapped(object sender, EventArgs e)
@@ -1060,13 +1081,21 @@ namespace DVBTTelevizor
                 AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                 AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 
-                if (IsPortrait)
+                if (_viewModel.EPGDetailVisible)
                 {
-                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
+                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PlayingEPGDetailGridPosition);
+                    MainLayout.RaiseChild(EPGDetailGrid);
                 }
                 else
                 {
-                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
+                    if (IsPortrait)
+                    {
+                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
+                    }
+                    else
+                    {
+                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
+                    }
                 }
 
                 switch (PlayingState)
