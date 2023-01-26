@@ -5,10 +5,12 @@ using System.Text;
 namespace MPEGTS
 {
     // https://en.wikipedia.org/wiki/Program-specific_information#PAT_(Program_association_specific_data
+    // https://www.etsi.org/deliver/etsi_en/300400_300499/300468/01.17.01_20/en_300468v011701a.pdf
 
     public class PMTTable : DVBTTable
     {
         public List<ElementaryStreamSpecificData> Streams { get; set; } = new List<ElementaryStreamSpecificData>();
+        public SubtitlingDescriptor SubtitleDescriptor { get; set; } = new SubtitlingDescriptor();
 
         public override void Parse(List<byte> bytes)
         {
@@ -84,7 +86,21 @@ namespace MPEGTS
                 pos += 5;
 
                 // Elementary stream descriptors folow
-                // TODO: read stream descriptor from bytes[pos + 0] position
+
+                var descriptorTag = bytes[pos + 0];
+                var descriptorLength = bytes[pos + 1];
+
+                var descriptorBytes = new byte[descriptorLength];
+                bytes.CopyTo(pos, descriptorBytes, 0, descriptorLength);
+
+                if (descriptorTag == 89)  // 0x59
+                {
+                    // subtitling_descriptor - see section 6.2.41
+                    SubtitleDescriptor.Parse(descriptorBytes);
+                } else
+                {
+                    // TODO - read other descriptors
+                }
 
                 pos += stream.ESInfoLength;
             }
