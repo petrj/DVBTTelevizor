@@ -4,6 +4,7 @@ namespace MPEGTS
     public class ElementaryStreamSpecificData
     {
         public SubtitlingDescriptor SubtitleDescriptor { get; set; } = new SubtitlingDescriptor();
+        public string LangugeAndAudioType { get; set; }
 
         public byte StreamType { get; set; }
         public int PID { get; set; }

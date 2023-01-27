@@ -97,6 +97,11 @@ namespace MPEGTS
                     // subtitling_descriptor - see section 6.2.41
                     stream.SubtitleDescriptor.Parse(descriptorBytes);
                 } else
+                if (descriptorTag == 0xA)  // 10
+                {
+                    stream.LangugeAndAudioType = MPEGTSCharReader.ReadString(descriptorBytes, 2, descriptorLength, false);
+
+                } else
                 {
                     // TODO - read other descriptors
                 }
@@ -149,6 +154,11 @@ namespace MPEGTS
                     if (subLangugage != null)
                     {
                         Console.WriteLine($"    Subtitiles: {subLangugage}");
+                    }
+
+                    if (!string.IsNullOrEmpty(stream.LangugeAndAudioType))
+                    {
+                        Console.WriteLine($"    Language: {stream.LangugeAndAudioType}");
                     }
                 }
             }
