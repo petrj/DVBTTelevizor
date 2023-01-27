@@ -168,7 +168,7 @@ namespace MPEGTS
                         ServiceDescriptors.Add(serviceDescriptor);
                     } else
                     {
-
+                        //Console.WriteLine($"SDT: unknown tag descriptor: {descriptorTag:X} hex ({descriptorTag} dec)");
                     }
 
                     pos = pos + descriptorLength +2;
