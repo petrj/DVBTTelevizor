@@ -10,7 +10,6 @@ namespace MPEGTS
     public class PMTTable : DVBTTable
     {
         public List<ElementaryStreamSpecificData> Streams { get; set; } = new List<ElementaryStreamSpecificData>();
-        public SubtitlingDescriptor SubtitleDescriptor { get; set; } = new SubtitlingDescriptor();
 
         public override void Parse(List<byte> bytes)
         {
@@ -90,13 +89,13 @@ namespace MPEGTS
                 var descriptorTag = bytes[pos + 0];
                 var descriptorLength = bytes[pos + 1];
 
-                var descriptorBytes = new byte[descriptorLength];
-                bytes.CopyTo(pos, descriptorBytes, 0, descriptorLength);
+                var descriptorBytes = new byte[descriptorLength +2];
+                bytes.CopyTo(pos, descriptorBytes, 0, descriptorLength +2);
 
-                if (descriptorTag == 89)  // 0x59
+                if (descriptorTag == 0x59)  // 89
                 {
                     // subtitling_descriptor - see section 6.2.41
-                    SubtitleDescriptor.Parse(descriptorBytes);
+                    stream.SubtitleDescriptor.Parse(descriptorBytes);
                 } else
                 {
                     // TODO - read other descriptors
@@ -144,6 +143,13 @@ namespace MPEGTS
                 foreach (var stream in Streams)
                 {
                     Console.WriteLine($"  {stream.StreamTypeDesc.ToString().PadRight(38, ' '),38} {"".PadRight(14,' '),14} {stream.PID,8}");
+
+                    var subLangugage = stream.GetSubtitleLanguageCode;
+
+                    if (subLangugage != null)
+                    {
+                        Console.WriteLine($"    Subtitiles: {subLangugage}");
+                    }
                 }
             }
 
