@@ -104,7 +104,7 @@ namespace MPEGTS
                 } else
                 {
                     // TODO - read other descriptors
-                    //Console.WriteLine($"PMT: unknown tag descriptor: {descriptorTag:X} hex ({descriptorTag} dec)");
+                    Console.WriteLine($"PMT: unknown tag descriptor: {descriptorTag:X} hex ({descriptorTag} dec)");
                 }
 
                 pos += stream.ESInfoLength;

@@ -136,6 +136,9 @@ namespace MPEGTS
                         bytes.CopyTo(pos, descriptorBytes, 0, descriptorLength);
 
                         ServiceList = new ServiceListDescriptor(descriptorBytes);
+                    } else
+                    {
+                        //Console.WriteLine($"NIT: unknown tag descriptor: {descriptorTag:X} hex ({descriptorTag} dec)");
                     }
 
                     //Console.WriteLine($"Found NIT transport descriptor: {descriptorTag} ({Convert.ToString(descriptorTag,16)})");
