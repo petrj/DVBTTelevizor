@@ -208,7 +208,7 @@
         </ListView>
 
         <Grid
-            AbsoluteLayout.LayoutBounds="1.0,0.0,0.5,0.5"
+            AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
             AbsoluteLayout.LayoutFlags="All"
             x:Name="EPGDetailGrid"
             BackgroundColor="#262626"

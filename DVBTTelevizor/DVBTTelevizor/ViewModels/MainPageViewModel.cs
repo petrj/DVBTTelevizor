@@ -171,6 +171,9 @@ namespace DVBTTelevizor
         {
             get
             {
+                // just debugging
+                return true;
+
                 return
                     _EPGDetailVisible &&
                     SelectedChannel != null &&
