@@ -50,9 +50,14 @@ namespace DVBTTelevizor
 
         private Tuple<DateTime, KeyboardNavigationActionEnum> _lastKeyPressed = null;
 
-        private Rectangle PreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.3);
-        private Rectangle EPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 1.0, 0.3);
+        private Rectangle LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.3);
+        private Rectangle PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.3);
 
+        private Rectangle LandscapeEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 1.0, 0.5);
+        private Rectangle PortraitEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 0.5, 0.5);
+
+        private Rectangle LandscapePlayingEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 1.0, 0.5);
+        private Rectangle PortraitPlayingEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 1.0, 0.3);
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
@@ -1076,22 +1081,28 @@ namespace DVBTTelevizor
                 AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                 AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 
-                //if (_viewModel.EPGDetailVisible)
-                //{
-                //    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PlayingEPGDetailGridPosition);
-                //    MainLayout.RaiseChild(EPGDetailGrid);
-                //}
-                //else
-                //{
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
                     if (IsPortrait)
                     {
-                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPosition);
+                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPlayingEPGDetailGridPosition);
+                    } else
+                    {
+                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePlayingEPGDetailGridPosition);
+                    }
+                    MainLayout.RaiseChild(EPGDetailGrid);
+                }
+                else
+                {
+                    if (IsPortrait)
+                    {
+                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
                     }
                     else
                     {
-                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPosition);
+                        AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
                     }
-                //}
+                }
 
                 switch (PlayingState)
                 {
@@ -1126,12 +1137,12 @@ namespace DVBTTelevizor
 
                         if (IsPortrait)
                         {
-                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PreviewVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, EPGDetailGridPosition);
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeEPGDetailGridPosition);
                         } else
                         {
-                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PreviewVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, EPGDetailGridPosition);
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeEPGDetailGridPosition);
                         }
 
                         CheckStreamCommand.Execute(null);

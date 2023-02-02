@@ -106,6 +106,8 @@
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="MaxLines" Value="2"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="TimeFromTextStyle" TargetType="Label">
