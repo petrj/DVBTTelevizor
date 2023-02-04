@@ -45,6 +45,7 @@ namespace DVBTTelevizor
         private bool _animePosIncreasing = true;
 
         private bool _EPGDetailVisible = false;
+        private bool? _EPGDetailVisibleLastValue = null;
 
         public enum SelectedPartEnum
         {
@@ -167,15 +168,22 @@ namespace DVBTTelevizor
             }
         }
 
+        private void NotifyEPGDetailVisibilityChange()
+        {
+            if (!_EPGDetailVisibleLastValue.HasValue || _EPGDetailVisibleLastValue.Value != EPGDetailVisible)
+            {
+                _EPGDetailVisibleLastValue = EPGDetailVisible;
+                MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EPGDetailVisibilityChange);
+                OnPropertyChanged(nameof(EPGDetailVisible));
+            }
+        }
+
         public bool EPGDetailVisible
         {
             get
             {
-                // just debugging
-                return true;
-
                 return
-                    _EPGDetailVisible &&
+                    //_EPGDetailVisible &&
                     SelectedChannel != null &&
                     SelectedChannel.CurrentEventItem != null;
             }
@@ -565,11 +573,13 @@ namespace DVBTTelevizor
                     OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                     OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                     OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-                    OnPropertyChanged(nameof(EPGDetailVisible));
+                    NotifyEPGDetailVisibilityChange();
                 }
                 finally
                 {
                     _semaphoreSlim.Release();
+
+
                 };
             }
         }
@@ -794,7 +804,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-                OnPropertyChanged(nameof(EPGDetailVisible));
+                NotifyEPGDetailVisibilityChange();
 
                 await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
 
@@ -852,7 +862,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-                OnPropertyChanged(nameof(EPGDetailVisible));
+                NotifyEPGDetailVisibilityChange();
             }
         }
 
