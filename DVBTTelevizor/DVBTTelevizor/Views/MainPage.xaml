@@ -106,6 +106,8 @@
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="MaxLines" Value="2"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="TimeFromTextStyle" TargetType="Label">
@@ -144,7 +146,7 @@
         </StackLayout>
     </NavigationPage.TitleView>
 
-    <AbsoluteLayout x:Name="absoluteLayout">
+    <AbsoluteLayout x:Name="MainLayout">
 
         <ListView
                 AbsoluteLayout.LayoutBounds="0,0,1,1"
@@ -208,7 +210,7 @@
         </ListView>
 
         <Grid
-            AbsoluteLayout.LayoutBounds="1.0,0.0,0.5,0.5"
+            AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
             AbsoluteLayout.LayoutFlags="All"
             x:Name="EPGDetailGrid"
             BackgroundColor="#262626"
