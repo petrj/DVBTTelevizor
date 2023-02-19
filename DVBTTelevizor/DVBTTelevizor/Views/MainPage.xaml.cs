@@ -358,26 +358,28 @@ namespace DVBTTelevizor
             }
 #endif
 
-            // prevent multiple key press events
+
 
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
-            if (_lastKeyPressed == null)
-            {
-                _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
-            }
-            else
-            {
-                if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 400 &&
-                    _lastKeyPressed.Item2 == keyAction)
-                {
-                    return; // ignoring event
-                }
-                else
-                {
-                    _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
-                }
-            }
+            // prevent multiple key press events
+            //
+            //if (_lastKeyPressed == null)
+            //{
+            //    _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
+            //}
+            //else
+            //{
+            //    if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 400 &&
+            //        _lastKeyPressed.Item2 == keyAction)
+            //    {
+            //        return; // ignoring event
+            //    }
+            //    else
+            //    {
+            //        _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
+            //    }
+            //}
 
             var stack = Navigation.NavigationStack;
             if (stack[stack.Count - 1].GetType() != typeof(MainPage))
@@ -398,27 +400,27 @@ namespace DVBTTelevizor
             {
                 case KeyboardNavigationActionEnum.Down:
                     await ActionDown();
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.Up:
                     await ActionUp();
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.Right:
                     await ActionRight();
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.Left:
                     await ActionLeft();
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.Back:
                     await ActionStop(false);
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.OK:
                     await ActionOK(longPress);
-                    break;
+                    return;
             }
 
             switch (key.ToLower())
@@ -493,14 +495,6 @@ namespace DVBTTelevizor
                 case "focus":
                 case "camera":
                     await Detail_Clicked(this, null);
-                    break;
-                default:
-                    {
-                        _loggingService.Debug($"Unbound key: {key}");
-#if DEBUG
-                        MessagingCenter.Send($"Unbound key: {key}", BaseViewModel.MSG_ToastMessage);
-#endif
-                    }
                     break;
             }
         }

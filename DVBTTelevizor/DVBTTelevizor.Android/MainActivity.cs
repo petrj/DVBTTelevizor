@@ -405,6 +405,11 @@ namespace DVBTTelevizor.Droid
 
         public override bool DispatchKeyEvent(KeyEvent e)
         {
+            if (e.Action == KeyEventActions.Up)
+            {
+                return true;
+            }
+
             var code = e.KeyCode.ToString();
             if (e.IsLongPress)
             {
@@ -413,33 +418,45 @@ namespace DVBTTelevizor.Droid
 
             var keyAction = KeyboardDeterminer.GetKeyAction(code);
 
-            if (!_dispatchKeyEventEnabled && keyAction != KeyboardNavigationActionEnum.Unknown)
-            {
-                _loggingService.Debug($"DispatchKeyEvent thrown out: {code}");
-
-                MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
-                return true;
-            }
-            else
+            if (_dispatchKeyEventEnabled)
             {
                 // ignoring ENTER 1 second after DispatchKeyEvent enabled
 
                 var ms = (DateTime.Now - _dispatchKeyEventEnabledAt).TotalMilliseconds;
 
-                if (keyAction == KeyboardNavigationActionEnum.OK && ms<1000)
+                if (keyAction == KeyboardNavigationActionEnum.OK && ms < 1000)
                 {
-                    _loggingService.Debug($"DispatchKeyEvent: ignoring ENTER");
+                    _loggingService.Debug($"DispatchKeyEvent: {code} -> ignoring OK action");
 
                     return true;
                 }
                 else
                 {
-                    _loggingService.Debug($"DispatchKeyEvent: {code}");
-
+                    _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to ancestor");
                     return base.DispatchKeyEvent(e);
                 }
             }
+            else
+            {
+                if (keyAction != KeyboardNavigationActionEnum.Unknown)
+                {
+                    _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to application, time: {e.EventTime - e.DownTime}");
 
+                    MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+
+                    return true;
+                }
+                else
+                {
+                    // unknown key
+
+                    _loggingService.Debug($"DispatchKeyEvent: {code} -> unknown key sending to ancestor");
+#if DEBUG
+                    ShowToastMessage($"<{code}>");
+#endif
+                    return base.DispatchKeyEvent(e);
+                }
+            }
         }
 
         private void SetFullScreen(bool on)
