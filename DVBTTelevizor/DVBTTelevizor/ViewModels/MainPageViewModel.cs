@@ -30,7 +30,6 @@ namespace DVBTTelevizor
 
         public Command VideoLongPressCommand { get; set; }
 
-        private DVBTChannel _lastSelectedChannel = null;
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
 
@@ -44,17 +43,17 @@ namespace DVBTTelevizor
         private int _animePos = 2;
         private bool _animePosIncreasing = true;
 
-        private bool _EPGDetailVisible = false;
+        private bool _EPGDetailEnabled = true;
         private bool? _EPGDetailVisibleLastValue = null;
 
         public enum SelectedPartEnum
         {
-            ChannelsList = 0,
+            ChannelsListOrVideo = 0,
             EPGDetail = 1,
             ToolBar = 2
         }
 
-        private SelectedPartEnum _selectedPart = SelectedPartEnum.ChannelsList;
+        private SelectedPartEnum _selectedPart = SelectedPartEnum.ChannelsListOrVideo;
 
         public MainPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
             : base(loggingService, dialogService, driver, config)
@@ -178,21 +177,30 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool EPGDetailEnabled
+        {
+            get
+            {
+                return _EPGDetailEnabled;
+            }
+            set
+            {
+                _EPGDetailEnabled = value;
+                OnPropertyChanged(nameof(EPGDetailVisible));
+                NotifyEPGDetailVisibilityChange();
+            }
+        }
+
         public bool EPGDetailVisible
         {
             get
             {
                 return
-                    //_EPGDetailVisible &&
+                    EPGDetailEnabled &&
                     SelectedChannel != null &&
                     SelectedChannel.CurrentEventItem != null;
             }
-            set
-            {
-                _EPGDetailVisible = value;
-            }
         }
-
 
         public string SelectedChannelEPGTitle
         {
@@ -322,11 +330,6 @@ namespace DVBTTelevizor
 
             SelectedChannel = ch;
             await ShowChannelMenu(ch);
-        }
-
-        private async Task AnyKeyPressed(string key)
-        {
-            MessagingCenter.Send(key, BaseViewModel.MSG_KeyDown);
         }
 
         public async Task ShowChannelMenu(DVBTChannel ch = null)

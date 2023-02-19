@@ -117,6 +117,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(FontSizeForDetailNote));
                 OnPropertyChanged(nameof(FontSizeForEntry));
                 OnPropertyChanged(nameof(ImageIconSize));
+                OnPropertyChanged(nameof(FontSizeForDescription));
             });
         }
 
@@ -141,6 +142,14 @@ namespace DVBTTelevizor
             get
             {
                 return GetScaledSize(12).ToString();
+            }
+        }
+
+        public string FontSizeForDescription
+        {
+            get
+            {
+                return GetScaledSize(13).ToString();
             }
         }
 

@@ -411,12 +411,12 @@ namespace DVBTTelevizor.Droid
             }
 
             var code = e.KeyCode.ToString();
+            var keyAction = KeyboardDeterminer.GetKeyAction(code);
+
             if (e.IsLongPress)
             {
                 code = $"{BaseViewModel.LongPressPrefix}{e.KeyCode.ToString()}";
             }
-
-            var keyAction = KeyboardDeterminer.GetKeyAction(code);
 
             if (_dispatchKeyEventEnabled)
             {

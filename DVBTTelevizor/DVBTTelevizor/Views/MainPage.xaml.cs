@@ -48,8 +48,6 @@ namespace DVBTTelevizor
 
         public Command CheckStreamCommand { get; set; }
 
-        private Tuple<DateTime, KeyboardNavigationActionEnum> _lastKeyPressed = null;
-
         // EPGDetailGrid
         private Rectangle LandscapeEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 0.3, 1.0);
         private Rectangle LandscapePreviewEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 0.3, 0.7);
@@ -64,13 +62,10 @@ namespace DVBTTelevizor
         private Rectangle PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rectangle(0.0, 0.0, 1.0, 0.7);
         private Rectangle PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.3);
 
-
         // ChannelsListView
         private Rectangle LandscapeChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rectangle(0.0, 1.0, 0.7, 1.0);
         private Rectangle ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rectangle(0, 0, 1, 1);
         private Rectangle PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rectangle(0.0, 0.0, 1.0, 0.7);
-
-
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
@@ -238,7 +233,7 @@ namespace DVBTTelevizor
             }
 
             _viewModel.SelectedToolbarItemName = null;
-            _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
             if (_viewModel.TunningButtonVisible)
             {
                 _tuneFocusItem.Focus();
@@ -345,41 +340,7 @@ namespace DVBTTelevizor
         {
             _loggingService.Debug($"OnKeyDown {key}");
 
-            // key events can be consumed only on this MainPage
-
-#if DEBUG
-            if (longPress)
-            {
-                MessagingCenter.Send($"Long key: {key}", BaseViewModel.MSG_ToastMessage);
-            }
-            else
-            {
-                MessagingCenter.Send($"key: {key}", BaseViewModel.MSG_ToastMessage);
-            }
-#endif
-
-
-
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
-
-            // prevent multiple key press events
-            //
-            //if (_lastKeyPressed == null)
-            //{
-            //    _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
-            //}
-            //else
-            //{
-            //    if ((DateTime.Now - _lastKeyPressed.Item1).TotalMilliseconds < 400 &&
-            //        _lastKeyPressed.Item2 == keyAction)
-            //    {
-            //        return; // ignoring event
-            //    }
-            //    else
-            //    {
-            //        _lastKeyPressed = new Tuple<DateTime, KeyboardNavigationActionEnum>(DateTime.Now, keyAction);
-            //    }
-            //}
 
             var stack = Navigation.NavigationStack;
             if (stack[stack.Count - 1].GetType() != typeof(MainPage))
@@ -545,9 +506,6 @@ namespace DVBTTelevizor
         {
             _loggingService.Debug($"ActionOK");
 
-            var firstOKActionWithinLast5Secs = (DateTime.Now - _lastActionOKTime).TotalSeconds > 5;
-            _lastActionOKTime = DateTime.Now;
-
             try
             {
                 if (_viewModel.TunningButtonVisible)
@@ -556,21 +514,31 @@ namespace DVBTTelevizor
                 } else
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
+                    var firstOKActionWithinLast5Secs = (DateTime.Now - _lastActionOKTime).TotalSeconds > 5;
+                    _lastActionOKTime = DateTime.Now;
+
                     if (longPress)
                     {
                         ToolMenu_Clicked(this, null);
                     } else
                     {
-                        // first action in 5 s --> show actual playing message
-                        // second action in 5 s --> show EPGDetail
-
-                        if (firstOKActionWithinLast5Secs)
+                        if (!_viewModel.EPGDetailEnabled)
                         {
-                            ShowActualPlayingMessage();
+                            // first action in 5 s --> show actual playing message
+                            // second action in 5 s --> show EPGDetail
+
+                            if (firstOKActionWithinLast5Secs)
+                            {
+                                ShowActualPlayingMessage();
+                            }
+                            else
+                            {
+                                _viewModel.EPGDetailEnabled = true;
+                                _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+                            }
                         } else
                         {
-                            //_viewModel.EPGDetailVisible = true;
-                            //RefreshGUI();
+                            _viewModel.EPGDetailEnabled = false;
                         }
                     }
                 }
@@ -578,7 +546,7 @@ namespace DVBTTelevizor
                 {
                     switch (_viewModel.SelectedPart)
                     {
-                        case SelectedPartEnum.ChannelsList:
+                        case SelectedPartEnum.ChannelsListOrVideo:
                             if (longPress)
                             {
                                 ToolMenu_Clicked(this, null);
@@ -612,15 +580,20 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    if (!_viewModel.StandingOnEnd)
+                    if (_viewModel.EPGDetailVisible)
                     {
-                        await _viewModel.SelectNextChannel();
-                        await _viewModel.PlayChannel();
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        } else
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+                        }
                     }
                 }
                 else
                 {
-                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
                         if (_viewModel.EPGDetailVisible)
                         {
@@ -637,7 +610,7 @@ namespace DVBTTelevizor
                         if (_viewModel.SelectedToolbarItemName == "ToolbarItemSettings")
                         {
                             _viewModel.SelectedToolbarItemName = null;
-                            _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                             if (_viewModel.TunningButtonVisible)
                             {
                                 _tuneFocusItem.Focus();
@@ -669,17 +642,25 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    // TODO: play last channel
-
-                    if (!_viewModel.StandingOnStart)
+                    if (_viewModel.EPGDetailVisible)
                     {
-                        await _viewModel.SelectPreviousChannel();
-                        await _viewModel.PlayChannel();
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        }
+                        else
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+                        }
+                    }
+                    else
+                    {
+                        // TODO: play previous channel
                     }
                 }
                 else
                 {
-                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
                         _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
                         _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
@@ -689,7 +670,7 @@ namespace DVBTTelevizor
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
                         await ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
-                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
@@ -704,7 +685,7 @@ namespace DVBTTelevizor
                             else
                             {
                                 await ScrollViewChannelEPGDescription.ScrollToAsync(0, 0, false);
-                                _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                                _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                                 if (_viewModel.TunningButtonVisible)
                                 {
                                     _tuneFocusItem.Focus();
@@ -732,15 +713,29 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    if (!_viewModel.StandingOnEnd)
+                    if (_viewModel.EPGDetailVisible)
                     {
-                        await _viewModel.SelectNextChannel();
-                        await _viewModel.PlayChannel();
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        }
+                        else
+                        {
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + 10 + (int)_config.AppFontSize, false);
+                        }
+                    }
+                    else
+                    {
+                        if (!_viewModel.StandingOnEnd)
+                        {
+                            await _viewModel.SelectNextChannel();
+                            await _viewModel.PlayChannel();
+                        }
                     }
                 }
                 else
                 {
-                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
                         await _viewModel.SelectNextChannel();
                     }
@@ -751,7 +746,7 @@ namespace DVBTTelevizor
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
                         _viewModel.SelectedToolbarItemName = null;
-                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                     }
                 }
             }
@@ -770,15 +765,29 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    if (!_viewModel.StandingOnStart)
+                    if (_viewModel.EPGDetailVisible)
                     {
-                        await _viewModel.SelectPreviousChannel();
-                        await _viewModel.PlayChannel();
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        }
+                        else
+                        {
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
+                        }
+                    }
+                    else
+                    {
+                        if (!_viewModel.StandingOnStart)
+                        {
+                            await _viewModel.SelectPreviousChannel();
+                            await _viewModel.PlayChannel();
+                        }
                     }
                 }
                 else
                 {
-                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsList)
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
                         await _viewModel.SelectPreviousChannel();
                     }
@@ -789,7 +798,7 @@ namespace DVBTTelevizor
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
                         _viewModel.SelectedToolbarItemName = null;
-                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                     }
                 }
             }
@@ -853,7 +862,7 @@ namespace DVBTTelevizor
             else
             if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
             {
-                _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                 _viewModel.SelectedToolbarItemName = null;
             }
 
@@ -891,7 +900,7 @@ namespace DVBTTelevizor
             else
             if (_viewModel.SelectedToolbarItemName == "ToolbarItemSettings")
             {
-                _viewModel.SelectedPart = SelectedPartEnum.ChannelsList;
+                _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
                 _viewModel.SelectedToolbarItemName = null;
             }
 
@@ -1298,7 +1307,7 @@ namespace DVBTTelevizor
 
             _viewModel.PlayingChannel = channel;
             PlayingState = PlayingStateEnum.Playing;
-
+            _viewModel.EPGDetailEnabled = false;
         }
 
         public async Task ActionStop(bool force)
@@ -1308,9 +1317,17 @@ namespace DVBTTelevizor
             if (_media == null || videoView == null || videoView.MediaPlayer == null)
                 return;
 
+            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+
             if (!force && (PlayingState == PlayingStateEnum.Playing))
             {
-                PlayingState = PlayingStateEnum.PlayingInPreview;
+                if (_viewModel.EPGDetailVisible)
+                {
+                    _viewModel.EPGDetailEnabled = false;
+                } else
+                {
+                    PlayingState = PlayingStateEnum.PlayingInPreview;
+                }
             }
             else
             if (force || (PlayingState == PlayingStateEnum.PlayingInPreview))
