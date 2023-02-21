@@ -1,22 +1,18 @@
 ﻿using System;
 using Android.App;
 using Android.Content.PM;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
 using Xamarin.Forms;
 using Android.Content;
 using System.Threading.Tasks;
-using Android.Net.Wifi;
-using VideoView = LibVLCSharp.Platforms.Android.VideoView;
-using LibVLCSharp.Shared;
 using LoggerService;
 using System.IO;
 using Xamarin.Essentials;
 using Android.Hardware.Usb;
-using Plugin.InAppBilling;
 using Google.Android.Material.Snackbar;
+using Plugin.CurrentActivity;
 
 namespace DVBTTelevizor.Droid
 {
@@ -56,8 +52,7 @@ namespace DVBTTelevizor.Droid
                 return;
             }
 
-            Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
-            Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
+            CrossCurrentActivity.Current.Init(this, savedInstanceState);
 
             _config = new DVBTTelevizorConfiguration();
 
@@ -77,12 +72,14 @@ namespace DVBTTelevizor.Droid
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.SetVmPolicy(builder.Build());
 
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
-
             // https://github.com/xamarin/Xamarin.Forms/issues/15582
             Xamarin.Forms.Forms.SetFlags("Disable_Accessibility_Experimental");
 
+            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
+            var context = Platform.AppContext;
+            var activity = Platform.CurrentActivity;
 
             // prevent sleep:
             Window window = (Forms.Context as Activity).Window;
@@ -355,8 +352,6 @@ namespace DVBTTelevizor.Droid
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
-
             if (requestCode == StartRequestCode && resultCode == Result.Ok)
             {
                 _waitingForInit = false;

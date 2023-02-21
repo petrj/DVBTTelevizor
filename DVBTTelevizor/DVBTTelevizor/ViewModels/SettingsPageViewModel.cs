@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Android.Content;
 using Plugin.InAppBilling;
-using Plugin.InAppBilling.Abstractions;
 
 namespace DVBTTelevizor
 {
@@ -258,10 +257,82 @@ namespace DVBTTelevizor
             }
         }
 
+        protected async Task AcknowledgePurchase(string token)
+        {
+            _loggingService.Info($"Acknowledge purchase token: {token}");
+
+            try
+            {
+                var acknowledged = await CrossInAppBilling.Current.FinalizePurchaseAsync(token);
+
+                foreach (var purchase in acknowledged)
+                {
+                    if (purchase.Success)
+                    {
+                        _loggingService.Info($"Successfully acknowledged");
+                    }
+                    else
+                    {
+                        _loggingService.Info($"Acknowledge failed");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Acknowledge error");
+            }
+        }
+
+        public async Task AcknowledgePurchases()
+        {
+            _loggingService.Info($"AcknowledgePurchases");
+
+#if DEBUG
+            return; // no check in debug mode, purchased state is managed by configuration
+#endif
+
+            try
+            {
+                // contacting service
+
+                var connected = await CrossInAppBilling.Current.ConnectAsync();
+
+                if (!connected)
+                {
+                    _loggingService.Info($"Connection to AppBilling service failed");
+                    return;
+                }
+
+                var purchases = await CrossInAppBilling.Current.GetPurchasesAsync(ItemType.InAppPurchase);
+                foreach (var purchase in purchases)
+                {
+                    if (purchase.IsAcknowledged.HasValue && !purchase.IsAcknowledged.Value)
+                    {
+                        await AcknowledgePurchase(purchase.PurchaseToken);
+
+                        _loggingService.Info($"Purchase AutoRenewing: {purchase.AutoRenewing}");
+                        _loggingService.Info($"Purchase Payload: {purchase.Payload}");
+                        _loggingService.Info($"Purchase PurchaseToken: {purchase.PurchaseToken}");
+                        _loggingService.Info($"Purchase State: {purchase.State}");
+                        _loggingService.Info($"Purchase TransactionDateUtc: {purchase.TransactionDateUtc}");
+                        _loggingService.Info($"Purchase ConsumptionState: {purchase.ConsumptionState}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while acknowledge purchases");
+            }
+            finally
+            {
+                await CrossInAppBilling.Current.DisconnectAsync();
+            }
+        }
+
         protected async Task Donate(string productId)
         {
            try
-            {
+           {
                 _loggingService.Debug($"Paying product id: {productId}");
 
                 var connected = await CrossInAppBilling.Current.ConnectAsync();
@@ -273,7 +344,7 @@ namespace DVBTTelevizor
                     return;
                 }
 
-                var purchase = await CrossInAppBilling.Current.PurchaseAsync(productId, ItemType.InAppPurchase, "apppayload");
+                var purchase = await CrossInAppBilling.Current.PurchaseAsync(productId, ItemType.InAppPurchase);
                 if (purchase == null)
                 {
                     _loggingService.Info($"Not purchased");
@@ -289,6 +360,19 @@ namespace DVBTTelevizor
                     _loggingService.Info($"Purchase Payload: {purchase.Payload}");
                     _loggingService.Info($"Purchase ConsumptionState: {purchase.ConsumptionState.ToString()}");
                     _loggingService.Info($"Purchase AutoRenewing: {purchase.AutoRenewing}");
+
+                    if (purchase.State == PurchaseState.Purchased)
+                    {
+                        await AcknowledgePurchase(purchase.PurchaseToken);
+                    }
+                    else if (purchase.State == PurchaseState.PaymentPending)
+                    {
+                        await _dialogService.Information($"Payment is pending.");
+                    }
+                    else
+                    {
+                        await _dialogService.Error($"Payment failed.");
+                    }
                 }
             }
             catch (Exception ex)

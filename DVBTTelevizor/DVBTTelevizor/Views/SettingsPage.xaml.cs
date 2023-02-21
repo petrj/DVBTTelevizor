@@ -41,6 +41,11 @@ namespace DVBTTelevizor
             BuildFocusableItems();
         }
 
+        public async Task AcknowledgePurchases()
+        {
+            await _viewModel.AcknowledgePurchases();
+        }
+
         private void PlayOnBackgroundSwitch_Toggled(object sender, ToggledEventArgs e)
         {
             if (_viewModel.Config.PlayOnBackground)

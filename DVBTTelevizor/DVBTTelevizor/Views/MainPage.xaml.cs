@@ -202,6 +202,8 @@ namespace DVBTTelevizor
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
             _tuneFocusItem.Focus();
+
+            Task.Run( async () => { await _settingsPage.AcknowledgePurchases(); });
         }
 
         public PlayingStateEnum PlayingState
@@ -1084,7 +1086,6 @@ namespace DVBTTelevizor
                 Task.Run(async () => await ActionStop(false));
             }
         }
-
 
         private void SwipeGestureRecognizer_Up(object sender, SwipedEventArgs e)
         {
