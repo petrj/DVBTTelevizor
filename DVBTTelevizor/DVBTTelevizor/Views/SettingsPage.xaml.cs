@@ -85,6 +85,7 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate10", new List<View>() { Donate10Button }));
 
@@ -177,6 +178,10 @@ namespace DVBTTelevizor
 
                         case "Donate1":
                             _viewModel.Donate1command.Execute(null);
+                            break;
+
+                        case "Donate2":
+                            _viewModel.Donate2Command.Execute(null);
                             break;
 
                         case "Donate5":

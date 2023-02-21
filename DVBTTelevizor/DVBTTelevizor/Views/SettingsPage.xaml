@@ -197,17 +197,19 @@
                     <Grid Margin="20,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="33*" />
-                            <ColumnDefinition Width="33*" />
-                            <ColumnDefinition Width="34*" />
+                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="25*" />
                         </Grid.ColumnDefinitions>
 
                         <Button x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="1$"  Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="1" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button x:Name="Donate10Button" Grid.Row="0" Grid.Column="2" Text="10$"  Command="{Binding Donate10command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
+                        <Button x:Name="Donate2Button" Grid.Row="0" Grid.Column="1" Text="2$"  Command="{Binding Donate2Command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="2" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button x:Name="Donate10Button" Grid.Row="0" Grid.Column="3" Text="10$"  Command="{Binding Donate10command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     </Grid>
 
                 </StackLayout>

@@ -25,6 +25,7 @@ namespace DVBTTelevizor
         public Command ShareChannelsCommand { get; set; }
 
         public Command Donate1command { get; set; }
+        public Command Donate2Command { get; set; }
         public Command Donate5command { get; set; }
         public Command Donate10command { get; set; }
 
@@ -45,9 +46,10 @@ namespace DVBTTelevizor
 
             ShareChannelsCommand = new Command(async  () => { await ShareLog(); });
 
-            Donate1command = new Command(async () => { await Donate("donation1"); });
-            Donate5command = new Command(async () => { await Donate("donation5"); });
-            Donate10command = new Command(async () => { await Donate("donation10"); });
+            Donate1command = new Command(async () => { await Donate("donation.1"); });
+            Donate2Command = new Command(async () => { await Donate("donation.2"); });
+            Donate5command = new Command(async () => { await Donate("donation.5"); });
+            Donate10command = new Command(async () => { await Donate("donation.10"); });
         }
 
         public string AndroidChannelsListPath
@@ -287,9 +289,9 @@ namespace DVBTTelevizor
         {
             _loggingService.Info($"AcknowledgePurchases");
 
-#if DEBUG
-            return; // no check in debug mode, purchased state is managed by configuration
-#endif
+//#if DEBUG
+//            return; // no check in debug mode, purchased state is managed by configuration
+//#endif
 
             try
             {
