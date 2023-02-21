@@ -223,6 +223,15 @@ namespace DVBTTelevizor.Droid
                 });
             });
 
+            MessagingCenter.Subscribe<string>(string.Empty, BaseViewModel.MSG_QuitApp, (sender) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    StopPlayingNotification();
+                    Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+                });
+            });
+
             InstanceAlreadyStarted = true;
 
             if (Intent != null &&

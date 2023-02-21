@@ -14,6 +14,7 @@ using System.Threading;
 using LoggerService;
 using LibVLCSharp.Shared;
 using static DVBTTelevizor.MainPageViewModel;
+using Xamarin.Essentials;
 
 namespace DVBTTelevizor
 {
@@ -37,6 +38,7 @@ namespace DVBTTelevizor
         private string _numberPressed = String.Empty;
         private bool _firstStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
+        private DateTime _lastBackPressedTime = DateTime.MinValue;
 
         public bool IsPortrait { get; private set; } = false;
 
@@ -376,7 +378,7 @@ namespace DVBTTelevizor
                     return;
 
                 case KeyboardNavigationActionEnum.Back:
-                    await ActionStop(false);
+                    await ActionBack(longPress);
                     return;
 
                 case KeyboardNavigationActionEnum.OK:
@@ -757,6 +759,34 @@ namespace DVBTTelevizor
             }
         }
 
+        private async Task ActionBack(bool longPress)
+        {
+            _loggingService.Info($"ActionBack");
+
+            if (PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview)
+            {
+                await ActionStop(longPress);
+                _lastBackPressedTime = DateTime.MinValue;
+                return;
+            }
+
+            if (longPress)
+            {
+                MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_QuitApp);
+                return;
+            }
+
+             if ((_lastBackPressedTime == DateTime.MinValue) || ((DateTime.Now - _lastBackPressedTime).TotalSeconds > 3))
+             {
+                 MessagingCenter.Send($"Stiskněte ještě jednou pro ukončení", BaseViewModel.MSG_ToastMessage);
+                 _lastBackPressedTime = DateTime.Now;
+             }
+             else
+             {
+                 MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_QuitApp);
+             }
+        }
+
         private async Task ActionUp()
         {
             _loggingService.Info($"ActionUp");
@@ -1055,14 +1085,35 @@ namespace DVBTTelevizor
             }
         }
 
+
         private void SwipeGestureRecognizer_Up(object sender, SwipedEventArgs e)
         {
-
+            Task.Run(async () =>
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    await ActionUp();
+                }
+                else if (PlayingState == PlayingStateEnum.PlayingInPreview)
+                {
+                    await ActionStop(false);
+                }
+            });
         }
 
         private void SwipeGestureRecognizer_Down(object sender, SwipedEventArgs e)
         {
-
+            Task.Run(async () =>
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    await ActionDown();
+                }
+                else if (PlayingState == PlayingStateEnum.PlayingInPreview)
+                {
+                    await ActionStop(false);
+                }
+            });
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -1353,7 +1404,7 @@ namespace DVBTTelevizor
                 return;
             }
 
-            Device.BeginInvokeOnMainThread(() =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 if (!videoView.MediaPlayer.IsPlaying)
                 {

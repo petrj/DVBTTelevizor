@@ -45,6 +45,7 @@ namespace DVBTTelevizor
         public const string MSG_EPGDetailVisibilityChange = "EPGDetailVisibilityChange";
 
         public const string MSG_CloseActualPage = "CloseActualPage";
+        public const string MSG_QuitApp = "QuitApp";
 
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";
         public const string MSG_StopPlayInBackgroundNotification = "StopPlayInBackgroundNotification";
