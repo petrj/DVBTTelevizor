@@ -30,6 +30,7 @@ namespace DVBTTelevizor
         private DVBTTelevizorConfiguration _config;
         private long _lastTunedFreq = -1;
         private long _lastTunedDeliverySystem = -1;
+        private const int ReadBufferSize = 32768;
 
         private bool _readingStream = true;
         private bool _recording = false;
@@ -437,7 +438,7 @@ namespace DVBTTelevizor
             {
                 DataStreamInfo = "Reading data ...";
 
-                byte[] buffer = new byte[2048];
+                byte[] buffer = new byte[ReadBufferSize];
 
                 FileStream recordFileStream = null;
                 string recordingFileName = null;
@@ -517,7 +518,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            System.Threading.Thread.Sleep(200);
+                            System.Threading.Thread.Sleep(100);
                         }
 
                         if (!rec && recordFileStream != null)

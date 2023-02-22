@@ -250,7 +250,7 @@
 
         </Grid>
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,0.45,0.5,0.35" AbsoluteLayout.LayoutFlags="All">
+        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
                 <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
