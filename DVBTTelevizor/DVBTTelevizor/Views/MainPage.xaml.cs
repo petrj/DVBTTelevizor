@@ -1405,7 +1405,7 @@ namespace DVBTTelevizor
                 return;
             }
 
-            await MainThread.InvokeOnMainThreadAsync(async () =>
+            Device.BeginInvokeOnMainThread(() =>
             {
                 if (!videoView.MediaPlayer.IsPlaying)
                 {
@@ -1419,10 +1419,10 @@ namespace DVBTTelevizor
                 }
                 else
                 {
+                    //PreviewVideoBordersFix();
+
                     NoVideoStackLayout.IsVisible = false;
                     VideoStackLayout.IsVisible = true;
-
-                    PreviewVideoBordersFix();
                 }
             });
         }
