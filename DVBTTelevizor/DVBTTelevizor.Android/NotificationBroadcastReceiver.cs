@@ -12,7 +12,7 @@ using Xamarin.Forms;
 
 namespace DVBTTelevizor.Droid
 {
-    [BroadcastReceiver(Enabled = true)]
+    [BroadcastReceiver(Enabled = true, Exported = true)]
     [IntentFilter(new[] { "net.petrjanousek.net.NotificationBroadcastReceiver" })]
     public class NotificationBroadcastReceiver : BroadcastReceiver
     {

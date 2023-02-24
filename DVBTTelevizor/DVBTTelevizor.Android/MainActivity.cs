@@ -16,7 +16,7 @@ using Plugin.CurrentActivity;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, Exported = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
@@ -575,7 +575,7 @@ namespace DVBTTelevizor.Droid
             try
             {
                 var msg = playStreamInfo == null || playStreamInfo.Channel == null ? "" : $"Playing {playStreamInfo.Channel.Name}";
-                _notificationHelper.ShowNotification(String.Empty, msg , String.Empty);
+                _notificationHelper.ShowPlayNotification(1, msg, string.Empty, string.Empty);
             }
             catch (Exception ex)
             {
@@ -587,7 +587,7 @@ namespace DVBTTelevizor.Droid
         {
             try
             {
-                _notificationHelper.CloseNotification();
+                _notificationHelper.CloseNotification(1);
             }
             catch (Exception ex)
             {
