@@ -52,29 +52,30 @@ namespace DVBTTelevizor.Droid
             }
         }
 
-        public void ShowNotification(string title, string body, string detail)
+        public void ShowPlayNotification(int notificationId, string title, string body, string detail)
         {
             var notificationIntent = Application.Context.PackageManager?.GetLaunchIntentForPackage(Application.Context.PackageName);
             notificationIntent.SetFlags(ActivityFlags.SingleTop);
-            var pendingIntent = PendingIntent.GetActivity(Application.Context, _notificationId, notificationIntent, PendingIntentFlags.CancelCurrent);
+            var pendingIntentFlags = PendingIntentFlags.CancelCurrent | PendingIntentFlags.Immutable;
+            var pendingIntent = PendingIntent.GetActivity(Application.Context, notificationId, notificationIntent, pendingIntentFlags);
 
             var stopIntent = new Intent(Application.Context, typeof(NotificationBroadcastReceiver));
             stopIntent.SetAction("Stop");
 
             var stopPendingIntent = PendingIntent.GetBroadcast(
                 Application.Context,
-                _notificationId,
+                notificationId,
                 stopIntent,
-                PendingIntentFlags.CancelCurrent
+                pendingIntentFlags
             );
 
             var quitIntent = new Intent(Application.Context, typeof(NotificationBroadcastReceiver));
             quitIntent.SetAction("Quit");
             var quitPendingIntent = PendingIntent.GetBroadcast(
                 Application.Context,
-                _notificationId,
+                notificationId,
                 quitIntent,
-                PendingIntentFlags.CancelCurrent
+                pendingIntentFlags
             );
 
             var notificationBuilder = new NotificationCompat.Builder(ApplicationContext, _channelId)
@@ -91,12 +92,45 @@ namespace DVBTTelevizor.Droid
                      .SetVisibility((int)NotificationVisibility.Public)
                      .SetContentIntent(pendingIntent);
 
-            NotificationManager.Notify(_notificationId, notificationBuilder.Build());
+            NotificationManager.Notify(notificationId, notificationBuilder.Build());
         }
 
-        public void CloseNotification()
+        public void ShowRecordNotification(int notificationId, string title, string body, string detail)
         {
-            NotificationManager.Cancel(_notificationId);
+            var notificationIntent = Application.Context.PackageManager?.GetLaunchIntentForPackage(Application.Context.PackageName);
+            notificationIntent.SetFlags(ActivityFlags.SingleTop);
+            var pendingIntentFlags = PendingIntentFlags.CancelCurrent | PendingIntentFlags.Immutable;
+            var pendingIntent = PendingIntent.GetActivity(Application.Context, notificationId, notificationIntent, pendingIntentFlags);
+
+            var stopIntent = new Intent(Application.Context, typeof(NotificationBroadcastReceiver));
+            stopIntent.SetAction("StopRecord");
+
+            var stopPendingIntent = PendingIntent.GetBroadcast(
+                Application.Context,
+                notificationId,
+                stopIntent,
+                pendingIntentFlags
+            );
+
+            var notificationBuilder = new NotificationCompat.Builder(ApplicationContext, _channelId)
+                     .SetContentTitle(body)
+                     .SetContentText(detail)
+                     .SetSubText(title)
+                     .SetSmallIcon(Resource.Drawable.SmallIcon)
+                     .SetAutoCancel(false)
+                     .SetOngoing(true)
+                     .SetSound(null)
+                     .SetVibrate(new long[] { 0, 0 })
+                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Stop, "Stop recording", stopPendingIntent))
+                     .SetVisibility((int)NotificationVisibility.Public)
+                     .SetContentIntent(pendingIntent);
+
+            NotificationManager.Notify(notificationId, notificationBuilder.Build());
+        }
+
+        public void CloseNotification(int notificationId)
+        {
+            NotificationManager.Cancel(notificationId);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using LoggerService;
 using System;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -35,7 +36,10 @@ namespace DVBTTelevizor
 
             if (!_config.PlayOnBackground)
             {
-                _mainPage.StopPlayback();
+                Task.Run(async () =>
+                {
+                    await _mainPage.ActionStop(true);
+                });
             }
         }
 

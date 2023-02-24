@@ -16,7 +16,7 @@ using Plugin.CurrentActivity;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = true, Exported = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
@@ -204,11 +204,27 @@ namespace DVBTTelevizor.Droid
                 });
             });
 
+            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_ShowRecordNotification, (playStreamInfo) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShowRecordNotification(playStreamInfo));
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_CloseRecordNotification, (msg) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    StopNotification(2);
+                });
+            });
+
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopPlayInBackgroundNotification, (sender) =>
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    StopPlayingNotification();
+                    StopNotification(1);
                 });
             });
 
@@ -224,7 +240,8 @@ namespace DVBTTelevizor.Droid
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    StopPlayingNotification();
+                    StopNotification(1);
+                    StopNotification(2);
                     Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
                 });
             });
@@ -575,7 +592,7 @@ namespace DVBTTelevizor.Droid
             try
             {
                 var msg = playStreamInfo == null || playStreamInfo.Channel == null ? "" : $"Playing {playStreamInfo.Channel.Name}";
-                _notificationHelper.ShowNotification(String.Empty, msg , String.Empty);
+                _notificationHelper.ShowPlayNotification(1, msg, string.Empty, string.Empty);
             }
             catch (Exception ex)
             {
@@ -583,11 +600,24 @@ namespace DVBTTelevizor.Droid
             }
         }
 
-        private void StopPlayingNotification()
+        private async Task ShowRecordNotification(PlayStreamInfo recStreamInfo)
         {
             try
             {
-                _notificationHelper.CloseNotification();
+                var msg = recStreamInfo == null || recStreamInfo.Channel == null ? "" : $"Recording {recStreamInfo.Channel.Name}";
+                _notificationHelper.ShowRecordNotification(2, msg, string.Empty, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void StopNotification(int notificationId)
+        {
+            try
+            {
+                _notificationHelper.CloseNotification(notificationId);
             }
             catch (Exception ex)
             {

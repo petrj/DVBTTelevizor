@@ -389,14 +389,21 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task RecordChannel(DVBTChannel channel, bool start)
+        public async Task RecordChannel(DVBTChannel channel, bool start)
         {
-            if (channel == null)
+            if (channel == null && start)
             {
                 channel = SelectedChannel;
-                if (channel == null)
-                    return;
+
             }
+
+            if (channel == null && !start)
+            {
+                channel = _recordingChannel;
+            }
+
+            if (channel == null)
+                return;
 
             _loggingService.Debug($"Recording channel {channel}: {start}");
 
@@ -423,6 +430,14 @@ namespace DVBTTelevizor
                     await _driver.StartRecording();
 
                     MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
+
+                    var playInfo = new PlayStreamInfo
+                    {
+                        Channel = channel,
+                        SignalStrengthPercentage = playRes.SignalStrengthPercentage
+                    };
+
+                    MessagingCenter.Send<PlayStreamInfo>(playInfo, BaseViewModel.MSG_ShowRecordNotification);
                 }
                 else
                 {
@@ -439,6 +454,8 @@ namespace DVBTTelevizor
                     channel.Recording = false;
 
                     MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
+
+                    MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_CloseRecordNotification);
                 }
             }
             catch (Exception ex)
