@@ -204,11 +204,27 @@ namespace DVBTTelevizor.Droid
                 });
             });
 
+            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_ShowRecordNotification, (playStreamInfo) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShowRecordNotification(playStreamInfo));
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_CloseRecordNotification, (msg) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    StopNotification(2);
+                });
+            });
+
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopPlayInBackgroundNotification, (sender) =>
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    StopPlayingNotification();
+                    StopNotification(1);
                 });
             });
 
@@ -224,7 +240,8 @@ namespace DVBTTelevizor.Droid
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    StopPlayingNotification();
+                    StopNotification(1);
+                    StopNotification(2);
                     Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
                 });
             });
@@ -583,11 +600,24 @@ namespace DVBTTelevizor.Droid
             }
         }
 
-        private void StopPlayingNotification()
+        private async Task ShowRecordNotification(PlayStreamInfo recStreamInfo)
         {
             try
             {
-                _notificationHelper.CloseNotification(1);
+                var msg = recStreamInfo == null || recStreamInfo.Channel == null ? "" : $"Recording {recStreamInfo.Channel.Name}";
+                _notificationHelper.ShowRecordNotification(2, msg, string.Empty, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void StopNotification(int notificationId)
+        {
+            try
+            {
+                _notificationHelper.CloseNotification(notificationId);
             }
             catch (Exception ex)
             {

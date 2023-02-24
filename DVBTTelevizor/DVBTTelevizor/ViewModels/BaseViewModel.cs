@@ -29,6 +29,7 @@ namespace DVBTTelevizor
         public const string MSG_DisableFullScreen = "DisableFullScreen";
         public const string MSG_PlayStream = "PlayStream";
         public const string MSG_StopStream = "StopStream";
+        public const string MSG_StopRecord = "StopRecord";
         public const string MSG_UpdateDriverState = "UpdateDriverState";
         public const string MSG_Init = "Init";
         public const string MSG_KeyDown = "KeyDown";
@@ -49,6 +50,9 @@ namespace DVBTTelevizor
 
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";
         public const string MSG_StopPlayInBackgroundNotification = "StopPlayInBackgroundNotification";
+
+        public const string MSG_ShowRecordNotification = "ShowRecordNotification";
+        public const string MSG_CloseRecordNotification = "CloseRecordNotification";
 
         public const string MSG_EnableDispatchKeyEvent = "EnableDispatchKeyEvent";
         public const string MSG_DisableDispatchKeyEvent = "DisableDispatchKeyEvent";

@@ -187,7 +187,12 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopStream, (msg) =>
             {
-                StopPlayback();
+                Task.Run(async () => { await ActionStop(true); });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopRecord, (msg) =>
+            {
+                Task.Run(async () => { await _viewModel.RecordChannel(null, false); });
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ImportChannelsList, (message) =>
@@ -321,23 +326,6 @@ namespace DVBTTelevizor
 
                 _servicePage.Done();
             });
-        }
-
-        public void StopPlayback()
-        {
-            if (PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview)
-            {
-                MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
-
-                videoView.MediaPlayer.Stop();
-                Task.Run(async () =>
-                {
-                    if (!_driver.Recording)
-                    {
-                        await _driver.Stop();
-                    }
-                });
-            }
         }
 
         public async void OnKeyDown(string key, bool longPress)
@@ -1395,6 +1383,8 @@ namespace DVBTTelevizor
                 {
                     await _driver.Stop();
                 }
+
+                MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
         }
 

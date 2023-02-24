@@ -26,7 +26,11 @@ namespace DVBTTelevizor.Droid
                 }
                 if (intent.Action == "Quit")
                 {
-                    Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+                    MessagingCenter.Send(string.Empty, BaseViewModel.MSG_QuitApp);
+                }
+                if (intent.Action == "StopRecord")
+                {
+                    MessagingCenter.Send(string.Empty, BaseViewModel.MSG_StopRecord);
                 }
             } catch (Exception ex)
             {
