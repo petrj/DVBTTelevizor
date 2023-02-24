@@ -334,6 +334,8 @@ namespace DVBTTelevizor
 
         public async Task ShowChannelMenu(DVBTChannel ch = null)
         {
+            string title;
+
             if (ch == null)
             {
                 ch = SelectedChannel;
@@ -341,27 +343,35 @@ namespace DVBTTelevizor
 
             if (ch == null)
             {
-                await _dialogService.Information("No channel selected");
-                return;
+                title = "Menu";
+            }
+            else
+            {
+                title = ch.Name;
             }
 
             var actions = new List<string>();
 
-            if (!ch.Recording)
+            if (ch != null)
             {
-                actions.Add("Play");
-                actions.Add("Scan EPG");
-                actions.Add("Detail & edit");
-                actions.Add("Record");
-                actions.Add("Delete");
-            }
-            else
-            {
-                actions.Add("Show record location");
-                actions.Add("Stop record");
+                if (!ch.Recording)
+                {
+                    actions.Add("Play");
+                    actions.Add("Scan EPG");
+                    actions.Add("Detail & edit");
+                    actions.Add("Record");
+                    actions.Add("Delete");
+                }
+                else
+                {
+                    actions.Add("Show record location");
+                    actions.Add("Stop record");
+                }
             }
 
-            var action = await _dialogService.DisplayActionSheet($"{ch.Name}", "Cancel", actions);
+            actions.Add("Quit app");
+
+            var action = await _dialogService.DisplayActionSheet(title, "Cancel", actions);
 
             switch (action)
             {
@@ -385,6 +395,12 @@ namespace DVBTTelevizor
                     break;
                 case "Delete":
                     await DeleteChannel(ch);
+                    break;
+                case "Quit app":
+                    if (await _dialogService.Confirm("Are you sure to quit DVBT televizor?"))
+                    {
+                        MessagingCenter.Send(String.Empty, BaseViewModel.MSG_QuitApp);
+                    }
                     break;
             }
         }
