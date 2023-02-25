@@ -85,6 +85,8 @@ namespace DVBTTelevizor.Droid
             Window window = (Forms.Context as Activity).Window;
             window.AddFlags(WindowManagerFlags.KeepScreenOn);
 
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             // https://stackoverflow.com/questions/39248138/how-to-hide-bottom-bar-of-android-back-home-in-xamarin-forms
             _defaultUiOptions = (int)Window.DecorView.SystemUiVisibility;
 
@@ -255,6 +257,11 @@ namespace DVBTTelevizor.Droid
             {
                 HandleImportFile(Intent);
             }
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _loggingService.Error(e.ExceptionObject as Exception, "CurrentDomain_UnhandledException");
         }
 
         private void HandleImportFile(Intent intent)

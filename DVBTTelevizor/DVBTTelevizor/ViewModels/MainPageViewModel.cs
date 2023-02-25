@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Linq;
+using MPEGTS;
 
 namespace DVBTTelevizor
 {
@@ -32,6 +33,7 @@ namespace DVBTTelevizor
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
+        public string RecordingFileName { get; set; } = null;
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
@@ -45,6 +47,8 @@ namespace DVBTTelevizor
 
         private bool _EPGDetailEnabled = true;
         private bool? _EPGDetailVisibleLastValue = null;
+
+
 
         public enum SelectedPartEnum
         {
@@ -71,6 +75,31 @@ namespace DVBTTelevizor
 
             BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
             BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
+        }
+
+        public string RecordingLabel
+        {
+            get
+            {
+                if (_recordingChannel == null || _playingState == PlayingStateEnum.Stopped)
+                    return string.Empty;
+
+                return "\u25CF";
+            }
+        }
+
+        public DVBTChannel RecordingChannel
+        {
+            get
+            {
+                return _recordingChannel;
+            }
+            set
+            {
+                _recordingChannel = value;
+
+                OnPropertyChanged(nameof(RecordingLabel));
+            }
         }
 
         public SelectedPartEnum SelectedPart
@@ -142,19 +171,6 @@ namespace DVBTTelevizor
                 {
                     _semaphoreSlim.Release();
                 };
-            }
-        }
-
-
-        public bool DebugArrowVisible
-        {
-            get
-            {
-#if DEBUG
-                return true;
-#else
-                return false;
-#endif
             }
         }
 
@@ -310,9 +326,52 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                _loggingService.Error(ex, "Import failed");
+                _loggingService.Error(ex,"Import failed");
                 await _dialogService.Error($"Import failed");
             }
+        }
+
+        public async Task<EventItem> GetChannelEPG(DVBTChannel channel)
+        {
+            if (channel == null)
+                return null;
+
+            EventItem eventItem = null;
+
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var eitManager = _driver.GetEITManager(channel.Frequency);
+                    if (eitManager != null)
+                    {
+                        var evs = eitManager.GetEvents(DateTime.Now, 2);
+                        var programMapPID = Convert.ToInt32(channel.ProgramMapPID);
+                        if (evs != null && evs.ContainsKey(programMapPID))
+                        {
+                            if (evs[programMapPID] != null)
+                            {
+                                if (evs[programMapPID].Count > 0)
+                                    channel.CurrentEventItem = eventItem = evs[programMapPID][0];
+
+                                if (evs[programMapPID].Count > 1)
+                                    channel.NextEventItem = evs[programMapPID][1];
+
+                                channel.NotifyEPGChanges();
+                            }
+                        }
+                    }
+
+                    return eventItem;
+
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex, "GetChannelEPG error");
+
+                    return null;
+                }
+            });
         }
 
         private async Task VideoLongPress()
@@ -354,7 +413,7 @@ namespace DVBTTelevizor
 
             if (ch != null)
             {
-                if (!ch.Recording)
+                if (RecordingChannel == null)
                 {
                     actions.Add("Play");
                     actions.Add("Scan EPG");
@@ -364,8 +423,11 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    actions.Add("Show record location");
-                    actions.Add("Stop record");
+                    if (RecordingChannel.Number == ch.Number)
+                    {
+                        actions.Add("Show record location");
+                        actions.Add("Stop record");
+                    }
                 }
             }
 
@@ -376,7 +438,7 @@ namespace DVBTTelevizor
             switch (action)
             {
                 case "Play":
-                    await PlayChannel(ch);
+                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
                     break;
                 case "Scan EPG":
                     await ScanEPG(ch);
@@ -385,13 +447,14 @@ namespace DVBTTelevizor
                     MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
                     break;
                 case "Record":
-                    await RecordChannel(ch, true);
+                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
                     break;
                 case "Show record location":
-                    await _dialogService.Information(_driver.RecordFileName);
+                    await _dialogService.Information(RecordingFileName);
                     break;
                 case "Stop record":
-                    await RecordChannel(ch, false);
+                    //await RecordChannel(ch, false);
+                    await StopRecord();
                     break;
                 case "Delete":
                     await DeleteChannel(ch);
@@ -405,85 +468,29 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task RecordChannel(DVBTChannel channel, bool start)
+        public async Task StopRecord()
         {
-            if (channel == null && start)
+            _loggingService.Debug($"StopRecord");
+
+            if (RecordingChannel == null)
             {
-                channel = SelectedChannel;
-
-            }
-
-            if (channel == null && !start)
-            {
-                channel = _recordingChannel;
-            }
-
-            if (channel == null)
-                return;
-
-            _loggingService.Debug($"Recording channel {channel}: {start}");
-
-            try
-            {
-
-                if (start)
-                {
-                    if (!_driver.Started)
-                    {
-                        MessagingCenter.Send($"Recording failed (device connection error)", BaseViewModel.MSG_ToastMessage);
-                        return;
-                    }
-
-                    var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
-                    if (!playRes.OK)
-                    {
-                        throw new Exception("Play returned false");
-                    }
-
-                    _recordingChannel = channel;
-                    channel.Recording = true;
-
-                    await _driver.StartRecording();
-
-                    MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
-
-                    var playInfo = new PlayStreamInfo
-                    {
-                        Channel = channel,
-                        SignalStrengthPercentage = playRes.SignalStrengthPercentage
-                    };
-
-                    MessagingCenter.Send<PlayStreamInfo>(playInfo, BaseViewModel.MSG_ShowRecordNotification);
-                }
-                else
-                {
-                    if (!_driver.Started)
-                    {
-                        MessagingCenter.Send($"Stop recording failed (device connection error)", BaseViewModel.MSG_ToastMessage);
-                        return;
-                    }
-
-                    _driver.StopRecording();
-                    await _driver.Stop();
-
-                    _recordingChannel = null;
-                    channel.Recording = false;
-
-                    MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
-
-                    MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_CloseRecordNotification);
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-
-                MessagingCenter.Send($"Start/stop recording failed (device connection error)", BaseViewModel.MSG_ToastMessage);
-
                 return;
             }
 
-            channel.NotifyRecordingLabelChange();
+            RecordingChannel.Recording = false;
+            RecordingChannel = null;
+            RecordingFileName = null;
+
+            MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
+
+            MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_CloseRecordNotification);
+
+            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_StopStream);
+
+            if (_playingState != PlayingStateEnum.Stopped)
+            {
+                MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
+            }
         }
 
         private async Task DeleteChannel(DVBTChannel channel)
@@ -512,7 +519,7 @@ namespace DVBTTelevizor
 
                 _loggingService.Info($"Short press on channel {ch.Name})");
 
-                Task.Run(async () => await PlayChannel(ch));
+                MessagingCenter.Send(new PlayStreamInfo { Channel = ch }, BaseViewModel.MSG_PlayStream);
             }
         }
 
@@ -704,68 +711,6 @@ namespace DVBTTelevizor
 
                 MessagingCenter.Send($"EPG scan failed", BaseViewModel.MSG_ToastMessage);
             }
-        }
-
-        public async Task PlayChannel(DVBTChannel channel = null)
-        {
-            if (channel == null)
-            {
-                channel = SelectedChannel;
-                if (channel == null)
-                    return;
-            }
-
-            var playInfo = new PlayStreamInfo
-            {
-                Channel = channel
-            };
-
-            if (_recordingChannel != null)
-            {
-                MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
-                return;
-            }
-
-            _loggingService.Debug($"Playing channel {channel}");
-
-            try
-            {
-                if (!_driver.Started)
-                {
-                    MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
-                    return;
-                }
-
-                IsRefreshing = true;
-
-                var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
-                if (!playRes.OK)
-                {
-                    throw new Exception("Play returned false");
-                }
-
-                playInfo.SignalStrengthPercentage = playRes.SignalStrengthPercentage;
-
-                var eitManager = _driver.GetEITManager(channel.Frequency);
-                if (eitManager != null)
-                {
-                    playInfo.CurrentEvent = eitManager.GetEvent(DateTime.Now, Convert.ToInt32(channel.ProgramMapPID));
-                }
-
-                MessagingCenter.Send(playInfo, BaseViewModel.MSG_PlayStream);
-
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex, $"Playing {channel.Name} failed");
-
-                MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
-            }
-            finally
-            {
-                IsRefreshing = false;
-            }
-
         }
 
         private async Task Refresh()
