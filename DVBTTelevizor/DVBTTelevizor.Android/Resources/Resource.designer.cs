@@ -25,6 +25,7 @@ namespace DVBTTelevizor.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::LibVLCSharp.Resource.String.app_name = global::DVBTTelevizor.Droid.Resource.String.app_name;
 			global::Plugin.InAppBilling.Resource.Attribute.alpha = global::DVBTTelevizor.Droid.Resource.Attribute.alpha;
 			global::Plugin.InAppBilling.Resource.Attribute.font = global::DVBTTelevizor.Droid.Resource.Attribute.font;
 			global::Plugin.InAppBilling.Resource.Attribute.fontProviderAuthority = global::DVBTTelevizor.Droid.Resource.Attribute.fontProviderAuthority;

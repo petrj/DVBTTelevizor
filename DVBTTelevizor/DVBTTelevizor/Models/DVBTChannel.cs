@@ -25,6 +25,8 @@ namespace DVBTTelevizor
         public EventItem CurrentEventItem { get; set; }
         public EventItem NextEventItem { get; set; }
 
+        private bool _recording = false;
+
         public string FrequencyLabel
         {
             get
@@ -58,7 +60,18 @@ namespace DVBTTelevizor
 
         public string ProviderName { get; set; }
 
-        public bool Recording { get; set; }
+        public bool Recording
+        {
+            get
+            {
+                return _recording;
+            }
+            set
+            {
+                _recording = value;
+                OnPropertyChanged(nameof(RecordingLabel));
+            }
+        }
 
         public string RecordingLabel
         {
@@ -69,11 +82,6 @@ namespace DVBTTelevizor
 
                 return String.Empty;
             }
-        }
-
-        public void NotifyRecordingLabelChange()
-        {
-            OnPropertyChanged(nameof(RecordingLabel));
         }
 
         public string PIDs { get; set; }
