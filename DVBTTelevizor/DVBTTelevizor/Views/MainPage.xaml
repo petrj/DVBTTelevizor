@@ -138,6 +138,14 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
             </Style>
 
+            <Style x:Key="RecordingLabelTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="Red"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -277,6 +285,8 @@
         </StackLayout>
 
         <Button AbsoluteLayout.LayoutBounds="1,0.9,1,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
+
+        <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" />
 
     </AbsoluteLayout>
 
