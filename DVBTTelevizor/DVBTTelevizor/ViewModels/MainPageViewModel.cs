@@ -317,7 +317,7 @@ namespace DVBTTelevizor
 
         private async Task VideoLongPress()
         {
-
+            MessagingCenter.Send($"{BaseViewModel.LongPressPrefix}enter", BaseViewModel.MSG_KeyDown);
         }
 
         private async Task LongPress(object item)
@@ -356,11 +356,19 @@ namespace DVBTTelevizor
             {
                 if (!ch.Recording)
                 {
-                    actions.Add("Play");
-                    actions.Add("Scan EPG");
-                    actions.Add("Detail & edit");
+                    if (PlayingChannel != null)
+                    {
+                        actions.Add("Stop");
+                    }
+                    else
+                    {
+                        actions.Add("Play");
+                        actions.Add("Scan EPG");
+                        actions.Add("Delete");
+                    }
+
                     actions.Add("Record");
-                    actions.Add("Delete");
+                    actions.Add("Detail & edit");
                 }
                 else
                 {
@@ -377,6 +385,9 @@ namespace DVBTTelevizor
             {
                 case "Play":
                     await PlayChannel(ch);
+                    break;
+                case "Stop":
+                    MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                     break;
                 case "Scan EPG":
                     await ScanEPG(ch);

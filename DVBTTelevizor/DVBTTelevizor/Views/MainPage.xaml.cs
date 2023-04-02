@@ -46,8 +46,6 @@ namespace DVBTTelevizor
         private MediaPlayer _mediaPlayer;
         private Media _media = null;
 
-        private DateTime _lastActionOKTime = DateTime.MinValue;
-
         public Command CheckStreamCommand { get; set; }
 
         // EPGDetailGrid
@@ -116,6 +114,7 @@ namespace DVBTTelevizor
             _servicePage.Disappearing += anyPage_Disappearing;
             _tunePage.Disappearing += anyPage_Disappearing;
             _settingsPage.Disappearing += anyPage_Disappearing;
+            _editChannelPage.Disappearing += _editChannelPage_Disappearing;
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
@@ -506,31 +505,26 @@ namespace DVBTTelevizor
                 } else
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    var firstOKActionWithinLast5Secs = (DateTime.Now - _lastActionOKTime).TotalSeconds > 5;
-                    _lastActionOKTime = DateTime.Now;
-
                     if (longPress)
                     {
                         ToolMenu_Clicked(this, null);
                     } else
                     {
-                        if (!_viewModel.EPGDetailEnabled)
+                        if (_viewModel.EPGDetailEnabled)
                         {
-                            // first action in 5 s --> show actual playing message
-                            // second action in 5 s --> show EPGDetail
-
-                            if (firstOKActionWithinLast5Secs)
-                            {
-                                ShowActualPlayingMessage();
-                            }
-                            else
+                            _viewModel.EPGDetailEnabled = false;
+                        }
+                        else
+                        {
+                            if (_viewModel.PlayingChannel != null &&
+                            _viewModel.SelectedChannel.CurrentEventItem != null)
                             {
                                 _viewModel.EPGDetailEnabled = true;
                                 _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+                            } else
+                            {
+                                ShowActualPlayingMessage();
                             }
-                        } else
-                        {
-                            _viewModel.EPGDetailEnabled = false;
                         }
                     }
                 }
@@ -1358,6 +1352,7 @@ namespace DVBTTelevizor
                 return;
 
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+            _viewModel.EPGDetailEnabled = false;
 
             if (!force && (PlayingState == PlayingStateEnum.Playing))
             {

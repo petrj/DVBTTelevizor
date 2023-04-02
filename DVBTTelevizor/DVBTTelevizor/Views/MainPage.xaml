@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local2="clr-namespace:DVBTTelevizor"
              xmlns:vlc="clr-namespace:LibVLCSharp.Forms.Shared;assembly=LibVLCSharp.Forms"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.MainPage"
              Title="DVBT Televizor">
@@ -250,9 +251,9 @@
 
         </Grid>
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All">
+        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
-            <StackLayout.GestureRecognizers local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
+            <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
                 <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
@@ -262,10 +263,10 @@
             </StackLayout.GestureRecognizers>
         </StackLayout>
 
-        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black">
+        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
             <Label Text="{Binding SelectedChannelName}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />
             <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
-            <StackLayout.GestureRecognizers local2:PressedEffect.LongPressCommand="{Binding VideoLongPressCommand}">
+            <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
                 <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
