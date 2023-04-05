@@ -284,6 +284,24 @@
             </StackLayout.GestureRecognizers>
         </StackLayout>
 
+        <Image x:Name="CloseVideoImage" Source="Quit.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Image.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCloseVideoTapped" NumberOfTapsRequired="1" />
+            </Image.GestureRecognizers>
+        </Image>
+
+        <Image x:Name="MinimizeVideoImage" Source="Minimize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.9,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Image.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnMinimizeVideoTapped" NumberOfTapsRequired="1" />
+            </Image.GestureRecognizers>
+        </Image>
+
+        <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Image.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnMaximizeVideoTapped" NumberOfTapsRequired="1" />
+            </Image.GestureRecognizers>
+        </Image>
+
         <Button AbsoluteLayout.LayoutBounds="1,0.9,1,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" />

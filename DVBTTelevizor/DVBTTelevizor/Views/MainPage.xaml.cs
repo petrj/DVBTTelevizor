@@ -76,6 +76,10 @@ namespace DVBTTelevizor
         private Rectangle ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rectangle(0, 0, 1, 1);
         private Rectangle PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rectangle(0.0, 0.0, 1.0, 0.7);
 
+        // OSD
+        private Rectangle CloseVideoPosition { get; set; } = new Rectangle(1.0, 0.0, 0.1, 0.1);
+        private Rectangle MinimizeMaximizeVideoPosition { get; set; } = new Rectangle(0.9, 0.0, 0.1, 0.1);
+
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
             InitializeComponent();
@@ -340,6 +344,27 @@ namespace DVBTTelevizor
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);
 
                 _servicePage.Done();
+            });
+        }
+
+        private void OnCloseVideoTapped(object sender, EventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await ActionStop(true);
+            });
+        }
+
+        private void OnMaximizeVideoTapped(object sender, EventArgs e)
+        {
+            PlayingState = PlayingStateEnum.Playing;
+        }
+
+        private void OnMinimizeVideoTapped(object sender, EventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await ActionStop(false);
             });
         }
 
@@ -1056,22 +1081,68 @@ namespace DVBTTelevizor
 
         private void OnVideoSingleTapped(object sender, EventArgs e)
         {
-            Task.Run(async () =>
-            {
-                await ActionOK(false);
-            });
+            ActionTap(1);
         }
 
         public void OnVideoDoubleTapped(object sender, EventArgs e)
         {
-            if (PlayingState == PlayingStateEnum.PlayingInPreview)
+            ActionTap(2);
+        }
+
+        public void ActionTap(int count)
+        {
+            _loggingService.Info($"ActionTap: {count}");
+
+            try
             {
-                PlayingState = PlayingStateEnum.Playing;
+                if (count == 1)
+                {
+                    if (PlayingState == PlayingStateEnum.PlayingInPreview || PlayingState == PlayingStateEnum.Playing)
+                    {
+                        Task.Run(async () =>
+                        {
+                            await ShowActualPlayingMessage();
+
+                            await Task.Delay(5000);
+
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                CloseVideoImage.IsVisible = false;
+                                MinimizeVideoImage.IsVisible = false;
+                                MaximizePreviewVideoImage.IsVisible = false;
+                            });
+                        });
+
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            AbsoluteLayout.SetLayoutBounds(CloseVideoImage, CloseVideoPosition);
+                            AbsoluteLayout.SetLayoutBounds(MinimizeVideoImage, MinimizeMaximizeVideoPosition);
+                            AbsoluteLayout.SetLayoutBounds(MaximizePreviewVideoImage, MinimizeMaximizeVideoPosition);
+
+                            CloseVideoImage.IsVisible = true;
+                            MinimizeVideoImage.IsVisible = PlayingState == PlayingStateEnum.Playing;
+                            MaximizePreviewVideoImage.IsVisible = PlayingState == PlayingStateEnum.PlayingInPreview;
+                        });
+                    }
+                }
+
+                if (count == 2)
+                {
+                    if (PlayingState == PlayingStateEnum.PlayingInPreview)
+                    {
+                        PlayingState = PlayingStateEnum.Playing;
+                    }
+                    else
+                    if (PlayingState == PlayingStateEnum.Playing)
+                    {
+                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                    }
+                }
             }
-            else
-            if (PlayingState == PlayingStateEnum.Playing)
+            catch (Exception ex)
             {
-                PlayingState = PlayingStateEnum.PlayingInPreview;
+                _loggingService.Error(ex, "ActionTap general error");
+                //MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -1296,6 +1367,10 @@ namespace DVBTTelevizor
 
                         break;
                 }
+
+                CloseVideoImage.IsVisible = false;
+                MinimizeVideoImage.IsVisible = false;
+                MaximizePreviewVideoImage.IsVisible = false;
             });
         }
 
