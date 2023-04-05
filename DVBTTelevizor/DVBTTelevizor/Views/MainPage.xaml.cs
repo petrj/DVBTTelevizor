@@ -39,6 +39,7 @@ namespace DVBTTelevizor
         private bool _firstStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
+        private DateTime _HideOSDTime = DateTime.MinValue;
         private int _lastUsedAudioTrack = -1;
 
         public bool IsPortrait { get; private set; } = false;
@@ -48,6 +49,7 @@ namespace DVBTTelevizor
         private Media _media = null;
 
         public Command CheckStreamCommand { get; set; }
+        public Command HideOSDCommand { get; set; }
 
         // EPGDetailGrid
         private Rectangle LandscapeEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 0.3, 1.0);
@@ -121,7 +123,10 @@ namespace DVBTTelevizor
             }
 
             CheckStreamCommand = new Command(async () => await CheckStream());
+            HideOSDCommand = new Command(async () => await HideOSD());
+
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
+            BackgroundCommandWorker.RunInBackground(HideOSDCommand, 1, 5);
 
             _servicePage.Disappearing += anyPage_Disappearing;
             _servicePage.Disappearing += anyPage_Disappearing;
@@ -1081,15 +1086,21 @@ namespace DVBTTelevizor
 
         private void OnVideoSingleTapped(object sender, EventArgs e)
         {
-            ActionTap(1);
+            Task.Run(async () =>
+            {
+                await ActionTap(1);
+            });
         }
 
         public void OnVideoDoubleTapped(object sender, EventArgs e)
         {
-            ActionTap(2);
+            Task.Run(async () =>
+            {
+                await ActionTap(2);
+            });
         }
 
-        public void ActionTap(int count)
+        public async Task ActionTap(int count)
         {
             _loggingService.Info($"ActionTap: {count}");
 
@@ -1099,21 +1110,12 @@ namespace DVBTTelevizor
                 {
                     if (PlayingState == PlayingStateEnum.PlayingInPreview || PlayingState == PlayingStateEnum.Playing)
                     {
-                        Task.Run(async () =>
+                        if (PlayingState == PlayingStateEnum.Playing)
                         {
-                            await ShowActualPlayingMessage();
+                            await ActionOK(false);
+                        }
 
-                            await Task.Delay(5000);
-
-                            Device.BeginInvokeOnMainThread(() =>
-                            {
-                                CloseVideoImage.IsVisible = false;
-                                MinimizeVideoImage.IsVisible = false;
-                                MaximizePreviewVideoImage.IsVisible = false;
-                            });
-                        });
-
-                        Device.BeginInvokeOnMainThread(() =>
+                        Device.BeginInvokeOnMainThread( async () =>
                         {
                             AbsoluteLayout.SetLayoutBounds(CloseVideoImage, CloseVideoPosition);
                             AbsoluteLayout.SetLayoutBounds(MinimizeVideoImage, MinimizeMaximizeVideoPosition);
@@ -1122,6 +1124,8 @@ namespace DVBTTelevizor
                             CloseVideoImage.IsVisible = true;
                             MinimizeVideoImage.IsVisible = PlayingState == PlayingStateEnum.Playing;
                             MaximizePreviewVideoImage.IsVisible = PlayingState == PlayingStateEnum.PlayingInPreview;
+
+                            _HideOSDTime = DateTime.Now.AddSeconds(5);
                         });
                     }
                 }
@@ -1143,6 +1147,26 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex, "ActionTap general error");
                 //MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
+            }
+        }
+
+        private async Task HideOSD()
+        {
+            if (_HideOSDTime == DateTime.MinValue)
+            {
+                return;
+            }
+
+            if (_HideOSDTime < DateTime.Now)
+            {
+                _HideOSDTime = DateTime.MinValue;
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    CloseVideoImage.IsVisible = false;
+                    MinimizeVideoImage.IsVisible = false;
+                    MaximizePreviewVideoImage.IsVisible = false;
+                });
             }
         }
 
