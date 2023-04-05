@@ -135,8 +135,6 @@ namespace DVBTTelevizor
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
-            Appearing += MainPage_Appearing;
-
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
             {
                 var longPress = false;
@@ -249,30 +247,6 @@ namespace DVBTTelevizor
             }
         }
 
-        private void MainPage_Appearing(object sender, EventArgs e)
-        {
-            if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
-            {
-                ToolbarItems.Remove(ToolServicePage);
-            }
-
-            if (_config.ShowServiceMenu && !ToolbarItems.Contains(ToolServicePage))
-            {
-                // adding before settings
-                ToolbarItems.Remove(ToolSettingsPage);
-
-                ToolbarItems.Add(ToolServicePage);
-                ToolbarItems.Add(ToolSettingsPage);
-            }
-
-            _viewModel.SelectedToolbarItemName = null;
-            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
-            if (_viewModel.TunningButtonVisible)
-            {
-                _tuneFocusItem.Focus();
-            }
-        }
-
         public void ResumePlayback()
         {
             _loggingService.Info("ResumePlayback");
@@ -321,12 +295,32 @@ namespace DVBTTelevizor
         {
             base.OnAppearing();
 
-            // workaround for non selected channel at startup
             if (_firstStartup)
             {
                 _firstStartup = false;
 
                 _viewModel.RefreshCommand.Execute(null);
+            }
+
+            if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
+            {
+                ToolbarItems.Remove(ToolServicePage);
+            }
+
+            if (_config.ShowServiceMenu && !ToolbarItems.Contains(ToolServicePage))
+            {
+                // adding before settings
+                ToolbarItems.Remove(ToolSettingsPage);
+
+                ToolbarItems.Add(ToolServicePage);
+                ToolbarItems.Add(ToolSettingsPage);
+            }
+
+            _viewModel.SelectedToolbarItemName = null;
+            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+            if (_viewModel.TunningButtonVisible)
+            {
+                _tuneFocusItem.Focus();
             }
         }
 

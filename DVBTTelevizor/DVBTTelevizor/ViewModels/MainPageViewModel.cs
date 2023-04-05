@@ -48,7 +48,7 @@ namespace DVBTTelevizor
         private bool _EPGDetailEnabled = true;
         private bool? _EPGDetailVisibleLastValue = null;
 
-
+        private int _refreshCounter = 0;
 
         public enum SelectedPartEnum
         {
@@ -642,7 +642,12 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Channels.Count == 0;
+                if (_refreshCounter == 0)
+                {
+                    return false;
+                }
+
+                return (Channels == null || Channels.Count == 0);
             }
         }
 
@@ -727,6 +732,8 @@ namespace DVBTTelevizor
         private async Task Refresh()
         {
             string selectedChanneFrequencyAndMapPID = null;
+
+            _refreshCounter++;
 
             try
             {
