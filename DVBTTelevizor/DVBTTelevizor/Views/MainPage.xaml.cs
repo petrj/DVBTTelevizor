@@ -784,7 +784,6 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "ActionDown general error");
-                //MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
             }
         }
 
@@ -807,7 +806,7 @@ namespace DVBTTelevizor
 
             if ((_lastBackPressedTime == DateTime.MinValue) || ((DateTime.Now - _lastBackPressedTime).TotalSeconds > 3))
             {
-                MessagingCenter.Send($"Stiskněte ještě jednou pro ukončení", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"Press back again to exit", BaseViewModel.MSG_ToastMessage);
                 _lastBackPressedTime = DateTime.Now;
             }
             else
@@ -864,7 +863,6 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "ActionUp general error");
-                MessagingCenter.Send($"Chyba: {ex.Message}", BaseViewModel.MSG_ToastMessage);
             }
         }
 

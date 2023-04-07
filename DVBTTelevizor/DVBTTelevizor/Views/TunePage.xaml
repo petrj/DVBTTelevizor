@@ -121,7 +121,35 @@
                             <Switch Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsToggled="{Binding ManualTuning}" HorizontalOptions="End"/>
                         </Grid>
 
-                        <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}" RowSpacing="0" Margin="0,0,0,0">
+                    <Grid x:Name="AutoTuneOptionsGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60*" />
+                            <ColumnDefinition Width="40*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="MinFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Minimal Frequency (Mhz)" Grid.ColumnSpan="2"  Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <Slider Grid.Row="1" Grid.Column="0" x:Name="SliderMinFrequency" Value="{Binding TuneFrequency}" Minimum="0" Maximum="100"/>
+                        <Entry  Grid.Row="1" Grid.Column="1" x:Name="EntryMinFrequency" Text="0" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+
+                        <BoxView x:Name="MaxFrequencyBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Maximal Frequency (Mhz)" Grid.ColumnSpan="2"  Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <Slider Grid.Row="3" Grid.Column="0" x:Name="SliderMaxFrequency" Minimum="0" Maximum="100"/>
+                        <Entry  Grid.Row="3" Grid.Column="1" x:Name="EntryMaxFrequency" Text="100" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+                    </Grid>
+
+                    <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}" RowSpacing="0" Margin="0,0,0,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
@@ -132,7 +160,7 @@
                                 <ColumnDefinition Width="40*" />
                             </Grid.ColumnDefinitions>
 
-                            <BoxView x:Name="FrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="FrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                             <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                             <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
@@ -149,7 +177,6 @@
                             ItemsSource="{Binding FrequencyChannels}"
                             ItemDisplayBinding="{Binding Description}"
                             FontSize="{Binding FontSizeForPicker}" />
-
                         </Grid>
 
                         <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">

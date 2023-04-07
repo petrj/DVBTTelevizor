@@ -413,16 +413,11 @@ namespace DVBTTelevizor.Droid
         {
             if (_config.EnableLogging)
             {
-                var logPath = Path.Combine(BaseViewModel.AndroidAppDirectory, "DVBTTelevizor.log.txt");
-
-                _loggingService = new FileLoggingService()
-                {
-                    LogFilename = logPath
-                };
-
+                _loggingService = new NLogLoggingService(GetType().Assembly, "DVBTTelevizor.Droid");
+                _loggingService.Info("Starting MainActivity");
             } else
             {
-                _loggingService = new BasicLoggingService();
+                _loggingService = new DummyLoggingService();
             }
         }
 

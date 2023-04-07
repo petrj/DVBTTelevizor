@@ -24,8 +24,6 @@ namespace DVBTTelevizor
 
         private ObservableCollection<DVBTChannel> _channels = null;
 
-        public long AutomaticTuningFirstChannel { get; set; } = 21;
-        public long AutomaticTuningLastChannel { get; set; } = 69;
         private long _actualTunningChannel = -1;
         private long _actualTuningDVBTType = -1;
 
@@ -385,7 +383,6 @@ namespace DVBTTelevizor
            });
         }
 
-
         private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
         {
             try
@@ -579,6 +576,32 @@ namespace DVBTTelevizor
                    OnPropertyChanged(nameof(AddChannelsVisible));
                }
            });
+        }
+
+        public async Task SetChannelsRange()
+        {
+            _loggingService.Info("SetChannelsRange");
+
+            try
+            {
+                var cap = await _driver.GetCapabalities();
+
+                if (!cap.SuccessFlag)
+                {
+                    throw new Exception("Response not success");
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+            finally
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    OnPropertyChanged(nameof(FrequencyChannels));
+                });
+            }
         }
     }
 }

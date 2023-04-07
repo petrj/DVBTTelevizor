@@ -1,12 +1,23 @@
-﻿using System;
+﻿using NLog.Config;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using System.Xml;
 
 namespace LoggerService
 {
     public class NLogLoggingService : ILoggingService
     {
-        NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        NLog.Logger _logger = null;
+
+        public NLogLoggingService(Assembly assembly, string projectName)
+        {
+            var location = $"{projectName}.NLog.config";
+            var stream = assembly.GetManifestResourceStream(location);
+            NLog.LogManager.Configuration = new XmlLoggingConfiguration(XmlReader.Create(stream), null);
+            _logger = NLog.LogManager.GetCurrentClassLogger();
+        }
 
         public void Debug(string message)
         {

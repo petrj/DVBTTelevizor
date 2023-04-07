@@ -117,6 +117,11 @@ namespace DVBTTelevizor
         private void TunePage_Appearing(object sender, EventArgs e)
         {
             UpdateFocusedPart("AutoTuning", "TuneButton");
+
+            Task.Run(async () =>
+            {
+                await _viewModel.SetChannelsRange();
+            });
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)

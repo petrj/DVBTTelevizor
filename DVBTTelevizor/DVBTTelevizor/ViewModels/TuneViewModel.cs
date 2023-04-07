@@ -13,6 +13,15 @@ namespace DVBTTelevizor
         protected string _tuneFrequency;
         protected long _tuneBandwidth = 8;
 
+        public const long AutoTuningMinFrequencyKhzDefaultValue = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
+        public const long AutomaticTuningLastChannelDefault = 858000;      // 858.0 MHz - UHF band channel 69
+
+        public long _autoTuningMinFrequencyKhz { get; set; } = AutoTuningMinFrequencyKhzDefaultValue;
+        public long _autoTuningMaxFrequencyKhz { get; set; } = AutomaticTuningLastChannelDefault;
+
+        public long AutomaticTuningFirstChannel { get; set; } = 21;
+        public long AutomaticTuningLastChannel { get; set; } = 69;
+
         private DVBTChannel _selectedChannel;
 
         public ObservableCollection<DVBTFrequencyChannel> FrequencyChannels { get; set; } = new ObservableCollection<DVBTFrequencyChannel>();
@@ -39,6 +48,34 @@ namespace DVBTTelevizor
                 };
 
                 FrequencyChannels.Add(fc);
+            }
+        }
+
+        public long AutoTuningMinFrequencyKhz
+        {
+            get
+            {
+                return _autoTuningMinFrequencyKhz;
+            }
+            set
+            {
+                _autoTuningMinFrequencyKhz = value;
+
+                OnPropertyChanged(nameof(AutoTuningMinFrequencyKhz));
+            }
+        }
+
+        public long AutoTuningMaxFrequencyKhz
+        {
+            get
+            {
+                return AutoTuningMaxFrequencyKhz;
+            }
+            set
+            {
+                AutoTuningMaxFrequencyKhz = value;
+
+                OnPropertyChanged(nameof(AutoTuningMaxFrequencyKhz));
             }
         }
 
