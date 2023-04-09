@@ -82,6 +82,7 @@
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
                 <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Right"/>
             </Style>
 
             <Style x:Key="IconStyle" TargetType="Image">
@@ -106,47 +107,97 @@
 
                     <StackLayout VerticalOptions="StartAndExpand" Spacing="0">
 
-                        <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}" Margin="0,20,0,0" RowSpacing="0">
+                    <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}" Margin="0,20,0,0" RowSpacing="0">
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                            <BoxView x:Name="ManualTuningBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="AutoManualTuningBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                            <Label Grid.Row="0" Grid.Column="0" Text="Manual tuning" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="0" Grid.Column="1" x:Name="ManualTuningCheckBox" IsToggled="{Binding ManualTuning}" HorizontalOptions="End"/>
-                        </Grid>
+                        <Label Grid.Row="0" Grid.Column="0" Text="Tuning mode" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Picker
+                            Grid.Row="0" Grid.Column="1"
+                            x:Name="AutoManualPicker"
+                            Margin="20,0,0,0"
+                            FontSize="{Binding FontSizeForPicker}"
+                            Style="{StaticResource PickerStyle}"
+                            SelectedIndex="{Binding TuneModeIndex, Mode=TwoWay}">
+                            <Picker.Items>
+                                <x:String>Automatic</x:String>
+                                <x:String>Manual</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Grid>
 
-                    <Grid x:Name="AutoTuneOptionsGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
+                    <Grid x:Name="AutoFrequencyGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="AutoFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Frequency:" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <StackLayout Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                            <Label  Text="{Binding AutoTuningFrequencyFromToMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+                            <Button  Text="&#x270E;" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" WidthRequest="50" Clicked="EditFrequencies_Clicked"/>
+                        </StackLayout>
+                    </Grid>
+
+                    <Grid x:Name="BandWidthGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60*" />
-                            <ColumnDefinition Width="40*" />
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="MinFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="BandWidtLabelBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label Grid.Row="0" Grid.Column="0" Text="Minimal Frequency (Mhz)" Grid.ColumnSpan="2"  Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label Grid.Row="0" Grid.Column="0" Text="Bandwidth:" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                        <Slider Grid.Row="1" Grid.Column="0" x:Name="SliderMinFrequency" Value="{Binding TuneFrequency}" Minimum="0" Maximum="100"/>
-                        <Entry  Grid.Row="1" Grid.Column="1" x:Name="EntryMinFrequency" Text="0" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+                        <StackLayout Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                            <Label  Text="{Binding BandWidthMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+                            <Button  Text="&#x270E;" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" WidthRequest="50"/>
+                        </StackLayout>
+                    </Grid>
 
-                        <BoxView x:Name="MaxFrequencyBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                    <Grid x:Name="FrequencyOptionsGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
 
-                        <Label Grid.Row="2" Grid.Column="0" Text="Maximal Frequency (Mhz)" Grid.ColumnSpan="2"  Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
 
-                        <Slider Grid.Row="3" Grid.Column="0" x:Name="SliderMaxFrequency" Minimum="0" Maximum="100"/>
-                        <Entry  Grid.Row="3" Grid.Column="1" x:Name="EntryMaxFrequency" Text="100" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+                        <BoxView x:Name="MinFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Label Grid.Row="0" Grid.Column="0" Text="From:" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryMinFrequency" Text="{Binding AutoTuningFrequencyFromKhz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+
+                        <BoxView x:Name="MaxFrequencyBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Label Grid.Row="1" Grid.Column="0" Text="To:"  Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                        <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryMaxFrequency" Text="{Binding AutoTuningFrequencyToKhz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+
+                        <!--Slider Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SliderMinFrequency" Maximum="{Binding AutoTuningMaxFrequencyKhz}" Value="{Binding AutoTuningFrequencyFromKhz}" Minimum="{Binding AutoTuningMinFrequencyKhz}"   /-->
+                        <!--Slider Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2" x:Name="SliderMaxFrequency" Maximum="{Binding AutoTuningMaxFrequencyKhz}" Value="{Binding AutoTuningFrequencyToKhz}" Minimum="{Binding AutoTuningMinFrequencyKhz}" /-->
+
                     </Grid>
 
                     <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}" RowSpacing="0" Margin="0,0,0,0">
@@ -179,7 +230,10 @@
                             FontSize="{Binding FontSizeForPicker}" />
                         </Grid>
 
-                        <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
+
+
+
+                    <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />

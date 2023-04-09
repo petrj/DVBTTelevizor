@@ -77,6 +77,20 @@ namespace DVBTTelevizor
             }
         }
 
+        public int TuneModeIndex
+        {
+            get
+            {
+                return _manualTuning ? 1 : 0;
+            }
+            set
+            {
+                ManualTuning = value == 1;
+
+                OnPropertyChanged(nameof(ManualTuning));
+                OnPropertyChanged(nameof(TuneModeIndex));
+            }
+        }
 
         public bool ManualTuning
         {

@@ -88,7 +88,8 @@ namespace DVBTTelevizor
                 {
                     //entry.BackgroundColor = Color.FromHex("#303F9F");
                 }
-                else if (part is Switch sw)
+                else
+                if (part is Switch sw)
                 {
                     sw.Focus();
                 }
