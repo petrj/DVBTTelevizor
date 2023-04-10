@@ -3,9 +3,13 @@ using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Forms;
+using Xamarin.Forms.Xaml.Internals;
+using static Android.Renderscripts.Sampler;
 
 namespace DVBTTelevizor
 {
@@ -15,16 +19,22 @@ namespace DVBTTelevizor
 
         protected long _tuneBandWidth = 8;
 
-        protected long _tuneBandWidthKhz = 8000;
+        protected long _tuneBandWidthKHz = 8000;
+
+        public Command SetDefaultFrequenciesCommand { get; set; }
 
         public const long AutoTuningMinFrequencyKhzDefaultValue = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
         public const long AutoTuningMaxFrequencyKhzDefaultValue = 858000;  // 858.0 MHz - UHF band channel 69
 
-        public long _autoTuningMinFrequencyKhz { get; set; } = AutoTuningMinFrequencyKhzDefaultValue;
-        public long _autoTuningMaxFrequencyKhz { get; set; } = AutoTuningMaxFrequencyKhzDefaultValue;
+        public const long BandWidthMinKHz = 1000;
+        public const long BandWidthMaxKHz = 32000;
+        public const long BandWidthDefaultKHz = 8000;
 
-        public long _autoTuningFrequencyFromKhz { get; set; } = AutoTuningMinFrequencyKhzDefaultValue;
-        public long _autoTuningFrequencyToKhz { get; set; } = AutoTuningMaxFrequencyKhzDefaultValue;
+        public long _autoTuningMinFrequencyKHz { get; set; } = AutoTuningMinFrequencyKhzDefaultValue;
+        public long _autoTuningMaxFrequencyKHz { get; set; } = AutoTuningMaxFrequencyKhzDefaultValue;
+
+        public long _autoTuningFrequencyFromKHz { get; set; } = AutoTuningMinFrequencyKhzDefaultValue;
+        public long _autoTuningFrequencyToKHz { get; set; } = AutoTuningMaxFrequencyKhzDefaultValue;
 
         public long AutomaticTuningFirstChannel { get; set; } = 21;
         public long AutomaticTuningLastChannel { get; set; } = 69;
@@ -39,6 +49,15 @@ namespace DVBTTelevizor
          : base(loggingService, dialogService, driver, config)
         {
             FillFrequencyChannels();
+
+            SetDefaultFrequenciesCommand = new Command(async () => await SetDefaultFrequencies());
+        }
+
+        public async Task SetDefaultFrequencies()
+        {
+            AutoTuningFrequencyFromKHz = AutoTuningMinFrequencyKhzDefaultValue;
+            AutoTuningFrequencyToKHz = AutoTuningMaxFrequencyKhzDefaultValue;
+            TuneBandWidthKHz = BandWidthDefaultKHz;
         }
 
         protected void FillFrequencyChannels()
@@ -58,90 +77,74 @@ namespace DVBTTelevizor
             }
         }
 
-        public long AutoTuningMinFrequencyKhz
+        public long AutoTuningMinFrequencyKHz
         {
             get
             {
-                return _autoTuningMinFrequencyKhz;
+                return _autoTuningMinFrequencyKHz;
             }
             set
             {
-                _autoTuningMinFrequencyKhz = value;
+                _autoTuningMinFrequencyKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningMinFrequencyKhz));
+                OnPropertyChanged(nameof(AutoTuningMinFrequencyKHz));
             }
         }
 
-        public long AutoTuningMaxFrequencyKhz
+        public long AutoTuningMaxFrequencyKHz
         {
             get
             {
-                return _autoTuningMaxFrequencyKhz;
+                return _autoTuningMaxFrequencyKHz;
             }
             set
             {
-                _autoTuningMaxFrequencyKhz = value;
+                _autoTuningMaxFrequencyKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningMaxFrequencyKhz));
+                OnPropertyChanged(nameof(AutoTuningMaxFrequencyKHz));
             }
         }
 
-        public long AutoTuningFrequencyFromKhz
+        public long AutoTuningFrequencyFromKHz
         {
             get
             {
-                return _autoTuningFrequencyFromKhz;
+                return _autoTuningFrequencyFromKHz;
             }
             set
             {
-                _autoTuningFrequencyFromKhz = value;
+                _autoTuningFrequencyFromKHz = value;
 
-                //CheckFrequencies();
+                if (!ValidFrequency(value))
+                    return;
 
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromKhz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToKhz));
+                OnPropertyChanged(nameof(AutoTuningFrequencyFromKHz));
+                OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
             }
         }
 
-        public long AutoTuningFrequencyToKhz
+        public long AutoTuningFrequencyToKHz
         {
             get
             {
-                return _autoTuningFrequencyToKhz;
+                return _autoTuningFrequencyToKHz;
             }
             set
             {
-                _autoTuningFrequencyToKhz = value;
+                _autoTuningFrequencyToKHz = value;
 
-                //CheckFrequencies();
+                if (!ValidFrequency(value))
+                    return;
 
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromKhz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToKhz));
+                OnPropertyChanged(nameof(AutoTuningFrequencyFromKHz));
+                OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
+                OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
-            }
-        }
-
-        public string AutoTuningFrequencyFromToMHz
-        {
-            get
-            {
-                return Math.Round(AutoTuningFrequencyFromKhz / 1000.0, 1).ToString() +
-                       " - " +
-                       Math.Round(AutoTuningFrequencyToKhz / 1000.0, 1).ToString() +
-                       " MHz";
-            }
-        }
-
-        public string AutoTuningFrequencyFromMHz
-        {
-            get
-            {
-                return Math.Round(AutoTuningFrequencyFromKhz / 1000.0, 1).ToString();
             }
         }
 
@@ -149,7 +152,58 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Math.Round(AutoTuningFrequencyToKhz / 1000.0, 1).ToString();
+                return Math.Round(AutoTuningFrequencyToKHz / 1000.0, 1).ToString();
+            }
+            set
+            {
+                if (!ValidFrequency(value))
+                    return;
+
+                var freqKHz = ParseFreqMHzToKHz(value);
+
+                if (AutoTuningFrequencyToKHz != freqKHz)
+                {
+                    AutoTuningFrequencyToKHz = freqKHz;
+                }
+            }
+        }
+
+        public string AutoTuningFrequencyFromToMHz
+        {
+            get
+            {
+                return Math.Round(AutoTuningFrequencyFromKHz / 1000.0, 1).ToString() +
+                       " - " +
+                       Math.Round(AutoTuningFrequencyToKHz / 1000.0, 1).ToString() +
+                       " MHz";
+            }
+        }
+
+        public string TuningFrequencyBandWidthMHz
+        {
+            get
+            {
+                return BandWidthMHz + " MHz";
+            }
+        }
+
+        public string AutoTuningFrequencyFromMHz
+        {
+            get
+            {
+                return Math.Round(AutoTuningFrequencyFromKHz / 1000.0, 1).ToString();
+            }
+            set
+            {
+                if (!ValidFrequency(value))
+                    return;
+
+                var freqKHz = ParseFreqMHzToKHz(value);
+
+                if (AutoTuningFrequencyFromKHz != freqKHz)
+                {
+                    AutoTuningFrequencyFromKHz = freqKHz;
+                }
             }
         }
 
@@ -157,48 +211,135 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Math.Round(TuneBandWidthKHz / 1000.0, 1).ToString() + " MHz";
+                return Math.Round(TuneBandWidthKHz / 1000.0, 1).ToString();
+            }
+            set
+            {
+                if (!ValidBandWidth(value))
+                    return;
+
+                var freqKHz = ParseFreqMHzToKHz(value);
+
+                if (TuneBandWidthKHz != freqKHz)
+                {
+                    TuneBandWidthKHz = freqKHz;
+                }
             }
         }
 
-        private void CheckFrequencies()
+        public int BandWidthPickerIndex
         {
-            // round to BandWidth:
-            if (TuneBandWidthKHz != 0)
+            get
             {
-                var stepFreqFrom = Math.Round(Convert.ToDecimal(_autoTuningFrequencyFromKhz - AutoTuningMinFrequencyKhz) / Convert.ToDecimal(TuneBandWidthKHz));
-                _autoTuningFrequencyFromKhz = Convert.ToInt64(AutoTuningMinFrequencyKhz + stepFreqFrom * TuneBandWidthKHz);
+                switch (_tuneBandWidthKHz)
+                {
+                    case 01700: return 1;
+                    case 05000: return 2;
+                    case 06000: return 3;
+                    case 07000: return 4;
+                    case 08000: return 5;
+                    case 10000: return 6;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                long bandWidthKHz;
 
-                var stepFreqTo = Math.Round(Convert.ToDecimal(_autoTuningFrequencyToKhz - AutoTuningMinFrequencyKhz) / Convert.ToDecimal(TuneBandWidthKHz));
-                _autoTuningFrequencyToKhz = Convert.ToInt64(AutoTuningMinFrequencyKhz + stepFreqTo * TuneBandWidthKHz);
+                switch (value)
+                {
+                    case 0:
+                        return; // custom bandwidth
+                    case 1:
+                        bandWidthKHz = 1700;
+                        break;
+                    case 2:
+                        bandWidthKHz = 5000;
+                        break;
+                    case 3:
+                        bandWidthKHz = 6000;
+                        break;
+                    case 4:
+                        bandWidthKHz = 7000;
+                        break;
+                    case 5:
+                        bandWidthKHz = 8000;
+                        break;
+                    case 6:
+                        bandWidthKHz = 10000;
+                        break;
+                    default:
+                        return;
+                }
+
+                if (TuneBandWidthKHz != bandWidthKHz)
+                {
+                    TuneBandWidthKHz = bandWidthKHz;
+
+                    OnPropertyChanged(nameof(BandWidthMHz));
+                    OnPropertyChanged(nameof(TuneBandWidthKHz));
+                }
+
+                OnPropertyChanged(nameof(BandWidthPickerIndex));
+            }
+        }
+
+        public bool ValidBandWidth(long freqKHz)
+        {
+            if (freqKHz < BandWidthMinKHz || freqKHz > BandWidthMaxKHz)
+            {
+                return false;
             }
 
-            if (_autoTuningFrequencyFromKhz < AutoTuningMinFrequencyKhz)
+            return true;
+        }
+
+        public bool ValidBandWidth(string freqMHz)
+        {
+            var freqKHz = ParseFreqMHzToKHz(freqMHz);
+            if (freqKHz == -1)
             {
-                _autoTuningFrequencyFromKhz = AutoTuningMinFrequencyKhz;
-            }
-            if (_autoTuningFrequencyFromKhz > AutoTuningMaxFrequencyKhz)
-            {
-                _autoTuningFrequencyFromKhz = AutoTuningMaxFrequencyKhz;
+                return false;
             }
 
-            if (_autoTuningFrequencyToKhz < AutoTuningMinFrequencyKhz)
+            return ValidBandWidth(freqKHz);
+        }
+
+        public bool ValidFrequency(long freqKHz)
+        {
+
+            if (freqKHz < _autoTuningMinFrequencyKHz || freqKHz > _autoTuningMaxFrequencyKHz)
             {
-                _autoTuningFrequencyToKhz = AutoTuningMinFrequencyKhz;
-            }
-            if (_autoTuningFrequencyToKhz > AutoTuningMaxFrequencyKhz)
-            {
-                _autoTuningFrequencyToKhz = AutoTuningMaxFrequencyKhz;
+                return false;
             }
 
-            if (_autoTuningFrequencyFromKhz > _autoTuningFrequencyToKhz)
+            return true;
+        }
+
+        public bool ValidFrequency(string freqMHz)
+        {
+            var freqKHz = ParseFreqMHzToKHz(freqMHz);
+            if (freqKHz == -1)
             {
-                _autoTuningFrequencyToKhz = _autoTuningFrequencyFromKhz;
+                return false;
             }
 
-            if (_autoTuningFrequencyToKhz < _autoTuningFrequencyFromKhz)
+            return ValidFrequency(freqKHz);
+        }
+
+        public long ParseFreqMHzToKHz(string freqMHz)
+        {
+            decimal freqMHzDecimal = -1;
+            var sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            if (decimal.TryParse(freqMHz.Replace(".", sep).Replace(",", sep), out freqMHzDecimal))
             {
-                _autoTuningFrequencyFromKhz = _autoTuningFrequencyToKhz;
+                return Convert.ToInt64(freqMHzDecimal * 1000);
+            }
+            else
+            {
+                return -1;
             }
         }
 
@@ -278,15 +419,18 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _tuneBandWidthKhz;
+                return _tuneBandWidthKHz;
             }
             set
             {
-                _tuneBandWidthKhz = value;
+                _tuneBandWidthKHz = value;
+
+                if (!ValidBandWidth(value))
+                    return;
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
-
+                OnPropertyChanged(nameof(BandWidthPickerIndex));
             }
         }
     }

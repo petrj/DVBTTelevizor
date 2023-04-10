@@ -133,7 +133,7 @@
                         </Picker>
                     </Grid>
 
-                    <Grid x:Name="AutoFrequencyGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
+                    <Grid x:Name="TuningOptionsGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -145,121 +145,35 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="AutoFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Label Grid.Row="0" Grid.Column="0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding AutoTuningFrequencyFromToMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
-                        <Label Grid.Row="0" Grid.Column="0" Text="Frequency:" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label Grid.Row="1" Grid.Column="0" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding TuningFrequencyBandWidthMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
-                        <StackLayout Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
-                            <Label  Text="{Binding AutoTuningFrequencyFromToMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
-                            <Button  Text="&#x270E;" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" WidthRequest="50" Clicked="EditFrequencies_Clicked"/>
-                        </StackLayout>
+                        <Button Grid.Row="2" Grid.Column="1" x:Name="EditFrequenciesButton" Text="Tune options" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="EndAndExpand"  Clicked="EditFrequencies_Clicked"/>
                     </Grid>
 
-                    <Grid x:Name="BandWidthGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="70*" />
-                            <ColumnDefinition Width="30*" />
-                        </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="BandWidtLabelBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                        <Label Grid.Row="0" Grid.Column="0" Text="Bandwidth:" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                        <StackLayout Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
-                            <Label  Text="{Binding BandWidthMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
-                            <Button  Text="&#x270E;" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" WidthRequest="50"/>
-                        </StackLayout>
-                    </Grid>
-
-                    <Grid x:Name="FrequencyOptionsGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="70*" />
-                            <ColumnDefinition Width="30*" />
-                        </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="MinFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-                        <Label Grid.Row="0" Grid.Column="0" Text="From:" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
-                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryMinFrequency" Text="{Binding AutoTuningFrequencyFromKhz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
-
-                        <BoxView x:Name="MaxFrequencyBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-                        <Label Grid.Row="1" Grid.Column="0" Text="To:"  Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
-                        <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryMaxFrequency" Text="{Binding AutoTuningFrequencyToKhz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
-
-                        <!--Slider Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SliderMinFrequency" Maximum="{Binding AutoTuningMaxFrequencyKhz}" Value="{Binding AutoTuningFrequencyFromKhz}" Minimum="{Binding AutoTuningMinFrequencyKhz}"   /-->
-                        <!--Slider Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2" x:Name="SliderMaxFrequency" Maximum="{Binding AutoTuningMaxFrequencyKhz}" Value="{Binding AutoTuningFrequencyToKhz}" Minimum="{Binding AutoTuningMinFrequencyKhz}" /-->
-
-                    </Grid>
-
-                    <Grid x:Name="ManualTuneOptionsGrid" IsVisible="{Binding ManualTuneOptionsVisible}" RowSpacing="0" Margin="0,0,0,0">
+                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="60*" />
-                                <ColumnDefinition Width="40*" />
-                            </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="FrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                            <Label Grid.Row="0" Grid.Column="0" Text="Frequency (Mhz)" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                            <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequency" Text="{Binding TuneFrequency}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
-
-                            <BoxView x:Name="ChannelBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                            <Label x:Name="LabelChannel" Grid.Row="1" Grid.Column="0" Text="Channel" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                            <Picker Grid.Row="1" Grid.Column="1"
-                            HorizontalOptions="End"
-                            x:Name="ChannelPicker"
-                            Style="{StaticResource PickerStyle}"
-                            SelectedItem="{Binding SelectedFrequencyChannelItem, Mode=TwoWay}"
-                            ItemsSource="{Binding FrequencyChannels}"
-                            ItemDisplayBinding="{Binding Description}"
-                            FontSize="{Binding FontSizeForPicker}" />
-                        </Grid>
-
-
-
-
-                    <Grid x:Name="TuneOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="1" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70*" />
                                 <ColumnDefinition Width="30*" />
                             </Grid.ColumnDefinitions>
 
-                            <BoxView x:Name="BandWithBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                            <Label Grid.Row="0" Grid.Column="0" Text="BandWidth (Mhz)" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                            <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidth" Text="{Binding TuneBandwidth}" Style="{DynamicResource EntryStyle}"  FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" />
+                            <Label Grid.Row="0" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsToggled="{Binding DVBTTuning}"  HorizontalOptions="End"  />
 
-                            <BoxView x:Name="DVBTBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                            <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                            <Label Grid.Row="1" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsToggled="{Binding DVBTTuning}"  HorizontalOptions="End"  />
-
-                            <BoxView x:Name="DVBT2BoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                            <Label Grid.Row="2" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="2" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
+                            <Label Grid.Row="1" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
                         </Grid>
 
                     </StackLayout>

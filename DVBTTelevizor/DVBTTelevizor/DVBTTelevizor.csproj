@@ -34,8 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\FrequencyPage.xaml.cs">
-      <DependentUpon>FrequencyPage.xaml</DependentUpon>
+    <Compile Update="Views\TuningOptionsPage.xaml.cs">
+      <DependentUpon>TuningOptionsPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
