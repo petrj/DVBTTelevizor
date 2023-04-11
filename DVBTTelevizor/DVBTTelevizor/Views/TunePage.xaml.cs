@@ -85,7 +85,10 @@ namespace DVBTTelevizor
 
             _focusItemsAuto
                 .AddItem(KeyboardFocusableItem.CreateFrom("AutoManualTuning", new List<View>() { AutoManualTuningBoxView, AutoManualPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("AutomaticTuningOptions", new List<View>() { EditFrequenciesButton,  }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EditBandWidth", new List<View>() { EditBandWidthButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyFrom", new List<View>() { EditFrequencyFromButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyTo", new List<View>() { EditFrequencyToButton }))
+
                 //.AddItem(KeyboardFocusableItem.CreateFrom("BandWidtMHz", new List<View>() { AutoFrequencyBoxView }))
                 //.AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView, EntryFrequency }))
                 //.AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView, ChannelPicker }))

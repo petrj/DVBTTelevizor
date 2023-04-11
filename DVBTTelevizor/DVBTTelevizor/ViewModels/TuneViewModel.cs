@@ -122,6 +122,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
+                OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
             }
         }
@@ -144,6 +145,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
+                OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
             }
         }
@@ -204,6 +206,22 @@ namespace DVBTTelevizor
                 {
                     AutoTuningFrequencyFromKHz = freqKHz;
                 }
+            }
+        }
+
+        public string AutoTuningFrequencyFromMHzCaption
+        {
+            get
+            {
+                return AutoTuningFrequencyFromMHz + " MHz";
+            }
+        }
+
+        public string AutoTuningFrequencyToMHzCaption
+        {
+            get
+            {
+                return AutoTuningFrequencyToMHz + " MHz";
             }
         }
 
