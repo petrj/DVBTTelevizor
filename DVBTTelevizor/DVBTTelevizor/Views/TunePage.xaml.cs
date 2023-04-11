@@ -123,6 +123,25 @@ namespace DVBTTelevizor
             Navigation.PushAsync(automaticTuningParamsPage);
         }
 
+        private void EditFrequencyFromButtton_Clicked(object sender, EventArgs e)
+        {
+            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
+            freqPage.SetFrequency("Tuning frequency from",
+                _viewModel.AutoTuningFrequencyFromKHz,
+                _viewModel.AutoTuningMinFrequencyKHz,
+                _viewModel.AutoTuningMaxFrequencyKHz,
+                _viewModel.AutoTuningMinFrequencyKHz,
+                _viewModel.TuneBandWidthKHz);
+
+            Navigation.PushAsync(freqPage);
+        }
+
+        private void EditFrequencyToButtton_Clicked(object sender, EventArgs e)
+        {
+            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
+            Navigation.PushAsync(freqPage);
+        }
+
         private void TunePage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
         {
             _previousFocusedItem = args.FocusedItem.Name;
@@ -296,6 +315,14 @@ namespace DVBTTelevizor
                                 //_viewModel.ManualTuning = !_viewModel.ManualTuning;
                                 EditFrequencies_Clicked(this, null);
                                 //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
+                                break;
+
+                            case "EditFrequencyFrom":
+                                EditFrequencyFromButtton_Clicked(this, null);
+                                break;
+
+                            case "EditFrequencyTo":
+                                EditFrequencyToButtton_Clicked(this, null);
                                 break;
 
                             case "TuneButton":

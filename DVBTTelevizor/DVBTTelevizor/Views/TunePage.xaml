@@ -174,8 +174,8 @@
                         <Label Grid.Row="2" Grid.Column="1" Text="-" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center"/>
                         <Label Grid.Row="2" Grid.Column="2" Text="{Binding AutoTuningFrequencyToMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" />
 
-                        <Button Grid.Row="3" Grid.Column="0" x:Name="EditFrequencyFromButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"  Clicked="EditFrequencies_Clicked"/>
-                        <Button Grid.Row="3" Grid.Column="2" x:Name="EditFrequencyToButton"   Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"  Clicked="EditFrequencies_Clicked"/>
+                        <Button Grid.Row="3" Grid.Column="0" x:Name="EditFrequencyFromButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"  Clicked="EditFrequencyFromButtton_Clicked"/>
+                        <Button Grid.Row="3" Grid.Column="2" x:Name="EditFrequencyToButton"   Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"  Clicked="EditFrequencyToButtton_Clicked"/>
                     </Grid>
 
                     <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
