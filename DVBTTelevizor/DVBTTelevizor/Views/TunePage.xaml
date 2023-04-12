@@ -148,7 +148,7 @@
 
                         <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
                         <Label Grid.Row="1" Grid.Column="1" Text="{Binding TuningFrequencyBandWidthMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center"/>
-                        <Button Grid.Row="2" Grid.Column="1" x:Name="EditBandWidthButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center"/>
+                        <Button Grid.Row="2" Grid.Column="1" x:Name="EditBandWidthButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center" Clicked="EditBandWidthButtton_Clicked"/>
                     </Grid>
 
                     <Grid x:Name="FrequenciesGrid" IsVisible="True" RowSpacing="0" Margin="0,10,0,0">

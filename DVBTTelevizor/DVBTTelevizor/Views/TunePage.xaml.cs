@@ -117,6 +117,19 @@ namespace DVBTTelevizor
             _focusItemsDone.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
         }
 
+        private void EditBandWidthButtton_Clicked(object sender, EventArgs e)
+        {
+            var freqPage = new BandWidthPage(_loggingService, _dialogService, _driver, _config);
+            freqPage.BandWidth = _viewModel.TuneBandWidthKHz;
+
+            Navigation.PushAsync(freqPage);
+
+            freqPage.Disappearing += delegate
+            {
+                _viewModel.TuneBandWidthKHz = freqPage.BandWidth;
+            };
+        }
+
         private void EditFrequencyFromButtton_Clicked(object sender, EventArgs e)
         {
             var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
@@ -319,6 +332,11 @@ namespace DVBTTelevizor
                                 AutoManualPicker.Focus();
                                 //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
                                 break;
+
+                            case "EditBandWidth":
+                                EditBandWidthButtton_Clicked(this, null);
+                                break;
+
 
                             case "EditFrequencyFrom":
                                 EditFrequencyFromButtton_Clicked(this, null);

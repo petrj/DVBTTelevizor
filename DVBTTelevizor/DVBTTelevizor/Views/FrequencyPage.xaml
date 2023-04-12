@@ -62,7 +62,7 @@
                     <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequencyKHz" Text="{Binding AutoTuningFrequencyKHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"/>
                     <Label Grid.Row="0" Grid.Column="2" Text="KHz" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
-                    <BoxView x:Name="FrequencyMHzBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+                    <BoxView x:Name="FrequencyMHzBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
                     <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryFrequencyMHz" Text="{Binding AutoTuningFrequencyMHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200" />
                     <Label Grid.Row="1" Grid.Column="2" Text="MHz" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 

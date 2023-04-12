@@ -235,63 +235,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public int BandWidthPickerIndex
-        {
-            get
-            {
-                switch (_tuneBandWidthKHz)
-                {
-                    case 01700: return 1;
-                    case 05000: return 2;
-                    case 06000: return 3;
-                    case 07000: return 4;
-                    case 08000: return 5;
-                    case 10000: return 6;
-                    default:
-                        return 0;
-                }
-            }
-            set
-            {
-                long bandWidthKHz;
-
-                switch (value)
-                {
-                    case 0:
-                        return; // custom bandwidth
-                    case 1:
-                        bandWidthKHz = 1700;
-                        break;
-                    case 2:
-                        bandWidthKHz = 5000;
-                        break;
-                    case 3:
-                        bandWidthKHz = 6000;
-                        break;
-                    case 4:
-                        bandWidthKHz = 7000;
-                        break;
-                    case 5:
-                        bandWidthKHz = 8000;
-                        break;
-                    case 6:
-                        bandWidthKHz = 10000;
-                        break;
-                    default:
-                        return;
-                }
-
-                if (TuneBandWidthKHz != bandWidthKHz)
-                {
-                    TuneBandWidthKHz = bandWidthKHz;
-
-                    OnPropertyChanged(nameof(BandWidthMHz));
-                    OnPropertyChanged(nameof(TuneBandWidthKHz));
-                }
-
-                OnPropertyChanged(nameof(BandWidthPickerIndex));
-            }
-        }
 
         public bool ValidBandWidth(long freqKHz)
         {
@@ -438,7 +381,7 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
-                OnPropertyChanged(nameof(BandWidthPickerIndex));
+                OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
             }
         }
     }

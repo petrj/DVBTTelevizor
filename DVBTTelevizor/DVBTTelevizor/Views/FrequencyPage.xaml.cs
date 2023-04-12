@@ -57,108 +57,33 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }));
 
             SliderFrequency.DragCompleted += SliderFrequency_DragCompleted;
+
+            EntryFrequencyKHz.Unfocused += EntryFrequencyKHz_Unfocused;
+            EntryFrequencyMHz.Unfocused += EntryFrequencyMHz_Unfocused;
+        }
+
+        private void EntryFrequencyMHz_Unfocused(object sender, FocusEventArgs e)
+        {
+            if (!_viewModel.ValidFrequency(EntryFrequencyMHz.Text))
+            {
+                _dialogService.Error($"BandWidth \"{EntryFrequencyMHz.Text}\" MHz is out of range {_viewModel.AutoTuningMinFrequencyKHz} KHz - {_viewModel.AutoTuningMaxFrequencyKHz} KHz");
+                _viewModel.AutoTuningFrequencyKHz = _viewModel.DefaultFrequencyKHz;
+            }
+        }
+
+        private void EntryFrequencyKHz_Unfocused(object sender, FocusEventArgs e)
+        {
+            if (!_viewModel.ValidFrequency(_viewModel.AutoTuningFrequencyKHz))
+            {
+                _dialogService.Error($"BandWidth \"{_viewModel.AutoTuningFrequencyKHz}\" KHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
+                _viewModel.AutoTuningFrequencyKHz = _viewModel.DefaultFrequencyKHz;
+            }
         }
 
         private void SliderFrequency_DragCompleted(object sender, EventArgs e)
         {
             _viewModel.RoundedFrequency();
         }
-
-        /*
-
-        private long RoundedFrequencyToBandWidth(string frequencyMHz, int silent)
-        {
-            if (!_viewModel.ValidFrequency(frequencyMHz))
-                return _viewModel.AutoTuningMinFrequencyKHz;
-
-            return RoundedFrequencyToBandWidth(_viewModel.ParseFreqMHzToKHz(frequencyMHz), silent, true);
-        }
-
-
-
-        private void SliderFrequencyTo_DragCompleted(object sender, EventArgs e)
-        {
-            _viewModel.AutoTuningFrequencyToKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyToKHz, 1);
-        }
-
-        private void EntryBandWidthMHz_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (!_viewModel.ValidBandWidth(EntryBandWidthMHz.Text))
-            {
-                _dialogService.Error($"BandWidth \"{EntryBandWidthMHz.Text}\" MHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
-                _viewModel.TuneBandWidthKHz = TuneViewModel.BandWidthDefaultKHz;
-            }
-
-            _viewModel.AutoTuningFrequencyFromKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyFromKHz, 0);
-            _viewModel.AutoTuningFrequencyToKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyToKHz, 0);
-        }
-
-        private void EntryBandWidthKHz_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (!_viewModel.ValidBandWidth(_viewModel.TuneBandWidthKHz))
-            {
-                _dialogService.Error($"BandWidth \"{_viewModel.TuneBandWidthKHz}\" KHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
-                _viewModel.TuneBandWidthKHz = TuneViewModel.BandWidthDefaultKHz;
-            }
-
-            _viewModel.AutoTuningFrequencyFromKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyFromKHz, 0);
-            _viewModel.AutoTuningFrequencyToKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyToKHz, 0);
-        }
-
-        private void BandWidthPicker_Unfocused(object sender, FocusEventArgs e)
-        {
-            _viewModel.AutoTuningFrequencyFromKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyFromKHz, 0);
-            _viewModel.AutoTuningFrequencyToKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyToKHz, 0);
-        }
-
-        private void EntryFrequencyFromMHz_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (!_viewModel.ValidFrequency(EntryFrequencyFromMHz.Text))
-            {
-                _dialogService.Error($"Frequency \"{EntryFrequencyFromMHz.Text}\" MHz is out of range {_viewModel.AutoTuningMinFrequencyKHz} KHz - {_viewModel.AutoTuningMaxFrequencyKHz} KHz");
-                _viewModel.AutoTuningFrequencyFromKHz = _viewModel._autoTuningMinFrequencyKHz;
-            } else
-            {
-                _viewModel.AutoTuningFrequencyFromKHz = RoundedFrequencyToBandWidth(EntryFrequencyFromMHz.Text, 0);
-            }
-        }
-
-        private void EntryFrequencyToMHz_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (!_viewModel.ValidFrequency(EntryFrequencyToMHz.Text))
-            {
-                _dialogService.Error($"Frequency \"{EntryFrequencyToMHz.Text}\" MHz is out of range {_viewModel.AutoTuningMinFrequencyKHz} KHz - {_viewModel.AutoTuningMaxFrequencyKHz} KHz");
-                _viewModel.AutoTuningFrequencyToKHz = _viewModel._autoTuningMaxFrequencyKHz;
-            } else
-            {
-                _viewModel.AutoTuningFrequencyToKHz = RoundedFrequencyToBandWidth(EntryFrequencyToMHz.Text, 0);
-            }
-        }
-
-        private void EntryFrequencyFromKHz_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (!_viewModel.ValidFrequency(_viewModel.AutoTuningFrequencyFromKHz))
-            {
-                _dialogService.Error($"Frequency \"{_viewModel.AutoTuningFrequencyFromKHz}\" KHz is out of range {_viewModel.AutoTuningMinFrequencyKHz} KHz - {_viewModel.AutoTuningMaxFrequencyKHz} KHz");
-                _viewModel.AutoTuningFrequencyFromKHz = _viewModel.AutoTuningMinFrequencyKHz;
-            } else
-            {
-                _viewModel.AutoTuningFrequencyFromKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyFromKHz, 0);
-            }
-        }
-
-        private void EntryFrequencyToKHz_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (!_viewModel.ValidFrequency(_viewModel.AutoTuningFrequencyToKHz))
-            {
-                _dialogService.Error($"Frequency \"{_viewModel.AutoTuningFrequencyToKHz}\" KHz is out of range {_viewModel.AutoTuningMinFrequencyKHz} KHz - {_viewModel.AutoTuningMaxFrequencyKHz} KHz");
-                _viewModel.AutoTuningFrequencyToKHz = _viewModel._autoTuningMaxFrequencyKHz;
-            } else
-            {
-                _viewModel.AutoTuningFrequencyToKHz = RoundedFrequencyToBandWidth(_viewModel.AutoTuningFrequencyToKHz, 0);
-            }
-        }
-        */
 
         public async void OnKeyDown(string key, bool longPress)
         {
