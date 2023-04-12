@@ -21,8 +21,6 @@ namespace DVBTTelevizor
 
         protected long _tuneBandWidthKHz = 8000;
 
-        public Command SetDefaultFrequenciesCommand { get; set; }
-
         public const long AutoTuningMinFrequencyKhzDefaultValue = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
         public const long AutoTuningMaxFrequencyKhzDefaultValue = 858000;  // 858.0 MHz - UHF band channel 69
 
@@ -49,15 +47,6 @@ namespace DVBTTelevizor
          : base(loggingService, dialogService, driver, config)
         {
             FillFrequencyChannels();
-
-            SetDefaultFrequenciesCommand = new Command(async () => await SetDefaultFrequencies());
-        }
-
-        public async Task SetDefaultFrequencies()
-        {
-            AutoTuningFrequencyFromKHz = AutoTuningMinFrequencyKhzDefaultValue;
-            AutoTuningFrequencyToKHz = AutoTuningMaxFrequencyKhzDefaultValue;
-            TuneBandWidthKHz = BandWidthDefaultKHz;
         }
 
         protected void FillFrequencyChannels()
@@ -123,6 +112,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
+                OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
             }
         }
@@ -145,7 +135,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
+                OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
             }
         }

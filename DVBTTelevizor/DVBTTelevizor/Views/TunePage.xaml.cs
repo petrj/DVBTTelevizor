@@ -117,12 +117,6 @@ namespace DVBTTelevizor
             _focusItemsDone.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
         }
 
-        private void EditFrequencies_Clicked(object sender, EventArgs e)
-        {
-            var automaticTuningParamsPage = new TuningOptionsPage(_loggingService, _dialogService, _driver, _config);
-            Navigation.PushAsync(automaticTuningParamsPage);
-        }
-
         private void EditFrequencyFromButtton_Clicked(object sender, EventArgs e)
         {
             var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
@@ -130,16 +124,31 @@ namespace DVBTTelevizor
                 _viewModel.AutoTuningFrequencyFromKHz,
                 _viewModel.AutoTuningMinFrequencyKHz,
                 _viewModel.AutoTuningMaxFrequencyKHz,
-                _viewModel.AutoTuningMinFrequencyKHz,
-                _viewModel.TuneBandWidthKHz);
+                _viewModel.AutoTuningMinFrequencyKHz);
 
             Navigation.PushAsync(freqPage);
+
+            freqPage.Disappearing += delegate
+            {
+                _viewModel.AutoTuningFrequencyFromKHz = freqPage.SelectedFrequency;
+            };
         }
 
         private void EditFrequencyToButtton_Clicked(object sender, EventArgs e)
         {
             var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
+            freqPage.SetFrequency("Tuning frequency to",
+                _viewModel.AutoTuningFrequencyToKHz,
+                _viewModel.AutoTuningMinFrequencyKHz,
+                _viewModel.AutoTuningMaxFrequencyKHz,
+                _viewModel.AutoTuningFrequencyToKHz);
+
             Navigation.PushAsync(freqPage);
+
+            freqPage.Disappearing += delegate
+            {
+                _viewModel.AutoTuningFrequencyToKHz = freqPage.SelectedFrequency;
+            };
         }
 
         private void TunePage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
@@ -308,12 +317,6 @@ namespace DVBTTelevizor
                             case "AutoManualTuning":
                                 //_viewModel.ManualTuning = !_viewModel.ManualTuning;
                                 AutoManualPicker.Focus();
-                                //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
-                                break;
-
-                            case "AutomaticTuningOptions":
-                                //_viewModel.ManualTuning = !_viewModel.ManualTuning;
-                                EditFrequencies_Clicked(this, null);
                                 //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
                                 break;
 

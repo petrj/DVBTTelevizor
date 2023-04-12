@@ -21,8 +21,8 @@ namespace DVBTTelevizor
 
         private string _title { get; set; }
 
-        public long BandWidthKHz { get; set; }
         public long DefaultFrequencyKHz { get; set; }
+        public long FrequencyKHzSliderStep { get; set; } = 1000;
 
         public Command SetDefaultFrequencyCommand { get; set; }
 
@@ -57,6 +57,43 @@ namespace DVBTTelevizor
                 _autoTuningMinFrequencyKHz = value;
 
                 OnPropertyChanged(nameof(AutoTuningMinFrequencyKHz));
+            }
+        }
+
+        public string AutoTuningMinFrequencyMHz
+        {
+            get
+            {
+                if (_autoTuningMinFrequencyKHz == 0)
+                    return "Min: 0 MHz";
+
+                return $"Min: {(_autoTuningMinFrequencyKHz / 1000.0).ToString("N0")} MHz";
+            }
+        }
+
+        public void RoundedFrequency()
+        {
+            if (!ValidFrequency(AutoTuningFrequencyKHz))
+                return;
+
+            var stepFreq = Math.Round(Convert.ToDecimal(AutoTuningFrequencyKHz - AutoTuningMinFrequencyKHz) / Convert.ToDecimal(FrequencyKHzSliderStep));
+            var freqRounded = Convert.ToInt64(AutoTuningMinFrequencyKHz + stepFreq * FrequencyKHzSliderStep);
+            if (freqRounded > AutoTuningMaxFrequencyKHz)
+            {
+                freqRounded = freqRounded - FrequencyKHzSliderStep;
+            }
+
+            AutoTuningFrequencyKHz = freqRounded;
+        }
+
+        public string AutoTuningMaxFrequencyMHz
+        {
+            get
+            {
+                if (_autoTuningMaxFrequencyKHz == 0)
+                    return "0 MHz";
+
+                return $"Max: {(_autoTuningMaxFrequencyKHz / 1000.0).ToString("N0")} MHz";
             }
         }
 

@@ -275,10 +275,6 @@ namespace DVBTTelevizor
                         case "BandWidthMHz":
                             EntryBandWidthMHz.Focus();
                             break;
-
-                        case "DefaultButton":
-                            _viewModel.SetDefaultFrequenciesCommand.Execute(null);
-                            break;
                     }
                     break;
             }
