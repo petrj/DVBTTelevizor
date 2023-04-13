@@ -4,8 +4,8 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="DVBTTelevizor.TunePage"
-             Title="Tuning">
+             x:Class="DVBTTelevizor.TuneOptionsPage"
+             Title="Tuning options">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -220,7 +220,7 @@
 
                     </StackLayout>
 
-                    <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
+                <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
 
                 </StackLayout>
 

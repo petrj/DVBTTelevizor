@@ -29,7 +29,7 @@ namespace DVBTTelevizor
         private DVBTTelevizorConfiguration _config;
         private ServicePage _servicePage;
         private ChannelPage _editChannelPage;
-        private TunePage _tunePage;
+        private TuneOptionsPage _tuneOptionsPage;
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
         private KeyboardFocusableItem _tuneFocusItem = null;
@@ -96,8 +96,8 @@ namespace DVBTTelevizor
 
             _channelService = new ConfigChannelService(_loggingService, _config);
 
-            _tunePage = new TunePage(_loggingService, _dlgService, _driver, _config, _channelService);
-            _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config);
+            _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
+            _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
             _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config);
 
@@ -130,7 +130,7 @@ namespace DVBTTelevizor
 
             _servicePage.Disappearing += anyPage_Disappearing;
             _servicePage.Disappearing += anyPage_Disappearing;
-            _tunePage.Disappearing += anyPage_Disappearing;
+            _tuneOptionsPage.Disappearing += anyPage_Disappearing;
             _settingsPage.Disappearing += anyPage_Disappearing;
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
@@ -1050,7 +1050,7 @@ namespace DVBTTelevizor
 
         private void ToolTune_Clicked(object sender, EventArgs e)
         {
-            Navigation.PushAsync(_tunePage);
+            Navigation.PushAsync(_tuneOptionsPage);
         }
 
         private void ToolRefresh_Clicked(object sender, EventArgs e)

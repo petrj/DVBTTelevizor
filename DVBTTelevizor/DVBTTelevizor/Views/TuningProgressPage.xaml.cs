@@ -31,7 +31,7 @@ namespace DVBTTelevizor
             _driver = driver;
             _config = config;
 
-            BindingContext = _viewModel = new TuneViewModel(_loggingService, _dialogService, _driver, _config);
+            BindingContext = _viewModel = new TuneViewModel(_loggingService, _dialogService, _driver, _config, channelService);
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 

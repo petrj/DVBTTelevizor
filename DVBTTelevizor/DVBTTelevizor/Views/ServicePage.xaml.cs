@@ -28,7 +28,7 @@ namespace DVBTTelevizor
         private string _lastFocusedItem = null;
         private KeyboardFocusableItemList _focusItems;
 
-        public ServicePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
+        public ServicePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
@@ -37,8 +37,7 @@ namespace DVBTTelevizor
             _driver = driver;
             _config = config;
 
-            BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config);
-            _viewModel.TuneFrequency = "626";
+            BindingContext = _viewModel = new ServicePageViewModel(_loggingService, _dialogService, _driver, _config, channelService);
             _viewModel.SelectedDeliverySystemType = _viewModel.DeliverySystemTypes[1];
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>

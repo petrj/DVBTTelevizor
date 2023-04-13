@@ -12,7 +12,6 @@ namespace DVBTTelevizor
 {
     public class TunePageViewModel : TuneViewModel
     {
-        private bool _manualTuning = false;
         private bool _tuningAborted = false;
 
         private bool _DVBTTuning = true;
@@ -24,12 +23,10 @@ namespace DVBTTelevizor
 
         private ObservableCollection<DVBTChannel> _channels = null;
 
-        private long _actualTunningChannel = -1;
+        private long _actualTunningFreqKHz = -1;
         private long _actualTuningDVBTType = -1;
 
         private double _signalStrengthProgress = 0;
-
-        public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         public Command TuneCommand { get; set; }
         public Command AbortTuneCommand { get; set; }
@@ -44,7 +41,7 @@ namespace DVBTTelevizor
         }
 
         public TunePageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
-         : base(loggingService, dialogService, driver, config)
+         : base(loggingService, dialogService, driver, config, channelService)
         {
             _channelService = channelService;
 
@@ -77,54 +74,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public int TuneModeIndex
-        {
-            get
-            {
-                return _manualTuning ? 1 : 0;
-            }
-            set
-            {
-                ManualTuning = value == 1;
-
-                OnPropertyChanged(nameof(ManualTuning));
-                OnPropertyChanged(nameof(TuneModeIndex));
-            }
-        }
-
-        public bool ManualTuning
-        {
-            get
-            {
-                return _manualTuning;
-            }
-            set
-            {
-                _manualTuning = value;
-
-                OnPropertyChanged(nameof(ManualTuning));
-                OnPropertyChanged(nameof(AutomaticTuning));
-                OnPropertyChanged(nameof(TuneOptionsVisible));
-                OnPropertyChanged(nameof(ManualTuneOptionsVisible));
-            }
-        }
-
-        public bool AutomaticTuning
-        {
-            get
-            {
-                return !_manualTuning;
-            }
-            set
-            {
-                _manualTuning = !value;
-
-                OnPropertyChanged(nameof(AutomaticTuning));
-                OnPropertyChanged(nameof(ManualTuning));
-                OnPropertyChanged(nameof(TuneOptionsVisible));
-                OnPropertyChanged(nameof(ManualTuneOptionsVisible));
-            }
-        }
 
         public string TuningLabel
         {
@@ -132,9 +81,9 @@ namespace DVBTTelevizor
             {
                 if (State == TuneState.TuningInProgress)
                 {
-                    var freqMhz = (474 + 8 * (_actualTunningChannel - 21));
+                    var freqMhz = (_actualTunningFreqKHz / 1000.0).ToString("N3");
                     var t = _actualTuningDVBTType == 0 ? "DVBT" : "DVBT2";
-                    return $"Tuning CH #{_actualTunningChannel} ({freqMhz} MHz {t})";
+                    return $"Tuning freq #{freqMhz} MHz {t})";
                 }
 
                 return String.Empty;
@@ -145,11 +94,11 @@ namespace DVBTTelevizor
         {
             get
             {
-                var onePerc = (AutomaticTuningLastChannel - AutomaticTuningFirstChannel) / 100.0;
+                var onePerc = (AutoTuningFrequencyToKHz - AutoTuningFrequencyFromKHz) / 100.0;
                 if (onePerc == 0)
                     return 0.0;
 
-                var perc = (_actualTunningChannel - AutomaticTuningFirstChannel) / onePerc;
+                var perc = (_actualTunningFreqKHz - AutoTuningFrequencyToKHz) / onePerc;
                 return perc / 100.0;
             }
         }
@@ -319,22 +268,22 @@ namespace DVBTTelevizor
                 if (ManualTuning)
                 {
 
-                    long freq = Convert.ToInt64(TuneFrequency) * 1000000;
-                    long bandWidth = TuneBandwidth * 1000000;
+                    long freqHz = TuningFrequencyKHz * 1000;
+                    long bandWidthHz = TuneBandWidthKHz * 1000;
 
-                    var ch = Convert.ToInt32((Convert.ToInt64(TuneFrequency) - 474 + 8 * 21) / 8);
+                    //var ch = Convert.ToInt32((Convert.ToInt64(TuneFrequency) - 474 + 8 * 21) / 8);
 
-                    _actualTunningChannel = ch;
+                    _actualTunningFreqKHz = TuningFrequencyKHz;
                     _actualTuningDVBTType = 0;
 
                     OnPropertyChanged(nameof(TuningLabel));
 
-                    if (DVBTTuning) await Tune(freq, bandWidth, 0);
+                    if (DVBTTuning) await Tune(freqHz, bandWidthHz, 0);
 
                     _actualTuningDVBTType = 1;
                     OnPropertyChanged(nameof(TuningLabel));
 
-                    if (DVBT2Tuning) await Tune(freq, bandWidth, 1);
+                    if (DVBT2Tuning) await Tune(freqHz, bandWidthHz, 1);
                 }
                 else
                 {
@@ -376,11 +325,15 @@ namespace DVBTTelevizor
 
                    _actualTuningDVBTType = dvbtTypeIndex;
 
+                   // TODO
+                   /*
                    for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
                    {
-                       _actualTunningChannel = i;
+
                        var freqMHz = (474 + 8 * (_actualTunningChannel - 21));
                        var freq = freqMHz * 1000000;
+
+                       _actualTunningFreqKHz = 0;
 
                        if (TuningAborted)
                        {
@@ -392,6 +345,7 @@ namespace DVBTTelevizor
 
                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
                    }
+                   */
                }
 
            });
@@ -570,7 +524,7 @@ namespace DVBTTelevizor
                    TunedChannels.Clear();
 
                    _actualTuningDVBTType = -1;
-                   _actualTunningChannel = -1;
+                   _actualTunningFreqKHz = -1;
 
                    State = TuneState.Ready;
 
@@ -592,30 +546,6 @@ namespace DVBTTelevizor
            });
         }
 
-        public async Task SetChannelsRange()
-        {
-            _loggingService.Info("SetChannelsRange");
 
-            try
-            {
-                var cap = await _driver.GetCapabalities();
-
-                if (!cap.SuccessFlag)
-                {
-                    throw new Exception("Response not success");
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
-            finally
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    OnPropertyChanged(nameof(FrequencyChannels));
-                });
-            }
-        }
     }
 }

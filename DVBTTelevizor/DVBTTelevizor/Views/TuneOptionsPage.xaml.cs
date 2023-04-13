@@ -10,13 +10,14 @@ using Xamarin.Forms.Xaml;
 namespace DVBTTelevizor
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class TunePage : ContentPage, IOnKeyDown
+    public partial class TuneOptionsPage : ContentPage, IOnKeyDown
     {
-        private TunePageViewModel _viewModel;
+        private TuneViewModel _viewModel;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         protected IDVBTDriverManager _driver;
         protected DVBTTelevizorConfiguration _config;
+        protected ChannelService _channelService;
 
         private bool _toolBarFocused = false;
         private bool _firstAppearing = true;
@@ -30,7 +31,7 @@ namespace DVBTTelevizor
         private KeyboardFocusableItemList _focusItemsAbort;
         private KeyboardFocusableItemList _focusItemsDone;
 
-        public TunePage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public TuneOptionsPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
@@ -38,9 +39,9 @@ namespace DVBTTelevizor
             _dialogService = dialogService;
             _driver = driver;
             _config = config;
+            _channelService = channelService;
 
-            BindingContext = _viewModel = new TunePageViewModel(_loggingService, _dialogService, _driver, _config, channelService);
-            _viewModel.TuneFrequency = "730";
+            BindingContext = _viewModel = new TuneViewModel(_loggingService, _dialogService, _driver, _config, channelService);
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
@@ -170,6 +171,13 @@ namespace DVBTTelevizor
             {
                 _viewModel.AutoTuningFrequencyToKHz = freqPage.SelectedFrequency;
             };
+        }
+
+        private void TuneButtton_Clicked(object sender, EventArgs e)
+        {
+            var page = new TuningProgressPage(_loggingService, _dialogService, _driver, _config, _channelService);
+
+            Navigation.PushAsync(page);
         }
 
         private void TunePage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
@@ -332,7 +340,6 @@ namespace DVBTTelevizor
                                 EditBandWidthButtton_Clicked(this, null);
                                 break;
 
-
                             case "EditFrequencyFrom":
                                 EditFrequencyFromButtton_Clicked(this, null);
                                 break;
@@ -351,6 +358,10 @@ namespace DVBTTelevizor
 
                             case "DVBT2":
                                 DVBT2TuningCheckBox.IsToggled = !DVBT2TuningCheckBox.IsToggled;
+                                break;
+
+                            case "TuneButton":
+                                TuneButtton_Clicked(this, null);
                                 break;
                         }
                     }

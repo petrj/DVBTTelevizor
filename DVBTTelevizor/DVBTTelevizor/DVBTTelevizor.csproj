@@ -40,6 +40,9 @@
     <Compile Update="Views\BandWidthPage.xaml.cs">
       <DependentUpon>BandWidthPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\TuneOptionsPage.xaml.cs">
+      <DependentUpon>TuneOptionsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\TuningProgressPage.xaml.cs">
       <DependentUpon>TuningProgressPage.xaml</DependentUpon>
     </Compile>
@@ -55,7 +58,7 @@
     <EmbeddedResource Update="Views\SettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\TunePage.xaml">
+    <EmbeddedResource Update="Views\TuneOptionsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
