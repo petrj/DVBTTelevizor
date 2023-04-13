@@ -40,6 +40,9 @@
     <Compile Update="Views\BandWidthPage.xaml.cs">
       <DependentUpon>BandWidthPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\TuningProgressPage.xaml.cs">
+      <DependentUpon>TuningProgressPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>

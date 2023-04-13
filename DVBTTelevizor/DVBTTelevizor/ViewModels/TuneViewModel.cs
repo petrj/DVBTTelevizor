@@ -23,10 +23,14 @@ namespace DVBTTelevizor
 
         public const long AutoTuningMinFrequencyKhzDefaultValue = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
         public const long AutoTuningMaxFrequencyKhzDefaultValue = 858000;  // 858.0 MHz - UHF band channel 69
+        public const long AutoTuningFrequencyKHzDefaultValue = 470000;
+
 
         public const long BandWidthMinKHz = 1000;
         public const long BandWidthMaxKHz = 32000;
         public const long BandWidthDefaultKHz = 8000;
+
+        public long _tuningFrequencyKHz { get; set; } = AutoTuningFrequencyKHzDefaultValue;
 
         public long _autoTuningMinFrequencyKHz { get; set; } = AutoTuningMinFrequencyKhzDefaultValue;
         public long _autoTuningMaxFrequencyKHz { get; set; } = AutoTuningMaxFrequencyKhzDefaultValue;
@@ -110,6 +114,38 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
+            }
+        }
+
+        public long TuningFrequencyKHz
+        {
+            get
+            {
+                return _tuningFrequencyKHz;
+            }
+            set
+            {
+                _tuningFrequencyKHz = value;
+
+                OnPropertyChanged(nameof(TuningFrequencyKHz));
+                OnPropertyChanged(nameof(TuningFrequencyMHz));
+                OnPropertyChanged(nameof(TuningFrequencyMHzCaption));
+            }
+        }
+
+        public string TuningFrequencyMHz
+        {
+            get
+            {
+                return (TuningFrequencyKHz / 1000.0).ToString("N3");
+            }
+        }
+
+        public string TuningFrequencyMHzCaption
+        {
+            get
+            {
+                return TuningFrequencyMHz + " MHz";
             }
         }
 

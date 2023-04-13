@@ -4,7 +4,7 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="DVBTTelevizor.TunePage"
+             x:Class="DVBTTelevizor.TuningProgressPage"
              Title="Tuning">
 
     <ContentPage.Resources>
@@ -102,127 +102,7 @@
 
             <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
-                <!-- top controls -->
-                <StackLayout VerticalOptions="StartAndExpand" Margin="10,0,10,0">
 
-                    <StackLayout VerticalOptions="StartAndExpand" Spacing="0">
-
-                    <Grid VerticalOptions="Start" IsVisible="{Binding TuneReady}" Margin="0,20,0,0" RowSpacing="0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="AutoManualTuningBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                        <Label Grid.Row="0" Grid.Column="0" Text="Tuning mode" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Picker
-                            Grid.Row="0" Grid.Column="1"
-                            x:Name="AutoManualPicker"
-                            Margin="20,0,0,0"
-                            FontSize="{Binding FontSizeForPicker}"
-                            Style="{StaticResource PickerStyle}"
-                            SelectedIndex="{Binding TuneModeIndex, Mode=TwoWay}">
-                            <Picker.Items>
-                                <x:String>Automatic</x:String>
-                                <x:String>Manual</x:String>
-                            </Picker.Items>
-                        </Picker>
-                    </Grid>
-
-                    <Grid x:Name="BandWidthGrid" IsVisible="True" RowSpacing="0" Margin="0,10,0,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="60*" />
-                            <ColumnDefinition Width="20*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding TuningFrequencyBandWidthMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center"/>
-                        <Button Grid.Row="2" Grid.Column="1" x:Name="EditBandWidthButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center" Clicked="EditBandWidthButtton_Clicked"/>
-                    </Grid>
-
-                    <Grid x:Name="FrequenciesGrid" IsVisible="{Binding AutomaticTuning}" RowSpacing="0" Margin="0,10,0,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="45*" />
-                            <ColumnDefinition Width="10*" />
-                            <ColumnDefinition Width="45*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                        <Label Grid.Row="1" Grid.Column="0" Text="From" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
-                        <Label Grid.Row="1" Grid.Column="2" Text="To" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" />
-
-                        <Label Grid.Row="2" Grid.Column="0"  Text="{Binding AutoTuningFrequencyFromMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
-                        <Label Grid.Row="2" Grid.Column="1" Text="-" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center"/>
-                        <Label Grid.Row="2" Grid.Column="2" Text="{Binding AutoTuningFrequencyToMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" />
-
-                        <Button Grid.Row="3" Grid.Column="0" x:Name="EditFrequencyFromButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"  Clicked="EditFrequencyFromButtton_Clicked"/>
-                        <Button Grid.Row="3" Grid.Column="2" x:Name="EditFrequencyToButton"   Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"  Clicked="EditFrequencyToButtton_Clicked"/>
-                    </Grid>
-
-                    <Grid x:Name="FrequncyGrid" IsVisible="{Binding ManualTuning}" RowSpacing="0" Margin="0,10,0,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="60*" />
-                            <ColumnDefinition Width="20*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding TuningFrequencyMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center"/>
-                        <Button Grid.Row="2" Grid.Column="1" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center" Clicked="EditFrequencyButton_Clicked"/>
-                    </Grid>
-
-                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="{Binding TuneOptionsVisible}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70*" />
-                                <ColumnDefinition Width="30*" />
-                            </Grid.ColumnDefinitions>
-
-                            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                            <Label Grid.Row="0" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsToggled="{Binding DVBTTuning}"  HorizontalOptions="End"  />
-
-                            <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                            <Label Grid.Row="1" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
-                        </Grid>
-
-                    </StackLayout>
-
-                    <Button  x:Name="TuneButton" Text="Tune" Command="{Binding TuneCommand}" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
-
-                </StackLayout>
 
                 <!-- middle controls -->
                 <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
@@ -275,7 +155,6 @@
                 <!-- bottom controls -->
                 <StackLayout VerticalOptions="End" Spacing="0" Margin="0,0,0,0">
 
-
                     <!-- delimiter -->
                     <Grid VerticalOptions="Start" IsVisible="{Binding TuningInProgress}" Margin="0,0,0,0">
                         <Grid.RowDefinitions>
@@ -321,9 +200,5 @@
         <!--/ScrollView-->
 
     </ContentPage.Content>
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
-    </ContentPage.ToolbarItems>
 
 </ContentPage>

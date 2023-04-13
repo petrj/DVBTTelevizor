@@ -1,11 +1,9 @@
 ﻿using LoggerService;
-using Org.Xmlpull.V1.Sax2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -21,6 +19,7 @@ namespace DVBTTelevizor
         protected DVBTTelevizorConfiguration _config;
 
         private bool _toolBarFocused = false;
+        private bool _firstAppearing = true;
 
         private KeyboardFocusableItemList _focusItems;
         private string _previousFocusedItemsPart;
@@ -88,25 +87,17 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("EditBandWidth", new List<View>() { EditBandWidthButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyFrom", new List<View>() { EditFrequencyFromButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyTo", new List<View>() { EditFrequencyToButton }))
-
-                //.AddItem(KeyboardFocusableItem.CreateFrom("BandWidtMHz", new List<View>() { AutoFrequencyBoxView }))
-                //.AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView, EntryFrequency }))
-                //.AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView, ChannelPicker }))
-
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
 
-            /*
             _focusItemsManual
-                .AddItem(KeyboardFocusableItem.CreateFrom("ManualTuning", new List<View>() { AutoManualTuningBoxView, AutoManualPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView, EntryFrequency }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView, ChannelPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("BandWith", new List<View>() { BandWithBoxView, EntryBandWidth }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("AutoManualTuning", new List<View>() { AutoManualTuningBoxView, AutoManualPicker }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EditBandWidth", new List<View>() { EditBandWidthButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequency", new List<View>() { EditFrequencyButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
-            */
 
             _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
             _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
@@ -115,6 +106,23 @@ namespace DVBTTelevizor
             _focusItemsManual.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
             _focusItemsAbort.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
             _focusItemsDone.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
+        }
+
+        private void EditFrequencyButton_Clicked(object sender, EventArgs e)
+        {
+            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
+            freqPage.SetFrequency("Tuning frequency",
+                _viewModel.TuningFrequencyKHz,
+                _viewModel.AutoTuningMinFrequencyKHz,
+                _viewModel.AutoTuningMaxFrequencyKHz,
+                TuneViewModel.AutoTuningFrequencyKHzDefaultValue);
+
+            Navigation.PushAsync(freqPage);
+
+            freqPage.Disappearing += delegate
+            {
+                _viewModel.TuningFrequencyKHz = freqPage.SelectedFrequency;
+            };
         }
 
         private void EditBandWidthButtton_Clicked(object sender, EventArgs e)
@@ -171,12 +179,17 @@ namespace DVBTTelevizor
 
         private void TunePage_Appearing(object sender, EventArgs e)
         {
-            UpdateFocusedPart("AutoTuning", "TuneButton");
-
-            Task.Run(async () =>
+            if (_firstAppearing)
             {
-                await _viewModel.SetChannelsRange();
-            });
+                UpdateFocusedPart("AutoTuning", "TuneButton");
+
+                Task.Run(async () =>
+                {
+                    await _viewModel.SetChannelsRange();
+                });
+
+                _firstAppearing = false;
+            }
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
@@ -213,16 +226,6 @@ namespace DVBTTelevizor
                     break;
                 case "AutoTuning":
                     _focusItems = _focusItemsAuto;
-                    break;
-
-                case "AbortButton":
-                    _focusItems = _focusItemsAbort;
-                    _focusItems.FocusItem("AbortButton");
-                    break;
-
-                case "FinishButton":
-                    _focusItems = _focusItemsDone;
-                    _focusItems.FocusItem("FinishButton");
                     break;
             }
 
@@ -261,14 +264,6 @@ namespace DVBTTelevizor
                             case "ManualTuning":
                             case "AutoTuning":
                                 _focusItems.FocusItem("TuneButton");
-                                break;
-
-                            case "AbortButton":
-                                _focusItems.FocusItem("AbortButton");
-                                break;
-
-                            case "FinishButton":
-                                _focusItems.FocusItem("FinishButton");
                                 break;
                         }
                     }
@@ -328,9 +323,9 @@ namespace DVBTTelevizor
                         switch (_focusItems.FocusedItemName)
                         {
                             case "AutoManualTuning":
-                                //_viewModel.ManualTuning = !_viewModel.ManualTuning;
+                                _viewModel.ManualTuning = !_viewModel.ManualTuning;
                                 AutoManualPicker.Focus();
-                                //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
+                                UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "AutoManualTuning");
                                 break;
 
                             case "EditBandWidth":
@@ -346,28 +341,8 @@ namespace DVBTTelevizor
                                 EditFrequencyToButtton_Clicked(this, null);
                                 break;
 
-                            case "TuneButton":
-                                _viewModel.TuneCommand.Execute(null);
-                                break;
-
-                            case "AbortButton":
-                                _viewModel.AbortTuneCommand.Execute(null);
-                                break;
-
-                            case "FinishButton":
-                                _viewModel.FinishTunedCommand.Execute(null);
-                                break;
-
-                            case "Channel":
-                                //ChannelPicker.Focus();
-                                break;
-
-                            case "Frequency":
-                                //EntryFrequency.Focus();
-                                break;
-
-                            case "BandWith":
-                                //EntryBandWidth.Focus();
+                            case "EditFrequency":
+                                EditFrequencyButton_Clicked(this, null);
                                 break;
 
                             case "DVBT":
