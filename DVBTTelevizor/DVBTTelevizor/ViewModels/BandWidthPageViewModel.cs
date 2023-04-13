@@ -1,14 +1,6 @@
-﻿using DVBTTelevizor.Models;
-using LoggerService;
+﻿using LoggerService;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml.Internals;
 
 namespace DVBTTelevizor
 {
@@ -34,7 +26,7 @@ namespace DVBTTelevizor
             {
                 _bandWidthKHz = value;
 
-                if (!ValidFrequency(value))
+                if (!ValidBandWidth(value))
                     return;
 
                 OnPropertyChanged(nameof(BandWidthKHz));
@@ -43,18 +35,18 @@ namespace DVBTTelevizor
             }
         }
 
-        public string BandWidthMHz
+        public double BandWidthMHz
         {
             get
             {
-                return Math.Round(BandWidthKHz / 1000.0, 3).ToString();
+                return BandWidthKHz / 1000.0;
             }
             set
             {
-                if (!ValidFrequency(value))
+                if (double.IsNaN(value) || !ValidBandWidth(value*1000))
                     return;
 
-                var freqKHz = ParseFreqMHzToKHz(value);
+                var freqKHz = Convert.ToInt64(value * 1000.0);
 
                 if (BandWidthKHz != freqKHz)
                 {
@@ -121,8 +113,12 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool ValidBandWidth(double freqKHz)
+        {
+            return ValidBandWidth(Convert.ToInt64(freqKHz));
+        }
 
-        public bool ValidFrequency(long freqKHz)
+        public bool ValidBandWidth(long freqKHz)
         {
 
             if (freqKHz < TuneViewModel.BandWidthMinKHz || freqKHz > TuneViewModel.BandWidthMaxKHz)
@@ -133,30 +129,15 @@ namespace DVBTTelevizor
             return true;
         }
 
-        public bool ValidFrequency(string freqMHz)
+        public bool ValidBandWidth(string freqMHz)
         {
-            var freqKHz = ParseFreqMHzToKHz(freqMHz);
+            var freqKHz = TuneViewModel.ParseFreqMHzToKHz(freqMHz);
             if (freqKHz == -1)
             {
                 return false;
             }
 
-            return ValidFrequency(freqKHz);
-        }
-
-        public long ParseFreqMHzToKHz(string freqMHz)
-        {
-            decimal freqMHzDecimal = -1;
-            var sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-
-            if (decimal.TryParse(freqMHz.Replace(".", sep).Replace(",", sep), out freqMHzDecimal))
-            {
-                return Convert.ToInt64(freqMHzDecimal * 1000);
-            }
-            else
-            {
-                return -1;
-            }
+            return ValidBandWidth(freqKHz);
         }
     }
 }

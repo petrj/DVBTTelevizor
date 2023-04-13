@@ -1,5 +1,6 @@
 ﻿using LoggerService;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;

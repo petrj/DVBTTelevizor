@@ -104,12 +104,8 @@ namespace DVBTTelevizor
             {
                 _autoTuningFrequencyFromKHz = value;
 
-                if (!ValidFrequency(value))
-                    return;
-
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromKHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
@@ -127,12 +123,8 @@ namespace DVBTTelevizor
             {
                 _autoTuningFrequencyToKHz = value;
 
-                if (!ValidFrequency(value))
-                    return;
-
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromKHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromToMHz));
                 OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
                 OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
@@ -145,29 +137,6 @@ namespace DVBTTelevizor
             get
             {
                 return Math.Round(AutoTuningFrequencyToKHz / 1000.0, 1).ToString();
-            }
-            set
-            {
-                if (!ValidFrequency(value))
-                    return;
-
-                var freqKHz = ParseFreqMHzToKHz(value);
-
-                if (AutoTuningFrequencyToKHz != freqKHz)
-                {
-                    AutoTuningFrequencyToKHz = freqKHz;
-                }
-            }
-        }
-
-        public string AutoTuningFrequencyFromToMHz
-        {
-            get
-            {
-                return Math.Round(AutoTuningFrequencyFromKHz / 1000.0, 1).ToString() +
-                       " - " +
-                       Math.Round(AutoTuningFrequencyToKHz / 1000.0, 1).ToString() +
-                       " MHz";
             }
         }
 
@@ -184,18 +153,6 @@ namespace DVBTTelevizor
             get
             {
                 return Math.Round(AutoTuningFrequencyFromKHz / 1000.0, 1).ToString();
-            }
-            set
-            {
-                if (!ValidFrequency(value))
-                    return;
-
-                var freqKHz = ParseFreqMHzToKHz(value);
-
-                if (AutoTuningFrequencyFromKHz != freqKHz)
-                {
-                    AutoTuningFrequencyFromKHz = freqKHz;
-                }
             }
         }
 
@@ -220,77 +177,6 @@ namespace DVBTTelevizor
             get
             {
                 return Math.Round(TuneBandWidthKHz / 1000.0, 1).ToString();
-            }
-            set
-            {
-                if (!ValidBandWidth(value))
-                    return;
-
-                var freqKHz = ParseFreqMHzToKHz(value);
-
-                if (TuneBandWidthKHz != freqKHz)
-                {
-                    TuneBandWidthKHz = freqKHz;
-                }
-            }
-        }
-
-
-        public bool ValidBandWidth(long freqKHz)
-        {
-            if (freqKHz < BandWidthMinKHz || freqKHz > BandWidthMaxKHz)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool ValidBandWidth(string freqMHz)
-        {
-            var freqKHz = ParseFreqMHzToKHz(freqMHz);
-            if (freqKHz == -1)
-            {
-                return false;
-            }
-
-            return ValidBandWidth(freqKHz);
-        }
-
-        public bool ValidFrequency(long freqKHz)
-        {
-
-            if (freqKHz < _autoTuningMinFrequencyKHz || freqKHz > _autoTuningMaxFrequencyKHz)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool ValidFrequency(string freqMHz)
-        {
-            var freqKHz = ParseFreqMHzToKHz(freqMHz);
-            if (freqKHz == -1)
-            {
-                return false;
-            }
-
-            return ValidFrequency(freqKHz);
-        }
-
-        public long ParseFreqMHzToKHz(string freqMHz)
-        {
-            decimal freqMHzDecimal = -1;
-            var sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-
-            if (decimal.TryParse(freqMHz.Replace(".", sep).Replace(",", sep), out freqMHzDecimal))
-            {
-                return Convert.ToInt64(freqMHzDecimal * 1000);
-            }
-            else
-            {
-                return -1;
             }
         }
 
@@ -376,12 +262,24 @@ namespace DVBTTelevizor
             {
                 _tuneBandWidthKHz = value;
 
-                if (!ValidBandWidth(value))
-                    return;
-
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
                 OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
+            }
+        }
+
+        public static long ParseFreqMHzToKHz(string freqMHz)
+        {
+            decimal freqMHzDecimal = -1;
+            var sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            if (decimal.TryParse(freqMHz.Replace(".", sep).Replace(",", sep), out freqMHzDecimal))
+            {
+                return Convert.ToInt64(freqMHzDecimal * 1000);
+            }
+            else
+            {
+                return -1;
             }
         }
     }

@@ -53,7 +53,7 @@ namespace DVBTTelevizor
 
         private void EntryBandWidthMHz_Unfocused(object sender, FocusEventArgs e)
         {
-            if (!_viewModel.ValidFrequency(EntryBandWidthMHz.Text))
+            if (!_viewModel.ValidBandWidth(EntryBandWidthMHz.Text))
             {
                 _dialogService.Error($"BandWidth \"{EntryBandWidthMHz.Text}\" MHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
                 _viewModel.BandWidthKHz = TuneViewModel.BandWidthDefaultKHz;
@@ -62,7 +62,7 @@ namespace DVBTTelevizor
 
         private void EntryBandWidthKHz_Unfocused(object sender, FocusEventArgs e)
         {
-            if (!_viewModel.ValidFrequency(_viewModel.BandWidthKHz))
+            if (!_viewModel.ValidBandWidth(_viewModel.BandWidthKHz))
             {
                 _dialogService.Error($"BandWidth \"{_viewModel.BandWidthKHz}\" KHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
                 _viewModel.BandWidthKHz = TuneViewModel.BandWidthDefaultKHz;

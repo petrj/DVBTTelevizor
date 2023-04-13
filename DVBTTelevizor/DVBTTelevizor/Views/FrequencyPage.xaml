@@ -59,17 +59,16 @@
                     </Grid.ColumnDefinitions>
 
                     <BoxView x:Name="FrequencyKHzBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
-                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequencyKHz" Text="{Binding AutoTuningFrequencyKHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryFrequencyKHz" Text="{Binding FrequencyKHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"/>
                     <Label Grid.Row="0" Grid.Column="2" Text="KHz" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
                     <BoxView x:Name="FrequencyMHzBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
-                    <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryFrequencyMHz" Text="{Binding AutoTuningFrequencyMHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200" />
+                    <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryFrequencyMHz" Text="{Binding FrequencyMHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200" />
                     <Label Grid.Row="1" Grid.Column="2" Text="MHz" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
                     <BoxView x:Name="SliderFrequencyBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
-                    <Slider Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SliderFrequency" Maximum="{Binding AutoTuningMaxFrequencyKHz}" Value="{Binding AutoTuningFrequencyKHz}" Minimum="{Binding AutoTuningMinFrequencyKHz}"  />
+                    <Slider Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" x:Name="SliderFrequency" Maximum="{Binding MaxFrequencyKHz}" Value="{Binding FrequencyKHz}" Minimum="{Binding MinFrequencyKHz}"  />
                 </Grid>
-
 
                 <Grid x:Name="MinMaxGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
 
@@ -81,8 +80,8 @@
                         <ColumnDefinition Width="50*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding AutoTuningMinFrequencyMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
-                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding AutoTuningMaxFrequencyMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding MinFrequencyMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding MaxFrequencyMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
                 </Grid>
 
                 <Grid x:Name="DefaultGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">

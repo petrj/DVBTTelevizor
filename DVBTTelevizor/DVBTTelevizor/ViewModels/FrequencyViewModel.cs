@@ -1,23 +1,14 @@
-﻿using DVBTTelevizor.Models;
-using LoggerService;
+﻿using LoggerService;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml.Internals;
-using static Android.Renderscripts.Sampler;
 
 namespace DVBTTelevizor
 {
     public class FrequencyViewModel : BaseViewModel
     {
-        private long _autoTuningMinFrequencyKHz { get; set; } = 174000;
-        private long _autoTuningMaxFrequencyKHz { get; set; } = 858000;
-        private long _autoTuningFrequencyKHz { get; set; } = 174000;
+        private long _minFrequencyKHz { get; set; } = 174000;
+        private long _maxFrequencyKHz { get; set; } = 858000;
+        private long _frequencyKHz { get; set; } = 174000;
 
         private string _title { get; set; }
 
@@ -29,7 +20,7 @@ namespace DVBTTelevizor
         public FrequencyViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
-            SetDefaultFrequencyCommand = new Command(() => { AutoTuningFrequencyKHz = DefaultFrequencyKHz; });
+            SetDefaultFrequencyCommand = new Command(() => { FrequencyKHz = DefaultFrequencyKHz; });
         }
 
         public string Title
@@ -46,105 +37,106 @@ namespace DVBTTelevizor
             }
         }
 
-        public long AutoTuningMinFrequencyKHz
+        public void RoundFrequency()
         {
-            get
-            {
-                return _autoTuningMinFrequencyKHz;
-            }
-            set
-            {
-                _autoTuningMinFrequencyKHz = value;
-
-                OnPropertyChanged(nameof(AutoTuningMinFrequencyKHz));
-            }
-        }
-
-        public string AutoTuningMinFrequencyMHz
-        {
-            get
-            {
-                if (_autoTuningMinFrequencyKHz == 0)
-                    return "Min: 0 MHz";
-
-                return $"Min: {(_autoTuningMinFrequencyKHz / 1000.0).ToString("N0")} MHz";
-            }
-        }
-
-        public void RoundedFrequency()
-        {
-            if (!ValidFrequency(AutoTuningFrequencyKHz))
+            if (!ValidFrequency(FrequencyKHz))
                 return;
 
-            var stepFreq = Math.Round(Convert.ToDecimal(AutoTuningFrequencyKHz - AutoTuningMinFrequencyKHz) / Convert.ToDecimal(FrequencyKHzSliderStep));
-            var freqRounded = Convert.ToInt64(AutoTuningMinFrequencyKHz + stepFreq * FrequencyKHzSliderStep);
-            if (freqRounded > AutoTuningMaxFrequencyKHz)
+            var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - MinFrequencyKHz) / Convert.ToDecimal(FrequencyKHzSliderStep));
+            var freqRounded = Convert.ToInt64(MinFrequencyKHz + stepFreq * FrequencyKHzSliderStep);
+            if (freqRounded > MaxFrequencyKHz)
             {
                 freqRounded = freqRounded - FrequencyKHzSliderStep;
             }
 
-            AutoTuningFrequencyKHz = freqRounded;
+            FrequencyKHz = freqRounded;
         }
 
-        public string AutoTuningMaxFrequencyMHz
+        public string MinFrequencyMHz
         {
             get
             {
-                if (_autoTuningMaxFrequencyKHz == 0)
+                if (_minFrequencyKHz == 0)
+                    return "Min: 0 MHz";
+
+                return $"Min: {(_minFrequencyKHz / 1000.0).ToString("N0")} MHz";
+            }
+        }
+
+        public string MaxFrequencyMHz
+        {
+            get
+            {
+                if (_maxFrequencyKHz == 0)
                     return "0 MHz";
 
-                return $"Max: {(_autoTuningMaxFrequencyKHz / 1000.0).ToString("N0")} MHz";
+                return $"Max: {(_maxFrequencyKHz / 1000.0).ToString("N0")} MHz";
             }
         }
 
-        public long AutoTuningMaxFrequencyKHz
+        public long MinFrequencyKHz
         {
             get
             {
-                return _autoTuningMaxFrequencyKHz;
+                return _minFrequencyKHz;
             }
             set
             {
-                _autoTuningMaxFrequencyKHz = value;
+                _minFrequencyKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningMaxFrequencyKHz));
+                OnPropertyChanged(nameof(MinFrequencyKHz));
             }
         }
 
-        public long AutoTuningFrequencyKHz
+        public long MaxFrequencyKHz
         {
             get
             {
-                return _autoTuningFrequencyKHz;
+                return _maxFrequencyKHz;
             }
             set
             {
-                _autoTuningFrequencyKHz = value;
+                _maxFrequencyKHz = value;
+
+                OnPropertyChanged(nameof(MaxFrequencyKHz));
+                OnPropertyChanged(nameof(MaxFrequencyMHz));
+            }
+        }
+
+        public long FrequencyKHz
+        {
+            get
+            {
+                return _frequencyKHz;
+            }
+            set
+            {
+                _frequencyKHz = value;
 
                 if (!ValidFrequency(value))
                     return;
 
-                OnPropertyChanged(nameof(AutoTuningFrequencyKHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyMHz));
+                OnPropertyChanged(nameof(FrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyMHz));
             }
         }
 
-        public string AutoTuningFrequencyMHz
+        public double FrequencyMHz
         {
             get
             {
-                return Math.Round(AutoTuningFrequencyKHz / 1000.0, 3).ToString();
+                return FrequencyKHz / 1000.0;
             }
             set
             {
-                if (!ValidFrequency(value))
+                if (double.IsNaN(value) || !ValidFrequency(value * 1000.0))
                     return;
 
-                var freqKHz = ParseFreqMHzToKHz(value);
+                var freqKHz = Convert.ToInt64(value * 1000.0);
 
-                if (AutoTuningFrequencyKHz != freqKHz)
+                if (FrequencyKHz != freqKHz)
                 {
-                    AutoTuningFrequencyKHz = freqKHz;
+                    FrequencyKHz = freqKHz;
                 }
             }
         }
@@ -152,7 +144,7 @@ namespace DVBTTelevizor
         public bool ValidFrequency(long freqKHz)
         {
 
-            if (freqKHz < _autoTuningMinFrequencyKHz || freqKHz > _autoTuningMaxFrequencyKHz)
+            if (freqKHz < _minFrequencyKHz || freqKHz > _maxFrequencyKHz)
             {
                 return false;
             }
@@ -160,30 +152,20 @@ namespace DVBTTelevizor
             return true;
         }
 
+        public bool ValidFrequency(double freqKHz)
+        {
+            return ValidFrequency(Convert.ToInt64(freqKHz));
+        }
+
         public bool ValidFrequency(string freqMHz)
         {
-            var freqKHz = ParseFreqMHzToKHz(freqMHz);
+            var freqKHz = TuneViewModel.ParseFreqMHzToKHz(freqMHz);
             if (freqKHz == -1)
             {
                 return false;
             }
 
             return ValidFrequency(freqKHz);
-        }
-
-        public long ParseFreqMHzToKHz(string freqMHz)
-        {
-            decimal freqMHzDecimal = -1;
-            var sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-
-            if (decimal.TryParse(freqMHz.Replace(".", sep).Replace(",", sep), out freqMHzDecimal))
-            {
-                return Convert.ToInt64(freqMHzDecimal * 1000);
-            }
-            else
-            {
-                return -1;
-            }
         }
     }
 }

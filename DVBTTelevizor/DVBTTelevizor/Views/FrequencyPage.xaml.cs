@@ -1,11 +1,6 @@
 ﻿using LoggerService;
-using NLog.Layouts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -35,15 +30,15 @@ namespace DVBTTelevizor
         public void SetFrequency(string title, long frequencyKHz, long minimumKHz, long maximumKHz, long defaultValueKHz)
         {
             _viewModel.Title = title;
-            _viewModel.AutoTuningMaxFrequencyKHz = maximumKHz;
-            _viewModel.AutoTuningFrequencyKHz = frequencyKHz;
-            _viewModel.AutoTuningMinFrequencyKHz = minimumKHz;
+            _viewModel.MaxFrequencyKHz = maximumKHz;
+            _viewModel.FrequencyKHz = frequencyKHz;
+            _viewModel.MinFrequencyKHz = minimumKHz;
             _viewModel.DefaultFrequencyKHz = defaultValueKHz;
         }
 
         public long SelectedFrequency
         {
-            get { return _viewModel.AutoTuningFrequencyKHz; }
+            get { return _viewModel.FrequencyKHz; }
         }
 
         private void BuildFocusableItems()
@@ -66,23 +61,23 @@ namespace DVBTTelevizor
         {
             if (!_viewModel.ValidFrequency(EntryFrequencyMHz.Text))
             {
-                _dialogService.Error($"BandWidth \"{EntryFrequencyMHz.Text}\" MHz is out of range {_viewModel.AutoTuningMinFrequencyKHz} KHz - {_viewModel.AutoTuningMaxFrequencyKHz} KHz");
-                _viewModel.AutoTuningFrequencyKHz = _viewModel.DefaultFrequencyKHz;
+                _dialogService.Error($"Frequency \"{EntryFrequencyMHz.Text}\" MHz is out of range {_viewModel.MinFrequencyKHz} KHz - {_viewModel.MaxFrequencyKHz} KHz");
+                _viewModel.FrequencyKHz = _viewModel.DefaultFrequencyKHz;
             }
         }
 
         private void EntryFrequencyKHz_Unfocused(object sender, FocusEventArgs e)
         {
-            if (!_viewModel.ValidFrequency(_viewModel.AutoTuningFrequencyKHz))
+            if (!_viewModel.ValidFrequency(_viewModel.FrequencyKHz))
             {
-                _dialogService.Error($"BandWidth \"{_viewModel.AutoTuningFrequencyKHz}\" KHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
-                _viewModel.AutoTuningFrequencyKHz = _viewModel.DefaultFrequencyKHz;
+                _dialogService.Error($"Frequency \"{_viewModel.FrequencyKHz}\" KHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
+                _viewModel.FrequencyKHz = _viewModel.DefaultFrequencyKHz;
             }
         }
 
         private void SliderFrequency_DragCompleted(object sender, EventArgs e)
         {
-            _viewModel.RoundedFrequency();
+            _viewModel.RoundFrequency();
         }
 
         public async void OnKeyDown(string key, bool longPress)
@@ -105,9 +100,9 @@ namespace DVBTTelevizor
                         switch (_focusItems.FocusedItemName)
                         {
                             case "SliderFrequency":
-                            if (_viewModel.AutoTuningFrequencyKHz + _viewModel.FrequencyKHzSliderStep <= _viewModel.AutoTuningMaxFrequencyKHz)
+                            if (_viewModel.FrequencyKHz + _viewModel.FrequencyKHzSliderStep <= _viewModel.MaxFrequencyKHz)
                             {
-                                _viewModel.AutoTuningFrequencyKHz += _viewModel.FrequencyKHzSliderStep;
+                                _viewModel.FrequencyKHz += _viewModel.FrequencyKHzSliderStep;
                             }
                             break;
                         }
@@ -116,9 +111,9 @@ namespace DVBTTelevizor
                         switch (_focusItems.FocusedItemName)
                         {
                             case "SliderFrequency":
-                                if (_viewModel.AutoTuningFrequencyKHz - _viewModel.FrequencyKHzSliderStep >= _viewModel.AutoTuningMinFrequencyKHz)
+                                if (_viewModel.FrequencyKHz - _viewModel.FrequencyKHzSliderStep >= _viewModel.MinFrequencyKHz)
                                 {
-                                    _viewModel.AutoTuningFrequencyKHz -= _viewModel.FrequencyKHzSliderStep;
+                                    _viewModel.FrequencyKHz -= _viewModel.FrequencyKHzSliderStep;
                                 }
                                 break;
                         }
