@@ -98,16 +98,68 @@
 
     <ContentPage.Content>
 
-        <!--ScrollView x:Name="TuneScrollView" Margin="0,0,0,0"-->
+        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
-            <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <StackLayout VerticalOptions="StartAndExpand" Margin="0,0,0,0">
 
+                <Grid x:Name="TuningInfoGrid" IsVisible="True" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90*" />
+                        <ColumnDefinition Width="10*" />
+                    </Grid.ColumnDefinitions>
 
-                <!-- middle controls -->
-                <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
+                    <Label Grid.Row="0" Grid.Column="0" IsVisible="True" Text="{Binding TuningLabel}" HorizontalOptions="Start" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                    <ActivityIndicator Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True" HorizontalOptions="End"/>
+                </Grid>
 
-                    <ListView x:Name="ChannelsListView"
+                <Grid x:Name="TuningProgressInfoGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90*" />
+                        <ColumnDefinition Width="10*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+
+                    <Label Grid.Row="1" Grid.Column="0" IsVisible="{Binding TuningInProgress}" Text="Signal strength" HorizontalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+
+                    <ProgressBar Grid.Row="2" Grid.Column="0" IsVisible="{Binding TuningInProgress}" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" HorizontalOptions="Fill" ProgressColor="Blue" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
+                    <Label Grid.Row="2" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+
+                    <Label Grid.Row="3" Grid.Column="0" IsVisible="{Binding TuningInProgress}" Text="Delivery system" HorizontalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="3" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                </Grid>
+
+                <Grid x:Name="ChannelsInfoGrid" IsVisible="True" VerticalOptions="StartAndExpand" RowSpacing="0"  Margin="0,0,0,0">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90*" />
+                        <ColumnDefinition Width="10*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" IsVisible="True" Text="Channels found" HorizontalOptions="Start" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="1" IsVisible="True" Text="{Binding TunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                </Grid>
+
+                <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}"/>
+                <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="Done" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}"/>
+
+                <ListView x:Name="ChannelsListView"
                         ItemsSource="{Binding TunedChannels}"
                         CachingStrategy="RecycleElement"
                         HasUnevenRows="True"
@@ -152,52 +204,7 @@
                     </ListView>
                 </StackLayout>
 
-                <!-- bottom controls -->
-                <StackLayout VerticalOptions="End" Spacing="0" Margin="0,0,0,0">
-
-                    <!-- delimiter -->
-                    <Grid VerticalOptions="Start" IsVisible="{Binding TuningInProgress}" Margin="0,0,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="10" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100*" />
-                        </Grid.ColumnDefinitions>
-                        <BoxView Grid.Row="0" Grid.Column="0" BackgroundColor="Black" HeightRequest="10" VerticalOptions="FillAndExpand"  Margin="0,0,0,0"/>
-                    </Grid>
-
-                    <Label IsVisible="{Binding TuningInProgress}" Text="{Binding TuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-
-                    <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,0,0,0">
-                        <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Black" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                    </StackLayout>
-
-
-                    <StackLayout IsVisible="{Binding TuningInProgress}" Margin="0,5,0,0">
-                        <Label Text="Signal strength" HorizontalOptions="Center" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-                        <ProgressBar Progress="{Binding SignalStrengthProgress}" HorizontalOptions="Fill" BackgroundColor="Black" ProgressColor="Blue" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                    </StackLayout>
-
-                    <Grid Margin="10,10,10,10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Row="0" Grid.Column="0" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding AbortButtonVisible}" FontSize="{Binding FontSizeForLabel}"/>
-                        <ActivityIndicator Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True"/>
-
-                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}"/>
-                    </Grid>
-                </StackLayout>
-
-            </StackLayout>
-
-        <!--/ScrollView-->
+        </StackLayout>
 
     </ContentPage.Content>
 

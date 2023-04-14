@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -35,12 +34,17 @@ namespace DVBTTelevizor
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_CloseActualPage, (message) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_CloseTuningPage, (message) =>
             {
                 Device.BeginInvokeOnMainThread(delegate
                 {
                    Navigation.PopAsync();
                 });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateTuningPageFocus, (name) =>
+            {
+                _focusItems.FocusItem(name);
             });
 
             BuildFocusableItems();
@@ -56,16 +60,26 @@ namespace DVBTTelevizor
             });
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            if (_viewModel.TuningInProgress)
+            {
+                _viewModel.AbortTuneCommand.Execute(null);
+            }
+        }
+
         public long FrequencyFromKHz
         {
-            get { return _viewModel.AutoTuningFrequencyFromKHz; }
-            set { _viewModel.AutoTuningFrequencyFromKHz = value; }
+            get { return _viewModel.FrequencyFromKHz; }
+            set { _viewModel.FrequencyFromKHz = value; }
         }
 
         public long FrequencyToKHz
         {
-            get { return _viewModel.AutoTuningFrequencyToKHz; }
-            set { _viewModel.AutoTuningFrequencyToKHz = value; }
+            get { return _viewModel.FrequencyToKHz; }
+            set { _viewModel.FrequencyToKHz = value; }
         }
 
         public long BandWidthKHz
@@ -88,43 +102,11 @@ namespace DVBTTelevizor
 
         private void BuildFocusableItems()
         {
-         /*   _focusItemsAuto = new KeyboardFocusableItemList();
-            _focusItemsManual = new KeyboardFocusableItemList();
-            _focusItemsAbort = new KeyboardFocusableItemList();
-            _focusItemsDone = new KeyboardFocusableItemList();
+            _focusItems = new KeyboardFocusableItemList();
 
-            _focusItemsAuto
-                .AddItem(KeyboardFocusableItem.CreateFrom("AutoManualTuning", new List<View>() { AutoManualTuningBoxView, AutoManualPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("EditBandWidth", new List<View>() { EditBandWidthButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyFrom", new List<View>() { EditFrequencyFromButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyTo", new List<View>() { EditFrequencyToButton }))
-
-                //.AddItem(KeyboardFocusableItem.CreateFrom("BandWidtMHz", new List<View>() { AutoFrequencyBoxView }))
-                //.AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView, EntryFrequency }))
-                //.AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView, ChannelPicker }))
-
-                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
-
-
-            _focusItemsManual
-                .AddItem(KeyboardFocusableItem.CreateFrom("ManualTuning", new List<View>() { AutoManualTuningBoxView, AutoManualPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView, EntryFrequency }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView, ChannelPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("BandWith", new List<View>() { BandWithBoxView, EntryBandWidth }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
-
-
-            _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
-            _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
-
-            _focusItemsAuto.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
-            _focusItemsManual.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
-            _focusItemsAbort.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
-            _focusItemsDone.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;*/
+            _focusItems
+                .AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -140,99 +122,36 @@ namespace DVBTTelevizor
 
             switch (keyAction)
             {
-                //case KeyboardNavigationActionEnum.Down:
-                //    if (ToolBarSelected)
-                //    {
-                //        ToolBarSelected = false;
-                //    }
-                //    else
-                //    {
-                //        _focusItems.FocusNextItem();
-                //    }
-                //    break;
+                case KeyboardNavigationActionEnum.Down:
+                    if (_viewModel.TuningInProgress)
+                    {
+                        _focusItems.FocusItem("AbortButton");
+                    } else
+                    {
+                        _focusItems.FocusItem("FinishButton");
+                    }
+                    break;
 
-                //case KeyboardNavigationActionEnum.Up:
-                //    if (ToolBarSelected)
-                //    {
-                //        ToolBarSelected = false;
-                //    }
-                //    else
-                //    {
-                //        _focusItems.FocusPreviousItem();
-                //    }
-                //    break;
-
-                //case KeyboardNavigationActionEnum.Right:
-                //case KeyboardNavigationActionEnum.Left:
-                //    ToolBarSelected = !ToolBarSelected;
-                //    break;
+                case KeyboardNavigationActionEnum.Up:
+                    _focusItems.FocusPreviousItem();
+                    break;
 
                 case KeyboardNavigationActionEnum.Back:
                     await Navigation.PopAsync();
                     break;
 
-                //case KeyboardNavigationActionEnum.OK:
-                //    if (ToolBarSelected)
-                //    {
-                //        ToolConnect_Clicked(this, null);
-                //    }
-                //    else
-                //    {
-                //        switch (_focusItems.FocusedItemName)
-                //        {
-                //            case "AutoManualTuning":
-                //                //_viewModel.ManualTuning = !_viewModel.ManualTuning;
-                //                AutoManualPicker.Focus();
-                //                //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
-                //                break;
+                case KeyboardNavigationActionEnum.OK:
+                        switch (_focusItems.FocusedItemName)
+                        {
+                            case "AbortButton":
+                                _viewModel.AbortTuneCommand.Execute(null);
+                                break;
 
-                //            case "EditBandWidth":
-                //                EditBandWidthButtton_Clicked(this, null);
-                //                break;
-
-
-                //            case "EditFrequencyFrom":
-                //                EditFrequencyFromButtton_Clicked(this, null);
-                //                break;
-
-                //            case "EditFrequencyTo":
-                //                EditFrequencyToButtton_Clicked(this, null);
-                //                break;
-
-                //            case "TuneButton":
-                //                _viewModel.TuneCommand.Execute(null);
-                //                break;
-
-                //            case "AbortButton":
-                //                _viewModel.AbortTuneCommand.Execute(null);
-                //                break;
-
-                //            case "FinishButton":
-                //                _viewModel.FinishTunedCommand.Execute(null);
-                //                break;
-
-                //            case "Channel":
-                //                //ChannelPicker.Focus();
-                //                break;
-
-                //            case "Frequency":
-                //                //EntryFrequency.Focus();
-                //                break;
-
-                //            case "BandWith":
-                //                //EntryBandWidth.Focus();
-                //                break;
-
-                //            case "DVBT":
-                //                DVBTTuningCheckBox.IsToggled = !DVBTTuningCheckBox.IsToggled;
-                //                break;
-
-                //            case "DVBT2":
-                //                DVBT2TuningCheckBox.IsToggled = !DVBT2TuningCheckBox.IsToggled;
-                //                break;
-                //        }
-                //    }
-                //    break;
+                            case "FinishButton":
+                                _viewModel.FinishTuningCommand.Execute(null);
+                                break;
+                        }
+                    break;
             }
         }
     }

@@ -43,10 +43,11 @@ namespace DVBTTelevizor
         public const string MSG_PlayNextChannel = "PlayNextChannel";
         public const string MSG_PlayPreviousChannel = "PlayPreviousChannel";
         public const string MSG_ShareFile = "ShareFile";
-        public const string MSG_UpdateTunePageFocus = "UpdateTunePageFocus";
+        public const string MSG_UpdateTuneOptionsPageFocus = "UpdateTuneOptionsPageFocus";
+        public const string MSG_UpdateTuningPageFocus = "MSG_UpdateTuningPageFocus";
         public const string MSG_EPGDetailVisibilityChange = "EPGDetailVisibilityChange";
 
-        public const string MSG_CloseActualPage = "CloseActualPage";
+        public const string MSG_CloseTuningPage = "CloseTuningPage";
         public const string MSG_QuitApp = "QuitApp";
 
         public const string MSG_PlayInBackgroundNotification = "PlayInBackgroundNotification";

@@ -16,8 +16,7 @@ namespace DVBTTelevizor
 
         private bool _manualTuning = false;
 
-        private bool _tuningAborted = false;
-        private double _signalStrengthProgress = 0;
+          private double _signalStrengthProgress = 0;
         private TuneState _tuneState = TuneState.TuningInProgress;
 
         private bool _DVBTTuning = true;
@@ -26,40 +25,55 @@ namespace DVBTTelevizor
         private long _actualTunningFreqKHz = -1;
         private long _actualTuningDVBTType = -1;
 
-        public const long AutoTuningMinFrequencyKHzDefaultValue = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
-        public const long AutoTuningMaxFrequencyKHzDefaultValue = 858000;  // 858.0 MHz - UHF band channel 69
+        public const long FrequencyMinDefaultKHz = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
+        public const long FrequencyMaxDefaultKHz = 858000;  // 858.0 MHz - UHF band channel 69
+
+        public long FrequencyDefaultKHz { get; set; } = 470000;
 
         public const long BandWidthMinKHz = 1000;
-        public const long BandWidthMaxKHz = 32000;
+        public const long BandWidthMaxKHz = 64000;
         public const long BandWidthDefaultKHz = 8000;
 
-        public long FrequencyKHzDefaultValue { get; set; } = 470000;
+        public long _frequencyMinKHz { get; set; } = FrequencyMinDefaultKHz;
+        public long _frequencyMaxKHz { get; set; } = FrequencyMaxDefaultKHz;
 
-        public long _autoTuningMinFrequencyKHz { get; set; } = AutoTuningMinFrequencyKHzDefaultValue;
-        public long _autoTuningMaxFrequencyKHz { get; set; } = AutoTuningMaxFrequencyKHzDefaultValue;
+        protected long _bandWidthKHz = BandWidthDefaultKHz;
 
-        protected long _tuneBandWidthKHz = BandWidthDefaultKHz;
-        protected long _tuningFrequencyKHz { get; set; }
-
-        public long _autoTuningFrequencyFromKHz { get; set; } = AutoTuningMinFrequencyKHzDefaultValue;
-        public long _autoTuningFrequencyToKHz { get; set; } = AutoTuningMaxFrequencyKHzDefaultValue;
+        protected long _frequencyKHz { get; set; }
+        public long _frequencyFromKHz { get; set; } = FrequencyMinDefaultKHz;
+        public long _frequencyToKHz { get; set; } = FrequencyMaxDefaultKHz;
 
         private DVBTChannel _selectedChannel;
 
         public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
         private ObservableCollection<DVBTChannel> _channels = null;
 
+        public Command AbortTuneCommand { get; set; }
+        public Command FinishTuningCommand { get; set; }
+
         public enum TuneState
         {
             TuningInProgress = 1,
             TuneFinishedOK = 2,
-            TuneFailed = 3
+            TuneFailed = 3,
+            TuneAborted = 4
         }
 
         public TuneViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
          : base(loggingService, dialogService, driver, config)
         {
             _channelService = channelService;
+
+            AbortTuneCommand = new Command(() =>
+            {
+                State = TuneState.TuneAborted;
+                MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+            });
+
+            FinishTuningCommand = new Command(() =>
+            {
+                MessagingCenter.Send(string.Empty, BaseViewModel.MSG_CloseTuningPage);
+            });
         }
 
         public bool ManualTuning
@@ -107,7 +121,6 @@ namespace DVBTTelevizor
             }
         }
 
-
         public bool DVBTTuning
         {
             get
@@ -136,149 +149,149 @@ namespace DVBTTelevizor
             }
         }
 
-        public long AutoTuningMinFrequencyKHz
+        public long FrequencyMinKHz
         {
             get
             {
-                return _autoTuningMinFrequencyKHz;
+                return _frequencyMinKHz;
             }
             set
             {
-                _autoTuningMinFrequencyKHz = value;
+                _frequencyMinKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningMinFrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyMinKHz));
             }
         }
 
-        public long AutoTuningMaxFrequencyKHz
+        public long FrequencyMaxKHz
         {
             get
             {
-                return _autoTuningMaxFrequencyKHz;
+                return _frequencyMaxKHz;
             }
             set
             {
-                _autoTuningMaxFrequencyKHz = value;
+                _frequencyMaxKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningMaxFrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyMaxKHz));
             }
         }
 
-        public long AutoTuningFrequencyFromKHz
+        public long FrequencyFromKHz
         {
             get
             {
-                return _autoTuningFrequencyFromKHz;
+                return _frequencyFromKHz;
             }
             set
             {
-                _autoTuningFrequencyFromKHz = value;
+                _frequencyFromKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromKHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromMHzCaption));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyFromMHz));
+                OnPropertyChanged(nameof(FrequencyFromMHzCaption));
+                OnPropertyChanged(nameof(FrequencyToMHzCaption));
+                OnPropertyChanged(nameof(FrequencyToMHz));
             }
         }
 
-        public long AutoTuningFrequencyToKHz
+        public long FrequencyToKHz
         {
             get
             {
-                return _autoTuningFrequencyToKHz;
+                return _frequencyToKHz;
             }
             set
             {
-                _autoTuningFrequencyToKHz = value;
+                _frequencyToKHz = value;
 
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromKHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToKHz));
-                OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyFromMHz));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToMHzCaption));
-                OnPropertyChanged(nameof(AutoTuningFrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(BandWidthMHzCaption));
+                OnPropertyChanged(nameof(FrequencyFromMHz));
+                OnPropertyChanged(nameof(FrequencyToMHzCaption));
+                OnPropertyChanged(nameof(FrequencyToMHz));
             }
         }
 
-        public string AutoTuningFrequencyToMHz
+        public double FrequencyToMHz
         {
             get
             {
-                return Math.Round(AutoTuningFrequencyToKHz / 1000.0, 1).ToString();
+                return FrequencyToKHz / 1000.0;
             }
         }
 
-        public long TuningFrequencyKHz
+        public long FrequencyKHz
         {
             get
             {
-                return _tuningFrequencyKHz;
+                return _frequencyKHz;
             }
             set
             {
-                _tuningFrequencyKHz = value;
+                _frequencyKHz = value;
 
-                OnPropertyChanged(nameof(TuningFrequencyKHz));
-                OnPropertyChanged(nameof(TuningFrequencyMHz));
-                OnPropertyChanged(nameof(TuningFrequencyMHzCaption));
+                OnPropertyChanged(nameof(FrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyMHz));
+                OnPropertyChanged(nameof(FrequencyMHzCaption));
             }
         }
 
-        public string TuningFrequencyMHz
+        public double FrequencyMHz
         {
             get
             {
-                return (TuningFrequencyKHz / 1000.0).ToString("N3");
+                return FrequencyKHz / 1000.0;
             }
         }
 
-        public string TuningFrequencyMHzCaption
+        public string FrequencyMHzCaption
         {
             get
             {
-                return TuningFrequencyMHz + " MHz";
+                return FrequencyMHz.ToString("N3") + " MHz";
             }
         }
 
-        public string TuningFrequencyBandWidthMHz
+        public string BandWidthMHzCaption
         {
             get
             {
-                return BandWidthMHz + " MHz";
+                return BandWidthMHz.ToString("N3") + " MHz";
             }
         }
 
-        public string AutoTuningFrequencyFromMHz
+        public double FrequencyFromMHz
         {
             get
             {
-                return Math.Round(AutoTuningFrequencyFromKHz / 1000.0, 1).ToString();
+                return FrequencyFromKHz / 1000.0;
             }
         }
 
-        public string AutoTuningFrequencyFromMHzCaption
+        public string FrequencyFromMHzCaption
         {
             get
             {
-                return AutoTuningFrequencyFromMHz + " MHz";
+                return FrequencyFromMHz.ToString("N3") + " MHz";
             }
         }
 
-        public string AutoTuningFrequencyToMHzCaption
+        public string FrequencyToMHzCaption
         {
             get
             {
-                return AutoTuningFrequencyToMHz + " MHz";
+                return FrequencyToMHz.ToString("N3") + " MHz";
             }
         }
 
-        public string BandWidthMHz
+        public double BandWidthMHz
         {
             get
             {
-                return Math.Round(TuneBandWidthKHz / 1000.0, 1).ToString();
+                return TuneBandWidthKHz / 1000.0;
             }
         }
 
@@ -300,15 +313,31 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _tuneBandWidthKHz;
+                return _bandWidthKHz;
             }
             set
             {
-                _tuneBandWidthKHz = value;
+                _bandWidthKHz = value;
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
-                OnPropertyChanged(nameof(TuningFrequencyBandWidthMHz));
+                OnPropertyChanged(nameof(BandWidthMHzCaption));
+            }
+        }
+
+        public string DeliverySystem
+        {
+            get
+            {
+                return _actualTuningDVBTType == 0 ? "DVBT" : "DVBT2";
+            }
+        }
+
+        public int TunedChannelsCount
+        {
+            get
+            {
+                return TunedChannels.Count;
             }
         }
 
@@ -316,27 +345,51 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (State == TuneState.TuningInProgress)
+                switch (State)
                 {
-                    var freqMhz = (_actualTunningFreqKHz / 1000.0).ToString("N3");
-                    var t = _actualTuningDVBTType == 0 ? "DVBT" : "DVBT2";
-                    return $"Tuning freq #{freqMhz} MHz {t})";
-                }
+                    case TuneState.TuningInProgress:
+                        var freqMhz = (_actualTunningFreqKHz / 1000.0).ToString("N3");
+                        return $"Tuning {freqMhz} MHz";
 
-                return String.Empty;
+                    case TuneState.TuneFinishedOK:
+                        return $"Tuning finished";
+
+                    case TuneState.TuneFailed:
+                        return $"Tuning failed";
+
+                    case TuneState.TuneAborted:
+                        return $"Tuning aborted";
+
+                    default:
+                        return String.Empty;
+                }
             }
         }
 
-        public double AutomaticTuningProgress
+        public double TuningProgress
         {
             get
             {
-                var onePerc = (AutoTuningFrequencyToKHz - AutoTuningFrequencyFromKHz) / 100.0;
+                var onePerc = (FrequencyToKHz - FrequencyFromKHz) / 100.0;
                 if (onePerc == 0)
                     return 0.0;
 
-                var perc = (_actualTunningFreqKHz - AutoTuningFrequencyFromKHz) / onePerc;
+                var perc = (_actualTunningFreqKHz - FrequencyFromKHz) / onePerc;
+                if (perc<0)
+                    return 0.0;
+
+                if (perc > 100)
+                    return 100.0;
+
                 return perc / 100.0;
+            }
+        }
+
+        public string TuningProgressCaption
+        {
+            get
+            {
+                return (TuningProgress * 100).ToString("N0") + " %";
             }
         }
 
@@ -353,31 +406,6 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(TuningFinished));
                 OnPropertyChanged(nameof(TuningLabel));
                 OnPropertyChanged(nameof(TuningInProgress));
-                OnPropertyChanged(nameof(AbortButtonVisible));
-                OnPropertyChanged(nameof(TuningAborted));
-            }
-        }
-
-        public bool TuningAborted
-        {
-            get
-            {
-                return _tuningAborted;
-            }
-            set
-            {
-                _tuningAborted = value;
-
-                OnPropertyChanged(nameof(TuningAborted));
-                OnPropertyChanged(nameof(AbortButtonVisible));
-            }
-        }
-
-        public bool AbortButtonVisible
-        {
-            get
-            {
-                return TuningInProgress && !TuningAborted;
             }
         }
 
@@ -392,6 +420,15 @@ namespace DVBTTelevizor
                 _signalStrengthProgress = value;
 
                 OnPropertyChanged(nameof(SignalStrengthProgress));
+                OnPropertyChanged(nameof(SignalStrengthProgressCaption));
+            }
+        }
+
+        public string SignalStrengthProgressCaption
+        {
+            get
+            {
+                return (_signalStrengthProgress * 100).ToString("N0") + " %";
             }
         }
 
@@ -421,9 +458,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return (State == TuneState.TuneFinishedOK)
-                         ||
-                       (State == TuneState.TuneFailed);
+                return (State != TuneState.TuningInProgress);
             }
         }
 
@@ -536,13 +571,6 @@ namespace DVBTTelevizor
             }
         }*/
 
-        private async Task AbortTune()
-        {
-            TuningAborted = true;
-            MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTunePageFocus);
-        }
-
-
         public async Task Tune()
         {
             try
@@ -557,25 +585,32 @@ namespace DVBTTelevizor
                         continue;
 
                     _actualTuningDVBTType = dvbtTypeIndex;
-                    _actualTunningFreqKHz = AutoTuningFrequencyFromKHz;
+                    _actualTunningFreqKHz = FrequencyFromKHz;
 
                     do
                     {
                         //await Tune(_actualTunningFreqKHz, TuneBandWidthKHz * 1000, dvbtTypeIndex);
 
+                        System.Threading.Thread.Sleep(300);
+
                         _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
 
                         _actualTunningFreqKHz += TuneBandWidthKHz;
 
-                        OnPropertyChanged(nameof(TuningLabel));
-                        OnPropertyChanged(nameof(TuningInProgress));
+                        SignalStrengthProgress = 0.7;
 
-                        if (TuningAborted)
+                        OnPropertyChanged(nameof(TuningLabel));
+                        OnPropertyChanged(nameof(DeliverySystem));
+                        OnPropertyChanged(nameof(TuningInProgress));
+                        OnPropertyChanged(nameof(TuningProgress));
+                        OnPropertyChanged(nameof(TuningProgressCaption));
+
+                        if (State == TuneState.TuneAborted)
                         {
                             return;
                         }
 
-                    } while (_actualTunningFreqKHz < AutoTuningFrequencyToKHz);
+                    } while (_actualTunningFreqKHz < FrequencyToKHz);
                 }
 
                 State = TuneState.TuneFinishedOK;
@@ -667,7 +702,7 @@ namespace DVBTTelevizor
                 _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
 
 
-                if (TuningAborted)
+                if (State == TuneState.TuneAborted)
                 {
                     _loggingService.Debug($"Tuning aborted");
                     return;

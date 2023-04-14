@@ -56,17 +56,9 @@ namespace DVBTTelevizor
                 });
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateTunePageFocus, (name) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateTuneOptionsPageFocus, (name) =>
             {
                 UpdateFocusedPart(name, null);
-            });
-
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_CloseActualPage, (message) =>
-            {
-                Device.BeginInvokeOnMainThread(delegate
-                {
-                   Navigation.PopAsync();
-                });
             });
 
             BuildFocusableItems();
@@ -102,18 +94,18 @@ namespace DVBTTelevizor
         {
             var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config)
             {
-                FrequencyKHz = _viewModel.TuningFrequencyKHz,
+                FrequencyKHz = _viewModel.FrequencyKHz,
                 PageTitle = "Tuning frequency",
-                MinFrequencyKHz = _viewModel.AutoTuningMinFrequencyKHz,
-                MaxFrequencyKHz = _viewModel.AutoTuningMaxFrequencyKHz,
-                FrequencyKHzDefault = _viewModel.FrequencyKHzDefaultValue
+                MinFrequencyKHz = _viewModel.FrequencyMinKHz,
+                MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
+                FrequencyKHzDefault = _viewModel.FrequencyDefaultKHz
             };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.TuningFrequencyKHz = freqPage.FrequencyKHz;
+                _viewModel.FrequencyKHz = freqPage.FrequencyKHz;
             };
         }
 
@@ -134,18 +126,18 @@ namespace DVBTTelevizor
         {
             var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config)
             {
-                FrequencyKHz = _viewModel.AutoTuningFrequencyFromKHz,
+                FrequencyKHz = _viewModel.FrequencyFromKHz,
                 PageTitle = "Tuning frequency from",
-                MinFrequencyKHz = _viewModel.AutoTuningMinFrequencyKHz,
-                MaxFrequencyKHz = _viewModel.AutoTuningMaxFrequencyKHz,
-                FrequencyKHzDefault = _viewModel.AutoTuningFrequencyFromKHz
+                MinFrequencyKHz = _viewModel.FrequencyMinKHz,
+                MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
+                FrequencyKHzDefault = _viewModel.FrequencyFromKHz
             };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.AutoTuningFrequencyFromKHz = freqPage.FrequencyKHz;
+                _viewModel.FrequencyFromKHz = freqPage.FrequencyKHz;
             };
         }
 
@@ -153,18 +145,18 @@ namespace DVBTTelevizor
         {
             var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config)
             {
-                FrequencyKHz = _viewModel.AutoTuningFrequencyToKHz,
+                FrequencyKHz = _viewModel.FrequencyToKHz,
                 PageTitle = "Tuning frequency to",
-                MinFrequencyKHz = _viewModel.AutoTuningMinFrequencyKHz,
-                MaxFrequencyKHz = _viewModel.AutoTuningMaxFrequencyKHz,
-                FrequencyKHzDefault = _viewModel.AutoTuningFrequencyToKHz
+                MinFrequencyKHz = _viewModel.FrequencyMinKHz,
+                MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
+                FrequencyKHzDefault = _viewModel.FrequencyToKHz
             };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.AutoTuningFrequencyToKHz = freqPage.FrequencyKHz;
+                _viewModel.FrequencyToKHz = freqPage.FrequencyKHz;
             };
         }
 
@@ -172,8 +164,8 @@ namespace DVBTTelevizor
         {
             var page = new TuningPage(_loggingService, _dialogService, _driver, _config, _channelService)
             {
-                FrequencyFromKHz = _viewModel.AutoTuningFrequencyFromKHz,
-                FrequencyToKHz = _viewModel.AutoTuningFrequencyToKHz,
+                FrequencyFromKHz = _viewModel.FrequencyFromKHz,
+                FrequencyToKHz = _viewModel.FrequencyToKHz,
                 BandWidthKHz = _viewModel.TuneBandWidthKHz,
                 DVBTTuning = _viewModel.DVBTTuning,
                 DVBT2Tuning = _viewModel.DVBT2Tuning

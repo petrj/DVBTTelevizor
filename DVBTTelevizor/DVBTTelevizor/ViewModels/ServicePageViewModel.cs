@@ -221,11 +221,11 @@ namespace DVBTTelevizor
                     return;
                 }
 
-                var freq = Convert.ToInt64(TuningFrequencyKHz) * 1000;
+                var freq = Convert.ToInt64(FrequencyKHz) * 1000;
                 var bandWidth = Convert.ToInt64(TuneBandWidthKHz) * 1000;
                 var type = SelectedDeliverySystemType == null ? 0 : SelectedDeliverySystemType.Index;
 
-                _loggingService.Info($"Tuning {TuningFrequencyKHz} KHz, {TuneBandWidthKHz} bandwidth, type {type} ");
+                _loggingService.Info($"Tuning {FrequencyKHz} KHz, {TuneBandWidthKHz} bandwidth, type {type} ");
 
                 var tuneRes = await _driver.Tune(freq, bandWidth, type);
 
@@ -234,7 +234,7 @@ namespace DVBTTelevizor
                     throw new Exception("Response not success");
                 }
 
-                MessagingCenter.Send($"Frequency {TuningFrequencyKHz} successfully tuned", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"Frequency {FrequencyKHz} successfully tuned", BaseViewModel.MSG_ToastMessage);
             }
             catch (Exception ex)
             {
@@ -319,14 +319,14 @@ namespace DVBTTelevizor
 
                 ScaningInProgress = true;
 
-                var res = await _driver.ScanEPG(Convert.ToInt64(TuningFrequencyKHz) * 1000, 5000);
+                var res = await _driver.ScanEPG(Convert.ToInt64(FrequencyKHz) * 1000, 5000);
 
                 ScaningInProgress = false;
 
                 if (res.OK)
                 {
                     var txt = String.Empty;
-                    foreach (var kvp in _driver.GetEITManager(Convert.ToInt64(TuningFrequencyKHz) * 1000).CurrentEvents)
+                    foreach (var kvp in _driver.GetEITManager(Convert.ToInt64(FrequencyKHz) * 1000).CurrentEvents)
                     {
                         txt += $"Service: {kvp.Key}  Event: {kvp.Value.TextValue} {Environment.NewLine}";
                     }
