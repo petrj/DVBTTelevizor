@@ -47,7 +47,7 @@ namespace DVBTTelevizor
                 _focusItems.FocusItem(name);
             });
 
-            NavigationPage.SetHasBackButton(this, false);
+            //NavigationPage.SetHasBackButton(this, false);
 
             BuildFocusableItems();
         }

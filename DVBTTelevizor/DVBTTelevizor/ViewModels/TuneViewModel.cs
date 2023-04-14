@@ -47,7 +47,7 @@ namespace DVBTTelevizor
         private DVBTChannel _selectedChannel;
 
         public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
-        private ObservableCollection<DVBTChannel> _channels = null;
+        private ObservableCollection<DVBTChannel> _savedChannels = null;
 
         public Command AbortTuneCommand { get; set; }
         public Command FinishTuningCommand { get; set; }
@@ -376,6 +376,23 @@ namespace DVBTTelevizor
             }
         }
 
+        public int TunedMultiplexesCount
+        {
+            get
+            {
+                var dict = new Dictionary<long, int>();
+                foreach (var channel in TunedChannels)
+                {
+                    if (!dict.ContainsKey(channel.Frequency))
+                    {
+                        dict[channel.Frequency] = 0;
+                    }
+                    dict[channel.Frequency]++;
+                }
+                return dict.Count;
+            }
+        }
+
         public string TuningLabel
         {
             get
@@ -552,7 +569,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info("Starting tuning");
 
-                _channels = await _channelService.LoadChannels();
+                _savedChannels = await _channelService.LoadChannels();
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
@@ -719,6 +736,7 @@ namespace DVBTTelevizor
                             TunedChannels.Add(ch);
 
                             OnPropertyChanged(nameof(TunedChannelsCount));
+                            OnPropertyChanged(nameof(TunedMultiplexesCount));
 
                             Device.BeginInvokeOnMainThread(() =>
                             {
@@ -728,13 +746,13 @@ namespace DVBTTelevizor
                             _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
 
                             // automatically adding new tuned channel if does not exist
-                            if (!ConfigViewModel.ChannelExists(_channels, ch.Frequency, ch.ProgramMapPID))
+                            if (!ConfigViewModel.ChannelExists(_savedChannels, ch.Frequency, ch.ProgramMapPID))
                             {
-                                ch.Number = ConfigViewModel.GetNextChannelNumber(_channels).ToString();
+                                ch.Number = ConfigViewModel.GetNextChannelNumber(_savedChannels).ToString();
 
-                                _channels.Add(ch);
+                                _savedChannels.Add(ch);
 
-                                await _channelService.SaveChannels(_channels);
+                                await _channelService.SaveChannels(_savedChannels);
                                 totalChannelsAddedCount++;
                             }
                         }
