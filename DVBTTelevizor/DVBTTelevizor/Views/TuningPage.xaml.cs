@@ -47,7 +47,14 @@ namespace DVBTTelevizor
                 _focusItems.FocusItem(name);
             });
 
+            NavigationPage.SetHasBackButton(this, false);
+
             BuildFocusableItems();
+        }
+
+        protected override bool OnBackButtonPressed()
+        {
+            return base.OnBackButtonPressed();
         }
 
         protected override void OnAppearing()
@@ -137,6 +144,14 @@ namespace DVBTTelevizor
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
+                    if (_viewModel.TuningInProgress)
+                    {
+                        if (!await _dialogService.Confirm("Abort tuning?"))
+                        {
+                            return;
+                        }
+                    }
+
                     await Navigation.PopAsync();
                     break;
 

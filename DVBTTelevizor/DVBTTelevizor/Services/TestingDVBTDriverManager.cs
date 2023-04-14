@@ -72,8 +72,8 @@ namespace DVBTTelevizor
                 SuccessFlag = true,
 
                 supportedDeliverySystems = 3,
-                minFrequency = 0,
-                maxFrequency = 0,
+                minFrequency = 474000000,
+                maxFrequency = 634000000,
                 frequencyStepSize = 8,
                 vendorId = 0,
                 productId = 0
@@ -415,6 +415,8 @@ namespace DVBTTelevizor
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem)
         {
             LastFreq = frequency;
+
+            System.Threading.Thread.Sleep(350);
 
             if (
                 (

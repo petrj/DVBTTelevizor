@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Forms;
 
 namespace DVBTTelevizor
@@ -159,7 +160,24 @@ namespace DVBTTelevizor
             {
                 _frequencyMinKHz = value;
 
+                if (FrequencyFromKHz < FrequencyMinKHz)
+                {
+                    FrequencyFromKHz = FrequencyMinKHz;
+                }
+                if (FrequencyToKHz < FrequencyMinKHz)
+                {
+                    FrequencyToKHz = FrequencyMinKHz;
+                }
+                if (FrequencyKHz < FrequencyMinKHz)
+                {
+                    FrequencyKHz = FrequencyMinKHz;
+                }
+
                 OnPropertyChanged(nameof(FrequencyMinKHz));
+
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyKHz));
             }
         }
 
@@ -173,7 +191,24 @@ namespace DVBTTelevizor
             {
                 _frequencyMaxKHz = value;
 
+                if (FrequencyFromKHz > FrequencyMaxKHz)
+                {
+                    FrequencyFromKHz = FrequencyMaxKHz;
+                }
+                if (FrequencyToKHz > FrequencyMaxKHz)
+                {
+                    FrequencyToKHz = FrequencyMaxKHz;
+                }
+                if (FrequencyKHz > FrequencyMaxKHz)
+                {
+                    FrequencyKHz = FrequencyMaxKHz;
+                }
+
                 OnPropertyChanged(nameof(FrequencyMaxKHz));
+
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyKHz));
             }
         }
 
@@ -497,6 +532,9 @@ namespace DVBTTelevizor
                 {
                     throw new Exception("Response not success");
                 }
+
+                FrequencyMinKHz = cap.minFrequency / 1000;
+                FrequencyMaxKHz = cap.maxFrequency / 1000;
             }
             catch (Exception ex)
             {
@@ -507,75 +545,14 @@ namespace DVBTTelevizor
 
             }
         }
-        /*
-        private async Task Tune()
-        {
-            _loggingService.Info($"Tuning");
-
-            //MessagingCenter.Send("AbortButton", BaseViewModel.MSG_UpdateTunePageFocus);
-            State = TuneState.TuningInProgress;
-
-            TunedChannels.Clear();
-
-            _channels = await _channelService.LoadChannels();
-            if (_channels == null) _channels = new ObservableCollection<DVBTChannel>();
-
-            OnPropertyChanged(nameof(TuningLabel));
-            OnPropertyChanged(nameof(AutomaticTuningProgress));
-
-            TuningAborted = false;
-
-            try
-            {
-                if (ManualTuning)
-                {
-                    long freqHz = TuningFrequencyKHz * 1000;
-                    long bandWidthHz = TuneBandWidthKHz * 1000;
-
-                    //var ch = Convert.ToInt32((Convert.ToInt64(TuneFrequency) - 474 + 8 * 21) / 8);
-
-                    _actualTunningFreqKHz = TuningFrequencyKHz;
-                    _actualTuningDVBTType = 0;
-
-                    OnPropertyChanged(nameof(TuningLabel));
-
-                    if (DVBTTuning) await Tune(freqHz, bandWidthHz, 0);
-
-                    _actualTuningDVBTType = 1;
-                    OnPropertyChanged(nameof(TuningLabel));
-
-                    if (DVBT2Tuning) await Tune(freqHz, bandWidthHz, 1);
-                }
-                else
-                {
-                    await AutomaticTune();
-                }
-
-                State = TuneState.TuneFinishedOK;
-            }
-            catch (Exception ex)
-            {
-                State = TuneState.TuneFailed;
-            }
-            finally
-            {
-
-                OnPropertyChanged(nameof(TuningFinished));
-                OnPropertyChanged(nameof(TunedChannels));
-                OnPropertyChanged(nameof(AddChannelsVisible));
-
-                OnPropertyChanged(nameof(TuningLabel));
-                OnPropertyChanged(nameof(AutomaticTuningProgress));
-
-                MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTunePageFocus);
-            }
-        }*/
 
         public async Task Tune()
         {
             try
             {
                 _loggingService.Info("Starting tuning");
+
+                _channels = await _channelService.LoadChannels();
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
@@ -589,15 +566,11 @@ namespace DVBTTelevizor
 
                     do
                     {
-                        //await Tune(_actualTunningFreqKHz, TuneBandWidthKHz * 1000, dvbtTypeIndex);
-
-                        System.Threading.Thread.Sleep(300);
-
-                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
-
                         _actualTunningFreqKHz += TuneBandWidthKHz;
 
-                        SignalStrengthProgress = 0.7;
+                        await Tune(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
+
+                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
 
                         OnPropertyChanged(nameof(TuningLabel));
                         OnPropertyChanged(nameof(DeliverySystem));
@@ -744,6 +717,8 @@ namespace DVBTTelevizor
                             ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;
 
                             TunedChannels.Add(ch);
+
+                            OnPropertyChanged(nameof(TunedChannelsCount));
 
                             Device.BeginInvokeOnMainThread(() =>
                             {

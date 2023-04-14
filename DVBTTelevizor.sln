@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		BuildAPK.ps1 = BuildAPK.ps1
 		Clear.bat = Clear.bat
 		Clear.ps1 = Clear.ps1
+		devices.txt = devices.txt
 		PushTestingDVBTDriverDataToDevice.bat = PushTestingDVBTDriverDataToDevice.bat
 		ResizeIconImage.ps1 = ResizeIconImage.ps1
 		WifiDebug.bat = WifiDebug.bat
