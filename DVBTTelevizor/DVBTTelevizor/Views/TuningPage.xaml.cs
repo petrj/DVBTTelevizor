@@ -46,6 +46,16 @@ namespace DVBTTelevizor
             BuildFocusableItems();
         }
 
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            Task.Run(async () =>
+            {
+                await _viewModel.Tune();
+            });
+        }
+
         public long FrequencyFromKHz
         {
             get { return _viewModel.AutoTuningFrequencyFromKHz; }
@@ -124,107 +134,106 @@ namespace DVBTTelevizor
 
         public async void OnKeyDown(string key, bool longPress)
         {
-            _loggingService.Debug($"TuningProgressPage OnKeyDown {key}");
+            _loggingService.Debug($"TuningPage OnKeyDown {key}");
 
-            /*
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
             switch (keyAction)
             {
-                case KeyboardNavigationActionEnum.Down:
-                    if (ToolBarSelected)
-                    {
-                        ToolBarSelected = false;
-                    }
-                    else
-                    {
-                        _focusItems.FocusNextItem();
-                    }
-                    break;
+                //case KeyboardNavigationActionEnum.Down:
+                //    if (ToolBarSelected)
+                //    {
+                //        ToolBarSelected = false;
+                //    }
+                //    else
+                //    {
+                //        _focusItems.FocusNextItem();
+                //    }
+                //    break;
 
-                case KeyboardNavigationActionEnum.Up:
-                    if (ToolBarSelected)
-                    {
-                        ToolBarSelected = false;
-                    }
-                    else
-                    {
-                        _focusItems.FocusPreviousItem();
-                    }
-                    break;
+                //case KeyboardNavigationActionEnum.Up:
+                //    if (ToolBarSelected)
+                //    {
+                //        ToolBarSelected = false;
+                //    }
+                //    else
+                //    {
+                //        _focusItems.FocusPreviousItem();
+                //    }
+                //    break;
 
-                case KeyboardNavigationActionEnum.Right:
-                case KeyboardNavigationActionEnum.Left:
-                    ToolBarSelected = !ToolBarSelected;
-                    break;
+                //case KeyboardNavigationActionEnum.Right:
+                //case KeyboardNavigationActionEnum.Left:
+                //    ToolBarSelected = !ToolBarSelected;
+                //    break;
 
                 case KeyboardNavigationActionEnum.Back:
                     await Navigation.PopAsync();
                     break;
 
-                case KeyboardNavigationActionEnum.OK:
-                    if (ToolBarSelected)
-                    {
-                        ToolConnect_Clicked(this, null);
-                    }
-                    else
-                    {
-                        switch (_focusItems.FocusedItemName)
-                        {
-                            case "AutoManualTuning":
-                                //_viewModel.ManualTuning = !_viewModel.ManualTuning;
-                                AutoManualPicker.Focus();
-                                //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
-                                break;
+                //case KeyboardNavigationActionEnum.OK:
+                //    if (ToolBarSelected)
+                //    {
+                //        ToolConnect_Clicked(this, null);
+                //    }
+                //    else
+                //    {
+                //        switch (_focusItems.FocusedItemName)
+                //        {
+                //            case "AutoManualTuning":
+                //                //_viewModel.ManualTuning = !_viewModel.ManualTuning;
+                //                AutoManualPicker.Focus();
+                //                //UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "ManualTuning");
+                //                break;
 
-                            case "EditBandWidth":
-                                EditBandWidthButtton_Clicked(this, null);
-                                break;
+                //            case "EditBandWidth":
+                //                EditBandWidthButtton_Clicked(this, null);
+                //                break;
 
 
-                            case "EditFrequencyFrom":
-                                EditFrequencyFromButtton_Clicked(this, null);
-                                break;
+                //            case "EditFrequencyFrom":
+                //                EditFrequencyFromButtton_Clicked(this, null);
+                //                break;
 
-                            case "EditFrequencyTo":
-                                EditFrequencyToButtton_Clicked(this, null);
-                                break;
+                //            case "EditFrequencyTo":
+                //                EditFrequencyToButtton_Clicked(this, null);
+                //                break;
 
-                            case "TuneButton":
-                                _viewModel.TuneCommand.Execute(null);
-                                break;
+                //            case "TuneButton":
+                //                _viewModel.TuneCommand.Execute(null);
+                //                break;
 
-                            case "AbortButton":
-                                _viewModel.AbortTuneCommand.Execute(null);
-                                break;
+                //            case "AbortButton":
+                //                _viewModel.AbortTuneCommand.Execute(null);
+                //                break;
 
-                            case "FinishButton":
-                                _viewModel.FinishTunedCommand.Execute(null);
-                                break;
+                //            case "FinishButton":
+                //                _viewModel.FinishTunedCommand.Execute(null);
+                //                break;
 
-                            case "Channel":
-                                //ChannelPicker.Focus();
-                                break;
+                //            case "Channel":
+                //                //ChannelPicker.Focus();
+                //                break;
 
-                            case "Frequency":
-                                //EntryFrequency.Focus();
-                                break;
+                //            case "Frequency":
+                //                //EntryFrequency.Focus();
+                //                break;
 
-                            case "BandWith":
-                                //EntryBandWidth.Focus();
-                                break;
+                //            case "BandWith":
+                //                //EntryBandWidth.Focus();
+                //                break;
 
-                            case "DVBT":
-                                DVBTTuningCheckBox.IsToggled = !DVBTTuningCheckBox.IsToggled;
-                                break;
+                //            case "DVBT":
+                //                DVBTTuningCheckBox.IsToggled = !DVBTTuningCheckBox.IsToggled;
+                //                break;
 
-                            case "DVBT2":
-                                DVBT2TuningCheckBox.IsToggled = !DVBT2TuningCheckBox.IsToggled;
-                                break;
-                        }
-                    }
-                    break;
-            }*/
+                //            case "DVBT2":
+                //                DVBT2TuningCheckBox.IsToggled = !DVBT2TuningCheckBox.IsToggled;
+                //                break;
+                //        }
+                //    }
+                //    break;
+            }
         }
     }
 }

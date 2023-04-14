@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-
 
 namespace DVBTTelevizor
 {
@@ -18,7 +18,7 @@ namespace DVBTTelevizor
 
         private bool _tuningAborted = false;
         private double _signalStrengthProgress = 0;
-        private TuneState _tuneState = TuneState.Ready;
+        private TuneState _tuneState = TuneState.TuningInProgress;
 
         private bool _DVBTTuning = true;
         private bool _DVBT2Tuning = true;
@@ -51,7 +51,6 @@ namespace DVBTTelevizor
 
         public enum TuneState
         {
-            Ready = 0,
             TuningInProgress = 1,
             TuneFinishedOK = 2,
             TuneFailed = 3
@@ -336,7 +335,7 @@ namespace DVBTTelevizor
                 if (onePerc == 0)
                     return 0.0;
 
-                var perc = (_actualTunningFreqKHz - AutoTuningFrequencyToKHz) / onePerc;
+                var perc = (_actualTunningFreqKHz - AutoTuningFrequencyFromKHz) / onePerc;
                 return perc / 100.0;
             }
         }
@@ -350,6 +349,12 @@ namespace DVBTTelevizor
             set
             {
                 _tuneState = value;
+
+                OnPropertyChanged(nameof(TuningFinished));
+                OnPropertyChanged(nameof(TuningLabel));
+                OnPropertyChanged(nameof(TuningInProgress));
+                OnPropertyChanged(nameof(AbortButtonVisible));
+                OnPropertyChanged(nameof(TuningAborted));
             }
         }
 
@@ -364,11 +369,11 @@ namespace DVBTTelevizor
                 _tuningAborted = value;
 
                 OnPropertyChanged(nameof(TuningAborted));
-                OnPropertyChanged(nameof(AbortedButtonVisible));
+                OnPropertyChanged(nameof(AbortButtonVisible));
             }
         }
 
-        public bool AbortedButtonVisible
+        public bool AbortButtonVisible
         {
             get
             {
@@ -390,20 +395,11 @@ namespace DVBTTelevizor
             }
         }
 
-
         public bool TuningInProgress
         {
             get
             {
                 return State == TuneState.TuningInProgress;
-            }
-        }
-
-        public bool AutomaticTuningInProgress
-        {
-            get
-            {
-                return State == TuneState.TuningInProgress && !ManualTuning;
             }
         }
 
@@ -476,7 +472,7 @@ namespace DVBTTelevizor
 
             }
         }
-
+        /*
         private async Task Tune()
         {
             _loggingService.Info($"Tuning");
@@ -538,7 +534,7 @@ namespace DVBTTelevizor
 
                 MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTunePageFocus);
             }
-        }
+        }*/
 
         private async Task AbortTune()
         {
@@ -547,11 +543,11 @@ namespace DVBTTelevizor
         }
 
 
-        private async Task AutomaticTune()
+        public async Task Tune()
         {
-            await Task.Run(async () =>
+            try
             {
-                _loggingService.Info("Starting automatic tuning");
+                _loggingService.Info("Starting tuning");
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
@@ -561,31 +557,33 @@ namespace DVBTTelevizor
                         continue;
 
                     _actualTuningDVBTType = dvbtTypeIndex;
+                    _actualTunningFreqKHz = AutoTuningFrequencyFromKHz;
 
-                    // TODO
-                    /*
-                    for (var i = AutomaticTuningFirstChannel; i <= AutomaticTuningLastChannel; i++)
+                    do
                     {
+                        //await Tune(_actualTunningFreqKHz, TuneBandWidthKHz * 1000, dvbtTypeIndex);
 
-                        var freqMHz = (474 + 8 * (_actualTunningChannel - 21));
-                        var freq = freqMHz * 1000000;
+                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
 
-                        _actualTunningFreqKHz = 0;
+                        _actualTunningFreqKHz += TuneBandWidthKHz;
+
+                        OnPropertyChanged(nameof(TuningLabel));
+                        OnPropertyChanged(nameof(TuningInProgress));
 
                         if (TuningAborted)
                         {
                             return;
                         }
 
-                        OnPropertyChanged(nameof(TuningLabel));
-                        OnPropertyChanged(nameof(AutomaticTuningProgress));
-
-                        await Tune(freq, TuneBandwidth * 1000000, dvbtTypeIndex);
-                    }
-                    */
+                    } while (_actualTunningFreqKHz < AutoTuningFrequencyToKHz);
                 }
 
-            });
+                State = TuneState.TuneFinishedOK;
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                State = TuneState.TuneFailed;
+            }
         }
 
         private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
@@ -750,37 +748,6 @@ namespace DVBTTelevizor
             {
                 throw;
             }
-        }
-
-        public async Task FinishTune()
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    TunedChannels.Clear();
-
-                    _actualTuningDVBTType = -1;
-                    _actualTunningFreqKHz = -1;
-
-                    State = TuneState.Ready;
-
-                    MessagingCenter.Send(ManualTuning ? "ManualTuning" : "AutoTuning", BaseViewModel.MSG_UpdateTunePageFocus);
-                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_CloseActualPage);
-                }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex);
-                }
-                finally
-                {
-                    OnPropertyChanged(nameof(TuningLabel));
-                    OnPropertyChanged(nameof(AutomaticTuningProgress));
-                    OnPropertyChanged(nameof(TuningFinished));
-                    OnPropertyChanged(nameof(TunedChannels));
-                    OnPropertyChanged(nameof(AddChannelsVisible));
-                }
-            });
         }
 
     }
