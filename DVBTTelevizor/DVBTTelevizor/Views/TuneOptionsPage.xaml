@@ -98,12 +98,9 @@
 
     <ContentPage.Content>
 
-        <!--ScrollView x:Name="TuneScrollView" Margin="0,0,0,0"-->
+        <ScrollView x:Name="TuneScrollView" Margin="0,0,0,0">
 
             <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
-
-                <!-- top controls -->
-                <StackLayout VerticalOptions="StartAndExpand" Margin="10,0,10,0">
 
                     <StackLayout VerticalOptions="StartAndExpand" Spacing="0">
 
@@ -222,103 +219,9 @@
 
                 <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="{Binding TuneReady}" Style="{DynamicResource ButtonStyle}"  BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
 
-                </StackLayout>
-
-                <!-- middle controls -->
-                <StackLayout VerticalOptions="CenterAndExpand" Margin="0,0,0,0">
-
-                    <ListView x:Name="ChannelsListView"
-                        ItemsSource="{Binding TunedChannels}"
-                        CachingStrategy="RecycleElement"
-                        HasUnevenRows="True"
-                        Style="{StaticResource ListViewStyle}"
-                        VerticalOptions="StartAndExpand"
-                        SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
-
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <ViewCell>
-                                    <ViewCell.View>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="1" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="12*" />
-                                                <ColumnDefinition Width="78*" />
-                                                <ColumnDefinition Width="10*" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
-
-                                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
-
-                                            <Image Grid.Row="0" Grid.Column="2" Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
-
-                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding ServiceTypelWithChannelLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
-                                            <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-
-                                            <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
-                                        </Grid>
-
-                                    </ViewCell.View>
-
-                                </ViewCell>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </StackLayout>
-
-                <!-- bottom controls -->
-                <StackLayout VerticalOptions="End" Spacing="0" Margin="0,0,0,0">
-
-
-                    <!-- delimiter -->
-                    <Grid VerticalOptions="Start" IsVisible="{Binding TuningInProgress}" Margin="0,0,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="10" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100*" />
-                        </Grid.ColumnDefinitions>
-                        <BoxView Grid.Row="0" Grid.Column="0" BackgroundColor="Black" HeightRequest="10" VerticalOptions="FillAndExpand"  Margin="0,0,0,0"/>
-                    </Grid>
-
-                    <Label IsVisible="{Binding TuningInProgress}" Text="{Binding TuningLabel}" HorizontalOptions="Center" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-
-                    <StackLayout IsVisible="{Binding AutomaticTuningInProgress}" Margin="0,0,0,0">
-                        <ProgressBar Progress="{Binding AutomaticTuningProgress}" BackgroundColor="Black" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                    </StackLayout>
-
-
-                    <StackLayout IsVisible="{Binding TuningInProgress}" Margin="0,5,0,0">
-                        <Label Text="Signal strength" HorizontalOptions="Center" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-                        <ProgressBar Progress="{Binding SignalStrengthProgress}" HorizontalOptions="Fill" BackgroundColor="Black" ProgressColor="Blue" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                    </StackLayout>
-
-                    <Grid Margin="10,10,10,10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="50*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Row="0" Grid.Column="0" x:Name="AbortTuneButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding AbortedButtonVisible}" FontSize="{Binding FontSizeForLabel}"/>
-                        <ActivityIndicator Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True"/>
-
-                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="FinishButton" Command="{Binding FinishTunedCommand}" Text="Done" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}"/>
-                    </Grid>
-                </StackLayout>
-
             </StackLayout>
 
-        <!--/ScrollView-->
+        </ScrollView>
 
     </ContentPage.Content>
 

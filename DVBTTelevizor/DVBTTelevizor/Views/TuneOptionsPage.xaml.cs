@@ -28,8 +28,6 @@ namespace DVBTTelevizor
 
         private KeyboardFocusableItemList _focusItemsAuto;
         private KeyboardFocusableItemList _focusItemsManual;
-        private KeyboardFocusableItemList _focusItemsAbort;
-        private KeyboardFocusableItemList _focusItemsDone;
 
         public TuneOptionsPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
@@ -42,8 +40,6 @@ namespace DVBTTelevizor
             _channelService = channelService;
 
             BindingContext = _viewModel = new TuneViewModel(_loggingService, _dialogService, _driver, _config, channelService);
-
-            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
             Appearing += TunePage_Appearing;
 
@@ -80,8 +76,6 @@ namespace DVBTTelevizor
         {
             _focusItemsAuto = new KeyboardFocusableItemList();
             _focusItemsManual = new KeyboardFocusableItemList();
-            _focusItemsAbort = new KeyboardFocusableItemList();
-            _focusItemsDone = new KeyboardFocusableItemList();
 
             _focusItemsAuto
                 .AddItem(KeyboardFocusableItem.CreateFrom("AutoManualTuning", new List<View>() { AutoManualTuningBoxView, AutoManualPicker }))
@@ -100,82 +94,90 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
 
-            _focusItemsAbort.AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortTuneButton }));
-            _focusItemsDone.AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
-
             _focusItemsAuto.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
             _focusItemsManual.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
-            _focusItemsAbort.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
-            _focusItemsDone.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
         }
 
         private void EditFrequencyButton_Clicked(object sender, EventArgs e)
         {
-            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
-            freqPage.SetFrequency("Tuning frequency",
-                _viewModel.TuningFrequencyKHz,
-                _viewModel.AutoTuningMinFrequencyKHz,
-                _viewModel.AutoTuningMaxFrequencyKHz,
-                TuneViewModel.AutoTuningFrequencyKHzDefaultValue);
+            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config)
+            {
+                FrequencyKHz = _viewModel.TuningFrequencyKHz,
+                PageTitle = "Tuning frequency",
+                MinFrequencyKHz = _viewModel.AutoTuningMinFrequencyKHz,
+                MaxFrequencyKHz = _viewModel.AutoTuningMaxFrequencyKHz,
+                FrequencyKHzDefault = _viewModel.FrequencyKHzDefaultValue
+            };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.TuningFrequencyKHz = freqPage.SelectedFrequency;
+                _viewModel.TuningFrequencyKHz = freqPage.FrequencyKHz;
             };
         }
 
         private void EditBandWidthButtton_Clicked(object sender, EventArgs e)
         {
-            var freqPage = new BandWidthPage(_loggingService, _dialogService, _driver, _config);
-            freqPage.BandWidth = _viewModel.TuneBandWidthKHz;
+            var bandWidthPage = new BandWidthPage(_loggingService, _dialogService, _driver, _config);
+            bandWidthPage.BandWidth = _viewModel.TuneBandWidthKHz;
 
-            Navigation.PushAsync(freqPage);
+            Navigation.PushAsync(bandWidthPage);
 
-            freqPage.Disappearing += delegate
+            bandWidthPage.Disappearing += delegate
             {
-                _viewModel.TuneBandWidthKHz = freqPage.BandWidth;
+                _viewModel.TuneBandWidthKHz = bandWidthPage.BandWidth;
             };
         }
 
         private void EditFrequencyFromButtton_Clicked(object sender, EventArgs e)
         {
-            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
-            freqPage.SetFrequency("Tuning frequency from",
-                _viewModel.AutoTuningFrequencyFromKHz,
-                _viewModel.AutoTuningMinFrequencyKHz,
-                _viewModel.AutoTuningMaxFrequencyKHz,
-                _viewModel.AutoTuningMinFrequencyKHz);
+            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config)
+            {
+                FrequencyKHz = _viewModel.AutoTuningFrequencyFromKHz,
+                PageTitle = "Tuning frequency from",
+                MinFrequencyKHz = _viewModel.AutoTuningMinFrequencyKHz,
+                MaxFrequencyKHz = _viewModel.AutoTuningMaxFrequencyKHz,
+                FrequencyKHzDefault = _viewModel.AutoTuningFrequencyFromKHz
+            };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.AutoTuningFrequencyFromKHz = freqPage.SelectedFrequency;
+                _viewModel.AutoTuningFrequencyFromKHz = freqPage.FrequencyKHz;
             };
         }
 
         private void EditFrequencyToButtton_Clicked(object sender, EventArgs e)
         {
-            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config);
-            freqPage.SetFrequency("Tuning frequency to",
-                _viewModel.AutoTuningFrequencyToKHz,
-                _viewModel.AutoTuningMinFrequencyKHz,
-                _viewModel.AutoTuningMaxFrequencyKHz,
-                _viewModel.AutoTuningFrequencyToKHz);
+            var freqPage = new FrequencyPage(_loggingService, _dialogService, _driver, _config)
+            {
+                FrequencyKHz = _viewModel.AutoTuningFrequencyToKHz,
+                PageTitle = "Tuning frequency to",
+                MinFrequencyKHz = _viewModel.AutoTuningMinFrequencyKHz,
+                MaxFrequencyKHz = _viewModel.AutoTuningMaxFrequencyKHz,
+                FrequencyKHzDefault = _viewModel.AutoTuningFrequencyToKHz
+            };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.AutoTuningFrequencyToKHz = freqPage.SelectedFrequency;
+                _viewModel.AutoTuningFrequencyToKHz = freqPage.FrequencyKHz;
             };
         }
 
         private void TuneButtton_Clicked(object sender, EventArgs e)
         {
-            var page = new TuningProgressPage(_loggingService, _dialogService, _driver, _config, _channelService);
+            var page = new TuningPage(_loggingService, _dialogService, _driver, _config, _channelService)
+            {
+                FrequencyFromKHz = _viewModel.AutoTuningFrequencyFromKHz,
+                FrequencyToKHz = _viewModel.AutoTuningFrequencyToKHz,
+                BandWidthKHz = _viewModel.TuneBandWidthKHz,
+                DVBTTuning = _viewModel.DVBTTuning,
+                DVBT2Tuning = _viewModel.DVBT2Tuning
+            };
 
             Navigation.PushAsync(page);
         }
@@ -217,10 +219,6 @@ namespace DVBTTelevizor
                     MessagingCenter.Send("", BaseViewModel.MSG_Init);
                 }
             }
-        }
-        private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
-        {
-           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
         }
 
         private void UpdateFocusedPart(string part, string itemToFocus)

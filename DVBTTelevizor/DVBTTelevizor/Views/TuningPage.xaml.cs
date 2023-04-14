@@ -12,7 +12,7 @@ using Xamarin.Forms.Xaml;
 namespace DVBTTelevizor
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class TuningProgressPage : ContentPage, IOnKeyDown
+    public partial class TuningPage : ContentPage, IOnKeyDown
     {
         private TuneViewModel _viewModel;
         protected ILoggingService _loggingService;
@@ -22,7 +22,7 @@ namespace DVBTTelevizor
 
         private KeyboardFocusableItemList _focusItems;
 
-        public TuningProgressPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public TuningPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
@@ -44,6 +44,36 @@ namespace DVBTTelevizor
             });
 
             BuildFocusableItems();
+        }
+
+        public long FrequencyFromKHz
+        {
+            get { return _viewModel.AutoTuningFrequencyFromKHz; }
+            set { _viewModel.AutoTuningFrequencyFromKHz = value; }
+        }
+
+        public long FrequencyToKHz
+        {
+            get { return _viewModel.AutoTuningFrequencyToKHz; }
+            set { _viewModel.AutoTuningFrequencyToKHz = value; }
+        }
+
+        public long BandWidthKHz
+        {
+            get { return _viewModel.TuneBandWidthKHz; }
+            set { _viewModel.TuneBandWidthKHz = value; }
+        }
+
+        public bool DVBTTuning
+        {
+            get { return _viewModel.DVBTTuning; }
+            set { _viewModel.DVBTTuning = value; }
+        }
+
+        public bool DVBT2Tuning
+        {
+            get { return _viewModel.DVBT2Tuning; }
+            set { _viewModel.DVBT2Tuning = value; }
         }
 
         private void BuildFocusableItems()

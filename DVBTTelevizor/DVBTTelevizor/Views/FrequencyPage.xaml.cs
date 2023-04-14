@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.Models;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
@@ -27,18 +28,34 @@ namespace DVBTTelevizor
             BuildFocusableItems();
         }
 
-        public void SetFrequency(string title, long frequencyKHz, long minimumKHz, long maximumKHz, long defaultValueKHz)
+        public long MinFrequencyKHz
         {
-            _viewModel.Title = title;
-            _viewModel.MaxFrequencyKHz = maximumKHz;
-            _viewModel.FrequencyKHz = frequencyKHz;
-            _viewModel.MinFrequencyKHz = minimumKHz;
-            _viewModel.DefaultFrequencyKHz = defaultValueKHz;
+            get { return _viewModel.MinFrequencyKHz; }
+            set { _viewModel.MinFrequencyKHz = value; }
         }
 
-        public long SelectedFrequency
+        public long MaxFrequencyKHz
+        {
+            get { return _viewModel.MaxFrequencyKHz; }
+            set { _viewModel.MaxFrequencyKHz = value; }
+        }
+
+        public long FrequencyKHz
         {
             get { return _viewModel.FrequencyKHz; }
+            set { _viewModel.FrequencyKHz = value; }
+        }
+
+        public long FrequencyKHzDefault
+        {
+            get { return _viewModel.FrequencyKHzDefault; }
+            set { _viewModel.FrequencyKHzDefault = value; }
+        }
+
+        public string PageTitle
+        {
+            get { return _viewModel.Title; }
+            set { _viewModel.Title = value; }
         }
 
         private void BuildFocusableItems()
@@ -62,7 +79,7 @@ namespace DVBTTelevizor
             if (!_viewModel.ValidFrequency(EntryFrequencyMHz.Text))
             {
                 _dialogService.Error($"Frequency \"{EntryFrequencyMHz.Text}\" MHz is out of range {_viewModel.MinFrequencyKHz} KHz - {_viewModel.MaxFrequencyKHz} KHz");
-                _viewModel.FrequencyKHz = _viewModel.DefaultFrequencyKHz;
+                _viewModel.FrequencyKHz = _viewModel.FrequencyKHzDefault;
             }
         }
 
@@ -71,7 +88,7 @@ namespace DVBTTelevizor
             if (!_viewModel.ValidFrequency(_viewModel.FrequencyKHz))
             {
                 _dialogService.Error($"Frequency \"{_viewModel.FrequencyKHz}\" KHz is out of range {TuneViewModel.BandWidthMinKHz} KHz - {TuneViewModel.BandWidthMaxKHz} KHz");
-                _viewModel.FrequencyKHz = _viewModel.DefaultFrequencyKHz;
+                _viewModel.FrequencyKHz = _viewModel.FrequencyKHzDefault;
             }
         }
 

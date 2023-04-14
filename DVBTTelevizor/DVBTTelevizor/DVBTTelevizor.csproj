@@ -43,8 +43,8 @@
     <Compile Update="Views\TuneOptionsPage.xaml.cs">
       <DependentUpon>TuneOptionsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\TuningProgressPage.xaml.cs">
-      <DependentUpon>TuningProgressPage.xaml</DependentUpon>
+    <Compile Update="Views\TuningPage.xaml.cs">
+      <DependentUpon>TuningPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 

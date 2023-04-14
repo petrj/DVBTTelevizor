@@ -12,15 +12,15 @@ namespace DVBTTelevizor
 
         private string _title { get; set; }
 
-        public long DefaultFrequencyKHz { get; set; }
         public long FrequencyKHzSliderStep { get; set; } = 1000;
+        public long FrequencyKHzDefault { get; set; } = 174000;
 
         public Command SetDefaultFrequencyCommand { get; set; }
 
         public FrequencyViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
-            SetDefaultFrequencyCommand = new Command(() => { FrequencyKHz = DefaultFrequencyKHz; });
+            SetDefaultFrequencyCommand = new Command(() => { FrequencyKHz = FrequencyKHzDefault; });
         }
 
         public string Title
