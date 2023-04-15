@@ -485,6 +485,17 @@ namespace DVBTTelevizor
                     return 0.0;
 
                 var perc = (_actualTunningFreqKHz - FrequencyFromKHz) / onePerc;
+
+                if (DVBTTuning && DVBT2Tuning)
+                {
+                    perc = perc / 2;
+
+                    if (_actualTuningDVBTType == 1)
+                    {
+                        perc +=50;
+                    }
+                }
+
                 if (perc<0)
                     return 0.0;
 
@@ -667,6 +678,16 @@ namespace DVBTTelevizor
             }
         }
 
+        private void UpdateTuningProperties()
+        {
+                OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
+                OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
+                OnPropertyChanged(nameof(DeliverySystem));
+                OnPropertyChanged(nameof(TuningInProgress));
+                OnPropertyChanged(nameof(TuningProgress));
+                OnPropertyChanged(nameof(TuningProgressCaption));
+        }
+
         public async Task Tune()
         {
             try
@@ -685,20 +706,20 @@ namespace DVBTTelevizor
                     _actualTuningDVBTType = dvbtTypeIndex;
                     _actualTunningFreqKHz = FrequencyFromKHz;
 
+                    UpdateTuningProperties();
+
                     do
                     {
-                        _actualTunningFreqKHz += TuneBandWidthKHz;
+                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
 
                         await Tune(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
 
-                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
+                        if (FrequencyToKHz != FrequencyFromKHz)
+                        {
+                            _actualTunningFreqKHz += TuneBandWidthKHz;
+                        }
 
-                        OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
-                        OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
-                        OnPropertyChanged(nameof(DeliverySystem));
-                        OnPropertyChanged(nameof(TuningInProgress));
-                        OnPropertyChanged(nameof(TuningProgress));
-                        OnPropertyChanged(nameof(TuningProgressCaption));
+                        UpdateTuningProperties();
 
                         if (State == TuneState.TuneAborted)
                         {

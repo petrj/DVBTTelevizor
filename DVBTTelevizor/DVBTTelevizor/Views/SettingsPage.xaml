@@ -51,7 +51,7 @@
 
     <ContentPage.Content>
 
-        <ScrollView x:Name="SettingsScrollView" Margin="20,10,20,0" >
+        <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" >
 
             <StackLayout>
 
@@ -59,7 +59,7 @@
 
                     <Label Text="Channels list" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-                    <Grid Margin="20,10,20,0">
+                    <Grid Margin="10,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -102,7 +102,7 @@
 
                     <Label Text="System settings" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-                    <Grid Margin="20,10,20,0">
+                    <Grid Margin="10,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -136,7 +136,7 @@
 
                     </Grid>
 
-                    <Grid Margin="20,10,20,0">
+                    <Grid Margin="10,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -172,7 +172,7 @@
 
                     <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-                    <Grid Margin="20,10,20,0">
+                    <Grid Margin="10,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -194,7 +194,7 @@
 
                     <Label Text="Donate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
 
-                    <Grid Margin="20,10,10,0">
+                    <Grid Margin="10,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />

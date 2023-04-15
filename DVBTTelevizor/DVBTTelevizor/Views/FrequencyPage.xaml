@@ -42,7 +42,7 @@
 
     <ContentPage.Content>
 
-        <ScrollView x:Name="FrequencyPageScrollView" Margin="20,10,20,0" >
+        <ScrollView x:Name="FrequencyPageScrollView" Margin="10,10,10,0" >
 
             <StackLayout>
 
@@ -50,16 +50,16 @@
 
                     <Label Text="{Binding Title}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
-                    <Grid x:Name="FrequencyGrid" IsVisible="True" RowSpacing="0" Margin="20,10,20,0">
+                    <Grid x:Name="FrequencyGrid" IsVisible="True" RowSpacing="0" Margin="10,10,10,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="63*" />
+                            <ColumnDefinition Width="55*" />
                             <ColumnDefinition Width="30*" />
-                            <ColumnDefinition Width="7*" />
+                            <ColumnDefinition Width="15*" />
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" x:Name="FrequencyMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
@@ -85,7 +85,7 @@
                         <Label Grid.Row="1" Grid.Column="2" Text="MHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
                     </Grid>
 
-                    <Grid x:Name="MinMaxGrid" IsVisible="True" RowSpacing="0" Margin="20,20,20,0">
+                    <Grid x:Name="MinMaxGrid" IsVisible="True" RowSpacing="0" Margin="10,20,10,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -93,9 +93,9 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="63*" />
+                            <ColumnDefinition Width="55*" />
                             <ColumnDefinition Width="30*" />
-                            <ColumnDefinition Width="7*" />
+                            <ColumnDefinition Width="15*" />
                         </Grid.ColumnDefinitions>
 
                         <BoxView x:Name="SliderFrequencyBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
@@ -108,7 +108,7 @@
                         <Label Grid.Row="2" Grid.Column="2" Text="{Binding MaxFrequencyRoundedMHz}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
                     </Grid>
 
-                    <Button Margin="20,20,20,0" x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultFrequencyCommand}"/>
+                    <Button Margin="0,20,0,0" x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultFrequencyCommand}"/>
 
                 </StackLayout>
 

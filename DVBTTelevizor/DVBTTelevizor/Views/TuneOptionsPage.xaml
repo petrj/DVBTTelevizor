@@ -54,10 +54,6 @@
                 <Setter Property="Margin" Value="10,0,5,0"/>
             </Style>
 
-            <Style x:Key="ButtonStyle" TargetType="Label">
-                <Setter Property="Margin" Value="20,20,20,0"/>
-            </Style>
-
             <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
@@ -95,13 +91,13 @@
 
     <ContentPage.Content>
 
-        <ScrollView x:Name="TuneScrollView" Margin="20,10,20,0">
+        <ScrollView x:Name="TuneScrollView" Margin="10,10,10,0">
 
             <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
                 <StackLayout VerticalOptions="StartAndExpand" Spacing="0" Margin="0,0,0,30">
 
-                    <Grid VerticalOptions="Start" IsVisible="True" Margin="20,10,20,0" RowSpacing="0">
+                    <Grid VerticalOptions="Start" IsVisible="True" Margin="10,10,10,0" RowSpacing="0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -127,42 +123,29 @@
                         </Picker>
                     </Grid>
 
-                    <Label Margin="20,10,20,0" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+                    <Label Margin="10,10,10,0" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
-                    <Grid x:Name="BandWidthGrid" IsVisible="True" RowSpacing="0" Margin="20,0,20,0">
+                    <Grid x:Name="BandWidthMHzValueGrid" HorizontalOptions="Center" IsVisible="True" RowSpacing="0" >
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="60*" />
-                            <ColumnDefinition Width="20*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Row="0" Grid.Column="1" x:Name="BandWidthMHzValueGrid" HorizontalOptions="Center" IsVisible="True" RowSpacing="0" >
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding BandWidthWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding BandWidthDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
-                        </Grid>
-
-                        <Button Grid.Row="1" Grid.Column="1" x:Name="EditBandWidthButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center" Clicked="EditBandWidthButtton_Clicked"/>
+                        <Label Grid.Row="0" Grid.Column="0"  Text="{Binding BandWidthWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Label Grid.Row="0" Grid.Column="1"  Text="{Binding BandWidthDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditBandWidthButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditBandWidthButtton_Clicked"/>
                     </Grid>
 
-                    <Grid x:Name="FrequenciesGrid" IsVisible="{Binding AutomaticTuning}" RowSpacing="0" Margin="20,10,20,0">
+                    <Label Margin="10,10,10,0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <Grid x:Name="FrequenciesGrid" IsVisible="{Binding AutomaticTuning}" RowSpacing="0" Margin="10,10,10,0">
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -173,14 +156,13 @@
                             <ColumnDefinition Width="45*" />
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label Grid.Row="0" Grid.Column="0" Text="From" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
+                        <Label Grid.Row="0" Grid.Column="2" Text="To" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" />
 
-                        <Label Grid.Row="1" Grid.Column="0" Text="From" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
-                        <Label Grid.Row="1" Grid.Column="2" Text="To" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" />
-
-                        <Grid Grid.Row="2" Grid.Column="0" x:Name="FrequencyFromMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="End">
+                        <Grid Grid.Row="1" Grid.Column="0" x:Name="FrequencyFromMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="End">
 
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -189,15 +171,17 @@
                             </Grid.ColumnDefinitions>
 
                             <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyFromWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyFromDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyFromDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyFromButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditFrequencyFromButtton_Clicked"/>
                         </Grid>
 
+                        <Label Grid.Row="1" Grid.Column="1" Text="-" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Center"/>
 
-                        <Label Grid.Row="2" Grid.Column="1" Text="-" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Center"/>
-
-                        <Grid Grid.Row="2" Grid.Column="2" x:Name="FrequencyToMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Start">
+                        <Grid Grid.Row="1" Grid.Column="2" x:Name="FrequencyToMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Start">
 
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -206,48 +190,30 @@
                             </Grid.ColumnDefinitions>
 
                             <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyToWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyToDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyToDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyToButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditFrequencyToButtton_Clicked"/>
                         </Grid>
 
-
-                        <Button Grid.Row="3" Grid.Column="0" x:Name="EditFrequencyFromButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"  Clicked="EditFrequencyFromButtton_Clicked"/>
-                        <Button Grid.Row="3" Grid.Column="2" x:Name="EditFrequencyToButton"   Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"  Clicked="EditFrequencyToButtton_Clicked"/>
                     </Grid>
 
-                    <Grid x:Name="FrequncyGrid" IsVisible="{Binding ManualTuning}" RowSpacing="0" Margin="20,10,20,0">
+                    <Grid x:Name="FrequencyMHzValueGrid" IsVisible="{Binding ManualTuning}" RowSpacing="0" Margin="10,10,10,0" HorizontalOptions="Center">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20*" />
-                            <ColumnDefinition Width="60*" />
-                            <ColumnDefinition Width="20*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
-
-
-                        <Grid Grid.Row="1" Grid.Column="1" x:Name="FrequencyMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Center">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
-                        </Grid>
-
-                        <Button Grid.Row="2" Grid.Column="1" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Center" Clicked="EditFrequencyButton_Clicked"/>
+                        <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditFrequencyButton_Clicked"/>
                     </Grid>
 
-                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0" Margin="20,10,20,0">
+                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0" Margin="10,10,10,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
@@ -269,7 +235,7 @@
                             <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
                         </Grid>
 
-                    <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}"  BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
+                    <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="True" BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
 
                 </StackLayout>
 

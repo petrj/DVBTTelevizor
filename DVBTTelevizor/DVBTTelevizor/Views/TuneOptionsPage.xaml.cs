@@ -164,12 +164,20 @@ namespace DVBTTelevizor
         {
             var page = new TuningPage(_loggingService, _dialogService, _driver, _config, _channelService)
             {
-                FrequencyFromKHz = _viewModel.FrequencyFromKHz,
-                FrequencyToKHz = _viewModel.FrequencyToKHz,
                 BandWidthKHz = _viewModel.TuneBandWidthKHz,
                 DVBTTuning = _viewModel.DVBTTuning,
                 DVBT2Tuning = _viewModel.DVBT2Tuning
             };
+
+            if (_viewModel.ManualTuning)
+            {
+                page.FrequencyFromKHz = _viewModel.FrequencyKHz;
+                page.FrequencyToKHz = _viewModel.FrequencyKHz;
+            } else
+            {
+                page.FrequencyFromKHz = _viewModel.FrequencyFromKHz;
+                page.FrequencyToKHz = _viewModel.FrequencyToKHz;
+            }
 
             Navigation.PushAsync(page);
         }
@@ -183,6 +191,8 @@ namespace DVBTTelevizor
         {
             if (_firstAppearing)
             {
+                _focusItemsAuto.DeFocusAll();
+                _focusItemsManual.DeFocusAll();
                 UpdateFocusedPart("AutoTuning", "TuneButton");
 
                 Task.Run(async () =>
