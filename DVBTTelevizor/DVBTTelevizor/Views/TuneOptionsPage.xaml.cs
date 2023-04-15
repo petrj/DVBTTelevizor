@@ -197,7 +197,7 @@ namespace DVBTTelevizor
 
                 Task.Run(async () =>
                 {
-                    await _viewModel.SetChannelsRange();
+                    await _viewModel.SetFrequencies();
                 });
 
                 _firstAppearing = false;

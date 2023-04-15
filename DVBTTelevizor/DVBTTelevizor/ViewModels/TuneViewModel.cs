@@ -13,11 +13,12 @@ namespace DVBTTelevizor
 {
     public class TuneViewModel : BaseViewModel
     {
-        ChannelService _channelService;
+        private ChannelService _channelService;
+        private DVBTTelevizorConfiguration _config;
 
         private bool _manualTuning = false;
 
-          private double _signalStrengthProgress = 0;
+        private double _signalStrengthProgress = 0;
         private TuneState _tuneState = TuneState.TuningInProgress;
 
         private bool _DVBTTuning = true;
@@ -64,6 +65,7 @@ namespace DVBTTelevizor
          : base(loggingService, dialogService, driver, config)
         {
             _channelService = channelService;
+            _config = config;
 
             AbortTuneCommand = new Command(() =>
             {
@@ -160,19 +162,6 @@ namespace DVBTTelevizor
             {
                 _frequencyMinKHz = value;
 
-                if (FrequencyFromKHz < FrequencyMinKHz)
-                {
-                    FrequencyFromKHz = FrequencyMinKHz;
-                }
-                if (FrequencyToKHz < FrequencyMinKHz)
-                {
-                    FrequencyToKHz = FrequencyMinKHz;
-                }
-                if (FrequencyKHz < FrequencyMinKHz)
-                {
-                    FrequencyKHz = FrequencyMinKHz;
-                }
-
                 OnPropertyChanged(nameof(FrequencyMinKHz));
 
                 OnPropertyChanged(nameof(FrequencyFromKHz));
@@ -191,19 +180,6 @@ namespace DVBTTelevizor
             {
                 _frequencyMaxKHz = value;
 
-                if (FrequencyFromKHz > FrequencyMaxKHz)
-                {
-                    FrequencyFromKHz = FrequencyMaxKHz;
-                }
-                if (FrequencyToKHz > FrequencyMaxKHz)
-                {
-                    FrequencyToKHz = FrequencyMaxKHz;
-                }
-                if (FrequencyKHz > FrequencyMaxKHz)
-                {
-                    FrequencyKHz = FrequencyMaxKHz;
-                }
-
                 OnPropertyChanged(nameof(FrequencyMaxKHz));
 
                 OnPropertyChanged(nameof(FrequencyFromKHz));
@@ -221,6 +197,8 @@ namespace DVBTTelevizor
             set
             {
                 _frequencyFromKHz = value;
+
+                _config.FrequencyFromKHz = _frequencyFromKHz;
 
                 OnPropertyChanged(nameof(FrequencyFromKHz));
                 OnPropertyChanged(nameof(FrequencyToKHz));
@@ -242,6 +220,8 @@ namespace DVBTTelevizor
             set
             {
                 _frequencyToKHz = value;
+
+                _config.FrequencyToKHz = _frequencyToKHz;
 
                 OnPropertyChanged(nameof(FrequencyFromKHz));
                 OnPropertyChanged(nameof(FrequencyToKHz));
@@ -271,6 +251,8 @@ namespace DVBTTelevizor
             set
             {
                 _frequencyKHz = value;
+
+                _config.FrequencyKHz = _frequencyKHz;
 
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyMHz));
@@ -432,6 +414,8 @@ namespace DVBTTelevizor
             set
             {
                 _bandWidthKHz = value;
+
+                _config.BandWidthKHz = _bandWidthKHz;
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
@@ -652,7 +636,20 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task SetChannelsRange()
+        private bool ValidFrequency(long freqKHz)
+        {
+            if (freqKHz == default)
+                return false;
+
+            if (freqKHz < FrequencyMinKHz || freqKHz > FrequencyMaxKHz)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task SetFrequencies()
         {
             _loggingService.Info("SetChannelsRange");
 
@@ -660,13 +657,47 @@ namespace DVBTTelevizor
             {
                 var cap = await _driver.GetCapabalities();
 
-                if (!cap.SuccessFlag)
+                if (cap.SuccessFlag)
                 {
-                    throw new Exception("Response not success");
+                    FrequencyMinKHz = cap.minFrequency / 1000;
+                    FrequencyMaxKHz = cap.maxFrequency / 1000;
+                } else
+                {
+                    FrequencyMinKHz = FrequencyMinDefaultKHz;
+                    FrequencyMaxKHz = FrequencyMaxDefaultKHz;
                 }
 
-                FrequencyMinKHz = cap.minFrequency / 1000;
-                FrequencyMaxKHz = cap.maxFrequency / 1000;
+                if (_config.BandWidthKHz != default &&
+                    _config.BandWidthKHz>=BandWidthMinKHz &&
+                    _config.BandWidthKHz <= BandWidthMaxKHz)
+                {
+                    TuneBandWidthKHz = _config.BandWidthKHz;
+                }
+                if (ValidFrequency(Config.FrequencyFromKHz))
+                {
+                    FrequencyFromKHz = Config.FrequencyFromKHz;
+                }
+                if (ValidFrequency(Config.FrequencyToKHz))
+                {
+                    FrequencyToKHz = Config.FrequencyToKHz;
+                }
+                if (ValidFrequency(Config.FrequencyKHz))
+                {
+                    FrequencyKHz = Config.FrequencyKHz;
+                }
+
+                if (!ValidFrequency(FrequencyKHz))
+                {
+                    FrequencyKHz = FrequencyDefaultKHz;
+                }
+                if (!ValidFrequency(FrequencyFromKHz))
+                {
+                    FrequencyFromKHz = FrequencyMinDefaultKHz;
+                }
+                if (!ValidFrequency(FrequencyToKHz))
+                {
+                    FrequencyToKHz = FrequencyMaxDefaultKHz;
+                }
             }
             catch (Exception ex)
             {
