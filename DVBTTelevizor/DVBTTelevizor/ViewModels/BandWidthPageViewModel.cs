@@ -32,6 +32,8 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(BandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
                 OnPropertyChanged(nameof(BandWidthPickerIndex));
+                OnPropertyChanged(nameof(BandWidthWholePartMHz));
+                OnPropertyChanged(nameof(BandWidthDecimalPartMHzCaption));
             }
         }
 
@@ -52,6 +54,24 @@ namespace DVBTTelevizor
                 {
                     BandWidthKHz = freqKHz;
                 }
+            }
+        }
+
+        public long BandWidthWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(BandWidthKHz / 1000.0));
+            }
+        }
+
+        public string BandWidthDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (BandWidthKHz / 1000.0) - BandWidthWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
             }
         }
 

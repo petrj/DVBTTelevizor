@@ -52,25 +52,25 @@ namespace DVBTTelevizor
             FrequencyKHz = freqRounded;
         }
 
-        public string MinFrequencyMHz
+        public long MinFrequencyRoundedMHz
         {
             get
             {
                 if (_minFrequencyKHz == 0)
-                    return "Min: 0 MHz";
+                    return 0;
 
-                return $"Min: {(_minFrequencyKHz / 1000.0).ToString("N0")} MHz";
+                return Convert.ToInt32(Math.Round(_minFrequencyKHz / 1000.0));
             }
         }
 
-        public string MaxFrequencyMHz
+        public long MaxFrequencyRoundedMHz
         {
             get
             {
                 if (_maxFrequencyKHz == 0)
-                    return "0 MHz";
+                    return 0;
 
-                return $"Max: {(_maxFrequencyKHz / 1000.0).ToString("N0")} MHz";
+                return Convert.ToInt32(Math.Round(_maxFrequencyKHz / 1000.0));
             }
         }
 
@@ -85,6 +85,7 @@ namespace DVBTTelevizor
                 _minFrequencyKHz = value;
 
                 OnPropertyChanged(nameof(MinFrequencyKHz));
+                OnPropertyChanged(nameof(MinFrequencyRoundedMHz));
             }
         }
 
@@ -99,7 +100,7 @@ namespace DVBTTelevizor
                 _maxFrequencyKHz = value;
 
                 OnPropertyChanged(nameof(MaxFrequencyKHz));
-                OnPropertyChanged(nameof(MaxFrequencyMHz));
+                OnPropertyChanged(nameof(MaxFrequencyRoundedMHz));
             }
         }
 
@@ -118,6 +119,8 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyMHz));
+                OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
+                OnPropertyChanged(nameof(FrequencyWholePartMHz));
             }
         }
 
@@ -138,6 +141,24 @@ namespace DVBTTelevizor
                 {
                     FrequencyKHz = freqKHz;
                 }
+            }
+        }
+
+        public long FrequencyWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
             }
         }
 

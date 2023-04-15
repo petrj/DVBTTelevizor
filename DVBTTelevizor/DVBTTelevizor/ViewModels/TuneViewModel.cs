@@ -228,6 +228,8 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(FrequencyFromMHzCaption));
                 OnPropertyChanged(nameof(FrequencyToMHzCaption));
                 OnPropertyChanged(nameof(FrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyFromWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyFromDecimalPartMHzCaption));
             }
         }
 
@@ -247,6 +249,8 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(FrequencyFromMHz));
                 OnPropertyChanged(nameof(FrequencyToMHzCaption));
                 OnPropertyChanged(nameof(FrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyToWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyToDecimalPartMHzCaption));
             }
         }
 
@@ -271,6 +275,8 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyMHz));
                 OnPropertyChanged(nameof(FrequencyMHzCaption));
+                OnPropertyChanged(nameof(FrequencyWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
             }
         }
 
@@ -290,11 +296,38 @@ namespace DVBTTelevizor
             }
         }
 
+
+        public double BandWidthMHz
+        {
+            get
+            {
+                return TuneBandWidthKHz / 1000.0;
+            }
+        }
+
         public string BandWidthMHzCaption
         {
             get
             {
                 return BandWidthMHz.ToString("N3") + " MHz";
+            }
+        }
+
+        public long BandWidthWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(TuneBandWidthKHz / 1000.0));
+            }
+        }
+
+        public string BandWidthDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (TuneBandWidthKHz / 1000.0) - BandWidthWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
             }
         }
 
@@ -322,11 +355,57 @@ namespace DVBTTelevizor
             }
         }
 
-        public double BandWidthMHz
+        public long FrequencyFromWholePartMHz
         {
             get
             {
-                return TuneBandWidthKHz / 1000.0;
+                return Convert.ToInt64(Math.Floor(FrequencyFromKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyFromDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyFromKHz / 1000.0) - FrequencyFromWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
+            }
+        }
+
+        public long FrequencyToWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyToKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyToDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyToKHz / 1000.0) - FrequencyToWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
+            }
+        }
+
+        public long FrequencyWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
             }
         }
 
@@ -357,6 +436,10 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(BandWidthMHz));
                 OnPropertyChanged(nameof(BandWidthMHzCaption));
+
+                OnPropertyChanged(nameof(BandWidthMHzCaption));
+                OnPropertyChanged(nameof(BandWidthWholePartMHz));
+                OnPropertyChanged(nameof(BandWidthDecimalPartMHzCaption));
             }
         }
 
@@ -393,31 +476,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public string TuningLabel
-        {
-            get
-            {
-                switch (State)
-                {
-                    case TuneState.TuningInProgress:
-                        var freqMhz = (_actualTunningFreqKHz / 1000.0).ToString("N3");
-                        return $"Tuning {freqMhz} MHz";
-
-                    case TuneState.TuneFinishedOK:
-                        return $"Tuning finished";
-
-                    case TuneState.TuneFailed:
-                        return $"Tuning failed";
-
-                    case TuneState.TuneAborted:
-                        return $"Tuning aborted";
-
-                    default:
-                        return String.Empty;
-                }
-            }
-        }
-
         public double TuningProgress
         {
             get
@@ -445,6 +503,50 @@ namespace DVBTTelevizor
             }
         }
 
+        public string ActualTuningFrequencyWholePartMHz
+        {
+            get
+            {
+                switch (State)
+                {
+                    case TuneState.TuningInProgress:
+
+                        if (_actualTunningFreqKHz < 0)
+                            return string.Empty;
+
+                        return Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0)).ToString();
+                    case TuneState.TuneFinishedOK:
+                        return "Finished";
+                    case TuneState.TuneFailed:
+                        return "Failed";
+                    case TuneState.TuneAborted:
+                        return "Aborted";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+
+        public string ActualTuningFrequencyDecimalPartMHzCaption
+        {
+            get
+            {
+                switch (State)
+                {
+                    case TuneState.TuningInProgress:
+
+                        if (_actualTunningFreqKHz < 0)
+                            return string.Empty;
+
+                        var part = (_actualTunningFreqKHz / 1000.0) - Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0));
+                        var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                        return $".{part1000} MHz";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+
         public TuneState State
         {
             get
@@ -456,8 +558,10 @@ namespace DVBTTelevizor
                 _tuneState = value;
 
                 OnPropertyChanged(nameof(TuningFinished));
-                OnPropertyChanged(nameof(TuningLabel));
                 OnPropertyChanged(nameof(TuningInProgress));
+
+                OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
+                OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
             }
         }
 
@@ -589,7 +693,8 @@ namespace DVBTTelevizor
 
                         _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
 
-                        OnPropertyChanged(nameof(TuningLabel));
+                        OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
+                        OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
                         OnPropertyChanged(nameof(DeliverySystem));
                         OnPropertyChanged(nameof(TuningInProgress));
                         OnPropertyChanged(nameof(TuningProgress));
@@ -604,6 +709,8 @@ namespace DVBTTelevizor
                 }
 
                 State = TuneState.TuneFinishedOK;
+                MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+
             } catch (Exception ex)
             {
                 _loggingService.Error(ex);

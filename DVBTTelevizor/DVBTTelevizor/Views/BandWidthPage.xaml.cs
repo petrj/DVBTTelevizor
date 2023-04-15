@@ -42,9 +42,9 @@ namespace DVBTTelevizor
             _focusItems = new KeyboardFocusableItemList();
 
             _focusItems
-                .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthCustom", new List<View>() { BandWidthCustomBoxView, BandWidthPicker }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthKHz", new List<View>() { BandWidthKHzBoxView, EntryBandWidthKHz }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthMHz", new List<View>() { BandWidthMHzBoxView, EntryBandWidthMHz }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthCustom", new List<View>() { BandWidthCustomBoxView, BandWidthPicker }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }));
 
             EntryBandWidthKHz.Unfocused += EntryBandWidthKHz_Unfocused;
