@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DVBTTelevizor.TuneOptionsPage"
+             Title="Tuning options">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="InfoLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="BackgroundColor" Value="#262626"/>
+            </Style>
+
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="False"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+            </Style>
+
+            <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="ProviderNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="VerticalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="LightGray"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="10,0,5,0"/>
+            </Style>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
+
+            <Style x:Key="EntryStyle" TargetType="Entry">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Keyboard" Value="Numeric"/>
+            </Style>
+
+            <Style x:Key="PickerStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="#222222"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Right"/>
+            </Style>
+
+            <Style x:Key="IconStyle" TargetType="Image">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+
+        <ScrollView x:Name="TuneScrollView" Margin="10,10,10,0">
+
+            <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+
+                <StackLayout VerticalOptions="StartAndExpand" Spacing="0" Margin="0,0,0,30">
+
+                    <Grid VerticalOptions="Start" IsVisible="True" Margin="10,10,10,0" RowSpacing="0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="AutoManualTuningBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Tuning mode" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Picker
+                                Grid.Row="0" Grid.Column="1"
+                                x:Name="AutoManualPicker"
+                                Margin="20,0,0,0"
+                                FontSize="{Binding FontSizeForPicker}"
+                                Style="{StaticResource PickerStyle}"
+                                SelectedIndex="{Binding TuneModeIndex, Mode=TwoWay}">
+                            <Picker.Items>
+                                <x:String>Automatic</x:String>
+                                <x:String>Manual</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Grid>
+
+                    <Label Margin="10,10,10,0" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <Grid x:Name="BandWidthMHzValueGrid" HorizontalOptions="Center" IsVisible="True" RowSpacing="0" >
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0"  Text="{Binding BandWidthWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Label Grid.Row="0" Grid.Column="1"  Text="{Binding BandWidthDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditBandWidthButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditBandWidthButtton_Clicked"/>
+                    </Grid>
+
+                    <Label Margin="10,10,10,0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <Grid x:Name="FrequenciesGrid" IsVisible="{Binding AutomaticTuning}" RowSpacing="0" Margin="10,10,10,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="45*" />
+                            <ColumnDefinition Width="10*" />
+                            <ColumnDefinition Width="45*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="From" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
+                        <Label Grid.Row="0" Grid.Column="2" Text="To" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" />
+
+                        <Grid Grid.Row="1" Grid.Column="0" x:Name="FrequencyFromMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="End">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyFromWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyFromDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyFromButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditFrequencyFromButtton_Clicked"/>
+                        </Grid>
+
+                        <Label Grid.Row="1" Grid.Column="1" Text="-" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Center"/>
+
+                        <Grid Grid.Row="1" Grid.Column="2" x:Name="FrequencyToMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Start">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyToWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyToDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyToButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditFrequencyToButtton_Clicked"/>
+                        </Grid>
+
+                    </Grid>
+
+                    <Grid x:Name="FrequencyMHzValueGrid" IsVisible="{Binding ManualTuning}" RowSpacing="0" Margin="10,10,10,0" HorizontalOptions="Center">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Clicked="EditFrequencyButton_Clicked"/>
+                    </Grid>
+
+                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0" Margin="10,10,10,0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70*" />
+                                <ColumnDefinition Width="30*" />
+                            </Grid.ColumnDefinitions>
+
+                            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsToggled="{Binding DVBTTuning}"  HorizontalOptions="End"  />
+
+                            <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
+                        </Grid>
+
+                    <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="True" BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
+
+                </StackLayout>
+
+            </StackLayout>
+
+        </ScrollView>
+
+    </ContentPage.Content>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
+    </ContentPage.ToolbarItems>
+
+</ContentPage>

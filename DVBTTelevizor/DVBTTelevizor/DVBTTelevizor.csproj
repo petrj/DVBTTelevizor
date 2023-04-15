@@ -34,6 +34,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\FrequencyPage.xaml.cs">
+      <DependentUpon>FrequencyPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\BandWidthPage.xaml.cs">
+      <DependentUpon>BandWidthPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TuneOptionsPage.xaml.cs">
+      <DependentUpon>TuneOptionsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TuningPage.xaml.cs">
+      <DependentUpon>TuningPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Views\ChannelPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
@@ -43,7 +58,7 @@
     <EmbeddedResource Update="Views\SettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\TunePage.xaml">
+    <EmbeddedResource Update="Views\TuneOptionsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

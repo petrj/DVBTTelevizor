@@ -1,44 +1,393 @@
-﻿using DVBTTelevizor.Models;
-using LoggerService;
+﻿using LoggerService;
+using MPEGTS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.Globalization;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Xamarin.CommunityToolkit.UI.Views;
 using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {
     public class TuneViewModel : BaseViewModel
     {
-        protected string _tuneFrequency;
-        protected long _tuneBandwidth = 8;
+        private ChannelService _channelService;
+        private DVBTTelevizorConfiguration _config;
+
+        private bool _manualTuning = false;
+
+        private double _signalStrengthProgress = 0;
+        private TuneState _tuneState = TuneState.TuningInProgress;
+
+        private bool _DVBTTuning = true;
+        private bool _DVBT2Tuning = true;
+
+        private long _actualTunningFreqKHz = -1;
+        private long _actualTuningDVBTType = -1;
+
+        public const long FrequencyMinDefaultKHz = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
+        public const long FrequencyMaxDefaultKHz = 858000;  // 858.0 MHz - UHF band channel 69
+
+        public long FrequencyDefaultKHz { get; set; } = 470000;
+
+        public const long BandWidthMinKHz = 1000;
+        public const long BandWidthMaxKHz = 64000;
+        public const long BandWidthDefaultKHz = 8000;
+
+        public long _frequencyMinKHz { get; set; } = FrequencyMinDefaultKHz;
+        public long _frequencyMaxKHz { get; set; } = FrequencyMaxDefaultKHz;
+
+        protected long _bandWidthKHz = BandWidthDefaultKHz;
+
+        protected long _frequencyKHz { get; set; }
+        public long _frequencyFromKHz { get; set; } = FrequencyMinDefaultKHz;
+        public long _frequencyToKHz { get; set; } = FrequencyMaxDefaultKHz;
 
         private DVBTChannel _selectedChannel;
 
-        public ObservableCollection<DVBTFrequencyChannel> FrequencyChannels { get; set; } = new ObservableCollection<DVBTFrequencyChannel>();
+        public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
+        private ObservableCollection<DVBTChannel> _savedChannels = null;
 
-        DVBTFrequencyChannel _selectedFrequencyChannel = null;
+        public Command AbortTuneCommand { get; set; }
+        public Command FinishTuningCommand { get; set; }
 
-        public TuneViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
-         : base(loggingService, dialogService, driver, config)
+        public enum TuneState
         {
-            FillFrequencyChannels();
+            TuningInProgress = 1,
+            TuneFinishedOK = 2,
+            TuneFailed = 3,
+            TuneAborted = 4
         }
 
-        protected void FillFrequencyChannels()
+        public TuneViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+         : base(loggingService, dialogService, driver, config)
         {
-            FrequencyChannels.Clear();
+            _channelService = channelService;
+            _config = config;
 
-            for (var i = 21; i <= 69; i++)
+            AbortTuneCommand = new Command(() =>
             {
-                var freqMhz = (474 + 8 * (i - 21));
-                var fc = new DVBTFrequencyChannel()
-                {
-                    FrequencyMhZ = freqMhz,
-                    ChannelNumber = i
-                };
+                State = TuneState.TuneAborted;
+                MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+            });
 
-                FrequencyChannels.Add(fc);
+            FinishTuningCommand = new Command(() =>
+            {
+                MessagingCenter.Send(string.Empty, BaseViewModel.MSG_CloseTuningPage);
+            });
+        }
+
+        public bool ManualTuning
+        {
+            get
+            {
+                return _manualTuning;
+            }
+            set
+            {
+                _manualTuning = value;
+
+                OnPropertyChanged(nameof(ManualTuning));
+                OnPropertyChanged(nameof(AutomaticTuning));
+            }
+        }
+
+        public bool AutomaticTuning
+        {
+            get
+            {
+                return !_manualTuning;
+            }
+            set
+            {
+                _manualTuning = !value;
+
+                OnPropertyChanged(nameof(AutomaticTuning));
+                OnPropertyChanged(nameof(ManualTuning));
+            }
+        }
+
+        public int TuneModeIndex
+        {
+            get
+            {
+                return _manualTuning ? 1 : 0;
+            }
+            set
+            {
+                ManualTuning = value == 1;
+
+                OnPropertyChanged(nameof(ManualTuning));
+                OnPropertyChanged(nameof(TuneModeIndex));
+            }
+        }
+
+        public bool DVBTTuning
+        {
+            get
+            {
+                return _DVBTTuning;
+            }
+            set
+            {
+                _DVBTTuning = value;
+
+                OnPropertyChanged(nameof(DVBTTuning));
+            }
+        }
+
+        public bool DVBT2Tuning
+        {
+            get
+            {
+                return _DVBT2Tuning;
+            }
+            set
+            {
+                _DVBT2Tuning = value;
+
+                OnPropertyChanged(nameof(DVBT2Tuning));
+            }
+        }
+
+        public long FrequencyMinKHz
+        {
+            get
+            {
+                return _frequencyMinKHz;
+            }
+            set
+            {
+                _frequencyMinKHz = value;
+
+                OnPropertyChanged(nameof(FrequencyMinKHz));
+
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyKHz));
+            }
+        }
+
+        public long FrequencyMaxKHz
+        {
+            get
+            {
+                return _frequencyMaxKHz;
+            }
+            set
+            {
+                _frequencyMaxKHz = value;
+
+                OnPropertyChanged(nameof(FrequencyMaxKHz));
+
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyKHz));
+            }
+        }
+
+        public long FrequencyFromKHz
+        {
+            get
+            {
+                return _frequencyFromKHz;
+            }
+            set
+            {
+                _frequencyFromKHz = value;
+
+                _config.FrequencyFromKHz = _frequencyFromKHz;
+
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyFromMHz));
+                OnPropertyChanged(nameof(FrequencyFromMHzCaption));
+                OnPropertyChanged(nameof(FrequencyToMHzCaption));
+                OnPropertyChanged(nameof(FrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyFromWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyFromDecimalPartMHzCaption));
+            }
+        }
+
+        public long FrequencyToKHz
+        {
+            get
+            {
+                return _frequencyToKHz;
+            }
+            set
+            {
+                _frequencyToKHz = value;
+
+                _config.FrequencyToKHz = _frequencyToKHz;
+
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(BandWidthMHzCaption));
+                OnPropertyChanged(nameof(FrequencyFromMHz));
+                OnPropertyChanged(nameof(FrequencyToMHzCaption));
+                OnPropertyChanged(nameof(FrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyToWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyToDecimalPartMHzCaption));
+            }
+        }
+
+        public double FrequencyToMHz
+        {
+            get
+            {
+                return FrequencyToKHz / 1000.0;
+            }
+        }
+
+        public long FrequencyKHz
+        {
+            get
+            {
+                return _frequencyKHz;
+            }
+            set
+            {
+                _frequencyKHz = value;
+
+                _config.FrequencyKHz = _frequencyKHz;
+
+                OnPropertyChanged(nameof(FrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyMHz));
+                OnPropertyChanged(nameof(FrequencyMHzCaption));
+                OnPropertyChanged(nameof(FrequencyWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
+            }
+        }
+
+        public double FrequencyMHz
+        {
+            get
+            {
+                return FrequencyKHz / 1000.0;
+            }
+        }
+
+        public string FrequencyMHzCaption
+        {
+            get
+            {
+                return FrequencyMHz.ToString("N3") + " MHz";
+            }
+        }
+
+
+        public double BandWidthMHz
+        {
+            get
+            {
+                return TuneBandWidthKHz / 1000.0;
+            }
+        }
+
+        public string BandWidthMHzCaption
+        {
+            get
+            {
+                return BandWidthMHz.ToString("N3") + " MHz";
+            }
+        }
+
+        public long BandWidthWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(TuneBandWidthKHz / 1000.0));
+            }
+        }
+
+        public string BandWidthDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (TuneBandWidthKHz / 1000.0) - BandWidthWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
+            }
+        }
+
+        public double FrequencyFromMHz
+        {
+            get
+            {
+                return FrequencyFromKHz / 1000.0;
+            }
+        }
+
+        public string FrequencyFromMHzCaption
+        {
+            get
+            {
+                return FrequencyFromMHz.ToString("N3") + " MHz";
+            }
+        }
+
+        public string FrequencyToMHzCaption
+        {
+            get
+            {
+                return FrequencyToMHz.ToString("N3") + " MHz";
+            }
+        }
+
+        public long FrequencyFromWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyFromKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyFromDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyFromKHz / 1000.0) - FrequencyFromWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
+            }
+        }
+
+        public long FrequencyToWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyToKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyToDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyToKHz / 1000.0) - FrequencyToWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
+            }
+        }
+
+        public long FrequencyWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
             }
         }
 
@@ -56,62 +405,537 @@ namespace DVBTTelevizor
             }
         }
 
-        public DVBTFrequencyChannel SelectedFrequencyChannelItem
+        public long TuneBandWidthKHz
         {
             get
             {
-                return _selectedFrequencyChannel;
+                return _bandWidthKHz;
             }
             set
             {
-                _selectedFrequencyChannel = value;
+                _bandWidthKHz = value;
 
-                if (value != null)
-                {
-                    TuneFrequency = (_selectedFrequencyChannel.FrequencyMhZ).ToString();
-                }
+                _config.BandWidthKHz = _bandWidthKHz;
 
-                OnPropertyChanged(nameof(SelectedFrequencyChannelItem));
-                OnPropertyChanged(nameof(TuneFrequency));
+                OnPropertyChanged(nameof(TuneBandWidthKHz));
+                OnPropertyChanged(nameof(BandWidthMHz));
+                OnPropertyChanged(nameof(BandWidthMHzCaption));
+
+                OnPropertyChanged(nameof(BandWidthMHzCaption));
+                OnPropertyChanged(nameof(BandWidthWholePartMHz));
+                OnPropertyChanged(nameof(BandWidthDecimalPartMHzCaption));
             }
         }
 
-        public string TuneFrequency
+        public string DeliverySystem
         {
             get
             {
-                return _tuneFrequency;
+                return _actualTuningDVBTType == 0 ? "DVBT" : "DVBT2";
             }
-            set
-            {
-                _tuneFrequency = value;
+        }
 
-                foreach (var f in FrequencyChannels)
+        public int TunedChannelsCount
+        {
+            get
+            {
+                return TunedChannels.Count;
+            }
+        }
+
+        public int TunedMultiplexesCount
+        {
+            get
+            {
+                var dict = new Dictionary<long, int>();
+                foreach (var channel in TunedChannels)
                 {
-                    if (f.FrequencyMhZ.ToString() == value)
+                    if (!dict.ContainsKey(channel.Frequency))
                     {
-                        _selectedFrequencyChannel = f;
-                        break;
+                        dict[channel.Frequency] = 0;
+                    }
+                    dict[channel.Frequency]++;
+                }
+                return dict.Count;
+            }
+        }
+
+        public double TuningProgress
+        {
+            get
+            {
+                var onePerc = (FrequencyToKHz - FrequencyFromKHz) / 100.0;
+                if (onePerc == 0)
+                    return 0.0;
+
+                var perc = (_actualTunningFreqKHz - FrequencyFromKHz) / onePerc;
+
+                if (DVBTTuning && DVBT2Tuning)
+                {
+                    perc = perc / 2;
+
+                    if (_actualTuningDVBTType == 1)
+                    {
+                        perc +=50;
                     }
                 }
 
-                OnPropertyChanged(nameof(TuneFrequency));
-                OnPropertyChanged(nameof(SelectedFrequencyChannelItem));
+                if (perc<0)
+                    return 0.0;
+
+                if (perc > 100)
+                    return 100.0;
+
+                return perc / 100.0;
             }
         }
 
-        public long TuneBandwidth
+        public string TuningProgressCaption
         {
             get
             {
-                return _tuneBandwidth;
+                return (TuningProgress * 100).ToString("N0") + " %";
+            }
+        }
+
+        public string ActualTuningFrequencyWholePartMHz
+        {
+            get
+            {
+                switch (State)
+                {
+                    case TuneState.TuningInProgress:
+
+                        if (_actualTunningFreqKHz < 0)
+                            return string.Empty;
+
+                        return Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0)).ToString();
+                    case TuneState.TuneFinishedOK:
+                        return "Finished";
+                    case TuneState.TuneFailed:
+                        return "Failed";
+                    case TuneState.TuneAborted:
+                        return "Aborted";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+
+        public string ActualTuningFrequencyDecimalPartMHzCaption
+        {
+            get
+            {
+                switch (State)
+                {
+                    case TuneState.TuningInProgress:
+
+                        if (_actualTunningFreqKHz < 0)
+                            return string.Empty;
+
+                        var part = (_actualTunningFreqKHz / 1000.0) - Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0));
+                        var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                        return $".{part1000} MHz";
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+
+        public TuneState State
+        {
+            get
+            {
+                return _tuneState;
             }
             set
             {
-                _tuneBandwidth = value;
+                _tuneState = value;
 
-                OnPropertyChanged(nameof(TuneBandwidth));
+                OnPropertyChanged(nameof(TuningFinished));
+                OnPropertyChanged(nameof(TuningInProgress));
+
+                OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
+                OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
             }
         }
+
+        public double SignalStrengthProgress
+        {
+            get
+            {
+                return _signalStrengthProgress;
+            }
+            set
+            {
+                _signalStrengthProgress = value;
+
+                OnPropertyChanged(nameof(SignalStrengthProgress));
+                OnPropertyChanged(nameof(SignalStrengthProgressCaption));
+            }
+        }
+
+        public string SignalStrengthProgressCaption
+        {
+            get
+            {
+                return (_signalStrengthProgress * 100).ToString("N0") + " %";
+            }
+        }
+
+        public bool TuningInProgress
+        {
+            get
+            {
+                return State == TuneState.TuningInProgress;
+            }
+        }
+
+        public bool AddChannelsVisible
+        {
+            get
+            {
+                return (
+                            (State == TuneState.TuneFinishedOK)
+                            ||
+                            (State == TuneState.TuneFailed)
+                       )
+                        &&
+                            TunedChannels.Count > 0;
+            }
+        }
+
+        public bool TuningFinished
+        {
+            get
+            {
+                return (State != TuneState.TuningInProgress);
+            }
+        }
+
+        public bool TuningNotInProgress
+        {
+            get
+            {
+                return !TuningInProgress;
+            }
+        }
+
+        public static long ParseFreqMHzToKHz(string freqMHz)
+        {
+            decimal freqMHzDecimal = -1;
+            var sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            if (decimal.TryParse(freqMHz.Replace(".", sep).Replace(",", sep), out freqMHzDecimal))
+            {
+                return Convert.ToInt64(freqMHzDecimal * 1000);
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        private bool ValidFrequency(long freqKHz)
+        {
+            if (freqKHz == default)
+                return false;
+
+            if (freqKHz < FrequencyMinKHz || freqKHz > FrequencyMaxKHz)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task SetFrequencies()
+        {
+            _loggingService.Info("SetChannelsRange");
+
+            try
+            {
+                var cap = await _driver.GetCapabalities();
+
+                if (cap.SuccessFlag)
+                {
+                    FrequencyMinKHz = cap.minFrequency / 1000;
+                    FrequencyMaxKHz = cap.maxFrequency / 1000;
+                } else
+                {
+                    FrequencyMinKHz = FrequencyMinDefaultKHz;
+                    FrequencyMaxKHz = FrequencyMaxDefaultKHz;
+                }
+
+                if (_config.BandWidthKHz != default &&
+                    _config.BandWidthKHz>=BandWidthMinKHz &&
+                    _config.BandWidthKHz <= BandWidthMaxKHz)
+                {
+                    TuneBandWidthKHz = _config.BandWidthKHz;
+                }
+                if (ValidFrequency(Config.FrequencyFromKHz))
+                {
+                    FrequencyFromKHz = Config.FrequencyFromKHz;
+                }
+                if (ValidFrequency(Config.FrequencyToKHz))
+                {
+                    FrequencyToKHz = Config.FrequencyToKHz;
+                }
+                if (ValidFrequency(Config.FrequencyKHz))
+                {
+                    FrequencyKHz = Config.FrequencyKHz;
+                }
+
+                if (!ValidFrequency(FrequencyKHz))
+                {
+                    FrequencyKHz = FrequencyDefaultKHz;
+                }
+                if (!ValidFrequency(FrequencyFromKHz))
+                {
+                    FrequencyFromKHz = FrequencyMinDefaultKHz;
+                }
+                if (!ValidFrequency(FrequencyToKHz))
+                {
+                    FrequencyToKHz = FrequencyMaxDefaultKHz;
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+            finally
+            {
+
+            }
+        }
+
+        private void UpdateTuningProperties()
+        {
+                OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
+                OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
+                OnPropertyChanged(nameof(DeliverySystem));
+                OnPropertyChanged(nameof(TuningInProgress));
+                OnPropertyChanged(nameof(TuningProgress));
+                OnPropertyChanged(nameof(TuningProgressCaption));
+        }
+
+        public async Task Tune()
+        {
+            try
+            {
+                _loggingService.Info("Starting tuning");
+
+                _savedChannels = await _channelService.LoadChannels();
+
+                for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
+                {
+                    if (!DVBTTuning && dvbtTypeIndex == 0)
+                        continue;
+                    if (!DVBT2Tuning && dvbtTypeIndex == 1)
+                        continue;
+
+                    _actualTuningDVBTType = dvbtTypeIndex;
+                    _actualTunningFreqKHz = FrequencyFromKHz;
+
+                    UpdateTuningProperties();
+
+                    do
+                    {
+                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
+
+                        await Tune(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
+
+                        if (FrequencyToKHz != FrequencyFromKHz)
+                        {
+                            _actualTunningFreqKHz += TuneBandWidthKHz;
+                        }
+
+                        UpdateTuningProperties();
+
+                        if (State == TuneState.TuneAborted)
+                        {
+                            return;
+                        }
+
+                    } while (_actualTunningFreqKHz < FrequencyToKHz);
+                }
+
+                State = TuneState.TuneFinishedOK;
+                MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                State = TuneState.TuneFailed;
+            }
+        }
+
+        private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
+        {
+            try
+            {
+
+                //#if DEBUG
+                //                await Task.Delay(1000);
+
+                //                var channel = new DVBTChannel();
+                //                channel.PIDs = "0,16,17";
+                //                channel.ProgramMapPID = 5000;
+                //                channel.Name = "Channel name";
+                //                channel.ProviderName = "Multiplex";
+                //                channel.Frequency = freq;
+                //                channel.Bandwdith = bandWidth;
+                //                channel.Number = String.Empty;
+                //                channel.DVBTType = dvbtTypeIndex;
+                //                channel.Type = ServiceTypeEnum.DigitalTelevisionService;
+
+                //                TunedChannels.Add(channel);
+
+                //                Device.BeginInvokeOnMainThread(() =>
+                //                {
+                //                    SelectedChannel = channel;
+                //                });
+                //#endif
+
+
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
+
+                switch (tuneResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        _loggingService.Debug("Search error");
+
+                        SignalStrengthProgress = 0;
+                        return;
+
+                    case SearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+
+                        SignalStrengthProgress = 0;
+                        return;
+
+                    case SearchProgramResultEnum.OK:
+
+                        SignalStrengthProgress = tuneResult.SignalPercentStrength / 100.0;
+                        break;
+                }
+
+                var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(false);
+
+                switch (searchMapPIDsResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        _loggingService.Debug("Search error");
+
+                        return;
+
+                    case SearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+
+                        return;
+
+                    case SearchProgramResultEnum.NoProgramFound:
+                        _loggingService.Debug("No program found");
+
+                        return;
+                }
+
+                var mapPIDs = new List<long>();
+                var mapPIDToServiceDescriptor = new Dictionary<long, ServiceDescriptor>();
+
+                foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
+                {
+                    mapPIDs.Add(sd.Value);
+                    mapPIDToServiceDescriptor.Add(sd.Value, sd.Key);
+                }
+                _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
+
+
+                if (State == TuneState.TuneAborted)
+                {
+                    _loggingService.Debug($"Tuning aborted");
+                    return;
+                }
+
+                // searching PIDs
+
+                var searchProgramPIDsResult = await _driver.SearchProgramPIDs(mapPIDs);
+
+                switch (searchProgramPIDsResult.Result)
+                {
+                    case SearchProgramResultEnum.Error:
+                        _loggingService.Debug($"Error scanning Map PIDs");
+                        break;
+                    case SearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+                        break;
+                    case SearchProgramResultEnum.NoProgramFound:
+                        _loggingService.Debug("No program found");
+                        break;
+                    case SearchProgramResultEnum.OK:
+
+                        var totalChannelsAddedCount = 0;
+
+                        foreach (var kvp in searchProgramPIDsResult.PIDs)
+                        {
+                            var pids = string.Join(",", kvp.Value);
+                            var sDescriptor = mapPIDToServiceDescriptor[kvp.Key];
+
+                            var ch = new DVBTChannel();
+                            ch.PIDs = pids;
+                            ch.ProgramMapPID = kvp.Key;
+                            ch.Name = sDescriptor.ServiceName;
+                            ch.ProviderName = sDescriptor.ProviderName;
+                            ch.Frequency = freq;
+                            ch.Bandwdith = bandWidth;
+                            ch.Number = String.Empty;
+                            ch.DVBTType = dvbtTypeIndex;
+                            ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;
+
+                            TunedChannels.Add(ch);
+
+                            OnPropertyChanged(nameof(TunedChannelsCount));
+                            OnPropertyChanged(nameof(TunedMultiplexesCount));
+
+                            Device.BeginInvokeOnMainThread(() =>
+                            {
+                                SelectedChannel = ch;
+                            });
+
+                            _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
+
+                            // automatically adding new tuned channel if does not exist
+                            if (!ConfigViewModel.ChannelExists(_savedChannels, ch.Frequency, ch.ProgramMapPID))
+                            {
+                                ch.Number = ConfigViewModel.GetNextChannelNumber(_savedChannels).ToString();
+
+                                _savedChannels.Add(ch);
+
+                                await _channelService.SaveChannels(_savedChannels);
+                                totalChannelsAddedCount++;
+                            }
+                        }
+
+                        if (totalChannelsAddedCount > 0)
+                        {
+                            if (totalChannelsAddedCount > 1)
+                            {
+                                MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);
+                            }
+                            else
+                            {
+                                MessagingCenter.Send($"Channel saved", BaseViewModel.MSG_ToastMessage);
+                            }
+                        }
+
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }

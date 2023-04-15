@@ -176,5 +176,53 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("ScanEPG", value);
             }
         }
+
+        public long BandWidthKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("BandWidthKHz");
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("BandWidthKHz", value);
+            }
+        }
+
+        public long FrequencyFromKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FrequencyFromKHz");
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FrequencyFromKHz", value);
+            }
+        }
+
+        public long FrequencyToKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FrequencyToKHz");
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FrequencyToKHz", value);
+            }
+        }
+
+        public long FrequencyKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FrequencyKHz");
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FrequencyKHz", value);
+            }
+        }
     }
 }

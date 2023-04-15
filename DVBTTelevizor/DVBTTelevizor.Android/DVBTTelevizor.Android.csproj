@@ -99,6 +99,7 @@
     <Compile Include="USBBroadcastReceiverSystem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="NLog.config" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />

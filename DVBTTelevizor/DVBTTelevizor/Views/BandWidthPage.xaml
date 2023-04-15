@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DVBTTelevizor.BandWidthPage"
+             Title="BandWidth">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="Left"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="EntryStyle" TargetType="Entry">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="Keyboard" Value="Numeric"/>
+                <Setter Property="PlaceholderColor" Value="Gray"/>
+                <Setter Property="BackgroundColor" Value="#222222"/>
+            </Style>
+
+            <Style x:Key="PickerStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="BackgroundColor" Value="#222222"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="HorizontalTextAlignment" Value="Right"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+
+        <ScrollView x:Name="BandWithPageScrollView" Margin="10,10,10,0" >
+
+            <StackLayout>
+
+                <StackLayout Margin="0,0,0,30" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+
+                    <Label Text="Frequency BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
+
+                    <Grid x:Name="BandWidthGrid" IsVisible="True" RowSpacing="0" Margin="10,10,10,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="55*" />
+                            <ColumnDefinition Width="30*" />
+                            <ColumnDefinition Width="15*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" x:Name="BandWidthMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding BandWidthWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding BandWidthDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                        </Grid>
+
+                        <BoxView x:Name="BandWidthKHzBoxView" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryBandWidthKHz" Text="{Binding BandWidthKHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"/>
+                        <Label Grid.Row="0" Grid.Column="2" Text="KHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+
+                        <BoxView x:Name="BandWidthMHzBoxView" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidthMHz" Text="{Binding BandWidthMHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"  />
+                        <Label Grid.Row="1" Grid.Column="2" Text="MHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+
+                        <BoxView x:Name="BandWidthCustomBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+                        <Label Grid.Row="2" Grid.Column="0" Text="DVB-T/DVB-T2 standard" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+                        <Picker
+                                Grid.Row="2" Grid.Column="1"
+                                x:Name="BandWidthPicker"
+                                Margin="0,0,0,0"
+                                FontSize="{Binding FontSizeForPicker}"
+                                Style="{StaticResource PickerStyle}"
+                                SelectedIndex="{Binding BandWidthPickerIndex, Mode=TwoWay}"
+                                WidthRequest="200">
+                            <Picker.Items>
+                                <x:String>Custom</x:String>
+                                <x:String>1.7</x:String>
+                                <x:String> 5</x:String>
+                                <x:String> 6</x:String>
+                                <x:String> 7</x:String>
+                                <x:String> 8</x:String>
+                                <x:String>10</x:String>
+                            </Picker.Items>
+                        </Picker>
+                        <Label Grid.Row="2" Grid.Column="2" Text="MHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
+
+                    </Grid>
+
+                    <Button x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultBandWidthCommand}"/>
+
+                </StackLayout>
+
+            </StackLayout>
+
+        </ScrollView>
+
+    </ContentPage.Content>
+
+</ContentPage>

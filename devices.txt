@@ -1,0 +1,55 @@
+Astrometa DVB-T2:
+{
+	"supportedDeliverySystems": 7,
+	"minFrequency": 174000000,
+	"maxFrequency": 862000000,
+	"frequencyStepSize": 166667,
+	"vendorId": 5620,
+	"productId": 305,
+	"SuccessFlag": true,
+	"RequestTime": "2023-04-07T19:00:10.304884+02:00",
+	"ResponseTime": "2023-04-07T19:00:10.546157+02:00",
+	"Bytes": []
+}
+
+Mygica T230C DVB-T/T2/C:
+{
+	"supportedDeliverySystems": 7,
+	"minFrequency": 42000000,
+	"maxFrequency": 870000000,
+	"frequencyStepSize": 166667,
+	"vendorId": 1394,
+	"productId": 50825,
+	"SuccessFlag": true,
+	"RequestTime": "2023-04-07T19:28:56.355767+02:00",
+	"ResponseTime": "2023-04-07T19:28:56.593777+02:00",
+	"Bytes": []
+}
+
+Realtek RTL2832U reference design:
+{
+	"supportedDeliverySystems": 1,
+	"minFrequency": 174000000,
+	"maxFrequency": 862000000,
+	"frequencyStepSize": 166667,
+	"vendorId": 3034,
+	"productId": 10296,
+	"SuccessFlag": true,
+	"RequestTime": "2023-04-07T20:03:52.101391+02:00",
+	"ResponseTime": "2023-04-07T20:03:52.510197+02:00",
+	"Bytes": []
+}
+
+ITE 9135 Generic:
+{
+	"supportedDeliverySystems": 1,
+	"minFrequency": 174000000,
+	"maxFrequency": 862000000,
+	"frequencyStepSize": 250000,
+	"vendorId": 1165,
+	"productId": 37173,
+	"SuccessFlag": true,
+	"RequestTime": "2023-04-07T20:18:42.460514+02:00",
+	"ResponseTime": "2023-04-07T20:18:42.710119+02:00",
+	"Bytes": []
+}

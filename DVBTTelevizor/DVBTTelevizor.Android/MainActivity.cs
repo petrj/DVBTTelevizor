@@ -413,16 +413,11 @@ namespace DVBTTelevizor.Droid
         {
             if (_config.EnableLogging)
             {
-                var logPath = Path.Combine(BaseViewModel.AndroidAppDirectory, "DVBTTelevizor.log.txt");
-
-                _loggingService = new FileLoggingService()
-                {
-                    LogFilename = logPath
-                };
-
+                _loggingService = new NLogLoggingService(GetType().Assembly, "DVBTTelevizor.Droid");
+                _loggingService.Info("Starting MainActivity");
             } else
             {
-                _loggingService = new BasicLoggingService();
+                _loggingService = new DummyLoggingService();
             }
         }
 
@@ -433,57 +428,65 @@ namespace DVBTTelevizor.Droid
 
         public override bool DispatchKeyEvent(KeyEvent e)
         {
-            if (e.Action == KeyEventActions.Up)
+            try
             {
-                return true;
-            }
 
-            var code = e.KeyCode.ToString();
-            var keyAction = KeyboardDeterminer.GetKeyAction(code);
-
-            if (e.IsLongPress)
-            {
-                code = $"{BaseViewModel.LongPressPrefix}{e.KeyCode.ToString()}";
-            }
-
-            if (_dispatchKeyEventEnabled)
-            {
-                // ignoring ENTER 1 second after DispatchKeyEvent enabled
-
-                var ms = (DateTime.Now - _dispatchKeyEventEnabledAt).TotalMilliseconds;
-
-                if (keyAction == KeyboardNavigationActionEnum.OK && ms < 1000)
+                if (e.Action == KeyEventActions.Up)
                 {
-                    _loggingService.Debug($"DispatchKeyEvent: {code} -> ignoring OK action");
-
                     return true;
+                }
+
+                var code = e.KeyCode.ToString();
+                var keyAction = KeyboardDeterminer.GetKeyAction(code);
+
+                if (e.IsLongPress)
+                {
+                    code = $"{BaseViewModel.LongPressPrefix}{e.KeyCode.ToString()}";
+                }
+
+                if (_dispatchKeyEventEnabled)
+                {
+                    // ignoring ENTER 1 second after DispatchKeyEvent enabled
+
+                    var ms = (DateTime.Now - _dispatchKeyEventEnabledAt).TotalMilliseconds;
+
+                    if (keyAction == KeyboardNavigationActionEnum.OK && ms < 1000)
+                    {
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> ignoring OK action");
+
+                        return true;
+                    }
+                    else
+                    {
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to ancestor");
+                        return base.DispatchKeyEvent(e);
+                    }
                 }
                 else
                 {
-                    _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to ancestor");
-                    return base.DispatchKeyEvent(e);
-                }
-            }
-            else
-            {
-                if (keyAction != KeyboardNavigationActionEnum.Unknown)
-                {
-                    _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to application, time: {e.EventTime - e.DownTime}");
+                    if (keyAction != KeyboardNavigationActionEnum.Unknown)
+                    {
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to application, time: {e.EventTime - e.DownTime}");
 
-                    MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
+                        MessagingCenter.Send(code, BaseViewModel.MSG_KeyDown);
 
-                    return true;
-                }
-                else
-                {
-                    // unknown key
+                        return true;
+                    }
+                    else
+                    {
+                        // unknown key
 
-                    _loggingService.Debug($"DispatchKeyEvent: {code} -> unknown key sending to ancestor");
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> unknown key sending to ancestor");
 #if DEBUG
-                    ShowToastMessage($"<{code}>");
+                        ShowToastMessage($"<{code}>");
 #endif
-                    return base.DispatchKeyEvent(e);
+                        return base.DispatchKeyEvent(e);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex, $"DispatchKeyEvent error:");
+                return true;
             }
         }
 

@@ -38,6 +38,10 @@ namespace DVBTTelevizor
                 {
                     _prefsEditor.PutInt(key, Convert.ToInt32(value));
                 }
+                if (typeof(T) == typeof(long))
+                {
+                    _prefsEditor.PutLong(key, Convert.ToInt64(value));
+                }
 
                 _prefsEditor.Commit();
 
@@ -69,6 +73,10 @@ namespace DVBTTelevizor
                 if (typeof(T) == typeof(int))
                 {
                     val = _sharedPrefs.GetInt(key, default(int));
+                }
+                if (typeof(T) == typeof(long))
+                {
+                    val = _sharedPrefs.GetLong(key, default(long));
                 }
                 else
                 {
