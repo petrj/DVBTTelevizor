@@ -31,7 +31,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Frequency/1000000 + " Mhz";
+                return (Frequency / 1000000).ToString("N1") + " MHz";
             }
         }
 
@@ -39,8 +39,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                var ch = (Convert.ToInt32(Frequency / 1000000) - 306) / 8;
-                return "CH #" + ch.ToString();
+                return FrequencyLabel;
             }
         }
 

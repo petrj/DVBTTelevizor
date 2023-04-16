@@ -416,7 +416,7 @@ namespace DVBTTelevizor
         {
             LastFreq = frequency;
 
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(100);
 
             if (
                 (

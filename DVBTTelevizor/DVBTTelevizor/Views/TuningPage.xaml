@@ -127,7 +127,7 @@
                         <Label Grid.Row="0" Grid.Column="1"  Text="{Binding ActualTuningFrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
                     </Grid>
 
-                    <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     <ActivityIndicator Grid.Row="0" Grid.Column="2" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
                 </Grid>
@@ -143,7 +143,7 @@
                         <ColumnDefinition Width="15*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" HorizontalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
@@ -159,11 +159,11 @@
                         <ColumnDefinition Width="15*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" IsVisible="True" Text="Multiplexes" HorizontalOptions="Start" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-                    <Label Grid.Row="0" Grid.Column="1" IsVisible="True" Text="{Binding TunedMultiplexesCount}" HorizontalOptions="End" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="0" IsVisible="True" Text="Multiplexes" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="1" IsVisible="True" Text="{Binding TunedMultiplexesCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" IsVisible="True" Text="Channels" HorizontalOptions="Start" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
-                    <Label Grid.Row="1" Grid.Column="1" IsVisible="True" Text="{Binding TunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" TextColor="White" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="1" Grid.Column="0" IsVisible="True" Text="Channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="1" Grid.Column="1" IsVisible="True" Text="{Binding TunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
 
                 <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
@@ -177,7 +177,7 @@
                         <ColumnDefinition Width="15*" />
                     </Grid.ColumnDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Tuning progress" HorizontalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Tuning progress" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
@@ -218,7 +218,7 @@
 
                                             <Image Grid.Row="0" Grid.Column="2" Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
 
-                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding ServiceTypelWithChannelLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
+                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
                                             <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                             <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
