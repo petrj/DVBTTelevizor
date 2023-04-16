@@ -182,9 +182,9 @@
                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
 
-                <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}"/>
+                <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Margin="0,20,0,0"/>
 
-                <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" />
+                <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Margin="0,20,0,0" />
 
                 <ListView x:Name="ChannelsListView"
                         ItemsSource="{Binding TunedChannels}"

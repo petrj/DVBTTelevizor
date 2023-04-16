@@ -49,6 +49,9 @@ namespace DVBTTelevizor
 
             EntryBandWidthKHz.Unfocused += EntryBandWidthKHz_Unfocused;
             EntryBandWidthMHz.Unfocused += EntryBandWidthMHz_Unfocused;
+
+            EntryBandWidthMHz.Focused += delegate { EntryBandWidthMHz.CursorPosition = EntryBandWidthMHz.Text.Length; };
+            EntryBandWidthKHz.Focused += delegate { EntryBandWidthKHz.CursorPosition = EntryBandWidthKHz.Text.Length; };
         }
 
         private void EntryBandWidthMHz_Unfocused(object sender, FocusEventArgs e)

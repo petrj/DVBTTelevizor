@@ -412,11 +412,11 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             LastFreq = frequency;
 
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
 
             if (
                 (

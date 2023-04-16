@@ -16,13 +16,8 @@ namespace DVBTTelevizor
         private ChannelService _channelService;
         private DVBTTelevizorConfiguration _config;
 
-        private bool _manualTuning = false;
-
         private double _signalStrengthProgress = 0;
         private TuneState _tuneState = TuneState.TuningInProgress;
-
-        private bool _DVBTTuning = true;
-        private bool _DVBT2Tuning = true;
 
         private long _actualTunningFreqKHz = -1;
         private long _actualTuningDVBTType = -1;
@@ -83,14 +78,28 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _manualTuning;
+                return _config.ManualTuning;
             }
             set
             {
-                _manualTuning = value;
+                _config.ManualTuning = value;
 
                 OnPropertyChanged(nameof(ManualTuning));
                 OnPropertyChanged(nameof(AutomaticTuning));
+            }
+        }
+
+        public bool FastTuning
+        {
+            get
+            {
+                return _config.FastTuning;
+            }
+            set
+            {
+                _config.FastTuning = value;
+
+                OnPropertyChanged(nameof(FastTuning));
             }
         }
 
@@ -98,11 +107,11 @@ namespace DVBTTelevizor
         {
             get
             {
-                return !_manualTuning;
+                return !ManualTuning;
             }
             set
             {
-                _manualTuning = !value;
+                ManualTuning = !value;
 
                 OnPropertyChanged(nameof(AutomaticTuning));
                 OnPropertyChanged(nameof(ManualTuning));
@@ -113,7 +122,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _manualTuning ? 1 : 0;
+                return ManualTuning ? 1 : 0;
             }
             set
             {
@@ -128,11 +137,11 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _DVBTTuning;
+                return !_config.DVBTTuningDisabled;
             }
             set
             {
-                _DVBTTuning = value;
+                _config.DVBTTuningDisabled = !value;
 
                 OnPropertyChanged(nameof(DVBTTuning));
             }
@@ -142,11 +151,11 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _DVBT2Tuning;
+                return !_config.DVBT2TuningDisabled;
             }
             set
             {
-                _DVBT2Tuning = value;
+                _config.DVBT2TuningDisabled = !value;
 
                 OnPropertyChanged(nameof(DVBT2Tuning));
             }
@@ -798,7 +807,7 @@ namespace DVBTTelevizor
                 //#endif
 
 
-                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex);
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, FastTuning);
 
                 switch (tuneResult.Result)
                 {
@@ -892,13 +901,12 @@ namespace DVBTTelevizor
                             ch.DVBTType = dvbtTypeIndex;
                             ch.Type = (ServiceTypeEnum)sDescriptor.ServisType;
 
-                            TunedChannels.Add(ch);
-
-                            OnPropertyChanged(nameof(TunedChannelsCount));
-                            OnPropertyChanged(nameof(TunedMultiplexesCount));
-
                             Device.BeginInvokeOnMainThread(() =>
                             {
+                                TunedChannels.Add(ch);
+                                OnPropertyChanged(nameof(TunedChannelsCount));
+                                OnPropertyChanged(nameof(TunedMultiplexesCount));
+
                                 SelectedChannel = ch;
                             });
 

@@ -108,7 +108,7 @@
                         <Label Grid.Row="2" Grid.Column="2" Text="{Binding MaxFrequencyRoundedMHz}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
                     </Grid>
 
-                    <Button Margin="0,20,0,0" x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultFrequencyCommand}"/>
+                    <Button Margin="0,20,0,0" x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultFrequencyCommand}" />
 
                 </StackLayout>
 

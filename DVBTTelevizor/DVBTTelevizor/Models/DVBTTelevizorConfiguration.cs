@@ -224,5 +224,53 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<long>("FrequencyKHz", value);
             }
         }
+
+        public bool DVBTTuningDisabled
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("DVBTTuningDisabled");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("DVBTTuningDisabled", value);
+            }
+        }
+
+        public bool DVBT2TuningDisabled
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("DVBT2TuningDisabled");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("DVBT2TuningDisabled", value);
+            }
+        }
+
+        public bool ManualTuning
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ManualTuning");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ManualTuning", value);
+            }
+        }
+
+        public bool FastTuning
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("FastTuning");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("FastTuning", value);
+            }
+        }
     }
 }

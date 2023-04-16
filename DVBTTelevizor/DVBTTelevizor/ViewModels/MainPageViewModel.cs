@@ -680,7 +680,7 @@ namespace DVBTTelevizor
                    {
                        MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
 
-                       var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType);
+                       var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
 
                        if (tuned.Result != SearchProgramResultEnum.OK )
                        {

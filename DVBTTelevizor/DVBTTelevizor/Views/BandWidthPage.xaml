@@ -110,7 +110,7 @@
 
                     </Grid>
 
-                    <Button x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultBandWidthCommand}"/>
+                    <Button x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultBandWidthCommand}"  Margin="0,20,0,0"/>
 
                 </StackLayout>
 

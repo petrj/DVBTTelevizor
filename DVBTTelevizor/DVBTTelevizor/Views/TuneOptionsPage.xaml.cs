@@ -76,6 +76,7 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequencyTo", new List<View>() { EditFrequencyToButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FastTuning", new List<View>() { FastTuningBoxView, FastTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
 
             _focusItemsManual
@@ -84,6 +85,7 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequency", new List<View>() { EditFrequencyButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2TuningCheckBox }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FastTuning", new List<View>() { FastTuningBoxView, FastTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
 
             _focusItemsAuto.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
@@ -358,6 +360,10 @@ namespace DVBTTelevizor
 
                             case "DVBT2":
                                 DVBT2TuningCheckBox.IsToggled = !DVBT2TuningCheckBox.IsToggled;
+                                break;
+
+                            case "FastTuning":
+                                FastTuningCheckBox.IsToggled = !FastTuningCheckBox.IsToggled;
                                 break;
 
                             case "TuneButton":

@@ -197,7 +197,7 @@
 
                     </Grid>
 
-                    <Grid x:Name="FrequencyMHzValueGrid" IsVisible="{Binding ManualTuning}" RowSpacing="0" Margin="10,10,10,0" HorizontalOptions="Center">
+                    <Grid x:Name="FrequencyMHzValueGrid" IsVisible="{Binding ManualTuning, Mode=TwoWay}" RowSpacing="0" Margin="10,10,10,0" HorizontalOptions="Center">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -227,15 +227,32 @@
                             <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                             <Label Grid.Row="0" Grid.Column="0" Text="DVBT" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsToggled="{Binding DVBTTuning}"  HorizontalOptions="End"  />
+                            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTTuningCheckBox" IsToggled="{Binding DVBTTuning, Mode=TwoWay}"  HorizontalOptions="End"  />
 
                             <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                             <Label Grid.Row="1" Grid.Column="0" Text="DVBT2" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning}" HorizontalOptions="End"  />
-                        </Grid>
+                            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2TuningCheckBox" IsToggled="{Binding DVBT2Tuning, Mode=TwoWay}" HorizontalOptions="End"  />
+                    </Grid>
 
-                    <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="True" BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" />
+                    <Grid x:Name="FastTuningGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0" Margin="10,10,10,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="FastTuningBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Fast tuning" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="FastTuningCheckBox" IsToggled="{Binding FastTuning, Mode=TwoWay}"  HorizontalOptions="End"  />
+
+                    </Grid>
+
+                    <Button  x:Name="TuneButton" Text="Tune" Clicked="TuneButtton_Clicked" IsVisible="True" BackgroundColor="LightGray" TextColor="Black" FontSize="{Binding FontSizeForLabel}" Margin="0,20,0,0" />
 
                 </StackLayout>
 

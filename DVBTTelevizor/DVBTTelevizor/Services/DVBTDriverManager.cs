@@ -950,9 +950,9 @@ namespace DVBTTelevizor
         /// <param name="deliverySystem"></param>
         /// <returns>Signal strength
         /// 0 .. no signal</returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
-            _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySystem}");
+            _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySystem} fastTuning: {fastTuning}");
 
             var res = new TuneResult();
 
@@ -961,8 +961,10 @@ namespace DVBTTelevizor
                 DVBTResponse tuneRes = null;
                 DVBTResponse setPIDres = null;
 
+                var attemptsCount = fastTuning ? 1 : 5;
+
                 // five attempts
-                for (var i = 1; i <= 5; i++)
+                for (var i = 1; i <= attemptsCount; i++)
                 {
                     tuneRes = await Tune(frequency, bandWidth, deliverySystem);
 
@@ -971,6 +973,7 @@ namespace DVBTTelevizor
                         break;
                     } else
                     {
+                        if (!fastTuning)
                         await Task.Delay(500);
                     }
                 }
@@ -982,7 +985,7 @@ namespace DVBTTelevizor
                 }
 
                 // set PIDs 0 and 17
-                for (var i = 1; i <= 5; i++)
+                for (var i = 1; i <= attemptsCount; i++)
                 {
                     setPIDres = await SetPIDs( new List<long>() { 0,17,18 });
 
@@ -992,7 +995,8 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        await Task.Delay(100);
+                        if (!fastTuning)
+                            await Task.Delay(100);
                     }
                 }
 
@@ -1007,9 +1011,12 @@ namespace DVBTTelevizor
                 // timeout for get signal:
                 var startTime = DateTime.Now;
 
+                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
+                var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
+
                 DVBTStatus status = new DVBTStatus();
 
-                while ((DateTime.Now - startTime).TotalSeconds < 10)
+                while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
                 {
                     status = await GetStatus();
 
@@ -1019,7 +1026,7 @@ namespace DVBTTelevizor
                         return res;
                     }
 
-                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > 5)
+                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
                     {
                         res.Result = SearchProgramResultEnum.NoSignal;
                         break;
@@ -1032,7 +1039,7 @@ namespace DVBTTelevizor
                     }
 
                     // waiting
-                    await Task.Delay(850);
+                    await Task.Delay(fastTuning ? 400 : 850);
                 }
 
                 if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)

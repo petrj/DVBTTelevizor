@@ -72,6 +72,9 @@ namespace DVBTTelevizor
 
             EntryFrequencyKHz.Unfocused += EntryFrequencyKHz_Unfocused;
             EntryFrequencyMHz.Unfocused += EntryFrequencyMHz_Unfocused;
+
+            EntryFrequencyKHz.Focused += delegate { EntryFrequencyKHz.CursorPosition = EntryFrequencyKHz.Text.Length; };
+            EntryFrequencyMHz.Focused += delegate { EntryFrequencyMHz.CursorPosition = EntryFrequencyMHz.Text.Length; };
         }
 
         private void EntryFrequencyMHz_Unfocused(object sender, FocusEventArgs e)
