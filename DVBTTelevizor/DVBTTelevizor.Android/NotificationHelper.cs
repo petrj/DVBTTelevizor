@@ -78,7 +78,7 @@ namespace DVBTTelevizor.Droid
                 pendingIntentFlags
             );
 
-            var notificationBuilder = new NotificationCompat.Builder(ApplicationContext, _channelId)
+            var notificationBuilder = new Android.Support.V4.App.NotificationCompat.Builder(ApplicationContext, _channelId)
                      .SetContentTitle(body)
                      .SetContentText(detail)
                      .SetSubText(title)
@@ -87,8 +87,8 @@ namespace DVBTTelevizor.Droid
                      .SetOngoing(true)
                      .SetSound(null)
                      .SetVibrate(new long[] { 0, 0 })
-                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Stop, "Stop", stopPendingIntent))
-                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Quit, "Quit", quitPendingIntent))
+                     .AddAction(new Android.Support.V4.App.NotificationCompat.Action(Resource.Drawable.Stop, "Stop", stopPendingIntent))
+                     .AddAction(new Android.Support.V4.App.NotificationCompat.Action(Resource.Drawable.Quit, "Quit", quitPendingIntent))
                      .SetVisibility((int)NotificationVisibility.Public)
                      .SetContentIntent(pendingIntent);
 
@@ -112,7 +112,7 @@ namespace DVBTTelevizor.Droid
                 pendingIntentFlags
             );
 
-            var notificationBuilder = new NotificationCompat.Builder(ApplicationContext, _channelId)
+            var notificationBuilder = new Android.Support.V4.App.NotificationCompat.Builder(ApplicationContext, _channelId)
                      .SetContentTitle(body)
                      .SetContentText(detail)
                      .SetSubText(title)
@@ -121,7 +121,7 @@ namespace DVBTTelevizor.Droid
                      .SetOngoing(true)
                      .SetSound(null)
                      .SetVibrate(new long[] { 0, 0 })
-                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Stop, "Stop recording", stopPendingIntent))
+                     .AddAction(new Android.Support.V4.App.NotificationCompat.Action(Resource.Drawable.Stop, "Stop recording", stopPendingIntent))
                      .SetVisibility((int)NotificationVisibility.Public)
                      .SetContentIntent(pendingIntent);
 
