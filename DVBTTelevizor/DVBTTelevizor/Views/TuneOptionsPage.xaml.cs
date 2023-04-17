@@ -164,6 +164,12 @@ namespace DVBTTelevizor
 
         private void TuneButtton_Clicked(object sender, EventArgs e)
         {
+            if (!_driver.Started)
+            {
+                _dialogService.Error($"Device not connected");
+                return;
+            }
+
             var page = new TuningPage(_loggingService, _dialogService, _driver, _config, _channelService)
             {
                 BandWidthKHz = _viewModel.TuneBandWidthKHz,
