@@ -110,6 +110,8 @@
 
                     <Button Margin="0,20,0,0" x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultFrequencyCommand}" />
 
+                    <Button x:Name="OKButton" Text="OK" FontSize="{Binding FontSizeForLabel}" Clicked="OKButton_Clicked" Margin="0,20,0,0"/>
+
                 </StackLayout>
 
             </StackLayout>

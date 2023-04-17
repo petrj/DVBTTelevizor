@@ -107,7 +107,10 @@ namespace DVBTTelevizor
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.FrequencyKHz = freqPage.FrequencyKHz;
+                if (freqPage.Confirmed)
+                {
+                    _viewModel.FrequencyKHz = freqPage.FrequencyKHz;
+                }
             };
         }
 
@@ -120,7 +123,10 @@ namespace DVBTTelevizor
 
             bandWidthPage.Disappearing += delegate
             {
-                _viewModel.TuneBandWidthKHz = bandWidthPage.BandWidth;
+                if (bandWidthPage.Confirmed)
+                {
+                    _viewModel.TuneBandWidthKHz = bandWidthPage.BandWidth;
+                }
             };
         }
 
@@ -132,14 +138,17 @@ namespace DVBTTelevizor
                 PageTitle = "Tuning frequency from",
                 MinFrequencyKHz = _viewModel.FrequencyMinKHz,
                 MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
-                FrequencyKHzDefault = _viewModel.FrequencyFromKHz
+                FrequencyKHzDefault = _viewModel.FrequencyFromDefaultKHz
             };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.FrequencyFromKHz = freqPage.FrequencyKHz;
+                if (freqPage.Confirmed)
+                {
+                    _viewModel.FrequencyFromKHz = freqPage.FrequencyKHz;
+                }
             };
         }
 
@@ -151,14 +160,17 @@ namespace DVBTTelevizor
                 PageTitle = "Tuning frequency to",
                 MinFrequencyKHz = _viewModel.FrequencyMinKHz,
                 MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
-                FrequencyKHzDefault = _viewModel.FrequencyToKHz
+                FrequencyKHzDefault = _viewModel.FrequencyToDefaultKHz
             };
 
             Navigation.PushAsync(freqPage);
 
             freqPage.Disappearing += delegate
             {
-                _viewModel.FrequencyToKHz = freqPage.FrequencyKHz;
+                if (freqPage.Confirmed)
+                {
+                    _viewModel.FrequencyToKHz = freqPage.FrequencyKHz;
+                }
             };
         }
 

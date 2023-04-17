@@ -322,6 +322,8 @@ namespace DVBTTelevizor
             {
                 _tuneFocusItem.Focus();
             }
+
+            _viewModel.EPGDetailEnabled = false;
         }
 
         protected override void OnDisappearing()
@@ -1074,6 +1076,8 @@ namespace DVBTTelevizor
             }
 
             _viewModel.DoNotScrollToChannel = false;
+
+            _viewModel.EPGDetailEnabled = true;
         }
 
         private void OnVideoSingleTapped(object sender, EventArgs e)

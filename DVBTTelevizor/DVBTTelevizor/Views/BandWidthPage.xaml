@@ -112,6 +112,8 @@
 
                     <Button x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultBandWidthCommand}"  Margin="0,20,0,0"/>
 
+                    <Button x:Name="OKButton" Text="OK" FontSize="{Binding FontSizeForLabel}" Clicked="OKButton_Clicked" Margin="0,20,0,0"/>
+
                 </StackLayout>
 
             </StackLayout>

@@ -26,6 +26,8 @@ namespace DVBTTelevizor
         public const long FrequencyMaxDefaultKHz = 858000;  // 858.0 MHz - UHF band channel 69
 
         public long FrequencyDefaultKHz { get; set; } = 470000;
+        public long FrequencyFromDefaultKHz { get; set; } = 470000;
+        public long FrequencyToDefaultKHz { get; set; } = 858000;
 
         public const long BandWidthMinKHz = 1000;
         public const long BandWidthMaxKHz = 64000;
@@ -666,6 +668,7 @@ namespace DVBTTelevizor
             {
                 var cap = await _driver.GetCapabalities();
 
+                // setting min/max frequencies from device
                 if (cap.SuccessFlag)
                 {
                     FrequencyMinKHz = cap.minFrequency / 1000;
@@ -676,12 +679,29 @@ namespace DVBTTelevizor
                     FrequencyMaxKHz = FrequencyMaxDefaultKHz;
                 }
 
+                // setting default frequencies according to min/max
+                if (!ValidFrequency(FrequencyDefaultKHz))
+                {
+                    FrequencyDefaultKHz = FrequencyMinKHz;
+                }
+                if (!ValidFrequency(FrequencyFromDefaultKHz))
+                {
+                    FrequencyFromDefaultKHz = FrequencyMinKHz;
+                }
+                if (!ValidFrequency(FrequencyToDefaultKHz))
+                {
+                    FrequencyToDefaultKHz = FrequencyMaxKHz;
+                }
+
+                // bandwidth
                 if (_config.BandWidthKHz != default &&
-                    _config.BandWidthKHz>=BandWidthMinKHz &&
+                    _config.BandWidthKHz >= BandWidthMinKHz &&
                     _config.BandWidthKHz <= BandWidthMaxKHz)
                 {
                     TuneBandWidthKHz = _config.BandWidthKHz;
                 }
+
+                // loading frequencies from configuration
                 if (ValidFrequency(Config.FrequencyFromKHz))
                 {
                     FrequencyFromKHz = Config.FrequencyFromKHz;
@@ -701,11 +721,11 @@ namespace DVBTTelevizor
                 }
                 if (!ValidFrequency(FrequencyFromKHz))
                 {
-                    FrequencyFromKHz = FrequencyMinDefaultKHz;
+                    FrequencyFromKHz = FrequencyFromDefaultKHz;
                 }
                 if (!ValidFrequency(FrequencyToKHz))
                 {
-                    FrequencyToKHz = FrequencyMaxDefaultKHz;
+                    FrequencyToKHz = FrequencyToDefaultKHz;
                 }
             }
             catch (Exception ex)

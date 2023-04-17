@@ -155,159 +155,162 @@
         </StackLayout>
     </NavigationPage.TitleView>
 
-    <AbsoluteLayout x:Name="MainLayout">
+    <StackLayout>
 
-        <ListView
-                AbsoluteLayout.LayoutBounds="0,0,1,1"
+        <Button x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0"/>
+
+        <AbsoluteLayout x:Name="MainLayout">
+
+            <ListView
+                    AbsoluteLayout.LayoutBounds="0,0,1,1"
+                    AbsoluteLayout.LayoutFlags="All"
+                    x:Name="ChannelsListView"
+                    ItemsSource="{Binding Channels}"
+                    CachingStrategy="RecycleElement"
+                    RefreshCommand="{Binding RefreshCommand}"
+                    IsRefreshing="{Binding IsRefreshing}"
+                    Style="{StaticResource ListViewStyle}"
+                    SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Grid
+                                    local2:PressedEffect.LongPressCommand="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.LongPressCommand}"
+                                    local2:PressedEffect.LongPressCommandParameter="{Binding .}"
+                                    local2:PressedEffect.ShortPressCommand="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ShortPressCommand}"
+                                    local2:PressedEffect.ShortPressCommandParameter="{Binding .}"
+                                    RowSpacing="0">
+
+                                    <Grid.Effects>
+                                        <local2:PressedEffect />
+                                    </Grid.Effects>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="1" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="12*" />
+                                        <ColumnDefinition Width="28*" />
+                                        <ColumnDefinition Width="50*" />
+                                        <ColumnDefinition Width="10*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+                                    <Label Grid.Row="0" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
+
+                                    <Image Grid.Row="0" Grid.Column="3"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+                                    <Label Grid.Row="1" Grid.Column="3"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
+
+                                    <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                    <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+
+                                    <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+
+                                    <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
+                                </Grid>
+
+                            </ViewCell.View>
+
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Grid
+                AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
                 AbsoluteLayout.LayoutFlags="All"
-                x:Name="ChannelsListView"
-                ItemsSource="{Binding Channels}"
-                CachingStrategy="RecycleElement"
-                RefreshCommand="{Binding RefreshCommand}"
-                IsRefreshing="{Binding IsRefreshing}"
-                Style="{StaticResource ListViewStyle}"
-                SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
-
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <ViewCell.View>
-                            <Grid
-                                local2:PressedEffect.LongPressCommand="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.LongPressCommand}"
-                                local2:PressedEffect.LongPressCommandParameter="{Binding .}"
-                                local2:PressedEffect.ShortPressCommand="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ShortPressCommand}"
-                                local2:PressedEffect.ShortPressCommandParameter="{Binding .}"
-                                RowSpacing="0">
-
-                                <Grid.Effects>
-                                    <local2:PressedEffect />
-                                </Grid.Effects>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="1" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="12*" />
-                                    <ColumnDefinition Width="28*" />
-                                    <ColumnDefinition Width="50*" />
-                                    <ColumnDefinition Width="10*" />
-                                </Grid.ColumnDefinitions>
-
-                                <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
-                                <Label Grid.Row="0" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
-
-                                <Image Grid.Row="0" Grid.Column="3"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
-                                <Label Grid.Row="1" Grid.Column="3"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
-
-                                <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-                                <Label Grid.Row="2" Grid.Column="1"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-                                <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-
-                                <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-
-                                <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
-                            </Grid>
-
-                        </ViewCell.View>
-
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-
-        <Grid
-            AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
-            AbsoluteLayout.LayoutFlags="All"
-            x:Name="EPGDetailGrid"
-            BackgroundColor="#262626"
-            Margin="0,0,0,0"
-            Padding="0,0,0,0"
-            IsVisible="{Binding EPGDetailVisible}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="60*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
-
-            <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
-            <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
-
-            <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" x:Name="ProgresssBarGrid" BackgroundColor="Aqua" VerticalOptions="CenterAndExpand">
+                x:Name="EPGDetailGrid"
+                BackgroundColor="#262626"
+                Margin="0,0,0,0"
+                Padding="0,0,0,0"
+                IsVisible="{Binding EPGDetailVisible}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="60*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
-                <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
+
+                <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
+                <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
+
+                <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" x:Name="ProgresssBarGrid" BackgroundColor="Aqua" VerticalOptions="CenterAndExpand">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
+                </Grid>
+
+                <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="StartAndExpand" VerticalOptions="Start"  Margin="5,5,5,5">
+                    <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" />
+                </ScrollView>
+
             </Grid>
 
-            <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="StartAndExpand" VerticalOptions="Start"  Margin="5,5,5,5">
-                <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" />
-            </ScrollView>
+            <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
+                <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
+                <StackLayout.GestureRecognizers >
+                    <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
+                    <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
+                    <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
+                    <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
+                    <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
+                    <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
+                </StackLayout.GestureRecognizers>
+            </StackLayout>
 
-        </Grid>
+            <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
+                <Label Text="{Binding SelectedChannelName}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
+                <StackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
+                    <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
+                    <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
+                    <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
+                    <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
+                    <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
+                </StackLayout.GestureRecognizers>
+            </StackLayout>
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
-            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
-            <StackLayout.GestureRecognizers >
-                <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
-                <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
-                <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
-                <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
-                <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
-                <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
-            </StackLayout.GestureRecognizers>
-        </StackLayout>
+            <Image x:Name="CloseVideoImage" Source="Quit.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseVideoTapped" NumberOfTapsRequired="1" />
+                </Image.GestureRecognizers>
+            </Image>
 
-        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
-            <Label Text="{Binding SelectedChannelName}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />
-            <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
-            <StackLayout.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
-                <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
-                <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
-                <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
-                <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
-                <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
-            </StackLayout.GestureRecognizers>
-        </StackLayout>
+            <Image x:Name="MinimizeVideoImage" Source="Minimize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.9,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMinimizeVideoTapped" NumberOfTapsRequired="1" />
+                </Image.GestureRecognizers>
+            </Image>
 
-        <Image x:Name="CloseVideoImage" Source="Quit.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
-            <Image.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnCloseVideoTapped" NumberOfTapsRequired="1" />
-            </Image.GestureRecognizers>
-        </Image>
+            <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnMaximizeVideoTapped" NumberOfTapsRequired="1" />
+                </Image.GestureRecognizers>
+            </Image>
 
-        <Image x:Name="MinimizeVideoImage" Source="Minimize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.9,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
-            <Image.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnMinimizeVideoTapped" NumberOfTapsRequired="1" />
-            </Image.GestureRecognizers>
-        </Image>
+            <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" />
 
-        <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
-            <Image.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnMaximizeVideoTapped" NumberOfTapsRequired="1" />
-            </Image.GestureRecognizers>
-        </Image>
+        </AbsoluteLayout>
 
-        <Button AbsoluteLayout.LayoutBounds="1.0,0.1,1.0,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" />
-
-        <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" />
-
-    </AbsoluteLayout>
-
+    </StackLayout>
 
 
     <ContentPage.ToolbarItems>
