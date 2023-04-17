@@ -7,7 +7,7 @@ using Android.Util;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Name= "net.petrjanousek.DVBTTelevizor.SplashActivity", Label = "Starting DVBT Televizor", Theme = "@style/SplashTheme", MainLauncher = true, NoHistory = true, Exported = true)]
+    [Activity(Name= "net.petrjanousek.DVBTTelevizor.SplashActivity", Label = "DVBT Televizor", Theme = "@style/SplashTheme", MainLauncher = true, NoHistory = true, Exported = true)]
     public class SplashActivity : AppCompatActivity
     {
         public override void OnCreate(Bundle savedInstanceState, PersistableBundle persistentState)
