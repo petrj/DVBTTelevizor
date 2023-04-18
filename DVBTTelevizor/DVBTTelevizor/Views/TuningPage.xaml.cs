@@ -61,6 +61,8 @@ namespace DVBTTelevizor
         {
             base.OnAppearing();
 
+            _viewModel.NotifyFontSizeChange();
+
             Task.Run(async () =>
             {
                 await _viewModel.Tune();
@@ -114,11 +116,31 @@ namespace DVBTTelevizor
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
+
+            _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+        }
+
+        private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        {
+            // scroll to item
+            if (args.FocusedItem.Name == "FinishButton" || args.FocusedItem.Name == "AbortButton")
+            {
+                // this does not work!
+                //ChannelsListView.ScrollTo(ChannelsListView.Header, ScrollToPosition.MakeVisible, false);
+
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    ChannelsListView.ScrollTo(_viewModel.FirstTunedChannel, ScrollToPosition.MakeVisible, false);
+                });
+            }
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-           ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+            if (_viewModel.State == TuneViewModel.TuneState.TuningInProgress)
+            {
+                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+            }
         }
 
         public async void OnKeyDown(string key, bool longPress)

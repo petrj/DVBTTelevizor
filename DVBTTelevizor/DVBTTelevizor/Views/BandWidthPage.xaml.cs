@@ -55,6 +55,14 @@ namespace DVBTTelevizor
 
             EntryBandWidthMHz.Focused += delegate { EntryBandWidthMHz.CursorPosition = EntryBandWidthMHz.Text.Length; };
             EntryBandWidthKHz.Focused += delegate { EntryBandWidthKHz.CursorPosition = EntryBandWidthKHz.Text.Length; };
+
+            _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+        }
+
+        private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        {
+            // scroll to item
+            BandWithPageScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height / 2, false);
         }
 
         private void EntryBandWidthMHz_Unfocused(object sender, FocusEventArgs e)

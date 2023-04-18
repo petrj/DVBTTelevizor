@@ -41,7 +41,7 @@ namespace DVBTTelevizor
 
             BindingContext = _viewModel = new TuneViewModel(_loggingService, _dialogService, _driver, _config, channelService);
 
-            Appearing += TunePage_Appearing;
+            Appearing += TuneOptionsPage_Appearing;
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
@@ -88,8 +88,8 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("FastTuning", new List<View>() { FastTuningBoxView, FastTuningCheckBox }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }));
 
-            _focusItemsAuto.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
-            _focusItemsManual.OnItemFocusedEvent += TunePage_OnItemFocusedEvent;
+            _focusItemsAuto.OnItemFocusedEvent += TuneOptionsPage_OnItemFocusedEvent;
+            _focusItemsManual.OnItemFocusedEvent += TuneOptionsPage_OnItemFocusedEvent;
         }
 
         private void EditFrequencyButton_Clicked(object sender, EventArgs e)
@@ -202,12 +202,15 @@ namespace DVBTTelevizor
             Navigation.PushAsync(page);
         }
 
-        private void TunePage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        private void TuneOptionsPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
         {
             _previousFocusedItem = args.FocusedItem.Name;
+
+            // scroll to item
+            TuneOptionsScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height / 2, false);
         }
 
-        private void TunePage_Appearing(object sender, EventArgs e)
+        private void TuneOptionsPage_Appearing(object sender, EventArgs e)
         {
             if (_firstAppearing)
             {
@@ -222,6 +225,8 @@ namespace DVBTTelevizor
 
                 _firstAppearing = false;
             }
+
+            _viewModel.NotifyFontSizeChange();
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
@@ -304,7 +309,7 @@ namespace DVBTTelevizor
 
         public async void OnKeyDown(string key, bool longPress)
         {
-            _loggingService.Debug($"TunePage OnKeyDown {key}");
+            _loggingService.Debug($"TuneOptionsPage OnKeyDown {key}");
 
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
 

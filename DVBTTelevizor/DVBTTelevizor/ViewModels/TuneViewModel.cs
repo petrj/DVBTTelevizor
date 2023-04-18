@@ -402,6 +402,19 @@ namespace DVBTTelevizor
             }
         }
 
+        public DVBTChannel FirstTunedChannel
+        {
+            get
+            {
+                if (TunedChannels.Count == 0)
+                {
+                    return null;
+                }
+
+                return TunedChannels[0];
+            }
+        }
+
         public DVBTChannel SelectedChannel
         {
             get

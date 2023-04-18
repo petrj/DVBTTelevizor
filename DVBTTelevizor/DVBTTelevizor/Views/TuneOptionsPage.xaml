@@ -91,7 +91,7 @@
 
     <ContentPage.Content>
 
-        <ScrollView x:Name="TuneScrollView" Margin="10,10,10,0">
+        <ScrollView x:Name="TuneOptionsScrollView" Margin="10,10,10,0">
 
             <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
