@@ -123,11 +123,14 @@ namespace DVBTTelevizor
 
         private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
         {
-            // scroll to item
-            if (args.FocusedItem.Name == "FinishButton" || args.FocusedItem.Name == "AbortButton")
+            Device.BeginInvokeOnMainThread( () =>
             {
-                ChannelsListView.ScrollTo(_viewModel.FirstTunedChannel, ScrollToPosition.End, false);
-            }
+                // scroll to item
+                if (args.FocusedItem.Name == "FinishButton" || args.FocusedItem.Name == "AbortButton")
+                {
+                    ChannelsListView.ScrollTo(_viewModel.FirstTunedChannel, ScrollToPosition.End, false);
+                }
+            });
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
