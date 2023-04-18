@@ -126,7 +126,9 @@
                                     <ColumnDefinition Width="15*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Grid Grid.Row="0" Grid.Column="0" x:Name="ActualTuningFrequencMHzValueGrid" IsVisible="True" RowSpacing="0" Margin="0,0,0,0">
+                                <Label Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningState}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                                <Grid Grid.Row="0" Grid.Column="0" x:Name="ActualTuningFrequencMHzValueGrid" IsVisible="{Binding TuningInProgress}"  RowSpacing="0" Margin="0,0,0,0">
 
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="auto" />

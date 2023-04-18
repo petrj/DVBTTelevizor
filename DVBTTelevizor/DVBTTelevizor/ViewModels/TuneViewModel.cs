@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using Android.Preferences;
+using LoggerService;
 using MPEGTS;
 using System;
 using System.Collections.Generic;
@@ -415,6 +416,19 @@ namespace DVBTTelevizor
             }
         }
 
+        public DVBTChannel LastTunedChannel
+        {
+            get
+            {
+                if (TunedChannels.Count == 0)
+                {
+                    return null;
+                }
+
+                return TunedChannels[TunedChannels.Count-1];
+            }
+        }
+
         public DVBTChannel SelectedChannel
         {
             get
@@ -427,6 +441,70 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(SelectedChannel));
             }
+        }
+
+        public int SelectNextTunedChannel()
+        {
+            if (TunedChannels == null || TunedChannels.Count == 0)
+            {
+                SelectedChannel = null;
+                return -1;
+            }
+
+            if (SelectedChannel == null)
+            {
+                SelectedChannel = TunedChannels[0];
+                return 1;
+            }
+
+            for (var i = 0; i < TunedChannels.Count; i++)
+            {
+                if (TunedChannels[i] == SelectedChannel)
+                {
+                    if (i == TunedChannels.Count -1 )
+                    {
+                        return 0;
+                    }
+
+                    SelectedChannel = TunedChannels[i + 1];
+
+                    return 1;
+                }
+            }
+
+            return -1;
+        }
+
+        public int SelectPreviousChannel()
+        {
+            if (TunedChannels == null || TunedChannels.Count == 0)
+            {
+                SelectedChannel = null;
+                return -1;
+            }
+
+            if (SelectedChannel == null)
+            {
+                SelectedChannel = TunedChannels[TunedChannels.Count - 1];
+                return 1;
+            }
+
+            for (var i = 0; i < TunedChannels.Count; i++)
+            {
+                if (TunedChannels[i] == SelectedChannel)
+                {
+                    if (i == 0)
+                    {
+                        return 0;
+                    }
+
+                    SelectedChannel = TunedChannels[i - 1];
+
+                    return 1;
+                }
+            }
+
+            return -1;
         }
 
         public long TuneBandWidthKHz
@@ -534,6 +612,18 @@ namespace DVBTTelevizor
                             return string.Empty;
 
                         return Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0)).ToString();
+                    default:
+                        return string.Empty;
+                }
+            }
+        }
+
+        public string ActualTuningState
+        {
+            get
+            {
+                switch (State)
+                {
                     case TuneState.TuneFinishedOK:
                         return "Finished";
                     case TuneState.TuneFailed:
@@ -576,11 +666,7 @@ namespace DVBTTelevizor
             {
                 _tuneState = value;
 
-                OnPropertyChanged(nameof(TuningFinished));
-                OnPropertyChanged(nameof(TuningInProgress));
-
-                OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
-                OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
+                UpdateTuningProperties();
             }
         }
 
@@ -753,12 +839,17 @@ namespace DVBTTelevizor
 
         private void UpdateTuningProperties()
         {
-                OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
-                OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
-                OnPropertyChanged(nameof(DeliverySystem));
-                OnPropertyChanged(nameof(TuningInProgress));
-                OnPropertyChanged(nameof(TuningProgress));
-                OnPropertyChanged(nameof(TuningProgressCaption));
+            OnPropertyChanged(nameof(TuningFinished));
+            OnPropertyChanged(nameof(TuningInProgress));
+            OnPropertyChanged(nameof(ActualTuningState));
+            OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
+            OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
+            OnPropertyChanged(nameof(DeliverySystem));
+            OnPropertyChanged(nameof(TuningInProgress));
+            OnPropertyChanged(nameof(TuningProgress));
+            OnPropertyChanged(nameof(TuningProgressCaption));
+            OnPropertyChanged(nameof(SignalStrengthProgress));
+            OnPropertyChanged(nameof(SignalStrengthProgressCaption));
         }
 
         public async Task Tune()
@@ -936,11 +1027,9 @@ namespace DVBTTelevizor
 
                             Device.BeginInvokeOnMainThread(() =>
                             {
-                                TunedChannels.Add(ch);
+                                TunedChannels.Insert(0,ch);
                                 OnPropertyChanged(nameof(TunedChannelsCount));
                                 OnPropertyChanged(nameof(TunedMultiplexesCount));
-
-                                SelectedChannel = ch;
                             });
 
                             _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");

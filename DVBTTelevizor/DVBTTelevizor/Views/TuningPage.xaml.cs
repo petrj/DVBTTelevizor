@@ -14,6 +14,7 @@ namespace DVBTTelevizor
     public partial class TuningPage : ContentPage, IOnKeyDown
     {
         private TuneViewModel _viewModel;
+        private bool _listViewSelected = false;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         protected IDVBTDriverManager _driver;
@@ -125,21 +126,62 @@ namespace DVBTTelevizor
             // scroll to item
             if (args.FocusedItem.Name == "FinishButton" || args.FocusedItem.Name == "AbortButton")
             {
-                // this does not work!
-                //ChannelsListView.ScrollTo(ChannelsListView.Header, ScrollToPosition.MakeVisible, false);
-
-                Device.BeginInvokeOnMainThread(delegate
-                {
-                    ChannelsListView.ScrollTo(_viewModel.FirstTunedChannel, ScrollToPosition.MakeVisible, false);
-                });
+                ChannelsListView.ScrollTo(_viewModel.FirstTunedChannel, ScrollToPosition.End, false);
             }
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            if (_viewModel.State == TuneViewModel.TuneState.TuningInProgress)
+            ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+        }
+
+        private void GoDown()
+        {
+            if (_listViewSelected)
             {
-                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+                var steps = _viewModel.SelectNextTunedChannel();
+                if (steps == 0)
+                {
+                    _viewModel.SelectedChannel = null;
+                    _listViewSelected = false;
+                    _focusItems.FocusItem(_viewModel.TuningInProgress ? "AbortButton" : "FinishButton");
+                }
+            } else
+            {
+                var fi = _focusItems.FocusedItem;
+
+                if (fi == null)
+                {
+                    _focusItems.FocusItem(_viewModel.TuningInProgress ? "AbortButton" : "FinishButton");
+                    return;
+                } else
+                {
+                    _listViewSelected = true;
+                    _focusItems.DeFocusAll();
+                    _viewModel.SelectedChannel = _viewModel.FirstTunedChannel;
+                }
+            }
+        }
+
+        private void GoUp()
+        {
+            if (_listViewSelected)
+            {
+                if (_viewModel.SelectedChannel == _viewModel.FirstTunedChannel)
+                {
+                    _viewModel.SelectedChannel = null;
+                    _listViewSelected = false;
+                    _focusItems.FocusItem(_viewModel.TuningInProgress ? "AbortButton" : "FinishButton");
+                }
+                else
+                {
+                    var steps = _viewModel.SelectPreviousChannel();
+                }
+            } else
+            {
+                _listViewSelected = true;
+                _focusItems.DeFocusAll();
+                _viewModel.SelectedChannel = _viewModel.LastTunedChannel;
             }
         }
 
@@ -152,17 +194,11 @@ namespace DVBTTelevizor
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Down:
-                    if (_viewModel.TuningInProgress)
-                    {
-                        _focusItems.FocusItem("AbortButton");
-                    } else
-                    {
-                        _focusItems.FocusItem("FinishButton");
-                    }
+                    GoDown();
                     break;
 
                 case KeyboardNavigationActionEnum.Up:
-                    _focusItems.FocusPreviousItem();
+                    GoUp();
                     break;
 
                 case KeyboardNavigationActionEnum.Back:

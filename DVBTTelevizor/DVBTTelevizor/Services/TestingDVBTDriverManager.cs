@@ -73,7 +73,7 @@ namespace DVBTTelevizor
 
                 supportedDeliverySystems = 3,
                 minFrequency = 474000000,
-                maxFrequency = 634000000,
+                maxFrequency = 714000000,
                 frequencyStepSize = 8,
                 vendorId = 0,
                 productId = 0
