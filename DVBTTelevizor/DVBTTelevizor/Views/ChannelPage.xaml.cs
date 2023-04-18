@@ -18,6 +18,7 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         private KeyboardFocusableItemList _focusItems;
+        public bool Confirmed { get; set; } = false;
 
         public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
@@ -31,6 +32,9 @@ namespace DVBTTelevizor
             BuildFocusableItems();
 
             Appearing += ChannelPage_Appearing;
+
+            EntryName.Focused += delegate { EntryName.CursorPosition = EntryName.Text.Length; };
+            EntryNumber.Focused += delegate { EntryNumber.CursorPosition = EntryNumber.Text.Length; };
         }
 
         private void BuildFocusableItems()
@@ -39,18 +43,16 @@ namespace DVBTTelevizor
 
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryName }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryNumber }));
-                /*.AddItem(KeyboardFocusableItem.CreateFrom("Provider", new List<View>() { ProviderBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Channel", new List<View>() { ChannelBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Frequency", new List<View>() { FrequencyBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTTypeView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Bandwith", new List<View>() { BandwithBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Type", new List<View>() { TypeBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MapPID", new List<View>() { MapPIDBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("PIDs", new List<View>() { PIDsBoxView }));
-                .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }));*/
+                .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryNumber }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("OKButton", new List<View>() { OKButton }));
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
+        }
+
+        private void OKButton_Clicked(object sender, EventArgs e)
+        {
+            Confirmed = true;
+            Navigation.PopAsync();
         }
 
         private void ChannelPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
@@ -62,6 +64,7 @@ namespace DVBTTelevizor
         private void ChannelPage_Appearing(object sender, EventArgs e)
         {
             _viewModel.NotifyFontSizeChange();
+            _focusItems.FocusItem("OKButton");
         }
 
         public DVBTChannel Channel
@@ -109,17 +112,13 @@ namespace DVBTTelevizor
                                 EntryName.Focus();
                                 break;
 
-                            case "Back":
-                                BackButton_Clicked(this, null);
+                        case "OKButton":
+                            Confirmed = true;
+                            await Navigation.PopAsync();
                             break;
                     }
                     break;
             }
-        }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            Navigation.PopAsync();
         }
     }
 }

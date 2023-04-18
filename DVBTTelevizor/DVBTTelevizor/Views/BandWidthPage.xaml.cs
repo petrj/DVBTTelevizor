@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using static Android.App.Assist.AssistStructure;
 
 namespace DVBTTelevizor
 {
@@ -78,6 +79,7 @@ namespace DVBTTelevizor
         {
             base.OnAppearing();
 
+            _viewModel.NotifyFontSizeChange();
             _focusItems.DeFocusAll();
         }
 

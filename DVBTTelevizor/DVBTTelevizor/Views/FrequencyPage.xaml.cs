@@ -106,6 +106,7 @@ namespace DVBTTelevizor
         {
             base.OnAppearing();
 
+            _viewModel.NotifyFontSizeChange();
             _focusItems.DeFocusAll();
         }
 

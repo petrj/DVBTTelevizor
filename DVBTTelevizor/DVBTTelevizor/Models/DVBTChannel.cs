@@ -27,23 +27,15 @@ namespace DVBTTelevizor
 
         private bool _recording = false;
 
-        public string FrequencyLabel
-        {
-            get
-            {
-                return (Frequency / 1000000).ToString("N1") + " MHz";
-            }
-        }
-
-        public string ChannelLabel
-        {
-            get
-            {
-                return FrequencyLabel;
-            }
-        }
-
         public long Bandwdith { get; set; }
+
+        public int DVBTType { get; set; }
+
+        public string Name { get; set; }
+
+        public string ProviderName { get; set; }
+
+        public string PIDs { get; set; }
 
         public string BandwdithLabel
         {
@@ -53,11 +45,13 @@ namespace DVBTTelevizor
             }
         }
 
-        public int DVBTType { get; set; }
-
-        public string Name { get; set; }
-
-        public string ProviderName { get; set; }
+        public string FrequencyLabel
+        {
+            get
+            {
+                return (Frequency / 1000000).ToString("N1") + " MHz";
+            }
+        }
 
         public bool Recording
         {
@@ -82,8 +76,6 @@ namespace DVBTTelevizor
                 return String.Empty;
             }
         }
-
-        public string PIDs { get; set; }
 
         public string PIDsLabel
         {
@@ -123,14 +115,6 @@ namespace DVBTTelevizor
             get
             {
                 return (((Frequency / 1000000) - 306) / 8).ToString();
-            }
-        }
-
-        public string ServiceTypelWithChannelLabel
-        {
-            get
-            {
-                return ChannelLabel + ", " + SimplifiedServiceType;
             }
         }
 
@@ -246,13 +230,6 @@ namespace DVBTTelevizor
         {
             get
             {
-//#if DEBUG
-//                if (CurrentEventItem == null)
-//                {
-//                    return "Current event title";
-//                }
-//#endif
-
                 if (CurrentEventItem == null)
                     return string.Empty;
 
@@ -309,6 +286,25 @@ namespace DVBTTelevizor
 
                 return null;
             }
+        }
+
+        public DVBTChannel Clone()
+        {
+            var channel = new DVBTChannel();
+
+            channel.Name = Name;
+            channel.ProviderName = ProviderName;
+            channel.Frequency = Frequency;
+            channel.Bandwdith = Bandwdith;
+            channel.ProgramMapPID = ProgramMapPID;
+            channel.PIDs = PIDs;
+            channel.ServiceType = ServiceType;
+            channel.Type = Type;
+            channel.Bandwdith = Bandwdith;
+            channel.DVBTType = DVBTType;
+            channel.Number = Number;
+
+            return channel;
         }
 
         #region INotifyPropertyChanged
