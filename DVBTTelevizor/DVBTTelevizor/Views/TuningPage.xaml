@@ -168,6 +168,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="85*" />
@@ -179,6 +180,9 @@
 
                         <Label Grid.Row="1" Grid.Column="0" IsVisible="True" Text="Channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Label Grid.Row="1" Grid.Column="1" IsVisible="True" Text="{Binding TunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" IsVisible="True" Text="New channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Label Grid.Row="2" Grid.Column="1" IsVisible="True" Text="{Binding NewTunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                     </Grid>
 
                     <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">

@@ -47,6 +47,7 @@ namespace DVBTTelevizor
 
         public ObservableCollection<DVBTChannel> TunedChannels { get; set; } = new ObservableCollection<DVBTChannel>();
         private ObservableCollection<DVBTChannel> _savedChannels = null;
+        private int _newTunedChannelsCount = 0;
 
         public Command AbortTuneCommand { get; set; }
         public Command FinishTuningCommand { get; set; }
@@ -545,6 +546,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public int NewTunedChannelsCount
+        {
+            get
+            {
+                return _newTunedChannelsCount;
+            }
+        }
+
         public int TunedMultiplexesCount
         {
             get
@@ -850,6 +859,9 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(TuningProgressCaption));
             OnPropertyChanged(nameof(SignalStrengthProgress));
             OnPropertyChanged(nameof(SignalStrengthProgressCaption));
+            OnPropertyChanged(nameof(TunedChannelsCount));
+            OnPropertyChanged(nameof(NewTunedChannelsCount));
+            OnPropertyChanged(nameof(TunedMultiplexesCount));
         }
 
         public async Task Tune()
@@ -1029,6 +1041,7 @@ namespace DVBTTelevizor
                             {
                                 TunedChannels.Add(ch);
                                 OnPropertyChanged(nameof(TunedChannelsCount));
+                                OnPropertyChanged(nameof(NewTunedChannelsCount));
                                 OnPropertyChanged(nameof(TunedMultiplexesCount));
                             });
 
@@ -1043,6 +1056,7 @@ namespace DVBTTelevizor
 
                                 await _channelService.SaveChannels(_savedChannels);
                                 totalChannelsAddedCount++;
+                                _newTunedChannelsCount++;
                             }
                         }
 

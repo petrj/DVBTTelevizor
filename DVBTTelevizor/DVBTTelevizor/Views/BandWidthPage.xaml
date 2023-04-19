@@ -83,7 +83,7 @@
                         <Label Grid.Row="0" Grid.Column="2" Text="KHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
                         <BoxView x:Name="BandWidthMHzBoxView" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-                        <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidthMHz" Text="{Binding BandWidthMHz}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"  />
+                        <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryBandWidthMHz" Text="{Binding BandWidthMHzAsString}" Style="{DynamicResource EntryStyle}" FontSize="{Binding FontSizeForEntry}" HorizontalOptions="End" WidthRequest="200"  />
                         <Label Grid.Row="1" Grid.Column="2" Text="MHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
 
                         <BoxView x:Name="BandWidthCustomBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>

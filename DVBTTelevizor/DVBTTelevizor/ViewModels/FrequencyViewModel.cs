@@ -119,6 +119,7 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyMHz));
+                OnPropertyChanged(nameof(FrequencyMHzAsString));
                 OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
                 OnPropertyChanged(nameof(FrequencyWholePartMHz));
             }
@@ -136,6 +137,28 @@ namespace DVBTTelevizor
                     return;
 
                 var freqKHz = Convert.ToInt64(value * 1000.0);
+
+                if (FrequencyKHz != freqKHz)
+                {
+                    FrequencyKHz = freqKHz;
+                }
+            }
+        }
+
+        public string FrequencyMHzAsString
+        {
+            get
+            {
+                return Math.Round(FrequencyKHz / 1000.0, 3).ToString();
+            }
+            set
+            {
+                if (!ValidFrequency(value))
+                {
+                    return;
+                }
+
+                var freqKHz = TuneViewModel.ParseFreqMHzToKHz(value);
 
                 if (FrequencyKHz != freqKHz)
                 {
