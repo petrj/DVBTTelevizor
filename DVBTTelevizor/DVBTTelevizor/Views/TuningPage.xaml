@@ -103,12 +103,13 @@
             <Grid x:Name="MainGrid">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
+                    <RowDefinition x:Name="MainGridFirstRow" Height="45*" />
+                    <RowDefinition x:Name="MainGridSecondRow" Height="3" />
+                    <RowDefinition x:Name="MainGridThirdRow" Height="55*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50*" />
-                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="3" />
                     <ColumnDefinition Width="50*" />
                 </Grid.ColumnDefinitions>
 
@@ -202,18 +203,17 @@
 
                 </StackLayout>
 
-                <BoxView x:Name="SplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BackgroundColor="White"/>
+                <BoxView x:Name="HorizontalSplitterBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="#262626"/>
+                <BoxView x:Name="VeticalSplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BackgroundColor="#262626"/>
 
                 <ListView x:Name="ChannelsListView"
-                        Grid.Row="1" Grid.Column="0"
+                        Grid.Row="2" Grid.Column="0"
                         Grid.ColumnSpan="3"
                         ItemsSource="{Binding TunedChannels}"
                         CachingStrategy="RecycleElement"
                         HasUnevenRows="True"
                         Style="{StaticResource ListViewStyle}"
-                        VerticalOptions="CenterAndExpand"
-                        SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
-                        Margin="10,10,10,0">
+                        SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
 
                     <ListView.ItemTemplate>
                             <DataTemplate>
@@ -249,6 +249,7 @@
                                 </ViewCell>
                             </DataTemplate>
                         </ListView.ItemTemplate>
+
                     </ListView>
 
             </Grid>
