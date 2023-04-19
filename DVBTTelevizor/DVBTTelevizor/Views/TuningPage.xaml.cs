@@ -22,6 +22,9 @@ namespace DVBTTelevizor
 
         private KeyboardFocusableItemList _focusItems;
 
+        private Size _lastAllocatedSize = new Size(-1, -1);
+        private bool _isPortrait = false;
+
         public TuningPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
@@ -51,6 +54,57 @@ namespace DVBTTelevizor
             //NavigationPage.SetHasBackButton(this, false);
 
             BuildFocusableItems();
+
+            ChannelsListView.ItemAppearing += ChannelsListView_ItemAppearing;
+        }
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
+
+            if (_lastAllocatedSize.Width == width &&
+                _lastAllocatedSize.Height == height)
+            {
+                // no size changed
+                return;
+            }
+
+            _lastAllocatedSize.Width = width;
+            _lastAllocatedSize.Height = height;
+
+            if (width > height)
+            {
+                _isPortrait = false;
+            }
+            else
+            {
+                _isPortrait = true;
+            }
+
+            RefreshGUI();
+        }
+
+        public void RefreshGUI()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (_isPortrait)
+                {
+                    TuningStackLayout.SetValue(Grid.ColumnSpanProperty, 3);
+                    SplitterBoxView.IsVisible = false;
+                    ChannelsListView.SetValue(Grid.ColumnSpanProperty, 3);
+                    ChannelsListView.SetValue(Grid.ColumnProperty, 0);
+                    ChannelsListView.SetValue(Grid.RowProperty, 1);
+                }
+                else
+                {
+                    TuningStackLayout.SetValue(Grid.ColumnSpanProperty, 1);
+                    SplitterBoxView.IsVisible = true;
+                    ChannelsListView.SetValue(Grid.RowProperty, 0);
+                    ChannelsListView.SetValue(Grid.ColumnProperty, 2);
+                    ChannelsListView.SetValue(Grid.ColumnSpanProperty, 1);
+                }
+            });
         }
 
         protected override bool OnBackButtonPressed()
@@ -117,25 +171,19 @@ namespace DVBTTelevizor
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
-
-            _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
         }
 
-        private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        private void ChannelsListView_ItemAppearing(object sender, ItemVisibilityEventArgs e)
         {
-            Device.BeginInvokeOnMainThread( () =>
+            Device.BeginInvokeOnMainThread(() =>
             {
-                // scroll to item
-                if (args.FocusedItem.Name == "FinishButton" || args.FocusedItem.Name == "AbortButton")
-                {
-                    ChannelsListView.ScrollTo(_viewModel.FirstTunedChannel, ScrollToPosition.End, false);
-                }
+                ChannelsListView.ScrollTo(e.Item, ScrollToPosition.MakeVisible, false);
             });
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-            ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+            ChannelsListView.ScrollTo(e.SelectedItem, ScrollToPosition.MakeVisible, false);
         }
 
         private void GoDown()

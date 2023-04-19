@@ -1027,7 +1027,7 @@ namespace DVBTTelevizor
 
                             Device.BeginInvokeOnMainThread(() =>
                             {
-                                TunedChannels.Insert(0,ch);
+                                TunedChannels.Add(ch);
                                 OnPropertyChanged(nameof(TunedChannelsCount));
                                 OnPropertyChanged(nameof(TunedMultiplexesCount));
                             });
