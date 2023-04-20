@@ -141,7 +141,6 @@ namespace DVBTTelevizor
             {
                 OnPropertyChanged(nameof(DriverConnectedIcon));
                 OnPropertyChanged(nameof(ToolbarItemTuneIcon));
-                OnPropertyChanged(nameof(ToolbarItemToolsIcon));
                 OnPropertyChanged(nameof(ToolbarItemMenuIcon));
                 OnPropertyChanged(nameof(ToolbarItemSettingsIcon));
             });
@@ -195,17 +194,6 @@ namespace DVBTTelevizor
                     return "MenuSelected.png";
 
                 return "Menu.png";
-            }
-        }
-
-        public string ToolbarItemToolsIcon
-        {
-            get
-            {
-                if (SelectedToolbarItemName == "ToolbarItemTools")
-                    return "ToolsSelected.png";
-
-                return "Tools.png";
             }
         }
 

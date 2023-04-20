@@ -107,32 +107,26 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="ShowServiceMenuBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ScanEPGBeforePlayBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Show service menu" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowServiceMenuSwitch"  IsToggled="{Binding Config.ShowServiceMenu, Mode=TwoWay}"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ScanEPGSwitch"  IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
 
-                        <BoxView x:Name="ScanEPGBeforePlayBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label  Grid.Row="1" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ScanEPGSwitch"  IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
-                        <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label  Grid.Row="2" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="2" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
-
-                        <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                        <Label  Grid.Row="3" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="3" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
 

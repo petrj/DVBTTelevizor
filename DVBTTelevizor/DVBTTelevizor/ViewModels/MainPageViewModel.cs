@@ -284,14 +284,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public bool ShowServiceMenuToolItem
-        {
-            get
-            {
-                return _config.ShowServiceMenu;
-            }
-        }
-
         private async Task ImportList(object json)
         {
             if (!(await _dialogService.Confirm("Are you sure to import channels list?")))

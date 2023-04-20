@@ -613,17 +613,10 @@ namespace DVBTTelevizor
         {
             get
             {
-                switch (State)
-                {
-                    case TuneState.TuningInProgress:
+                if (_actualTunningFreqKHz < 0)
+                    return string.Empty;
 
-                        if (_actualTunningFreqKHz < 0)
-                            return string.Empty;
-
-                        return Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0)).ToString();
-                    default:
-                        return string.Empty;
-                }
+                return Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0)).ToString();
             }
         }
 
@@ -649,19 +642,12 @@ namespace DVBTTelevizor
         {
             get
             {
-                switch (State)
-                {
-                    case TuneState.TuningInProgress:
+                if (_actualTunningFreqKHz < 0)
+                    return string.Empty;
 
-                        if (_actualTunningFreqKHz < 0)
-                            return string.Empty;
-
-                        var part = (_actualTunningFreqKHz / 1000.0) - Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0));
-                        var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
-                        return $".{part1000} MHz";
-                    default:
-                        return string.Empty;
-                }
+                var part = (_actualTunningFreqKHz / 1000.0) - Convert.ToInt64(Math.Floor(_actualTunningFreqKHz / 1000.0));
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000} MHz";
             }
         }
 
@@ -846,7 +832,7 @@ namespace DVBTTelevizor
             }
         }
 
-        private void UpdateTuningProperties()
+        public void UpdateTuningProperties()
         {
             OnPropertyChanged(nameof(TuningFinished));
             OnPropertyChanged(nameof(TuningInProgress));

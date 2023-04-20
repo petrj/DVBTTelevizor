@@ -75,7 +75,6 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("ExportToFile", new List<View>() { ExportToFileButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ImportChannels", new List<View>() { ImportChannelsButton }))
 
-                .AddItem(KeyboardFocusableItem.CreateFrom("ShowServiceMenuBoxView", new List<View>() { ShowServiceMenuBoxView, ShowServiceMenuSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ScanEPGBeforePlay", new List<View>() { ScanEPGBeforePlayBoxView, ScanEPGSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowFullScreen", new List<View>() { ShowFullScreenBoxView, FullscreenSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowPlayOnBackground", new List<View>() { ShowPlayOnBackgroundBoxView, PlayOnBackgroundSwitch }))
@@ -150,10 +149,6 @@ namespace DVBTTelevizor
 
                         case "ImportChannels":
                             _viewModel.ImportChannelsCommand.Execute(null);
-                            break;
-
-                        case "ShowServiceMenuBoxView":
-                            ShowServiceMenuSwitch.IsToggled = !ShowServiceMenuSwitch.IsToggled;
                             break;
 
                         case "ScanEPGBeforePlay":
