@@ -59,12 +59,12 @@ namespace DVBTTelevizor
         private Rectangle PortraitPreviewEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 1.0, 0.3);
 
         // CloseEPGImage
-        private Rectangle LandscapeCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.0, 0.1, 0.1);
-        private Rectangle LandscapePreviewCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.35, 0.1, 0.1);
-        private Rectangle PortraitCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.75, 0.1, 0.1);
-        private Rectangle PortraitPreviewCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.75, 0.1, 0.1);
-        private Rectangle LandscapePlayingCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.0, 0.1, 0.1);
-        private Rectangle PortraitPlayingCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.75, 0.1, 0.1);
+        private Rectangle LandscapeCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.0, 0.05, 0.05);
+        private Rectangle LandscapePreviewCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.32, 0.05, 0.05);
+        private Rectangle PortraitCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.725, 0.05, 0.05);
+        private Rectangle PortraitPreviewCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.725, 0.05, 0.05);
+        private Rectangle LandscapePlayingCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.0, 0.05, 0.05);
+        private Rectangle PortraitPlayingCloseEPGDetailImagePosition { get; set; } = new Rectangle(1.0, 0.725, 0.05, 0.05);
 
         // VideoStackLayout
         private Rectangle LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.3, 0.3);
@@ -86,11 +86,11 @@ namespace DVBTTelevizor
         private Rectangle PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rectangle(0.0, 0.0, 1.0, 0.7);
 
         // OSD
-        private Rectangle CloseVideoPosition { get; set; } = new Rectangle(1.0, 0.0, 0.1, 0.1);
-        private Rectangle MinimizeMaximizeVideoPosition { get; set; } = new Rectangle(0.9, 0.0, 0.1, 0.1);
+        private Rectangle CloseVideoPosition { get; set; } = new Rectangle(1.0, 0.0, 0.05, 0.05);
+        private Rectangle MinimizeMaximizeVideoPosition { get; set; } = new Rectangle(0.95, 0.0, 0.05, 0.05);
 
-        private Rectangle CloseVideoPositionLandscapeWhenEPGDetailVisible { get; set; } = new Rectangle(0.65, 0.0, 0.1, 0.1);
-        private Rectangle MinimizeMaximizeVideoPositionLandscapeWhenEPGDetailVisible { get; set; } = new Rectangle(0.55, 0.0, 0.1, 0.1);
+        private Rectangle CloseVideoPositionLandscapeWhenEPGDetailVisible { get; set; } = new Rectangle(0.68, 0.0, 0.05, 0.05);
+        private Rectangle MinimizeMaximizeVideoPositionLandscapeWhenEPGDetailVisible { get; set; } = new Rectangle(0.62, 0.0, 0.05, 0.05);
 
         public MainPage(ILoggingService loggingService, DVBTTelevizorConfiguration config, IDVBTDriverManager driverManager)
         {
