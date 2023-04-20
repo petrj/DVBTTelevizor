@@ -104,18 +104,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public bool ShowServiceMenu
-        {
-            get
-            {
-                return GetPersistingSettingValue<bool>("ShowServiceMenu");
-            }
-            set
-            {
-                SavePersistingSettingValue<bool>("ShowServiceMenu", value);
-            }
-        }
-
         public bool EnableLogging
         {
             get

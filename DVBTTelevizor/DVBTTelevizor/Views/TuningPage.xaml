@@ -138,8 +138,8 @@
                                 <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningFrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding ActualTuningFrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningFrequencyWholePartMHz}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding ActualTuningFrequencyDecimalPartMHzCaption}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
                         </Grid>
 
                         <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>

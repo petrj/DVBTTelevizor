@@ -27,7 +27,6 @@ namespace DVBTTelevizor
         private DialogService _dlgService;
         private ILoggingService _loggingService;
         private DVBTTelevizorConfiguration _config;
-        private ServicePage _servicePage;
         private ChannelPage _editChannelPage;
         private TuneOptionsPage _tuneOptionsPage;
         private SettingsPage _settingsPage;
@@ -108,7 +107,6 @@ namespace DVBTTelevizor
             _channelService = new ConfigChannelService(_loggingService, _config);
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
-            _servicePage = new ServicePage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
             _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config);
 
@@ -139,8 +137,6 @@ namespace DVBTTelevizor
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
             BackgroundCommandWorker.RunInBackground(HideOSDCommand, 1, 5);
 
-            _servicePage.Disappearing += anyPage_Disappearing;
-            _servicePage.Disappearing += anyPage_Disappearing;
             _tuneOptionsPage.Disappearing += anyPage_Disappearing;
             _settingsPage.Disappearing += anyPage_Disappearing;
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
@@ -313,20 +309,6 @@ namespace DVBTTelevizor
                 _viewModel.RefreshCommand.Execute(null);
             }
 
-            if (!_config.ShowServiceMenu && ToolbarItems.Contains(ToolServicePage))
-            {
-                ToolbarItems.Remove(ToolServicePage);
-            }
-
-            if (_config.ShowServiceMenu && !ToolbarItems.Contains(ToolServicePage))
-            {
-                // adding before settings
-                ToolbarItems.Remove(ToolSettingsPage);
-
-                ToolbarItems.Add(ToolServicePage);
-                ToolbarItems.Add(ToolSettingsPage);
-            }
-
             _viewModel.SelectedToolbarItemName = null;
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
             if (_viewModel.TunningButtonVisible)
@@ -354,8 +336,6 @@ namespace DVBTTelevizor
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_UpdateDriverState);
                 MessagingCenter.Unsubscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed);
-
-                _servicePage.Done();
             });
         }
 
@@ -900,9 +880,6 @@ namespace DVBTTelevizor
                 case "ToolbarItemMenu":
                     ToolMenu_Clicked(this, null);
                     return;
-                case "ToolbarItemTools":
-                    ToolServicePage_Clicked(this, null);
-                    return;
             }
         }
 
@@ -921,11 +898,6 @@ namespace DVBTTelevizor
             }
             else
             if (_viewModel.SelectedToolbarItemName == "ToolbarItemMenu")
-            {
-                _viewModel.SelectedToolbarItemName = "ToolbarItemTools";
-            }
-            else
-            if (_viewModel.SelectedToolbarItemName == "ToolbarItemTools")
             {
                 _viewModel.SelectedToolbarItemName = "ToolbarItemTune";
             }
@@ -959,11 +931,6 @@ namespace DVBTTelevizor
             }
             else
             if (_viewModel.SelectedToolbarItemName == "ToolbarItemTune")
-            {
-                _viewModel.SelectedToolbarItemName = "ToolbarItemTools";
-            }
-            else
-            if (_viewModel.SelectedToolbarItemName == "ToolbarItemTools")
             {
                 _viewModel.SelectedToolbarItemName = "ToolbarItemMenu";
             }
@@ -1054,11 +1021,6 @@ namespace DVBTTelevizor
                     MessagingCenter.Send("", BaseViewModel.MSG_Init);
                 }
             }
-        }
-
-        private void ToolServicePage_Clicked(object sender, EventArgs e)
-        {
-            Navigation.PushAsync(_servicePage);
         }
 
         private void ToolSettingsPage_Clicked(object sender, EventArgs e)
