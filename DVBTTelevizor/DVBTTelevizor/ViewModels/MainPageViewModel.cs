@@ -428,6 +428,12 @@ namespace DVBTTelevizor
 
                     actions.Add("Record");
                     actions.Add("Detail & edit");
+
+                    if (!EPGDetailEnabled &&
+                        ch.CurrentEventItem != null)
+                    {
+                        actions.Add("Show channel description");
+                    }
                 }
                 else
                 {
@@ -447,6 +453,9 @@ namespace DVBTTelevizor
             {
                 case "Play":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
+                    break;
+                case "Show channel description":
+                    EPGDetailEnabled = true;
                     break;
                 case "Stop":
                     MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
