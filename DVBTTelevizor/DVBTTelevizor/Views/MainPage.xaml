@@ -241,7 +241,7 @@
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
 
                 <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
                 <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
@@ -288,21 +288,27 @@
                 </StackLayout.GestureRecognizers>
             </StackLayout>
 
-            <Image x:Name="CloseVideoImage" Source="Quit.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Image x:Name="CloseVideoImage" Source="Close.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" HorizontalOptions="End">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnCloseVideoTapped" NumberOfTapsRequired="1" />
                 </Image.GestureRecognizers>
             </Image>
 
-            <Image x:Name="MinimizeVideoImage" Source="Minimize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.9,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Image x:Name="MinimizeVideoImage" Source="Minimize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.9,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="5,0,5,0" HorizontalOptions="End">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMinimizeVideoTapped" NumberOfTapsRequired="1" />
                 </Image.GestureRecognizers>
             </Image>
 
-            <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" HorizontalOptions="End">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMaximizeVideoTapped" NumberOfTapsRequired="1" />
+                </Image.GestureRecognizers>
+            </Image>
+
+            <Image x:Name="CloseEPGDetailImage" Source="Close.png"  IsVisible="{Binding EPGDetailVisible}" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="0,0,0,0" HorizontalOptions="End">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseEPGDetailTapped" NumberOfTapsRequired="1" />
                 </Image.GestureRecognizers>
             </Image>
 

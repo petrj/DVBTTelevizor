@@ -387,8 +387,8 @@ namespace DVBTTelevizor
 
             _loggingService.Info($"Long press on channel {ch.Name})");
 
+            DoNotScrollToChannel = true;
             SelectedChannel = ch;
-            await ShowChannelMenu(ch);
         }
 
         public async Task ShowChannelMenu(DVBTChannel ch = null)
