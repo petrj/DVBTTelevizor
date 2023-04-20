@@ -13,7 +13,6 @@ namespace DVBTTelevizor
         private FrequencyViewModel _viewModel;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
-        public bool Confirmed { get; set; } = false;
 
         private KeyboardFocusableItemList _focusItems;
 
@@ -67,8 +66,7 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("FrequencyKHz", new List<View>() { FrequencyKHzBoxView, EntryFrequencyKHz }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("FrequencyMHz", new List<View>() { FrequencyMHzBoxView, EntryFrequencyMHz }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("SliderFrequency", new List<View>() { SliderFrequencyBoxView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("OKButton", new List<View>() { OKButton }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }));
 
             SliderFrequency.DragCompleted += SliderFrequency_DragCompleted;
 
@@ -116,12 +114,6 @@ namespace DVBTTelevizor
 
             _viewModel.NotifyFontSizeChange();
             _focusItems.DeFocusAll();
-        }
-
-        private void OKButton_Clicked(object sender, EventArgs e)
-        {
-            Confirmed = true;
-            Navigation.PopAsync();
         }
 
         public async void OnKeyDown(string key, bool longPress)
@@ -181,11 +173,6 @@ namespace DVBTTelevizor
 
                         case "DefaultButton":
                             _viewModel.SetDefaultFrequencyCommand.Execute(null);
-                            break;
-
-                        case "OKButton":
-                            Confirmed = true;
-                            await Navigation.PopAsync();
                             break;
                     }
                     break;

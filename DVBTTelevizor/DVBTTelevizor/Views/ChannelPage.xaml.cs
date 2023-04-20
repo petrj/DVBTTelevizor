@@ -18,7 +18,6 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         private KeyboardFocusableItemList _focusItems;
-        public bool Confirmed { get; set; } = false;
 
         public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
         {
@@ -43,16 +42,9 @@ namespace DVBTTelevizor
 
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryName }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryNumber }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("OKButton", new List<View>() { OKButton }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryNumber }));
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
-        }
-
-        private void OKButton_Clicked(object sender, EventArgs e)
-        {
-            Confirmed = true;
-            Navigation.PopAsync();
         }
 
         private void ChannelPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
@@ -111,11 +103,6 @@ namespace DVBTTelevizor
                             case "Name":
                                 EntryName.Focus();
                                 break;
-
-                        case "OKButton":
-                            Confirmed = true;
-                            await Navigation.PopAsync();
-                            break;
                     }
                     break;
             }

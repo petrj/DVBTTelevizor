@@ -17,7 +17,6 @@ namespace DVBTTelevizor
         private BandWidthPageViewModel _viewModel;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
-        public bool Confirmed { get; set; } = false;
 
         private KeyboardFocusableItemList _focusItems;
 
@@ -47,8 +46,7 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthKHz", new List<View>() { BandWidthKHzBoxView, EntryBandWidthKHz }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthMHz", new List<View>() { BandWidthMHzBoxView, EntryBandWidthMHz }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("BandWidthCustom", new List<View>() { BandWidthCustomBoxView, BandWidthPicker }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("OKButton", new List<View>() { OKButton }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }));
 
             EntryBandWidthKHz.Unfocused += EntryBandWidthKHz_Unfocused;
             EntryBandWidthMHz.Unfocused += EntryBandWidthMHz_Unfocused;
@@ -91,12 +89,6 @@ namespace DVBTTelevizor
             _focusItems.DeFocusAll();
         }
 
-        private void OKButton_Clicked(object sender, EventArgs e)
-        {
-            Confirmed = true;
-            Navigation.PopAsync();
-        }
-
         public async void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"FrequencyPage OnKeyDown {key}");
@@ -135,11 +127,6 @@ namespace DVBTTelevizor
 
                         case "DefaultButton":
                             _viewModel.SetDefaultBandWidthCommand.Execute(null);
-                            break;
-
-                        case "OKButton":
-                            Confirmed = true;
-                            await Navigation.PopAsync();
                             break;
                     }
                     break;

@@ -107,10 +107,7 @@ namespace DVBTTelevizor
 
             freqPage.Disappearing += delegate
             {
-                if (freqPage.Confirmed)
-                {
-                    _viewModel.FrequencyKHz = freqPage.FrequencyKHz;
-                }
+                _viewModel.FrequencyKHz = freqPage.FrequencyKHz;
             };
         }
 
@@ -123,10 +120,7 @@ namespace DVBTTelevizor
 
             bandWidthPage.Disappearing += delegate
             {
-                if (bandWidthPage.Confirmed)
-                {
-                    _viewModel.TuneBandWidthKHz = bandWidthPage.BandWidth;
-                }
+                _viewModel.TuneBandWidthKHz = bandWidthPage.BandWidth;
             };
         }
 
@@ -145,10 +139,7 @@ namespace DVBTTelevizor
 
             freqPage.Disappearing += delegate
             {
-                if (freqPage.Confirmed)
-                {
-                    _viewModel.FrequencyFromKHz = freqPage.FrequencyKHz;
-                }
+                _viewModel.FrequencyFromKHz = freqPage.FrequencyKHz;
             };
         }
 
@@ -167,10 +158,7 @@ namespace DVBTTelevizor
 
             freqPage.Disappearing += delegate
             {
-                if (freqPage.Confirmed)
-                {
-                    _viewModel.FrequencyToKHz = freqPage.FrequencyKHz;
-                }
+                _viewModel.FrequencyToKHz = freqPage.FrequencyKHz;
             };
         }
 

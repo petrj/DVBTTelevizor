@@ -275,19 +275,13 @@ namespace DVBTTelevizor
         {
             Task.Run(async () =>
             {
-                if (_editChannelPage.Confirmed)
-                {
-                    _viewModel.SelectedChannel.Name = _editChannelPage.Channel.Name;
-                    _viewModel.SelectedChannel.Number = _editChannelPage.Channel.Number;
+                await _channelService.SaveChannels(_viewModel.Channels);
 
-                    await _channelService.SaveChannels(_viewModel.Channels);
-
-                    Device.BeginInvokeOnMainThread(
-                        delegate
-                        {
-                            _viewModel.RefreshCommand.Execute(null);
-                        });
-                }
+                Device.BeginInvokeOnMainThread(
+                    delegate
+                    {
+                        _viewModel.RefreshCommand.Execute(null);
+                    });
             });
         }
 
@@ -977,7 +971,7 @@ namespace DVBTTelevizor
             var ch = _viewModel.SelectedChannel;
             if (ch != null)
             {
-                _editChannelPage.Channel = ch.Clone();
+                _editChannelPage.Channel = ch;
                 Navigation.PushAsync(_editChannelPage);
             }
         }
