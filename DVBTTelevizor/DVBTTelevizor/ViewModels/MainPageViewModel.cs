@@ -11,6 +11,8 @@ using System.Threading;
 using Newtonsoft.Json;
 using System.Linq;
 using MPEGTS;
+using LibVLCSharp.Shared;
+using static Android.Provider.MediaStore;
 
 namespace DVBTTelevizor
 {
@@ -49,6 +51,9 @@ namespace DVBTTelevizor
         private bool? _EPGDetailVisibleLastValue = null;
 
         private int _refreshCounter = 0;
+
+        public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
 
         public enum SelectedPartEnum
         {
@@ -410,6 +415,15 @@ namespace DVBTTelevizor
                     if (PlayingChannel != null)
                     {
                         actions.Add("Stop");
+
+                        if (PlayingChannelSubtitles.Count>0)
+                        {
+                            actions.Add("Subtitles...");
+                        }
+                        if (PlayingChannelAudioTracks.Count > 0)
+                        {
+                            actions.Add("Audio track...");
+                        }
                     }
                     else
                     {
@@ -461,7 +475,13 @@ namespace DVBTTelevizor
                 case "Stop":
                     MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                     break;
-                case "Scan EPG":
+                case "Subtitles...":
+                    await ShowSubtitlesMenu(ch);
+                    break;
+                case "Audio track...":
+                    await ShowAudioTrackMenu(ch);
+                    break;
+                    case "Scan EPG":
                     await ScanEPG(ch);
                     break;
                 case "Detail & edit":
@@ -486,6 +506,50 @@ namespace DVBTTelevizor
                         MessagingCenter.Send(String.Empty, BaseViewModel.MSG_QuitApp);
                     }
                     break;
+            }
+        }
+
+        public async Task ShowAudioTrackMenu(DVBTChannel ch)
+        {
+            var actions = new List<string>();
+
+            foreach (var kvp in PlayingChannelAudioTracks)
+            {
+                actions.Add(kvp.Value);
+            }
+
+            var action = await _dialogService.DisplayActionSheet("Audio track", "Cancel", actions);
+
+            foreach (var kvp in PlayingChannelAudioTracks)
+            {
+                if (action == kvp.Value)
+                {
+                    MessagingCenter.Send($"Audio track: {kvp.Value}", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send(kvp.Key.ToString(), BaseViewModel.MSG_ChangeAudioTrackId);
+                    break;
+                }
+            }
+        }
+
+        public async Task ShowSubtitlesMenu(DVBTChannel ch)
+        {
+            var actions = new List<string>();
+
+            foreach (var kvp in PlayingChannelSubtitles)
+            {
+                actions.Add(kvp.Value);
+            }
+
+            var action = await _dialogService.DisplayActionSheet("Subtitles", "Cancel", actions);
+
+            foreach (var kvp in PlayingChannelSubtitles)
+            {
+                if (action == kvp.Value)
+                {
+                    MessagingCenter.Send($"Subtitles: {kvp.Value}", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send(kvp.Key.ToString(), BaseViewModel.MSG_ChangeSubtitleId);
+                    break;
+                }
             }
         }
 

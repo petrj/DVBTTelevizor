@@ -215,6 +215,34 @@ namespace DVBTTelevizor
                 RefreshGUI();
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeSubtitleId, (spuId) =>
+            {
+                int id;
+                if (!int.TryParse(spuId, out id) || (!_viewModel.PlayingChannelSubtitles.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
+                {
+                    return;
+                }
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    videoView.MediaPlayer.SetSpu(id);
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAudioTrackId, (trackId) =>
+            {
+                int id;
+                if (!int.TryParse(trackId, out id) || (!_viewModel.PlayingChannelAudioTracks.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
+                {
+                    return;
+                }
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    videoView.MediaPlayer.SetAudioTrack(id);
+                });
+            });
+
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
             _tuneFocusItem.Focus();
 
@@ -1455,6 +1483,8 @@ namespace DVBTTelevizor
             }
 
             _viewModel.PlayingChannel = channel;
+            _viewModel.PlayingChannelSubtitles.Clear();
+            _viewModel.PlayingChannelAudioTracks.Clear();
             PlayingState = PlayingStateEnum.Playing;
             _viewModel.EPGDetailEnabled = false;
         }
@@ -1498,6 +1528,8 @@ namespace DVBTTelevizor
                 }
 
                 PlayingState = PlayingStateEnum.Stopped;
+                _viewModel.PlayingChannelSubtitles.Clear();
+                _viewModel.PlayingChannelAudioTracks.Clear();
                 _viewModel.PlayingChannel = null;
 
                 MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
@@ -1513,11 +1545,14 @@ namespace DVBTTelevizor
 
             Device.BeginInvokeOnMainThread(() =>
             {
+                // checking stopped stream
+
                 if (!videoView.MediaPlayer.IsPlaying)
                 {
                     videoView.MediaPlayer.Play(_media);
                 }
 
+                // checking no video
                 if (videoView.MediaPlayer.VideoTrackCount <= 0)
                 {
                     NoVideoStackLayout.IsVisible = true;
@@ -1529,6 +1564,27 @@ namespace DVBTTelevizor
 
                     NoVideoStackLayout.IsVisible = false;
                     VideoStackLayout.IsVisible = true;
+                }
+
+                // setting subtitles
+                foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                {
+                    if (!_viewModel.PlayingChannelSubtitles.ContainsKey(desc.Id))
+                    {
+                        _loggingService.Debug($"Adding subtitle {desc.Name}");
+                        _viewModel.PlayingChannelSubtitles.Add(desc.Id, desc.Name);
+                        //videoView.MediaPlayer.SetSpu(desc.Id);
+                    }
+                }
+
+                // setting audio
+                foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
+                {
+                    if (!_viewModel.PlayingChannelAudioTracks.ContainsKey(desc.Id))
+                    {
+                        _loggingService.Debug($"Adding audio track {desc.Name}");
+                        _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
+                    }
                 }
             });
         }

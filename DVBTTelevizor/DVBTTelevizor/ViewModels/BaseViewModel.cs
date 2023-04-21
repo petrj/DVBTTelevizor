@@ -46,6 +46,8 @@ namespace DVBTTelevizor
         public const string MSG_UpdateTuneOptionsPageFocus = "UpdateTuneOptionsPageFocus";
         public const string MSG_UpdateTuningPageFocus = "MSG_UpdateTuningPageFocus";
         public const string MSG_EPGDetailVisibilityChange = "EPGDetailVisibilityChange";
+        public const string MSG_ChangeSubtitleId = "ChangeSubtitleId";
+        public const string MSG_ChangeAudioTrackId = "ChangeAudioTrackId";
 
         public const string MSG_CloseTuningPage = "CloseTuningPage";
         public const string MSG_QuitApp = "QuitApp";
