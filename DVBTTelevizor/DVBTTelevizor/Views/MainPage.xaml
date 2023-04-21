@@ -261,6 +261,11 @@
                     <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" />
                 </ScrollView>
 
+                <Grid.GestureRecognizers >
+                    <SwipeGestureRecognizer Direction="Right" Swiped="EPDDetail_SwipedRight"/>
+                    <SwipeGestureRecognizer Direction="Down" Swiped="EPDDetail_SwipedDown"/>
+                </Grid.GestureRecognizers>
+
             </Grid>
 
             <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
@@ -303,12 +308,6 @@
             <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" HorizontalOptions="End">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnMaximizeVideoTapped" NumberOfTapsRequired="1" />
-                </Image.GestureRecognizers>
-            </Image>
-
-            <Image x:Name="CloseEPGDetailImage" Source="Close.png"  IsVisible="{Binding EPGDetailVisible}" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="0,0,0,0" HorizontalOptions="End">
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnCloseEPGDetailTapped" NumberOfTapsRequired="1" />
                 </Image.GestureRecognizers>
             </Image>
 

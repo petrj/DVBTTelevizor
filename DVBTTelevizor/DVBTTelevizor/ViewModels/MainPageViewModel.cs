@@ -421,10 +421,16 @@ namespace DVBTTelevizor
                     actions.Add("Record");
                     actions.Add("Detail & edit");
 
-                    if (!EPGDetailEnabled &&
-                        ch.CurrentEventItem != null)
+
+                    if (ch.CurrentEventItem != null)
                     {
-                        actions.Add("Show channel description");
+                        if (!EPGDetailEnabled)
+                        {
+                            actions.Add("Show channel description");
+                        } else
+                        {
+                            actions.Add("Close channel description");
+                        }
                     }
                 }
                 else
@@ -448,6 +454,9 @@ namespace DVBTTelevizor
                     break;
                 case "Show channel description":
                     EPGDetailEnabled = true;
+                    break;
+                case "Close channel description":
+                    EPGDetailEnabled = false;
                     break;
                 case "Stop":
                     MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
