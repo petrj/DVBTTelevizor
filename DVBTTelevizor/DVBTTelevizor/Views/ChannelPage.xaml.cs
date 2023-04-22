@@ -41,8 +41,8 @@ namespace DVBTTelevizor
             _focusItems = new KeyboardFocusableItemList();
 
             _focusItems
-                .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryName }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryNumber }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryNumber}))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryName }));
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
         }

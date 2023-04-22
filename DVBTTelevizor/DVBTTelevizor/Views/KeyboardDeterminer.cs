@@ -13,7 +13,8 @@ namespace DVBTTelevizor
         Right = 4,
         Down = 8,
         Left = 16,
-        Back = 32
+        Back = 32,
+        Special = 64
     }
 
     public static class KeyboardDeterminer
@@ -38,7 +39,68 @@ namespace DVBTTelevizor
             if (OK(key))
                 return KeyboardNavigationActionEnum.OK;
 
+            if (Special(key))
+                return KeyboardNavigationActionEnum.Special;
+
             return KeyboardNavigationActionEnum.Unknown;
+        }
+
+        public static bool Special(string key)
+        {
+            switch (key.ToLower())
+            {
+                case "0":
+                case "num0":
+                case "number0":
+                case "1":
+                case "num1":
+                case "number1":
+                case "2":
+                case "num2":
+                case "number2":
+                case "3":
+                case "num3":
+                case "number3":
+                case "4":
+                case "num4":
+                case "number4":
+                case "5":
+                case "num5":
+                case "number5":
+                case "6":
+                case "num6":
+                case "number6":
+                case "7":
+                case "num7":
+                case "number7":
+                case "8":
+                case "num8":
+                case "number8":
+                case "9":
+                case "num9":
+                case "number9":
+                case "f5":
+                case "numpad0":
+                case "ctrlleft":
+                case "buttonl2":
+                case "info":
+                case "guide":
+                case "i":
+                case "g":
+                case "numpadadd":
+                case "buttonthumbl":
+                case "tab":
+                case "f1":
+                case "f6":
+                case "f7":
+                case "f8":
+                case "focus":
+                case "camera":
+                case "menu":
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         public static bool Down(string key)

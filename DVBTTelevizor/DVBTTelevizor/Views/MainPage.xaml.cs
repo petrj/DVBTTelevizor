@@ -36,6 +36,7 @@ namespace DVBTTelevizor
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
         private bool _firstStartup = true;
+        private bool _firstSelectionAfterStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
         private int _lastUsedAudioTrack = -1;
@@ -124,7 +125,9 @@ namespace DVBTTelevizor
             _tuneOptionsPage.Disappearing += anyPage_Disappearing;
             _settingsPage.Disappearing += anyPage_Disappearing;
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
+
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
+            ChannelsListView.Scrolled += ChannelsListView_Scrolled;
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
             {
@@ -496,6 +499,7 @@ namespace DVBTTelevizor
                 case "f8":
                 case "focus":
                 case "camera":
+                case "menu":
                     await Detail_Clicked(this, null);
                     break;
             }
@@ -549,7 +553,7 @@ namespace DVBTTelevizor
 
             try
             {
-                if (_viewModel.TunningButtonVisible)
+                if (_viewModel.TunningButtonVisible && (_viewModel.SelectedPart  != SelectedPartEnum.ToolBar))
                 {
                     ToolTune_Clicked(this, null);
                 }
@@ -803,8 +807,17 @@ namespace DVBTTelevizor
 
             if (PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview)
             {
-                await ActionStop(longPress);
-                _lastBackPressedTime = DateTime.MinValue;
+                if (_viewModel.EPGDetailEnabled)
+                {
+                    _viewModel.EPGDetailEnabled = false;
+                }
+                else
+                {
+
+                    await ActionStop(longPress);
+                    _lastBackPressedTime = DateTime.MinValue;
+                }
+
                 return;
             }
 
@@ -1056,6 +1069,24 @@ namespace DVBTTelevizor
         private async void ToolMenu_Clicked(object sender, EventArgs e)
         {
             await _viewModel.ShowChannelMenu();
+        }
+
+        private void ChannelsListView_Scrolled(object sender, ScrolledEventArgs e)
+        {
+            _loggingService.Debug($"ChannelsListView_Scrolled");
+
+            // workaround for de-highlighting selected item after scroll on startup
+            if (_firstSelectionAfterStartup)
+            {
+                _loggingService.Info($"ChannelsListView_Scrolled - highlighting channel");
+
+                _viewModel.DoNotScrollToChannel = true;
+                var ch = _viewModel.SelectedChannel;
+                _viewModel.SelectedChannel = null;
+                _viewModel.SelectedChannel = ch;
+                _firstSelectionAfterStartup = false;
+            }
+
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -1393,16 +1424,21 @@ namespace DVBTTelevizor
 
             int? signalStrengthPercentage = null;
 
-            if (_viewModel.RecordingChannel != null)
+            if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel.Number != channel.Number))
             {
-                if (_viewModel.RecordingChannel.Number != channel.Number)
-                {
-                    MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
-                    return;
-                }
-
+                MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                return;
             }
-            else
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if ((PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview) && (_viewModel.PlayingChannel != channel))
+                {
+                    videoView.MediaPlayer.Stop();
+                }
+            });
+
+            if ((PlayingState == PlayingStateEnum.Stopped) || (_viewModel.PlayingChannel != channel))
             {
                 var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
                 if (!playRes.OK)
@@ -1413,14 +1449,6 @@ namespace DVBTTelevizor
 
                 signalStrengthPercentage = playRes.SignalStrengthPercentage;
             }
-
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                if (PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview)
-                {
-                    videoView.MediaPlayer.Stop();
-                }
-            });
 
             Device.BeginInvokeOnMainThread(() =>
             {
@@ -1447,7 +1475,7 @@ namespace DVBTTelevizor
                         _media.AddOption(":sout-keep");
                     }
 
-                    if (shouldPlay)
+                    if (shouldPlay && (_viewModel.PlayingChannel != channel))
                     {
                         videoView.MediaPlayer.Play(_media);
                         _lastUsedAudioTrack = videoView.MediaPlayer.AudioTrack;

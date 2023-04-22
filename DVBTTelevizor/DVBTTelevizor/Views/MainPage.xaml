@@ -257,8 +257,8 @@
                     <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
                 </Grid>
 
-                <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="StartAndExpand" VerticalOptions="Start"  Margin="5,5,5,5">
-                    <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" />
+                <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Margin="5,5,5,5">
+                    <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"/>
                 </ScrollView>
 
                 <Grid.GestureRecognizers >

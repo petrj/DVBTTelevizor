@@ -429,7 +429,6 @@ namespace DVBTTelevizor.Droid
         {
             try
             {
-
                 if (e.Action == KeyEventActions.Up)
                 {
                     return true;

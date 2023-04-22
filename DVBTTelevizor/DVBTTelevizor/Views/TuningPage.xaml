@@ -100,7 +100,7 @@
 
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
-            <Grid x:Name="MainGrid">
+            <Grid x:Name="MainGrid" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
                 <Grid.RowDefinitions>
                     <RowDefinition x:Name="MainGridFirstRow" Height="45*" />
@@ -208,7 +208,7 @@
                 </StackLayout>
 
                 <BoxView x:Name="HorizontalSplitterBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="#262626"/>
-                <BoxView x:Name="VeticalSplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BackgroundColor="#262626"/>
+                <BoxView x:Name="VeticalSplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" BackgroundColor="#262626"/>
 
                 <ListView x:Name="ChannelsListView"
                         Grid.Row="2" Grid.Column="0"
