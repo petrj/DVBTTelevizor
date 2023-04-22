@@ -62,6 +62,9 @@ namespace DVBTTelevizor
         private Rectangle PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rectangle(0.0, 0.0, 1.0, 0.7);
         private Rectangle PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.3);
 
+        // VideoStackLayout must be visible when initializing VLC window!
+        private Rectangle NoVideoStackLayoutPosition { get; set; } = new Rectangle(0, 0, 0.001, 0.001);
+
         // RecordingLabel
         private Rectangle LandscapeRecordingLabelPosition { get; set; } = new Rectangle(1.0, 1.0, 0.1, 0.1);
         private Rectangle LandscapePreviewRecordingLabelPosition { get; set; } = new Rectangle(1.0, 0.25, 0.1, 0.1);
@@ -1334,7 +1337,7 @@ namespace DVBTTelevizor
                             MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
                         }
 
-                        VideoStackLayout.IsVisible = false;
+                        //VideoStackLayout.IsVisible = false;
                         NoVideoStackLayout.IsVisible = false;
 
                         if (IsPortrait)
@@ -1361,6 +1364,9 @@ namespace DVBTTelevizor
                                 AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
                             }
                         }
+
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+
 
                         break;
                 }
@@ -1556,7 +1562,8 @@ namespace DVBTTelevizor
                 if (videoView.MediaPlayer.VideoTrackCount <= 0)
                 {
                     NoVideoStackLayout.IsVisible = true;
-                    VideoStackLayout.IsVisible = false;
+                    //VideoStackLayout.IsVisible = false;
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
                 }
                 else
                 {
