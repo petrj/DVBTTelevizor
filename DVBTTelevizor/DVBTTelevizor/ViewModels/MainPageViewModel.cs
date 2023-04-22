@@ -54,6 +54,7 @@ namespace DVBTTelevizor
 
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
+        public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
 
         public enum SelectedPartEnum
         {
@@ -424,6 +425,10 @@ namespace DVBTTelevizor
                         {
                             actions.Add("Audio track...");
                         }
+                        if (PlayingChannelAspect.Width != -1)
+                        {
+                            actions.Add("Aspect ratio...");
+                        }
                     }
                     else
                     {
@@ -481,7 +486,10 @@ namespace DVBTTelevizor
                 case "Audio track...":
                     await ShowAudioTrackMenu(ch);
                     break;
-                    case "Scan EPG":
+                case "Aspect ratio...":
+                    await ShowAspectMenu(ch);
+                    break;
+                case "Scan EPG":
                     await ScanEPG(ch);
                     break;
                 case "Detail & edit":
@@ -506,6 +514,24 @@ namespace DVBTTelevizor
                         MessagingCenter.Send(String.Empty, BaseViewModel.MSG_QuitApp);
                     }
                     break;
+            }
+        }
+
+        public async Task ShowAspectMenu(DVBTChannel ch)
+        {
+            var actions = new List<string>();
+
+            actions.Add("16:9");
+            actions.Add("4:3");
+            actions.Add("Original");
+            actions.Add("Fill");
+
+            var action = await _dialogService.DisplayActionSheet("Aspect ratio", "Cancel", actions);
+
+            if (action != "Cancel")
+            {
+                MessagingCenter.Send(action, BaseViewModel.MSG_ChangeAspect);
+                MessagingCenter.Send($"Aspect ratio: {action}", BaseViewModel.MSG_ToastMessage);
             }
         }
 

@@ -15,6 +15,8 @@ using LoggerService;
 using LibVLCSharp.Shared;
 using static DVBTTelevizor.MainPageViewModel;
 using Xamarin.Essentials;
+using System.Security.Cryptography;
+
 
 namespace DVBTTelevizor
 {
@@ -249,6 +251,11 @@ namespace DVBTTelevizor
                 });
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAspect, (aspect) =>
+            {
+                SetAspect(aspect);
+            });
+
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
             _tuneFocusItem.Focus();
 
@@ -267,6 +274,36 @@ namespace DVBTTelevizor
 
                 RefreshGUI();
             }
+        }
+
+        public void SetAspect(string aspect)
+        {
+            if (PlayingState == PlayingStateEnum.Stopped || _viewModel.PlayingChannelAspect.Width == -1)
+            {
+                return;
+            }
+
+            int width = Convert.ToInt32(_viewModel.PlayingChannelAspect.Width);
+            int height = Convert.ToInt32(_viewModel.PlayingChannelAspect.Height);
+
+            switch (aspect)
+            {
+                case "16:9":
+                    width = Convert.ToInt32(16.0 /9.0* _viewModel.PlayingChannelAspect.Height);
+                    break;
+                case "4:3":
+                    width = Convert.ToInt32(4.0 / 3.0 * _viewModel.PlayingChannelAspect.Height);
+                    break;
+                case "Fill":
+                    width = Convert.ToInt32(_lastAllocatedSize.Width);
+                    height = Convert.ToInt32(_lastAllocatedSize.Height);
+                    break;
+            }
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                videoView.MediaPlayer.AspectRatio = $"{width}:{height}";
+            });
         }
 
         public void ResumePlayback()
@@ -1519,6 +1556,7 @@ namespace DVBTTelevizor
             _viewModel.PlayingChannel = channel;
             _viewModel.PlayingChannelSubtitles.Clear();
             _viewModel.PlayingChannelAudioTracks.Clear();
+            _viewModel.PlayingChannelAspect = new Size(-1, -1);
             PlayingState = PlayingStateEnum.Playing;
             _viewModel.EPGDetailEnabled = false;
         }
@@ -1564,6 +1602,7 @@ namespace DVBTTelevizor
                 PlayingState = PlayingStateEnum.Stopped;
                 _viewModel.PlayingChannelSubtitles.Clear();
                 _viewModel.PlayingChannelAudioTracks.Clear();
+                _viewModel.PlayingChannelAspect = new Size(-1, -1);
                 _viewModel.PlayingChannel = null;
 
                 MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
@@ -1619,6 +1658,17 @@ namespace DVBTTelevizor
                     {
                         _loggingService.Debug($"Adding audio track {desc.Name}");
                         _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
+                    }
+                }
+
+                if (_viewModel.PlayingChannelAspect.Width == -1)
+                {
+                    // setting aspect ratio
+                    var videoTrack = GetVideoTrack();
+                    if (videoTrack.HasValue)
+                    {
+                        _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
+                        _loggingService.Debug($"Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
                     }
                 }
             });
