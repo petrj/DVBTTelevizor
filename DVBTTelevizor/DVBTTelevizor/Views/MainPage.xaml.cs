@@ -97,7 +97,7 @@ namespace DVBTTelevizor
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
-            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config);
+            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, _channelService);
 
             Core.Initialize();
 
@@ -353,13 +353,6 @@ namespace DVBTTelevizor
         protected override void OnAppearing()
         {
             base.OnAppearing();
-
-            if (_firstStartup)
-            {
-                _firstStartup = false;
-
-                _viewModel.RefreshCommand.Execute(null);
-            }
 
             _viewModel.SelectedToolbarItemName = null;
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
@@ -1117,13 +1110,11 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info($"ChannelsListView_Scrolled - highlighting channel");
 
-                _viewModel.DoNotScrollToChannel = true;
                 var ch = _viewModel.SelectedChannel;
                 _viewModel.SelectedChannel = null;
                 _viewModel.SelectedChannel = ch;
                 _firstSelectionAfterStartup = false;
             }
-
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

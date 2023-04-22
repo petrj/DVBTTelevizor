@@ -19,8 +19,13 @@ namespace DVBTTelevizor
             {
                 _channel = value;
 
-                OnPropertyChanged(nameof(Channel));
+                NotifyChannelChange();
             }
+        }
+
+        public void NotifyChannelChange()
+        {
+            OnPropertyChanged(nameof(Channel));
         }
 
         public ChannelPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)

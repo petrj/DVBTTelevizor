@@ -74,11 +74,8 @@
                                    FontSize="{Binding FontSizeForEntry}" />
                         </Grid>
 
-                        <Grid RowSpacing="0" Margin="10,10,10,0">
+                        <Grid RowSpacing="10" Margin="10,30,10,0">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
@@ -96,20 +93,34 @@
                             <Label Grid.Row="1" Grid.Column="0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                             <Label Grid.Row="1" Grid.Column="2" Text="{Binding Channel.FrequencyLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                            <Label Grid.Row="2" Grid.Column="0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="2" Grid.Column="0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                            <Label Grid.Row="3" Grid.Column="0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="3" Grid.Column="2" Text="{Binding Channel.BandwdithLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="3" Grid.Column="0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="3" Grid.Column="2" Text="{Binding Channel.DVBTTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                            <Label Grid.Row="4" Grid.Column="0" Text="Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="4" Grid.Column="2" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        </Grid>
 
-                            <Label Grid.Row="5" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="5" Grid.Column="2" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Grid RowSpacing="10" Margin="10,30,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="34*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="64*" />
+                            </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="6" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="6" Grid.Column="2" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="0" Grid.Column="0" Text="Service type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding Channel.ServiceTypeLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="1" Grid.Column="2" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
                     </StackLayout>

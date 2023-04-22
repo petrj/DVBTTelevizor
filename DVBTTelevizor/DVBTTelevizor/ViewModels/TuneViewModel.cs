@@ -1034,7 +1034,7 @@ namespace DVBTTelevizor
                             _loggingService.Debug($"Found channel \"{sDescriptor.ServiceName}\"");
 
                             // automatically adding new tuned channel if does not exist
-                            if (!ConfigViewModel.ChannelExists(_savedChannels, ch.Frequency, ch.ProgramMapPID))
+                            if (!ConfigViewModel.ChannelExists(_savedChannels, ch.FrequencyAndMapPID))
                             {
                                 ch.Number = ConfigViewModel.GetNextChannelNumber(_savedChannels).ToString();
 

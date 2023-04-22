@@ -26,12 +26,11 @@ namespace DVBTTelevizor
             }
         }
 
-        public static bool ChannelExists(ObservableCollection<DVBTChannel> channels, long frequency, long ProgramMapPID)
+        public static bool ChannelExists(ObservableCollection<DVBTChannel> channels, string channelFrequencyAndMapPID)
         {
             foreach (var ch in channels)
             {
-                if (ch.Frequency == frequency &&
-                    ch.ProgramMapPID == ProgramMapPID)
+                if (ch.FrequencyAndMapPID == channelFrequencyAndMapPID)
                 {
                     return true;
                 }

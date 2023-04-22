@@ -221,7 +221,7 @@ namespace DVBTTelevizor
                 var count = 0;
                 foreach (var ch in importedChannels)
                 {
-                    if (!ConfigViewModel.ChannelExists(chs, ch.Frequency, ch.ProgramMapPID))
+                    if (!ConfigViewModel.ChannelExists(chs, ch.FrequencyAndMapPID))
                     {
                         count++;
                         ch.Number = ConfigViewModel.GetNextChannelNumber(chs).ToString();

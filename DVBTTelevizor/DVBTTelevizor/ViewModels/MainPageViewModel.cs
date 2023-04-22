@@ -81,6 +81,8 @@ namespace DVBTTelevizor
 
             BackgroundCommandWorker.RunInBackground(RefreshEPGCommand, 2, 10);
             BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
+
+            RefreshCommand.Execute(null);
         }
 
         public string RecordingLabel
@@ -308,7 +310,7 @@ namespace DVBTTelevizor
                 var count = 0;
                 foreach (var ch in importedChannels)
                 {
-                    if (!ConfigViewModel.ChannelExists(chs, ch.Frequency, ch.ProgramMapPID))
+                    if (!ConfigViewModel.ChannelExists(chs, ch.FrequencyAndMapPID))
                     {
                         count++;
                         ch.Number = ConfigViewModel.GetNextChannelNumber(chs).ToString();
@@ -438,17 +440,16 @@ namespace DVBTTelevizor
                     }
 
                     actions.Add("Record");
-                    actions.Add("Detail & edit");
-
+                    actions.Add("Detail...");
 
                     if (ch.CurrentEventItem != null)
                     {
                         if (!EPGDetailEnabled)
                         {
-                            actions.Add("Show channel description");
+                            actions.Add("Show programme description");
                         } else
                         {
-                            actions.Add("Close channel description");
+                            actions.Add("Hide programme description");
                         }
                     }
                 }
@@ -471,10 +472,10 @@ namespace DVBTTelevizor
                 case "Play":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
                     break;
-                case "Show channel description":
+                case "Show programme description":
                     EPGDetailEnabled = true;
                     break;
-                case "Close channel description":
+                case "Hide programme description":
                     EPGDetailEnabled = false;
                     break;
                 case "Stop":
@@ -492,7 +493,7 @@ namespace DVBTTelevizor
                 case "Scan EPG":
                     await ScanEPG(ch);
                     break;
-                case "Detail & edit":
+                case "Detail...":
                     MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
                     break;
                 case "Record":
@@ -673,7 +674,7 @@ namespace DVBTTelevizor
                             firstChannel = ch;
                         }
 
-                        if (ch.Frequency.ToString() + ch.ProgramMapPID.ToString() == frequencyAndMapPID)
+                        if (ch.FrequencyAndMapPID == frequencyAndMapPID)
                         {
                             selectChannel = ch;
                             break;
@@ -727,13 +728,17 @@ namespace DVBTTelevizor
                     OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                     OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                     OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+
+                    if (value != null)
+                    {
+                        _config.SelectedChannelFrequencyAndMapPID = _selectedChannel.FrequencyAndMapPID;
+                    }
+
                     NotifyEPGDetailVisibilityChange();
                 }
                 finally
                 {
                     _semaphoreSlim.Release();
-
-
                 };
             }
         }
@@ -833,21 +838,23 @@ namespace DVBTTelevizor
         {
             string selectedChanneFrequencyAndMapPID = null;
 
-            _refreshCounter++;
-
             try
             {
                 IsRefreshing = true;
 
-                await _semaphoreSlim.WaitAsync();
-
                 DoNotScrollToChannel = true;
+
+                await _semaphoreSlim.WaitAsync();
 
                 _loggingService.Info($"Refreshing channels");
 
+                if (_refreshCounter == 0)
+                {
+                    selectedChanneFrequencyAndMapPID = _config.SelectedChannelFrequencyAndMapPID;
+                }
                 if (SelectedChannel != null)
                 {
-                    selectedChanneFrequencyAndMapPID = SelectedChannel.Frequency.ToString() + SelectedChannel.ProgramMapPID.ToString();
+                    selectedChanneFrequencyAndMapPID = SelectedChannel.FrequencyAndMapPID;
                 }
 
                 Channels.Clear();
@@ -893,6 +900,7 @@ namespace DVBTTelevizor
             {
                 _semaphoreSlim.Release();
 
+                _refreshCounter++;
                 IsRefreshing = false;
 
                 OnPropertyChanged(nameof(Channels));
@@ -903,11 +911,12 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+
                 NotifyEPGDetailVisibilityChange();
 
-                await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
-
                 DoNotScrollToChannel = false;
+
+                await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
             }
         }
 

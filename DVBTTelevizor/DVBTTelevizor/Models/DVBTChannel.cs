@@ -41,7 +41,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Bandwdith / 1000000 + " Mhz";
+                return (Bandwdith / 1000000).ToString("N3") + " MHz";
             }
         }
 
@@ -49,7 +49,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return (Frequency / 1000000).ToString("N1") + " MHz";
+                return (Frequency / 1000000).ToString("N3") + " MHz";
             }
         }
 
@@ -81,7 +81,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return $"PIDs: {ProgramMapPID.ToString()},{PIDs}";
+                return $"PIDs: {ProgramMapPID.ToString()}, {PIDs}";
             }
         }
 
@@ -107,14 +107,6 @@ namespace DVBTTelevizor
                     default:
                         return $"{res}";
                 }
-            }
-        }
-
-        public string DVBTChannelNubmer
-        {
-            get
-            {
-                return (((Frequency / 1000000) - 306) / 8).ToString();
             }
         }
 
@@ -305,6 +297,14 @@ namespace DVBTTelevizor
             channel.Number = Number;
 
             return channel;
+        }
+
+        public string FrequencyAndMapPID
+        {
+            get
+            {
+                return Frequency.ToString() + "[" + ProgramMapPID.ToString() + "]";
+            }
         }
 
         #region INotifyPropertyChanged

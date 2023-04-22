@@ -260,5 +260,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("FastTuning", value);
             }
         }
+
+        public string SelectedChannelFrequencyAndMapPID
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SelectedChannelFrequencyAndMapPID");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SelectedChannelFrequencyAndMapPID", value);
+            }
+        }
     }
 }
