@@ -295,6 +295,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public void NotifyRecordChange()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                OnPropertyChanged(nameof(RecordingLabel));
+            });
+        }
+
         private async Task ImportList(object json)
         {
             if (!(await _dialogService.Confirm("Are you sure to import channels list?")))
@@ -460,11 +468,8 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    if (RecordingChannel.Number == ch.Number)
-                    {
-                        actions.Add("Show record location");
-                        actions.Add("Stop record");
-                    }
+                    actions.Add("Show record location");
+                    actions.Add("Stop record");
                 }
             }
 

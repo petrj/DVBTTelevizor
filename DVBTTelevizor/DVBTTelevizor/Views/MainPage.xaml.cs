@@ -40,7 +40,6 @@ namespace DVBTTelevizor
         private bool _firstSelectionAfterStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
-        private int _lastUsedAudioTrack = -1;
 
         public bool IsPortrait { get; private set; } = false;
 
@@ -1464,6 +1463,8 @@ namespace DVBTTelevizor
 
         public async Task ActionPlay(bool recording, DVBTChannel channel = null)
         {
+            _loggingService.Debug($"Calling ActionPlay (recording: {recording}");
+
             if (channel == null)
                 channel = _viewModel.SelectedChannel;
 
@@ -1478,74 +1479,97 @@ namespace DVBTTelevizor
 
             int? signalStrengthPercentage = null;
 
-            if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel.Number != channel.Number))
+            if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel != channel))
             {
                 MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
                 return;
             }
 
-            Device.BeginInvokeOnMainThread(() =>
-            {
-                if ((PlayingState == PlayingStateEnum.Playing || PlayingState == PlayingStateEnum.PlayingInPreview) && (_viewModel.PlayingChannel != channel))
-                {
-                    videoView.MediaPlayer.Stop();
-                }
-            });
+            var shouldMediaPlay = true;
+            var shouldDriverPlay = true;
+            var shouldMediaRecord = false;
 
-            if ((PlayingState == PlayingStateEnum.Stopped) || (_viewModel.PlayingChannel != channel))
+            // just playing  ?
+            if (PlayingState != PlayingStateEnum.Stopped)
+            {
+                if (_viewModel.PlayingChannel != channel)
+                {
+                    // playing different channel
+                    shouldMediaPlay = true;
+                    shouldDriverPlay = true;
+                }
+                else
+                {
+                    // playing the same channel
+                    shouldDriverPlay = false;
+                    shouldMediaPlay = false;
+                }
+
+                if (recording && _viewModel.RecordingChannel == null)
+                {
+                    // start recording
+                    shouldMediaRecord = true;
+                    shouldMediaPlay = true;
+                    shouldDriverPlay = false;
+                }
+            }
+            else
+            {
+                if (recording && _viewModel.RecordingChannel == channel)
+                {
+                    shouldMediaPlay = true;
+                    shouldDriverPlay = false;
+                    shouldMediaRecord = false;
+                }
+                else
+                {
+                    shouldMediaPlay = true;
+                    shouldDriverPlay = true;
+                    shouldMediaRecord = recording;
+                }
+            }
+
+            if (shouldDriverPlay)
             {
                 var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
-                if (!playRes.OK)
+                if ( (!playRes.OK) || (_driver.VideoStream == null))
+
                 {
-                    MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
                 signalStrengthPercentage = playRes.SignalStrengthPercentage;
             }
 
-            Device.BeginInvokeOnMainThread(() =>
+            if (shouldMediaPlay)
             {
-                if (_driver.VideoStream != null)
+                _media = new Media(_libVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+
+                if (shouldMediaRecord)
                 {
-                    bool shouldPlay = true;
-                    if (_viewModel.RecordingChannel == null)
-                    {
-                        _media = new Media(_libVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
-                    }
-                    else
-                    {
-                        shouldPlay = false;
-                    }
+                    _viewModel.RecordingChannel = channel;
+                    _viewModel.RecordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
 
-                    if (recording && _viewModel.RecordingChannel == null)
-                    {
-                        _viewModel.RecordingChannel = channel;
-                        _viewModel.RecordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                    channel.Recording = true;
 
-                        channel.Recording = true;
+                    _media.AddOption(":sout=#duplicate{dst=file{dst=\"" + _viewModel.RecordingFileName + "\"},dst=display}");
+                    _media.AddOption(":sout-keep");
 
-                        _media.AddOption(":sout=#duplicate{dst=file{dst=\"" + _viewModel.RecordingFileName + "\"},dst=display}");
-                        _media.AddOption(":sout-keep");
-                    }
-
-                    if (shouldPlay && (_viewModel.PlayingChannel != channel))
-                    {
-                        videoView.MediaPlayer.Play(_media);
-                        _lastUsedAudioTrack = videoView.MediaPlayer.AudioTrack;
-                    }
-
-                    if (recording)
-                    {
-                        MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
-                    }
-
-                    if (videoView.MediaPlayer.AudioTrack == -1)
-                    {
-                        videoView.MediaPlayer.SetAudioTrack(_lastUsedAudioTrack);
-                    }
+                    MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
                 }
-            });
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    if (videoView.MediaPlayer.IsPlaying)
+                    {
+                        videoView.MediaPlayer.Stop();
+                    }
+                    videoView.MediaPlayer.Play(_media);
+                    videoView.MediaPlayer.SetSpu(-1);
+                    videoView.MediaPlayer.Mute = false;
+                });
+            }
 
             var playInfo = new PlayStreamInfo
             {
@@ -1576,6 +1600,8 @@ namespace DVBTTelevizor
             _viewModel.PlayingChannelAspect = new Size(-1, -1);
             PlayingState = PlayingStateEnum.Playing;
             _viewModel.EPGDetailEnabled = false;
+
+            _viewModel.NotifyRecordChange();
         }
 
         public async Task ActionStop(bool force)
@@ -1611,9 +1637,7 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    // MediaPlayer mute does not work
-                    _lastUsedAudioTrack = videoView.MediaPlayer.AudioTrack;
-                    videoView.MediaPlayer.SetAudioTrack(-1);
+                    videoView.MediaPlayer.Mute = true;
                 }
 
                 PlayingState = PlayingStateEnum.Stopped;
@@ -1624,6 +1648,10 @@ namespace DVBTTelevizor
 
                 MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
+
+            _viewModel.SelectedToolbarItemName = null;
+            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+            _viewModel.NotifyRecordChange();
         }
 
         private async Task CheckStream()
