@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Android.InputMethodServices;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +46,11 @@ namespace DVBTTelevizor
         public async Task<string> DisplayActionSheet(string title, string cancel, List<string> buttonLabels)
         {
             return await DialogPage.DisplayActionSheet(title, cancel, null, buttonLabels.ToArray());
+        }
+
+        public async Task<string> GetNumberDialog(string message, string title, string defaultValue = "")
+        {
+            return await DialogPage.DisplayPromptAsync(title, message, initialValue: defaultValue, maxLength: 4, keyboard: Xamarin.Forms.Keyboard.Numeric);
         }
     }
 }

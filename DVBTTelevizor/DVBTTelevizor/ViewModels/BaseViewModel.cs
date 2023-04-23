@@ -49,6 +49,8 @@ namespace DVBTTelevizor
         public const string MSG_ChangeSubtitleId = "ChangeSubtitleId";
         public const string MSG_ChangeAudioTrackId = "ChangeAudioTrackId";
         public const string MSG_ChangeAspect = "ChangeAspect";
+        public const string MSG_ToggleTeletext = "ToggleTeletext";
+        public const string MSG_TeletextPageNumber = "TeletextPageNumber";
 
         public const string MSG_CloseTuningPage = "CloseTuningPage";
         public const string MSG_QuitApp = "QuitApp";

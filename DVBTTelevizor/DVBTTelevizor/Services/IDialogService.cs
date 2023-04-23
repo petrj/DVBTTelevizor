@@ -16,5 +16,6 @@ namespace DVBTTelevizor
         Task Error(string message, string title = "Error");
 
         Task<string> DisplayActionSheet(string title, string cancel, List<string> buttonLabels);
+        Task<string> GetNumberDialog(string message, string title, string defaultValue = "");
     }
 }

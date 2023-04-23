@@ -52,6 +52,9 @@ namespace DVBTTelevizor
 
         private int _refreshCounter = 0;
 
+        public bool TeletextActive { get; set; } = false;
+        private int _lastTeltetextPageNumber = 100;
+
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
@@ -431,6 +434,8 @@ namespace DVBTTelevizor
                         {
                             actions.Add("Aspect ratio...");
                         }
+
+                        actions.Add("Teletext...");
                     }
                     else
                     {
@@ -484,6 +489,9 @@ namespace DVBTTelevizor
                 case "Subtitles...":
                     await ShowSubtitlesMenu(ch);
                     break;
+                case "Teletext...":
+                    await TeletextMenu();
+                    break;
                 case "Audio track...":
                     await ShowAudioTrackMenu(ch);
                     break;
@@ -513,6 +521,41 @@ namespace DVBTTelevizor
                     if (await _dialogService.Confirm("Are you sure to quit DVBT televizor?"))
                     {
                         MessagingCenter.Send(String.Empty, BaseViewModel.MSG_QuitApp);
+                    }
+                    break;
+            }
+        }
+
+        public async Task TeletextMenu()
+        {
+            var actions = new List<string>();
+
+            if (!TeletextActive)
+            {
+                actions.Add("On");
+            } else
+            {
+                actions.Add("Off");
+            }
+
+            actions.Add("Page number...");
+
+            var action = await _dialogService.DisplayActionSheet("Teletext", "Cancel", actions);
+
+            switch (action)
+            {
+                case "On":
+                case "Off":
+                    MessagingCenter.Send(action, BaseViewModel.MSG_ToggleTeletext);
+                    TeletextActive = !TeletextActive;
+                    break;
+                case "Page number...":
+                    string pageNumber = await _dialogService.GetNumberDialog("Set page number", "Teletext", _lastTeltetextPageNumber.ToString());
+                    int num;
+                    if (int.TryParse(pageNumber, out num))
+                    {
+                        _lastTeltetextPageNumber = num;
+                        MessagingCenter.Send(pageNumber, BaseViewModel.MSG_TeletextPageNumber);
                     }
                     break;
             }

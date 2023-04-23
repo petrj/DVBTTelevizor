@@ -14,8 +14,7 @@ using System.Threading;
 using LoggerService;
 using LibVLCSharp.Shared;
 using static DVBTTelevizor.MainPageViewModel;
-using Xamarin.Essentials;
-using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 
 
 namespace DVBTTelevizor
@@ -254,6 +253,22 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAspect, (aspect) =>
             {
                 SetAspect(aspect);
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToggleTeletext, (aspect) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    videoView.MediaPlayer.ToggleTeletext();
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_TeletextPageNumber, (pageNum) =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    videoView.MediaPlayer.Teletext = Convert.ToInt32(pageNum);
+                });
             });
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
@@ -560,18 +575,29 @@ namespace DVBTTelevizor
 
                 if (numberPressedBefore == _numberPressed)
                 {
-                    Task.Run(async () =>
+                    if (_viewModel.TeletextActive)
                     {
-                        await _viewModel.SelectChannelByNumber(_numberPressed);
-
-                        if (
-                                (_viewModel.SelectedChannel != null) &&
-                                (_numberPressed == _viewModel.SelectedChannel.Number)
-                           )
+                        Device.BeginInvokeOnMainThread(() =>
                         {
-                            await ActionPlay(false);
-                        }
-                    });
+                            videoView.MediaPlayer.Teletext = Convert.ToInt32(_numberPressed);
+                        });
+                    }
+                    else
+                    {
+
+                        Task.Run(async () =>
+                        {
+                            await _viewModel.SelectChannelByNumber(_numberPressed);
+
+                            if (
+                                    (_viewModel.SelectedChannel != null) &&
+                                    (_numberPressed == _viewModel.SelectedChannel.Number)
+                               )
+                            {
+                                await ActionPlay(false);
+                            }
+                        });
+                    }
                 }
 
             }).Start();
@@ -1609,58 +1635,66 @@ namespace DVBTTelevizor
 
             Device.BeginInvokeOnMainThread(() =>
             {
-                // checking stopped stream
-
-                if (!videoView.MediaPlayer.IsPlaying)
+                try
                 {
-                    videoView.MediaPlayer.Play(_media);
-                }
 
-                // checking no video
-                if (videoView.MediaPlayer.VideoTrackCount <= 0)
-                {
-                    NoVideoStackLayout.IsVisible = true;
-                    //VideoStackLayout.IsVisible = false;
-                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
-                }
-                else
-                {
-                    //PreviewVideoBordersFix();
+                    // checking stopped stream
 
-                    NoVideoStackLayout.IsVisible = false;
-                    VideoStackLayout.IsVisible = true;
-                }
-
-                // setting subtitles
-                foreach (var desc in videoView.MediaPlayer.SpuDescription)
-                {
-                    if (!_viewModel.PlayingChannelSubtitles.ContainsKey(desc.Id))
+                    if (!videoView.MediaPlayer.IsPlaying)
                     {
-                        _loggingService.Debug($"Adding subtitle {desc.Name}");
-                        _viewModel.PlayingChannelSubtitles.Add(desc.Id, desc.Name);
-                        //videoView.MediaPlayer.SetSpu(desc.Id);
+                        videoView.MediaPlayer.Play(_media);
                     }
-                }
 
-                // setting audio
-                foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
-                {
-                    if (!_viewModel.PlayingChannelAudioTracks.ContainsKey(desc.Id))
+                    // checking no video
+                    if (videoView.MediaPlayer.VideoTrackCount <= 0)
                     {
-                        _loggingService.Debug($"Adding audio track {desc.Name}");
-                        _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
+                        NoVideoStackLayout.IsVisible = true;
+                        //VideoStackLayout.IsVisible = false;
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
                     }
-                }
+                    else
+                    {
+                        //PreviewVideoBordersFix();
 
-                if (_viewModel.PlayingChannelAspect.Width == -1)
-                {
-                    // setting aspect ratio
-                    var videoTrack = GetVideoTrack();
-                    if (videoTrack.HasValue)
-                    {
-                        _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
-                        _loggingService.Debug($"Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
+                        NoVideoStackLayout.IsVisible = false;
+                        VideoStackLayout.IsVisible = true;
                     }
+
+                    // setting subtitles
+                    foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                    {
+                        if (!_viewModel.PlayingChannelSubtitles.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"Adding subtitle {desc.Name}");
+                            _viewModel.PlayingChannelSubtitles.Add(desc.Id, desc.Name);
+                            //videoView.MediaPlayer.SetSpu(desc.Id);
+                        }
+                    }
+
+                    // setting audio
+                    foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
+                    {
+                        if (!_viewModel.PlayingChannelAudioTracks.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"Adding audio track {desc.Name}");
+                            _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
+                        }
+                    }
+
+                    if (_viewModel.PlayingChannelAspect.Width == -1)
+                    {
+                        // setting aspect ratio
+                        var videoTrack = GetVideoTrack();
+                        if (videoTrack.HasValue)
+                        {
+                            _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
+                            _loggingService.Debug($"Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
+                        }
+                    }
+
+                } catch (Exception ex)
+                {
+                    _loggingService.Error(ex, "CheckStream general error");
                 }
             });
         }
