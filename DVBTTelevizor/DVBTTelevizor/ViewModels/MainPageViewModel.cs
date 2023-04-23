@@ -58,6 +58,7 @@ namespace DVBTTelevizor
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
+        public int LastAudioTrack { get; set; } = -1;
 
         public enum SelectedPartEnum
         {
@@ -86,6 +87,23 @@ namespace DVBTTelevizor
             BackgroundCommandWorker.RunInBackground(AnimeIconCommand, 1, 1);
 
             RefreshCommand.Execute(null);
+        }
+
+        public void SelectchannelAfterStartup(int delaySeconds)
+        {
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                Thread.Sleep(delaySeconds * 1000);
+
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(delegate
+                {
+                    var ch = SelectedChannel;
+                    SelectedChannel = null;
+                    SelectedChannel = ch;
+                });
+            }).Start();
         }
 
         public string RecordingLabel
@@ -424,52 +442,51 @@ namespace DVBTTelevizor
 
             if (ch != null)
             {
+                if (PlayingChannel == null)
+                {
+                    actions.Add("Play");
+                    actions.Add("Scan EPG");
+                    actions.Add("Delete");
+                } else
+                {
+                    actions.Add("Stop");
+
+                    if (PlayingChannelSubtitles.Count > 0)
+                    {
+                        actions.Add("Subtitles...");
+                    }
+                    if (PlayingChannelAudioTracks.Count > 0)
+                    {
+                        actions.Add("Audio track...");
+                    }
+                    if (PlayingChannelAspect.Width != -1)
+                    {
+                        actions.Add("Aspect ratio...");
+                    }
+
+                    actions.Add("Teletext...");
+                }
+
                 if (RecordingChannel == null)
                 {
-                    if (PlayingChannel != null)
-                    {
-                        actions.Add("Stop");
-
-                        if (PlayingChannelSubtitles.Count>0)
-                        {
-                            actions.Add("Subtitles...");
-                        }
-                        if (PlayingChannelAudioTracks.Count > 0)
-                        {
-                            actions.Add("Audio track...");
-                        }
-                        if (PlayingChannelAspect.Width != -1)
-                        {
-                            actions.Add("Aspect ratio...");
-                        }
-
-                        actions.Add("Teletext...");
-                    }
-                    else
-                    {
-                        actions.Add("Play");
-                        actions.Add("Scan EPG");
-                        actions.Add("Delete");
-                    }
-
                     actions.Add("Record");
-                    actions.Add("Detail...");
-
-                    if (ch.CurrentEventItem != null)
-                    {
-                        if (!EPGDetailEnabled)
-                        {
-                            actions.Add("Show programme description");
-                        } else
-                        {
-                            actions.Add("Hide programme description");
-                        }
-                    }
-                }
-                else
+                } else
                 {
                     actions.Add("Show record location");
                     actions.Add("Stop record");
+                }
+
+                actions.Add("Detail...");
+
+                if (ch.CurrentEventItem != null)
+                {
+                    if (!EPGDetailEnabled)
+                    {
+                        actions.Add("Show programme description");
+                    } else
+                    {
+                        actions.Add("Hide programme description");
+                    }
                 }
             }
 
@@ -651,6 +668,8 @@ namespace DVBTTelevizor
             {
                 MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
             }
+
+            NotifyRecordChange();
         }
 
         private async Task DeleteChannel(DVBTChannel channel)

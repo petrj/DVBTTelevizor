@@ -22,6 +22,7 @@ namespace DVBTTelevizor
                 var chs = _config.Channels;
                 if (chs == null)
                     chs = new ObservableCollection<DVBTChannel>();
+
                 return chs;
             });
         }
@@ -30,12 +31,14 @@ namespace DVBTTelevizor
         {
             return await Task.Run(() =>
             {
+                var chs = new ObservableCollection<DVBTChannel>();
+
                 foreach (var ch in channels)
                 {
-                    ch.ClearEPG();
+                    chs.Add(ch.Clone());
                 }
 
-                _config.Channels = channels;
+                _config.Channels = chs;
                 return true;
             });
         }

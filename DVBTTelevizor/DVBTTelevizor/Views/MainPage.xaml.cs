@@ -37,7 +37,6 @@ namespace DVBTTelevizor
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
         private bool _firstStartup = true;
-        private bool _firstSelectionAfterStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
 
@@ -46,6 +45,8 @@ namespace DVBTTelevizor
         private LibVLC _libVLC = null;
         private MediaPlayer _mediaPlayer;
         private Media _media = null;
+
+        private bool _firstAppearing = true;
 
         public Command CheckStreamCommand { get; set; }
 
@@ -127,7 +128,6 @@ namespace DVBTTelevizor
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
-            ChannelsListView.Scrolled += ChannelsListView_Scrolled;
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_KeyDown, (key) =>
             {
@@ -376,6 +376,14 @@ namespace DVBTTelevizor
             }
 
             _viewModel.EPGDetailEnabled = false;
+
+            if (_firstAppearing)
+            {
+                _firstAppearing = false;
+
+                // workaround for not selecting channel after startup:
+                _viewModel.SelectchannelAfterStartup(3);
+            }
         }
 
         protected override void OnDisappearing()
@@ -1126,22 +1134,6 @@ namespace DVBTTelevizor
             await _viewModel.ShowChannelMenu();
         }
 
-        private void ChannelsListView_Scrolled(object sender, ScrolledEventArgs e)
-        {
-            _loggingService.Debug($"ChannelsListView_Scrolled");
-
-            // workaround for de-highlighting selected item after scroll on startup
-            if (_firstSelectionAfterStartup)
-            {
-                _loggingService.Info($"ChannelsListView_Scrolled - highlighting channel");
-
-                var ch = _viewModel.SelectedChannel;
-                _viewModel.SelectedChannel = null;
-                _viewModel.SelectedChannel = ch;
-                _firstSelectionAfterStartup = false;
-            }
-        }
-
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
             if (!_viewModel.DoNotScrollToChannel)
@@ -1566,8 +1558,11 @@ namespace DVBTTelevizor
                         videoView.MediaPlayer.Stop();
                     }
                     videoView.MediaPlayer.Play(_media);
-                    videoView.MediaPlayer.SetSpu(-1);
-                    videoView.MediaPlayer.Mute = false;
+
+                    if (shouldMediaRecord)
+                    {
+                        videoView.MediaPlayer.SetSpu(-1);
+                    }
                 });
             }
 
@@ -1601,6 +1596,7 @@ namespace DVBTTelevizor
             PlayingState = PlayingStateEnum.Playing;
             _viewModel.EPGDetailEnabled = false;
 
+
             _viewModel.NotifyRecordChange();
         }
 
@@ -1628,17 +1624,18 @@ namespace DVBTTelevizor
             }
             else
             {
-                if (_viewModel.RecordingChannel == null)
+                Device.BeginInvokeOnMainThread(async () =>
                 {
-                    Device.BeginInvokeOnMainThread(async () =>
+                    if (_viewModel.RecordingChannel == null)
                     {
                         videoView.MediaPlayer.Stop();
-                    });
-                }
-                else
-                {
-                    videoView.MediaPlayer.Mute = true;
-                }
+                    }
+                    else
+                    {
+                        // Mute does not work
+                        videoView.MediaPlayer.SetAudioTrack(-1);
+                    }
+                });
 
                 PlayingState = PlayingStateEnum.Stopped;
                 _viewModel.PlayingChannelSubtitles.Clear();
