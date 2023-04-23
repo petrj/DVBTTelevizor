@@ -16,6 +16,9 @@ Využívá ovladač "DVB-T Driver": https://play.google.com/store/apps/details?i
 - EPG pro právě probíhající/následující program (podporováno pouze kódování Latin alphabet)
 - možnost zvětšení fontu (ideální pro tablety a TV)
 - pro Android 4.4 a vyšší (architektury: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a) 
+- podpora titulků
+- podpora změny audio stopy
+- podpora teletextu
 
 
 #### EN
@@ -32,6 +35,8 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - EPG for current/next program (only Latin alphabet support)
 - possibility to enlarge the font (ideal for tablets and TVs)
 - Android 4.4 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a
+- supporting subtitles
+- supporting teletext
 
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot2.png" width="400" alt="Screenshot2"/>
