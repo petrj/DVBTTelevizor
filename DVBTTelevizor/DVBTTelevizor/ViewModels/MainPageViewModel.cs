@@ -1069,6 +1069,27 @@ namespace DVBTTelevizor
             }
         }
 
+        public async Task SelectFirstOrLastChannel(bool first)
+        {
+            _loggingService.Info($"Selecting first/last channel");
+
+            await Task.Run(
+                async () =>
+                {
+                        if (Channels.Count == 0)
+                            return;
+
+                        if (first)
+                        {
+                            SelectedChannel = Channels[0];
+                        }
+                        else
+                        {
+                            SelectedChannel = Channels[Channels.Count - 1];
+                        }
+                });
+        }
+
         public async Task SelectNextChannel(int step = 1)
         {
             _loggingService.Info($"Selecting next channel (step {step})");

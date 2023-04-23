@@ -47,6 +47,7 @@ namespace DVBTTelevizor
         private Media _media = null;
 
         private bool _firstAppearing = true;
+        private DVBTChannel[] _lastPlayedChannels = new DVBTChannel[2];
 
         public Command CheckStreamCommand { get; set; }
 
@@ -482,6 +483,26 @@ namespace DVBTTelevizor
 
             switch (key.ToLower())
             {
+                case "end":
+                case "moveend":
+                    await ActionFirstOrLast(false);
+                    break;
+                case "home":
+                case "movehome":
+                    await ActionFirstOrLast(true);
+                    break;
+
+                case "mediafastforward":
+                case "mediaforward":
+                case "pagedown":
+                    await ActionDown(10);
+                    break;
+                case "mediarewind":
+                case "mediafastrewind":
+                case "pageup":
+                    await ActionUp(10);
+                    break;
+
                 case "0":
                 case "num0":
                 case "number0":
@@ -750,21 +771,19 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    if (_viewModel.EPGDetailVisible)
+                    // play previous channel
+                    if (_lastPlayedChannels != null &&
+                        _lastPlayedChannels[0] != _viewModel.SelectedChannel)
                     {
-                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
-                        {
-                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
-                        }
-                        else
-                        {
-                            _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
-                        }
+                        _viewModel.SelectedChannel = _lastPlayedChannels[0];
                     }
                     else
+                    if (!_viewModel.StandingOnStart)
                     {
-                        // TODO: play previous channel
+                        await _viewModel.SelectPreviousChannel();
                     }
+
+                    await ActionPlay(false);
                 }
                 else
                 {
@@ -813,7 +832,7 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task ActionDown()
+        private async Task ActionDown(int step = 1)
         {
             _loggingService.Info($"ActionDown");
 
@@ -836,7 +855,7 @@ namespace DVBTTelevizor
                     {
                         if (!_viewModel.StandingOnEnd)
                         {
-                            await _viewModel.SelectNextChannel();
+                            await _viewModel.SelectNextChannel(step);
                             await ActionPlay(false);
                         }
                     }
@@ -845,7 +864,7 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
-                        await _viewModel.SelectNextChannel();
+                        await _viewModel.SelectNextChannel(step);
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
@@ -861,6 +880,23 @@ namespace DVBTTelevizor
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "ActionDown general error");
+            }
+        }
+
+        private async Task ActionFirstOrLast(bool first)
+        {
+            _loggingService.Info($"ActionFirstOrLast");
+
+            try
+            {
+                if ((PlayingState != PlayingStateEnum.Playing) && (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo))
+                {
+                    await _viewModel.SelectFirstOrLastChannel(first);
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionFirstOrLast general error");
             }
         }
 
@@ -901,7 +937,7 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task ActionUp()
+        private async Task ActionUp(int step = 1)
         {
             _loggingService.Info($"ActionUp");
 
@@ -924,7 +960,7 @@ namespace DVBTTelevizor
                     {
                         if (!_viewModel.StandingOnStart)
                         {
-                            await _viewModel.SelectPreviousChannel();
+                            await _viewModel.SelectPreviousChannel(step);
                             await ActionPlay(false);
                         }
                     }
@@ -933,7 +969,7 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
-                        await _viewModel.SelectPreviousChannel();
+                        await _viewModel.SelectPreviousChannel(step);
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
@@ -1537,6 +1573,7 @@ namespace DVBTTelevizor
             if (shouldMediaPlay)
             {
                 _media = new Media(_libVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                _viewModel.TeletextActive = false;
 
                 if (shouldMediaRecord)
                 {
@@ -1596,6 +1633,11 @@ namespace DVBTTelevizor
             PlayingState = PlayingStateEnum.Playing;
             _viewModel.EPGDetailEnabled = false;
 
+            if (_lastPlayedChannels[1] != channel)
+            {
+                _lastPlayedChannels[0] = _lastPlayedChannels[1];
+                _lastPlayedChannels[1] = channel;
+            }
 
             _viewModel.NotifyRecordChange();
         }

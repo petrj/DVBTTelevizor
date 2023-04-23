@@ -981,7 +981,6 @@ namespace DVBTTelevizor
                 }
                 _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
 
-
                 if (State == TuneState.TuneAborted)
                 {
                     _loggingService.Debug($"Tuning aborted");

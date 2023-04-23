@@ -97,6 +97,17 @@ namespace DVBTTelevizor
                 case "focus":
                 case "camera":
                 case "menu":
+                case "pagedown":
+                case "pageup":
+                case "end":
+                case "moveend":
+                case "home":
+                case "movehome":
+                case "mediafastforward":
+                case "mediaforward":
+                case "mediarewind":
+                case "mediafastrewind":
+
                     return true;
                 default:
                     return false;
@@ -137,7 +148,6 @@ namespace DVBTTelevizor
         {
             switch (key.ToLower())
             {
-                case "pagedown":
                 case "dpadright":
                 case "right":
                 case "d":
@@ -157,7 +167,6 @@ namespace DVBTTelevizor
             switch (key.ToLower())
             {
                 case "dpadleft":
-                case "pageup":
                 case "left":
                 case "a":
                 case "b":
@@ -205,7 +214,6 @@ namespace DVBTTelevizor
                 case "numpadenter":
                 case "buttona":
                 case "buttonstart":
-                case "capslock":
                 case "comma":
                 case "semicolon":
                 case "grave":

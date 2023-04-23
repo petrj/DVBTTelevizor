@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="cs">
   <head>
-    <title>Online Televizor</title>
+    <title>DVBT Televizor</title>
     <meta charset="utf-8">
     <meta name="description" content="DVBT Televizor">
     <meta name="keywords" content="DVBT Televizor">
@@ -59,7 +59,7 @@
 	  
 	  
 	   
-	</div>		
+	</div>
 
 	<a href="https://play.google.com/store/apps/details?id=net.petrjanousek.DVBTTelevizor">
 		<img src="files/play.png" alt="Goolge Play" style="margin-left:auto;margin-right:auto;width:25%;display:block;"/>		
@@ -90,6 +90,8 @@
                 <li>EPG for current/next program (only Latin alphabet support)</li>
                 <li>possibility to enlarge the font (ideal for tablets and TVs)</li>
                 <li>Android 4.4 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a</li>
+				<li>subtitles support</li>
+				<li>teletext support</li>
             </ul>
             
         </div>
@@ -103,8 +105,8 @@
         
     <div class="wrapDiv">
         
-            <a href="files/Screenshot.png" class="screenshot">
-                    <img src="files/Screenshot.png" alt="Screenshot" />
+            <a href="files/Screenshot1.png" class="screenshot">
+                    <img src="files/Screenshot1.png" alt="Screenshot" />
             </a>
             
             <a href="files/Screenshot2.png" class="screenshot">
@@ -120,16 +122,20 @@
             </a>
 
             <a href="files/Screenshot5.png" class="screenshot">
-                    <img src="files/Screenshot5.png" alt="Screenshot" />                
+                    <img src="files/Screenshot5.png" alt="Screenshot" />
             </a>
 
             <a href="files/Screenshot6.png" class="screenshot">
-                    <img src="files/Screenshot6.png" alt="Screenshot" />                
+                    <img src="files/Screenshot6.png" alt="Screenshot" />
             </a>
             
-            <a href="files/Screenshot7.png" class="screenshot">
-                    <img src="files/Screenshot7.png" alt="Screenshot" />                
-            </a>            
+            <a href="files/Screenshot7.png" class="screenshot">			
+                    <img src="files/Screenshot7.png" alt="Screenshot" />
+            </a>
+			
+            <a href="files/Screenshot8.png" class="screenshot">
+                    <img src="files/Screenshot8.png" alt="Screenshot" />
+            </a>			
         
     </div>
     <div style="clear:both;"></div>
@@ -144,34 +150,52 @@
                     <th colspan="2">Supported keys</th>
                 </tr>
                 <tr>
-                    <td>arrows down/up, button R1/L1, S/W, NumPad2/NumPad8</td>
-                    <td>selecting next/previous channel</td>
+                    <td>Next/previous channel<br/>Application navigation</td>
+                    <td>arrows down/up, button R1/L1, W/S, NumPad2/NumPad8</td>
+                </tr>				
+                <tr>
+                    <td></td>
+                    <td>arrows left/right, PageUp/PageDown,  A/D, B/F, F2/F3, NumPad4/NumPad6</td>
                 </tr>
                 <tr>
-                    <td>arrows left/right, PageUp/PageDown, A/D, B/F, F2/F3, NumPad4/NumPad6</td>
-                    <td>selecting next/previous channel (step 10)</td>
+                    <td>Next/previous channel (step 10)</td>
+                    <td>PageUp/PageDown</td>
+                </tr>	
+                <tr>
+                    <td>First/last channel</td>
+                    <td>Home/End</td>
                 </tr>
                 <tr>
-                    <td>OK, Enter, space, Play/Pause, Numpad5, buttons R2/A/Start </td>
-                    <td>play selected channel</td>
-                </tr>
+                    <td>Play previous channel</td>
+                    <td>Left (when playing)</td>
+                </tr>				
                 <tr>
+                    <td>Play/OK</td>
+                    <td>Enter, space, R2, NumPad5, button A, button Start, Capslock, Comma, Semicolon, Grave</td>
+                </tr>
+				<tr>
+                    <td>Stop/back</td>
+                    <td>Esc, F4, Delete, Button X, button B</td>
+                </tr>
+				<tr>
+                    <td>Menu/info</td>
+                    <td>I, G, NumPad+, Tab, F1, F6, F7, F8, Button L2</td>
+                </tr>
+               
+                <tr>
+					<td>Play channel by it's number</td>
                     <td>0..9</td>
-                    <td>play channel by it's number</td>
                 </tr>
                 <tr>
-                    <td>F4, Escape, Play/Stop/Close, NumPad-, Delete, button X</td>
-                    <td>stop</td>
-                </tr>								
+					<td>Set teletext page number</td>
+                    <td>0..9 (when teletext on) </td>
+                </tr>							
+				
                 <tr>
+					<td>Refresh</td>
                     <td>F5, Numpad 0, Left CTRL</td>
-                    <td>refresh channels</td>
                 </tr>
-                <tr>
-                    <td>Guide, Info, button L2/Camera, I, G, F1, Tab, NumPad+, Tab, F1,F6,F7,F8</td>
-                    <td>- detail of selected channel when playing<br/>
-- Edit/detail dialog when not playing</td>
-                </tr>                           
+                       
 
             </table> 
 
@@ -185,19 +209,49 @@
 
             <table>
                 <tr>
-                    <th colspan="2">Supported gestures (when playing)</th>
+                    <th colspan="2">Video gestures</th>
                 </tr>
                 <tr>
-                    <td>swipe left/right</td>
+                    <td>Swipe left</td>
                     <td>stop</td>
                 </tr>
                 <tr>
-                    <td>swipe up/down</td>
-                    <td>play next/previous channel</td>
+                    <td>Swipe right</td>
+                    <td>stop or preview mode</td>
                 </tr>
                 <tr>
-                    <td>double tap</td>
-                    <td>enable/disable fullscreen</td>
+                    <td>Swipe up/down</td>
+                    <td>play previous/next channel</td>
+                </tr>
+                <tr>
+                    <td>Single tap</td>
+                    <td>show/hide programme description</td>
+                </tr>
+                <tr>
+                    <td>Double tap</td>
+                    <td>toggle fullscreen mode/preview mode</td>
+                </tr>
+                <tr>
+                    <td>Long tap</td>
+                    <td>menu</td>
+                </tr>
+            </table>
+
+    </div>
+    <div style="clear:both;"></div>
+	
+    <br/>
+    <br/>    
+
+ <div class="wrapDiv">
+
+            <table>
+                <tr>
+                    <th colspan="2">Programme description panel gestures</th>
+                </tr>
+                <tr>
+                    <td>swipe right/down</td>
+                    <td>hide programme description</td>
                 </tr>
             </table>
 
