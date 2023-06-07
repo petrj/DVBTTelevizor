@@ -7,7 +7,8 @@
   <ItemGroup>
     <Compile Remove="Class1.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
+    <PackageReference Include="LoggerService" Version="1.0.0" />
   </ItemGroup>
 </Project>

@@ -73,6 +73,9 @@
     <PackageReference Include="LibVLCSharp.Forms">
       <Version>3.7.0</Version>
     </PackageReference>
+    <PackageReference Include="LoggerService">
+      <Version>1.0.0</Version>
+    </PackageReference>
     <PackageReference Include="Plugin.CurrentActivity">
       <Version>2.1.0.4</Version>
     </PackageReference>
@@ -137,10 +140,6 @@
     <Folder Include="Resources\drawable-xxxhdpi\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\LoggerService\LoggerService.csproj">
-      <Project>{48F92363-A63A-45E9-AD73-E7DD3E51E35F}</Project>
-      <Name>LoggerService</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DVBTTelevizor\DVBTTelevizor.csproj">
       <Project>{D909A3AA-45B0-4F06-9975-404C7CAA96AB}</Project>
       <Name>DVBTTelevizor</Name>

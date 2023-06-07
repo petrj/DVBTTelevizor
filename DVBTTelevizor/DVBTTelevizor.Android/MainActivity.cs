@@ -315,7 +315,7 @@ namespace DVBTTelevizor.Droid
                     {
                         _waitingForInit = false;
 
-                        _loggingService.Error("Device response timeout");
+                        _loggingService.Info("Device response timeout");
 
                         MessagingCenter.Send("response timeout", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
                     }

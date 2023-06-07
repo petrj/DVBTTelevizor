@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		WifiDebug.bat = WifiDebug.bat
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerService\LoggerService.csproj", "{48F92363-A63A-45E9-AD73-E7DD3E51E35F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MPEGTS", "MPEGTS\MPEGTS.csproj", "{21353C2B-4A82-431A-B1C5-CA57E87685EA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVBTTelevizor", "DVBTTelevizor\DVBTTelevizor\DVBTTelevizor.csproj", "{D7D14254-AEC9-49B9-8543-1DE3D0E4ADDA}"
@@ -46,10 +44,6 @@ Global
 		{F151692A-25DB-4364-982D-96A1FBDFE9B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F151692A-25DB-4364-982D-96A1FBDFE9B8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F151692A-25DB-4364-982D-96A1FBDFE9B8}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{48F92363-A63A-45E9-AD73-E7DD3E51E35F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48F92363-A63A-45E9-AD73-E7DD3E51E35F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48F92363-A63A-45E9-AD73-E7DD3E51E35F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48F92363-A63A-45E9-AD73-E7DD3E51E35F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21353C2B-4A82-431A-B1C5-CA57E87685EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{21353C2B-4A82-431A-B1C5-CA57E87685EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21353C2B-4A82-431A-B1C5-CA57E87685EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
