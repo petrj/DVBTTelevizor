@@ -13,7 +13,8 @@
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.7.0" />
     <PackageReference Include="LibVLCSharp.Forms" Version="3.7.0" />
-    <PackageReference Include="LoggerService" Version="1.0.0" />
+    <PackageReference Include="LoggerService" Version="1.0.2" />
+    <PackageReference Include="MPEGTS" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Plugin.InAppBilling" Version="6.7.0" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
@@ -21,10 +22,6 @@
     <PackageReference Include="Xamarin.CommunityToolkit" Version="2.0.5" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2291" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\MPEGTS\MPEGTS.csproj" />
   </ItemGroup>
 
   <ItemGroup>
