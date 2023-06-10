@@ -14,7 +14,7 @@ namespace DVBTTelevizor.Droid
 {
 	
 	
-	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Android.Build.Tasks", "13.1.0.5")]
+	[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Android.Build.Tasks", "13.2.0.93")]
 	public partial class Resource
 	{
 		
@@ -24388,43 +24388,46 @@ namespace DVBTTelevizor.Droid
 			public const int Refresh = 2131165343;
 			
 			// aapt resource value: 0x7F0700A0
-			public const int Settings = 2131165344;
+			public const int RemoteTelevizor = 2131165344;
 			
 			// aapt resource value: 0x7F0700A1
-			public const int SettingsSelected = 2131165345;
+			public const int Settings = 2131165345;
 			
 			// aapt resource value: 0x7F0700A2
-			public const int SmallIcon = 2131165346;
+			public const int SettingsSelected = 2131165346;
 			
 			// aapt resource value: 0x7F0700A3
-			public const int splash_screen = 2131165347;
+			public const int SmallIcon = 2131165347;
 			
 			// aapt resource value: 0x7F0700A4
-			public const int Stop = 2131165348;
+			public const int splash_screen = 2131165348;
 			
 			// aapt resource value: 0x7F0700A5
-			public const int test_custom_background = 2131165349;
+			public const int Stop = 2131165349;
 			
 			// aapt resource value: 0x7F0700A6
-			public const int Tools = 2131165350;
+			public const int test_custom_background = 2131165350;
 			
 			// aapt resource value: 0x7F0700A7
-			public const int ToolsSelected = 2131165351;
+			public const int Tools = 2131165351;
 			
 			// aapt resource value: 0x7F0700A8
-			public const int tooltip_frame_dark = 2131165352;
+			public const int ToolsSelected = 2131165352;
 			
 			// aapt resource value: 0x7F0700A9
-			public const int tooltip_frame_light = 2131165353;
+			public const int tooltip_frame_dark = 2131165353;
 			
 			// aapt resource value: 0x7F0700AA
-			public const int Tune = 2131165354;
+			public const int tooltip_frame_light = 2131165354;
 			
 			// aapt resource value: 0x7F0700AB
-			public const int TuneSelected = 2131165355;
+			public const int Tune = 2131165355;
 			
 			// aapt resource value: 0x7F0700AC
-			public const int TV = 2131165356;
+			public const int TuneSelected = 2131165356;
+			
+			// aapt resource value: 0x7F0700AD
+			public const int TV = 2131165357;
 			
 			static Drawable()
 			{

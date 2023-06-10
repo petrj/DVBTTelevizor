@@ -49,6 +49,21 @@ namespace DVBTTelevizor
             }
         }
 
+        public double Height
+        {
+            get
+            {
+                double h = 0;
+                foreach (var part in Parts)
+                {
+                    if (part.Height > h)
+                        h = part.Height;
+                }
+
+                return h;
+            }
+        }
+
         public double ReComputeMaxYPosition()
         {
             double res = 0;
@@ -81,12 +96,12 @@ namespace DVBTTelevizor
                 } else
                 if (part is Picker picker)
                 {
-                    picker.BackgroundColor = Color.FromHex("#303F9F");
+                    //picker.BackgroundColor = Color.FromHex("#303F9F");
                 }
                 else
                 if (part is Entry entry)
                 {
-                    entry.BackgroundColor = Color.FromHex("#303F9F");
+                    //entry.BackgroundColor = Color.FromHex("#303F9F");
                 }
                 else
                 if (part is Switch sw)
@@ -117,12 +132,12 @@ namespace DVBTTelevizor
                 else
                 if (part is Picker picker)
                 {
-                    picker.BackgroundColor = Color.FromHex("#222222");
+                    //picker.BackgroundColor = Color.FromHex("#222222");
                 }
                 else
                 if (part is Entry entry)
                 {
-                    entry.BackgroundColor = Color.FromHex("#222222");
+                    //entry.BackgroundColor = Color.FromHex("#222222");
                 }
                 else
                 {

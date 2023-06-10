@@ -65,6 +65,7 @@ namespace DVBTTelevizor
         public const string MSG_DisableDispatchKeyEvent = "DisableDispatchKeyEvent";
 
         public const string MSG_ImportChannelsList = "ImportChannelsList";
+        public const string MSG_RemoteKeyAction = "RemoteKeyAction";
 
         public string SelectedToolbarItemName { get; set; } = null;
 
@@ -93,6 +94,14 @@ namespace DVBTTelevizor
 
                 } while (true);
             }).Start();
+        }
+
+        public static string DeviceFriendlyName
+        {
+            get
+            {
+                return $"{Xamarin.Essentials.DeviceInfo.Manufacturer} {Xamarin.Essentials.DeviceInfo.Model}";
+            }
         }
 
         // cannot run async!

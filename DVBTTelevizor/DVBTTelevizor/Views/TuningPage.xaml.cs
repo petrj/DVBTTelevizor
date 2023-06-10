@@ -315,5 +315,10 @@ namespace DVBTTelevizor
                     break;
             }
         }
+
+        public void OnTextSent(string text)
+        {
+
+        }
     }
 }

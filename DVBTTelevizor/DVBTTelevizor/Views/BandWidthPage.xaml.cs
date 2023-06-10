@@ -132,5 +132,18 @@ namespace DVBTTelevizor
                     break;
             }
         }
+
+        public void OnTextSent(string text)
+        {
+            switch (_focusItems.FocusedItemName)
+            {
+                case "BandWidthKHz":
+                    EntryBandWidthKHz.Text = text;
+                    break;
+                case "BandWidthMHz":
+                    EntryBandWidthMHz.Text = text;
+                    break;
+            }
+        }
     }
 }
