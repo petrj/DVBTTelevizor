@@ -27,7 +27,7 @@
     <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;TestingDVBTDriverManager</DefineConstants>
+    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
@@ -68,10 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LibVLCSharp">
-      <Version>3.7.0</Version>
+      <Version>3.2.1</Version>
     </PackageReference>
     <PackageReference Include="LibVLCSharp.Forms">
-      <Version>3.7.0</Version>
+      <Version>3.2.1</Version>
     </PackageReference>
     <PackageReference Include="LoggerService">
       <Version>1.0.2</Version>
@@ -89,7 +89,7 @@
       <Version>1.8.116</Version>
     </PackageReference>
     <PackageReference Include="VideoLAN.LibVLC.Android">
-      <Version>3.5.3</Version>
+      <Version>3.1.2</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.v4">
       <Version>28.0.0.3</Version>

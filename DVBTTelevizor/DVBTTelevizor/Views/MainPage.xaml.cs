@@ -441,10 +441,11 @@ namespace DVBTTelevizor
 
         private void anyPage_Disappearing(object sender, EventArgs e)
         {
+            _viewModel.NotifyFontSizeChange();
+            _viewModel.RefreshCommand.Execute(null);
+
             if (sender is SettingsPage)
             {
-                _viewModel.NotifyFontSizeChange();
-                _viewModel.RefreshCommand.Execute(null);
                 RestartRemoteAccessService();
             }
         }
@@ -1656,7 +1657,7 @@ namespace DVBTTelevizor
 
             if (shouldMediaPlay)
             {
-                _media = new Media(_libVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
                 _viewModel.TeletextActive = false;
 
                 if (shouldMediaRecord)
