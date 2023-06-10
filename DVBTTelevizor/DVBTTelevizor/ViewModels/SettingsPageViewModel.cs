@@ -150,6 +150,8 @@ namespace DVBTTelevizor
                 {
                     ActivateLogging();
                 }
+
+                OnPropertyChanged(nameof(EnableLogging));
             }
         }
 
@@ -386,6 +388,20 @@ namespace DVBTTelevizor
             finally
             {
                 await CrossInAppBilling.Current.DisconnectAsync();
+            }
+        }
+
+        public bool AllowRemoteAccessService
+        {
+            get
+            {
+                return Config.AllowRemoteAccessService;
+            }
+            set
+            {
+                Config.AllowRemoteAccessService = value;
+
+                OnPropertyChanged(nameof(Config));
             }
         }
     }

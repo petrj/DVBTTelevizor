@@ -1,4 +1,5 @@
 ﻿using Android.Widget;
+using Java.Lang;
 using LoggerService;
 using System;
 using System.Collections.Generic;
@@ -151,6 +152,19 @@ namespace DVBTTelevizor
                                 EntryName.Focus();
                                 break;
                     }
+                    break;
+            }
+        }
+
+        public void OnTextSent(string text)
+        {
+            switch (_focusItems.FocusedItemName)
+            {
+                case "Number":
+                    EntryNumber.Text = text;
+                    break;
+                case "Name":
+                    EntryName.Text = text;
                     break;
             }
         }

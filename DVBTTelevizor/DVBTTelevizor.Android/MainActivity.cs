@@ -247,6 +247,11 @@ namespace DVBTTelevizor.Droid
                 });
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_RemoteKeyAction, (code) =>
+            {
+                SendRemoteKey(code);
+            });
+
             InstanceAlreadyStarted = true;
 
             if (Intent != null &&
@@ -261,6 +266,21 @@ namespace DVBTTelevizor.Droid
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _loggingService.Error(e.ExceptionObject as Exception, "CurrentDomain_UnhandledException");
+        }
+
+        private void SendRemoteKey(string code)
+        {
+            _loggingService.Debug($"SendRemoteKey: {code}");
+
+            Android.Views.Keycode keyCode;
+            if (Enum.TryParse<Android.Views.Keycode>(code, out keyCode))
+            {
+                new Instrumentation().SendKeyDownUpSync(keyCode);
+            }
+            else
+            {
+                _loggingService.Info("SendRemoteKey: invalid key code");
+            }
         }
 
         private void HandleImportFile(Intent intent)

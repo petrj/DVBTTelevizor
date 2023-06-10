@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,6 +16,7 @@ namespace DVBTTelevizor
         private SettingsPageViewModel _viewModel;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
+        private DVBTTelevizorConfiguration _config;
 
         private KeyboardFocusableItemList _focusItems;
 
@@ -25,6 +26,7 @@ namespace DVBTTelevizor
 
             _loggingService = loggingService;
             _dialogService = dialogService;
+            _config = config;
 
             BindingContext = _viewModel = new SettingsPageViewModel(_loggingService, _dialogService, config, channelService);
 
@@ -81,6 +83,11 @@ namespace DVBTTelevizor
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("FontSize", new List<View>() { FontSizeBoxView, FontSizePicker }))
 
+                .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessEnabled", new List<View>() { RemoteAccessEnabledBoxView, RemoteAccessSwitch }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessIP", new List<View>() { RemoteAccessIPBoxView, IPEntry }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessPort", new List<View>() { RemoteAccessPortBoxView, PortEntry }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessSecurityKey", new List<View>() { RemoteAccessSecurityKeyBoxView, SecurityKeyEntry }))
+
                 .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
@@ -95,8 +102,34 @@ namespace DVBTTelevizor
         {
             // scroll to element
 
-            // TODO: scroll only if necessary (  use SettingsScrollView.ScrollY, sccreen Height, ..... )
-            SettingsScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height/2, false);
+            if (args.FocusedItem == null)
+                return;
+
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                // scroll to element
+                await SettingsScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - args.FocusedItem.Height, false);
+            });
+
+            Action action = null;
+
+            switch (_focusItems.LastFocusDirection)
+            {
+                case KeyboardFocusDirection.Next: action = delegate { _focusItems.FocusNextItem(); }; break;
+                case KeyboardFocusDirection.Previous: action = delegate { _focusItems.FocusPreviousItem(); }; break;
+                default: action = delegate { args.FocusedItem.DeFocus(); }; break;
+            }
+
+            if (
+                    (args.FocusedItem.Name == "RemoteAccessIP" ||
+                    args.FocusedItem.Name == "RemoteAccessPort" ||
+                    args.FocusedItem.Name == "RemoteAccessSecurityKey")
+                    && (!_config.AllowRemoteAccessService)
+               )
+            {
+                action();
+                return;
+            }
         }
 
         public async void OnKeyDown(string key, bool longPress)
@@ -186,10 +219,36 @@ namespace DVBTTelevizor
                         case "Donate10":
                             _viewModel.Donate10command.Execute(null);
                             break;
+
+                        case "RemoteAccessEnabled":
+                            RemoteAccessSwitch.IsToggled = !RemoteAccessSwitch.IsToggled;
+                            break;
+
+                        case "RemoteAccessIP":
+                            IPEntry.Focus();
+                            break;
+
+                        case "RemoteAccessPort":
+                            PortEntry.Focus();
+                            break;
+
+                        case "RemoteAccessSecurityKey":
+                            SecurityKeyEntry.Focus();
+                            break;
                     }
 
                     break;
             }
+        }
+
+        public void OnTextSent(string text)
+        {
+
+        }
+
+        private void OnRemoteTelevizorLabelTapped(object sender, EventArgs e)
+        {
+            Task.Run(async () => await Launcher.OpenAsync("https://play.google.com/store/apps/details?id=net.petrjanousek.RemoteTelevizor"));
         }
     }
 }

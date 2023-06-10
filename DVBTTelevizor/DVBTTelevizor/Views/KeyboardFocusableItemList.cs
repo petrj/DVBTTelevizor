@@ -13,6 +13,9 @@ namespace DVBTTelevizor
         public event KeyboardFocusableItemEventDelegate OnItemFocusedEvent;
         public event KeyboardFocusableItemEventDelegate OnItemUnFocusedEvent;
 
+        public KeyboardFocusDirection LastFocusDirection { get; private set; } = KeyboardFocusDirection.UnKnown;
+        public string LastFocusedItemName { get; set; } = null;
+
         public KeyboardFocusableItem FocusedItem
         {
             get
@@ -63,7 +66,7 @@ namespace DVBTTelevizor
 
             if (_focusedItem == null)
             {
-                FocusItem(Items[0].Name);
+                FocusItem(Items[0].Name, KeyboardFocusDirection.Next);
                 return;
             }
 
@@ -96,7 +99,7 @@ namespace DVBTTelevizor
                 itemToSelect = firstItem;
             }
 
-            FocusItem(itemToSelect.Name);
+            FocusItem(itemToSelect.Name, KeyboardFocusDirection.Next);
         }
 
         public void FocusPreviousItem()
@@ -106,7 +109,7 @@ namespace DVBTTelevizor
 
             if (_focusedItem == null)
             {
-                FocusItem(Items[Items.Count-1].Name);
+                FocusItem(Items[Items.Count - 1].Name, KeyboardFocusDirection.Previous);
                 return;
             }
 
@@ -138,35 +141,10 @@ namespace DVBTTelevizor
                 itemToSelect = prevItem; // the last one item in collection
             }
 
-            /*
-
-
-
-                    if (firstItem == null)
-                {
-                    firstItem = item;
-
-                    //
-                }
-
-                if (selectNext)
-                {
-                    itemToSelect = item;
-                    break;
-                }
-
-                if (item == _focusedItem)
-                {
-                    selectNext = true;
-                }*/
-
-
-
-
-            FocusItem(itemToSelect.Name);
+            FocusItem(itemToSelect.Name, KeyboardFocusDirection.Previous);
         }
 
-        public void FocusItem(string name)
+        public void FocusItem(string name, KeyboardFocusDirection focusDirection = KeyboardFocusDirection.UnKnown)
         {
             _focusedItem = null;
             DeFocusAll();
@@ -177,6 +155,9 @@ namespace DVBTTelevizor
             {
                 _focusedItem = item;
                 item.Focus();
+
+                LastFocusedItemName = name;
+                LastFocusDirection = focusDirection;
 
                 // raise event
                 if (OnItemFocusedEvent != null)

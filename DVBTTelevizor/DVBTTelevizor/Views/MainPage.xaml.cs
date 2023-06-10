@@ -15,6 +15,7 @@ using LoggerService;
 using LibVLCSharp.Shared;
 using static DVBTTelevizor.MainPageViewModel;
 using System.Runtime.InteropServices;
+using RemoteAccessService;
 
 
 namespace DVBTTelevizor
@@ -33,6 +34,7 @@ namespace DVBTTelevizor
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
         private KeyboardFocusableItem _tuneFocusItem = null;
+        private RemoteAccessService.RemoteAccessService _remoteAccessService;
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
@@ -48,6 +50,7 @@ namespace DVBTTelevizor
 
         private bool _firstAppearing = true;
         private DVBTChannel[] _lastPlayedChannels = new DVBTChannel[2];
+        private List<string> _remoteDevicesConnected = new List<string>();
 
         public Command CheckStreamCommand { get; set; }
 
@@ -275,6 +278,34 @@ namespace DVBTTelevizor
             _tuneFocusItem.Focus();
 
             Task.Run(async () => { await _settingsPage.AcknowledgePurchases(); });
+
+            _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
+            RestartRemoteAccessService();
+        }
+
+        private void RestartRemoteAccessService()
+        {
+            if (_config.AllowRemoteAccessService)
+            {
+                if (_remoteAccessService.IsBusy)
+                {
+                    if (_remoteAccessService.ParamsChanged(_config.RemoteAccessServiceIP, _config.RemoteAccessServicePort, _config.RemoteAccessServiceSecurityKey))
+                    {
+                        _remoteAccessService.StopListening();
+                        _remoteAccessService.SetConnection(_config.RemoteAccessServiceIP, _config.RemoteAccessServicePort, _config.RemoteAccessServiceSecurityKey);
+                        _remoteAccessService.StartListening(OnMessageReceived, BaseViewModel.DeviceFriendlyName);
+                    }
+                }
+                else
+                {
+                    _remoteAccessService.SetConnection(_config.RemoteAccessServiceIP, _config.RemoteAccessServicePort, _config.RemoteAccessServiceSecurityKey);
+                    _remoteAccessService.StartListening(OnMessageReceived, BaseViewModel.DeviceFriendlyName);
+                }
+            }
+            else
+            {
+                _remoteAccessService.StopListening();
+            }
         }
 
         public PlayingStateEnum PlayingState
@@ -345,6 +376,55 @@ namespace DVBTTelevizor
             }
         }
 
+        private void OnMessageReceived(RemoteAccessService.RemoteAccessMessage message)
+        {
+            if (message == null)
+                return;
+
+            var senderFriendlyName = message.GetSenderFriendlyName();
+            if (!_remoteDevicesConnected.Contains(senderFriendlyName))
+            {
+                _remoteDevicesConnected.Add(senderFriendlyName);
+                var msg = "Remote device connected";
+                if (!string.IsNullOrEmpty(senderFriendlyName))
+                {
+                    msg += $" ({senderFriendlyName})";
+                }
+
+                MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+            }
+
+            if (message.command == "keyDown")
+            {
+                MessagingCenter.Send(message.commandArg1, BaseViewModel.MSG_RemoteKeyAction);
+            }
+            if (message.command == "sendText")
+            {
+                OnTextSent(message.commandArg1);
+            }
+        }
+
+        public void OnTextSent(string text)
+        {
+            Device.BeginInvokeOnMainThread(delegate
+            {
+                var stack = Navigation.NavigationStack;
+                if (stack[stack.Count - 1].GetType() != typeof(MainPage))
+                {
+                    // different page on navigation top
+
+                    var pageOnTop = stack[stack.Count - 1];
+
+                    if (pageOnTop is IOnKeyDown)
+                    {
+                        (pageOnTop as IOnKeyDown).OnTextSent(text);
+                    }
+
+                    return;
+                }
+            });
+        }
+
         private void _editChannelPage_Disappearing(object sender, EventArgs e)
         {
             Task.Run(async () =>
@@ -361,8 +441,12 @@ namespace DVBTTelevizor
 
         private void anyPage_Disappearing(object sender, EventArgs e)
         {
-            _viewModel.NotifyFontSizeChange();
-            _viewModel.RefreshCommand.Execute(null);
+            if (sender is SettingsPage)
+            {
+                _viewModel.NotifyFontSizeChange();
+                _viewModel.RefreshCommand.Execute(null);
+                RestartRemoteAccessService();
+            }
         }
 
         protected override void OnAppearing()

@@ -7,5 +7,6 @@ namespace DVBTTelevizor
     public interface IOnKeyDown
     {
         void OnKeyDown(string key, bool longPress);
+        void OnTextSent(string text);
     }
 }
