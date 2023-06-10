@@ -41,7 +41,7 @@ namespace DVBTTelevizor
         Task StartRecording();
         void StopRecording();
 
-        Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs, bool stopReadStream = true);
+        Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs);
         Task<bool> Stop();
 
         Task<bool> CheckStatus();
@@ -49,6 +49,7 @@ namespace DVBTTelevizor
         Task<DVBTVersion> GetVersion();
         Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySystem);
         Task<DVBTResponse> SetPIDs(List<long> PIDs);
+        Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000);
         Task<DVBTCapabilities> GetCapabalities();
         Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs);
         Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning);

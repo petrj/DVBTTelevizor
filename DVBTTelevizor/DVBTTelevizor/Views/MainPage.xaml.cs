@@ -1417,6 +1417,8 @@ namespace DVBTTelevizor
 
         public void RefreshGUI()
         {
+            _loggingService.Info("RefreshGUI");
+
             Device.BeginInvokeOnMainThread(() =>
             {
                 AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
@@ -1763,6 +1765,8 @@ namespace DVBTTelevizor
                         videoView.MediaPlayer.SetAudioTrack(-1);
                     }
                 });
+
+                await _driver.Stop();
 
                 PlayingState = PlayingStateEnum.Stopped;
                 _viewModel.PlayingChannelSubtitles.Clear();

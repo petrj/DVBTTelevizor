@@ -272,7 +272,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs, bool stopReadStream = true)
+        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs)
         {
             var res = new PlayResult()
             {
@@ -305,13 +305,18 @@ namespace DVBTTelevizor
                 {
                     _log.Debug($"Signal found");
 
+                    StartReadStream();
+                    StartReadBuffer();
+
+                    //await WaitForBufferPIDs(PIDs, 10000);
+
                     if (_config.ScanEPG && PIDs.Count>0)
                     {
                         await ScanEPGForChannel(frequency, Convert.ToInt32(PIDs[0]), 500);
                     }
 
-                    if (stopReadStream)
-                        StopReadStream();
+                    StopReadBuffer();
+                    StopReadStream();
 
                     res.OK = true;
                     res.SignalStrengthPercentage = Convert.ToInt32(statusRes.rfStrengthPercentage);
@@ -766,6 +771,75 @@ namespace DVBTTelevizor
                 RequestTime = response.RequestTime,
                 ResponseTime = response.ResponseTime
             };
+        }
+
+        public async Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000)
+        {
+            _log.Debug($"--------------------------------------------------------------------");
+            _log.Debug($"Wait For Buffer PIDs: {String.Join(",", PIDs)}");
+
+            var pidsFound = new Dictionary<long, int>();
+            var wrongPIDsFound = new Dictionary<long, int>();
+            foreach (var pid in PIDs)
+            {
+                pidsFound.Add(pid, 0);
+            }
+
+            try
+            {
+                var startTime = DateTime.Now;
+
+                while ((DateTime.Now - startTime).TotalMilliseconds < msTimeout)
+                {
+                    _log.Debug($"Buffer size: {Buffer.Count}");
+
+                    var packets = MPEGTransportStreamPacket.Parse(Buffer);
+
+                    _log.Debug($"Packets found: {packets.Count}");
+
+                    var packetsByPID = MPEGTransportStreamPacket.SortPacketsByPID(packets);
+
+                    foreach (var pidPackets in packetsByPID)
+                    {
+                        //_log.Debug($"  PID  : {pidPackets.Key.ToString().PadLeft(10)} {pidPackets.Value.Count.ToString().PadLeft(10)}(x)");
+
+                        if (!pidsFound.ContainsKey(pidPackets.Key))
+                        {
+                            if (!wrongPIDsFound.ContainsKey(pidPackets.Key))
+                            {
+                                wrongPIDsFound.Add(pidPackets.Key, 0);
+                            }
+                            wrongPIDsFound[pidPackets.Key] = pidPackets.Value.Count;
+                        }
+                        else
+                        {
+                            pidsFound[pidPackets.Key] = pidPackets.Value.Count;
+                        }
+                    }
+
+
+                    _log.Debug($"--Found:");
+                    foreach (var pids in pidsFound)
+                    {
+                        _log.Debug($"  PID  : {pids.Key.ToString().PadLeft(10)} {pids.Value.ToString().PadLeft(10)}(x)");
+                    }
+                    if (wrongPIDsFound.Count > 0)
+                    {
+                        _log.Debug($"--Wrong:");
+                        foreach (var pids in wrongPIDsFound)
+                        {
+                            _log.Debug($"  PID  : {pids.Key.ToString().PadLeft(10)} {pids.Value.ToString().PadLeft(10)}(x)");
+                        }
+                    }
+
+
+                    await Task.Delay(100);
+                }
+
+            } catch (Exception ex)
+            {
+                _log.Error(ex);
+            }
         }
 
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)

@@ -80,6 +80,10 @@ namespace DVBTTelevizor
             };
         }
 
+        public async Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000)
+        {
+        }
+
         public EITManager GetEITManager(long freq)
         {
             var eit = new EITManager(new BasicLoggingService());
@@ -226,7 +230,7 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs, bool stopReadStream = true)
+        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs)
         {
             if (PIDs != null && PIDs.Count > 0)
             {
