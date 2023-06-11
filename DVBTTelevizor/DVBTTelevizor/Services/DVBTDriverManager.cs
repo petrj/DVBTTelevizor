@@ -305,8 +305,8 @@ namespace DVBTTelevizor
                 {
                     _log.Debug($"Signal found");
 
-                    StartReadStream();
-                    StartReadBuffer();
+                    //StartReadStream();
+                    //StartReadBuffer();
 
                     //await WaitForBufferPIDs(PIDs, 10000);
 

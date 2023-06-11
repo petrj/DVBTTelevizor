@@ -1264,7 +1264,10 @@ namespace DVBTTelevizor
 
             _viewModel.DoNotScrollToChannel = false;
 
-            _viewModel.EPGDetailEnabled = true;
+            if (PlayingState != PlayingStateEnum.Playing)
+            { // EPG detail should not be enabled when playing on fullscreen (avoiding not necessary RefreshGUI calling)
+                _viewModel.EPGDetailEnabled = true;
+            }
         }
 
         private void OnVideoSingleTapped(object sender, EventArgs e)
@@ -1429,7 +1432,10 @@ namespace DVBTTelevizor
                     case PlayingStateEnum.Playing:
 
                         // turn off tool bar
-                        NavigationPage.SetHasNavigationBar(this, false);
+                        if (NavigationPage.GetHasNavigationBar(this))
+                        {
+                            NavigationPage.SetHasNavigationBar(this, false);
+                        }
 
                         MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableFullScreen);
 
@@ -1475,12 +1481,17 @@ namespace DVBTTelevizor
                             }
                         }
 
+                        //MainLayout.RaiseChild(VideoStackLayout);
+
                         CheckStreamCommand.Execute(null);
 
                         break;
                     case PlayingStateEnum.PlayingInPreview:
 
-                        NavigationPage.SetHasNavigationBar(this, true);
+                        if (!NavigationPage.GetHasNavigationBar(this))
+                        {
+                            NavigationPage.SetHasNavigationBar(this, true);
+                        }
 
                         //ChannelsListView.IsVisible = true;
 
@@ -1527,7 +1538,10 @@ namespace DVBTTelevizor
                         break;
                     case PlayingStateEnum.Stopped:
 
-                        NavigationPage.SetHasNavigationBar(this, true);
+                        if (!NavigationPage.GetHasNavigationBar(this))
+                        {
+                            NavigationPage.SetHasNavigationBar(this, true);
+                        }
 
                         //ChannelsListView.IsVisible = true;
 
@@ -1569,10 +1583,6 @@ namespace DVBTTelevizor
 
                         break;
                 }
-
-                CloseVideoImage.IsVisible = false;
-                MinimizeVideoImage.IsVisible = false;
-                MaximizePreviewVideoImage.IsVisible = false;
             });
         }
 
@@ -1814,6 +1824,12 @@ namespace DVBTTelevizor
 
                         NoVideoStackLayout.IsVisible = false;
                         VideoStackLayout.IsVisible = true;
+
+                        if (AbsoluteLayout.GetLayoutBounds(VideoStackLayout) == NoVideoStackLayoutPosition)
+                        {
+                            _loggingService.Debug("CheckStream - VideoStackLayout has invalid bounds");
+                            RefreshGUI();
+                        }
                     }
 
                     // setting subtitles

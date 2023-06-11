@@ -293,24 +293,6 @@
                 </StackLayout.GestureRecognizers>
             </StackLayout>
 
-            <Image x:Name="CloseVideoImage" Source="Close.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="1.0,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" HorizontalOptions="End">
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnCloseVideoTapped" NumberOfTapsRequired="1" />
-                </Image.GestureRecognizers>
-            </Image>
-
-            <Image x:Name="MinimizeVideoImage" Source="Minimize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.9,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="5,0,5,0" HorizontalOptions="End">
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnMinimizeVideoTapped" NumberOfTapsRequired="1" />
-                </Image.GestureRecognizers>
-            </Image>
-
-            <Image x:Name="MaximizePreviewVideoImage" Source="Maximize.png"  IsVisible="False" AbsoluteLayout.LayoutBounds="0.8,0.0,0.1,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" HorizontalOptions="End">
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnMaximizeVideoTapped" NumberOfTapsRequired="1" />
-                </Image.GestureRecognizers>
-            </Image>
-
             <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
         </AbsoluteLayout>
