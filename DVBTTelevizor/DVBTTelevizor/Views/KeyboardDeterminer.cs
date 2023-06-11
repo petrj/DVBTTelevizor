@@ -104,10 +104,23 @@ namespace DVBTTelevizor
                 case "home":
                 case "movehome":
                 case "mediafastforward":
+                case "mediaplaypause":
                 case "mediaforward":
                 case "mediarewind":
                 case "mediafastrewind":
-
+                case "mediastop":
+                case "blue":
+                case "progblue":
+                case "yellow":
+                case "progyellow":
+                case "green":
+                case "proggreen":
+                case "red":
+                case "progred":
+                case "F9":
+                case "F10":
+                case "F11":
+                case "F12":
                     return true;
                 default:
                     return false;
@@ -186,9 +199,8 @@ namespace DVBTTelevizor
             {
                 case "f4":
                 case "escape":
-                case "mediaplaystop":
-                case "mediastop":
                 case "mediaclose":
+                case "mediaplaystop":
                 case "numpadsubtract":
                 case "del":
                 case "buttonx":

@@ -16,6 +16,7 @@ using LibVLCSharp.Shared;
 using static DVBTTelevizor.MainPageViewModel;
 using System.Runtime.InteropServices;
 using RemoteAccessService;
+using System.Security.Cryptography;
 
 
 namespace DVBTTelevizor
@@ -35,6 +36,8 @@ namespace DVBTTelevizor
         private ChannelService _channelService;
         private KeyboardFocusableItem _tuneFocusItem = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
+        private DateTime _lastToggledAudioStreamTime = DateTime.MinValue;
+        private DateTime _lastToggledSubtitlesTime = DateTime.MinValue;
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
@@ -316,9 +319,13 @@ namespace DVBTTelevizor
             }
             set
             {
+                var oldValue = _viewModel.PlayingState;
                 _viewModel.PlayingState = value;
 
-                RefreshGUI();
+                if (oldValue != value)
+                {
+                    RefreshGUI();
+                }
             }
         }
 
@@ -660,7 +667,200 @@ namespace DVBTTelevizor
                 case "menu":
                     await Detail_Clicked(this, null);
                     break;
+                case "red":
+                case "progred":
+                case "F9":
+                    await ToggleRecord();
+                    break;
+                case "green":
+                case "proggreen":
+                case "F10":
+                    await _viewModel.ShowChannelMenu();
+                    break;
+                case "yellow":
+                case "progyellow":
+                case "F11":
+                    ToggleSubtitles();
+                    break;
+                case "blue":
+                case "progblue":
+                case "F12":
+                    ToggleAudioStream();
+                    break;
+                case "mediaplaypause":
+                    await ActionPlay(false);
+                    break;
+                case "mediastop":
+                    await ActionStop(true);
+                    break;
             }
+        }
+
+        private async Task ToggleRecord()
+        {
+            if (_viewModel.SelectedChannel == null)
+            {
+                return;
+            }
+
+            if (_viewModel.RecordingChannel == null)
+            {
+                MessagingCenter.Send(new PlayStreamInfo { Channel = _viewModel.SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
+            } else
+            {
+                await _viewModel.StopRecord();
+            }
+        }
+
+        private void ToggleAudioStream()
+        {
+            _loggingService.Info($"ToggleAudioStream");
+
+            if ((_lastToggledAudioStreamTime != DateTime.MinValue) && (DateTime.Now - _lastToggledAudioStreamTime).TotalSeconds < 3)
+            {
+                return;
+            }
+
+            _lastToggledAudioStreamTime = DateTime.Now;
+
+            if (_mediaPlayer == null)
+                return;
+
+            if (_viewModel.PlayingChannelAudioTracks.Count <= 1)
+                return;
+
+            var currentAudioTrack = _mediaPlayer.AudioTrack;
+            if (currentAudioTrack == -1)
+                return;
+
+            var firstAudioTrackId = -1;
+            string firstAudioTrackName = null;
+
+            var select = false;
+            var selected = false;
+
+            string selectedName = null;
+            int selectedId = -1;
+
+            foreach (var track in _viewModel.PlayingChannelAudioTracks)
+            {
+                if (firstAudioTrackId == -1)
+                {
+                    firstAudioTrackId = track.Key;
+                    firstAudioTrackName = track.Value;
+                }
+
+                // toggle next track
+                if (track.Key == currentAudioTrack)
+                {
+                    select = true;
+                }
+                else
+                {
+                    if (select)
+                    {
+                        selectedName = track.Value;
+                        selectedId = track.Key;
+                        selected = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!selected)
+            {
+                selectedName = firstAudioTrackName;
+                selectedId = firstAudioTrackId;
+            }
+
+            _mediaPlayer.SetAudioTrack(selectedId);
+
+            if (string.IsNullOrEmpty(selectedName)) selectedName = $"# {selectedId}";
+
+            MessagingCenter.Send($"Setting audio track {selectedName}", BaseViewModel.MSG_ToastMessage);
+
+            _loggingService.Info($"Selected audio track: {selectedName}");
+        }
+
+        private void ToggleSubtitles()
+        {
+            _loggingService.Info($"ToggleSubtitles");
+
+            if ((_lastToggledSubtitlesTime != DateTime.MinValue) && (DateTime.Now - _lastToggledSubtitlesTime).TotalSeconds < 3)
+            {
+                return;
+            }
+
+            _lastToggledSubtitlesTime = DateTime.Now;
+
+            if (_mediaPlayer == null)
+                return;
+
+            if (_viewModel.PlayingChannelSubtitles.Count == 0)
+                return;
+
+            var currentSubtitlesTrack = _mediaPlayer.Spu;
+
+            var firstSubtitlesId = -1;
+            string firstSubtitlesName = null;
+
+            var select = false;
+            var selected = false;
+
+            string selectedName = null;
+            int selectedId = -1;
+
+            foreach (var subt in _viewModel.PlayingChannelSubtitles)
+            {
+                if (firstSubtitlesId == -1)
+                {
+                    firstSubtitlesId = subt.Key;
+                    firstSubtitlesName = subt.Value;
+                }
+
+                // toggle next track
+                if (subt.Key == currentSubtitlesTrack)
+                {
+                    select = true;
+                }
+                else
+                {
+                    if (select)
+                    {
+                        selectedName = subt.Value;
+                        selectedId = subt.Key;
+                        selected = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!selected)
+            {
+                if (currentSubtitlesTrack == -1)
+                {
+                    selectedName = firstSubtitlesName;
+                    selectedId = firstSubtitlesId;
+                } else
+                {
+                    selectedName = "disabled";
+                    selectedId = -1;
+                }
+            }
+
+            _mediaPlayer.SetSpu(selectedId);
+
+            if (string.IsNullOrEmpty(selectedName)) selectedName = $"# {selectedId}";
+
+            if (selectedName == "disabled")
+            {
+                MessagingCenter.Send($"Subtitles disabled", BaseViewModel.MSG_ToastMessage);
+            } else
+            {
+                MessagingCenter.Send($"Setting subtitles {selectedName}", BaseViewModel.MSG_ToastMessage);
+            }
+
+            _loggingService.Info($"Selected subtitles: {selectedName}");
         }
 
         private void HandleNumKey(int number)
@@ -1768,6 +1968,7 @@ namespace DVBTTelevizor
                     if (_viewModel.RecordingChannel == null)
                     {
                         videoView.MediaPlayer.Stop();
+                        await _driver.Stop();
                     }
                     else
                     {
@@ -1775,8 +1976,6 @@ namespace DVBTTelevizor
                         videoView.MediaPlayer.SetAudioTrack(-1);
                     }
                 });
-
-                await _driver.Stop();
 
                 PlayingState = PlayingStateEnum.Stopped;
                 _viewModel.PlayingChannelSubtitles.Clear();
