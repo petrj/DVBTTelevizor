@@ -26,9 +26,9 @@ namespace DVBTTelevizor
         public const long FrequencyMinDefaultKHz = 174000;  // 174.0 MHz - VHF high-band (band III) channel 7
         public const long FrequencyMaxDefaultKHz = 858000;  // 858.0 MHz - UHF band channel 69
 
-        public long FrequencyDefaultKHz { get; set; } = 470000;
-        public long FrequencyFromDefaultKHz { get; set; } = 470000;
-        public long FrequencyToDefaultKHz { get; set; } = 858000;
+        public long FrequencyDefaultKHz { get; set; } = 474000;
+        public long FrequencyFromDefaultKHz { get; set; } = 474000;
+        public long FrequencyToDefaultKHz { get; set; } = 852000;
 
         public const long BandWidthMinKHz = 1000;
         public const long BandWidthMaxKHz = 64000;
@@ -799,27 +799,24 @@ namespace DVBTTelevizor
                 if (ValidFrequency(Config.FrequencyFromKHz))
                 {
                     FrequencyFromKHz = Config.FrequencyFromKHz;
+                } else
+                {
+                    FrequencyFromKHz = FrequencyFromDefaultKHz;
                 }
                 if (ValidFrequency(Config.FrequencyToKHz))
                 {
                     FrequencyToKHz = Config.FrequencyToKHz;
+                } else
+                {
+                    FrequencyToKHz = FrequencyToDefaultKHz;
                 }
+
                 if (ValidFrequency(Config.FrequencyKHz))
                 {
                     FrequencyKHz = Config.FrequencyKHz;
-                }
-
-                if (!ValidFrequency(FrequencyKHz))
+                } else
                 {
                     FrequencyKHz = FrequencyDefaultKHz;
-                }
-                if (!ValidFrequency(FrequencyFromKHz))
-                {
-                    FrequencyFromKHz = FrequencyFromDefaultKHz;
-                }
-                if (!ValidFrequency(FrequencyToKHz))
-                {
-                    FrequencyToKHz = FrequencyToDefaultKHz;
                 }
             }
             catch (Exception ex)

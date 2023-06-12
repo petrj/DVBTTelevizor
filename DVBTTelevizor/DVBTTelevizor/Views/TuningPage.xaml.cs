@@ -93,23 +93,21 @@ namespace DVBTTelevizor
                 {
                     TuningStackLayout.SetValue(Grid.ColumnSpanProperty, 3);
                     //TuningStackLayout.SetValue(Grid.RowSpanProperty, 1);
-                    HorizontalSplitterBoxView.IsVisible = true;
                     VeticalSplitterBoxView.IsVisible = false;
                     ChannelsListView.SetValue(Grid.ColumnSpanProperty, 3);
                     ChannelsListView.SetValue(Grid.ColumnProperty, 0);
-                    ChannelsListView.SetValue(Grid.RowProperty, 2);
+                    ChannelsListView.SetValue(Grid.RowProperty, 1);
                     ChannelsListView.SetValue(Grid.RowSpanProperty, 1);
                 }
                 else
                 {
                     TuningStackLayout.SetValue(Grid.ColumnSpanProperty, 1);
-                    TuningStackLayout.SetValue(Grid.RowSpanProperty,3);
-                    HorizontalSplitterBoxView.IsVisible = false;
+                    TuningStackLayout.SetValue(Grid.RowSpanProperty,2);
                     VeticalSplitterBoxView.IsVisible = true;
                     ChannelsListView.SetValue(Grid.RowProperty, 0);
                     ChannelsListView.SetValue(Grid.ColumnProperty, 2);
                     ChannelsListView.SetValue(Grid.ColumnSpanProperty, 1);
-                    ChannelsListView.SetValue(Grid.RowSpanProperty, 3);
+                    ChannelsListView.SetValue(Grid.RowSpanProperty, 2);
                 }
             });
         }

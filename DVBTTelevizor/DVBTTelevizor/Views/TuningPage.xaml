@@ -103,9 +103,8 @@
             <Grid x:Name="MainGrid" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition x:Name="MainGridFirstRow" Height="45*" />
-                    <RowDefinition x:Name="MainGridSecondRow" Height="3" />
-                    <RowDefinition x:Name="MainGridThirdRow" Height="55*" />
+                    <RowDefinition x:Name="MainGridFirstRow" Height="50*" />
+                    <RowDefinition x:Name="MainGridThirdRow" Height="50*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50*" />
@@ -207,11 +206,10 @@
 
                 </StackLayout>
 
-                <BoxView x:Name="HorizontalSplitterBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="#262626"/>
-                <BoxView x:Name="VeticalSplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" BackgroundColor="#262626"/>
+                <BoxView x:Name="VeticalSplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BackgroundColor="#262626"/>
 
                 <ListView x:Name="ChannelsListView"
-                        Grid.Row="2" Grid.Column="0"
+                        Grid.Row="1" Grid.Column="0"
                         Grid.ColumnSpan="3"
                         ItemsSource="{Binding TunedChannels}"
                         CachingStrategy="RecycleElement"
