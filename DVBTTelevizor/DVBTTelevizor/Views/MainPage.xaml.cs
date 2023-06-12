@@ -1682,8 +1682,7 @@ namespace DVBTTelevizor
                         }
 
                         //MainLayout.RaiseChild(VideoStackLayout);
-
-                        CheckStreamCommand.Execute(null);
+                        //CheckStreamCommand.Execute(null);
 
                         break;
                     case PlayingStateEnum.PlayingInPreview:
@@ -1733,7 +1732,7 @@ namespace DVBTTelevizor
                             AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
                         }
 
-                        CheckStreamCommand.Execute(null);
+                        //CheckStreamCommand.Execute(null);
 
                         break;
                     case PlayingStateEnum.Stopped:
@@ -1853,6 +1852,10 @@ namespace DVBTTelevizor
                     shouldMediaRecord = recording;
                 }
             }
+
+            _loggingService.Debug($"shouldMediaPlay: {shouldMediaPlay}");
+            _loggingService.Debug($"shouldDriverPlay: {shouldDriverPlay}");
+            _loggingService.Debug($"shouldMediaRecord: {shouldMediaRecord}");
 
             if (shouldDriverPlay)
             {
