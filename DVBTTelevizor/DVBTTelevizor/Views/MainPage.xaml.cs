@@ -17,6 +17,9 @@ using static DVBTTelevizor.MainPageViewModel;
 using System.Runtime.InteropServices;
 using RemoteAccessService;
 using System.Security.Cryptography;
+using Java.Util;
+using static Android.App.Assist.AssistStructure;
+using static Android.InputMethodServices.Keyboard;
 
 
 namespace DVBTTelevizor
@@ -244,29 +247,23 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeSubtitleId, (spuId) =>
             {
                 int id;
-                if (!int.TryParse(spuId, out id) || (!_viewModel.PlayingChannelSubtitles.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
+                if (!int.TryParse(spuId, out id) )
                 {
                     return;
                 }
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    videoView.MediaPlayer.SetSpu(id);
-                });
+                SetSubtitles(id);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAudioTrackId, (trackId) =>
             {
                 int id;
-                if (!int.TryParse(trackId, out id) || (!_viewModel.PlayingChannelAudioTracks.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
+                if (!int.TryParse(trackId, out id))
                 {
                     return;
                 }
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    videoView.MediaPlayer.SetAudioTrack(id);
-                });
+                SetAudioTrack(id);
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAspect, (aspect) =>
@@ -298,6 +295,54 @@ namespace DVBTTelevizor
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
             RestartRemoteAccessService();
         }
+
+        private void SetSubtitles(int id)
+        {
+            if ((!_viewModel.PlayingChannelSubtitles.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
+            {
+                return;
+            }
+
+            _viewModel.Subtitles = id;
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                videoView.MediaPlayer.SetSpu(id);
+            });
+        }
+
+        /// <summary>
+        /// -100 .. auto
+        /// -1 .. no audio
+        ///  0 .. n  .. track id
+        /// </summary>
+        /// <param name="id"></param>
+        private void SetAudioTrack(int id)
+        {
+            if (id == -100)
+            {
+                _viewModel.AudioTrack = -100;
+                return;
+            }
+
+            if ((!_viewModel.PlayingChannelAudioTracks.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
+            {
+                return;
+            }
+
+            _viewModel.AudioTrack = id;
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (_viewModel.RecordingChannel != null)
+                {
+                    videoView.MediaPlayer.SetAudioTrack(-1);
+                }
+
+                videoView.MediaPlayer.SetAudioTrack(id);
+            });
+        }
+
 
         private void RestartRemoteAccessService()
         {
@@ -786,7 +831,7 @@ namespace DVBTTelevizor
                 selectedId = firstAudioTrackId;
             }
 
-            _mediaPlayer.SetAudioTrack(selectedId);
+            SetAudioTrack(selectedId);
 
             if (string.IsNullOrEmpty(selectedName)) selectedName = $"# {selectedId}";
 
@@ -861,7 +906,7 @@ namespace DVBTTelevizor
                 }
             }
 
-            _mediaPlayer.SetSpu(selectedId);
+            SetSubtitles(selectedId);
 
             if (string.IsNullOrEmpty(selectedName)) selectedName = $"# {selectedId}";
 
@@ -1895,7 +1940,8 @@ namespace DVBTTelevizor
 
                     channel.Recording = true;
 
-                    _media.AddOption(":sout=#duplicate{dst=file{dst=\"" + _viewModel.RecordingFileName + "\"},dst=display}");
+                    //_media.AddOption(":sout=#duplicate{dst=file{dst=\"" + _viewModel.RecordingFileName + "\"},dst=display}");
+                    _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
                     _media.AddOption(":sout-keep");
 
                     MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
@@ -1908,12 +1954,10 @@ namespace DVBTTelevizor
                         videoView.MediaPlayer.Stop();
                     }
                     videoView.MediaPlayer.Play(_media);
-
-                    if (shouldMediaRecord)
-                    {
-                        videoView.MediaPlayer.SetSpu(-1);
-                    }
                 });
+
+                SetSubtitles(-1);
+                SetAudioTrack(-100);
             }
 
             var playInfo = new PlayStreamInfo
@@ -1989,7 +2033,7 @@ namespace DVBTTelevizor
                     else
                     {
                         // Mute does not work
-                        videoView.MediaPlayer.SetAudioTrack(-1);
+                        SetAudioTrack(-1);
                     }
                 });
 
@@ -2009,6 +2053,8 @@ namespace DVBTTelevizor
 
         private async Task CheckStream()
         {
+            _loggingService.Debug("CheckStream");
+
             if (PlayingState == PlayingStateEnum.Stopped)
             {
                 return;
@@ -2018,9 +2064,7 @@ namespace DVBTTelevizor
             {
                 try
                 {
-
                     // checking stopped stream
-
                     if (!videoView.MediaPlayer.IsPlaying)
                     {
                         videoView.MediaPlayer.Play(_media);
@@ -2047,23 +2091,28 @@ namespace DVBTTelevizor
                         }
                     }
 
+                    var actualSubtitleTrack = videoView.MediaPlayer.Spu;
+                    var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
+
+                    _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                    _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+
                     // setting subtitles
                     foreach (var desc in videoView.MediaPlayer.SpuDescription)
                     {
                         if (!_viewModel.PlayingChannelSubtitles.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"Adding subtitle {desc.Name}");
+                            _loggingService.Debug($"CheckStream - Adding subtitle {desc.Name}");
                             _viewModel.PlayingChannelSubtitles.Add(desc.Id, desc.Name);
-                            //videoView.MediaPlayer.SetSpu(desc.Id);
                         }
                     }
 
-                    // setting audio
+                    // setting audio tracks
                     foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
                     {
                         if (!_viewModel.PlayingChannelAudioTracks.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"Adding audio track {desc.Name}");
+                            _loggingService.Debug($"CheckStream - Adding audio track {desc.Name}");
                             _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
                         }
                     }
@@ -2075,11 +2124,45 @@ namespace DVBTTelevizor
                         if (videoTrack.HasValue)
                         {
                             _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
-                            _loggingService.Debug($"Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
+                            _loggingService.Debug($"CheckStream - Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
                         }
                     }
 
-                } catch (Exception ex)
+                    // check subtitles
+                    if (actualSubtitleTrack != _viewModel.Subtitles)
+                    {
+                        _loggingService.Debug($"CheckStream - invalid subtitles {actualSubtitleTrack}, setting {_viewModel.Subtitles}");
+                        videoView.MediaPlayer.SetSpu(_viewModel.Subtitles);
+                    }
+
+                    // check audio track
+                    if (actualAudioTrack != _viewModel.AudioTrack)
+                    {
+                        if (_viewModel.AudioTrack == -100)
+                        {
+                            _loggingService.Debug($"CheckStream - Setting automatic audio track {actualAudioTrack}");
+                            _viewModel.AudioTrack = actualAudioTrack;
+
+                            if (_viewModel.RecordingChannel != null)
+                            {
+                                _loggingService.Debug($"CheckStream - Record audio fix");
+
+                                // workaround for ducplicate sound when sout duplicate
+                                Device.BeginInvokeOnMainThread(() =>
+                                {
+                                    videoView.MediaPlayer.SetAudioTrack(-1);
+                                    videoView.MediaPlayer.SetAudioTrack(actualAudioTrack);
+                                });
+                            }
+                        } else
+                        {
+                            _loggingService.Debug($"CheckStream - invalid audio track {actualAudioTrack}, setting {_viewModel.AudioTrack}");
+                            videoView.MediaPlayer.SetAudioTrack(_viewModel.AudioTrack);
+                        }
+                    }
+
+                }
+                catch (Exception ex)
                 {
                     _loggingService.Error(ex, "CheckStream general error");
                 }

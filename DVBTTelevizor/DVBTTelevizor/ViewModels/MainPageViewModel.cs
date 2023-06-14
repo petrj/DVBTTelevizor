@@ -59,7 +59,9 @@ namespace DVBTTelevizor
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
-        public int LastAudioTrack { get; set; } = -1;
+
+        public int AudioTrack { get; set; } = -100;
+        public int Subtitles { get; set; } = -1;
 
         public enum SelectedPartEnum
         {
@@ -678,11 +680,6 @@ namespace DVBTTelevizor
             MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_CloseRecordNotification);
 
             MessagingCenter.Send(String.Empty, BaseViewModel.MSG_StopStream);
-
-            if (_playingState != PlayingStateEnum.Stopped)
-            {
-                MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
-            }
 
             NotifyRecordChange();
         }
