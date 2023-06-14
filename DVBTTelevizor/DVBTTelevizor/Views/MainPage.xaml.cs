@@ -173,6 +173,19 @@ namespace DVBTTelevizor
                 });
             });
 
+            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_RecordStreamToFile, (playStreamInfo) =>
+            {
+                Task.Run(async () =>
+                {
+                    await _driver.Tune(playStreamInfo.Channel.Frequency, playStreamInfo.Channel.Bandwdith, playStreamInfo.Channel.DVBTType);
+                    await _driver.SetPIDs(playStreamInfo.Channel.PIDsArary);
+                    await _driver.StartRecording();
+                    _viewModel.RecordingChannel = playStreamInfo.Channel;
+                    _viewModel.RecordingChannel.Recording = true;
+                    _viewModel.NotifyRecordChange();
+                });
+            });
+
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfiguration, (message) =>
             {
                 _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");

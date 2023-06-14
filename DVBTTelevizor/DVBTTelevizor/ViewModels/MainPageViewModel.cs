@@ -13,6 +13,7 @@ using System.Linq;
 using MPEGTS;
 using LibVLCSharp.Shared;
 using static Android.Provider.MediaStore;
+using static Android.Icu.Text.AlphabeticIndex;
 
 namespace DVBTTelevizor
 {
@@ -470,6 +471,9 @@ namespace DVBTTelevizor
                 if (RecordingChannel == null)
                 {
                     actions.Add("Record");
+#if DEBUG
+                    actions.Add("Record to file");
+#endif
                 } else
                 {
                     actions.Add("Show record location");
@@ -529,11 +533,14 @@ namespace DVBTTelevizor
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
                     break;
+                case "Record to file":
+                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStreamToFile);
+                    break;
+
                 case "Show record location":
                     await _dialogService.Information(RecordingFileName);
                     break;
                 case "Stop record":
-                    //await RecordChannel(ch, false);
                     await StopRecord();
                     break;
                 case "Delete":
@@ -648,6 +655,14 @@ namespace DVBTTelevizor
         public async Task StopRecord()
         {
             _loggingService.Debug($"StopRecord");
+
+#if DEBUG
+            if (_driver.Recording)
+            {
+                _driver.StopRecording();
+                await _driver.SetPIDs(new List<long>() { 0, 17, 18 });
+            }
+#endif
 
             if (RecordingChannel == null)
             {
