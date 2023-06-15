@@ -328,6 +328,7 @@ Temporary Items
 # Android apk
 *.apk
 *.apk
+*.aab
 
 nuget.exe
 OnlineTelevizor\OnlineTelevizor.UWP\AppPackages\*

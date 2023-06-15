@@ -19,6 +19,7 @@ Využívá ovladač "DVB-T Driver": https://play.google.com/store/apps/details?i
 - podpora titulků
 - podpora změny audio stopy
 - podpora teletextu
+- podpora vzdáleného ovládání z jiného zařízení
 
 
 #### EN
@@ -37,6 +38,7 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - Android 4.4 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a
 - supporting subtitles
 - supporting teletext
+- remote access from other device
 
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot2.png" width="400" alt="Screenshot2"/>
