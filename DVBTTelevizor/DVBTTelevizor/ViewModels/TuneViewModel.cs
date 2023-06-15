@@ -760,39 +760,43 @@ namespace DVBTTelevizor
 
             try
             {
-                var cap = await _driver.GetCapabalities();
-
-                // setting min/max frequencies from device
-                if (cap.SuccessFlag)
-                {
-                    FrequencyMinKHz = cap.minFrequency / 1000;
-                    FrequencyMaxKHz = cap.maxFrequency / 1000;
-                } else
-                {
-                    FrequencyMinKHz = FrequencyMinDefaultKHz;
-                    FrequencyMaxKHz = FrequencyMaxDefaultKHz;
-                }
-
-                // setting default frequencies according to min/max
-                if (!ValidFrequency(FrequencyDefaultKHz))
-                {
-                    FrequencyDefaultKHz = FrequencyMinKHz;
-                }
-                if (!ValidFrequency(FrequencyFromDefaultKHz))
-                {
-                    FrequencyFromDefaultKHz = FrequencyMinKHz;
-                }
-                if (!ValidFrequency(FrequencyToDefaultKHz))
-                {
-                    FrequencyToDefaultKHz = FrequencyMaxKHz;
-                }
-
                 // bandwidth
                 if (_config.BandWidthKHz != default &&
                     _config.BandWidthKHz >= BandWidthMinKHz &&
                     _config.BandWidthKHz <= BandWidthMaxKHz)
                 {
                     TuneBandWidthKHz = _config.BandWidthKHz;
+                }
+
+                try
+                {
+                    FrequencyMinKHz = FrequencyMinDefaultKHz;
+                    FrequencyMaxKHz = FrequencyMaxDefaultKHz;
+
+                    var cap = await _driver.GetCapabalities();
+
+                    // setting min/max frequencies from device
+                    if (cap.SuccessFlag)
+                    {
+                        FrequencyMinKHz = cap.minFrequency / 1000;
+                        FrequencyMaxKHz = cap.maxFrequency / 1000;
+                    }
+                } catch
+                {
+                }
+
+                // setting default frequencies according to min/max
+                if (!ValidFrequency(FrequencyDefaultKHz))
+                {
+                    FrequencyDefaultKHz = FrequencyMinKHz + TuneBandWidthKHz/2;
+                }
+                if (!ValidFrequency(FrequencyFromDefaultKHz))
+                {
+                    FrequencyFromDefaultKHz = FrequencyMinKHz + TuneBandWidthKHz / 2;
+                }
+                if (!ValidFrequency(FrequencyToDefaultKHz))
+                {
+                    FrequencyToDefaultKHz = FrequencyMaxKHz;
                 }
 
                 // loading frequencies from configuration

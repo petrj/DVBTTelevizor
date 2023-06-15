@@ -51,6 +51,20 @@ namespace DVBTTelevizor
             });
 
             BuildFocusableItems();
+
+            IPEntry.Focused += Entry_Focused;
+            PortEntry.Focused += Entry_Focused;
+            SecurityKeyEntry.Focused += Entry_Focused;
+        }
+
+        private void Entry_Focused(object sender, FocusEventArgs e)
+        {
+            if (sender is Entry entry)
+            {
+                // move cursor to end
+                if (entry.Text != null)
+                    entry.CursorPosition = entry.Text.Length;
+            }
         }
 
         public async Task AcknowledgePurchases()
@@ -253,7 +267,18 @@ namespace DVBTTelevizor
 
         public void OnTextSent(string text)
         {
-
+            switch (_focusItems.FocusedItemName)
+            {
+                case "RemoteAccessIP":
+                    IPEntry.Text = text;
+                    break;
+                case "RemoteAccessPort":
+                    PortEntry.Text = text;
+                    break;
+                case "RemoteAccessSecurityKey":
+                    SecurityKeyEntry.Text = text;
+                    break;
+            }
         }
 
         private void OnRemoteTelevizorLabelTapped(object sender, EventArgs e)
