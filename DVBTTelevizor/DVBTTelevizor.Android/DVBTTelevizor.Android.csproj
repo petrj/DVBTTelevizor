@@ -55,8 +55,8 @@
     <AndroidEnableSGenConcurrent>false</AndroidEnableSGenConcurrent>
     <AndroidLinkMode>None</AndroidLinkMode>
     <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
-    <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
-    <AndroidPackageFormat>aab</AndroidPackageFormat>
+    <AndroidCreatePackagePerAbi>true</AndroidCreatePackagePerAbi>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidUseAapt2>true</AndroidUseAapt2>
   </PropertyGroup>
   <ItemGroup>
