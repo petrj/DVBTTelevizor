@@ -68,6 +68,8 @@ namespace DVBTTelevizor
         public const string MSG_ImportChannelsList = "ImportChannelsList";
         public const string MSG_RemoteKeyAction = "RemoteKeyAction";
 
+        public const string MSG_SettingsPageForceLayout = "SettingsPageForceLayout";
+
         public string SelectedToolbarItemName { get; set; } = null;
 
         public BaseViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)

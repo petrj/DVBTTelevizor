@@ -402,6 +402,7 @@ namespace DVBTTelevizor
                 Config.AllowRemoteAccessService = value;
 
                 OnPropertyChanged(nameof(Config));
+                MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_SettingsPageForceLayout);
             }
         }
     }

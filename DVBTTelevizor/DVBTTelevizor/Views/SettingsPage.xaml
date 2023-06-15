@@ -68,9 +68,9 @@
 
     <ContentPage.Content>
 
-        <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" >
+        <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-            <StackLayout>
+            <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
                 <StackLayout Margin="0,0,0,30">
 
@@ -196,60 +196,64 @@
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="RemoteAccessSwitch" IsToggled="{Binding AllowRemoteAccessService, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
                     </Grid>
 
-                    <Grid Margin="30,10,0,0" IsVisible="{Binding Config.AllowRemoteAccessService}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100*" />
-                        </Grid.ColumnDefinitions>
+                    <StackLayout IsVisible="{Binding Config.AllowRemoteAccessService}">
 
-                        <BoxView x:Name="RemoteAccessIPBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
-                        <Label  Grid.Row="0" Grid.Column="0" Text="IP" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Entry  Grid.Row="1" Grid.Column="0" x:Name="IPEntry" Text="{Binding Config.RemoteAccessServiceIP, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
-
-                        <BoxView x:Name="RemoteAccessPortBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
-                        <Label  Grid.Row="2" Grid.Column="0" Text="Port" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Entry  Grid.Row="3" Grid.Column="0" x:Name="PortEntry" Text="{Binding Config.RemoteAccessServicePort, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
-
-                        <BoxView x:Name="RemoteAccessSecurityKeyBoxView" Grid.Row="4" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
-                        <Label  Grid.Row="4" Grid.Column="0" Text="Security key" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Entry Grid.Row="5" Grid.Column="0"  x:Name="SecurityKeyEntry" Text="{Binding Config.RemoteAccessServiceSecurityKey, Mode=TwoWay}" Style="{StaticResource EntryStyle}" />
-
-                        <Grid Grid.Row="6" Grid.Column="0" HorizontalOptions="End">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="100" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" />
-                                    <ColumnDefinition Width="auto" />
+                        <Grid Margin="30,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100*" />
                             </Grid.ColumnDefinitions>
 
-                                <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Source="RemoteTelevizor" Aspect="AspectFit" VerticalOptions="Start" HorizontalOptions="Center">
-                                    <Image.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />
-                                    </Image.GestureRecognizers>
-                                </Image>
-                            <Label Grid.Row="0" Grid.Column="0" Text="Use app" Style="{StaticResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-                            <Label Grid.Row="0" Grid.Column="1" Text="Remote Televizor" Style="{StaticResource LinkStyle}" FontSize="{Binding FontSizeForDetailNote}" >
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />
-                                    </Label.GestureRecognizers>
-                                </Label>
+                            <BoxView x:Name="RemoteAccessIPBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                            <Label  Grid.Row="0" Grid.Column="0" Text="IP" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                            <Entry  Grid.Row="1" Grid.Column="0" x:Name="IPEntry" Text="{Binding Config.RemoteAccessServiceIP, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
 
+                            <BoxView x:Name="RemoteAccessPortBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                            <Label  Grid.Row="2" Grid.Column="0" Text="Port" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                            <Entry  Grid.Row="3" Grid.Column="0" x:Name="PortEntry" Text="{Binding Config.RemoteAccessServicePort, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
+
+                            <BoxView x:Name="RemoteAccessSecurityKeyBoxView" Grid.Row="4" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                            <Label  Grid.Row="4" Grid.Column="0" Text="Security key" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Entry Grid.Row="5" Grid.Column="0"  x:Name="SecurityKeyEntry" Text="{Binding Config.RemoteAccessServiceSecurityKey, Mode=TwoWay}" Style="{StaticResource EntryStyle}" />
+
+                            <Grid Grid.Row="6" Grid.Column="0" HorizontalOptions="End">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="100" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+
+                                    <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Source="RemoteTelevizor" Aspect="AspectFit" VerticalOptions="Start" HorizontalOptions="Center">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                <Label Grid.Row="0" Grid.Column="0" Text="Use app" Style="{StaticResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+                                <Label Grid.Row="0" Grid.Column="1" Text="Remote Televizor" Style="{StaticResource LinkStyle}" FontSize="{Binding FontSizeForDetailNote}" >
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />
+                                        </Label.GestureRecognizers>
+                                    </Label>
+
+                            </Grid>
                         </Grid>
-                    </Grid>
+
+                    </StackLayout>
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,30" x:Name="StackLayoutLogging">
 
                     <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -283,7 +287,7 @@
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,30" x:Name="StackLayoutDonate">
 
                     <Label Text="Donate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
 

@@ -40,6 +40,16 @@ namespace DVBTTelevizor
                 }
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_SettingsPageForceLayout, async (value) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    // workaround for overlayed Logging and Donate stacklayout after change visibility of Remote access stacklayout
+                    StackLayoutLogging.BackgroundColor = Color.Transparent;
+                    StackLayoutDonate.BackgroundColor = Color.Transparent;
+                });
+            });
+
             BuildFocusableItems();
         }
 
