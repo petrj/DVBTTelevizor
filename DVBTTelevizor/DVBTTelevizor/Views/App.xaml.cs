@@ -48,10 +48,7 @@ namespace DVBTTelevizor
         {
             _loggingService.Info($"OnResume");
 
-            if (_config.PlayOnBackground)
-            {
-                _mainPage.ResumePlayback();
-            }
+            _mainPage.Resume();
 
             if (!_driver.Started)
             {

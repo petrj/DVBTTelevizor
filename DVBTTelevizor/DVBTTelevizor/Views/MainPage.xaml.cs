@@ -417,16 +417,22 @@ namespace DVBTTelevizor
             });
         }
 
-        public void ResumePlayback()
+        public void Resume()
         {
             _loggingService.Info("ResumePlayback");
 
+            bool playing = false;
             if ((PlayingState == PlayingStateEnum.Playing) || (PlayingState == PlayingStateEnum.PlayingInPreview))
             {
-                // workaround for black screen after resume (only audio is playing)
-                // TODO: resume video without reinitializing
+                playing = true;
+            }
 
-                Device.BeginInvokeOnMainThread(() =>
+            // workaround for black screen after resume (only audio is playing)
+            // TODO: resume video without reinitializing
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (playing)
                 {
                     if (_mediaPlayer.VideoTrack != -1)
                     {
@@ -437,8 +443,13 @@ namespace DVBTTelevizor
 
                         videoView.MediaPlayer.Play();
                     }
-                });
-            }
+                } else
+                {
+                    VideoStackLayout.Children.Remove(videoView);
+                    VideoStackLayout.Children.Add(videoView);
+                }
+            });
+
         }
 
         private void OnMessageReceived(RemoteAccessService.RemoteAccessMessage message)
@@ -1940,9 +1951,9 @@ namespace DVBTTelevizor
 
                     channel.Recording = true;
 
-                    //_media.AddOption(":sout=#duplicate{dst=file{dst=\"" + _viewModel.RecordingFileName + "\"},dst=display}");
-                    _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
+                    _media.AddOption(":sout-all");  //  does not work? only first audio and no subtitles recorded!
                     _media.AddOption(":sout-keep");
+                    _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
 
                     MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
                 }
