@@ -116,6 +116,8 @@ namespace DVBTTelevizor
                 });
 
                 eit.ProgramNumberToMapPID.Add(0, 310);
+
+                DVBTDriverManager.SaveToDB(eit, freq);
             }
 
             if (freq == 514000000)
@@ -181,6 +183,8 @@ namespace DVBTTelevizor
                 eit.ProgramNumberToMapPID.Add(0, 2400);
                 eit.ProgramNumberToMapPID.Add(1, 2300);
                 eit.ProgramNumberToMapPID.Add(2, 7070);
+
+                DVBTDriverManager.SaveToDB(eit, freq);
             }
 
             if (freq == 626000000 && Freq626Loaded)
@@ -197,6 +201,8 @@ namespace DVBTTelevizor
                 });
 
                 eit.ProgramNumberToMapPID.Add(0, 8888);
+
+                DVBTDriverManager.SaveToDB(eit, freq);
             }
 
             return eit;

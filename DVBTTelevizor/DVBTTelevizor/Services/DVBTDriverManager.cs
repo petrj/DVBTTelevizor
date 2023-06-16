@@ -14,6 +14,8 @@ using LoggerService;
 using System.Runtime.InteropServices;
 using MPEGTS;
 using DVBTTelevizor.Models;
+using Android.Net.Sip;
+using SQLite;
 
 namespace DVBTTelevizor
 {
@@ -304,9 +306,6 @@ namespace DVBTTelevizor
                 if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
                 {
                     _log.Debug($"Signal found");
-
-                    //StartReadStream();
-                    //StartReadBuffer();
 
                     //await WaitForBufferPIDs(PIDs, 10000);
 
@@ -1138,7 +1137,7 @@ namespace DVBTTelevizor
 
         public async Task<EITScanResult> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
         {
-            _log.Debug($"Scanning EPG for freq {freq} ");
+            _log.Debug($"Scanning EPG for freq {freq} and programMapPID {programMapPID}");
 
             try
             {
@@ -1152,17 +1151,7 @@ namespace DVBTTelevizor
                     }; // already cached
                 }
 
-                // searching for PID 18 (EIT) + PSI packets ..
-
-                StartReadBuffer();
-
-                await Task.Delay(msTimeout);
-
-                var res = eitManager.Scan(Buffer);
-
-                StopReadBuffer();
-
-                return res;
+                return await ScanEPG(freq, msTimeout);
             }
             catch (Exception ex)
             {
@@ -1193,6 +1182,11 @@ namespace DVBTTelevizor
 
                 StopReadBuffer();
 
+                if (res.OK)
+                {
+                    SaveToDB(eitManager, freq);
+                }
+
                 return res;
             }
             catch (Exception ex)
@@ -1203,6 +1197,56 @@ namespace DVBTTelevizor
                 {
                     OK = false
                 };
+            }
+        }
+
+        private static string GetDBPath(long freq, int serviceId)
+        {
+            return Path.Combine(BaseViewModel.AndroidAppDirectory, $"EIT.{freq}.{serviceId}.sqllite");
+        }
+
+        public static void SaveToDB(EITManager eitManager, long freq)
+        {
+            try
+            {
+                foreach (var kvp in eitManager.ScheduledEvents)
+                {
+                    var serviceId = kvp.Key;
+
+                    var db = new SQLiteConnection(GetDBPath(freq, serviceId));
+
+                    db.DropTable<EventItem>();
+
+                    db.CreateTable<EventItem>();
+
+                    foreach (var eventItem in kvp.Value)
+                    {
+                        db.Insert(eventItem);
+                    }
+
+                    // current event added as record with negative id
+
+                    if (eitManager.CurrentEvents.ContainsKey(serviceId))
+                    {
+                        var eventItem = eitManager.CurrentEvents[serviceId];
+
+                        db.Insert(new EventItem()
+                        {
+                            EventId = -eventItem.EventId,
+                            EventName = eventItem.EventName,
+                            FinishTime = eventItem.FinishTime,
+                            StartTime = eventItem.StartTime,
+                            ServiceId = serviceId,
+                            Text = eventItem.Text,
+                            LanguageCode = eventItem.LanguageCode
+                        });
+                    }
+
+                    db.Close();
+                }
+            } catch (Exception ex)
+            {
+                //_log.Error(ex);
             }
         }
 
