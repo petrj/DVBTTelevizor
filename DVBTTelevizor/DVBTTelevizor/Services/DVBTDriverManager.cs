@@ -1200,9 +1200,9 @@ namespace DVBTTelevizor
             }
         }
 
-        private static string GetDBPath(long freq, int serviceId)
+        private static string GetDBPath(long freq, int programMapPID)
         {
-            return Path.Combine(BaseViewModel.AndroidAppDirectory, $"EIT.{freq}.{serviceId}.sqllite");
+            return Path.Combine(BaseViewModel.AndroidAppDirectory, $"EIT.{freq}.{programMapPID}.sqllite");
         }
 
         public static void SaveToDB(EITManager eitManager, long freq)
@@ -1211,9 +1211,9 @@ namespace DVBTTelevizor
             {
                 foreach (var kvp in eitManager.ScheduledEvents)
                 {
-                    var serviceId = kvp.Key;
+                    var programMapPID = kvp.Key;
 
-                    var db = new SQLiteConnection(GetDBPath(freq, serviceId));
+                    var db = new SQLiteConnection(GetDBPath(freq, programMapPID));
 
                     db.DropTable<EventItem>();
 
@@ -1226,9 +1226,9 @@ namespace DVBTTelevizor
 
                     // current event added as record with negative id
 
-                    if (eitManager.CurrentEvents.ContainsKey(serviceId))
+                    if (eitManager.CurrentEvents.ContainsKey(programMapPID))
                     {
-                        var eventItem = eitManager.CurrentEvents[serviceId];
+                        var eventItem = eitManager.CurrentEvents[programMapPID];
 
                         db.Insert(new EventItem()
                         {
@@ -1236,7 +1236,7 @@ namespace DVBTTelevizor
                             EventName = eventItem.EventName,
                             FinishTime = eventItem.FinishTime,
                             StartTime = eventItem.StartTime,
-                            ServiceId = serviceId,
+                            ServiceId = eventItem.ServiceId,
                             Text = eventItem.Text,
                             LanguageCode = eventItem.LanguageCode
                         });

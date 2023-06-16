@@ -96,7 +96,7 @@ namespace DVBTTelevizor
 
             if (freq == 490000000)
             {
-                eit.ScheduledEvents.Add(0, new List<EventItem>()
+                eit.ScheduledEvents.Add(310, new List<EventItem>()
                 {
                     new EventItem()
                     {
@@ -115,14 +115,12 @@ namespace DVBTTelevizor
                 }
                 });
 
-                eit.ProgramNumberToMapPID.Add(0, 310);
-
                 DVBTDriverManager.SaveToDB(eit, freq);
             }
 
             if (freq == 514000000)
             {
-                eit.ScheduledEvents.Add(0, new List<EventItem>()
+                eit.ScheduledEvents.Add(2400, new List<EventItem>()
                 {
                     new EventItem()
                     {
@@ -141,7 +139,7 @@ namespace DVBTTelevizor
                     }
                 });
 
-                eit.ScheduledEvents.Add(1, new List<EventItem>()
+                eit.ScheduledEvents.Add(2300, new List<EventItem>()
                 {
                     new EventItem()
                     {
@@ -161,7 +159,7 @@ namespace DVBTTelevizor
 
                 });
 
-                eit.ScheduledEvents.Add(2, new List<EventItem>()
+                eit.ScheduledEvents.Add(7070, new List<EventItem>()
                 {
                     new EventItem()
                     {
@@ -180,16 +178,12 @@ namespace DVBTTelevizor
                     }
                 });
 
-                eit.ProgramNumberToMapPID.Add(0, 2400);
-                eit.ProgramNumberToMapPID.Add(1, 2300);
-                eit.ProgramNumberToMapPID.Add(2, 7070);
-
                 DVBTDriverManager.SaveToDB(eit, freq);
             }
 
             if (freq == 626000000 && Freq626Loaded)
             {
-                eit.ScheduledEvents.Add(0, new List<EventItem>()
+                eit.ScheduledEvents.Add(8888, new List<EventItem>()
                 {
                     new EventItem()
                     {
@@ -199,8 +193,6 @@ namespace DVBTTelevizor
                         FinishTime = timeAfterTenMinutes
                     }
                 });
-
-                eit.ProgramNumberToMapPID.Add(0, 8888);
 
                 DVBTDriverManager.SaveToDB(eit, freq);
             }
