@@ -767,14 +767,20 @@ namespace DVBTTelevizor
                 });
         }
 
-        public string SelectedChannelName
+        public string NoVideoTitle
         {
             get
             {
-                if (SelectedChannel == null)
-                return null;
+                if (PlayingChannel == null)
+                {
+                    if (SelectedChannel == null)
+                        return null;
 
-                return SelectedChannel.Name;
+                    return SelectedChannel.Name;
+                } else
+                {
+                    return PlayingChannel.Name;
+                }
             }
         }
 
@@ -800,7 +806,7 @@ namespace DVBTTelevizor
                     _selectedChannel = value;
 
                     OnPropertyChanged(nameof(SelectedChannel));
-                    OnPropertyChanged(nameof(SelectedChannelName));
+                    OnPropertyChanged(nameof(NoVideoTitle));
                     OnPropertyChanged(nameof(SelectedChannelEPGTitle));
                     OnPropertyChanged(nameof(SelectedChannelEPGDescription));
                     OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
