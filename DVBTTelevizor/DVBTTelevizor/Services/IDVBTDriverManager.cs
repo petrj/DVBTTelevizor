@@ -31,32 +31,30 @@ namespace DVBTTelevizor
         string RecordFileName { get; }
 
         string DataStreamInfo { get; set; }
-        List<byte> Buffer { get; }
+
+        long LastTunedFreq { get; }
 
         void Start();
         Task Disconnect();
 
-        void StopReadStream();
-
         Task StartRecording();
         void StopRecording();
 
-        Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs);
+        void StopReadStream();
+
         Task<bool> Stop();
 
         Task<bool> CheckStatus();
         Task<DVBTStatus> GetStatus();
         Task<DVBTVersion> GetVersion();
         Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySystem);
+        Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning);
         Task<DVBTResponse> SetPIDs(List<long> PIDs);
         Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000);
         Task<DVBTCapabilities> GetCapabalities();
         Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs);
-        Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning);
-        Task<EITScanResult> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000);
-        Task<EITScanResult> ScanEPG(long freq, int msTimeout = 2000);
         Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true);
 
-        EITManager GetEITManager(long freq);
+        Task<EITScanResult> ScanEPG(int msTimeout = 2000);
     }
 }

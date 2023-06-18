@@ -1,4 +1,5 @@
-﻿using MPEGTS;
+﻿using DVBTTelevizor.Models;
+using MPEGTS;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -257,6 +258,18 @@ namespace DVBTTelevizor
         {
             CurrentEventItem = null;
             NextEventItem = null;
+        }
+
+        public void SetCurrentEvent(EPGCurrentEvent currentEvent)
+        {
+            if (currentEvent == null)
+                return;
+
+            if (currentEvent.CurrentEventItem != null)
+                CurrentEventItem = currentEvent.CurrentEventItem;
+
+            if (currentEvent.NextEventItem != null)
+                NextEventItem = currentEvent.NextEventItem;
         }
 
         public void NotifyEPGChanges()

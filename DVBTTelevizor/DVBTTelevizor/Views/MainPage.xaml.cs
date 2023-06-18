@@ -1454,8 +1454,8 @@ namespace DVBTTelevizor
             }
 
             var msg = "\u25B6 " + playStreamInfo.Channel.Name;
-            if (playStreamInfo.CurrentEvent != null)
-                msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+            if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
+                msg += $" - {playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
 
             // showing signal percents only for the first time
             if (playStreamInfo.SignalStrengthPercentage > 0)
@@ -1870,7 +1870,7 @@ namespace DVBTTelevizor
                 return;
             }
 
-            int? signalStrengthPercentage = null;
+            long? signalStrengthPercentage = null;
 
             if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel != channel))
             {
@@ -1928,15 +1928,35 @@ namespace DVBTTelevizor
 
             if (shouldDriverPlay)
             {
-                var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
-                if ( (!playRes.OK) || (_driver.VideoStream == null))
-
+                var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
+                if (tunedRes.Result != SearchProgramResultEnum.OK)
                 {
-                    MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
+                    switch (tunedRes.Result)
+                    {
+                        case SearchProgramResultEnum.NoSignal:
+                            MessagingCenter.Send($"No sginal", BaseViewModel.MSG_ToastMessage);
+                            break;
+                        default:
+                            MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
+                            break;
+                    }
+
                     return;
                 }
 
-                signalStrengthPercentage = playRes.SignalStrengthPercentage;
+                if (_config.ScanEPG)
+                {
+                    var ev = await _viewModel.GetChannelEPG(channel);
+                    if (ev == null)
+                    {
+                        MessagingCenter.Send($"Scanning EPG...", BaseViewModel.MSG_ToastMessage);
+                        await _viewModel.EIT.Scan(1500);
+                    }
+                }
+
+                _driver.StopReadStream();
+
+                signalStrengthPercentage = tunedRes.SignalPercentStrength;
             }
 
             if (shouldMediaPlay)
@@ -1978,10 +1998,10 @@ namespace DVBTTelevizor
 
             if (signalStrengthPercentage.HasValue)
             {
-                playInfo.SignalStrengthPercentage = signalStrengthPercentage.Value;
+                playInfo.SignalStrengthPercentage = Convert.ToInt32(signalStrengthPercentage.Value);
             }
 
-            playInfo.CurrentEvent = await _viewModel.GetChannelEPG(_viewModel.SelectedChannel);
+            playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
             await ShowActualPlayingMessage(playInfo);
 

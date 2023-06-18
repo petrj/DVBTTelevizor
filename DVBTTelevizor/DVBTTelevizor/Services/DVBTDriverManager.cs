@@ -16,6 +16,7 @@ using MPEGTS;
 using DVBTTelevizor.Models;
 using Android.Net.Sip;
 using SQLite;
+using DVBTTelevizor.Services;
 
 namespace DVBTTelevizor
 {
@@ -44,8 +45,6 @@ namespace DVBTTelevizor
         private static object _infoLock = new object();
 
         private string _dataStreamInfo  = "Data reading not initialized";
-
-        private Dictionary<long,EITManager> _eitManagers = new Dictionary<long, EITManager>();  // frequency -> EITManager
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -109,7 +108,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public List<byte> Buffer
+        private List<byte> Buffer
         {
             get
             {
@@ -128,15 +127,12 @@ namespace DVBTTelevizor
             }
         }
 
-        public EITManager GetEITManager(long freq)
+        public long LastTunedFreq
         {
-            if (_eitManagers.ContainsKey(freq))
-                return _eitManagers[freq];
-
-            var eitManager = new EITManager(_log);
-            _eitManagers.Add(freq, eitManager);
-
-            return eitManager;
+            get
+            {
+                return _lastTunedFreq;
+            }
         }
 
         public void Start()
@@ -272,62 +268,6 @@ namespace DVBTTelevizor
 
                 _readingBuffer = false;
             }
-        }
-
-        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs)
-        {
-            var res = new PlayResult()
-            {
-                OK = false
-            };
-
-            _log.Debug($"Playing {frequency} Mhz, type: {deliverySystem}, PIDs: {String.Join(",", PIDs)}");
-
-            var tunedRes = await Tune(frequency, bandwidth, deliverySystem);
-            if (!tunedRes.SuccessFlag)
-                return res;
-
-            var setPIDsRes = await SetPIDs(PIDs);
-            if (!setPIDsRes.SuccessFlag)
-                return res;
-
-            // wait 5s for signal ......
-
-            for (var i=0;i<5;i++)
-            {
-                _log.Debug($"Getting status {i+1}/{10}");
-
-                var statusRes = await GetStatus();
-                if (!statusRes.SuccessFlag)
-                {
-                    return res;
-                }
-
-                if (statusRes.hasSignal==1 && statusRes.hasLock == 1 && statusRes.hasSync == 1)
-                {
-                    _log.Debug($"Signal found");
-
-                    //await WaitForBufferPIDs(PIDs, 10000);
-
-                    if (_config.ScanEPG && PIDs.Count>0)
-                    {
-                        await ScanEPGForChannel(frequency, Convert.ToInt32(PIDs[0]), 500);
-                    }
-
-                    StopReadBuffer();
-                    StopReadStream();
-
-                    res.OK = true;
-                    res.SignalStrengthPercentage = Convert.ToInt32(statusRes.rfStrengthPercentage);
-
-                    return res;
-                }
-
-                await Task.Delay(500);
-            }
-
-            _log.Debug($"Signal not found");
-            return res;
         }
 
         public async Task<bool> Stop()
@@ -1021,9 +961,10 @@ namespace DVBTTelevizor
         /// <param name="frequency"></param>
         /// <param name="bandWidth"></param>
         /// <param name="deliverySystem"></param>
-        /// <returns>Signal strength
-        /// 0 .. no signal</returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
+        /// <param name="PIDs"></param>
+        /// <param name="fastTuning"></param>
+        /// <returns></returns>
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
             _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySystem} fastTuning: {fastTuning}");
 
@@ -1060,7 +1001,7 @@ namespace DVBTTelevizor
                 // set PIDs 0 and 17
                 for (var i = 1; i <= attemptsCount; i++)
                 {
-                    setPIDres = await SetPIDs( new List<long>() { 0,17,18 });
+                    setPIDres = await SetPIDs(PIDs);
 
                     if (setPIDres.SuccessFlag)
                     {
@@ -1135,59 +1076,23 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<EITScanResult> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
+        public async Task<EITScanResult> ScanEPG(int msTimeout = 2000)
         {
-            _log.Debug($"Scanning EPG for freq {freq} and programMapPID {programMapPID}");
+            _log.Debug($"Scanning EPG from Buffer");
 
             try
             {
-                var eitManager = GetEITManager(freq);
-                var ev = eitManager.GetEvent(DateTime.Now, programMapPID);
-                if (ev != null)
-                {
-                    return new EITScanResult()
-                    {
-                        OK = true
-                    }; // already cached
-                }
-
-                return await ScanEPG(freq, msTimeout);
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex);
-
-                return new EITScanResult()
-                {
-                    OK = false
-                };
-            }
-        }
-
-        public async Task<EITScanResult> ScanEPG(long freq, int msTimeout = 2000)
-        {
-            _log.Debug($"Scanning EPG for freq {freq}");
-
-            try
-            {
+                // searching for PID 18 (EIT) + PSI packets ..
                 StartReadBuffer();
 
                 await Task.Delay(msTimeout);
 
-                var eitManager = GetEITManager(freq);
-
-                // searching for PID 18 (EIT) + PSI packets ..
-
-                var res = eitManager.Scan(Buffer);
-
                 StopReadBuffer();
 
-                if (res.OK)
-                {
-                    SaveToDB(eitManager, freq);
-                }
+                var eitService = new EITService(_log);
+                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(Buffer));
 
-                return res;
+                return scanResult;
             }
             catch (Exception ex)
             {
@@ -1197,56 +1102,6 @@ namespace DVBTTelevizor
                 {
                     OK = false
                 };
-            }
-        }
-
-        private static string GetDBPath(long freq, int programMapPID)
-        {
-            return Path.Combine(BaseViewModel.AndroidAppDirectory, $"EIT.{freq}.{programMapPID}.sqllite");
-        }
-
-        public static void SaveToDB(EITManager eitManager, long freq)
-        {
-            try
-            {
-                foreach (var kvp in eitManager.ScheduledEvents)
-                {
-                    var programMapPID = kvp.Key;
-
-                    var db = new SQLiteConnection(GetDBPath(freq, programMapPID));
-
-                    db.DropTable<EventItem>();
-
-                    db.CreateTable<EventItem>();
-
-                    foreach (var eventItem in kvp.Value)
-                    {
-                        db.Insert(eventItem);
-                    }
-
-                    // current event added as record with negative id
-
-                    if (eitManager.CurrentEvents.ContainsKey(programMapPID))
-                    {
-                        var eventItem = eitManager.CurrentEvents[programMapPID];
-
-                        db.Insert(new EventItem()
-                        {
-                            EventId = -eventItem.EventId,
-                            EventName = eventItem.EventName,
-                            FinishTime = eventItem.FinishTime,
-                            StartTime = eventItem.StartTime,
-                            ServiceId = eventItem.ServiceId,
-                            Text = eventItem.Text,
-                            LanguageCode = eventItem.LanguageCode
-                        });
-                    }
-
-                    db.Close();
-                }
-            } catch (Exception ex)
-            {
-                //_log.Error(ex);
             }
         }
 
