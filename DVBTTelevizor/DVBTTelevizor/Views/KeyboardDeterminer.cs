@@ -52,6 +52,7 @@ namespace DVBTTelevizor
                 case "0":
                 case "num0":
                 case "number0":
+                case "numpad0":
                 case "1":
                 case "num1":
                 case "number1":
@@ -80,7 +81,6 @@ namespace DVBTTelevizor
                 case "num9":
                 case "number9":
                 case "f5":
-                case "numpad0":
                 case "ctrlleft":
                 case "buttonl2":
                 case "info":

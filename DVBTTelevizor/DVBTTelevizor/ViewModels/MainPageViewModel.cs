@@ -410,8 +410,15 @@ namespace DVBTTelevizor
 
             _loggingService.Info($"Long press on channel {ch.Name})");
 
-            DoNotScrollToChannel = true;
-            SelectedChannel = ch;
+            try
+            {
+                DoNotScrollToChannel = true;
+                SelectedChannel = ch;
+            }
+            finally
+            {
+                DoNotScrollToChannel = false;
+            }
         }
 
         public async Task ShowChannelMenu(DVBTChannel ch = null)
@@ -429,10 +436,18 @@ namespace DVBTTelevizor
             }
             else
             {
-                title = ch.Name;
+                if (PlayingChannel == null)
+                {
+                    title = ch.Name;
+                } else
+                {
+                    title = PlayingChannel.Name;
+                }
             }
 
             var actions = new List<string>();
+
+            string selectedChannelDetailAction = "Detail...";
 
             if (ch != null)
             {
@@ -473,7 +488,11 @@ namespace DVBTTelevizor
                     actions.Add("Stop record");
                 }
 
-                actions.Add("Detail...");
+                if (SelectedChannel != null)
+                {
+                    selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
+                    actions.Add(selectedChannelDetailAction);
+                }
 
                 if (ch.CurrentEventItem != null)
                 {
@@ -520,9 +539,6 @@ namespace DVBTTelevizor
                 case "Scan EPG":
                     await ScanEPG(ch);
                     break;
-                case "Detail...":
-                    MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
-                    break;
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
                     break;
@@ -545,6 +561,11 @@ namespace DVBTTelevizor
                         MessagingCenter.Send(String.Empty, BaseViewModel.MSG_QuitApp);
                     }
                     break;
+            }
+
+            if (action == selectedChannelDetailAction)
+            {
+                MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
             }
         }
 
@@ -693,7 +714,7 @@ namespace DVBTTelevizor
             {
                 // select and play
 
-                DoNotScrollToChannel = true;
+                //DoNotScrollToChannel = true;
 
                 var ch = item as DVBTChannel;
 

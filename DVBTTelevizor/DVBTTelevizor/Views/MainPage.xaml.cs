@@ -47,6 +47,7 @@ namespace DVBTTelevizor
         private bool _firstStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
+        private bool _lastTimeHome = false;
 
         public bool IsPortrait { get; private set; } = false;
 
@@ -294,14 +295,6 @@ namespace DVBTTelevizor
 
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
             RestartRemoteAccessService();
-
-            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected1;
-        }
-
-        private void ChannelsListView_ItemSelected1(object sender, SelectedItemChangedEventArgs e)
-        {
-            _loggingService.Debug("ChannelsListView_ItemSelected1");
-
         }
 
         private void SetSubtitles(int id)
@@ -675,6 +668,7 @@ namespace DVBTTelevizor
                 case "0":
                 case "num0":
                 case "number0":
+                case "numpad0":
                     HandleNumKey(0);
                     break;
                 case "1":
@@ -723,7 +717,6 @@ namespace DVBTTelevizor
                     HandleNumKey(9);
                     break;
                 case "f5":
-                case "numpad0":
                 case "ctrlleft":
                     _viewModel.RefreshCommand.Execute(null);
                     break;
@@ -974,9 +967,28 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-
                         Task.Run(async () =>
                         {
+                            if (_numberPressed == "0")
+                            {
+                                switch (_viewModel.PlayingState)
+                                {
+                                    case PlayingStateEnum.Playing:
+                                        await ActionLeft();
+                                        break;
+                                    case PlayingStateEnum.PlayingInPreview:
+                                        _viewModel.SelectedChannel = _viewModel.PlayingChannel;
+                                        await ActionPlay(_viewModel.RecordingChannel != null, _viewModel.PlayingChannel);
+                                        break;
+                                    case PlayingStateEnum.Stopped:
+                                        await ActionFirstOrLast(_lastTimeHome);
+                                        _lastTimeHome = !_lastTimeHome;
+                                        break;
+                                };
+
+                                return;
+                            }
+
                             await _viewModel.SelectChannelByNumber(_numberPressed);
 
                             if (
@@ -1538,8 +1550,6 @@ namespace DVBTTelevizor
             {
                 ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
             }
-
-            _viewModel.DoNotScrollToChannel = false;
 
             if (PlayingState != PlayingStateEnum.Playing)
             { // EPG detail should not be enabled when playing on fullscreen (avoiding not necessary RefreshGUI calling)
