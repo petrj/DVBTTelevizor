@@ -92,6 +92,11 @@ namespace DVBTTelevizor.Services
                 TryLoadEvents(freq, programMapPID);
             }
 
+            if (!FreqEPG.ContainsKey(freq))
+            {
+                return null;
+            }
+
             var channelEPG = FreqEPG[freq];
 
             if (!channelEPG.EventItems.ContainsKey(programMapPID))
@@ -107,6 +112,8 @@ namespace DVBTTelevizor.Services
             _log.Debug($"[EIT] Scanning freq {_driver.LastTunedFreq}");
 
             var scanRes = await _driver.ScanEPG(msTimeout);
+
+            _log.Debug($"[EIT] scanned result: {scanRes.OK}");
 
             if (!scanRes.OK)
             {
@@ -136,21 +143,30 @@ namespace DVBTTelevizor.Services
 
             // save to DB
 
-            foreach (var mapPID in modifiedMapPIDs)
+            Task.Run(() =>
             {
-                var db = new SQLiteConnection(GetDBPath(_driver.LastTunedFreq, mapPID));
+                _log.Debug($"[EIT] saving");
 
-                db.DropTable<EventItem>();
-
-                db.CreateTable<EventItem>();
-
-                foreach (var ev in channelEPG.EventItems[mapPID])
+                foreach (var mapPID in modifiedMapPIDs)
                 {
-                    db.Insert(ev);
+                    _log.Debug($"[EIT] saving MapPID {mapPID}");
+
+                    var db = new SQLiteConnection(GetDBPath(_driver.LastTunedFreq, mapPID));
+
+                    db.DropTable<EventItem>();
+
+                    db.CreateTable<EventItem>();
+
+                    foreach (var ev in channelEPG.EventItems[mapPID])
+                    {
+                        db.Insert(ev);
+                    }
+
+                    db.Close();
                 }
 
-                db.Close();
-            }
+                _log.Debug($"[EIT] saved");
+            });
 
             return new EITScanResult()
             {

@@ -294,6 +294,14 @@ namespace DVBTTelevizor
 
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
             RestartRemoteAccessService();
+
+            ChannelsListView.ItemSelected += ChannelsListView_ItemSelected1;
+        }
+
+        private void ChannelsListView_ItemSelected1(object sender, SelectedItemChangedEventArgs e)
+        {
+            _loggingService.Debug("ChannelsListView_ItemSelected1");
+
         }
 
         private void SetSubtitles(int id)
