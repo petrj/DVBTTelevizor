@@ -490,7 +490,13 @@ namespace DVBTTelevizor
 
                 if (SelectedChannel != null)
                 {
-                    selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
+                    if (PlayingChannel != null && SelectedChannel != PlayingChannel)
+                    {
+                        selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
+                    } else
+                    {
+                        selectedChannelDetailAction = $"Detail...";
+                    }
                     actions.Add(selectedChannelDetailAction);
                 }
 
