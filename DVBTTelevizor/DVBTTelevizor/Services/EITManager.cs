@@ -74,8 +74,6 @@ namespace DVBTTelevizor.Services
 
         private void TryLoadEvents(long freq, long programMapPID)
         {
-            _log.Debug($"[EIT] TryLoadEvents");
-
             var dbPath = GetDBPath(freq, programMapPID);
             if (!File.Exists(dbPath))
             {
@@ -93,6 +91,8 @@ namespace DVBTTelevizor.Services
             {
                 channelEPG = FreqEPG[freq];
             }
+
+            _log.Debug($"[EIT] Loading events {freq}.{programMapPID}");
 
             var db = new SQLiteConnection(GetDBPath(freq, programMapPID));
 
