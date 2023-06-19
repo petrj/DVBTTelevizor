@@ -257,6 +257,8 @@ namespace DVBTTelevizor
             {
                 await _channelService.SaveChannels(new System.Collections.ObjectModel.ObservableCollection<DVBTChannel>());
 
+                MessagingCenter.Send(String.Empty, BaseViewModel.MSG_ClearEPG);
+
                 MessagingCenter.Send("Channels cleared", BaseViewModel.MSG_ToastMessage);
             }
         }

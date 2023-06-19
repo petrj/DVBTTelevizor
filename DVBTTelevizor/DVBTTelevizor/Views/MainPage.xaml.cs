@@ -288,6 +288,11 @@ namespace DVBTTelevizor
                 });
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearEPG, (msg) =>
+            {
+                _viewModel.EIT.ClearAll();
+            });
+
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
             _tuneFocusItem.Focus();
 
@@ -1713,9 +1718,10 @@ namespace DVBTTelevizor
             {
                 try
                 {
-
                     AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                     AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+
+                    _loggingService.Debug($"PlayingState: {PlayingState}");
 
                     switch (PlayingState)
                     {
@@ -1872,6 +1878,9 @@ namespace DVBTTelevizor
 
                             break;
                     }
+
+                    _loggingService.Info("RefreshGUI completed");
+
                 } catch (Exception ex)
                 {
                     _loggingService.Error(ex);
@@ -2109,7 +2118,7 @@ namespace DVBTTelevizor
 
         private async Task CheckStream()
         {
-            _loggingService.Debug("CheckStream");
+            //_loggingService.Debug("CheckStream");
 
             if (PlayingState == PlayingStateEnum.Stopped)
             {

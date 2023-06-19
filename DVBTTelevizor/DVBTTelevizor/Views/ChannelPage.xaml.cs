@@ -52,7 +52,7 @@ namespace DVBTTelevizor
         private void EntryNumber_Unfocused(object sender, FocusEventArgs e)
         {
             int num;
-            if (!int.TryParse(EntryNumber.Text, out num) || (num < 0) || (num>32000))
+            if (!int.TryParse(EntryNumber.Text, out num) || (num < 1) || (num>32000))
             {
                 _dialogService.Error($"Invalid number");
                 _viewModel.Channel.Number = _previousValue;

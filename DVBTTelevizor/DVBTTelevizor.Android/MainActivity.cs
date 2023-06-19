@@ -329,7 +329,7 @@ namespace DVBTTelevizor.Droid
 
                 Task.Run(async () =>
                 {
-                    await Task.Delay(5000); // wait 5 secs;
+                    await Task.Delay(10000); // wait 10 secs;
 
                     if (_waitingForInit)
                     {
@@ -510,16 +510,21 @@ namespace DVBTTelevizor.Droid
 
         private void SetFullScreen(bool on)
         {
+            _loggingService.Info($"SetFullScreen: {on}");
+
             try
             {
-                if (on)
+                Device.BeginInvokeOnMainThread(() =>
                 {
-                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)_fullscreenUiOptions;
-                }
-                else
-                {
-                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)_defaultUiOptions;
-                };
+                    if (on)
+                    {
+                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)_fullscreenUiOptions;
+                    }
+                    else
+                    {
+                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)_defaultUiOptions;
+                    };
+                });
             }
             catch (Exception ex)
             {

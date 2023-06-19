@@ -21,6 +21,23 @@ namespace DVBTTelevizor.Services
             _driver = driver;
         }
 
+        public void ClearAll()
+        {
+            _log.Debug($"[EIT] ClearAll");
+
+            try
+            {
+                var folder = Path.Combine(BaseViewModel.AndroidAppDirectory, "EIT");
+                Directory.Delete(folder, true);
+
+                FreqEPG.Clear();
+
+            } catch (Exception ex)
+            {
+                _log.Error(ex);
+            }
+        }
+
         private static string GetDBPath(long freq, long programMapPID)
         {
             var folder = Path.Combine(BaseViewModel.AndroidAppDirectory, "EIT");
@@ -57,6 +74,8 @@ namespace DVBTTelevizor.Services
 
         private void TryLoadEvents(long freq, long programMapPID)
         {
+            _log.Debug($"[EIT] TryLoadEvents");
+
             var dbPath = GetDBPath(freq, programMapPID);
             if (!File.Exists(dbPath))
             {

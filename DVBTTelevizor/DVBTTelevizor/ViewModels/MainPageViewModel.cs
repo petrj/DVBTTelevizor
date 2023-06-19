@@ -1023,7 +1023,7 @@ namespace DVBTTelevizor
 
         private async Task RefreshEPG()
         {
-            _loggingService.Debug($"Refreshing EPG");
+            //_loggingService.Debug($"Refreshing EPG");
 
             try
             {

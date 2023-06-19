@@ -69,6 +69,7 @@ namespace DVBTTelevizor
         public const string MSG_RemoteKeyAction = "RemoteKeyAction";
 
         public const string MSG_SettingsPageForceLayout = "SettingsPageForceLayout";
+        public const string MSG_ClearEPG = "ClearEPG";
 
         public string SelectedToolbarItemName { get; set; } = null;
 
@@ -78,25 +79,6 @@ namespace DVBTTelevizor
             _loggingService = loggingService;
             _dialogService = dialogService;
             _driver = driver;
-
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-
-                do
-                {
-                    Xamarin.Forms.Device.BeginInvokeOnMainThread(
-                        new Action(
-                            delegate
-                            {
-                                OnPropertyChanged(nameof(DataStreamInfo));
-                            }));
-
-                    // 2 secs delay
-                    Thread.Sleep(2 * 1000);
-
-                } while (true);
-            }).Start();
         }
 
         public static string DeviceFriendlyName
