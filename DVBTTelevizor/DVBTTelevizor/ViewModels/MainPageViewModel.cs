@@ -47,8 +47,6 @@ namespace DVBTTelevizor
         private bool? _EPGDetailVisibleLastValue = null;
 
         private int _refreshCounter = 0;
-
-        public bool TeletextActive { get; set; } = false;
         private int _lastTeltetextPageNumber = 100;
 
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
@@ -571,36 +569,12 @@ namespace DVBTTelevizor
 
         public async Task TeletextMenu()
         {
-            var actions = new List<string>();
-
-            if (!TeletextActive)
+            string pageNumber = await _dialogService.GetNumberDialog("Set page number", "Teletext", _lastTeltetextPageNumber.ToString());
+            int num;
+            if (int.TryParse(pageNumber, out num))
             {
-                actions.Add("On");
-            } else
-            {
-                actions.Add("Off");
-            }
-
-            actions.Add("Page number...");
-
-            var action = await _dialogService.DisplayActionSheet("Teletext", "Cancel", actions);
-
-            switch (action)
-            {
-                case "On":
-                case "Off":
-                    MessagingCenter.Send(action, BaseViewModel.MSG_ToggleTeletext);
-                    TeletextActive = !TeletextActive;
-                    break;
-                case "Page number...":
-                    string pageNumber = await _dialogService.GetNumberDialog("Set page number", "Teletext", _lastTeltetextPageNumber.ToString());
-                    int num;
-                    if (int.TryParse(pageNumber, out num))
-                    {
-                        _lastTeltetextPageNumber = num;
-                        MessagingCenter.Send(pageNumber, BaseViewModel.MSG_TeletextPageNumber);
-                    }
-                    break;
+                _lastTeltetextPageNumber = num;
+                MessagingCenter.Send(pageNumber, BaseViewModel.MSG_TeletextPageNumber);
             }
         }
 

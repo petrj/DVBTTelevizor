@@ -264,14 +264,6 @@ namespace DVBTTelevizor
                 SetAspect(aspect);
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToggleTeletext, (aspect) =>
-            {
-                CallWithTimeout(delegate
-                {
-                    videoView.MediaPlayer.ToggleTeletext();
-                });
-            });
-
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_TeletextPageNumber, (pageNum) =>
             {
                 CallWithTimeout(delegate
@@ -954,62 +946,52 @@ namespace DVBTTelevizor
 
                 if (numberPressedBefore == _numberPressed)
                 {
-                    if (_viewModel.TeletextActive)
+                    Task.Run(async () =>
                     {
-                        CallWithTimeout(delegate
+                        if (_numberPressed == "0")
                         {
-                            videoView.MediaPlayer.Teletext = Convert.ToInt32(_numberPressed);
-                        });
-                    }
-                    else
-                    {
-                        Task.Run(async () =>
+                            switch (_viewModel.PlayingState)
+                            {
+                                case PlayingStateEnum.Playing:
+                                    await ActionLeft();
+                                    break;
+                                case PlayingStateEnum.PlayingInPreview:
+                                    _viewModel.SelectedChannel = _viewModel.PlayingChannel;
+                                    await ActionPlay(_viewModel.RecordingChannel != null, _viewModel.PlayingChannel);
+                                    break;
+                                case PlayingStateEnum.Stopped:
+                                    if (_viewModel.StandingOnEnd)
+                                    {
+                                        await ActionFirstOrLast(true);
+                                        _lastTimeHome = true;
+                                    }
+                                    else
+                                        if (_viewModel.StandingOnStart)
+                                    {
+                                        await ActionFirstOrLast(false);
+                                        _lastTimeHome = false;
+                                    }
+                                    else
+                                    {
+                                        await ActionFirstOrLast(_lastTimeHome);
+                                        _lastTimeHome = !_lastTimeHome;
+                                    }
+                                    break;
+                            };
+
+                            return;
+                        }
+
+                        await _viewModel.SelectChannelByNumber(_numberPressed);
+
+                        if (
+                                (_viewModel.SelectedChannel != null) &&
+                                (_numberPressed == _viewModel.SelectedChannel.Number)
+                            )
                         {
-                            if (_numberPressed == "0")
-                            {
-                                switch (_viewModel.PlayingState)
-                                {
-                                    case PlayingStateEnum.Playing:
-                                        await ActionLeft();
-                                        break;
-                                    case PlayingStateEnum.PlayingInPreview:
-                                        _viewModel.SelectedChannel = _viewModel.PlayingChannel;
-                                        await ActionPlay(_viewModel.RecordingChannel != null, _viewModel.PlayingChannel);
-                                        break;
-                                    case PlayingStateEnum.Stopped:
-                                        if (_viewModel.StandingOnEnd)
-                                        {
-                                            await ActionFirstOrLast(true);
-                                            _lastTimeHome = true;
-                                        }
-                                        else
-                                         if (_viewModel.StandingOnStart)
-                                        {
-                                            await ActionFirstOrLast(false);
-                                            _lastTimeHome = false;
-                                        }
-                                        else
-                                        {
-                                            await ActionFirstOrLast(_lastTimeHome);
-                                            _lastTimeHome = !_lastTimeHome;
-                                        }
-                                        break;
-                                };
-
-                                return;
-                            }
-
-                            await _viewModel.SelectChannelByNumber(_numberPressed);
-
-                            if (
-                                    (_viewModel.SelectedChannel != null) &&
-                                    (_numberPressed == _viewModel.SelectedChannel.Number)
-                               )
-                            {
-                                await ActionPlay(false);
-                            }
-                        });
-                    }
+                            await ActionPlay(false);
+                        }
+                    });
                 }
 
             }).Start();
@@ -2031,7 +2013,6 @@ namespace DVBTTelevizor
                 if (shouldMediaPlay)
                 {
                     _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
-                    _viewModel.TeletextActive = false;
 
                     if (shouldMediaRecord)
                     {
