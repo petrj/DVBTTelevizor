@@ -21,6 +21,7 @@ using Java.Util;
 using static Android.App.Assist.AssistStructure;
 using static Android.InputMethodServices.Keyboard;
 using static Java.Util.ResourceBundle;
+using static Android.Renderscripts.ScriptGroup;
 
 
 namespace DVBTTelevizor
@@ -316,7 +317,7 @@ namespace DVBTTelevizor
 
             _viewModel.Subtitles = id;
 
-            Device.BeginInvokeOnMainThread(() =>
+            CallWithTimeout( delegate
             {
                 videoView.MediaPlayer.SetSpu(id);
             });
@@ -343,7 +344,7 @@ namespace DVBTTelevizor
 
             _viewModel.AudioTrack = id;
 
-            Device.BeginInvokeOnMainThread(() =>
+            CallWithTimeout(delegate
             {
                 if (_viewModel.RecordingChannel != null)
                 {
@@ -1980,6 +1981,20 @@ namespace DVBTTelevizor
                 _loggingService.Debug($"shouldDriverPlay: {shouldDriverPlay}");
                 _loggingService.Debug($"shouldMediaRecord: {shouldMediaRecord}");
 
+
+                if (shouldMediaPlay)
+                {
+                    if (videoView.MediaPlayer.IsPlaying)
+                    {
+                        _loggingService.Debug("Stopping Media player");
+
+                        CallWithTimeout(delegate
+                        {
+                            videoView.MediaPlayer.Stop();
+                        });
+                    }
+                }
+
                 if (shouldDriverPlay)
                 {
                     var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
@@ -2015,18 +2030,6 @@ namespace DVBTTelevizor
 
                 if (shouldMediaPlay)
                 {
-                    if (videoView.MediaPlayer.IsPlaying)
-                    {
-                        _loggingService.Debug("Stopping Media player");
-
-                        // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
-
-                        ThreadPool.QueueUserWorkItem(delegate
-                        {
-                            videoView.MediaPlayer.Stop();
-                        });
-                    }
-
                     _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
                     _viewModel.TeletextActive = false;
 
@@ -2044,7 +2047,7 @@ namespace DVBTTelevizor
                         MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
                     }
 
-                    ThreadPool.QueueUserWorkItem(delegate
+                    CallWithTimeout(delegate
                     {
                         videoView.MediaPlayer.Play(_media);
                     });
@@ -2150,6 +2153,20 @@ namespace DVBTTelevizor
             _viewModel.NotifyRecordChange();
         }
 
+        private void CallWithTimeout(Action action, int miliseconds = 1000)
+        {
+        // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
+            var task = Task.Run(() =>
+            {
+                ThreadPool.QueueUserWorkItem(_ => action());
+            });
+
+            if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
+            {
+                _loggingService.Info("Action not completed!");
+            }
+        }
+
         private async Task CheckStream()
         {
             _loggingService.Debug("CheckStream");
@@ -2162,35 +2179,43 @@ namespace DVBTTelevizor
                 return;
             }
 
-            Device.BeginInvokeOnMainThread(() =>
+            CallWithTimeout(delegate
             {
                 try
                 {
                     // checking stopped stream
                     if (!videoView.MediaPlayer.IsPlaying)
                     {
-                        videoView.MediaPlayer.Play(_media);
+                        videoView.MediaPlayer.Play();
                     }
 
                     // checking no video
-                    if (videoView.MediaPlayer.VideoTrackCount <= 0)
+                    var videoTreackCount = videoView.MediaPlayer.VideoTrackCount;
+
+                    if (videoTreackCount <= 0)
                     {
-                        NoVideoStackLayout.IsVisible = true;
-                        //VideoStackLayout.IsVisible = false;
-                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            NoVideoStackLayout.IsVisible = true;
+                            //VideoStackLayout.IsVisible = false;
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                        });
                     }
                     else
                     {
                         //PreviewVideoBordersFix();
 
-                        NoVideoStackLayout.IsVisible = false;
-                        VideoStackLayout.IsVisible = true;
-
-                        if (AbsoluteLayout.GetLayoutBounds(VideoStackLayout) == NoVideoStackLayoutPosition)
+                        Device.BeginInvokeOnMainThread(() =>
                         {
-                            _loggingService.Debug("CheckStream - VideoStackLayout has invalid bounds");
-                            RefreshGUI();
-                        }
+                            NoVideoStackLayout.IsVisible = false;
+                            VideoStackLayout.IsVisible = true;
+
+                            if (AbsoluteLayout.GetLayoutBounds(VideoStackLayout) == NoVideoStackLayoutPosition)
+                            {
+                                _loggingService.Debug("CheckStream - VideoStackLayout has invalid bounds");
+                                RefreshGUI();
+                            }
+                        });
                     }
 
                     var actualSubtitleTrack = videoView.MediaPlayer.Spu;
@@ -2240,7 +2265,7 @@ namespace DVBTTelevizor
                     // check audio track
                     if (actualAudioTrack != _viewModel.AudioTrack)
                     {
-                        if (_viewModel.AudioTrack == -100)
+                        if ((_viewModel.AudioTrack == -100) && (actualAudioTrack != -1))
                         {
                             _loggingService.Debug($"CheckStream - Setting automatic audio track {actualAudioTrack}");
                             _viewModel.AudioTrack = actualAudioTrack;
@@ -2256,7 +2281,8 @@ namespace DVBTTelevizor
                                     videoView.MediaPlayer.SetAudioTrack(actualAudioTrack);
                                 });
                             }
-                        } else
+                        }
+                        else
                         {
                             _loggingService.Debug($"CheckStream - invalid audio track {actualAudioTrack}, setting {_viewModel.AudioTrack}");
                             videoView.MediaPlayer.SetAudioTrack(_viewModel.AudioTrack);
