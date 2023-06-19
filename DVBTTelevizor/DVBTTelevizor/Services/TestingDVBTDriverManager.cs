@@ -13,7 +13,14 @@ namespace DVBTTelevizor
     {
         private long LastFreq { get; set; }
         private long LastPID { get; set; }
-        private bool Freq626Loaded { get; set; } = false;
+
+        public long LastTunedFreq
+        {
+            get
+            {
+                return LastFreq;
+            }
+        }
 
         public DVBTDriverConfiguration Configuration { get; set; } = new DVBTDriverConfiguration();
 
@@ -44,15 +51,15 @@ namespace DVBTTelevizor
 
         }
 
+        public void StopReadStream()
+        {
+
+        }
+
         public async Task<bool> Stop()
         {
             LastPID = 0;
             return true;
-        }
-
-        public void StopReadStream()
-        {
-
         }
 
         public void StopRecording()
@@ -84,124 +91,6 @@ namespace DVBTTelevizor
         {
         }
 
-        public EITManager GetEITManager(long freq)
-        {
-            var eit = new EITManager(new BasicLoggingService());
-
-            var timeAfterTenMinutes = DateTime.Now.AddMinutes(10);
-            var timeBefore5Minutes = DateTime.Now.AddMinutes(-5);
-            var timeBefore50Minutes = DateTime.Now.AddMinutes(-50);
-
-            var loremIpsumText = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Integer pellentesque quam vel velit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus porttitor turpis ac leo. Praesent dapibus. Aliquam erat volutpat. Etiam commodo dui eget wisi. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Quisque porta. Phasellus faucibus molestie nisl. Aenean id metus id velit ullamcorper pulvinar. Suspendisse sagittis ultrices augue. In rutrum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Integer tempor. Mauris metus. In laoreet, magna id viverra tincidunt, sem odio bibendum justo, vel imperdiet sapien wisi sed libero. In convallis. Fusce nibh. Integer in sapien. Aenean vel massa quis mauris vehicula lacinia. Aliquam erat volutpat. Fusce tellus. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Maecenas sollicitudin. Curabitur bibendum justo non orci. Maecenas libero. Nullam eget nisl. Nullam justo enim, consectetuer nec, ullamcorper ac, vestibulum in, elit. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? Nullam sapien sem, ornare ac, nonummy non, lobortis a enim. Vestibulum erat nulla, ullamcorper nec, rutrum non, nonummy ac, erat. Curabitur vitae diam non enim vestibulum interdum. Aenean placerat. Pellentesque ipsum. Etiam dui sem, fermentum vitae, sagittis id, malesuada in, quam. Duis ante orci, molestie vitae vehicula venenatis, tincidunt ac pede. Mauris metus. Sed vel lectus.";
-
-            if (freq == 490000000)
-            {
-                eit.ScheduledEvents.Add(0, new List<EventItem>()
-                {
-                    new EventItem()
-                    {
-                        EventId = 0,
-                        EventName = "Advertisment - current program name",
-                        Text = $"Fructies, Garnier and other ... {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
-                        StartTime = timeBefore5Minutes,
-                        FinishTime = timeAfterTenMinutes
-                    },
-                    new EventItem()
-                {
-                    EventId = 1,
-                    EventName = "Advertisment - next program name",
-                    StartTime = timeAfterTenMinutes,
-                    FinishTime = DateTime.Now.AddHours(2)
-                }
-                });
-
-                eit.ProgramNumberToMapPID.Add(0, 310);
-            }
-
-            if (freq == 514000000)
-            {
-                eit.ScheduledEvents.Add(0, new List<EventItem>()
-                {
-                    new EventItem()
-                    {
-                        EventId = 0,
-                        EventName = "Sport - current program name",
-                        Text = $"Figure skating {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
-                        StartTime = timeBefore5Minutes,
-                        FinishTime = timeAfterTenMinutes
-                    },
-                    new EventItem()
-                    {
-                        EventId = 1,
-                        EventName = "Sport - next program name",
-                        StartTime = timeAfterTenMinutes,
-                        FinishTime = DateTime.Now.AddHours(2)
-                    }
-                });
-
-                eit.ScheduledEvents.Add(1, new List<EventItem>()
-                {
-                    new EventItem()
-                    {
-                        EventId = 2,
-                        EventName = "News - current program name",
-                        Text = $"War map sitiation{Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
-                        StartTime = timeBefore50Minutes,
-                        FinishTime = timeAfterTenMinutes
-                    },
-                    new EventItem()
-                    {
-                        EventId = 3,
-                        EventName = "News - next program name",
-                        StartTime = timeAfterTenMinutes,
-                        FinishTime = DateTime.Now.AddHours(2)
-                    },
-
-                });
-
-                eit.ScheduledEvents.Add(2, new List<EventItem>()
-                {
-                    new EventItem()
-                    {
-                        EventId = 4,
-                        EventName = "Radio - current program name",
-                        Text = $"Audio book reading {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
-                        StartTime = timeBefore5Minutes,
-                        FinishTime = timeAfterTenMinutes
-                    },
-                    new EventItem()
-                    {
-                        EventId = 5,
-                        EventName = "Radio - next program name",
-                        StartTime = timeAfterTenMinutes,
-                        FinishTime = DateTime.Now.AddHours(2)
-                    }
-                });
-
-                eit.ProgramNumberToMapPID.Add(0, 2400);
-                eit.ProgramNumberToMapPID.Add(1, 2300);
-                eit.ProgramNumberToMapPID.Add(2, 7070);
-            }
-
-            if (freq == 626000000 && Freq626Loaded)
-            {
-                eit.ScheduledEvents.Add(0, new List<EventItem>()
-                {
-                    new EventItem()
-                    {
-                        EventId = 0,
-                        EventName = "Informations",
-                        StartTime = timeBefore5Minutes,
-                        FinishTime = timeAfterTenMinutes
-                    }
-                });
-
-                eit.ProgramNumberToMapPID.Add(0, 8888);
-            }
-
-            return eit;
-        }
-
         public async Task<DVBTStatus> GetStatus()
         {
             return new DVBTStatus()
@@ -230,41 +119,132 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task<PlayResult> Play(long frequency, long bandwidth, int deliverySystem, List<long> PIDs)
+        public async Task<EITScanResult> ScanEPG(int msTimeout = 2000)
         {
-            if (PIDs != null && PIDs.Count > 0)
+            var res = new EITScanResult();
+
+            var timeAfterTenMinutes = DateTime.Now.AddMinutes(10);
+            var timeBefore5Minutes = DateTime.Now.AddMinutes(-5);
+            var timeBefore50Minutes = DateTime.Now.AddMinutes(-50);
+
+            var loremIpsumText = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Integer pellentesque quam vel velit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus porttitor turpis ac leo. Praesent dapibus. Aliquam erat volutpat. Etiam commodo dui eget wisi. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Quisque porta. Phasellus faucibus molestie nisl. Aenean id metus id velit ullamcorper pulvinar. Suspendisse sagittis ultrices augue. In rutrum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Integer tempor. Mauris metus. In laoreet, magna id viverra tincidunt, sem odio bibendum justo, vel imperdiet sapien wisi sed libero. In convallis. Fusce nibh. Integer in sapien. Aenean vel massa quis mauris vehicula lacinia. Aliquam erat volutpat. Fusce tellus. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Maecenas sollicitudin. Curabitur bibendum justo non orci. Maecenas libero. Nullam eget nisl. Nullam justo enim, consectetuer nec, ullamcorper ac, vestibulum in, elit. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? Nullam sapien sem, ornare ac, nonummy non, lobortis a enim. Vestibulum erat nulla, ullamcorper nec, rutrum non, nonummy ac, erat. Curabitur vitae diam non enim vestibulum interdum. Aenean placerat. Pellentesque ipsum. Etiam dui sem, fermentum vitae, sagittis id, malesuada in, quam. Duis ante orci, molestie vitae vehicula venenatis, tincidunt ac pede. Mauris metus. Sed vel lectus.";
+
+            if (LastFreq == 490000000)
             {
-                LastPID = PIDs[0];
+                res.CurrentEvents.Add(310,
+                    new EventItem()
+                    {
+                        EventId = 0,
+                        EventName = "Advertisment - current program name",
+                        Text = $"Fructies, Garnier and other ... {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    });
+
+                res.ScheduledEvents.Add(310, new List<EventItem>()
+                {
+                    new EventItem()
+                    {
+                        EventId = 0,
+                        EventName = "Advertisment - current program name",
+                        Text = $"Fructies, Garnier and other ... {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    },
+                    new EventItem()
+                    {
+                        EventId = 1,
+                        EventName = "Advertisment - next program name",
+                        StartTime = timeAfterTenMinutes,
+                        FinishTime = DateTime.Now.AddHours(2)
+                    },
+                    new EventItem()
+                    {
+                        EventId = 2,
+                        EventName = "Advertisment - another program name",
+                        StartTime = DateTime.Now.AddHours(2),
+                        FinishTime = DateTime.Now.AddHours(3)
+                    }
+                });
             }
 
-            return new PlayResult()
+            if (LastFreq == 514000000)
             {
-                 OK = true,
-                 SignalStrengthPercentage = 100
-            };
-        }
+                res.ScheduledEvents.Add(2400, new List<EventItem>()
+                {
+                    new EventItem()
+                    {
+                        EventId = 0,
+                        EventName = "Sport - current program name",
+                        Text = $"Figure skating {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    },
+                    new EventItem()
+                    {
+                        EventId = 1,
+                        EventName = "Sport - next program name",
+                        StartTime = timeAfterTenMinutes,
+                        FinishTime = DateTime.Now.AddHours(2)
+                    }
+                });
 
-        public async Task<EITScanResult> ScanEPG(long freq, int msTimeout = 2000)
-        {
-            if (freq == 626000000)
-            {
-                Freq626Loaded = true;
+                res.ScheduledEvents.Add(2300, new List<EventItem>()
+                {
+                    new EventItem()
+                    {
+                        EventId = 2,
+                        EventName = "News - current program name",
+                        Text = $"War map sitiation{Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore50Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    },
+                    new EventItem()
+                    {
+                        EventId = 3,
+                        EventName = "News - next program name",
+                        StartTime = timeAfterTenMinutes,
+                        FinishTime = DateTime.Now.AddHours(2)
+                    },
+                });
+
+                res.ScheduledEvents.Add(7070, new List<EventItem>()
+                {
+                    new EventItem()
+                    {
+                        EventId = 4,
+                        EventName = "Radio - current program name",
+                        Text = $"Audio book reading {Environment.NewLine}{Environment.NewLine}{loremIpsumText}",
+                        StartTime = timeBefore5Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    },
+                    new EventItem()
+                    {
+                        EventId = 5,
+                        EventName = "Radio - next program name",
+                        StartTime = timeAfterTenMinutes,
+                        FinishTime = DateTime.Now.AddHours(2)
+                    }
+                });
             }
 
-            return new EITScanResult()
+            if (LastFreq == 626000000)
             {
-                OK = true,
-                UnsupportedEncoding = false
-            };
-        }
+                res.ScheduledEvents.Add(8888, new List<EventItem>()
+                {
+                    new EventItem()
+                    {
+                        EventId = 0,
+                        EventName = "Informations",
+                        StartTime = timeBefore5Minutes,
+                        FinishTime = timeAfterTenMinutes
+                    }
+                });
+            }
 
-        public async Task<EITScanResult> ScanEPGForChannel(long freq, int programMapPID, int msTimeout = 2000)
-        {
-            return new EITScanResult()
-            {
-                OK = true,
-                UnsupportedEncoding = false
-            };
+            res.OK = true;
+
+            return res;
         }
 
         public async Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
@@ -416,7 +396,7 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
             LastFreq = frequency;
 

@@ -47,6 +47,7 @@ namespace DVBTTelevizor
         private bool _firstStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
+        private bool _lastTimeHome = false;
 
         public bool IsPortrait { get; private set; } = false;
 
@@ -667,6 +668,7 @@ namespace DVBTTelevizor
                 case "0":
                 case "num0":
                 case "number0":
+                case "numpad0":
                     HandleNumKey(0);
                     break;
                 case "1":
@@ -715,7 +717,6 @@ namespace DVBTTelevizor
                     HandleNumKey(9);
                     break;
                 case "f5":
-                case "numpad0":
                 case "ctrlleft":
                     _viewModel.RefreshCommand.Execute(null);
                     break;
@@ -966,9 +967,28 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-
                         Task.Run(async () =>
                         {
+                            if (_numberPressed == "0")
+                            {
+                                switch (_viewModel.PlayingState)
+                                {
+                                    case PlayingStateEnum.Playing:
+                                        await ActionLeft();
+                                        break;
+                                    case PlayingStateEnum.PlayingInPreview:
+                                        _viewModel.SelectedChannel = _viewModel.PlayingChannel;
+                                        await ActionPlay(_viewModel.RecordingChannel != null, _viewModel.PlayingChannel);
+                                        break;
+                                    case PlayingStateEnum.Stopped:
+                                        await ActionFirstOrLast(_lastTimeHome);
+                                        _lastTimeHome = !_lastTimeHome;
+                                        break;
+                                };
+
+                                return;
+                            }
+
                             await _viewModel.SelectChannelByNumber(_numberPressed);
 
                             if (
@@ -1454,8 +1474,8 @@ namespace DVBTTelevizor
             }
 
             var msg = "\u25B6 " + playStreamInfo.Channel.Name;
-            if (playStreamInfo.CurrentEvent != null)
-                msg += $" - {playStreamInfo.CurrentEvent.EventName}";
+            if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
+                msg += $" - {playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
 
             // showing signal percents only for the first time
             if (playStreamInfo.SignalStrengthPercentage > 0)
@@ -1530,8 +1550,6 @@ namespace DVBTTelevizor
             {
                 ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
             }
-
-            _viewModel.DoNotScrollToChannel = false;
 
             if (PlayingState != PlayingStateEnum.Playing)
             { // EPG detail should not be enabled when playing on fullscreen (avoiding not necessary RefreshGUI calling)
@@ -1693,163 +1711,170 @@ namespace DVBTTelevizor
 
             Device.BeginInvokeOnMainThread(() =>
             {
-                AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
-
-                switch (PlayingState)
+                try
                 {
-                    case PlayingStateEnum.Playing:
 
-                        // turn off tool bar
-                        if (NavigationPage.GetHasNavigationBar(this))
-                        {
-                            NavigationPage.SetHasNavigationBar(this, false);
-                        }
+                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                    AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 
-                        MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableFullScreen);
+                    switch (PlayingState)
+                    {
+                        case PlayingStateEnum.Playing:
 
-                        // VideoStackLayout must be visible before changing Layout
-                        VideoStackLayout.IsVisible = true;
-                        NoVideoStackLayout.IsVisible = false;
-                        //ChannelsListView.IsVisible = false;
-
-                        if (IsPortrait)
-                        {
-                            if (_viewModel.EPGDetailVisible)
+                            // turn off tool bar
+                            if (NavigationPage.GetHasNavigationBar(this))
                             {
-                                AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPlayingEPGDetailGridPosition);
-                                //MainLayout.RaiseChild(EPGDetailGrid);
+                                NavigationPage.SetHasNavigationBar(this, false);
+                            }
 
-                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitRecordingLabelPositionWhenEPGDetailVisible);
+                            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableFullScreen);
+
+                            // VideoStackLayout must be visible before changing Layout
+                            VideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = false;
+                            //ChannelsListView.IsVisible = false;
+
+                            if (IsPortrait)
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPlayingEPGDetailGridPosition);
+                                    //MainLayout.RaiseChild(EPGDetailGrid);
+
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitRecordingLabelPositionWhenEPGDetailVisible);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, PotraitRecordingLabelPosition);
+                                }
                             }
                             else
                             {
-                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(0, 0, 1, 1));
-                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, PotraitRecordingLabelPosition);
-                            }
-                        }
-                        else
-                        {
-                            if (_viewModel.EPGDetailVisible)
-                            {
-                                AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePlayingEPGDetailGridPosition);
-                                //MainLayout.RaiseChild(EPGDetailGrid);
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePlayingEPGDetailGridPosition);
+                                    //MainLayout.RaiseChild(EPGDetailGrid);
 
-                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPositionWhenEPGDetailVisible);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPosition);
+                                }
+                            }
+
+                            //MainLayout.RaiseChild(VideoStackLayout);
+                            //CheckStreamCommand.Execute(null);
+
+                            break;
+                        case PlayingStateEnum.PlayingInPreview:
+
+                            if (!NavigationPage.GetHasNavigationBar(this))
+                            {
+                                NavigationPage.SetHasNavigationBar(this, true);
+                            }
+
+                            //ChannelsListView.IsVisible = true;
+
+                            if (!_config.Fullscreen)
+                            {
+                                MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                            }
+
+                            if (IsPortrait)
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPreviewEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rectangle(0, 0, 1, 1));
+                                }
+
+                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitPreviewRecordingLabelPosition);
                             }
                             else
                             {
-                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rectangle(0, 0, 1, 1));
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rectangle(0, 0, 1, 1));
-                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPosition);
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePreviewEPGDetailGridPosition);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rectangle(0, 0, 1, 1));
+                                }
+
+                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
                             }
-                        }
 
-                        //MainLayout.RaiseChild(VideoStackLayout);
-                        //CheckStreamCommand.Execute(null);
+                            //CheckStreamCommand.Execute(null);
 
-                        break;
-                    case PlayingStateEnum.PlayingInPreview:
+                            break;
+                        case PlayingStateEnum.Stopped:
 
-                        if (!NavigationPage.GetHasNavigationBar(this))
-                        {
-                            NavigationPage.SetHasNavigationBar(this, true);
-                        }
-
-                        //ChannelsListView.IsVisible = true;
-
-                        if (!_config.Fullscreen)
-                        {
-                            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
-                        }
-
-                        if (IsPortrait)
-                        {
-                            if (_viewModel.EPGDetailVisible)
+                            if (!NavigationPage.GetHasNavigationBar(this))
                             {
-                                AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPreviewEPGDetailGridPosition);
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
+                                NavigationPage.SetHasNavigationBar(this, true);
                             }
-                            else
+
+                            //ChannelsListView.IsVisible = true;
+
+                            if (!_config.Fullscreen)
                             {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rectangle(0, 0, 1, 1));
+                                MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
                             }
 
-                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitPreviewRecordingLabelPosition);
-                        }
-                        else
-                        {
-                            if (_viewModel.EPGDetailVisible)
+                            //VideoStackLayout.IsVisible = false;
+                            NoVideoStackLayout.IsVisible = false;
+
+                            if (IsPortrait)
                             {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePreviewEPGDetailGridPosition);
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
+                                }
                             }
-                            else
+                            else // landscape
                             {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rectangle(0, 0, 1, 1));
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
+                                }
                             }
 
-                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
-                        }
-
-                        //CheckStreamCommand.Execute(null);
-
-                        break;
-                    case PlayingStateEnum.Stopped:
-
-                        if (!NavigationPage.GetHasNavigationBar(this))
-                        {
-                            NavigationPage.SetHasNavigationBar(this, true);
-                        }
-
-                        //ChannelsListView.IsVisible = true;
-
-                        if (!_config.Fullscreen)
-                        {
-                            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
-                        }
-
-                        //VideoStackLayout.IsVisible = false;
-                        NoVideoStackLayout.IsVisible = false;
-
-                        if (IsPortrait)
-                        {
-                            if (_viewModel.EPGDetailVisible)
-                            {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
-                            }
-                            else
-                            {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
-                            }
-                        }
-                        else // landscape
-                        {
-                            if (_viewModel.EPGDetailVisible)
-                            {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
-                                AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
-                            }
-                            else
-                            {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
-                            }
-                        }
-
-                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
 
 
-                        break;
+                            break;
+                    }
+                } catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
                 }
             });
         }
@@ -1870,7 +1895,7 @@ namespace DVBTTelevizor
                 return;
             }
 
-            int? signalStrengthPercentage = null;
+            long? signalStrengthPercentage = null;
 
             if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel != channel))
             {
@@ -1928,15 +1953,35 @@ namespace DVBTTelevizor
 
             if (shouldDriverPlay)
             {
-                var playRes = await _driver.Play(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary);
-                if ( (!playRes.OK) || (_driver.VideoStream == null))
-
+                var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
+                if (tunedRes.Result != SearchProgramResultEnum.OK)
                 {
-                    MessagingCenter.Send($"Playing {channel.Name} failed", BaseViewModel.MSG_ToastMessage);
+                    switch (tunedRes.Result)
+                    {
+                        case SearchProgramResultEnum.NoSignal:
+                            MessagingCenter.Send($"No sginal", BaseViewModel.MSG_ToastMessage);
+                            break;
+                        default:
+                            MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
+                            break;
+                    }
+
                     return;
                 }
 
-                signalStrengthPercentage = playRes.SignalStrengthPercentage;
+                if (_config.ScanEPG)
+                {
+                    var ev = await _viewModel.GetChannelEPG(channel);
+                    if (ev == null)
+                    {
+                        MessagingCenter.Send($"Scanning EPG...", BaseViewModel.MSG_ToastMessage);
+                        await _viewModel.EIT.Scan(1500);
+                    }
+                }
+
+                _driver.StopReadStream();
+
+                signalStrengthPercentage = tunedRes.SignalPercentStrength;
             }
 
             if (shouldMediaPlay)
@@ -1978,10 +2023,10 @@ namespace DVBTTelevizor
 
             if (signalStrengthPercentage.HasValue)
             {
-                playInfo.SignalStrengthPercentage = signalStrengthPercentage.Value;
+                playInfo.SignalStrengthPercentage = Convert.ToInt32(signalStrengthPercentage.Value);
             }
 
-            playInfo.CurrentEvent = await _viewModel.GetChannelEPG(_viewModel.SelectedChannel);
+            playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
             await ShowActualPlayingMessage(playInfo);
 

@@ -14,6 +14,8 @@ using MPEGTS;
 using LibVLCSharp.Shared;
 using static Android.Provider.MediaStore;
 using static Android.Icu.Text.AlphabeticIndex;
+using DVBTTelevizor.Services;
+using DVBTTelevizor.Models;
 
 namespace DVBTTelevizor
 {
@@ -63,6 +65,8 @@ namespace DVBTTelevizor
         public int AudioTrack { get; set; } = -100;
         public int Subtitles { get; set; } = -1;
 
+        public EITManager EIT { get; set; }
+
         public enum SelectedPartEnum
         {
             ChannelsListOrVideo = 0,
@@ -76,6 +80,8 @@ namespace DVBTTelevizor
             : base(loggingService, dialogService, driver, config)
         {
             _channelService = channelService;
+
+            EIT = new EITManager(loggingService, driver);
 
             RefreshCommand = new Command(async () => await Refresh());
             RefreshEPGCommand = new Command(async () => await RefreshEPG());
@@ -363,47 +369,32 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<EventItem> GetChannelEPG(DVBTChannel channel)
+        public async Task<EPGCurrentEvent> GetChannelEPG(DVBTChannel channel)
         {
             if (channel == null)
                 return null;
 
-            EventItem eventItem = null;
-
-            return await Task.Run(() =>
+            try
             {
-                try
+                if (EIT != null)
                 {
-                    var eitManager = _driver.GetEITManager(channel.Frequency);
-                    if (eitManager != null)
+                    var currEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
+                    if (currEv != null)
                     {
-                        var evs = eitManager.GetEvents(DateTime.Now, 2);
-                        var programMapPID = Convert.ToInt32(channel.ProgramMapPID);
-                        if (evs != null && evs.ContainsKey(programMapPID))
-                        {
-                            if (evs[programMapPID] != null)
-                            {
-                                if (evs[programMapPID].Count > 0)
-                                    channel.CurrentEventItem = eventItem = evs[programMapPID][0];
-
-                                if (evs[programMapPID].Count > 1)
-                                    channel.NextEventItem = evs[programMapPID][1];
-
-                                channel.NotifyEPGChanges();
-                            }
-                        }
+                        channel.SetCurrentEvent(currEv);
+                        channel.NotifyEPGChanges();
+                        return currEv;
                     }
-
-                    return eventItem;
-
                 }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex, "GetChannelEPG error");
 
-                    return null;
-                }
-            });
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "GetChannelEPG error");
+
+                return null;
+            }
         }
 
         private async Task VideoLongPress()
@@ -419,8 +410,15 @@ namespace DVBTTelevizor
 
             _loggingService.Info($"Long press on channel {ch.Name})");
 
-            DoNotScrollToChannel = true;
-            SelectedChannel = ch;
+            try
+            {
+                DoNotScrollToChannel = true;
+                SelectedChannel = ch;
+            }
+            finally
+            {
+                DoNotScrollToChannel = false;
+            }
         }
 
         public async Task ShowChannelMenu(DVBTChannel ch = null)
@@ -438,10 +436,18 @@ namespace DVBTTelevizor
             }
             else
             {
-                title = ch.Name;
+                if (PlayingChannel == null)
+                {
+                    title = ch.Name;
+                } else
+                {
+                    title = PlayingChannel.Name;
+                }
             }
 
             var actions = new List<string>();
+
+            string selectedChannelDetailAction = "Detail...";
 
             if (ch != null)
             {
@@ -482,7 +488,17 @@ namespace DVBTTelevizor
                     actions.Add("Stop record");
                 }
 
-                actions.Add("Detail...");
+                if (SelectedChannel != null)
+                {
+                    if (PlayingChannel != null && SelectedChannel != PlayingChannel)
+                    {
+                        selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
+                    } else
+                    {
+                        selectedChannelDetailAction = $"Detail...";
+                    }
+                    actions.Add(selectedChannelDetailAction);
+                }
 
                 if (ch.CurrentEventItem != null)
                 {
@@ -529,9 +545,6 @@ namespace DVBTTelevizor
                 case "Scan EPG":
                     await ScanEPG(ch);
                     break;
-                case "Detail...":
-                    MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
-                    break;
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
                     break;
@@ -554,6 +567,11 @@ namespace DVBTTelevizor
                         MessagingCenter.Send(String.Empty, BaseViewModel.MSG_QuitApp);
                     }
                     break;
+            }
+
+            if (action == selectedChannelDetailAction)
+            {
+                MessagingCenter.Send(ch.ToString(), BaseViewModel.MSG_EditChannel);
             }
         }
 
@@ -702,7 +720,7 @@ namespace DVBTTelevizor
             {
                 // select and play
 
-                DoNotScrollToChannel = true;
+                //DoNotScrollToChannel = true;
 
                 var ch = item as DVBTChannel;
 
@@ -870,7 +888,7 @@ namespace DVBTTelevizor
                    {
                        MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
 
-                       var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
+                       var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
 
                        if (tuned.Result != SearchProgramResultEnum.OK )
                        {
@@ -878,9 +896,7 @@ namespace DVBTTelevizor
                            return;
                        }
 
-                       // setting PID 18 + PSI for each channel in the same multiplex:
-
-                       var res = await _driver.ScanEPG(channel.Frequency, 5000);
+                       var res = await EIT.Scan(5000);
 
                        await _driver.Stop();
 
@@ -1007,7 +1023,7 @@ namespace DVBTTelevizor
 
         private async Task RefreshEPG()
         {
-            //_loggingService.Info($"Refreshing EPG");
+            _loggingService.Debug($"Refreshing EPG");
 
             try
             {
@@ -1017,26 +1033,13 @@ namespace DVBTTelevizor
                 {
                     channel.ClearEPG();
 
-                    var eitM = _driver.GetEITManager(channel.Frequency);
-
-                    if (eitM != null)
+                    var channelEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
+                    if (channelEv != null)
                     {
-                        var evs = eitM.GetEvents(DateTime.Now, 2);
-                        var programMapPID = Convert.ToInt32(channel.ProgramMapPID);
-                        if (evs != null && evs.ContainsKey(programMapPID))
-                        {
-                            if (evs[programMapPID] != null)
-                            {
-                                if (evs[programMapPID].Count > 0)
-                                    channel.CurrentEventItem = evs[programMapPID][0];
-
-                                if (evs[programMapPID].Count > 1)
-                                    channel.NextEventItem = evs[programMapPID][1];
-
-                                channel.NotifyEPGChanges();
-                            }
-                        }
+                        channel.SetCurrentEvent(channelEv);
                     }
+
+                    channel.NotifyEPGChanges();
                 }
             }
             catch (Exception ex)

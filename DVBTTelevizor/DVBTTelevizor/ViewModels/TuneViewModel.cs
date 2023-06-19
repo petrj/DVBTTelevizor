@@ -930,7 +930,7 @@ namespace DVBTTelevizor
                 //#endif
 
 
-                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, FastTuning);
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, new List<long>() { 0, 17, 18 }, FastTuning);
 
                 switch (tuneResult.Result)
                 {
