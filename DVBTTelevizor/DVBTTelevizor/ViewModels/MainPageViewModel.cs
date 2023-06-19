@@ -322,11 +322,12 @@ namespace DVBTTelevizor
             }
         }
 
-        public void NotifyRecordChange()
+        public void NotifyMediaChange()
         {
             Device.BeginInvokeOnMainThread(() =>
             {
                 OnPropertyChanged(nameof(RecordingLabel));
+                OnPropertyChanged(nameof(NoVideoTitle));
             });
         }
 
@@ -699,7 +700,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Send(String.Empty, BaseViewModel.MSG_StopStream);
 
-            NotifyRecordChange();
+            NotifyMediaChange();
         }
 
         private async Task DeleteChannel(DVBTChannel channel)

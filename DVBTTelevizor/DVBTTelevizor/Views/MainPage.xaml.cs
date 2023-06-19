@@ -192,7 +192,7 @@ namespace DVBTTelevizor
                     await _driver.StartRecording();
                     _viewModel.RecordingChannel = playStreamInfo.Channel;
                     _viewModel.RecordingChannel.Recording = true;
-                    _viewModel.NotifyRecordChange();
+                    _viewModel.NotifyMediaChange();
                 });
             });
 
@@ -992,8 +992,22 @@ namespace DVBTTelevizor
                                         await ActionPlay(_viewModel.RecordingChannel != null, _viewModel.PlayingChannel);
                                         break;
                                     case PlayingStateEnum.Stopped:
-                                        await ActionFirstOrLast(_lastTimeHome);
-                                        _lastTimeHome = !_lastTimeHome;
+                                        if (_viewModel.StandingOnEnd)
+                                        {
+                                            await ActionFirstOrLast(true);
+                                            _lastTimeHome = true;
+                                        }
+                                        else
+                                         if (_viewModel.StandingOnStart)
+                                        {
+                                            await ActionFirstOrLast(false);
+                                            _lastTimeHome = false;
+                                        }
+                                        else
+                                        {
+                                            await ActionFirstOrLast(_lastTimeHome);
+                                            _lastTimeHome = !_lastTimeHome;
+                                        }
                                         break;
                                 };
 
@@ -1919,6 +1933,8 @@ namespace DVBTTelevizor
                 if (channel == null)
                     return;
 
+                _loggingService.Debug($"playing: {channel.Name} ({channel.Number})");
+
                 if (!_driver.Started)
                 {
                     MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
@@ -2092,7 +2108,7 @@ namespace DVBTTelevizor
                     _lastPlayedChannels[1] = channel;
                 }
 
-                _viewModel.NotifyRecordChange();
+                _viewModel.NotifyMediaChange();
             } finally
             {
                 _refreshGUIEnabled = true;
@@ -2150,7 +2166,7 @@ namespace DVBTTelevizor
 
             _viewModel.SelectedToolbarItemName = null;
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
-            _viewModel.NotifyRecordChange();
+            _viewModel.NotifyMediaChange();
         }
 
         private void CallWithTimeout(Action action, int miliseconds = 1000)
