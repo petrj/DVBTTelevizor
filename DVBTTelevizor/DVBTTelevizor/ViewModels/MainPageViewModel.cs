@@ -1,21 +1,14 @@
-﻿using Xamarin.Forms;
+﻿using DVBTTelevizor.Models;
+using DVBTTelevizor.Services;
+using LoggerService;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using LoggerService;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Threading;
-using Newtonsoft.Json;
 using System.Linq;
-using MPEGTS;
-using LibVLCSharp.Shared;
-using static Android.Provider.MediaStore;
-using static Android.Icu.Text.AlphabeticIndex;
-using DVBTTelevizor.Services;
-using DVBTTelevizor.Models;
+using System.Threading;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {

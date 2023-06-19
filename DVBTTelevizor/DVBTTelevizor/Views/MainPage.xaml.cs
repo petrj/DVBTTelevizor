@@ -1,27 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using LibVLCSharp.Shared;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using Xamarin.Forms;
 using System.IO;
 using System.Threading;
-using LoggerService;
-using LibVLCSharp.Shared;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 using static DVBTTelevizor.MainPageViewModel;
-using System.Runtime.InteropServices;
-using RemoteAccessService;
-using System.Security.Cryptography;
-using Java.Util;
-using static Android.App.Assist.AssistStructure;
-using static Android.InputMethodServices.Keyboard;
-using static Java.Util.ResourceBundle;
-using static Android.Renderscripts.ScriptGroup;
 
 
 namespace DVBTTelevizor
@@ -280,7 +266,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ToggleTeletext, (aspect) =>
             {
-                Device.BeginInvokeOnMainThread(() =>
+                CallWithTimeout(delegate
                 {
                     videoView.MediaPlayer.ToggleTeletext();
                 });
@@ -288,7 +274,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_TeletextPageNumber, (pageNum) =>
             {
-                Device.BeginInvokeOnMainThread(() =>
+                CallWithTimeout(delegate
                 {
                     videoView.MediaPlayer.Teletext = Convert.ToInt32(pageNum);
                 });
@@ -354,7 +340,6 @@ namespace DVBTTelevizor
                 videoView.MediaPlayer.SetAudioTrack(id);
             });
         }
-
 
         private void RestartRemoteAccessService()
         {
@@ -423,7 +408,7 @@ namespace DVBTTelevizor
                     break;
             }
 
-            Device.BeginInvokeOnMainThread(() =>
+            CallWithTimeout(delegate
             {
                 videoView.MediaPlayer.AspectRatio = $"{width}:{height}";
             });
@@ -971,7 +956,7 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.TeletextActive)
                     {
-                        Device.BeginInvokeOnMainThread(() =>
+                        CallWithTimeout(delegate
                         {
                             videoView.MediaPlayer.Teletext = Convert.ToInt32(_numberPressed);
                         });
@@ -1063,7 +1048,7 @@ namespace DVBTTelevizor
                                 }
                                 else
                                 {
-                                    ShowActualPlayingMessage();
+                                    await ShowActualPlayingMessage();
                                 }
                             }
                     }
@@ -1735,7 +1720,7 @@ namespace DVBTTelevizor
             if (!_refreshGUIEnabled)
                 return;
 
-            _loggingService.Info("RefreshGUI");
+            //_loggingService.Info("RefreshGUI");
 
                 Device.BeginInvokeOnMainThread(() =>
                 {
@@ -1746,7 +1731,7 @@ namespace DVBTTelevizor
                         AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                         AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 
-                        _loggingService.Debug($"PlayingState: {PlayingState}");
+                        //_loggingService.Debug($"PlayingState: {PlayingState}");
 
                         switch (PlayingState)
                         {
@@ -1904,7 +1889,7 @@ namespace DVBTTelevizor
                                 break;
                         }
 
-                        _loggingService.Info("RefreshGUI completed");
+                        //_loggingService.Info("RefreshGUI completed");
 
                     }
                     catch (Exception ex)
@@ -1993,10 +1978,9 @@ namespace DVBTTelevizor
                     }
                 }
 
-                _loggingService.Debug($"shouldMediaPlay: {shouldMediaPlay}");
-                _loggingService.Debug($"shouldDriverPlay: {shouldDriverPlay}");
-                _loggingService.Debug($"shouldMediaRecord: {shouldMediaRecord}");
-
+                //_loggingService.Debug($"shouldMediaPlay: {shouldMediaPlay}");
+                //_loggingService.Debug($"shouldDriverPlay: {shouldDriverPlay}");
+                //_loggingService.Debug($"shouldMediaRecord: {shouldMediaRecord}");
 
                 if (shouldMediaPlay)
                 {
@@ -2145,7 +2129,10 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.RecordingChannel == null)
                     {
-                        videoView.MediaPlayer.Stop();
+                        CallWithTimeout(delegate
+                        {
+                            videoView.MediaPlayer.Stop();
+                        });
                         await _driver.Stop();
                     }
                     else
@@ -2171,7 +2158,7 @@ namespace DVBTTelevizor
 
         private void CallWithTimeout(Action action, int miliseconds = 1000)
         {
-        // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
+            // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
             var task = Task.Run(() =>
             {
                 ThreadPool.QueueUserWorkItem(_ => action());
@@ -2409,6 +2396,5 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex);
             }
         }
-
     }
 }
