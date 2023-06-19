@@ -20,6 +20,7 @@ using System.Security.Cryptography;
 using Java.Util;
 using static Android.App.Assist.AssistStructure;
 using static Android.InputMethodServices.Keyboard;
+using static Java.Util.ResourceBundle;
 
 
 namespace DVBTTelevizor
@@ -31,6 +32,7 @@ namespace DVBTTelevizor
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
+        private bool _checkStreamEnabled = true;
 
         private IDVBTDriverManager _driver;
         private DialogService _dlgService;
@@ -1719,7 +1721,6 @@ namespace DVBTTelevizor
                 return;
 
             _loggingService.Info("RefreshGUI");
-            _loggingService.Info(System.Environment.StackTrace);
 
                 Device.BeginInvokeOnMainThread(() =>
                 {
@@ -1909,6 +1910,7 @@ namespace DVBTTelevizor
             try
             {
                 _refreshGUIEnabled = false;
+                _checkStreamEnabled = false;
 
                 if (channel == null)
                     channel = _viewModel.SelectedChannel;
@@ -2013,14 +2015,17 @@ namespace DVBTTelevizor
 
                 if (shouldMediaPlay)
                 {
-                    Device.BeginInvokeOnMainThread(() =>
+                    if (videoView.MediaPlayer.IsPlaying)
                     {
-                        if (videoView.MediaPlayer.IsPlaying)
+                        _loggingService.Debug("Stopping Media player");
+
+                        // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
+
+                        ThreadPool.QueueUserWorkItem(delegate
                         {
-                            _loggingService.Debug("Stopping Media player");
-                            //videoView.MediaPlayer.Stop();
-                        }
-                    });
+                            videoView.MediaPlayer.Stop();
+                        });
+                    }
 
                     _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
                     _viewModel.TeletextActive = false;
@@ -2039,7 +2044,7 @@ namespace DVBTTelevizor
                         MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
                     }
 
-                    Device.BeginInvokeOnMainThread(() =>
+                    ThreadPool.QueueUserWorkItem(delegate
                     {
                         videoView.MediaPlayer.Play(_media);
                     });
@@ -2088,6 +2093,7 @@ namespace DVBTTelevizor
             } finally
             {
                 _refreshGUIEnabled = true;
+                _checkStreamEnabled = true;
                 RefreshGUI();
             }
         }
@@ -2146,7 +2152,10 @@ namespace DVBTTelevizor
 
         private async Task CheckStream()
         {
-            //_loggingService.Debug("CheckStream");
+            _loggingService.Debug("CheckStream");
+
+            if (!_checkStreamEnabled)
+                return;
 
             if (PlayingState == PlayingStateEnum.Stopped)
             {
