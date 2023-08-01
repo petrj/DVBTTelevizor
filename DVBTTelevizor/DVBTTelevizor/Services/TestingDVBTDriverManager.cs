@@ -30,7 +30,13 @@ namespace DVBTTelevizor
 
         public bool ReadingStream { get; set; } = false;
 
-        public string RecordFileName { get; set; } = null;
+        public string RecordFileName
+        {
+            get
+            {
+                return Path.Combine(BaseViewModel.AndroidAppDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+            }
+        }
 
         public string DataStreamInfo { get; set; } = "Data reading not initialized";
 
@@ -48,7 +54,12 @@ namespace DVBTTelevizor
 
         public async Task StartRecording()
         {
+            Recording = true;
+        }
 
+        public void StopRecording()
+        {
+            Recording = false;
         }
 
         public void StopReadStream()
@@ -60,11 +71,6 @@ namespace DVBTTelevizor
         {
             LastPID = 0;
             return true;
-        }
-
-        public void StopRecording()
-        {
-
         }
 
         public async Task Disconnect()

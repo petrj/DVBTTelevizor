@@ -31,7 +31,6 @@ namespace DVBTTelevizor
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
-        public string RecordingFileName { get; set; } = null;
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
@@ -63,6 +62,17 @@ namespace DVBTTelevizor
             ChannelsListOrVideo = 0,
             EPGDetail = 1,
             ToolBar = 2
+        }
+
+        public string RecordingFileName
+        {
+            get
+            {
+                if (_driver == null)
+                    return null;
+
+                return _driver.RecordFileName;
+            }
         }
 
         private SelectedPartEnum _selectedPart = SelectedPartEnum.ChannelsListOrVideo;
@@ -441,13 +451,22 @@ namespace DVBTTelevizor
 
             string selectedChannelDetailAction = "Detail...";
 
+            var rawRecording = RecordingChannel != null && _driver.Recording;
+
             if (ch != null)
             {
                 if (PlayingChannel == null)
                 {
-                    actions.Add("Play");
-                    actions.Add("Scan EPG");
-                    actions.Add("Delete");
+                    if (!rawRecording)
+                    {
+                        actions.Add("Play");
+                    }
+
+                    if (RecordingChannel == null)
+                    {
+                        actions.Add("Scan EPG");
+                        actions.Add("Delete");
+                    }
                 } else
                 {
                     actions.Add("Stop");
@@ -471,9 +490,10 @@ namespace DVBTTelevizor
                 if (RecordingChannel == null)
                 {
                     actions.Add("Record");
-#if DEBUG
-                    actions.Add("Record to file");
-#endif
+                    if (PlayingChannel == null)
+                    {
+                        actions.Add("Record raw stream");
+                    }
                 } else
                 {
                     actions.Add("Show record location");
@@ -540,7 +560,7 @@ namespace DVBTTelevizor
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
                     break;
-                case "Record to file":
+                case "Record raw stream":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStreamToFile);
                     break;
 
@@ -644,22 +664,17 @@ namespace DVBTTelevizor
         {
             _loggingService.Debug($"StopRecord");
 
-#if DEBUG
             if (_driver.Recording)
             {
                 _driver.StopRecording();
                 await _driver.SetPIDs(new List<long>() { 0, 17, 18 });
             }
-#endif
 
-            if (RecordingChannel == null)
+            if (RecordingChannel != null)
             {
-                return;
+                RecordingChannel.Recording = false;
+                RecordingChannel = null;
             }
-
-            RecordingChannel.Recording = false;
-            RecordingChannel = null;
-            RecordingFileName = null;
 
             MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
 

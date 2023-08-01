@@ -1908,6 +1908,12 @@ namespace DVBTTelevizor
                     return;
                 }
 
+                if (_driver.Recording)
+                {
+                    MessagingCenter.Send($"Playing {channel.Name} failed (raw stream recording in progress)", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 long? signalStrengthPercentage = null;
 
                 if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel != channel))
@@ -2017,7 +2023,6 @@ namespace DVBTTelevizor
                     if (shouldMediaRecord)
                     {
                         _viewModel.RecordingChannel = channel;
-                        _viewModel.RecordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
 
                         channel.Recording = true;
 
