@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using static Android.Resource;
 using static DVBTTelevizor.MainPageViewModel;
 
 
@@ -35,7 +36,7 @@ namespace DVBTTelevizor
         private DateTime _lastToggledSubtitlesTime = DateTime.MinValue;
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
-        private string _numberPressed = String.Empty;
+        private string _numberPressed = System.String.Empty;
         private bool _firstStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
@@ -928,7 +929,7 @@ namespace DVBTTelevizor
             if ((DateTime.Now - _lastNumPressedTime).TotalSeconds > 1)
             {
                 _lastNumPressedTime = DateTime.MinValue;
-                _numberPressed = String.Empty;
+                _numberPressed = System.String.Empty;
             }
 
             _lastNumPressedTime = DateTime.Now;
@@ -1725,7 +1726,7 @@ namespace DVBTTelevizor
                                     NavigationPage.SetHasNavigationBar(this, false);
                                 }
 
-                                MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EnableFullScreen);
+                                MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_EnableFullScreen);
 
                                 // VideoStackLayout must be visible before changing Layout
                                 VideoStackLayout.IsVisible = true;
@@ -1784,7 +1785,7 @@ namespace DVBTTelevizor
 
                                 if (!_config.Fullscreen)
                                 {
-                                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                                    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
                                 }
 
                                 if (IsPortrait)
@@ -1834,7 +1835,7 @@ namespace DVBTTelevizor
 
                                 if (!_config.Fullscreen)
                                 {
-                                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                                    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
                                 }
 
                                 //VideoStackLayout.IsVisible = false;
@@ -2028,6 +2029,8 @@ namespace DVBTTelevizor
 
                         _media.AddOption(":sout-all");  //  does not work? only first audio and no subtitles recorded!
                         _media.AddOption(":sout-keep");
+                        _media.AddOption(":sout-ts-es-id-pid");
+                        _media.AddOption(":ts-es-id-pid");
                         _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
 
                         MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
@@ -2158,7 +2161,7 @@ namespace DVBTTelevizor
 
         private async Task CheckStream()
         {
-            _loggingService.Debug("CheckStream");
+            //_loggingService.Debug("CheckStream");
 
             if (!_checkStreamEnabled)
                 return;
@@ -2210,8 +2213,8 @@ namespace DVBTTelevizor
                     var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                     var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
 
-                    _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
-                    _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+                    //_loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                    //_loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
 
                     // setting subtitles
                     foreach (var desc in videoView.MediaPlayer.SpuDescription)

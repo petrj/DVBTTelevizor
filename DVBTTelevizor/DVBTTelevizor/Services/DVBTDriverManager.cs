@@ -31,13 +31,17 @@ namespace DVBTTelevizor
         private NetworkStream _controlStream;
         private NetworkStream _transferStream;
         private DVBTTelevizorConfiguration _config;
+
         private long _lastTunedFreq = -1;
         private long _lastTunedDeliverySystem = -1;
+        private List<long> _lastPIDs = new List<long>();
+
         private const int ReadBufferSize = 32768;
 
         private bool _readingStream = true;
         private bool _recording = false;
-        bool _readingBuffer = false;
+        private bool _readingBuffer = false;
+        private string _recordingFileName = null;
 
         List<byte> _readBuffer = new List<byte>();
 
@@ -235,6 +239,7 @@ namespace DVBTTelevizor
                 {
                     _log.Debug($"Stopping recording");
                     _recording = false;
+                    _recordingFileName = null;
                 }
             }
         }
@@ -368,7 +373,10 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Path.Combine(BaseViewModel.AndroidAppDirectory, $"stream-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                lock (_readThreadLock)
+                {
+                    return _recordingFileName;
+                }
             }
         }
 
@@ -385,7 +393,6 @@ namespace DVBTTelevizor
                 byte[] buffer = new byte[ReadBufferSize];
 
                 FileStream recordFileStream = null;
-                string recordingFileName = null;
                 long bytesReadFromLastMeasureStartTime = 0;
 
                 bool readingStream = true;
@@ -418,7 +425,7 @@ namespace DVBTTelevizor
 
                         if (_lastTunedFreq >= 0)
                         {
-                            status += $" freq {_lastTunedFreq / 1000000} Mhz";
+                            status += $" freq {_lastTunedFreq / 1000000} MHz";
                         }
 
                         if (rec)
@@ -442,12 +449,13 @@ namespace DVBTTelevizor
                             {
                                 if (recordFileStream == null)
                                 {
-                                    recordingFileName = RecordFileName;
+                                    var fileNameFreq = (_lastTunedFreq / 1000000).ToString() + "MHz";
+                                    _recordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"DVBT-MPEGTS-{fileNameFreq}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
 
-                                    if (File.Exists(recordingFileName))
-                                        File.Delete(recordingFileName);
+                                    if (File.Exists(_recordingFileName))
+                                        File.Delete(_recordingFileName);
 
-                                    recordFileStream = new FileStream(recordingFileName, FileMode.Create, FileAccess.Write);
+                                    recordFileStream = new FileStream(_recordingFileName, FileMode.Create, FileAccess.Write);
                                 }
 
                                 recordFileStream.Write(buffer, 0, bytesRead);
@@ -636,7 +644,7 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySystem)
         {
-            _log.Debug($"Tuning {frequency} Mhz, type: {deliverySystem}");
+            _log.Debug($"Tuning {frequency} MHz, type: {deliverySystem}");
 
             if (frequency == _lastTunedFreq && deliverySystem == _lastTunedDeliverySystem)
             {
@@ -784,6 +792,7 @@ namespace DVBTTelevizor
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)
         {
             _log.Debug($"Setting PIDs: {String.Join(",", PIDs)}");
+            _lastPIDs = PIDs;
 
             var responseSize = 10;
 
@@ -966,7 +975,7 @@ namespace DVBTTelevizor
         /// <returns></returns>
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
-            _log.Debug($"Tuning enhanced freq: {frequency} Mhz, type: {deliverySystem} fastTuning: {fastTuning}");
+            _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
 
             var res = new TuneResult();
 

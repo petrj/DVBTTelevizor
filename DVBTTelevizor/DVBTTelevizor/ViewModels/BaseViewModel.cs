@@ -133,7 +133,7 @@ namespace DVBTTelevizor
 
         public void NotifyToolBarChange()
         {
-            _loggingService.Info($"NotifyToolBarChange");
+            //_loggingService.Info($"NotifyToolBarChange");
 
             Device.BeginInvokeOnMainThread(() =>
             {

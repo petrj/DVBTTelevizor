@@ -510,7 +510,7 @@ namespace DVBTTelevizor.Droid
 
         private void SetFullScreen(bool on)
         {
-            _loggingService.Info($"SetFullScreen: {on}");
+            //_loggingService.Info($"SetFullScreen: {on}");
 
             try
             {

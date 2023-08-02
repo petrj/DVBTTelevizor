@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace DVBTTelevizor
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
+        private string _VLCRecordingFileName = null;
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
@@ -68,10 +70,12 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (_driver == null)
-                    return null;
+                if (_driver != null && _driver.Recording && !String.IsNullOrEmpty(_driver.RecordFileName))
+                {
+                    return _driver.RecordFileName;
+                }
 
-                return _driver.RecordFileName;
+                return _VLCRecordingFileName;
             }
         }
 
@@ -136,6 +140,17 @@ namespace DVBTTelevizor
             set
             {
                 _recordingChannel = value;
+
+                if (_recordingChannel == null)
+                {
+                    _VLCRecordingFileName = null;
+                } else
+                {
+                    if (_VLCRecordingFileName == null)
+                    {
+                        _VLCRecordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"DVBT-MPEGTS-{_recordingChannel.Name}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                    }
+                }
 
                 OnPropertyChanged(nameof(RecordingLabel));
             }
@@ -451,7 +466,7 @@ namespace DVBTTelevizor
 
             string selectedChannelDetailAction = "Detail...";
 
-            var rawRecording = RecordingChannel != null && _driver.Recording;
+            var rawRecording = _driver.Recording;
 
             if (ch != null)
             {
@@ -462,7 +477,7 @@ namespace DVBTTelevizor
                         actions.Add("Play");
                     }
 
-                    if (RecordingChannel == null)
+                    if ((RecordingChannel == null) && (!rawRecording))
                     {
                         actions.Add("Scan EPG");
                         actions.Add("Delete");
@@ -487,7 +502,7 @@ namespace DVBTTelevizor
                     actions.Add("Teletext...");
                 }
 
-                if (RecordingChannel == null)
+                if ((RecordingChannel == null) && (!rawRecording))
                 {
                     actions.Add("Record");
                     if (PlayingChannel == null)
@@ -561,7 +576,7 @@ namespace DVBTTelevizor
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
                     break;
                 case "Record raw stream":
-                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStreamToFile);
+                    await ShowConfirmRawRecordStreamMenu(ch);
                     break;
 
                 case "Show record location":
@@ -614,6 +629,19 @@ namespace DVBTTelevizor
                 MessagingCenter.Send(action, BaseViewModel.MSG_ChangeAspect);
                 MessagingCenter.Send($"Aspect ratio: {action}", BaseViewModel.MSG_ToastMessage);
             }
+        }
+
+        public async Task ShowConfirmRawRecordStreamMenu(DVBTChannel ch)
+        {
+            var response = await _dialogService.Confirm("Raw stream contains all DVBT tracks (audio, subtitles), but playing is disabled while recording is in progress" +
+                Environment.NewLine +
+                Environment.NewLine +
+                "Are you sure to start raw stream recording?", "Confirmation");
+
+            if (!response)
+                return;
+
+            MessagingCenter.Send(new PlayStreamInfo { Channel = ch }, BaseViewModel.MSG_RecordStreamToFile);
         }
 
         public async Task ShowAudioTrackMenu(DVBTChannel ch)
@@ -670,11 +698,15 @@ namespace DVBTTelevizor
                 await _driver.SetPIDs(new List<long>() { 0, 17, 18 });
             }
 
-            if (RecordingChannel != null)
+            Xamarin.Forms.Device.BeginInvokeOnMainThread(delegate
             {
-                RecordingChannel.Recording = false;
-                RecordingChannel = null;
-            }
+                if (RecordingChannel != null)
+                {
+                    RecordingChannel.Recording = false;
+                    RecordingChannel = null;
+                    _VLCRecordingFileName = null;
+                }
+            });
 
             MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
 
@@ -854,6 +886,12 @@ namespace DVBTTelevizor
             if (_recordingChannel != null)
             {
                 MessagingCenter.Send($"Cannot scan EPG (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                return;
+            }
+
+            if (_driver.Recording)
+            {
+                MessagingCenter.Send($"Cannot scan EPG (raw stream recording in progress)", BaseViewModel.MSG_ToastMessage);
                 return;
             }
 
