@@ -1215,7 +1215,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + 10 + (int)_config.AppFontSize, false);
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - 10 + (int)_config.AppFontSize, false);
                         }
                     }
                     else
@@ -1235,7 +1235,7 @@ namespace DVBTTelevizor
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
-                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + 10 + (int)_config.AppFontSize, false);
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - 10 + (int)_config.AppFontSize, false);
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
@@ -1320,7 +1320,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + (10 + (int)_config.AppFontSize), false);
                         }
                     }
                     else
@@ -1340,7 +1340,7 @@ namespace DVBTTelevizor
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
-                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + (10 + (int)_config.AppFontSize), false);
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
@@ -1634,6 +1634,8 @@ namespace DVBTTelevizor
             }
             else
             {
+                // right
+
                 Task.Run(async () => await ActionStop(false));
             }
         }
@@ -1648,7 +1650,7 @@ namespace DVBTTelevizor
                 }
                 else if (PlayingState == PlayingStateEnum.PlayingInPreview)
                 {
-                    await ActionStop(false);
+                    PlayingState = PlayingStateEnum.Playing;
                 }
             });
         }
@@ -1663,7 +1665,7 @@ namespace DVBTTelevizor
                 }
                 else if (PlayingState == PlayingStateEnum.PlayingInPreview)
                 {
-                    await ActionStop(false);
+                    PlayingState = PlayingStateEnum.Playing;
                 }
             });
         }
@@ -2029,8 +2031,6 @@ namespace DVBTTelevizor
 
                         _media.AddOption(":sout-all");  //  does not work? only first audio and no subtitles recorded!
                         _media.AddOption(":sout-keep");
-                        _media.AddOption(":sout-ts-es-id-pid");
-                        _media.AddOption(":ts-es-id-pid");
                         _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
 
                         MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);

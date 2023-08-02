@@ -538,6 +538,8 @@ namespace DVBTTelevizor.Droid
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
+                    _loggingService.Debug($"ToastMessage:{message}");
+
                     var view = FindViewById(Android.Resource.Id.Content);
 
                     var snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
