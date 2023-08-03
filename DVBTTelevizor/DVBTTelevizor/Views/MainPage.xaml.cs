@@ -1209,11 +1209,22 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.EPGDetailVisible)
                     {
-                        _viewModel.EPGDetailEnabled = false;
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        }
+                        else
+                        {
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - 10 + (int)_config.AppFontSize, false);
+                        }
                     }
                     else
                     {
-                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                        if (!_viewModel.StandingOnEnd)
+                        {
+                            await _viewModel.SelectNextChannel(step);
+                            await ActionPlay(false);
+                        }
                     }
                 }
                 else
@@ -1303,11 +1314,22 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.EPGDetailVisible)
                     {
-                        _viewModel.EPGDetailEnabled = false;
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        }
+                        else
+                        {
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + (10 + (int)_config.AppFontSize), false);
+                        }
                     }
                     else
                     {
-                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                        if (!_viewModel.StandingOnStart)
+                        {
+                            await _viewModel.SelectPreviousChannel(step);
+                            await ActionPlay(false);
+                        }
                     }
                 }
                 else
@@ -1624,7 +1646,14 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    await ActionUp();
+                    if (_viewModel.EPGDetailVisible)
+                    {
+                        _viewModel.EPGDetailEnabled = false;
+                    }
+                    else
+                    {
+                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                    }
                 }
                 else if (PlayingState == PlayingStateEnum.PlayingInPreview)
                 {
@@ -1639,7 +1668,14 @@ namespace DVBTTelevizor
             {
                 if (PlayingState == PlayingStateEnum.Playing)
                 {
-                    await ActionDown();
+                    if (_viewModel.EPGDetailVisible)
+                    {
+                        _viewModel.EPGDetailEnabled = false;
+                    }
+                    else
+                    {
+                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                    }
                 }
                 else if (PlayingState == PlayingStateEnum.PlayingInPreview)
                 {
