@@ -1215,7 +1215,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - 10 + (int)_config.AppFontSize, false);
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + 10 + (int)_config.AppFontSize, false);
                         }
                     }
                     else
@@ -1235,7 +1235,7 @@ namespace DVBTTelevizor
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
-                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - 10 + (int)_config.AppFontSize, false);
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + 10 + (int)_config.AppFontSize, false);
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
@@ -1320,7 +1320,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + (10 + (int)_config.AppFontSize), false);
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
                         }
                     }
                     else
@@ -1340,7 +1340,7 @@ namespace DVBTTelevizor
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
-                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + (10 + (int)_config.AppFontSize), false);
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
                     {
