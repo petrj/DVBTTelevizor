@@ -1209,22 +1209,11 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.EPGDetailVisible)
                     {
-                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
-                        {
-                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
-                        }
-                        else
-                        {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - 10 + (int)_config.AppFontSize, false);
-                        }
+                        _viewModel.EPGDetailEnabled = false;
                     }
                     else
                     {
-                        if (!_viewModel.StandingOnEnd)
-                        {
-                            await _viewModel.SelectNextChannel(step);
-                            await ActionPlay(false);
-                        }
+                        PlayingState = PlayingStateEnum.PlayingInPreview;
                     }
                 }
                 else
@@ -1314,22 +1303,11 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.EPGDetailVisible)
                     {
-                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
-                        {
-                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
-                        }
-                        else
-                        {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY + (10 + (int)_config.AppFontSize), false);
-                        }
+                        _viewModel.EPGDetailEnabled = false;
                     }
                     else
                     {
-                        if (!_viewModel.StandingOnStart)
-                        {
-                            await _viewModel.SelectPreviousChannel(step);
-                            await ActionPlay(false);
-                        }
+                        PlayingState = PlayingStateEnum.PlayingInPreview;
                     }
                 }
                 else
