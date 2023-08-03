@@ -1994,7 +1994,7 @@ namespace DVBTTelevizor
                         switch (tunedRes.Result)
                         {
                             case SearchProgramResultEnum.NoSignal:
-                                MessagingCenter.Send($"No sginal", BaseViewModel.MSG_ToastMessage);
+                                MessagingCenter.Send($"No signal", BaseViewModel.MSG_ToastMessage);
                                 break;
                             default:
                                 MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);

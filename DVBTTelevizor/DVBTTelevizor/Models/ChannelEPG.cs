@@ -63,7 +63,14 @@ namespace DVBTTelevizor
 
         public void AddEvent(long mapPID, EventItem item)
         {
-            if (EventExists(mapPID, item))
+            var ev = GetEventIfExistsSame(mapPID, item);
+            if (ev != null)
+            {
+                // remove obsolete event
+                EventItems[mapPID].Remove(ev);
+            }
+
+            if (item.FinishTime < DateTime.Now)
                 return;
 
             if (!EventItems.ContainsKey(mapPID))
@@ -71,28 +78,25 @@ namespace DVBTTelevizor
                 EventItems.Add(mapPID, new List<EventItem>());
             }
 
-            if (item.FinishTime < DateTime.Now)
-                return;
-
             EventItems[mapPID].Add(item);
         }
 
-        private bool EventExists(long mapPID, EventItem item)
+        private EventItem GetEventIfExistsSame(long mapPID, EventItem item)
         {
             if (!EventItems.ContainsKey(mapPID))
             {
-                return false;
+                return null;
             }
 
             foreach (var eventItem in EventItems[mapPID])
             {
                 if (eventItem.SameEvent(item))
                 {
-                    return true;
+                    return eventItem;
                 }
             }
 
-            return false;
+            return null;
         }
 
         public List<EventItem> GetEvents(DateTime date, long programMapPID, int count)

@@ -170,18 +170,25 @@ namespace DVBTTelevizor.Services
                 {
                     _log.Debug($"[EIT] saving MapPID {mapPID}");
 
-                    var db = new SQLiteConnection(GetDBPath(_driver.LastTunedFreq, mapPID));
-
-                    db.DropTable<EventItem>();
-
-                    db.CreateTable<EventItem>();
-
-                    foreach (var ev in channelEPG.EventItems[mapPID])
+                    try
                     {
-                        db.Insert(ev);
-                    }
 
-                    db.Close();
+                        var db = new SQLiteConnection(GetDBPath(_driver.LastTunedFreq, mapPID));
+
+                        db.DropTable<EventItem>();
+
+                        db.CreateTable<EventItem>();
+
+                        foreach (var ev in channelEPG.EventItems[mapPID])
+                        {
+                            db.Insert(ev);
+                        }
+
+                        db.Close();
+                    } catch (Exception ex)
+                    {
+                        _log.Error(ex, $"[EIT]");
+                    }
                 }
 
                 _log.Debug($"[EIT] saved");
