@@ -2018,6 +2018,7 @@ namespace DVBTTelevizor
                         return;
                     }
 
+                    /*
                     if (_config.ScanEPG)
                     {
                         var ev = await _viewModel.GetChannelEPG(channel);
@@ -2027,8 +2028,9 @@ namespace DVBTTelevizor
                             await _viewModel.EIT.Scan(1500);
                         }
                     }
-
-                    _driver.StopReadStream();
+                    */
+                    //_driver.StopReadStream();
+                    _driver.SendStream();
 
                     signalStrengthPercentage = tunedRes.SignalPercentStrength;
                 }

@@ -64,7 +64,14 @@ namespace DVBTTelevizor
 
         public void StopReadStream()
         {
+        }
 
+        public void SendStream()
+        {
+        }
+
+        public void StopSendingStream()
+        {
         }
 
         public async Task<bool> Stop()

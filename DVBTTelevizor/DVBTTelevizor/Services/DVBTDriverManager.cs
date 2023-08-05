@@ -39,6 +39,7 @@ namespace DVBTTelevizor
         private const int ReadBufferSize = 32768;
 
         private bool _readingStream = true;
+        private bool _sendingStream = false;
         private bool _recording = false;
         private bool _readingBuffer = false;
         private string _recordingFileName = null;
@@ -49,6 +50,9 @@ namespace DVBTTelevizor
         private static object _infoLock = new object();
 
         private string _dataStreamInfo  = "Data reading not initialized";
+
+        private Stream _DVBStream = null;
+        //private TcpClient _DVBTcpClient = null;
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -63,12 +67,10 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (ReadingStream)
+                lock (_readThreadLock)
                 {
-                    return null;
+                    return _DVBStream;
                 }
-
-                return _transferStream;
             }
         }
 
@@ -193,6 +195,30 @@ namespace DVBTTelevizor
             }
         }
 
+        public void SendStream()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"SendStream");
+
+                _sendingStream = true;
+            }
+        }
+
+        public void StopSendingStream()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"SendStream");
+
+                //_DVBTcpClient.Close();
+                _DVBStream.Close();
+                _DVBStream.Dispose();
+                _DVBStream = null;
+                _sendingStream = false;
+            }
+        }
+
         public async Task Disconnect()
         {
             _log.Debug($"Dsconnecting");
@@ -279,7 +305,8 @@ namespace DVBTTelevizor
         {
             _log.Debug("Stopping ...");
 
-            StartReadStream();
+            //StartReadStream();
+            StopSendingStream();
 
             var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17 });
             if (!setPIDsRes.SuccessFlag)
@@ -398,6 +425,7 @@ namespace DVBTTelevizor
                 bool readingStream = true;
                 bool rec = false;
                 bool readingBuffer = false;
+                bool sendingStream = false;
 
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
                 string lastSpeed = "";
@@ -410,6 +438,7 @@ namespace DVBTTelevizor
                         rec = _recording;
                         readingBuffer = _readingBuffer;
                         readingStream = _readingStream;
+                        sendingStream = _sendingStream;
                     }
 
                     string status = String.Empty;
@@ -432,10 +461,10 @@ namespace DVBTTelevizor
                         {
                             status += ", recording";
                         }
-                        if (readingBuffer)
-                        {
-                            status += ", bufferring";
-                        }
+                        //if (readingBuffer)
+                        //{
+                        //    status += ", bufferring";
+                        //}
 
                         if (_transferClient.Available > 0)
                         {
@@ -460,10 +489,29 @@ namespace DVBTTelevizor
 
                                 recordFileStream.Write(buffer, 0, bytesRead);
                             }
-                            if (readingBuffer)
+                            //if (readingBuffer)
+                            //{
+                            //    for (var i = 0; i < bytesRead; i++)
+                            //        Buffer.Add(buffer[i]);
+                            //}
+                            if (sendingStream)
                             {
-                                for (var i = 0; i < bytesRead; i++)
-                                    Buffer.Add(buffer[i]);
+                                try
+                                {
+                                    if (_DVBStream == null)
+                                    {
+                                        //_DVBTcpClient = new TcpClient();
+                                        //_DVBTcpClient.Connect("127.0.0.1", 7777);
+                                        _DVBStream = new MemoryStream(100*1024);
+                                    }
+
+                                    status += $", writing {bytesRead / 1024} KB to DVBStream";
+                                    _DVBStream.Write(buffer, 0, bytesRead);
+                                   // _DVBStream.Flush();
+                                } catch (Exception ex)
+                                {
+                                    _log.Error(ex);
+                                }
                             }
 
                             _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -479,50 +527,53 @@ namespace DVBTTelevizor
                             recordFileStream.Close();
                             recordFileStream = null;
                         }
-                    }
 
-                    // calculating speed:
-                    var totalSeconds = (DateTime.Now - lastBitRateMeasureStartTime).TotalSeconds;
-                    if (totalSeconds > 2)
-                    {
-                        var bytesPerSec = bytesReadFromLastMeasureStartTime * 8 / totalSeconds;
-                        string speed;
 
-                        if (bytesPerSec > 1000000)
+                        // calculating speed:
+                        var totalSeconds = (DateTime.Now - lastBitRateMeasureStartTime).TotalSeconds;
+                        if (totalSeconds > 2)
                         {
-                            speed = $", {Convert.ToInt32(8*(bytesPerSec / 1000000.0)).ToString("N2")} Mb/sec";
-                        }
-                        else if (bytesPerSec > 1000)
-                        {
-                            speed = $", {Convert.ToInt32(8*(bytesPerSec / 1000.0)).ToString("N2")} Kb/sec";
+                            var bytesPerSec = bytesReadFromLastMeasureStartTime * 8 / totalSeconds;
+                            string speed;
+
+                            if (bytesPerSec > 1000000)
+                            {
+                                speed = $", {Convert.ToInt32(8 * (bytesPerSec / 1000000.0)).ToString("N2")} Mb/sec";
+                            }
+                            else if (bytesPerSec > 1000)
+                            {
+                                speed = $", {Convert.ToInt32(8 * (bytesPerSec / 1000.0)).ToString("N2")} Kb/sec";
+                            }
+                            else
+                            {
+                                speed = $", {8 * bytesPerSec} b/sec";
+                            }
+
+                            status += speed;
+
+                            if (totalSeconds > 3)
+                            {
+                                lastSpeed = speed;
+                                lastBitRateMeasureStartTime = DateTime.Now;
+                                bytesReadFromLastMeasureStartTime = 0;
+                            }
                         }
                         else
                         {
-                            speed = $", {8*bytesPerSec} b/sec";
-                        }
-
-                        status += speed;
-
-                        if (totalSeconds > 3)
-                        {
-                            lastSpeed = speed;
-                            lastBitRateMeasureStartTime = DateTime.Now;
-                            bytesReadFromLastMeasureStartTime = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (lastSpeed != String.Empty)
-                        {
-                            status += lastSpeed;
-                        }
-                        else
-                        {
-                            status += ", 0 b/sec";
+                            if (lastSpeed != String.Empty)
+                            {
+                                status += lastSpeed;
+                            }
+                            else
+                            {
+                                status += ", 0 b/sec";
+                            }
                         }
                     }
 
                     DataStreamInfo = status;
+                    _log.Debug(DataStreamInfo);
+
                 }
                 while (_transferClient.Connected);
 

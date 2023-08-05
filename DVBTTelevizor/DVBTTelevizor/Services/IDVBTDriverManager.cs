@@ -42,6 +42,9 @@ namespace DVBTTelevizor
 
         void StopReadStream();
 
+        void SendStream();
+        void StopSendingStream();
+
         Task<bool> Stop();
 
         Task<bool> CheckStatus();
