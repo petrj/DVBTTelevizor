@@ -2032,33 +2032,27 @@ namespace DVBTTelevizor
                     */
 
                     //_driver.StopReadStream();
-
-                    _driver.SendStream();
+                    _driver.PlayStream();
 
                     signalStrengthPercentage = tunedRes.SignalPercentStrength;
                 }
 
                 if (shouldMediaPlay)
                 {
-                    //_media = new Media(_libVLC, _driver.VideoStream, new string[] { });
-                    //_media = new Media(_libVLC, "http://10.0.0.25:8001", FromType.FromLocation);
-                    //_media = new Media(_libVLC, "udp://10.0.0.25:9500", FromType.FromLocation);
-                    //_media = new Media(_libVLC, "10.0.0.25:8001", FromType.FromLocation);
                     _media = new Media(_libVLC, "udp://@10.0.0.25:8001", FromType.FromLocation);
 
+                    //if (shouldMediaRecord)
+                    //{
+                    //    _viewModel.RecordingChannel = channel;
 
-                    if (shouldMediaRecord)
-                    {
-                        _viewModel.RecordingChannel = channel;
+                    //    channel.Recording = true;
 
-                        channel.Recording = true;
+                    //    _media.AddOption(":sout-all");  //  does not work? only first audio and no subtitles recorded!
+                    //    _media.AddOption(":sout-keep");
+                    //    _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
 
-                        _media.AddOption(":sout-all");  //  does not work? only first audio and no subtitles recorded!
-                        _media.AddOption(":sout-keep");
-                        _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
-
-                        MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
-                    }
+                    //    MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
+                    //}
 
                     CallWithTimeout(delegate
                     {

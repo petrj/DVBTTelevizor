@@ -66,11 +66,11 @@ namespace DVBTTelevizor
         {
         }
 
-        public void SendStream()
+        public void PlayStream()
         {
         }
 
-        public void StopSendingStream()
+        public void StopStream()
         {
         }
 
