@@ -17,6 +17,7 @@ using DVBTTelevizor.Models;
 using Android.Net.Sip;
 using SQLite;
 using DVBTTelevizor.Services;
+using Java.IO;
 
 namespace DVBTTelevizor
 {
@@ -53,6 +54,7 @@ namespace DVBTTelevizor
 
         private Stream _DVBStream = null;
         //private TcpClient _DVBTcpClient = null;
+        private Socket _socket = null;
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -69,7 +71,16 @@ namespace DVBTTelevizor
             {
                 lock (_readThreadLock)
                 {
-                    return _DVBStream;
+                    if (_sendingStream)
+                    {
+                        return _DVBStream;
+                    } else
+                    if (!_readingStream)
+                    {
+                        return _transferStream;
+                    }
+
+                    return null;
                 }
             }
         }
@@ -201,7 +212,172 @@ namespace DVBTTelevizor
             {
                 _log.Debug($"SendStream");
 
-                _sendingStream = true;
+                try
+                {
+                    /*
+                    _outPutUdpClient = new UdpClient { ExclusiveAddressUse = false };
+
+                    IPAddress outPutIp = IPAddress.Parse("10.0.0.25");
+                    int multicastPort = 9500;
+
+                    var localEp = new IPEndPoint(outPutIp, multicastPort);
+
+                    _outPutUdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    _outPutUdpClient.Ttl = 3;
+                    _outPutUdpClient.Client.Bind(localEp);
+
+                    var mcastAddr = IPAddress.Parse("10.0.0.25");
+
+                    _outPutUdpClient.Connect(mcastAddr, multicastPort);
+                    */
+
+                    //var client = new TcpClient();
+                    //_DVBTcpClient = new TcpClient();
+                    //_DVBTcpClient.Connect("127.0.0.1", 7777);
+
+
+                    /* Socket
+                    Task.Run(delegate
+                    {
+                        TcpListener myList = new TcpListener(8001);
+
+                        myList.Start();
+
+                        //Console.WriteLine("The server is running at port 8001...");
+                        //Console.WriteLine("The local End point is  :" +                                    myList.LocalEndpoint);
+                        //Console.WriteLine("Waiting for a connection.....");
+
+                        _socket = myList.AcceptSocket();
+
+
+
+                        _log.Info("Client connected to socket");
+
+                        while (true)
+                        {
+                            Task.Delay(1000);
+                        }
+                    });
+                    */
+                    /*  Memory stream
+
+                    _DVBStream = new MemoryStream(100 * 1024);
+                    */
+
+                    _sendingStream = true;
+
+
+                    /*
+                    //after few moments:
+                    //System.IO.IOException: Unable to write data to the transport connection: The socket has been shut down.System.IO.IOException: Unable to write data to the transport connection: The socket has been shut down. ---> System.Net.Sockets.SocketException: The socket has been shut down  at
+
+                    var ipAddress = Dns.Resolve("localhost").AddressList[0];
+                    TcpListener server = new TcpListener(ipAddress, 8001);
+                    server.Start();
+                    _log.Info($"Video stream address: {ipAddress.ToString()}:8001");
+
+                    Task.Run(delegate
+                    {
+                        try
+                        {
+                            using (var client = server.AcceptTcpClient())
+                            {
+                                client.ReceiveTimeout = 60 * 1000;
+                                client.SendTimeout = 60 * 1000;
+                                _DVBStream = client.GetStream();
+
+                                _log.Info($"Client connected");
+
+                                while (_sendingStream)
+                                {
+                                    //client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+                                        if (Buffer.Count > 0)
+                                        {
+                                            lock (_readThreadLock)
+                                            {
+                                                _DVBStream.Write(Buffer.ToArray(), 0, Buffer.Count);
+                                                Buffer.Clear();
+
+                                                _log.Info($"    --> TcpListener running");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                                            System.Threading.Thread.Sleep(100);
+                                        }
+                                }
+
+                                _log.Info($"Video stream closed");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.Error(ex);
+                        }
+                    });
+                    */
+
+                    Task.Run(delegate
+                    {
+                        try
+                        {
+                            var ipAddress = IPAddress.Parse("10.0.0.25"); // Replace with your target IP address
+                            int port = 8001; // Choose a suitable port
+
+                            using (UdpClient udpClient = new UdpClient())
+                            {
+                                // Set up the destination endpoint
+                                IPEndPoint endPoint = new IPEndPoint(ipAddress, port);
+
+                                while (_sendingStream)
+                                {
+                                    if (Buffer.Count > 0)
+                                    {
+                                        lock (_readThreadLock)
+                                        {
+                                            var maxPacketSize = 1400;
+                                            var bufferPart = new byte[maxPacketSize];
+                                            var bufferPos = 0;
+
+                                            while (bufferPos < Buffer.Count)
+                                            {
+                                                if (bufferPos + maxPacketSize <= Buffer.Count)
+                                                {
+                                                    Buffer.CopyTo(bufferPos, bufferPart, 0, maxPacketSize);
+                                                    udpClient.Send(bufferPart, maxPacketSize , endPoint);
+                                                    bufferPos+= maxPacketSize;
+                                                }
+                                                else
+                                                {
+                                                    Buffer.CopyTo(bufferPos, bufferPart, 0, Buffer.Count - bufferPos);
+                                                    udpClient.Send(bufferPart, Buffer.Count - bufferPos, endPoint);
+                                                    bufferPos += Buffer.Count - bufferPos;
+                                                }
+                                            }
+                                            Buffer.Clear();
+
+                                            _log.Info($"    --> TcpListener running");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        System.Threading.Thread.Sleep(100);
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.Error(ex);
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex);
+                }
             }
         }
 
@@ -212,9 +388,12 @@ namespace DVBTTelevizor
                 _log.Debug($"SendStream");
 
                 //_DVBTcpClient.Close();
-                _DVBStream.Close();
-                _DVBStream.Dispose();
-                _DVBStream = null;
+                if (_DVBStream != null)
+                {
+                    _DVBStream.Close();
+                    _DVBStream.Dispose();
+                    _DVBStream = null;
+                }
                 _sendingStream = false;
             }
         }
@@ -427,6 +606,8 @@ namespace DVBTTelevizor
                 bool readingBuffer = false;
                 bool sendingStream = false;
 
+                UdpClient udpClient = null;
+
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
                 string lastSpeed = "";
 
@@ -481,34 +662,49 @@ namespace DVBTTelevizor
                                     var fileNameFreq = (_lastTunedFreq / 1000000).ToString() + "MHz";
                                     _recordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"DVBT-MPEGTS-{fileNameFreq}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
 
-                                    if (File.Exists(_recordingFileName))
-                                        File.Delete(_recordingFileName);
+                                    if (System.IO.File.Exists(_recordingFileName))
+                                        System.IO.File.Delete(_recordingFileName);
 
                                     recordFileStream = new FileStream(_recordingFileName, FileMode.Create, FileAccess.Write);
                                 }
 
                                 recordFileStream.Write(buffer, 0, bytesRead);
                             }
-                            //if (readingBuffer)
-                            //{
-                            //    for (var i = 0; i < bytesRead; i++)
-                            //        Buffer.Add(buffer[i]);
-                            //}
+                            if (readingBuffer)
+                            {
+                                for (var i = 0; i < bytesRead; i++)
+                                    Buffer.Add(buffer[i]);
+                            }
                             if (sendingStream)
                             {
                                 try
                                 {
-                                    if (_DVBStream == null)
+                                    status += $", --> {(bytesRead / 1024).ToString("N0")} KB to buffer";
+
+                                    lock (_readThreadLock)
                                     {
-                                        //_DVBTcpClient = new TcpClient();
-                                        //_DVBTcpClient.Connect("127.0.0.1", 7777);
-                                        _DVBStream = new MemoryStream(100*1024);
+                                        for (var i = 0; i < bytesRead; i++)
+                                            Buffer.Add(buffer[i]);
                                     }
 
-                                    status += $", writing {bytesRead / 1024} KB to DVBStream";
-                                    _DVBStream.Write(buffer, 0, bytesRead);
-                                   // _DVBStream.Flush();
-                                } catch (Exception ex)
+                                    //if (_DVBStream != null)
+                                    //{
+                                    //    status += $", sending {(bytesRead / 1024).ToString("N0")} KB";
+                                    //    _DVBStream.Write(buffer, 0, bytesRead);
+                                    //}
+
+
+                                    /*
+                                    if (udpClient == null)
+                                    {
+                                        udpClient = new UdpClient();
+                                    }
+
+                                    udpClient.Send(buffer, bytesRead, "10.0.0.25", 8001);
+                                    */
+
+                                }
+                                catch (Exception ex)
                                 {
                                     _log.Error(ex);
                                 }

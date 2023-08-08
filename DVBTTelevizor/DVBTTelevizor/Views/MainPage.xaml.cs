@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -2029,7 +2030,9 @@ namespace DVBTTelevizor
                         }
                     }
                     */
+
                     //_driver.StopReadStream();
+
                     _driver.SendStream();
 
                     signalStrengthPercentage = tunedRes.SignalPercentStrength;
@@ -2037,7 +2040,12 @@ namespace DVBTTelevizor
 
                 if (shouldMediaPlay)
                 {
-                    _media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+                    //_media = new Media(_libVLC, _driver.VideoStream, new string[] { });
+                    //_media = new Media(_libVLC, "http://10.0.0.25:8001", FromType.FromLocation);
+                    //_media = new Media(_libVLC, "udp://10.0.0.25:9500", FromType.FromLocation);
+                    //_media = new Media(_libVLC, "10.0.0.25:8001", FromType.FromLocation);
+                    _media = new Media(_libVLC, "udp://@10.0.0.25:8001", FromType.FromLocation);
+
 
                     if (shouldMediaRecord)
                     {
@@ -2098,7 +2106,11 @@ namespace DVBTTelevizor
                 }
 
                 _viewModel.NotifyMediaChange();
-            } finally
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+            finally
             {
                 _refreshGUIEnabled = true;
                 _checkStreamEnabled = true;
