@@ -12,10 +12,9 @@ namespace DVBTTelevizor.Services
     {
         public const int MaxPacketSize = 1400;
 
-        private bool _active = false;
         private ILoggingService _log;
-        private UdpClient _currentUDPClient = null;
-        private IPEndPoint _currentEndPoint = null;
+        private UdpClient _UDPClient = null;
+        private IPEndPoint _EndPoint = null;
 
         private string _ip;
         private int _port = 8001;
@@ -32,7 +31,7 @@ namespace DVBTTelevizor.Services
         {
             get
             {
-                return _currentUDPClient;
+                return _UDPClient;
             }
         }
 
@@ -40,15 +39,7 @@ namespace DVBTTelevizor.Services
         {
             get
             {
-                return _currentEndPoint;
-            }
-        }
-
-        public bool Active
-        {
-            get
-            {
-                return _active;
+                return _EndPoint;
             }
         }
 
@@ -77,102 +68,48 @@ namespace DVBTTelevizor.Services
             }
 
             _log.Info($"UDPStreamer: Binding address {IP}:{Port}");
-        }
 
-        public void StartUDPClientThread()
-        {
-            _log.Info($"UDPStreamer: Starting UDP client thread");
-
-            Task.Run(delegate
-            {
-                _active = true;
-                _currentUDPClient = null;
-
-                using (UdpClient udpClient = new UdpClient())
-                {
-                    // Set up the destination endpoint
-                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(IP), Port);
-
-                    _currentUDPClient = udpClient;
-                    _currentEndPoint = endPoint;
-
-                    while (_active)
-                    {
-                        System.Threading.Thread.Sleep(100);
-                    }
-                }
-
-                _log.Info($"UDPStreamer: UDP client thread finished");
-            });
+            _UDPClient = new UdpClient();
+            _EndPoint = new IPEndPoint(IPAddress.Parse(IP), Port);
         }
 
         public void SendByteArray(byte[] array, int count)
         {
-            if (_currentUDPClient == null || _currentEndPoint == null)
-                return;
-
-            if (array != null && count > 0)
+            try
             {
-                _log.Info($"[UDP] --> {(count / 1024).ToString("N0")} KB");
+                if (_UDPClient == null || _EndPoint == null)
+                    return;
 
-                var bufferPart = new byte[MaxPacketSize];
-                var bufferPartSize = 0;
-                var bufferPos = 0;
-
-                while (bufferPos < count)
+                if (array != null && count > 0)
                 {
-                    if (bufferPos + MaxPacketSize <= count)
+                    //_log.Info($"[UDP] --> {(count / 1024).ToString("N0")} KB");
+
+                    var bufferPart = new byte[MaxPacketSize];
+                    var bufferPartSize = 0;
+                    var bufferPos = 0;
+
+                    while (bufferPos < count)
                     {
-                        bufferPartSize = MaxPacketSize;
-                    }
-                    else
-                    {
-                        bufferPartSize = count - bufferPos;
-                    }
+                        if (bufferPos + MaxPacketSize <= count)
+                        {
+                            bufferPartSize = MaxPacketSize;
+                        }
+                        else
+                        {
+                            bufferPartSize = count - bufferPos;
+                        }
 
-                    Buffer.BlockCopy(array, bufferPos, bufferPart, 0, bufferPartSize);
-                    _currentUDPClient.Send(bufferPart, bufferPartSize, _currentEndPoint);
-                    bufferPos += bufferPartSize;
-                }
-            }
-        }
-
-        public void SendByteArray(List<byte> bytes)
-        {
-            if (_currentUDPClient == null || _currentEndPoint == null)
-                return;
-
-            if (bytes != null && bytes.Count > 0)
-            {
-                _log.Info($"[UDP] --> {(bytes.Count/1024).ToString("N0")} KB");
-
-                var bufferPart = new byte[MaxPacketSize];
-                var bufferPos = 0;
-
-                while (bufferPos < bytes.Count)
-                {
-                    if (bufferPos + MaxPacketSize <= bytes.Count)
-                    {
-                        bytes.CopyTo(bufferPos, bufferPart, 0, MaxPacketSize);
-                        _currentUDPClient.Send(bufferPart, MaxPacketSize, _currentEndPoint);
-                        bufferPos += MaxPacketSize;
-                    }
-                    else
-                    {
-                        bytes.CopyTo(bufferPos, bufferPart, 0, bytes.Count - bufferPos);
-                        _currentUDPClient.Send(bufferPart, bytes.Count - bufferPos, _currentEndPoint);
-                        bufferPos += bytes.Count - bufferPos;
+                        Buffer.BlockCopy(array, bufferPos, bufferPart, 0, bufferPartSize);
+                        _UDPClient.Send(bufferPart, bufferPartSize, _EndPoint);
+                        bufferPos += bufferPartSize;
                     }
                 }
+
             }
-        }
-
-        public void StopUDPClientThread()
-        {
-            _log.Info($"UDPStreamer: Stopping UDP client thread");
-
-            _active = false;
-            _currentUDPClient = null;
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+            }
         }
 
         public static IPAddress GetLocalIPAddress()
