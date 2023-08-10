@@ -24,11 +24,15 @@ namespace DVBTTelevizor
 
         public DVBTDriverConfiguration Configuration { get; set; } = new DVBTDriverConfiguration();
 
-        public bool Started { get; set; } = false;
+        public bool Connected { get; set; } = false;
 
         public bool Recording { get; set; } = false;
 
         public bool ReadingStream { get; set; } = false;
+
+        public bool Streaming { get; set; } = true;
+
+        public string StreamUrl { get; set; } = "udp://@localhost:9600";
 
         public string RecordFileName
         {
@@ -44,12 +48,12 @@ namespace DVBTTelevizor
 
         public async Task<bool> CheckStatus()
         {
-            return Started;
+            return Connected;
         }
 
-        public void Start()
+        public void Connect()
         {
-            Started = true;
+            Connected = true;
         }
 
         public async Task StartRecording()
@@ -66,7 +70,7 @@ namespace DVBTTelevizor
         {
         }
 
-        public void PlayStream()
+        public void StartStream()
         {
         }
 
@@ -82,7 +86,7 @@ namespace DVBTTelevizor
 
         public async Task Disconnect()
         {
-            Started = false;
+            Connected = false;
         }
 
         public async Task<DVBTCapabilities> GetCapabalities()

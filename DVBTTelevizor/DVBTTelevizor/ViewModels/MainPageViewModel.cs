@@ -32,7 +32,6 @@ namespace DVBTTelevizor
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
-        private string _VLCRecordingFileName = null;
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
@@ -75,7 +74,7 @@ namespace DVBTTelevizor
                     return _driver.RecordFileName;
                 }
 
-                return _VLCRecordingFileName;
+                return null;
             }
         }
 
@@ -140,17 +139,6 @@ namespace DVBTTelevizor
             set
             {
                 _recordingChannel = value;
-
-                if (_recordingChannel == null)
-                {
-                    _VLCRecordingFileName = null;
-                } else
-                {
-                    if (_VLCRecordingFileName == null)
-                    {
-                        _VLCRecordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"DVBT-MPEGTS-{_recordingChannel.Name}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
-                    }
-                }
 
                 OnPropertyChanged(nameof(RecordingLabel));
             }
@@ -695,7 +683,6 @@ namespace DVBTTelevizor
             if (_driver.Recording)
             {
                 _driver.StopRecording();
-                await _driver.SetPIDs(new List<long>() { 0, 17, 18 });
             }
 
             Xamarin.Forms.Device.BeginInvokeOnMainThread(delegate
@@ -704,7 +691,6 @@ namespace DVBTTelevizor
                 {
                     RecordingChannel.Recording = false;
                     RecordingChannel = null;
-                    _VLCRecordingFileName = null;
                 }
             });
 
@@ -899,7 +885,7 @@ namespace DVBTTelevizor
 
             try
             {
-                if (!_driver.Started)
+                if (!_driver.Connected)
                 {
                     MessagingCenter.Send($"Cannot scan EPG (device connection error)", BaseViewModel.MSG_ToastMessage);
                     return;

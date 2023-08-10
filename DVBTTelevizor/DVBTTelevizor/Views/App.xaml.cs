@@ -50,7 +50,7 @@ namespace DVBTTelevizor
 
             _mainPage.Resume();
 
-            if (!_driver.Started)
+            if (!_driver.Connected)
             {
                 MessagingCenter.Send("", BaseViewModel.MSG_Init);
             }

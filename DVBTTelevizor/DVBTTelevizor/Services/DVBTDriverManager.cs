@@ -51,7 +51,7 @@ namespace DVBTTelevizor
         private static object _readThreadLock = new object();
         private static object _infoLock = new object();
 
-        private string _dataStreamInfo  = "Data reading not initialized";
+        private string _dataStreamInfo = "Data reading not initialized";
 
         private DVBUDPStreamer _DVBUDPStreamer;
 
@@ -66,6 +66,20 @@ namespace DVBTTelevizor
 
             _DVBUDPStreamer = new DVBUDPStreamer(_log);
         }
+
+        public string StreamUrl
+        {
+            get
+            {
+                if (_DVBUDPStreamer == null)
+                {
+                    return "udp://@localhost:9600";
+                }
+
+                return $"udp://@{_DVBUDPStreamer.IP}:{_DVBUDPStreamer.Port}";
+            }
+        }
+
 
         public Stream VideoStream
         {
@@ -103,6 +117,17 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool Streaming
+        {
+            get
+            {
+                lock (_readThreadLock)
+                {
+                    return _streaming;
+                }
+            }
+        }
+
         public string DataStreamInfo
         {
             get
@@ -132,7 +157,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public bool Started
+        public bool Connected
         {
             get
             {
@@ -148,7 +173,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void Start()
+        public void Connect()
         {
             _log.Debug($"Starting");
 
@@ -192,7 +217,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void StopReadStream()
+        private void StopReadStream()
         {
             lock (_readThreadLock)
             {
@@ -202,7 +227,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void PlayStream()
+        public void StartStream()
         {
              _log.Debug($"PlayStream");
 
@@ -420,7 +445,7 @@ namespace DVBTTelevizor
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            _log.Debug("Starting reader tread");
+            _log.Debug("Starting DVBT reader thread");
 
             var totalBytesRead = 0;
 
@@ -592,7 +617,7 @@ namespace DVBTTelevizor
 
             try
             {
-                if (!Started)
+                if (!Connected)
                     return false;
 
                 var status = await GetStatus();

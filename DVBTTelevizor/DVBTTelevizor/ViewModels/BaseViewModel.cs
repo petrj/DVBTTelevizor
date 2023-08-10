@@ -92,7 +92,7 @@ namespace DVBTTelevizor
         public void ConnectDriver(string message)
         {
             _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
-            _driver.Start();
+            _driver.Connect();
 
             MessagingCenter.Send($"Device {_driver.Configuration.DeviceName} connected", BaseViewModel.MSG_ToastMessage);
 
@@ -127,7 +127,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _driver.Started;
+                return _driver.Connected;
             }
         }
 

@@ -164,7 +164,7 @@ namespace DVBTTelevizor
 
         private void TuneButtton_Clicked(object sender, EventArgs e)
         {
-            if (!_driver.Started)
+            if (!_driver.Connected)
             {
                 _dialogService.Error($"Device not connected");
                 return;
@@ -219,7 +219,7 @@ namespace DVBTTelevizor
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
         {
-            if (_driver.Started)
+            if (_driver.Connected)
             {
                 if (!(await _dialogService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"Device status", "Back", "Disconnect")))
                 {

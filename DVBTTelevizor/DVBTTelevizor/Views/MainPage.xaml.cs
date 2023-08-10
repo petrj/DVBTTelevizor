@@ -188,7 +188,7 @@ namespace DVBTTelevizor
             {
                 _loggingService.Debug($"Received DVBTDriverConfiguration message: {message}");
 
-                if (!_driver.Started)
+                if (!_driver.Connected)
                 {
                     _viewModel.ConnectDriver(message);
                 }
@@ -1497,7 +1497,7 @@ namespace DVBTTelevizor
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
         {
-            if (_driver.Started)
+            if (_driver.Connected)
             {
                 if (!(await _dlgService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"Device status", "Back", "Disconnect")))
                 {
@@ -1920,7 +1920,7 @@ namespace DVBTTelevizor
 
                 _loggingService.Debug($"playing: {channel.Name} ({channel.Number})");
 
-                if (!_driver.Started)
+                if (!_driver.Connected)
                 {
                     MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
                     return;
@@ -2019,40 +2019,46 @@ namespace DVBTTelevizor
                         return;
                     }
 
-                    /*
-                    if (_config.ScanEPG)
+                    _driver.StartStream();
+
+                    // scan EPG when playing
+                    Task.Run(async () =>
                     {
                         var ev = await _viewModel.GetChannelEPG(channel);
                         if (ev == null)
                         {
-                            MessagingCenter.Send($"Scanning EPG...", BaseViewModel.MSG_ToastMessage);
-                            await _viewModel.EIT.Scan(1500);
-                        }
-                    }
-                    */
+                            await _viewModel.EIT.Scan(5000);
 
-                    //_driver.StopReadStream();
-                    _driver.PlayStream();
+                            if (_viewModel.PlayingChannel == channel)
+                            {
+                                ev = await _viewModel.GetChannelEPG(channel);
+                                if (ev != null)
+                                {
+                                    await ShowActualPlayingMessage(new PlayStreamInfo
+                                    {
+                                        Channel = channel,
+                                        CurrentEvent = ev
+                                    });
+                                }
+                            }
+                        }
+                    });
 
                     signalStrengthPercentage = tunedRes.SignalPercentStrength;
                 }
 
                 if (shouldMediaPlay)
                 {
-                    _media = new Media(_libVLC, "udp://@10.0.0.25:8001", FromType.FromLocation);
+                    _media = new Media(_libVLC, _driver.StreamUrl, FromType.FromLocation);
 
-                    //if (shouldMediaRecord)
-                    //{
-                    //    _viewModel.RecordingChannel = channel;
+                    if (shouldMediaRecord)
+                    {
+                        _viewModel.RecordingChannel = channel;
 
-                    //    channel.Recording = true;
-
-                    //    _media.AddOption(":sout-all");  //  does not work? only first audio and no subtitles recorded!
-                    //    _media.AddOption(":sout-keep");
-                    //    _media.AddOption(":sout=#duplicate{dst=display,dst=file{dst=\"" + _viewModel.RecordingFileName + "\"}}");
-
-                    //    MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
-                    //}
+                        channel.Recording = true;
+                        _driver.StartRecording();
+                        MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
+                    }
 
                     CallWithTimeout(delegate
                     {
@@ -2100,6 +2106,7 @@ namespace DVBTTelevizor
                 }
 
                 _viewModel.NotifyMediaChange();
+
             } catch (Exception ex)
             {
                 _loggingService.Error(ex);

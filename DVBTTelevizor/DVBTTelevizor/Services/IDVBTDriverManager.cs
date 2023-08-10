@@ -22,28 +22,28 @@ namespace DVBTTelevizor
     {
         DVBTDriverConfiguration Configuration { get; set; }
 
-        bool Started { get; }
+        bool Connected { get; }
 
         Stream VideoStream { get; }
+        string StreamUrl { get; }
 
         bool Recording { get; }
         bool ReadingStream { get; }
+        bool Streaming { get; }
         string RecordFileName { get; }
 
         string DataStreamInfo { get; set; }
 
         long LastTunedFreq { get; }
 
-        void Start();
+        void Connect();
         Task Disconnect();
+
+        void StartStream();
+        void StopStream();
 
         Task StartRecording();
         void StopRecording();
-
-        void StopReadStream();
-
-        void PlayStream();
-        void StopStream();
 
         Task<bool> Stop();
 
