@@ -51,7 +51,7 @@ namespace DVBTTelevizor.Services
             }
         }
 
-        public DVBUDPStreamer(ILoggingService log, string ip = null)
+        public DVBUDPStreamer(ILoggingService log, string ip = null, int port = -1)
         {
             _log = log;
 
@@ -65,6 +65,30 @@ namespace DVBTTelevizor.Services
                 {
                     _ip = ipAddr.ToString();
                 }
+            }
+
+            if (port == -1)
+            {
+                if (DVBUDPStreamer.IsPortAvailable(1234)) // default VLC port for UDP stream (https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers)
+                {
+                    port = 1234;
+                } else
+                if (DVBUDPStreamer.IsPortAvailable(8000))
+                {
+                    port = 8000;
+                }
+                else
+                {
+                    port = DVBUDPStreamer.FindAvailablePort(32000, 33000);
+                }
+
+                if (port == -1)
+                {
+                    _log.Info($"UDPStreamer: No available port found, binding port 55555");
+                    port = 55555;
+                }
+
+                _port = port;
             }
 
             _log.Info($"UDPStreamer: Binding address {IP}:{Port}");
@@ -125,6 +149,36 @@ namespace DVBTTelevizor.Services
             }
             //throw new Exception("No suitable IP address found.");
             return null;
+        }
+
+        public static int FindAvailablePort(int startPort, int endPort)
+        {
+            for (int port = startPort; port <= endPort; port++)
+            {
+                if (IsPortAvailable(port))
+                {
+                    return port;
+                }
+            }
+            return -1; // No available port found
+        }
+
+        public static bool IsPortAvailable(int port)
+        {
+            TcpListener listener = null;
+            try
+            {
+                listener = new TcpListener(IPAddress.Loopback, port);
+                {
+                    listener.Start();
+                    listener.Stop();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

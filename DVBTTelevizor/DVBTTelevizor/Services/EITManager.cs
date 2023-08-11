@@ -196,7 +196,9 @@ namespace DVBTTelevizor.Services
 
             return new EITScanResult()
             {
-                OK = true
+                OK = true,
+                CurrentEvents = scanRes.CurrentEvents,
+                ScheduledEvents = scanRes.ScheduledEvents
             };
         }
     }

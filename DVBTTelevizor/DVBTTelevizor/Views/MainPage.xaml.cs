@@ -159,28 +159,15 @@ namespace DVBTTelevizor
             {
                 Task.Run(async () =>
                 {
-                    await ActionPlay(false, playStreamInfo.Channel);
+                    await ActionPlay(playStreamInfo.Channel);
                 });
             });
 
-            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_PlayAndRecordStream, (playStreamInfo) =>
+            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_RecordStream, (playStreamInfo) =>
             {
                 Task.Run(async () =>
                 {
-                    await ActionPlay(true, playStreamInfo.Channel);
-                });
-            });
-
-            MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_RecordStreamToFile, (playStreamInfo) =>
-            {
-                Task.Run(async () =>
-                {
-                    await _driver.Tune(playStreamInfo.Channel.Frequency, playStreamInfo.Channel.Bandwdith, playStreamInfo.Channel.DVBTType);
-                    await _driver.SetPIDs(playStreamInfo.Channel.PIDsArary);
-                    await _driver.StartRecording();
-                    _viewModel.RecordingChannel = playStreamInfo.Channel;
-                    _viewModel.RecordingChannel.Recording = true;
-                    _viewModel.NotifyMediaChange();
+                    await ActionRecord(playStreamInfo.Channel);
                 });
             });
 
@@ -226,7 +213,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_StopRecord, (msg) =>
             {
-                Task.Run(async () => { await _viewModel.StopRecord(); });
+                Task.Run(async () => { await ActionStopRecord(); });
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ImportChannelsList, (message) =>
@@ -748,7 +735,7 @@ namespace DVBTTelevizor
                     ToggleAudioStream();
                     break;
                 case "mediaplaypause":
-                    await ActionPlay(false);
+                    await ActionPlayStop();
                     break;
                 case "mediastop":
                     await ActionStop(true);
@@ -765,10 +752,10 @@ namespace DVBTTelevizor
 
             if (_viewModel.RecordingChannel == null)
             {
-                MessagingCenter.Send(new PlayStreamInfo { Channel = _viewModel.SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
+                await ActionRecord();
             } else
             {
-                await _viewModel.StopRecord();
+                await ActionStopRecord();
             }
         }
 
@@ -959,7 +946,7 @@ namespace DVBTTelevizor
                                     break;
                                 case PlayingStateEnum.PlayingInPreview:
                                     _viewModel.SelectedChannel = _viewModel.PlayingChannel;
-                                    await ActionPlay(_viewModel.RecordingChannel != null, _viewModel.PlayingChannel);
+                                    await ActionPlay(_viewModel.PlayingChannel);
                                     break;
                                 case PlayingStateEnum.Stopped:
                                     if (_viewModel.StandingOnEnd)
@@ -991,7 +978,7 @@ namespace DVBTTelevizor
                                 (_numberPressed == _viewModel.SelectedChannel.Number)
                             )
                         {
-                            await ActionPlay(false);
+                            await ActionPlay();
                         }
                     });
                 }
@@ -1032,7 +1019,7 @@ namespace DVBTTelevizor
                                 }
                                 else
                                 {
-                                    await ShowActualPlayingMessage();
+                                    await _viewModel.ShowActualPlayingMessage();
                                 }
                             }
                     }
@@ -1048,11 +1035,11 @@ namespace DVBTTelevizor
                             }
                             else
                             {
-                                await ActionPlay(false, _viewModel.SelectedChannel);
+                                await ActionPlay(_viewModel.SelectedChannel);
                             }
                             break;
                         case SelectedPartEnum.EPGDetail:
-                            await ActionPlay(false, _viewModel.SelectedChannel);
+                            await ActionPlay(_viewModel.SelectedChannel);
                             return;
 
                         case SelectedPartEnum.ToolBar:
@@ -1151,7 +1138,7 @@ namespace DVBTTelevizor
                         await _viewModel.SelectPreviousChannel();
                     }
 
-                    await ActionPlay(false);
+                    await ActionPlay();
                 }
                 else
                 {
@@ -1224,7 +1211,7 @@ namespace DVBTTelevizor
                         if (!_viewModel.StandingOnEnd)
                         {
                             await _viewModel.SelectNextChannel(step);
-                            await ActionPlay(false);
+                            await ActionPlay();
                         }
                     }
                 }
@@ -1329,7 +1316,7 @@ namespace DVBTTelevizor
                         if (!_viewModel.StandingOnStart)
                         {
                             await _viewModel.SelectPreviousChannel(step);
-                            await ActionPlay(false);
+                            await ActionPlay();
                         }
                     }
                 }
@@ -1451,43 +1438,13 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)
-        {
-            if (playStreamInfo == null ||
-                playStreamInfo.Channel == null)
-            {
-                if (_viewModel.SelectedChannel == null)
-                    return;
-
-                playStreamInfo = new PlayStreamInfo
-                {
-                    Channel = _viewModel.SelectedChannel
-                };
-
-                playStreamInfo.CurrentEvent = await _viewModel.GetChannelEPG(_viewModel.SelectedChannel);
-            }
-
-            var msg = "\u25B6 " + playStreamInfo.Channel.Name;
-            if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
-                msg += $" - {playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
-
-            // showing signal percents only for the first time
-            if (playStreamInfo.SignalStrengthPercentage > 0)
-            {
-                msg += $" (signal {playStreamInfo.SignalStrengthPercentage}%)";
-                playStreamInfo.SignalStrengthPercentage = 0;
-            }
-
-            MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
-        }
-
         private async Task Detail_Clicked(object sender, EventArgs e)
         {
             _loggingService.Info($"Detail_Clicked");
 
             if ((PlayingState == PlayingStateEnum.Playing) || (PlayingState == PlayingStateEnum.PlayingInPreview))
             {
-                await ShowActualPlayingMessage();
+                await _viewModel.ShowActualPlayingMessage();
             }
             else
             {
@@ -1591,7 +1548,7 @@ namespace DVBTTelevizor
                             }
                             else
                             {
-                                ShowActualPlayingMessage();
+                                _viewModel.ShowActualPlayingMessage();
                             }
                         }
                     }
@@ -1903,9 +1860,26 @@ namespace DVBTTelevizor
                 });
         }
 
-        public async Task ActionPlay(bool recording, DVBTChannel channel = null)
+        public async Task ActionPlayStop(DVBTChannel channel = null)
         {
-            _loggingService.Debug($"Calling ActionPlay (recording: {recording}");
+            if (channel == null)
+                channel = _viewModel.SelectedChannel;
+
+            if (channel == null)
+                return;
+
+            if (_viewModel.PlayingChannel == channel)
+            {
+                await ActionStop(true);
+            } else
+            {
+                await ActionPlay(channel);
+            }
+        }
+
+        public async Task ActionPlay(DVBTChannel channel = null)
+        {
+            _loggingService.Debug($"Calling ActionPlay");
 
             try
             {
@@ -1922,27 +1896,21 @@ namespace DVBTTelevizor
 
                 if (!_driver.Connected)
                 {
-                    MessagingCenter.Send($"Playing {channel.Name} failed (device connection error)", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send($"Playing {channel.Name} failed (device not connected)", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
-                if (_driver.Recording)
-                {
-                    MessagingCenter.Send($"Playing {channel.Name} failed (raw stream recording in progress)", BaseViewModel.MSG_ToastMessage);
-                    return;
-                }
-
-                long? signalStrengthPercentage = null;
-
-                if ((_viewModel.RecordingChannel != null) && (_viewModel.RecordingChannel != channel))
+                if (_viewModel.RecordingChannel != null && _viewModel.RecordingChannel != channel)
                 {
                     MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
-                var shouldMediaPlay = true;
+                long? signalStrengthPercentage = null;
+
                 var shouldDriverPlay = true;
-                var shouldMediaRecord = false;
+                var shouldMediaPlay = true;
+                var shouldMediaStop = false;
 
                 // just playing  ?
                 if (PlayingState != PlayingStateEnum.Stopped)
@@ -1952,57 +1920,36 @@ namespace DVBTTelevizor
                         // playing different channel
                         shouldMediaPlay = true;
                         shouldDriverPlay = true;
+                        shouldMediaStop = true;
                     }
                     else
                     {
                         // playing the same channel
                         shouldDriverPlay = false;
                         shouldMediaPlay = false;
-                    }
-
-                    if (recording && _viewModel.RecordingChannel == null)
-                    {
-                        // start recording
-                        shouldMediaRecord = true;
-                        shouldMediaPlay = true;
-                        shouldDriverPlay = false;
+                        shouldMediaStop = false;
                     }
                 }
                 else
                 {
-                    if (recording && _viewModel.RecordingChannel == channel)
-                    {
-                        shouldMediaPlay = true;
-                        shouldDriverPlay = false;
-                        shouldMediaRecord = false;
-                    }
-                    else
-                    {
-                        shouldMediaPlay = true;
-                        shouldDriverPlay = true;
-                        shouldMediaRecord = recording;
-                    }
+                    shouldMediaPlay = true;
+                    shouldDriverPlay = true;
+                    shouldMediaStop = false;
                 }
 
-                //_loggingService.Debug($"shouldMediaPlay: {shouldMediaPlay}");
-                //_loggingService.Debug($"shouldDriverPlay: {shouldDriverPlay}");
-                //_loggingService.Debug($"shouldMediaRecord: {shouldMediaRecord}");
-
-                if (shouldMediaPlay)
+                if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
-                    if (videoView.MediaPlayer.IsPlaying)
+                    CallWithTimeout(delegate
                     {
                         _loggingService.Debug("Stopping Media player");
-
-                        CallWithTimeout(delegate
-                        {
-                            videoView.MediaPlayer.Stop();
-                        });
-                    }
+                        videoView.MediaPlayer.Stop();
+                    });
                 }
 
                 if (shouldDriverPlay)
                 {
+                    MessagingCenter.Send($"Tuning {channel.FrequencyLabel} ....", BaseViewModel.MSG_LongToastMessage);
+
                     var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
                     if (tunedRes.Result != SearchProgramResultEnum.OK)
                     {
@@ -2021,28 +1968,7 @@ namespace DVBTTelevizor
 
                     _driver.StartStream();
 
-                    // scan EPG when playing
-                    Task.Run(async () =>
-                    {
-                        var ev = await _viewModel.GetChannelEPG(channel);
-                        if (ev == null)
-                        {
-                            await _viewModel.EIT.Scan(5000);
-
-                            if (_viewModel.PlayingChannel == channel)
-                            {
-                                ev = await _viewModel.GetChannelEPG(channel);
-                                if (ev != null)
-                                {
-                                    await ShowActualPlayingMessage(new PlayStreamInfo
-                                    {
-                                        Channel = channel,
-                                        CurrentEvent = ev
-                                    });
-                                }
-                            }
-                        }
-                    });
+                    await _viewModel.ScanEPGWhenPlay(channel);
 
                     signalStrengthPercentage = tunedRes.SignalPercentStrength;
                 }
@@ -2050,15 +1976,6 @@ namespace DVBTTelevizor
                 if (shouldMediaPlay)
                 {
                     _media = new Media(_libVLC, _driver.StreamUrl, FromType.FromLocation);
-
-                    if (shouldMediaRecord)
-                    {
-                        _viewModel.RecordingChannel = channel;
-
-                        channel.Recording = true;
-                        _driver.StartRecording();
-                        MessagingCenter.Send($"Recording started", BaseViewModel.MSG_ToastMessage);
-                    }
 
                     CallWithTimeout(delegate
                     {
@@ -2081,14 +1998,10 @@ namespace DVBTTelevizor
 
                 playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
-                await ShowActualPlayingMessage(playInfo);
+                await _viewModel.ShowActualPlayingMessage(playInfo);
 
                 if (_config.PlayOnBackground)
                 {
-                    if (recording)
-                    {
-                        MessagingCenter.Send<PlayStreamInfo>(playInfo, BaseViewModel.MSG_ShowRecordNotification);
-                    }
                     MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playInfo);
                 }
 
@@ -2172,6 +2085,86 @@ namespace DVBTTelevizor
             _viewModel.SelectedToolbarItemName = null;
             _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
             _viewModel.NotifyMediaChange();
+        }
+
+        public async Task ActionRecord(DVBTChannel channel = null)
+        {
+            _loggingService.Debug($"Calling ActionRecord");
+
+            try
+            {
+                if (channel == null)
+                    channel = _viewModel.SelectedChannel;
+
+                if (channel == null)
+                    return;
+
+                if (!_driver.Connected)
+                {
+                    MessagingCenter.Send($"Record {channel.Name} failed (device not connected)", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
+                _loggingService.Debug($"recording channel: {channel.Name} ({channel.Number})");
+
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    if (_viewModel.PlayingChannel != channel)
+                    {
+                        // playing different channel
+                        await ActionStop(true);
+                        await ActionPlay(channel);
+                    }
+                } else
+                {
+                    await ActionPlay(channel);
+                }
+
+                _viewModel.RecordingChannel = channel;
+                _viewModel.RecordingChannel.Recording = true;
+
+                await _driver.StartRecording();
+
+                MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_ShowRecordNotification);
+
+                _viewModel.NotifyMediaChange();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        public async Task ActionStopRecord()
+        {
+            _loggingService.Debug($"Calling ActionStopRecord");
+
+            try
+            {
+                if (_driver.Recording)
+                {
+                    _driver.StopRecording();
+                }
+
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(delegate
+                {
+                    if (_viewModel.RecordingChannel != null)
+                    {
+                        _viewModel.RecordingChannel.Recording = false;
+                        _viewModel.RecordingChannel = null;
+                    }
+                });
+
+                MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
+
+                MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_CloseRecordNotification);
+
+                _viewModel.NotifyMediaChange();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
         private void CallWithTimeout(Action action, int miliseconds = 1000)
@@ -2290,18 +2283,6 @@ namespace DVBTTelevizor
                         {
                             _loggingService.Debug($"CheckStream - Setting automatic audio track {actualAudioTrack}");
                             _viewModel.AudioTrack = actualAudioTrack;
-
-                            if (_viewModel.RecordingChannel != null)
-                            {
-                                _loggingService.Debug($"CheckStream - Record audio fix");
-
-                                // workaround for ducplicate sound when sout duplicate
-                                Device.BeginInvokeOnMainThread(() =>
-                                {
-                                    videoView.MediaPlayer.SetAudioTrack(-1);
-                                    videoView.MediaPlayer.SetAudioTrack(actualAudioTrack);
-                                });
-                            }
                         }
                         else
                         {

@@ -481,6 +481,9 @@ namespace DVBTTelevizor
                     if (_lastTunedFreq >= 0)
                     {
                         status = $"Tuned {(_lastTunedFreq / 1000000).ToString("N2")} MHz";
+                    } else
+                    {
+                        status = $"Not tuned";
                     }
 
                     if (!readingStream)
