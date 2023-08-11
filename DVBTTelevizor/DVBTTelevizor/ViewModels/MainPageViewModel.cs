@@ -461,7 +461,11 @@ namespace DVBTTelevizor
                     if (RecordingChannel == null || RecordingChannel == ch)
                     {
                         actions.Add("Play");
-                        actions.Add("Scan EPG");
+
+                        if (!EIT.Scanning)
+                        {
+                            actions.Add("Scan EPG");
+                        }
                     }
 
                     if (RecordingChannel == null)
@@ -826,9 +830,16 @@ namespace DVBTTelevizor
                 playStreamInfo.CurrentEvent = await GetChannelEPG(SelectedChannel);
             }
 
-            var msg = "\u25B6 " + playStreamInfo.Channel.Name;
+            var msg = playStreamInfo.ShortInfoWithoutChannelName ? "" : "\u25B6 " + playStreamInfo.Channel.Name;
+
             if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
-                msg += $" - {playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
+            {
+                if (msg != "")
+                {
+                    msg += " - ";
+                }
+                msg += $"{playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
+            }
 
             // showing signal percents only for the first time
             if (playStreamInfo.SignalStrengthPercentage > 0)
@@ -849,18 +860,21 @@ namespace DVBTTelevizor
                 var ev = await GetChannelEPG(channel);
                 if (ev == null)
                 {
-                    await EIT.Scan(msTimeOut);
-
-                    if (PlayingChannel == channel)
+                    var scanRes = await EIT.Scan(msTimeOut);
+                    if (scanRes.OK)
                     {
-                        ev = await GetChannelEPG(channel);
-                        if (ev != null)
+                        if (PlayingChannel == channel)
                         {
-                            await ShowActualPlayingMessage(new PlayStreamInfo
+                            ev = await GetChannelEPG(channel);
+                            if (ev != null)
                             {
-                                Channel = channel,
-                                CurrentEvent = ev
-                            });
+                                await ShowActualPlayingMessage(new PlayStreamInfo
+                                {
+                                    Channel = channel,
+                                    CurrentEvent = ev,
+                                    ShortInfoWithoutChannelName = true
+                                });
+                            }
                         }
                     }
                 }
@@ -920,7 +934,6 @@ namespace DVBTTelevizor
 
                        await _driver.Stop();
 
-                       await RefreshEPG();
 
                        var msg = String.Empty;
 
@@ -929,19 +942,9 @@ namespace DVBTTelevizor
                            msg += "EPG scan failed";
                        } else
                        {
-                           var evFound = res.ScheduledEvents.Count + res.CurrentEvents.Count;
+                           msg += $"EPG scan completed";
 
-                           if (evFound == 0)
-                           {
-                               msg += $"No EPG event found";
-                           } else
-                           {
-                               msg += $"Found {evFound} event";
-                               if (evFound > 1)
-                               {
-                                   msg += $"s";
-                               }
-                            }
+                           await RefreshEPG();
                        }
 
                        if (res.UnsupportedEncoding)

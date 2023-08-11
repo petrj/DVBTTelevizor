@@ -4,21 +4,119 @@ using MPEGTS;
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DVBTTelevizor.Services
 {
     public class EITManager
     {
+        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private bool _scanning = false;
         private ILoggingService _log;
         private IDVBTDriverManager _driver;
+        private Dictionary<int,List<EventItem>> _eventsToSave = new Dictionary<int, List<EventItem>>();
 
         public EITManager(ILoggingService loggingService, IDVBTDriverManager driver)
         {
             _log = loggingService;
             _driver = driver;
+
+            var saveDBsWorker = new BackgroundWorker();
+            saveDBsWorker.DoWork += SaveDBsWorker_DoWork;
+            saveDBsWorker.RunWorkerAsync();
+        }
+
+        private void AddEventsToSave(int mapPID, List<EventItem> items)
+        {
+            try
+            {
+                // _log.Debug($"[EIT] addding PID {mapPID} events to save");
+
+                _semaphoreSlim.WaitAsync();
+
+                if (_eventsToSave.ContainsKey(mapPID))
+                {
+                    // removing older event in queue
+                    _eventsToSave.Remove(mapPID);
+                }
+
+                _eventsToSave.Add(mapPID, items);
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            };
+        }
+
+        /// <summary>
+        /// FIFO queue for saving EIT events
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveDBsWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                var pid = -1;
+                List<EventItem> events = null;
+
+                try
+                {
+                    _semaphoreSlim.WaitAsync();
+
+                    // removing oldest record from queue
+
+                    if (_eventsToSave.Count > 0)
+                    {
+                        pid  = _eventsToSave.Keys.First();
+                        events = _eventsToSave.Values.First();
+                        _eventsToSave.Remove(pid);
+                    }
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                };
+
+                if (pid != -1)
+                {
+                    // saving oldest record
+                    try
+                    {
+                        var dbName = GetDBPath(_driver.LastTunedFreq, pid);
+
+                        _log.Debug($"[EIT] saving {_driver.LastTunedFreq}.{pid}.sqllite");
+
+                        var db = new SQLiteConnection(dbName);
+
+                        db.DropTable<EventItem>();
+
+                        db.CreateTable<EventItem>();
+
+                        foreach (var ev in events)
+                        {
+                            db.Insert(ev);
+                        }
+
+                        db.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Error(ex, $"[EIT]");
+                    }
+                } else
+                {
+                    // no event to save
+
+                    System.Threading.Thread.Sleep(200);
+                }
+            }
         }
 
         public void ClearAll()
@@ -48,7 +146,15 @@ namespace DVBTTelevizor.Services
             return Path.Combine(folder, $"EIT.{freq}.{programMapPID}.sqllite");
         }
 
-        public Dictionary<long, ChannelEPG> FreqEPG { get; set; } = new Dictionary<long, ChannelEPG>();
+        private Dictionary<long, ChannelEPG> FreqEPG { get; set; } = new Dictionary<long, ChannelEPG>();
+
+        public bool Scanning
+        {
+            get
+            {
+                return _scanning;
+            }
+        }
 
         public EPGCurrentEvent GetEvent(DateTime date, long freq, long programMapPID)
         {
@@ -59,7 +165,7 @@ namespace DVBTTelevizor.Services
 
             var res = new EPGCurrentEvent();
 
-            if (evs.Count>0)
+            if (evs.Count > 0)
             {
                 res.CurrentEventItem = evs[0].Clone();
             }
@@ -130,76 +236,64 @@ namespace DVBTTelevizor.Services
         {
             _log.Debug($"[EIT] Scanning freq {_driver.LastTunedFreq}");
 
-            var scanRes = await _driver.ScanEPG(msTimeout);
-
-            _log.Debug($"[EIT] scanned result: {scanRes.OK}");
-
-            if (!scanRes.OK)
+            if (Scanning)
             {
-                _log.Debug($"[EIT] scanning failed");
-                return scanRes;
-            }
+                _log.Debug($"[EIT] Scanning already running");
 
-            if (scanRes.UnsupportedEncoding)
-            {
-                _log.Debug($"[EIT] unsupported encoding");
-                return scanRes;
-            }
-
-            ChannelEPG channelEPG = null;
-
-            if (!FreqEPG.ContainsKey(_driver.LastTunedFreq))
-            {
-                channelEPG = new ChannelEPG();
-                FreqEPG.Add(_driver.LastTunedFreq, channelEPG);
-            }
-            else
-            {
-                channelEPG = FreqEPG[_driver.LastTunedFreq];
-            }
-
-            var modifiedMapPIDs = channelEPG.AddEvents(scanRes);
-
-            // save to DB
-
-            Task.Run(() =>
-            {
-                _log.Debug($"[EIT] saving");
-
-                foreach (var mapPID in modifiedMapPIDs)
+                return new EITScanResult()
                 {
-                    _log.Debug($"[EIT] saving MapPID {mapPID}");
+                    OK = false
+                };
+            }
 
-                    try
-                    {
+            try
+            {
+                _scanning = true;
 
-                        var db = new SQLiteConnection(GetDBPath(_driver.LastTunedFreq, mapPID));
+                var scanRes = await _driver.ScanEPG(msTimeout);
 
-                        db.DropTable<EventItem>();
+                _log.Debug($"[EIT] scanned result: {scanRes.OK}");
 
-                        db.CreateTable<EventItem>();
-
-                        foreach (var ev in channelEPG.EventItems[mapPID])
-                        {
-                            db.Insert(ev);
-                        }
-
-                        db.Close();
-                    } catch (Exception ex)
-                    {
-                        _log.Error(ex, $"[EIT]");
-                    }
+                if (!scanRes.OK)
+                {
+                    _log.Debug($"[EIT] scanning failed");
+                    return scanRes;
                 }
 
-                _log.Debug($"[EIT] saved");
-            });
+                if (scanRes.UnsupportedEncoding)
+                {
+                    _log.Debug($"[EIT] unsupported encoding");
+                    return scanRes;
+                }
 
-            return new EITScanResult()
+                ChannelEPG channelEPG = null;
+
+                if (!FreqEPG.ContainsKey(_driver.LastTunedFreq))
+                {
+                    channelEPG = new ChannelEPG();
+                    FreqEPG.Add(_driver.LastTunedFreq, channelEPG);
+                }
+                else
+                {
+                    channelEPG = FreqEPG[_driver.LastTunedFreq];
+                }
+
+                var modifiedMapPIDs = channelEPG.AddEvents(scanRes);
+
+                // save to DB
+                foreach (var mapPID in modifiedMapPIDs)
+                {
+                    AddEventsToSave(Convert.ToInt32(mapPID), channelEPG.EventItems[mapPID]);
+                }
+
+                return new EITScanResult()
+                {
+                    OK = true
+                };
+            } finally
             {
-                OK = true,
-                CurrentEvents = scanRes.CurrentEvents,
-                ScheduledEvents = scanRes.ScheduledEvents
-            };
+                _scanning = false;
+            }
         }
     }
 }

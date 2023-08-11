@@ -1983,7 +1983,7 @@ namespace DVBTTelevizor
                     });
 
                     SetSubtitles(-1);
-                    SetAudioTrack(-100);
+                    SetAudioTrack(-100); // !!!!!! TODO try remove this line !!!!!!!!!!!
                 }
 
                 var playInfo = new PlayStreamInfo

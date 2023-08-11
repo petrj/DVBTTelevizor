@@ -46,7 +46,7 @@ namespace DVBTTelevizor
         private string _recordingFileName = null;
 
         List<byte> _readBuffer = new List<byte>();
-        private string lastSpeedCalculationSec = null;
+        private string _lastSpeedCalculationSec = null;
 
         private static object _readThreadLock = new object();
         private static object _infoLock = new object();
@@ -558,13 +558,12 @@ namespace DVBTTelevizor
 
                         var currentLastSpeedCalculationSec = DateTime.Now.ToString("yyyyMMddhhmmss");
 
-                        if (lastSpeedCalculationSec != currentLastSpeedCalculationSec)
+                        if (_lastSpeedCalculationSec != currentLastSpeedCalculationSec)
                         {
                             // occurs once per second
 
                             if (bytesReadFromLastMeasureStartTime > 0)
                             {
-                                lastSpeedCalculationSec = currentLastSpeedCalculationSec;
                                 var bitsPerSec = bytesReadFromLastMeasureStartTime * 8;
 
                                 if (bitsPerSec > 1000000)
@@ -584,6 +583,7 @@ namespace DVBTTelevizor
                             _log.Debug($"{status}");
 
                             bytesReadFromLastMeasureStartTime = 0;
+                            _lastSpeedCalculationSec = currentLastSpeedCalculationSec;
                         }
                     }
 
