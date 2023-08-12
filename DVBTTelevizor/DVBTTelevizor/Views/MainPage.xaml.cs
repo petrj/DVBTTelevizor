@@ -1610,7 +1610,8 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                        await _viewModel.SelectPreviousChannel();
+                        await ActionPlay();
                     }
                 }
                 else if (PlayingState == PlayingStateEnum.PlayingInPreview)
@@ -1632,7 +1633,8 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        PlayingState = PlayingStateEnum.PlayingInPreview;
+                        await _viewModel.SelectNextChannel();
+                        await ActionPlay();
                     }
                 }
                 else if (PlayingState == PlayingStateEnum.PlayingInPreview)
