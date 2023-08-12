@@ -32,7 +32,6 @@ namespace DVBTTelevizor
 
         private DVBTChannel _selectedChannel;
         private DVBTChannel _recordingChannel;
-        private string _VLCRecordingFileName = null;
 
         public bool DoNotScrollToChannel { get; set; } = false;
 
@@ -75,7 +74,7 @@ namespace DVBTTelevizor
                     return _driver.RecordFileName;
                 }
 
-                return _VLCRecordingFileName;
+                return null;
             }
         }
 
@@ -140,17 +139,6 @@ namespace DVBTTelevizor
             set
             {
                 _recordingChannel = value;
-
-                if (_recordingChannel == null)
-                {
-                    _VLCRecordingFileName = null;
-                } else
-                {
-                    if (_VLCRecordingFileName == null)
-                    {
-                        _VLCRecordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"DVBT-MPEGTS-{_recordingChannel.Name}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
-                    }
-                }
 
                 OnPropertyChanged(nameof(RecordingLabel));
             }
@@ -466,20 +454,22 @@ namespace DVBTTelevizor
 
             string selectedChannelDetailAction = "Detail...";
 
-            var rawRecording = _driver.Recording;
-
             if (ch != null)
             {
                 if (PlayingChannel == null)
                 {
-                    if (!rawRecording)
+                    if (RecordingChannel == null || RecordingChannel == ch)
                     {
                         actions.Add("Play");
+
+                        if (!EIT.Scanning)
+                        {
+                            actions.Add("Scan EPG");
+                        }
                     }
 
-                    if ((RecordingChannel == null) && (!rawRecording))
+                    if (RecordingChannel == null)
                     {
-                        actions.Add("Scan EPG");
                         actions.Add("Delete");
                     }
                 } else
@@ -502,13 +492,9 @@ namespace DVBTTelevizor
                     actions.Add("Teletext...");
                 }
 
-                if ((RecordingChannel == null) && (!rawRecording))
+                if (RecordingChannel == null)
                 {
                     actions.Add("Record");
-                    if (PlayingChannel == null)
-                    {
-                        actions.Add("Record raw stream");
-                    }
                 } else
                 {
                     actions.Add("Show record location");
@@ -573,17 +559,13 @@ namespace DVBTTelevizor
                     await ScanEPG(ch);
                     break;
                 case "Record":
-                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayAndRecordStream);
+                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStream);
                     break;
-                case "Record raw stream":
-                    await ShowConfirmRawRecordStreamMenu(ch);
-                    break;
-
                 case "Show record location":
                     await _dialogService.Information(RecordingFileName);
                     break;
                 case "Stop record":
-                    await StopRecord();
+                    MessagingCenter.Send(string.Empty, BaseViewModel.MSG_StopRecord);
                     break;
                 case "Delete":
                     await DeleteChannel(ch);
@@ -631,19 +613,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task ShowConfirmRawRecordStreamMenu(DVBTChannel ch)
-        {
-            var response = await _dialogService.Confirm("Raw stream contains all DVBT tracks (audio, subtitles), but playing is disabled while recording is in progress" +
-                Environment.NewLine +
-                Environment.NewLine +
-                "Are you sure to start raw stream recording?", "Confirmation");
-
-            if (!response)
-                return;
-
-            MessagingCenter.Send(new PlayStreamInfo { Channel = ch }, BaseViewModel.MSG_RecordStreamToFile);
-        }
-
         public async Task ShowAudioTrackMenu(DVBTChannel ch)
         {
             var actions = new List<string>();
@@ -686,35 +655,6 @@ namespace DVBTTelevizor
                     break;
                 }
             }
-        }
-
-        public async Task StopRecord()
-        {
-            _loggingService.Debug($"StopRecord");
-
-            if (_driver.Recording)
-            {
-                _driver.StopRecording();
-                await _driver.SetPIDs(new List<long>() { 0, 17, 18 });
-            }
-
-            Xamarin.Forms.Device.BeginInvokeOnMainThread(delegate
-            {
-                if (RecordingChannel != null)
-                {
-                    RecordingChannel.Recording = false;
-                    RecordingChannel = null;
-                    _VLCRecordingFileName = null;
-                }
-            });
-
-            MessagingCenter.Send($"Recording stopped", BaseViewModel.MSG_ToastMessage);
-
-            MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_CloseRecordNotification);
-
-            MessagingCenter.Send(String.Empty, BaseViewModel.MSG_StopStream);
-
-            NotifyMediaChange();
         }
 
         private async Task DeleteChannel(DVBTChannel channel)
@@ -874,7 +814,74 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task ScanEPG(DVBTChannel channel)
+        public async Task ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)
+        {
+            if (playStreamInfo == null ||
+                playStreamInfo.Channel == null)
+            {
+                if (SelectedChannel == null)
+                    return;
+
+                playStreamInfo = new PlayStreamInfo
+                {
+                    Channel = SelectedChannel
+                };
+
+                playStreamInfo.CurrentEvent = await GetChannelEPG(SelectedChannel);
+            }
+
+            var msg = playStreamInfo.ShortInfoWithoutChannelName ? "" : "\u25B6 " + playStreamInfo.Channel.Name;
+
+            if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
+            {
+                if (msg != "")
+                {
+                    msg += " - ";
+                }
+                msg += $"{playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
+            }
+
+            // showing signal percents only for the first time
+            if (playStreamInfo.SignalStrengthPercentage > 0)
+            {
+                msg += $" (signal {playStreamInfo.SignalStrengthPercentage}%)";
+                playStreamInfo.SignalStrengthPercentage = 0;
+            }
+
+            MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+        }
+
+        public async Task ScanEPGWhenPlay(DVBTChannel channel, int msTimeOut = 5000)
+        {
+            // run in background
+            // scan EPG
+            Task.Run(async () =>
+            {
+                var ev = await GetChannelEPG(channel);
+                if (ev == null)
+                {
+                    var scanRes = await EIT.Scan(msTimeOut);
+                    if (scanRes.OK)
+                    {
+                        if (PlayingChannel == channel)
+                        {
+                            ev = await GetChannelEPG(channel);
+                            if (ev != null)
+                            {
+                                await ShowActualPlayingMessage(new PlayStreamInfo
+                                {
+                                    Channel = channel,
+                                    CurrentEvent = ev,
+                                    ShortInfoWithoutChannelName = true
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        public async Task ScanEPG(DVBTChannel channel, int msTimeOut = 5000)
         {
             if (channel == null)
             {
@@ -883,15 +890,27 @@ namespace DVBTTelevizor
                     return;
             }
 
-            if (_recordingChannel != null)
+            if (_playingChannel == channel || _recordingChannel == channel)
+            {
+                await ScanEPGWhenPlay(channel, msTimeOut);
+                return;
+            }
+
+            if ((_playingChannel != null) && (_playingChannel != channel))
+            {
+                MessagingCenter.Send($"Cannot scan EPG (playing in progress)", BaseViewModel.MSG_ToastMessage);
+                return;
+            }
+
+            if ((_recordingChannel != null) && (_recordingChannel != channel))
             {
                 MessagingCenter.Send($"Cannot scan EPG (recording in progress)", BaseViewModel.MSG_ToastMessage);
                 return;
             }
 
-            if (_driver.Recording)
+            if (!_driver.Connected)
             {
-                MessagingCenter.Send($"Cannot scan EPG (raw stream recording in progress)", BaseViewModel.MSG_ToastMessage);
+                MessagingCenter.Send($"Cannot scan EPG (device not connected)", BaseViewModel.MSG_ToastMessage);
                 return;
             }
 
@@ -899,12 +918,6 @@ namespace DVBTTelevizor
 
             try
             {
-                if (!_driver.Started)
-                {
-                    MessagingCenter.Send($"Cannot scan EPG (device connection error)", BaseViewModel.MSG_ToastMessage);
-                    return;
-                }
-
                 await Task.Run(async () =>
                    {
                        MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
@@ -917,28 +930,32 @@ namespace DVBTTelevizor
                            return;
                        }
 
-                       var res = await EIT.Scan(5000);
+                       var res = await EIT.Scan(msTimeOut);
 
                        await _driver.Stop();
 
-                       await RefreshEPG();
 
                        var msg = String.Empty;
 
                        if (!res.OK)
                        {
                            msg += "EPG scan failed";
+                       } else
+                       {
+                           msg += $"EPG scan completed";
+
+                           await RefreshEPG();
                        }
 
                        if (res.UnsupportedEncoding)
                        {
                            if (msg != String.Empty)
                            {
-                               msg += ", unsupported encoding found";
+                               msg += " (unsupported encoding!)";
                             }
                            else
                            {
-                               msg = "Unsupported encoding found";
+                               msg = "Unsupported encoding";
                            }
                        }
 

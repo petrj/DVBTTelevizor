@@ -314,7 +314,7 @@ namespace DVBTTelevizor.Droid
         {
             try
             {
-                if (_driverManager.Started)
+                if (_driverManager.Connected)
                 {
                     return;
                 }
@@ -377,7 +377,7 @@ namespace DVBTTelevizor.Droid
         {
             // TODO: detect device that has been attached
 
-            if (!_driverManager.Started)
+            if (!_driverManager.Connected)
             {
                 InitDriver();
             } else

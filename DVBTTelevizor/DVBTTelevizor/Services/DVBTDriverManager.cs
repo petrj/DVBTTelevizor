@@ -17,6 +17,7 @@ using DVBTTelevizor.Models;
 using Android.Net.Sip;
 using SQLite;
 using DVBTTelevizor.Services;
+using Java.IO;
 
 namespace DVBTTelevizor
 {
@@ -39,16 +40,20 @@ namespace DVBTTelevizor
         private const int ReadBufferSize = 32768;
 
         private bool _readingStream = true;
+        private bool _streaming = false;
         private bool _recording = false;
         private bool _readingBuffer = false;
         private string _recordingFileName = null;
 
         List<byte> _readBuffer = new List<byte>();
+        private string _lastSpeedCalculationSec = null;
 
         private static object _readThreadLock = new object();
         private static object _infoLock = new object();
 
-        private string _dataStreamInfo  = "Data reading not initialized";
+        private string _dataStreamInfo = "Data reading not initialized";
+
+        private DVBUDPStreamer _DVBUDPStreamer;
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -57,17 +62,36 @@ namespace DVBTTelevizor
             _log.Debug($"Initializing DVBT driver manager");
 
             _config = config;
+
+            _DVBUDPStreamer = new DVBUDPStreamer(_log);
+        }
+
+        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        {
+            get
+            {
+                return _readingStream ? DVBTDriverStreamTypeEnum.UDP : DVBTDriverStreamTypeEnum.Stream;
+            }
+        }
+
+        public string StreamUrl
+        {
+            get
+            {
+                if (_DVBUDPStreamer == null)
+                {
+                    return "udp://@localhost:9600";
+                }
+
+                return $"udp://@{_DVBUDPStreamer.IP}:{_DVBUDPStreamer.Port}";
+            }
         }
 
         public Stream VideoStream
         {
             get
             {
-                if (ReadingStream)
-                {
-                    return null;
-                }
-
+                // play raw video from driver Transfer stream
                 return _transferStream;
             }
         }
@@ -90,6 +114,17 @@ namespace DVBTTelevizor
                 lock (_readThreadLock)
                 {
                     return _readingStream;
+                }
+            }
+        }
+
+        public bool Streaming
+        {
+            get
+            {
+                lock (_readThreadLock)
+                {
+                    return _streaming;
                 }
             }
         }
@@ -123,7 +158,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public bool Started
+        public bool Connected
         {
             get
             {
@@ -139,7 +174,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public void Start()
+        public void Connect()
         {
             _log.Debug($"Starting");
 
@@ -183,13 +218,41 @@ namespace DVBTTelevizor
             }
         }
 
-        public void StopReadStream()
+        private void StopReadStream()
         {
             lock (_readThreadLock)
             {
                 _log.Debug($"Stopping read stream");
 
                 _readingStream = false;
+            }
+        }
+
+        public void StartStream()
+        {
+             _log.Debug($"PlayStream");
+
+            try
+            {
+                _streaming = true;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+            }
+        }
+
+        public void StopStream()
+        {
+            _log.Debug($"StopStream");
+
+            try
+            {
+                _streaming = false;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
             }
         }
 
@@ -279,9 +342,11 @@ namespace DVBTTelevizor
         {
             _log.Debug("Stopping ...");
 
-            StartReadStream();
+            //StartReadStream();
+            StopStream();
 
-            var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17 });
+            //var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17, 18 });
+            var setPIDsRes = await SetPIDs(new List<long>() { });
             if (!setPIDsRes.SuccessFlag)
                 return false;
 
@@ -382,13 +447,13 @@ namespace DVBTTelevizor
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            _log.Debug("Starting reader tread");
+            _log.Debug("Starting DVBT reader thread");
 
             var totalBytesRead = 0;
 
             try
             {
-                DataStreamInfo = "Reading data ...";
+                DataStreamInfo = "";
 
                 byte[] buffer = new byte[ReadBufferSize];
 
@@ -398,9 +463,9 @@ namespace DVBTTelevizor
                 bool readingStream = true;
                 bool rec = false;
                 bool readingBuffer = false;
+                bool streaming = false;
 
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
-                string lastSpeed = "";
 
                 do
                 {
@@ -410,23 +475,27 @@ namespace DVBTTelevizor
                         rec = _recording;
                         readingBuffer = _readingBuffer;
                         readingStream = _readingStream;
+                        streaming = _streaming;
                     }
 
                     string status = String.Empty;
 
+                    if (_lastTunedFreq >= 0)
+                    {
+                        status = $"Tuned {(_lastTunedFreq / 1000000).ToString("N2")} MHz";
+                    } else
+                    {
+                        status = $"Not tuned";
+                    }
+
                     if (!readingStream)
                     {
-                        status = "Not reading stream";
+                        status += ", not reading";
                         System.Threading.Thread.Sleep(200);
                     }
                     else
                     {
-                        status = "Reading";
-
-                        if (_lastTunedFreq >= 0)
-                        {
-                            status += $" freq {_lastTunedFreq / 1000000} MHz";
-                        }
+                        status += ", reading";
 
                         if (rec)
                         {
@@ -436,6 +505,10 @@ namespace DVBTTelevizor
                         {
                             status += ", bufferring";
                         }
+                        if (streaming)
+                        {
+                            status += ", streaming";
+                        }
 
                         if (_transferClient.Available > 0)
                         {
@@ -443,7 +516,6 @@ namespace DVBTTelevizor
                             totalBytesRead += bytesRead;
                             bytesReadFromLastMeasureStartTime += bytesRead;
 
-                            //_log.Debug($"Bytes read: {bytesRead} ...");
 
                             if (rec)
                             {
@@ -452,8 +524,8 @@ namespace DVBTTelevizor
                                     var fileNameFreq = (_lastTunedFreq / 1000000).ToString() + "MHz";
                                     _recordingFileName = Path.Combine(BaseViewModel.AndroidAppDirectory, $"DVBT-MPEGTS-{fileNameFreq}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
 
-                                    if (File.Exists(_recordingFileName))
-                                        File.Delete(_recordingFileName);
+                                    if (System.IO.File.Exists(_recordingFileName))
+                                        System.IO.File.Delete(_recordingFileName);
 
                                     recordFileStream = new FileStream(_recordingFileName, FileMode.Create, FileAccess.Write);
                                 }
@@ -464,6 +536,10 @@ namespace DVBTTelevizor
                             {
                                 for (var i = 0; i < bytesRead; i++)
                                     Buffer.Add(buffer[i]);
+                            }
+                            if (streaming)
+                            {
+                                _DVBUDPStreamer.SendByteArray(buffer, bytesRead);
                             }
 
                             _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -479,50 +555,42 @@ namespace DVBTTelevizor
                             recordFileStream.Close();
                             recordFileStream = null;
                         }
-                    }
 
-                    // calculating speed:
-                    var totalSeconds = (DateTime.Now - lastBitRateMeasureStartTime).TotalSeconds;
-                    if (totalSeconds > 2)
-                    {
-                        var bytesPerSec = bytesReadFromLastMeasureStartTime * 8 / totalSeconds;
-                        string speed;
+                        // calculating speed
 
-                        if (bytesPerSec > 1000000)
-                        {
-                            speed = $", {Convert.ToInt32(8*(bytesPerSec / 1000000.0)).ToString("N2")} Mb/sec";
-                        }
-                        else if (bytesPerSec > 1000)
-                        {
-                            speed = $", {Convert.ToInt32(8*(bytesPerSec / 1000.0)).ToString("N2")} Kb/sec";
-                        }
-                        else
-                        {
-                            speed = $", {8*bytesPerSec} b/sec";
-                        }
+                        var currentLastSpeedCalculationSec = DateTime.Now.ToString("yyyyMMddhhmmss");
 
-                        status += speed;
-
-                        if (totalSeconds > 3)
+                        if (_lastSpeedCalculationSec != currentLastSpeedCalculationSec)
                         {
-                            lastSpeed = speed;
-                            lastBitRateMeasureStartTime = DateTime.Now;
+                            // occurs once per second
+
+                            if (bytesReadFromLastMeasureStartTime > 0)
+                            {
+                                var bitsPerSec = bytesReadFromLastMeasureStartTime * 8;
+
+                                if (bitsPerSec > 1000000)
+                                {
+                                    status += $" ({Convert.ToInt32((bitsPerSec / 1000000.0)).ToString("N0")} Mb/sec)";
+                                }
+                                else if (bitsPerSec > 1000)
+                                {
+                                    status += $" ({Convert.ToInt32((bitsPerSec / 1000.0)).ToString("N0")} Kb/sec)";
+                                }
+                                else
+                                {
+                                    status += $" ({bitsPerSec} b/sec)";
+                                }
+                            }
+
+                            _log.Debug($"{status}");
+
                             bytesReadFromLastMeasureStartTime = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (lastSpeed != String.Empty)
-                        {
-                            status += lastSpeed;
-                        }
-                        else
-                        {
-                            status += ", 0 b/sec";
+                            _lastSpeedCalculationSec = currentLastSpeedCalculationSec;
                         }
                     }
 
                     DataStreamInfo = status;
+
                 }
                 while (_transferClient.Connected);
 
@@ -554,7 +622,7 @@ namespace DVBTTelevizor
 
             try
             {
-                if (!Started)
+                if (!Connected)
                     return false;
 
                 var status = await GetStatus();
@@ -791,29 +859,39 @@ namespace DVBTTelevizor
 
         public async Task<DVBTResponse> SetPIDs(List<long> PIDs)
         {
-            _log.Debug($"Setting PIDs: {String.Join(",", PIDs)}");
-            _lastPIDs = PIDs;
-
-            var responseSize = 10;
-
-            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_SET_PIDS, PIDs, responseSize);
-            var response = await SendRequest(req, 5);
-
-            if (response.Bytes.Count < responseSize)
-                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
-
-            var requestNumber = response.Bytes[0];
-            var longsCountInResponse = response.Bytes[1];
-            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
-
-            _log.Debug($"Set PIDS response: {successFlag}");
-
-            return new DVBTResponse()
+            try
             {
-                SuccessFlag = successFlag == 1,
-                RequestTime = response.RequestTime,
-                ResponseTime = response.ResponseTime
-            };
+
+                _log.Debug($"Setting PIDs: {String.Join(",", PIDs)}");
+                _lastPIDs = PIDs;
+
+                var responseSize = 10;
+
+                var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_SET_PIDS, PIDs, responseSize);
+                var response = await SendRequest(req, 5);
+
+                if (response.Bytes.Count < responseSize)
+                    throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count}");
+
+                var requestNumber = response.Bytes[0];
+                var longsCountInResponse = response.Bytes[1];
+                var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
+
+                _log.Debug($"Set PIDS response: {successFlag}");
+
+                return new DVBTResponse()
+                {
+                    SuccessFlag = successFlag == 1,
+                    RequestTime = response.RequestTime,
+                    ResponseTime = response.ResponseTime
+                };
+            } catch (Exception ex)
+            {
+                return new DVBTResponse()
+                {
+                    SuccessFlag = false
+                };
+            }
         }
 
         private void SaveBuffer(string namePrefix, byte[] buffer)

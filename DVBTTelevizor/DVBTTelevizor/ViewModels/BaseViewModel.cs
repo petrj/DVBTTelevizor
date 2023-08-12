@@ -28,8 +28,7 @@ namespace DVBTTelevizor
         public const string MSG_EnableFullScreen = "EnableFullScreen";
         public const string MSG_DisableFullScreen = "DisableFullScreen";
         public const string MSG_PlayStream = "PlayStream";
-        public const string MSG_PlayAndRecordStream = "PlayAndRecordStream";
-        public const string MSG_RecordStreamToFile = "RecordStreamToFile";
+        public const string MSG_RecordStream = "RecordStream";
         public const string MSG_StopStream = "StopStream";
         public const string MSG_StopRecord = "StopRecord";
         public const string MSG_UpdateDriverState = "UpdateDriverState";
@@ -92,7 +91,7 @@ namespace DVBTTelevizor
         public void ConnectDriver(string message)
         {
             _driver.Configuration = JsonConvert.DeserializeObject<DVBTDriverConfiguration>(message);
-            _driver.Start();
+            _driver.Connect();
 
             MessagingCenter.Send($"Device {_driver.Configuration.DeviceName} connected", BaseViewModel.MSG_ToastMessage);
 
@@ -127,7 +126,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _driver.Started;
+                return _driver.Connected;
             }
         }
 

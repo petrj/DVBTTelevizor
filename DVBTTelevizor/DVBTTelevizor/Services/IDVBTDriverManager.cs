@@ -14,7 +14,7 @@ using LoggerService;
 using System.Runtime.InteropServices;
 using MPEGTS;
 using DVBTTelevizor.Models;
-
+using Java.IO;
 
 namespace DVBTTelevizor
 {
@@ -22,25 +22,30 @@ namespace DVBTTelevizor
     {
         DVBTDriverConfiguration Configuration { get; set; }
 
-        bool Started { get; }
+        bool Connected { get; }
+
+        DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }
 
         Stream VideoStream { get; }
+        string StreamUrl { get; }
 
         bool Recording { get; }
         bool ReadingStream { get; }
+        bool Streaming { get; }
         string RecordFileName { get; }
 
         string DataStreamInfo { get; set; }
 
         long LastTunedFreq { get; }
 
-        void Start();
+        void Connect();
         Task Disconnect();
+
+        void StartStream();
+        void StopStream();
 
         Task StartRecording();
         void StopRecording();
-
-        void StopReadStream();
 
         Task<bool> Stop();
 
