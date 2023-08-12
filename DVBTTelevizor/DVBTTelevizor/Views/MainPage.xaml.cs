@@ -70,7 +70,7 @@ namespace DVBTTelevizor
         private Rectangle PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rectangle(1.0, 0.0, 0.5, 0.3);
 
         // VideoStackLayout must be visible when initializing VLC window!
-        private Rectangle NoVideoStackLayoutPosition { get; set; } = new Rectangle(0, 0, 0.001, 0.001);
+        private Rectangle NoVideoStackLayoutPosition { get; set; } = new Rectangle(-10, -10, -5, -5);
 
         // RecordingLabel
         private Rectangle LandscapeRecordingLabelPosition { get; set; } = new Rectangle(1.0, 1.0, 0.1, 0.1);
