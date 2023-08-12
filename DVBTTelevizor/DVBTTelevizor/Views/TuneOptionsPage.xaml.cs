@@ -177,6 +177,14 @@ namespace DVBTTelevizor
                 DVBT2Tuning = _viewModel.DVBT2Tuning
             };
 
+            page.Disappearing += delegate
+            {
+                if (page.NewTunedChannelsCount > 0)
+                {
+                    Navigation.PopAsync();
+                }
+            };
+
             if (_viewModel.ManualTuning)
             {
                 page.FrequencyFromKHz = _viewModel.FrequencyKHz;

@@ -139,6 +139,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public int NewTunedChannelsCount
+        {
+            get
+            {
+                return _viewModel.NewTunedChannelsCount;
+            }
+        }
+
         public long FrequencyFromKHz
         {
             get { return _viewModel.FrequencyFromKHz; }
