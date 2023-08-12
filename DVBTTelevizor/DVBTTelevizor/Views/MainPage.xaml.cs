@@ -2125,7 +2125,13 @@ namespace DVBTTelevizor
 
                 await _driver.StartRecording();
 
-                MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_ShowRecordNotification);
+                var playStreamInfo = new PlayStreamInfo()
+                {
+                   Channel = channel,
+                   CurrentEvent = await _viewModel.GetChannelEPG(channel)
+                };
+
+                MessagingCenter.Send<PlayStreamInfo>(playStreamInfo, BaseViewModel.MSG_ShowRecordNotification);
 
                 _viewModel.NotifyMediaChange();
             }
