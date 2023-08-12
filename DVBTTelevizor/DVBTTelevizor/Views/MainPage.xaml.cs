@@ -1977,7 +1977,15 @@ namespace DVBTTelevizor
 
                 if (shouldMediaPlay)
                 {
-                    _media = new Media(_libVLC, _driver.StreamUrl, FromType.FromLocation);
+                    switch (_driver.DVBTDriverStreamType)
+                    {
+                        case Models.DVBTDriverStreamTypeEnum.UDP:
+                            _media = new Media(_libVLC, _driver.StreamUrl, FromType.FromLocation);
+                            break;
+                        case Models.DVBTDriverStreamTypeEnum.Stream:
+                            _media = new Media(_libVLC, _driver.VideoStream);
+                            break;
+                    }
 
                     CallWithTimeout(delegate
                     {

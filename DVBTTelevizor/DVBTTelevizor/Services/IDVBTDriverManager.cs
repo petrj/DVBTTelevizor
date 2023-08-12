@@ -24,6 +24,8 @@ namespace DVBTTelevizor
 
         bool Connected { get; }
 
+        DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }
+
         Stream VideoStream { get; }
         string StreamUrl { get; }
 

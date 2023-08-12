@@ -55,7 +55,6 @@ namespace DVBTTelevizor
 
         private DVBUDPStreamer _DVBUDPStreamer;
 
-
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             _log = loggingService;
@@ -65,6 +64,14 @@ namespace DVBTTelevizor
             _config = config;
 
             _DVBUDPStreamer = new DVBUDPStreamer(_log);
+        }
+
+        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        {
+            get
+            {
+                return _readingStream ? DVBTDriverStreamTypeEnum.UDP : DVBTDriverStreamTypeEnum.Stream;
+            }
         }
 
         public string StreamUrl
@@ -80,18 +87,12 @@ namespace DVBTTelevizor
             }
         }
 
-
         public Stream VideoStream
         {
             get
             {
                 // play raw video from driver Transfer stream
-                if (!_readingStream)
-                {
-                    return _transferStream;
-                }
-
-                return null;
+                return _transferStream;
             }
         }
 

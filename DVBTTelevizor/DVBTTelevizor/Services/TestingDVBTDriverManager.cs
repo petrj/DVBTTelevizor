@@ -14,6 +14,14 @@ namespace DVBTTelevizor
         private long LastFreq { get; set; }
         private long LastPID { get; set; }
 
+        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        {
+            get
+            {
+                return DVBTDriverStreamTypeEnum.Stream;
+            }
+        }
+
         public long LastTunedFreq
         {
             get
@@ -416,6 +424,7 @@ namespace DVBTTelevizor
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
             LastFreq = frequency;
+            LastPID = PIDs[0];
 
             System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
 
