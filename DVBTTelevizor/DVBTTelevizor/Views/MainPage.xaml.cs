@@ -309,15 +309,9 @@ namespace DVBTTelevizor
                 return;
             }
 
-            _viewModel.AudioTrack = id;
-
             CallWithTimeout(delegate
             {
-                if (_viewModel.RecordingChannel != null)
-                {
-                    videoView.MediaPlayer.SetAudioTrack(-1);
-                }
-
+                _viewModel.AudioTrack = id;
                 videoView.MediaPlayer.SetAudioTrack(id);
             });
         }
@@ -1993,7 +1987,7 @@ namespace DVBTTelevizor
                     });
 
                     SetSubtitles(-1);
-                    SetAudioTrack(-100); // !!!!!! TODO try remove this line !!!!!!!!!!!
+                    SetAudioTrack(-100);
                 }
 
                 var playInfo = new PlayStreamInfo

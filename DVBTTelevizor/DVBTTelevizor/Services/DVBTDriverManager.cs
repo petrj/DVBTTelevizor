@@ -80,7 +80,7 @@ namespace DVBTTelevizor
             {
                 if (_DVBUDPStreamer == null)
                 {
-                    return "udp://@localhost:9600";
+                    return "udp://@localhost:1234";
                 }
 
                 return $"udp://@{_DVBUDPStreamer.IP}:{_DVBUDPStreamer.Port}";

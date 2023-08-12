@@ -17,7 +17,7 @@ namespace DVBTTelevizor.Services
         private IPEndPoint _EndPoint = null;
 
         private string _ip;
-        private int _port = 8001;
+        private int _port = 1234;
 
         public string IP
         {
