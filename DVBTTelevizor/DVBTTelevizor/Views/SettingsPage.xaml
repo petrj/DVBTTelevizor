@@ -123,27 +123,21 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="ScanEPGBeforePlayBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label  Grid.Row="0" Grid.Column="0" Text="Scan EPG before play" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ScanEPGSwitch"  IsToggled="{Binding Config.ScanEPG, Mode=TwoWay}"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
-                        <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label  Grid.Row="1" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="1" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
-
-                        <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                        <Label  Grid.Row="2" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="2" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                        <Label  Grid.Row="1" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
 
@@ -174,6 +168,29 @@
                                 <x:String>Huge</x:String>
                             </Picker.Items>
                         </Picker>
+                    </Grid>
+
+                    <Grid Margin="30,10,10,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="AutoStartBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="Startup auto play" x:Name="AutoStartLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Picker
+                            Grid.Row="1" Grid.Column="0"
+                            x:Name="ChannelAutoPlayedAfterStartPicker"
+                            FontSize="{Binding FontSizeForPicker}"
+                            Style="{StaticResource CommonPickerTextStyle}"
+                            SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
+                            ItemsSource="{Binding AutoPlayChannels}"
+                            ItemDisplayBinding="{Binding Name}"
+                            Title="Startup auto play"/>
                     </Grid>
 
                 </StackLayout>

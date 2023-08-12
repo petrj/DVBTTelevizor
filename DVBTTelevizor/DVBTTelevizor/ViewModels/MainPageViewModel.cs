@@ -56,6 +56,8 @@ namespace DVBTTelevizor
         public int AudioTrack { get; set; } = -100;
         public int Subtitles { get; set; } = -1;
 
+        private bool _autoPlayProcessed = false;
+
         public EITManager EIT { get; set; }
 
         public enum SelectedPartEnum
@@ -117,6 +119,61 @@ namespace DVBTTelevizor
                     SelectedChannel = ch;
                 });
             }).Start();
+        }
+
+        public async Task AutoPlay()
+        {
+            if (_autoPlayProcessed)
+                return;
+
+            _loggingService.Info($"AutoPlay: {_config.ChannelAutoPlayedAfterStart}");
+
+            if (string.IsNullOrEmpty(_config.ChannelAutoPlayedAfterStart))
+            {
+                _autoPlayProcessed = true;
+                return;
+            }
+
+            if (_driver != null &&
+                _driver.Connected &&
+                Channels != null &&
+                Channels.Count > 0)
+            {
+                _autoPlayProcessed = true;
+
+                DVBTChannel _autoPlayChannel = null;
+
+                var lastChannel = new DVBTChannel()
+                {
+                    Name = "<last channel>",
+                    Frequency = 0,
+                    ProgramMapPID = 0
+                };
+
+                if (lastChannel.FrequencyAndMapPID == _config.ChannelAutoPlayedAfterStart)
+                {
+                    //_viewModel.SelectedChannel = lastChannel;
+                    _autoPlayChannel = await SelectChannelByFrequencyAndMapPID(lastChannel.FrequencyAndMapPID);
+                }
+
+                if (_autoPlayChannel == null)
+                {
+                    foreach (var ch in Channels)
+                    {
+                        if (ch.FrequencyAndMapPID == _config.ChannelAutoPlayedAfterStart)
+                        {
+                            _autoPlayChannel = ch;
+                            break;
+                        }
+                    }
+                }
+
+                if (_autoPlayChannel != null)
+                {
+                    SelectedChannel = _autoPlayChannel;
+                    MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_PlayStream);
+                }
+            }
         }
 
         public string RecordingLabel
@@ -706,18 +763,18 @@ namespace DVBTTelevizor
                 });
         }
 
-        public async Task SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
+        public async Task<DVBTChannel> SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
         {
             _loggingService.Info($"Selecting channel by frequency and mapPID {frequencyAndMapPID}");
 
-            await Task.Run(
+            return await Task.Run<DVBTChannel>(
                 () =>
                 {
                     DVBTChannel firstChannel = null;
                     DVBTChannel selectChannel = null;
 
                     if (Channels.Count == 0)
-                        return;
+                        return null;
 
                     foreach (var ch in Channels)
                     {
@@ -737,6 +794,8 @@ namespace DVBTTelevizor
                         selectChannel = firstChannel;
 
                     SelectedChannel = selectChannel;
+
+                    return SelectedChannel;
                 });
         }
 
@@ -1056,6 +1115,7 @@ namespace DVBTTelevizor
                 DoNotScrollToChannel = false;
 
                 await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
+                await AutoPlay();
             }
         }
 

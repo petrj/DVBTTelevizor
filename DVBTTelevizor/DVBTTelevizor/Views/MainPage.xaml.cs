@@ -38,7 +38,6 @@ namespace DVBTTelevizor
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = System.String.Empty;
-        private bool _firstStartup = true;
         private Size _lastAllocatedSize = new Size(-1, -1);
         private DateTime _lastBackPressedTime = DateTime.MinValue;
         private bool _lastTimeHome = false;
@@ -179,6 +178,8 @@ namespace DVBTTelevizor
                 {
                     _viewModel.ConnectDriver(message);
                 }
+
+                Task.Run(async () => await _viewModel.AutoPlay());
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
@@ -1476,14 +1477,6 @@ namespace DVBTTelevizor
             Navigation.PushAsync(_tuneOptionsPage);
         }
 
-        private void ToolRefresh_Clicked(object sender, EventArgs e)
-        {
-            if (_firstStartup)
-            {
-                _viewModel.RefreshCommand.Execute(null);
-            }
-        }
-
         private async void ToolMenu_Clicked(object sender, EventArgs e)
         {
             await _viewModel.ShowChannelMenu();
@@ -1944,7 +1937,7 @@ namespace DVBTTelevizor
 
                 if (shouldDriverPlay)
                 {
-                    MessagingCenter.Send($"Tuning {channel.FrequencyLabel} ....", BaseViewModel.MSG_LongToastMessage);
+                    MessagingCenter.Send($"Tuning {channel.FrequencyShortLabel} ....", BaseViewModel.MSG_LongToastMessage);
 
                     var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
                     if (tunedRes.Result != SearchProgramResultEnum.OK)

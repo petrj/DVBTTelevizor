@@ -154,15 +154,15 @@ namespace DVBTTelevizor
             }
         }
 
-        public bool ScanEPG
+        public string ChannelAutoPlayedAfterStart
         {
             get
             {
-                return GetPersistingSettingValue<bool>("ScanEPG");
+                return GetPersistingSettingValue<string>("ChannelAutoPlayedAfterStart");
             }
             set
             {
-                SavePersistingSettingValue<bool>("ScanEPG", value);
+                SavePersistingSettingValue<string>("ChannelAutoPlayedAfterStart", value);
             }
         }
 

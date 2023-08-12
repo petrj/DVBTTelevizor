@@ -84,6 +84,9 @@ namespace DVBTTelevizor
         {
             _focusItems.DeFocusAll();
 
+            if (_viewModel != null)
+                _viewModel.FillAutoPlayChannels();
+
             base.OnAppearing();
         }
 
@@ -101,11 +104,11 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("ExportToFile", new List<View>() { ExportToFileButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ImportChannels", new List<View>() { ImportChannelsButton }))
 
-                .AddItem(KeyboardFocusableItem.CreateFrom("ScanEPGBeforePlay", new List<View>() { ScanEPGBeforePlayBoxView, ScanEPGSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowFullScreen", new List<View>() { ShowFullScreenBoxView, FullscreenSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowPlayOnBackground", new List<View>() { ShowPlayOnBackgroundBoxView, PlayOnBackgroundSwitch }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("FontSize", new List<View>() { FontSizeBoxView, FontSizePicker }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("AutoStart", new List<View>() { AutoStartBoxView, ChannelAutoPlayedAfterStartPicker }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessEnabled", new List<View>() { RemoteAccessEnabledBoxView, RemoteAccessSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessIP", new List<View>() { RemoteAccessIPBoxView, IPEntry }))
@@ -208,10 +211,6 @@ namespace DVBTTelevizor
                             _viewModel.ImportChannelsCommand.Execute(null);
                             break;
 
-                        case "ScanEPGBeforePlay":
-                            ScanEPGSwitch.IsToggled = !ScanEPGSwitch.IsToggled;
-                            break;
-
                         case "ShowFullScreen":
                             FullscreenSwitch.IsToggled = !FullscreenSwitch.IsToggled;
                             break;
@@ -222,6 +221,10 @@ namespace DVBTTelevizor
 
                         case "FontSize":
                             FontSizePicker.Focus();
+                            break;
+
+                        case "AutoStart":
+                            ChannelAutoPlayedAfterStartPicker.Focus();
                             break;
 
                         case "EnableLogging":

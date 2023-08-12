@@ -29,6 +29,9 @@ namespace DVBTTelevizor
         public Command Donate5command { get; set; }
         public Command Donate10command { get; set; }
 
+        public ObservableCollection<DVBTChannel> AutoPlayChannels { get; set; } = new ObservableCollection<DVBTChannel>();
+        public DVBTChannel _selectedChannel = null;
+
         public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
             :base(config)
         {
@@ -50,6 +53,78 @@ namespace DVBTTelevizor
             Donate2Command = new Command(async () => { await Donate("donation.2"); });
             Donate5command = new Command(async () => { await Donate("donation.5"); });
             Donate10command = new Command(async () => { await Donate("donation.10"); });
+        }
+
+        public async void FillAutoPlayChannels()
+        {
+            var channels = await _channelService.LoadChannels();
+            if (channels.Count == 0)
+            {
+                await _dialogService.Information("Channel list is empty");
+                return;
+            }
+
+            AutoPlayChannels.Clear();
+
+            var noChannel = new DVBTChannel()
+            {
+                Name = "<no channel>",
+                Frequency = -1,
+                ProgramMapPID = -1
+            };
+            var lastChannel = new DVBTChannel()
+            {
+                Name = "<last channel>",
+                Frequency = 0,
+                ProgramMapPID = 0
+            };
+
+            AutoPlayChannels.Add(noChannel);
+            AutoPlayChannels.Add(lastChannel);
+
+            var anythingSelected = false;
+
+            foreach (var ch in channels)
+            {
+                AutoPlayChannels.Add(ch);
+
+                if (ch.FrequencyAndMapPID == Config.ChannelAutoPlayedAfterStart)
+                {
+                    anythingSelected = true;
+                    SelectedChannel = ch;
+                }
+            }
+
+            if (!anythingSelected)
+            {
+                if (Config.ChannelAutoPlayedAfterStart == noChannel.FrequencyAndMapPID)
+                {
+                    SelectedChannel = noChannel;
+                }
+                else
+                {
+                    SelectedChannel = lastChannel;
+                }
+            }
+
+            OnPropertyChanged(nameof(AutoPlayChannels));
+        }
+
+        public DVBTChannel SelectedChannel
+        {
+            get
+            {
+                return _selectedChannel;
+            }
+            set
+            {
+                _selectedChannel = value;
+
+                if (value != null)
+                    Config.ChannelAutoPlayedAfterStart = value.FrequencyAndMapPID;
+
+                OnPropertyChanged(nameof(SelectedChannel));
+            }
         }
 
         public string AndroidChannelsListPath
@@ -256,6 +331,8 @@ namespace DVBTTelevizor
             if (await _dialogService.Confirm($"Are you sure to clear all channels ({chs.Count})?"))
             {
                 await _channelService.SaveChannels(new System.Collections.ObjectModel.ObservableCollection<DVBTChannel>());
+                _config.ChannelAutoPlayedAfterStart = null;
+                _config.SelectedChannelFrequencyAndMapPID = null;
 
                 MessagingCenter.Send(String.Empty, BaseViewModel.MSG_ClearEPG);
 

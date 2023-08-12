@@ -54,6 +54,19 @@ namespace DVBTTelevizor
             }
         }
 
+        public string FrequencyShortLabel
+        {
+            get
+            {
+                if (Frequency % 1000000 == 0)
+                {
+                    return (Frequency / 1000000).ToString("N0") + " MHz";
+                }
+
+                return (Frequency / 1000000).ToString("N3") + " MHz";
+            }
+        }
+
         public bool Recording
         {
             get
