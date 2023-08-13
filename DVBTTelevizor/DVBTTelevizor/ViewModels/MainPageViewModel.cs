@@ -889,7 +889,7 @@ namespace DVBTTelevizor
                 playStreamInfo.CurrentEvent = await GetChannelEPG(SelectedChannel);
             }
 
-            var msg = playStreamInfo.ShortInfoWithoutChannelName ? "" : "\u25B6 " + playStreamInfo.Channel.Name;
+            var msg = playStreamInfo.ShortInfoWithoutChannelName ? "" : "\u25B6 " + playStreamInfo.Channel.Number + " - " + playStreamInfo.Channel.Name;
 
             if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
             {

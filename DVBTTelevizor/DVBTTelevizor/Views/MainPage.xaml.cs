@@ -1929,7 +1929,7 @@ namespace DVBTTelevizor
 
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
-                    await _driver.Stop(); // setting no PID
+                    //await _driver.Stop(); // setting no PID
 
                     CallWithTimeout(delegate
                     {

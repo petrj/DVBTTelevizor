@@ -730,55 +730,67 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning {frequency} MHz, type: {deliverySystem}");
 
-            if (frequency == _lastTunedFreq && deliverySystem == _lastTunedDeliverySystem)
+            try
             {
-                _log.Debug($"Frequency already tuned");
+
+                //if (frequency == _lastTunedFreq && deliverySystem == _lastTunedDeliverySystem)
+                //{
+                //    _log.Debug($"Frequency already tuned");
+
+                //    return new DVBTResponse()
+                //    {
+                //        SuccessFlag = true,
+                //        RequestTime = DateTime.Now,
+                //        ResponseTime = DateTime.Now
+                //    };
+                //}
+
+                // 26 bytes
+
+                //List<byte> bytesToSend = new List<byte>();
+
+                //bytesToSend.Add(2); // REQ_TUNE
+                //bytesToSend.Add(3); // Payload for 3 longs
+
+                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
+                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
+                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
+
+                var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySystem) };
+
+                var responseSize = 10;
+
+                var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_TUNE, payload, responseSize);
+                var response = await SendRequest(req, 10);
+
+                if (response.Bytes.Count < responseSize)
+                    throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count}");
+
+                var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
+
+                if (successFlag == 1)
+                {
+                    _lastTunedFreq = frequency;
+                    _lastTunedDeliverySystem = deliverySystem;
+                }
+
+                _log.Debug($"Tune response: {successFlag}");
 
                 return new DVBTResponse()
                 {
-                    SuccessFlag = true,
-                    RequestTime = DateTime.Now,
-                    ResponseTime = DateTime.Now
+                    SuccessFlag = successFlag == 1,
+                    RequestTime = response.RequestTime,
+                    ResponseTime = response.ResponseTime
+                };
+            } catch (Exception ex)
+            {
+                _log.Error(ex, "Tune error");
+
+                return new DVBTResponse()
+                {
+                    SuccessFlag = false
                 };
             }
-
-            // 26 bytes
-
-            //List<byte> bytesToSend = new List<byte>();
-
-            //bytesToSend.Add(2); // REQ_TUNE
-            //bytesToSend.Add(3); // Payload for 3 longs
-
-            //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
-            //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
-            //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
-
-            var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySystem) };
-
-            var responseSize = 10;
-
-            var req = new DVBTRequest(DVBTDriverRequestTypeEnum.REQ_TUNE, payload, responseSize);
-            var response = await SendRequest(req, 10);
-
-            if (response.Bytes.Count < responseSize)
-                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
-
-            var successFlag = DVBTStatus.GetBigEndianLongFromByteArray(response.Bytes.ToArray(), 2);
-
-            if (successFlag == 1)
-            {
-                _lastTunedFreq = frequency;
-                _lastTunedDeliverySystem = deliverySystem;
-            }
-
-            _log.Debug($"Tune response: {successFlag}");
-
-            return new DVBTResponse()
-            {
-                SuccessFlag = successFlag == 1,
-                RequestTime = response.RequestTime,
-                ResponseTime = response.ResponseTime
-            };
         }
 
         private async Task<DVBTResponse> SendCloseConnection()
@@ -1080,6 +1092,32 @@ namespace DVBTTelevizor
 
                 var attemptsCount = fastTuning ? 1 : 5;
 
+                // this fix the "MUX switching no driver data error"
+
+                var preTuneRes = await Tune(0, bandWidth, deliverySystem);
+
+                // set PIDs 0 and 17
+                for (var i = 1; i <= attemptsCount; i++)
+                {
+                    setPIDres = await SetPIDs(new List<long>() { 0, 17 });
+
+                    if (setPIDres.SuccessFlag)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (!fastTuning)
+                            await Task.Delay(100);
+                    }
+                }
+
+                if (!setPIDres.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
                 // five attempts
                 for (var i = 1; i <= attemptsCount; i++)
                 {
@@ -1096,28 +1134,6 @@ namespace DVBTTelevizor
                 }
 
                 if (!tuneRes.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // set PIDs 0 and 17
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    setPIDres = await SetPIDs(PIDs);
-
-                    if (setPIDres.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(100);
-                    }
-                }
-
-                if (!setPIDres.SuccessFlag)
                 {
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
@@ -1167,6 +1183,29 @@ namespace DVBTTelevizor
 
                 res.SignalPercentStrength = status.rfStrengthPercentage;
 
+                // set all PIDs
+                for (var i = 1; i <= attemptsCount; i++)
+                {
+                    setPIDres = await SetPIDs(PIDs);
+
+                    if (setPIDres.SuccessFlag)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (!fastTuning)
+                            await Task.Delay(100);
+                    }
+                }
+
+                if (!setPIDres.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                res.Result = SearchProgramResultEnum.OK;
                 return res;
 
             }
