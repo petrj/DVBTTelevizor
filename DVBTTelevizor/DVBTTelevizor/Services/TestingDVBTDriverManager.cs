@@ -42,6 +42,8 @@ namespace DVBTTelevizor
 
         public string StreamUrl { get; set; } = "udp://@localhost:9600";
 
+        public bool DriverStreamDataAvailable { get; set; } = true;
+
         public string RecordFileName
         {
             get

@@ -910,16 +910,18 @@ namespace DVBTTelevizor
             MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
         }
 
-        public async Task ScanEPGWhenPlay(DVBTChannel channel, int msTimeOut = 5000)
+        public async Task ScanEPGWhenPlay(DVBTChannel channel, int msTimeOut = 2000, int msScanTimeOut = 5000)
         {
             // run in background
             // scan EPG
             Task.Run(async () =>
             {
+                await Task.Delay(msTimeOut);
+
                 var ev = await GetChannelEPG(channel);
                 if (ev == null)
                 {
-                    var scanRes = await EIT.Scan(msTimeOut);
+                    var scanRes = await EIT.Scan(msScanTimeOut);
                     if (scanRes.OK)
                     {
                         if (PlayingChannel == channel)
@@ -951,7 +953,7 @@ namespace DVBTTelevizor
 
             if (_playingChannel == channel || _recordingChannel == channel)
             {
-                await ScanEPGWhenPlay(channel, msTimeOut);
+                await ScanEPGWhenPlay(channel, 0, msTimeOut);
                 return;
             }
 

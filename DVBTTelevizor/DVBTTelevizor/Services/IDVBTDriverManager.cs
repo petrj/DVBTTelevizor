@@ -38,6 +38,8 @@ namespace DVBTTelevizor
 
         long LastTunedFreq { get; }
 
+        bool DriverStreamDataAvailable { get; }
+
         void Connect();
         Task Disconnect();
 

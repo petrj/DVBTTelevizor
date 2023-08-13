@@ -43,6 +43,7 @@ namespace DVBTTelevizor
         private bool _streaming = false;
         private bool _recording = false;
         private bool _readingBuffer = false;
+        private bool _driverStreamDataAvailable = false;
         private string _recordingFileName = null;
 
         List<byte> _readBuffer = new List<byte>();
@@ -71,6 +72,14 @@ namespace DVBTTelevizor
             get
             {
                 return _readingStream ? DVBTDriverStreamTypeEnum.UDP : DVBTDriverStreamTypeEnum.Stream;
+            }
+        }
+
+        public bool DriverStreamDataAvailable
+        {
+            get
+            {
+                return _driverStreamDataAvailable;
             }
         }
 
@@ -235,6 +244,7 @@ namespace DVBTTelevizor
             try
             {
                 _streaming = true;
+                _driverStreamDataAvailable = false;
             }
             catch (Exception ex)
             {
@@ -540,6 +550,12 @@ namespace DVBTTelevizor
                             if (streaming)
                             {
                                 _DVBUDPStreamer.SendByteArray(buffer, bytesRead);
+
+                                if (!_driverStreamDataAvailable && bytesRead > 0)
+                                {
+                                    _driverStreamDataAvailable = true;
+                                    _log.Debug("DVBT driver data available");
+                                }
                             }
 
                             _transferClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);

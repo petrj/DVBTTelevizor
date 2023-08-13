@@ -35,6 +35,7 @@ namespace DVBTTelevizor
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private DateTime _lastToggledAudioStreamTime = DateTime.MinValue;
         private DateTime _lastToggledSubtitlesTime = DateTime.MinValue;
+        private DateTime _lastActionPlayTime = DateTime.MinValue;
 
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private string _numberPressed = System.String.Empty;
@@ -1928,7 +1929,7 @@ namespace DVBTTelevizor
 
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
-                    await _driver.Stop();
+                    await _driver.Stop(); // setting no PID
 
                     CallWithTimeout(delegate
                     {
@@ -1958,6 +1959,8 @@ namespace DVBTTelevizor
                     }
 
                     _driver.StartStream();
+
+                    _lastActionPlayTime = DateTime.Now;
 
                     await _viewModel.ScanEPGWhenPlay(channel);
 
@@ -2073,6 +2076,9 @@ namespace DVBTTelevizor
                 });
 
                 PlayingState = PlayingStateEnum.Stopped;
+
+                _lastActionPlayTime = DateTime.MinValue;
+
                 _viewModel.PlayingChannelSubtitles.Clear();
                 _viewModel.PlayingChannelAudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
@@ -2235,6 +2241,26 @@ namespace DVBTTelevizor
                                 RefreshGUI();
                             }
                         });
+                    }
+
+                    // check do data from driver
+
+                    if (_lastActionPlayTime != DateTime.MinValue)
+                    {
+                        if (!_driver.DriverStreamDataAvailable)
+                        {
+                            var timeFromPlayMSecs = (DateTime.Now - _lastActionPlayTime).TotalMilliseconds;
+                            if (timeFromPlayMSecs > 10000)
+                            {
+                                _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+
+                                MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
+                                MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
+                            } else if (timeFromPlayMSecs > 5000)
+                            {
+                                _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                            }
+                        }
                     }
 
                     var actualSubtitleTrack = videoView.MediaPlayer.Spu;
