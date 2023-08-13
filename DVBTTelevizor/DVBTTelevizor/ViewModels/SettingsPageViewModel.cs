@@ -20,6 +20,7 @@ namespace DVBTTelevizor
         private ChannelService _channelService;
 
         public Command ClearChannelsCommand { get; set; }
+        public Command ClearEPGCommand { get; set; }
         public Command ExportChannelsCommand { get; set; }
         public Command ImportChannelsCommand { get; set; }
         public Command ShareChannelsCommand { get; set; }
@@ -42,6 +43,7 @@ namespace DVBTTelevizor
             _config = config;
 
             ClearChannelsCommand = new Command(async () => await ClearChannels());
+            ClearEPGCommand = new Command(async () => await ClearEPG());
 
             ExportChannelsCommand = new Command(async () => await Export());
 
@@ -337,6 +339,18 @@ namespace DVBTTelevizor
                 MessagingCenter.Send(String.Empty, BaseViewModel.MSG_ClearEPG);
 
                 MessagingCenter.Send("Channels cleared", BaseViewModel.MSG_ToastMessage);
+            }
+        }
+
+        private async Task ClearEPG()
+        {
+            _loggingService.Info($"Clearing EPG");
+
+            if (await _dialogService.Confirm($"Are you sure to clear EPG?"))
+            {
+                MessagingCenter.Send(String.Empty, BaseViewModel.MSG_ClearEPG);
+
+                MessagingCenter.Send("EPG cleared", BaseViewModel.MSG_ToastMessage);
             }
         }
 

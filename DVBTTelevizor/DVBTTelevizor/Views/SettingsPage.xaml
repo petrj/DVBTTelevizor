@@ -199,6 +199,12 @@
 
                 <StackLayout Margin="0,0,0,30">
 
+                    <Button x:Name="ClearEPGButton" Text="Clear EPG"  Command="{Binding ClearEPGCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                </StackLayout>
+
+                <StackLayout Margin="0,0,0,30">
+
                     <Label Text="Remote accesss" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
                     <Grid Margin="30,10,10,0">

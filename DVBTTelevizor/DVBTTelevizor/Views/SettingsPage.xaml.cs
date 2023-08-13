@@ -110,6 +110,8 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("FontSize", new List<View>() { FontSizeBoxView, FontSizePicker }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("AutoStart", new List<View>() { AutoStartBoxView, ChannelAutoPlayedAfterStartPicker }))
 
+                .AddItem(KeyboardFocusableItem.CreateFrom("ClearEPG", new List<View>() { ClearEPGButton }))
+
                 .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessEnabled", new List<View>() { RemoteAccessEnabledBoxView, RemoteAccessSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessIP", new List<View>() { RemoteAccessIPBoxView, IPEntry }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessPort", new List<View>() { RemoteAccessPortBoxView, PortEntry }))
@@ -197,6 +199,10 @@ namespace DVBTTelevizor
 
                         case "ClearChannels":
                             _viewModel.ClearChannelsCommand.Execute(null);
+                            break;
+
+                        case "ClearEPG":
+                            _viewModel.ClearEPGCommand.Execute(null);
                             break;
 
                         case "ShareChannels":
