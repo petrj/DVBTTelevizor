@@ -57,7 +57,7 @@ namespace DVBTTelevizor.Droid
             _config = new DVBTTelevizorConfiguration();
 
 #if DEBUG
-            _config.EnableLogging = true;
+            //_config.EnableLogging = true;
             //_config.AutoInitAfterStart = false;
 #endif
 

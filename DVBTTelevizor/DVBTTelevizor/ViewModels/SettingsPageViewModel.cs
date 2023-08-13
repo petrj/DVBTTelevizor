@@ -232,14 +232,14 @@ namespace DVBTTelevizor
 
         private void ActivateLogging()
         {
-            Task.Run(async ()=>
+            if (!_config.EnableLogging)
             {
-                if (!_config.EnableLogging)
+                _config.EnableLogging = true;
+                Device.BeginInvokeOnMainThread(async () =>
                 {
-                    _config.EnableLogging = true;
                     await _dialogService.Information("Logging will be enabled after application restart");
-                }
-            });
+                });
+            }
         }
 
         private async Task Export()
