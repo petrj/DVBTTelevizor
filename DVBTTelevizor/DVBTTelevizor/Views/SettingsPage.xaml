@@ -30,10 +30,12 @@
 
             <Style x:Key="ButtonStyle" TargetType="Label">
                 <Setter Property="Margin" Value="30,0,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
             </Style>
 
             <Style x:Key="DonateButtonStyle" TargetType="Label">
                 <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
             </Style>
 
             <Style x:Key="CommonPickerTextStyle" TargetType="Picker">

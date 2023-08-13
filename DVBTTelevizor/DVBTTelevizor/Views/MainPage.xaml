@@ -68,6 +68,7 @@
 
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="20,0,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
             </Style>
 
             <Style x:Key="ChannelEPGTextStyle" TargetType="Label">

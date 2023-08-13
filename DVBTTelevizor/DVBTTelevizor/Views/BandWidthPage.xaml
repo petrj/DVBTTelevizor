@@ -37,6 +37,10 @@
                 <Setter Property="HorizontalTextAlignment" Value="Right"/>
             </Style>
 
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="FontAttributes" Value="Bold"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -110,7 +114,7 @@
 
                     </Grid>
 
-                    <Button x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultBandWidthCommand}"  Margin="0,20,0,0"/>
+                    <Button x:Name="DefaultButton" Text="Reset to default" FontSize="{Binding FontSizeForLabel}" Command="{Binding SetDefaultBandWidthCommand}" Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0"/>
 
                 </StackLayout>
 

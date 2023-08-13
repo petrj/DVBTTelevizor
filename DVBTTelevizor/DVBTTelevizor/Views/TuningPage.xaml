@@ -54,10 +54,6 @@
                 <Setter Property="Margin" Value="10,0,5,0"/>
             </Style>
 
-            <Style x:Key="ButtonStyle" TargetType="Label">
-                <Setter Property="Margin" Value="0,0,0,0"/>
-            </Style>
-
             <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
@@ -91,6 +87,11 @@
                 <Setter Property="VerticalOptions" Value="Center"/>
                 <Setter Property="HorizontalOptions" Value="End"/>
                 <Setter Property="Margin" Value="0,0,5,0"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
         </ResourceDictionary>
@@ -200,9 +201,9 @@
                         <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     </Grid>
 
-                    <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Margin="5,5,5,0"/>
+                    <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Margin="5,5,5,0"/>
 
-                    <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Margin="5,5,5,0" />
+                    <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Margin="5,5,5,0" />
 
                 </StackLayout>
 
