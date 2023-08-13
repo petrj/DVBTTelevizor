@@ -1922,9 +1922,17 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    shouldMediaPlay = true;
-                    shouldDriverPlay = true;
-                    shouldMediaStop = false;
+                    if (_viewModel.RecordingChannel == channel)
+                    {
+                        shouldMediaPlay = true;
+                        shouldDriverPlay = false;
+                        shouldMediaStop = false;
+                    } else
+                    {
+                        shouldMediaPlay = true;
+                        shouldDriverPlay = true;
+                        shouldMediaStop = false;
+                    }
                 }
 
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
@@ -2060,18 +2068,14 @@ namespace DVBTTelevizor
             {
                 Device.BeginInvokeOnMainThread(async () =>
                 {
+                    CallWithTimeout(delegate
+                    {
+                        videoView.MediaPlayer.Stop();
+                    });
+
                     if (_viewModel.RecordingChannel == null)
                     {
-                        CallWithTimeout(delegate
-                        {
-                            videoView.MediaPlayer.Stop();
-                        });
                         await _driver.Stop();
-                    }
-                    else
-                    {
-                        // Mute does not work
-                        SetAudioTrack(-1);
                     }
                 });
 
@@ -2155,6 +2159,11 @@ namespace DVBTTelevizor
                 if (_driver.Recording)
                 {
                     _driver.StopRecording();
+                }
+
+                if (PlayingState == PlayingStateEnum.Stopped)
+                {
+                    await _driver.Stop();
                 }
 
                 Xamarin.Forms.Device.BeginInvokeOnMainThread(delegate
