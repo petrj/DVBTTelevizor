@@ -120,6 +120,54 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool StreamInfoVisible
+        {
+            get
+            {
+                return _viewModel.StreamInfoVisible;
+            }
+            set
+            {
+                _viewModel.StreamInfoVisible = value;
+            }
+        }
+
+        public string StreamVideoSize
+        {
+            get
+            {
+                return _viewModel.StreamVideoSize;
+            }
+            set
+            {
+                _viewModel.StreamVideoSize = value;
+            }
+        }
+
+        public string StreamAudioTracks
+        {
+            get
+            {
+                return _viewModel.StreamAudioTracks;
+            }
+            set
+            {
+                _viewModel.StreamAudioTracks = value;
+            }
+        }
+
+        public string StreamSubtitles
+        {
+            get
+            {
+                return _viewModel.StreamSubtitles;
+            }
+            set
+            {
+                _viewModel.StreamSubtitles = value;
+            }
+        }
+
         public async void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"ChannelPage OnKeyDown {key}");

@@ -1,4 +1,5 @@
-﻿using LibVLCSharp.Shared;
+﻿using Android.Media;
+using LibVLCSharp.Shared;
 using LoggerService;
 using System;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace DVBTTelevizor
         public bool IsPortrait { get; private set; } = false;
 
         private LibVLC _libVLC = null;
-        private MediaPlayer _mediaPlayer;
+        private LibVLCSharp.Shared.MediaPlayer _mediaPlayer;
         private Media _media = null;
 
         private bool _firstAppearing = true;
@@ -106,7 +107,7 @@ namespace DVBTTelevizor
             Core.Initialize();
 
             _libVLC = new LibVLC();
-            _mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+            _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
             videoView.MediaPlayer = _mediaPlayer;
 
             BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
@@ -1429,7 +1430,54 @@ namespace DVBTTelevizor
             var ch = _viewModel.SelectedChannel;
             if (ch != null)
             {
+                try
+                {
+                    _editChannelPage.StreamInfoVisible = false;
+                    _editChannelPage.StreamVideoSize = "";
+
+                    if (_viewModel.PlayingChannel != null && (ch.FrequencyAndMapPID == _viewModel.PlayingChannel.FrequencyAndMapPID))
+                    {
+                        var videoTrack = GetVideoTrack();
+                        if (videoTrack.HasValue)
+                        {
+                            _editChannelPage.StreamInfoVisible = true;
+                            _editChannelPage.StreamVideoSize = $"{videoTrack.Value.Data.Video.Width}x{videoTrack.Value.Data.Video.Height}";
+                        }
+
+                        var audioTracks = System.String.Empty;
+                        if (_viewModel.PlayingChannelAudioTracks.Count > 0)
+                        {
+                            _editChannelPage.StreamInfoVisible = true;
+
+                            foreach (var audioTrack in (_viewModel.PlayingChannelAudioTracks))
+                            {
+                                if (audioTrack.Key != -1)
+                                    audioTracks += $"{audioTrack.Value} [{audioTrack.Key}]{Environment.NewLine}";
+                            }
+                        }
+
+                        var subs = System.String.Empty;
+                        if (_viewModel.PlayingChannelSubtitles.Count > 0)
+                        {
+                            _editChannelPage.StreamInfoVisible = true;
+
+                            foreach (var subTrack in (_viewModel.PlayingChannelSubtitles))
+                            {
+                                if (subTrack.Key != -1)
+                                    subs += $"{subTrack.Value} [{subTrack.Key}]{Environment.NewLine}";
+                            }
+                        }
+
+                        _editChannelPage.StreamAudioTracks = audioTracks;
+                        _editChannelPage.StreamSubtitles = subs;
+                    }
+                } catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+
                 _editChannelPage.Channel = ch;
+
                 Navigation.PushAsync(_editChannelPage);
             }
         }

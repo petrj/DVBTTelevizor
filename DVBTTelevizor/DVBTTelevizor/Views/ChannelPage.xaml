@@ -123,6 +123,28 @@
                             <Label Grid.Row="2" Grid.Column="2" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
+                        <Grid RowSpacing="10" Margin="10,30,10,0" IsVisible="{Binding StreamInfoVisible}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="34*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="64*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding StreamVideoSize}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="1" Grid.Column="2" Text="{Binding StreamAudioTracks}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalTextAlignment="End"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding StreamSubtitles}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalTextAlignment="End"/>
+                        </Grid>
+
                     </StackLayout>
                 </StackLayout>
             </ScrollView>

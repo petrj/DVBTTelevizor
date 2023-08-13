@@ -560,7 +560,7 @@ namespace DVBTTelevizor
 
                 if (SelectedChannel != null)
                 {
-                    if (PlayingChannel != null && SelectedChannel != PlayingChannel)
+                    if (PlayingChannel != null && SelectedChannel.FrequencyAndMapPID != PlayingChannel.FrequencyAndMapPID)
                     {
                         selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
                     } else
