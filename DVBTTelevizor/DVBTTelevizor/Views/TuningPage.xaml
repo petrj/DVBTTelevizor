@@ -200,9 +200,9 @@
                         <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     </Grid>
 
-                    <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Margin="5,20,5,0"/>
+                    <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Margin="5,5,5,0"/>
 
-                    <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Margin="5,20,5,0" />
+                    <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Margin="5,5,5,0" />
 
                 </StackLayout>
 
