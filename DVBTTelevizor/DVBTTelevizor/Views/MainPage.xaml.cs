@@ -1928,6 +1928,8 @@ namespace DVBTTelevizor
 
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
+                    await _driver.Stop();
+
                     CallWithTimeout(delegate
                     {
                         _loggingService.Debug("Stopping Media player");

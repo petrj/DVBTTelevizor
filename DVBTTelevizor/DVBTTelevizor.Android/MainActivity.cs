@@ -57,8 +57,7 @@ namespace DVBTTelevizor.Droid
             _config = new DVBTTelevizorConfiguration();
 
 #if DEBUG
-            //_config.EnableLogging = true;
-            //_config.AutoInitAfterStart = false;
+            _config.EnableLogging = true;
 #endif
 
             InitLogging();
@@ -432,7 +431,6 @@ namespace DVBTTelevizor.Droid
             if (_config.EnableLogging)
             {
                 _loggingService = new NLogLoggingService(GetType().Assembly, "DVBTTelevizor.Droid");
-                _loggingService.Info("Starting MainActivity");
             } else
             {
                 _loggingService = new DummyLoggingService();

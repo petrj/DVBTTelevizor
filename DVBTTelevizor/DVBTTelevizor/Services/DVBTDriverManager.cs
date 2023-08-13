@@ -345,7 +345,7 @@ namespace DVBTTelevizor
             //StartReadStream();
             StopStream();
 
-            //var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17, 18 });
+            //var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17 });
             var setPIDsRes = await SetPIDs(new List<long>() { });
             if (!setPIDsRes.SuccessFlag)
                 return false;
