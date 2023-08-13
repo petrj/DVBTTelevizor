@@ -911,7 +911,7 @@ namespace DVBTTelevizor
         {
             _loggingService.Debug($"HandleNumKey {number}");
 
-            if ((DateTime.Now - _lastNumPressedTime).TotalSeconds > 1)
+            if ((DateTime.Now - _lastNumPressedTime).TotalSeconds > 2)
             {
                 _lastNumPressedTime = DateTime.MinValue;
                 _numberPressed = System.String.Empty;

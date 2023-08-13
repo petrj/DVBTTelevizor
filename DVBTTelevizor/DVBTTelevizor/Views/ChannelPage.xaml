@@ -145,6 +145,8 @@
                             <Label Grid.Row="2" Grid.Column="2" Text="{Binding StreamSubtitles}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalTextAlignment="End"/>
                         </Grid>
 
+                        <Label Margin="10,30,10,0" x:Name="ChannelEndLabel"/>
+
                     </StackLayout>
                 </StackLayout>
             </ScrollView>

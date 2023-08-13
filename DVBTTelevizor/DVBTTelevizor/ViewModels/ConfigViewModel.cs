@@ -161,6 +161,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public string FontSizeForEPGTitle
+        {
+            get
+            {
+                return GetScaledSize(13).ToString();
+            }
+        }
+
         public string FontSizeForEntry
         {
             get
