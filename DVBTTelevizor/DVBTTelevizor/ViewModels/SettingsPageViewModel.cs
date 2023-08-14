@@ -59,13 +59,6 @@ namespace DVBTTelevizor
 
         public async void FillAutoPlayChannels()
         {
-            var channels = await _channelService.LoadChannels();
-            if (channels.Count == 0)
-            {
-                await _dialogService.Information("Channel list is empty");
-                return;
-            }
-
             AutoPlayChannels.Clear();
 
             var noChannel = new DVBTChannel()
@@ -80,6 +73,14 @@ namespace DVBTTelevizor
                 Frequency = 0,
                 ProgramMapPID = 0
             };
+
+            var channels = await _channelService.LoadChannels();
+            if (channels.Count == 0)
+            {
+                AutoPlayChannels.Add(noChannel);
+                SelectedChannel = noChannel;
+                return;
+            }
 
             AutoPlayChannels.Add(noChannel);
             AutoPlayChannels.Add(lastChannel);

@@ -109,15 +109,13 @@
 
                     <Button x:Name="ShareChannelsButton" Text="Share"  Command="{Binding ShareChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                    <Button x:Name="ExportToFileButton" Text="Export to file"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-
+                    <Button x:Name="ExportToFileButton" Text="Export to file"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Margin="30,30,20,0"/>
                     <Button x:Name="ImportChannelsButton" Text="Import from file"  Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,0">
 
                     <Label Text="System settings" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
