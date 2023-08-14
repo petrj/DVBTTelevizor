@@ -115,6 +115,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(FontSizeForChannelNumber));
                 OnPropertyChanged(nameof(FontSizeForDetailNote));
                 OnPropertyChanged(nameof(FontSizeForEntry));
+                OnPropertyChanged(nameof(FontSizeForEPGTitle));
                 OnPropertyChanged(nameof(ImageIconSize));
                 OnPropertyChanged(nameof(FontSizeForDescription));
                 OnPropertyChanged(nameof(FontSizeForLargeCaption));
