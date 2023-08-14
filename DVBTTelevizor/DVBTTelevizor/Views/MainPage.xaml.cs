@@ -1682,7 +1682,7 @@ namespace DVBTTelevizor
 
         protected override void OnSizeAllocated(double width, double height)
         {
-            System.Diagnostics.Debug.WriteLine($"OnSizeAllocated: {width}/{height}");
+            //System.Diagnostics.Debug.WriteLine($"OnSizeAllocated: {width}/{height}");
 
             base.OnSizeAllocated(width, height);
 
@@ -2063,6 +2063,7 @@ namespace DVBTTelevizor
                     MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playInfo);
                 }
 
+                _viewModel.SelectedChannel = channel;
                 _viewModel.PlayingChannel = channel;
                 _viewModel.PlayingChannelSubtitles.Clear();
                 _viewModel.PlayingChannelAudioTracks.Clear();
