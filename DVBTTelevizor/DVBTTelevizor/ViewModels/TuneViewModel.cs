@@ -1009,11 +1009,9 @@ namespace DVBTTelevizor
 
                         foreach (var kvp in searchProgramPIDsResult.PIDs)
                         {
-                            var pids = string.Join(",", kvp.Value);
                             var sDescriptor = mapPIDToServiceDescriptor[kvp.Key];
 
                             var ch = new DVBTChannel();
-                            ch.PIDs = pids;
                             ch.ProgramMapPID = kvp.Key;
                             ch.Name = sDescriptor.ServiceName;
                             ch.ProviderName = sDescriptor.ProviderName;

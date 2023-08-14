@@ -55,6 +55,7 @@ namespace DVBTTelevizor
         Task<DVBTStatus> GetStatus();
         Task<DVBTVersion> GetVersion();
         Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySystem);
+        Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning);
         Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning);
         Task<DVBTResponse> SetPIDs(List<long> PIDs);
         Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000);

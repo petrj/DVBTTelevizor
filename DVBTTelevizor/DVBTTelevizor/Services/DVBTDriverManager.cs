@@ -1070,6 +1070,103 @@ namespace DVBTTelevizor
             }
         }
 
+        public async Task<SearchPIDsResult> SearchProgramPIDs(long mapPID)
+        {
+            _log.Debug($"Searching PIDS of Map PID: {mapPID}");
+
+            var res = new SearchPIDsResult();
+
+            try
+            {
+                // setting PIDs filter
+
+                var pidRes = await SetPIDs(new List<long>() { mapPID });
+
+                if (!pidRes.SuccessFlag)
+                {
+                    _log.Debug($"Setting PID {mapPID} failed");
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // getting status
+
+                var status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    _log.Debug($"Getting status failed");
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+                {
+                    _log.Debug($"No signal");
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    return res;
+                }
+
+                PMTTable pmtTable = null;
+
+                try
+                {
+                    StartReadBuffer();
+
+                    // waiting
+                    await Task.Delay(100);
+
+                    var timeoutForReadingBuffer = 1500; //  1500 ms timeout for getting PMT
+                    var startTime = DateTime.Now;
+
+                    while ((DateTime.Now - startTime).TotalMilliseconds < timeoutForReadingBuffer)
+                    {
+                        var allPackets = MPEGTransportStreamPacket.Parse(Buffer);
+                        if (allPackets.Count > 0)
+                        {
+                            pmtTable = DVBTTable.CreateFromPackets<PMTTable>(allPackets, mapPID);
+
+                            if (pmtTable != null)
+                            {
+                                break;
+                            }
+                        }
+
+                        await Task.Delay(100);
+                    }
+                }
+                finally
+                {
+                    StopReadBuffer();
+                }
+
+                if (pmtTable == null)
+                {
+                    _log.Debug($"No PMT found");
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                res.Result = SearchProgramResultEnum.OK;
+
+                foreach (var stream in pmtTable.Streams)
+                {
+                    _log.Debug($"PIDS found: {stream.PID}");
+                    res.PIDs.Add(stream.PID);
+                }
+
+                _log.Debug($"Searching PIDS response: {res}");
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }
+        }
+
         /// <summary>
         /// Tuning with timeout
         /// </summary>
@@ -1082,6 +1179,128 @@ namespace DVBTTelevizor
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
+
+            var res = new TuneResult();
+
+            try
+            {
+                DVBTResponse tuneRes = null;
+                DVBTResponse setPIDres = null;
+
+                var attemptsCount = fastTuning ? 1 : 5;
+
+                // five attempts
+                for (var i = 1; i <= attemptsCount; i++)
+                {
+                    tuneRes = await Tune(frequency, bandWidth, deliverySystem);
+
+                    if (tuneRes.SuccessFlag)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (!fastTuning)
+                            await Task.Delay(500);
+                    }
+                }
+
+                if (!tuneRes.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // set PIDs 0 and 17
+                for (var i = 1; i <= attemptsCount; i++)
+                {
+                    setPIDres = await SetPIDs(PIDs);
+
+                    if (setPIDres.SuccessFlag)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (!fastTuning)
+                            await Task.Delay(100);
+                    }
+                }
+
+                if (!setPIDres.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                // freq tuned
+
+                // timeout for get signal:
+                var startTime = DateTime.Now;
+
+                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
+                var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
+
+                DVBTStatus status = new DVBTStatus();
+
+                while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
+                {
+                    status = await GetStatus();
+
+                    if (!status.SuccessFlag)
+                    {
+                        res.Result = SearchProgramResultEnum.Error;
+                        return res;
+                    }
+
+                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
+                    {
+                        res.Result = SearchProgramResultEnum.NoSignal;
+                        break;
+                    }
+
+                    if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
+                    {
+                        res.Result = SearchProgramResultEnum.OK;
+                        break;
+                    }
+
+                    // waiting
+                    await Task.Delay(fastTuning ? 400 : 850);
+                }
+
+                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+                {
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    return res;
+                }
+
+                res.SignalPercentStrength = status.rfStrengthPercentage;
+
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// Tuning with timeout
+        /// </summary>
+        /// <param name="frequency"></param>
+        /// <param name="bandWidth"></param>
+        /// <param name="deliverySystem"></param>
+        /// <param name="PID"></param>
+        /// <param name="fastTuning"></param>
+        /// <returns></returns>
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
+        {
+            _log.Debug($"Tuning enhanced freq: {frequency} MHz, MapPID {mapPID}, type: {deliverySystem} fastTuning: {fastTuning}");
 
             var res = new TuneResult();
 
@@ -1126,10 +1345,11 @@ namespace DVBTTelevizor
                     if (tuneRes.SuccessFlag)
                     {
                         break;
-                    } else
+                    }
+                    else
                     {
                         if (!fastTuning)
-                        await Task.Delay(500);
+                            await Task.Delay(500);
                     }
                 }
 
@@ -1183,10 +1403,25 @@ namespace DVBTTelevizor
 
                 res.SignalPercentStrength = status.rfStrengthPercentage;
 
+                // set Map PID for getting PMT table
+                var pmtTableSearchRes = await SearchProgramPIDs(mapPID);
+
+                if (pmtTableSearchRes.Result != SearchProgramResultEnum.OK)
+                {
+                    res.Result = pmtTableSearchRes.Result;
+                    return res;
+                }
+
+                pmtTableSearchRes.PIDs.Add(0);
+                pmtTableSearchRes.PIDs.Add(16);
+                pmtTableSearchRes.PIDs.Add(17);
+                pmtTableSearchRes.PIDs.Add(18);
+                pmtTableSearchRes.PIDs.Add(mapPID);
+
                 // set all PIDs
                 for (var i = 1; i <= attemptsCount; i++)
                 {
-                    setPIDres = await SetPIDs(PIDs);
+                    setPIDres = await SetPIDs(pmtTableSearchRes.PIDs);
 
                     if (setPIDres.SuccessFlag)
                     {
@@ -1269,10 +1504,12 @@ namespace DVBTTelevizor
                     }
                 }
 
+                var timeoutForReadingBuffer = 7; //  7 secs
+                var startTime = DateTime.Now;
+
                 StartReadBuffer();
 
-                var timeoutForReadingBuffer = 15; //  15 secs
-                var startTime = DateTime.Now;
+                await Task.Delay(200);
 
                 SDTTable sdtTable = null;
                 PSITable psiTable = null;
@@ -1302,7 +1539,7 @@ namespace DVBTTelevizor
                         }
                     }
 
-                    await Task.Delay(500);
+                    await Task.Delay(200);
                 }
 
                 StopReadBuffer();
@@ -1317,7 +1554,6 @@ namespace DVBTTelevizor
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
                 }
-
 
                 res.ServiceDescriptors = serviceDescriptors;
                 res.Result = SearchProgramResultEnum.OK;

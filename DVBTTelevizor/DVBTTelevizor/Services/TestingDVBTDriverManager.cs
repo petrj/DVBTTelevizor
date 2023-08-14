@@ -423,6 +423,11 @@ namespace DVBTTelevizor
             };
         }
 
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
+        {
+            return await TuneEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { mapPID }, fastTuning);
+        }
+
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
             LastFreq = frequency;

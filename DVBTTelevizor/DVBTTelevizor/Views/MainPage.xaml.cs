@@ -1997,7 +1997,8 @@ namespace DVBTTelevizor
                 {
                     MessagingCenter.Send($"Tuning {channel.FrequencyShortLabel} ....", BaseViewModel.MSG_LongToastMessage);
 
-                    var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
+                    //var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
+                    var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.ProgramMapPID, false);
                     if (tunedRes.Result != SearchProgramResultEnum.OK)
                     {
                         switch (tunedRes.Result)

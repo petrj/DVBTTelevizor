@@ -36,8 +36,6 @@ namespace DVBTTelevizor
 
         public string ProviderName { get; set; }
 
-        public string PIDs { get; set; }
-
         public string BandwdithLabel
         {
             get
@@ -91,14 +89,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public string PIDsLabel
-        {
-            get
-            {
-                return $"PIDs: {ProgramMapPID.ToString()}, {PIDs}";
-            }
-        }
-
         public string DVBTTypeLabel
         {
             get
@@ -121,29 +111,6 @@ namespace DVBTTelevizor
                     default:
                         return $"{res}";
                 }
-            }
-        }
-
-        public List<long> PIDsArary
-        {
-            get
-            {
-                var res = new List<long>();
-                res.Add(ProgramMapPID);
-                res.Add(0);  // PSI
-                res.Add(16); // NIT
-                res.Add(17); // SDT
-                res.Add(18); // EIT
-
-                if (!String.IsNullOrEmpty(PIDs))
-                {
-                    foreach (var pid in PIDs.Split(','))
-                    {
-                        res.Add(Convert.ToInt64(pid));
-                    }
-                }
-
-                return res;
             }
         }
 
@@ -315,7 +282,6 @@ namespace DVBTTelevizor
             channel.Frequency = Frequency;
             channel.Bandwdith = Bandwdith;
             channel.ProgramMapPID = ProgramMapPID;
-            channel.PIDs = PIDs;
             channel.ServiceType = ServiceType;
             channel.Type = Type;
             channel.Bandwdith = Bandwdith;

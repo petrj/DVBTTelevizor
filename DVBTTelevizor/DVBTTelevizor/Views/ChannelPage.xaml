@@ -105,7 +105,6 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="34*" />
@@ -118,9 +117,6 @@
 
                             <Label Grid.Row="1" Grid.Column="0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                             <Label Grid.Row="1" Grid.Column="2" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                            <Label Grid.Row="2" Grid.Column="0" Text="PIDs" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding Channel.PIDs}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
                         <Grid RowSpacing="10" Margin="10,30,10,0" IsVisible="{Binding StreamInfoVisible}">
