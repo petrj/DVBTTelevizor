@@ -100,7 +100,8 @@ namespace DVBTTelevizor
                 PageTitle = "Tuning frequency",
                 MinFrequencyKHz = _viewModel.FrequencyMinKHz,
                 MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
-                FrequencyKHzDefault = _viewModel.FrequencyDefaultKHz
+                FrequencyKHzDefault = _viewModel.FrequencyDefaultKHz,
+                FrequencyKHzSliderStep = _viewModel.TuneBandWidthKHz
             };
 
             Navigation.PushAsync(freqPage);
@@ -132,7 +133,8 @@ namespace DVBTTelevizor
                 PageTitle = "Tuning frequency from",
                 MinFrequencyKHz = _viewModel.FrequencyMinKHz,
                 MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
-                FrequencyKHzDefault = _viewModel.FrequencyFromDefaultKHz
+                FrequencyKHzDefault = _viewModel.FrequencyFromDefaultKHz,
+                FrequencyKHzSliderStep = _viewModel.TuneBandWidthKHz
             };
 
             Navigation.PushAsync(freqPage);
@@ -151,7 +153,8 @@ namespace DVBTTelevizor
                 PageTitle = "Tuning frequency to",
                 MinFrequencyKHz = _viewModel.FrequencyMinKHz,
                 MaxFrequencyKHz = _viewModel.FrequencyMaxKHz,
-                FrequencyKHzDefault = _viewModel.FrequencyToDefaultKHz
+                FrequencyKHzDefault = _viewModel.FrequencyToDefaultKHz,
+                FrequencyKHzSliderStep = _viewModel.TuneBandWidthKHz
             };
 
             Navigation.PushAsync(freqPage);

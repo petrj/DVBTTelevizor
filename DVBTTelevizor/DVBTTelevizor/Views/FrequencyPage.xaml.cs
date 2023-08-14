@@ -52,6 +52,12 @@ namespace DVBTTelevizor
             set { _viewModel.FrequencyKHzDefault = value; }
         }
 
+        public long FrequencyKHzSliderStep
+        {
+            get { return _viewModel.FrequencyKHzSliderStep; }
+            set { _viewModel.FrequencyKHzSliderStep = value; }
+        }
+
         public string PageTitle
         {
             get { return _viewModel.Title; }
