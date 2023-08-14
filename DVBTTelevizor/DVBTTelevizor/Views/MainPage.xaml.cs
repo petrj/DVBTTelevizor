@@ -180,13 +180,12 @@ namespace DVBTTelevizor
                 {
                     _viewModel.ConnectDriver(message);
                 }
-
-                Task.Run(async () => await _viewModel.AutoPlay());
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
                 _viewModel.UpdateDriverState();
+                Task.Run(async () => await _viewModel.AutoPlay());
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>

@@ -106,7 +106,7 @@ namespace DVBTTelevizor
 
         public void SelectchannelAfterStartup(int delaySeconds)
         {
-            new Thread(() =>
+            new Thread(async () =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
@@ -118,6 +118,8 @@ namespace DVBTTelevizor
                     SelectedChannel = null;
                     SelectedChannel = ch;
                 });
+
+                await AutoPlay();
             }).Start();
         }
 
@@ -153,7 +155,7 @@ namespace DVBTTelevizor
                 if (lastChannel.FrequencyAndMapPID == _config.ChannelAutoPlayedAfterStart)
                 {
                     //_viewModel.SelectedChannel = lastChannel;
-                    _autoPlayChannel = await SelectChannelByFrequencyAndMapPID(lastChannel.FrequencyAndMapPID);
+                    _autoPlayChannel = await SelectChannelByFrequencyAndMapPID(_config.SelectedChannelFrequencyAndMapPID);
                 }
 
                 if (_autoPlayChannel == null)
@@ -1117,7 +1119,6 @@ namespace DVBTTelevizor
                 DoNotScrollToChannel = false;
 
                 await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
-                await AutoPlay();
             }
         }
 
