@@ -190,10 +190,15 @@ namespace DVBTTelevizor
 
             if (_viewModel.ManualTuning)
             {
+                _config.FrequencyKHz = _viewModel.FrequencyKHz;
+
                 page.FrequencyFromKHz = _viewModel.FrequencyKHz;
                 page.FrequencyToKHz = _viewModel.FrequencyKHz;
             } else
             {
+                _config.FrequencyFromKHz = _viewModel.FrequencyFromKHz;
+                _config.FrequencyToKHz = _viewModel.FrequencyToKHz;
+
                 page.FrequencyFromKHz = _viewModel.FrequencyFromKHz;
                 page.FrequencyToKHz = _viewModel.FrequencyToKHz;
             }

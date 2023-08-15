@@ -211,8 +211,6 @@ namespace DVBTTelevizor
             {
                 _frequencyFromKHz = value;
 
-                _config.FrequencyFromKHz = _frequencyFromKHz;
-
                 OnPropertyChanged(nameof(FrequencyFromKHz));
                 OnPropertyChanged(nameof(FrequencyToKHz));
                 OnPropertyChanged(nameof(FrequencyFromMHz));
@@ -233,8 +231,6 @@ namespace DVBTTelevizor
             set
             {
                 _frequencyToKHz = value;
-
-                _config.FrequencyToKHz = _frequencyToKHz;
 
                 OnPropertyChanged(nameof(FrequencyFromKHz));
                 OnPropertyChanged(nameof(FrequencyToKHz));
