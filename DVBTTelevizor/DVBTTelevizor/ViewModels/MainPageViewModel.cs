@@ -782,7 +782,10 @@ namespace DVBTTelevizor
                     DVBTChannel selectChannel = null;
 
                     if (Channels.Count == 0)
+                    {
+                        SelectedChannel = null;
                         return null;
+                    }
 
                     foreach (var ch in Channels)
                     {
