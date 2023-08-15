@@ -476,8 +476,14 @@ namespace DVBTTelevizor
 
             try
             {
-                DoNotScrollToChannel = true;
-                SelectedChannel = ch;
+                if (ch != SelectedChannel)
+                {
+                    DoNotScrollToChannel = true;
+                    SelectedChannel = ch;
+                } else
+                {
+                    await ShowChannelMenu(ch);
+                }
             }
             finally
             {
