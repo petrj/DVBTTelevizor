@@ -129,9 +129,9 @@ namespace DVBTTelevizor
 
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
 
-            _tuneOptionsPage.Disappearing += anyPage_Disappearing;
-            _settingsPage.Disappearing += anyPage_Disappearing;
-            _editChannelPage.Disappearing += _editChannelPage_Disappearing;
+            _tuneOptionsPage.Disappearing += AnyPage_Disappearing;
+            _settingsPage.Disappearing += AnyPage_Disappearing;
+            _editChannelPage.Disappearing += EditChannelPage_Disappearing;
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
@@ -279,6 +279,8 @@ namespace DVBTTelevizor
 
         private void SetSubtitles(int id)
         {
+            _loggingService.Info($"Setting subtitles: {id}");
+
             if ((!_viewModel.PlayingChannelSubtitles.ContainsKey(id)) || (PlayingState == PlayingStateEnum.Stopped))
             {
                 return;
@@ -300,6 +302,8 @@ namespace DVBTTelevizor
         /// <param name="id"></param>
         private void SetAudioTrack(int id)
         {
+            _loggingService.Info($"Setting audio track: {id}");
+
             if (id == -100)
             {
                 _viewModel.AudioTrack = -100;
@@ -320,6 +324,8 @@ namespace DVBTTelevizor
 
         private void RestartRemoteAccessService()
         {
+            _loggingService.Info("RestartRemoteAccessService");
+
             if (_config.AllowRemoteAccessService)
             {
                 if (_remoteAccessService.IsBusy)
@@ -393,7 +399,7 @@ namespace DVBTTelevizor
 
         public void Resume()
         {
-            _loggingService.Info("ResumePlayback");
+            _loggingService.Info("Resume");
 
             bool playing = false;
             if ((PlayingState == PlayingStateEnum.Playing) || (PlayingState == PlayingStateEnum.PlayingInPreview))
@@ -475,7 +481,7 @@ namespace DVBTTelevizor
             });
         }
 
-        private void _editChannelPage_Disappearing(object sender, EventArgs e)
+        private void EditChannelPage_Disappearing(object sender, EventArgs e)
         {
             Task.Run(async () =>
             {
@@ -489,7 +495,7 @@ namespace DVBTTelevizor
             });
         }
 
-        private void anyPage_Disappearing(object sender, EventArgs e)
+        private void AnyPage_Disappearing(object sender, EventArgs e)
         {
             _viewModel.NotifyFontSizeChange();
             _viewModel.RefreshCommand.Execute(null);
@@ -502,6 +508,8 @@ namespace DVBTTelevizor
 
         protected override void OnAppearing()
         {
+            _loggingService.Info($"OnAppearing");
+
             base.OnAppearing();
 
             _viewModel.SelectedToolbarItemName = null;
@@ -524,11 +532,15 @@ namespace DVBTTelevizor
 
         protected override void OnDisappearing()
         {
+            _loggingService.Info($"OnDisappearing");
+
             base.OnDisappearing();
         }
 
         public void Done()
         {
+            _loggingService.Info($"Done");
+
             Task.Run(async () =>
             {
                 await _viewModel.DisconnectDriver();
@@ -741,6 +753,8 @@ namespace DVBTTelevizor
 
         private async Task ToggleRecord()
         {
+            _loggingService.Info($"ToggleRecord");
+
             if (_viewModel.SelectedChannel == null)
             {
                 return;
@@ -1426,6 +1440,8 @@ namespace DVBTTelevizor
 
         private void EditSelectedChannel()
         {
+            _loggingService.Info($"EditSelectedChannel");
+
             var ch = _viewModel.SelectedChannel;
             if (ch != null)
             {
@@ -1916,7 +1932,7 @@ namespace DVBTTelevizor
 
         public async Task ActionPlay(DVBTChannel channel = null)
         {
-            _loggingService.Debug($"Calling ActionPlay");
+            _loggingService.Debug($"ActionPlay");
 
             try
             {
@@ -2093,7 +2109,7 @@ namespace DVBTTelevizor
 
         public async Task ActionStop(bool force)
         {
-            _loggingService.Debug($"Calling ActionStop (Force: {force}, PlayingState: {PlayingState})");
+            _loggingService.Debug($"ActionStop (Force: {force}, PlayingState: {PlayingState})");
 
             if (_media == null || videoView == null || videoView.MediaPlayer == null)
                 return;
@@ -2147,7 +2163,7 @@ namespace DVBTTelevizor
 
         public async Task ActionRecord(DVBTChannel channel = null)
         {
-            _loggingService.Debug($"Calling ActionRecord");
+            _loggingService.Debug($"ActionRecord");
 
             try
             {
@@ -2201,7 +2217,7 @@ namespace DVBTTelevizor
 
         public async Task ActionStopRecord()
         {
-            _loggingService.Debug($"Calling ActionStopRecord");
+            _loggingService.Debug($"ActionStopRecord");
 
             try
             {

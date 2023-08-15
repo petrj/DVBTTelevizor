@@ -106,6 +106,8 @@ namespace DVBTTelevizor
 
         public void SelectchannelAfterStartup(int delaySeconds)
         {
+            _loggingService.Info("SelectchannelAfterStartup");
+
             new Thread(async () =>
             {
                 Thread.CurrentThread.IsBackground = true;
