@@ -113,99 +113,101 @@
                     <ColumnDefinition Width="50*" />
                 </Grid.ColumnDefinitions>
 
-                <StackLayout x:Name="TuningStackLayout" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                <ScrollView x:Name="TunningScrollView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
+                    <StackLayout x:Name="TuningStackLayout" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,0,0,0">
 
-                    <Grid x:Name="TuningInfoGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50*" />
-                            <ColumnDefinition Width="35*" />
-                            <ColumnDefinition Width="15*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningState}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-
-                        <Grid Grid.Row="0" Grid.Column="0" x:Name="ActualTuningFrequencMHzValueGrid" IsVisible="{Binding TuningInProgress}"  RowSpacing="0" Margin="0,0,0,0">
+                        <Grid x:Name="TuningInfoGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="50*" />
+                                <ColumnDefinition Width="35*" />
+                                <ColumnDefinition Width="15*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningFrequencyWholePartMHz}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding ActualTuningFrequencyDecimalPartMHzCaption}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            <Label x:Name="ActualTuningStateLabel" Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningState}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                            <Grid Grid.Row="0" Grid.Column="0" x:Name="ActualTuningFrequencMHzValueGrid" IsVisible="{Binding TuningInProgress}"  RowSpacing="0" Margin="0,0,0,0">
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0"  Text="{Binding ActualTuningFrequencyWholePartMHz}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+                                <Label Grid.Row="0" Grid.Column="1"  Text="{Binding ActualTuningFrequencyDecimalPartMHzCaption}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+                            </Grid>
+
+                            <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                            <ActivityIndicator Grid.Row="0" Grid.Column="2" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
                         </Grid>
 
-                        <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Grid x:Name="SignalProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
 
-                        <ActivityIndicator Grid.Row="0" Grid.Column="2" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
-                    </Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25*" />
+                                <ColumnDefinition Width="55*" />
+                                <ColumnDefinition Width="20*" />
+                            </Grid.ColumnDefinitions>
 
-                    <Grid x:Name="SignalProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Signal" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
+                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        </Grid>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30*" />
-                            <ColumnDefinition Width="55*" />
-                            <ColumnDefinition Width="15*" />
-                        </Grid.ColumnDefinitions>
+                        <Grid x:Name="ChannelsInfoGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
 
-                        <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    </Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="85*" />
+                                <ColumnDefinition Width="15*" />
+                            </Grid.ColumnDefinitions>
 
-                    <Grid x:Name="ChannelsInfoGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                            <Label Grid.Row="0" Grid.Column="0" IsVisible="True" Text="Multiplexes" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="0" Grid.Column="1" IsVisible="True" Text="{Binding TunedMultiplexesCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="85*" />
-                            <ColumnDefinition Width="15*" />
-                        </Grid.ColumnDefinitions>
+                            <Label Grid.Row="1" Grid.Column="0" IsVisible="True" Text="Channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="1" Grid.Column="1" IsVisible="True" Text="{Binding TunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
 
-                        <Label Grid.Row="0" Grid.Column="0" IsVisible="True" Text="Multiplexes" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Label Grid.Row="0" Grid.Column="1" IsVisible="True" Text="{Binding TunedMultiplexesCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="2" Grid.Column="0" IsVisible="True" Text="New channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="2" Grid.Column="1" IsVisible="True" Text="{Binding NewTunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                        </Grid>
 
-                        <Label Grid.Row="1" Grid.Column="0" IsVisible="True" Text="Channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Label Grid.Row="1" Grid.Column="1" IsVisible="True" Text="{Binding TunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+                        <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
 
-                        <Label Grid.Row="2" Grid.Column="0" IsVisible="True" Text="New channels" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Label Grid.Row="2" Grid.Column="1" IsVisible="True" Text="{Binding NewTunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
-                    </Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25*" />
+                                <ColumnDefinition Width="55*" />
+                                <ColumnDefinition Width="20*" />
+                            </Grid.ColumnDefinitions>
 
-                    <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                            <Label Grid.Row="0" Grid.Column="0" Text="Tuning progress" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
+                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        </Grid>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30*" />
-                            <ColumnDefinition Width="55*" />
-                            <ColumnDefinition Width="15*" />
-                        </Grid.ColumnDefinitions>
+                        <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Margin="5,5,5,0"/>
 
-                        <Label Grid.Row="0" Grid.Column="0" Text="Tuning progress" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    </Grid>
+                        <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Margin="5,5,5,0" />
 
-                    <Button x:Name="AbortButton" Text="Abort" Command="{Binding AbortTuneCommand}" IsVisible="{Binding TuningInProgress}" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Margin="5,5,5,0"/>
-
-                    <Button x:Name="FinishButton" Command="{Binding FinishTuningCommand}" Text="OK" IsVisible="{Binding TuningFinished}" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Margin="5,5,5,0" />
-
-                </StackLayout>
+                    </StackLayout>
+                </ScrollView>
 
                 <BoxView x:Name="VeticalSplitterBoxView" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" BackgroundColor="#262626"/>
 

@@ -91,7 +91,7 @@ namespace DVBTTelevizor
             {
                 if (_isPortrait)
                 {
-                    TuningStackLayout.SetValue(Grid.ColumnSpanProperty, 3);
+                    TunningScrollView.SetValue(Grid.ColumnSpanProperty, 3);
                     //TuningStackLayout.SetValue(Grid.RowSpanProperty, 1);
                     VeticalSplitterBoxView.IsVisible = false;
                     ChannelsListView.SetValue(Grid.ColumnSpanProperty, 3);
@@ -101,8 +101,8 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    TuningStackLayout.SetValue(Grid.ColumnSpanProperty, 1);
-                    TuningStackLayout.SetValue(Grid.RowSpanProperty,2);
+                    TunningScrollView.SetValue(Grid.ColumnSpanProperty, 1);
+                    TunningScrollView.SetValue(Grid.RowSpanProperty,2);
                     VeticalSplitterBoxView.IsVisible = true;
                     ChannelsListView.SetValue(Grid.RowProperty, 0);
                     ChannelsListView.SetValue(Grid.ColumnProperty, 2);
@@ -182,13 +182,22 @@ namespace DVBTTelevizor
             _focusItems = new KeyboardFocusableItemList();
 
             _focusItems
+                .AddItem(KeyboardFocusableItem.CreateFrom("ActualTuning", new List<View>() { ActualTuningStateLabel }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("AbortButton", new List<View>() { AbortButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("FinishButton", new List<View>() { FinishButton }));
+
+            _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
+        }
+
+        private void ChannelPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
+        {
+            // scroll to item
+            TunningScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition, false);
         }
 
         private void ChannelsListView_ItemAppearing(object sender, ItemVisibilityEventArgs e)
         {
-            if (_viewModel.TuningInProgress)
+            if (_viewModel.TuningInProgress && !_listViewSelected)
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
@@ -229,9 +238,16 @@ namespace DVBTTelevizor
             }
             else
             {
-                _listViewSelected = true;
-                _focusItems.DeFocusAll();
-                _viewModel.SelectedChannel = _viewModel.FirstTunedChannel;
+                if (_focusItems.LastFocusedItemName != "ActualTuning")
+                {
+                    _listViewSelected = true;
+                    _focusItems.DeFocusAll();
+                    _viewModel.SelectedChannel = _viewModel.FirstTunedChannel;
+                }
+                else
+                {
+                    _focusItems.FocusNextItem();
+                }
             }
         }
 
@@ -268,9 +284,15 @@ namespace DVBTTelevizor
                 }
             } else
             {
-                _listViewSelected = true;
-                _focusItems.DeFocusAll();
-                _viewModel.SelectedChannel = _viewModel.LastTunedChannel;
+                if (_focusItems.LastFocusedItemName == "ActualTuning")
+                {
+                    _listViewSelected = true;
+                    _focusItems.DeFocusAll();
+                    _viewModel.SelectedChannel = _viewModel.LastTunedChannel;
+                } else
+                {
+                    _focusItems.FocusPreviousItem();
+                }
             }
         }
 
