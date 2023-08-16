@@ -1412,10 +1412,11 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                pmtTableSearchRes.PIDs.Add(0);
-                pmtTableSearchRes.PIDs.Add(16);
-                pmtTableSearchRes.PIDs.Add(17);
-                pmtTableSearchRes.PIDs.Add(18);
+                pmtTableSearchRes.PIDs.Add(0);  // PAT
+                pmtTableSearchRes.PIDs.Add(16); // NIT
+                pmtTableSearchRes.PIDs.Add(17); // SDT
+                pmtTableSearchRes.PIDs.Add(18); // EIT
+                pmtTableSearchRes.PIDs.Add(20); // TDT
                 pmtTableSearchRes.PIDs.Add(mapPID);
 
                 // set all PIDs

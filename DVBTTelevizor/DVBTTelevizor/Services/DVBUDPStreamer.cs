@@ -57,14 +57,7 @@ namespace DVBTTelevizor.Services
 
             if (ip == null)
             {
-                var ipAddr = DVBUDPStreamer.GetLocalIPAddress();
-                if (ipAddr == null)
-                {
-                    _ip = "localhost";
-                } else
-                {
-                    _ip = ipAddr.ToString();
-                }
+                _ip = "127.0.0.1";
             }
 
             if (port == -1)
