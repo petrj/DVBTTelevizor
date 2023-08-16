@@ -77,7 +77,6 @@ namespace DVBTTelevizor
             var channels = await _channelService.LoadChannels();
             if (channels.Count == 0)
             {
-                AutoPlayChannels.Add(noChannel);
                 SelectedChannel = noChannel;
                 return;
             }
@@ -98,7 +97,7 @@ namespace DVBTTelevizor
                 }
             }
 
-            if (!anythingSelected)
+            if (!anythingSelected && (!string.IsNullOrEmpty(Config.ChannelAutoPlayedAfterStart)))
             {
                 if (Config.ChannelAutoPlayedAfterStart == noChannel.FrequencyAndMapPID)
                 {
@@ -108,6 +107,9 @@ namespace DVBTTelevizor
                 {
                     SelectedChannel = lastChannel;
                 }
+            } else
+            {
+                SelectedChannel = noChannel;
             }
 
             OnPropertyChanged(nameof(AutoPlayChannels));

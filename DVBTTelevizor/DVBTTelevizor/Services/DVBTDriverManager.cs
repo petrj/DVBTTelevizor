@@ -1116,7 +1116,7 @@ namespace DVBTTelevizor
                     // waiting
                     await Task.Delay(100);
 
-                    var timeoutForReadingBuffer = 1500; //  1500 ms timeout for getting PMT
+                    var timeoutForReadingBuffer = 10000; //  10 s timeout for getting PMT
                     var startTime = DateTime.Now;
 
                     while ((DateTime.Now - startTime).TotalMilliseconds < timeoutForReadingBuffer)
@@ -1504,7 +1504,7 @@ namespace DVBTTelevizor
                     }
                 }
 
-                var timeoutForReadingBuffer = 7; //  7 secs
+                var timeoutForReadingBuffer = 15; //  15 secs
                 var startTime = DateTime.Now;
 
                 StartReadBuffer();
