@@ -13,6 +13,7 @@ using Xamarin.Essentials;
 using Android.Hardware.Usb;
 using Google.Android.Material.Snackbar;
 using Plugin.CurrentActivity;
+using DVBTTelevizor.Services;
 
 namespace DVBTTelevizor.Droid
 {
@@ -318,6 +319,23 @@ namespace DVBTTelevizor.Droid
                 }
 
                 _loggingService.Info("Initializing device");
+
+#if TestingDVBTDriver
+
+                var testingDVBTDriver = new TestingDVBTDriver(_loggingService);
+                testingDVBTDriver.Connect();
+
+                var cfg = new DVBTDriverConfiguration()
+                {
+                    DeviceName = "Testing DVBT driver",
+                    ControlPort = testingDVBTDriver.ControlIPEndPoint.Port,
+                    TransferPort = testingDVBTDriver.TransferIPEndPoint.Port
+                };
+
+                MessagingCenter.Send(cfg.ToString(), BaseViewModel.MSG_DVBTDriverConfiguration);
+
+                return;
+#endif
 
                 var req = new Intent(Intent.ActionView);
                 req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());

@@ -1,10 +1,6 @@
 @cd /d %~dp0
-cd TestingDVBTDriverManager.DebugData
+cd TestingDVBTDriverData
 
 set androidFolder=/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/
 
-adb push stream.ts %androidFolder%
-adb push 310.ts %androidFolder%
-adb push 2300.ts %androidFolder%
-adb push 2400.ts %androidFolder%
-adb push 7070.ts %androidFolder%
+adb push DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts %androidFolder%

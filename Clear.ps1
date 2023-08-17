@@ -7,12 +7,7 @@ foreach ($folder in `
     "DVBTTelevizor\DVBTTelevizor\obj",
     "DVBTTelevizor\DVBTTelevizor.Android\bin",
     "DVBTTelevizor\DVBTTelevizor.Android\obj",
-		"LoggerService\bin",
-		"LoggerService\obj",
-		"MPEGTS\bin",
-		"MPEGTS\obj",
-		"MPEGTSAnalyzator\bin",
-		"MPEGTSAnalyzator\obj",
+    "packages",
     ".vs"
      ))
 {

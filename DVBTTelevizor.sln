@@ -13,19 +13,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Clear.ps1 = Clear.ps1
 		devices.txt = devices.txt
 		PushTestingDVBTDriverDataToDevice.bat = PushTestingDVBTDriverDataToDevice.bat
+		PushTestingDVBTDriverManagerDataToDevice.bat = PushTestingDVBTDriverManagerDataToDevice.bat
 		ResizeIconImage.ps1 = ResizeIconImage.ps1
 		WifiDebug.bat = WifiDebug.bat
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DVBTTelevizor", "DVBTTelevizor\DVBTTelevizor\DVBTTelevizor.csproj", "{D7D14254-AEC9-49B9-8543-1DE3D0E4ADDA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestingDVBTDriverManager.DebugData", "TestingDVBTDriverManager.DebugData", "{823E48A1-D12F-4F43-BAC3-7158BCDFBE9B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestingDVBTDriverManagerData", "TestingDVBTDriverManagerData", "{823E48A1-D12F-4F43-BAC3-7158BCDFBE9B}"
 	ProjectSection(SolutionItems) = preProject
-		TestingDVBTDriverManager.DebugData\2300.ts = TestingDVBTDriverManager.DebugData\2300.ts
-		TestingDVBTDriverManager.DebugData\2400.ts = TestingDVBTDriverManager.DebugData\2400.ts
-		TestingDVBTDriverManager.DebugData\310.ts = TestingDVBTDriverManager.DebugData\310.ts
-		TestingDVBTDriverManager.DebugData\7070.ts = TestingDVBTDriverManager.DebugData\7070.ts
-		TestingDVBTDriverManager.DebugData\stream.ts = TestingDVBTDriverManager.DebugData\stream.ts
+		TestingDVBTDriverManagerData\2300.ts = TestingDVBTDriverManagerData\2300.ts
+		TestingDVBTDriverManagerData\2400.ts = TestingDVBTDriverManagerData\2400.ts
+		TestingDVBTDriverManagerData\310.ts = TestingDVBTDriverManagerData\310.ts
+		TestingDVBTDriverManagerData\7070.ts = TestingDVBTDriverManagerData\7070.ts
+		TestingDVBTDriverManagerData\stream.ts = TestingDVBTDriverManagerData\stream.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestingDVBTDriverData", "TestingDVBTDriverData", "{E0D4A3B9-003B-4BB6-A3A4-905DA75CDB1C}"
+	ProjectSection(SolutionItems) = preProject
+		TestingDVBTDriverData\DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts = TestingDVBTDriverData\DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts
 	EndProjectSection
 EndProject
 Global
