@@ -47,7 +47,6 @@ namespace DVBTTelevizor.Services
         private List<long> _PIDFilter = new List<long>();
 
         private object key = 1;
-        private string _lastSpeedCalculationSec = null;
 
         public TestingDVBTDriver(ILoggingService loggingService)
         {
@@ -104,7 +103,9 @@ namespace DVBTTelevizor.Services
             try
             {
                 var bytes = new Byte[MaxBufferSize];
-                var bufferSize = 500000; // constant speed cca 4 MB
+                var bufferSize = 250000; // constant speed cca 4 MB
+                var lastSpeedCalculationTime = DateTime.MinValue;
+                var lastSpeedCalculationTimeLog = DateTime.MinValue;
 
                 _loggingService.Info($"TestingDVBTDriver transfer endpoint: {_transferIPEndPoint.Address}:{_transferIPEndPoint.Port}");
 
@@ -124,17 +125,33 @@ namespace DVBTTelevizor.Services
                             {
                                 if ((_sendingDataFrequency != 0) && (_freqStreams.ContainsKey(_sendingDataFrequency)) && _PIDFilter.Count>0 && !SendingDataDisabled)
                                 {
-                                    var currentLastSpeedCalculationSec = DateTime.Now.ToString("yyyyMMddhhmmss");
-                                    if (_lastSpeedCalculationSec != currentLastSpeedCalculationSec)
+                                    if ((DateTime.Now-lastSpeedCalculationTime).TotalMilliseconds>200)
                                     {
-                                        // occurs once per second
-                                        _lastSpeedCalculationSec = currentLastSpeedCalculationSec;
+                                        // calculate speed
+
+                                        lastSpeedCalculationTime = DateTime.Now;
+
+                                        var bitsPerSec = (bufferSize*5.0) * 8;
+                                        var speed = "";
+
+                                        if (bitsPerSec > 1000000)
+                                        {
+                                            speed = $" ({Convert.ToInt32((bitsPerSec / 1000000.0)).ToString("N0")} Mb/sec)";
+                                        }
+                                        else if (bitsPerSec > 1000)
+                                        {
+                                            speed = $" ({Convert.ToInt32((bitsPerSec / 1000.0)).ToString("N0")} Kb/sec)";
+                                        }
+                                        else
+                                        {
+                                            speed = $" ({bitsPerSec} b/sec)";
+                                        }
+
+                                        // sending data
 
                                         if (_sendingDataPosition + bufferSize < _freqStreams[_sendingDataFrequency].Count)
                                         {
-                                            _loggingService.Debug($"TestingDVBTDriver sending data....");
-
-                                            var timeStart = DateTime.Now;
+                                            //_loggingService.Debug($"TestingDVBTDriver sending data....");
 
                                             var thisSecBytes = new byte[bufferSize];
                                             _freqStreams[_sendingDataFrequency].CopyTo(_sendingDataPosition, thisSecBytes, 0, bufferSize);
@@ -149,7 +166,7 @@ namespace DVBTTelevizor.Services
                                             var tdtTable = DVBTTable.CreateFromPackets<TDTTable>(packets, 20);
                                             if (tdtTable != null && tdtTable.UTCTime != DateTime.MinValue)
                                             {
-                                                _loggingService.Debug($" .. !!!!!!!! TDT table time: {tdtTable.UTCTime}");
+                                                //_loggingService.Debug($" .. !!!!!!!! TDT table time: {tdtTable.UTCTime}");
 
                                                 if (_timeShift == TimeSpan.MinValue)
                                                 {
@@ -158,25 +175,25 @@ namespace DVBTTelevizor.Services
                                                 {
                                                     var expectedTime = tdtTable.UTCTime.Add(_timeShift);
                                                     var timeDiff = DateTime.Now - expectedTime;
-                                                    _loggingService.Debug($" .. timeDiff: {timeDiff.TotalMilliseconds} ms");
+                                                    //_loggingService.Debug($" .. timeDiff: {timeDiff.TotalMilliseconds} ms");
 
                                                     if (timeDiff.TotalMilliseconds > 0)
                                                     {
-                                                        // decreasing buffer size
-                                                        bufferSize = Convert.ToInt32(bufferSize * 1.1);
+                                                        // increasing buffer size
+                                                        bufferSize = Convert.ToInt32(bufferSize * 1.5);
                                                         if (bufferSize > MaxBufferSize)
                                                         {
                                                             _loggingService.Debug($" .. cannot increase buffer size!");
                                                             bufferSize = MaxBufferSize;
                                                         } else
                                                         {
-                                                            _loggingService.Debug($" .. new buffer size: {bufferSize}");
+                                                            _loggingService.Debug($" .. >>> increasing buffer size to: {bufferSize/1000} KB");
                                                         }
                                                     }
                                                     else if (timeDiff.TotalMilliseconds < 0)
                                                     {
-                                                        // increasing buffer size
-                                                        bufferSize = Convert.ToInt32(bufferSize * 0.9);
+                                                        // decreasing buffer size
+                                                        bufferSize = Convert.ToInt32(bufferSize * 0.5);
                                                         if (bufferSize < MinBufferSize)
                                                         {
                                                             _loggingService.Debug($" .. cannot decrease buffer size!");
@@ -184,14 +201,17 @@ namespace DVBTTelevizor.Services
                                                         }
                                                         else
                                                         {
-                                                            _loggingService.Debug($" .. new buffer size: {bufferSize}");
+                                                            _loggingService.Debug($" .. <<< desreasing buffer size to: {bufferSize / 1000} KB");
                                                         }
                                                     }
                                                 }
                                             }
 
-                                            var timeSpan = DateTime.Now - timeStart;
-                                            _loggingService.Debug($" .. Time for parse & send: {timeSpan.TotalMilliseconds} ms");
+                                            if ((DateTime.Now - lastSpeedCalculationTimeLog).TotalMilliseconds > 1000)
+                                            {
+                                                lastSpeedCalculationTimeLog = DateTime.Now;
+                                                _loggingService.Debug($"TestingDVBTDriver sending data: {speed}, time for parse & send: {(DateTime.Now - lastSpeedCalculationTime).TotalMilliseconds} ms");
+                                            }
                                         }
                                         else
                                         {
