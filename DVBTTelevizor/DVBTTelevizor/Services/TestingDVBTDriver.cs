@@ -180,20 +180,20 @@ namespace DVBTTelevizor.Services
                                                     if (timeDiff.TotalMilliseconds > 0)
                                                     {
                                                         // increasing buffer size
-                                                        bufferSize = Convert.ToInt32(bufferSize * 1.5);
+                                                        bufferSize = Convert.ToInt32(bufferSize * 1.2);
                                                         if (bufferSize > MaxBufferSize)
                                                         {
                                                             _loggingService.Debug($" .. cannot increase buffer size!");
                                                             bufferSize = MaxBufferSize;
                                                         } else
                                                         {
-                                                            _loggingService.Debug($" .. >>> increasing buffer size to: {bufferSize/1000} KB");
+                                                            _loggingService.Debug($" .. >>> increasing buffer size to: {bufferSize/1000} KB  [{timeDiff.TotalMilliseconds}]");
                                                         }
                                                     }
                                                     else if (timeDiff.TotalMilliseconds < 0)
                                                     {
                                                         // decreasing buffer size
-                                                        bufferSize = Convert.ToInt32(bufferSize * 0.5);
+                                                        bufferSize = Convert.ToInt32(bufferSize * 0.8);
                                                         if (bufferSize < MinBufferSize)
                                                         {
                                                             _loggingService.Debug($" .. cannot decrease buffer size!");
@@ -201,7 +201,7 @@ namespace DVBTTelevizor.Services
                                                         }
                                                         else
                                                         {
-                                                            _loggingService.Debug($" .. <<< desreasing buffer size to: {bufferSize / 1000} KB");
+                                                            _loggingService.Debug($" .. <<< desreasing buffer size to: {bufferSize / 1000} KB [{timeDiff.TotalMilliseconds}]");
                                                         }
                                                     }
                                                 }
