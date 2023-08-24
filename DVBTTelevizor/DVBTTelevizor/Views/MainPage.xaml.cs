@@ -2034,7 +2034,7 @@ namespace DVBTTelevizor
 
                     _lastActionPlayTime = DateTime.Now;
 
-                    await _viewModel.ScanEPGWhenPlay(channel);
+                    //await _viewModel.ScanEPG(channel, true, 2000);
 
                     signalStrengthPercentage = tunedRes.SignalPercentStrength;
                 }
@@ -2070,15 +2070,6 @@ namespace DVBTTelevizor
                     playInfo.SignalStrengthPercentage = Convert.ToInt32(signalStrengthPercentage.Value);
                 }
 
-                playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
-
-                await _viewModel.ShowActualPlayingMessage(playInfo);
-
-                if (_config.PlayOnBackground)
-                {
-                    MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playInfo);
-                }
-
                 _viewModel.SelectedChannel = channel;
                 _viewModel.PlayingChannel = channel;
                 _viewModel.PlayingChannelSubtitles.Clear();
@@ -2094,6 +2085,20 @@ namespace DVBTTelevizor
                 }
 
                 _viewModel.NotifyMediaChange();
+
+                playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
+
+                if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
+                {
+                    await _viewModel.ScanEPG(channel, true, true, 2000, 5000);
+                }
+
+                await _viewModel.ShowActualPlayingMessage(playInfo);
+
+                if (_config.PlayOnBackground)
+                {
+                    MessagingCenter.Send<MainPage, PlayStreamInfo>(this, BaseViewModel.MSG_PlayInBackgroundNotification, playInfo);
+                }
 
             } catch (Exception ex)
             {

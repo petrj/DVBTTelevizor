@@ -528,12 +528,9 @@ namespace DVBTTelevizor
                     if (RecordingChannel == null || RecordingChannel == ch)
                     {
                         actions.Add("Play");
-
-                        if (!EIT.Scanning)
-                        {
-                            actions.Add("Scan EPG");
-                        }
                     }
+
+                    actions.Add("Scan EPG");
 
                     if (RecordingChannel == null)
                     {
@@ -542,6 +539,8 @@ namespace DVBTTelevizor
                 } else
                 {
                     actions.Add("Stop");
+
+                    actions.Add("Scan EPG");
 
                     if (PlayingChannelSubtitles.Count > 0)
                     {
@@ -623,7 +622,7 @@ namespace DVBTTelevizor
                     await ShowAspectMenu(ch);
                     break;
                 case "Scan EPG":
-                    await ScanEPG(ch);
+                    await ScanEPG(ch, false, false, 0, 5000);
                     break;
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStream);
@@ -923,39 +922,7 @@ namespace DVBTTelevizor
             MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
         }
 
-        public async Task ScanEPGWhenPlay(DVBTChannel channel, int msTimeOut = 2000, int msScanTimeOut = 5000)
-        {
-            // run in background
-            // scan EPG
-            Task.Run(async () =>
-            {
-                await Task.Delay(msTimeOut);
-
-                var ev = await GetChannelEPG(channel);
-                if (ev == null)
-                {
-                    var scanRes = await EIT.Scan(msScanTimeOut);
-                    if (scanRes.OK)
-                    {
-                        if (PlayingChannel == channel)
-                        {
-                            ev = await GetChannelEPG(channel);
-                            if (ev != null)
-                            {
-                                await ShowActualPlayingMessage(new PlayStreamInfo
-                                {
-                                    Channel = channel,
-                                    CurrentEvent = ev,
-                                    ShortInfoWithoutChannelName = true
-                                });
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        public async Task ScanEPG(DVBTChannel channel, int msTimeOut = 5000)
+        public async Task ScanEPG(DVBTChannel channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
         {
             if (channel == null)
             {
@@ -964,50 +931,68 @@ namespace DVBTTelevizor
                     return;
             }
 
-            if (_playingChannel == channel || _recordingChannel == channel)
-            {
-                await ScanEPGWhenPlay(channel, 0, msTimeOut);
-                return;
-            }
+            _loggingService.Debug($"Scanning EPG for channel {channel}");
 
             if ((_playingChannel != null) && (_playingChannel != channel))
             {
-                MessagingCenter.Send($"Cannot scan EPG (playing in progress)", BaseViewModel.MSG_ToastMessage);
+                if (!silent)
+                {
+                    MessagingCenter.Send($"Cannot scan EPG (playing in progress)", BaseViewModel.MSG_ToastMessage);
+                }
                 return;
             }
 
             if ((_recordingChannel != null) && (_recordingChannel != channel))
             {
-                MessagingCenter.Send($"Cannot scan EPG (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                if (!silent)
+                {
+                    MessagingCenter.Send($"Cannot scan EPG (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                }
                 return;
             }
 
             if (!_driver.Connected)
             {
-                MessagingCenter.Send($"Cannot scan EPG (device not connected)", BaseViewModel.MSG_ToastMessage);
+                if (!silent)
+                {
+                    MessagingCenter.Send($"Cannot scan EPG (device not connected)", BaseViewModel.MSG_ToastMessage);
+                }
                 return;
             }
 
-            _loggingService.Debug($"Scanning EPG for channel {channel}");
-
             try
             {
-                await Task.Run(async () =>
+                Task.Run(async () =>
                    {
-                       MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
-
-                       var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
-
-                       if (tuned.Result != SearchProgramResultEnum.OK )
+                       if (!silent)
                        {
-                           MessagingCenter.Send($"Scanning EPG failed", BaseViewModel.MSG_ToastMessage);
-                           return;
+                           MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
                        }
 
-                       var res = await EIT.Scan(msTimeOut);
+                       await Task.Delay(msRunTimeOut);
 
-                       await _driver.Stop();
+                       var justPlaying = ((_playingChannel == channel || _recordingChannel == channel));
 
+                       if (!justPlaying)
+                       {
+                           var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
+
+                           if (tuned.Result != SearchProgramResultEnum.OK)
+                           {
+                               if (!silent)
+                               {
+                                   MessagingCenter.Send($"Scanning EPG failed", BaseViewModel.MSG_ToastMessage);
+                               }
+                               return;
+                           }
+                       }
+
+                       var res = await EIT.Scan(msScanTimeOut);
+
+                       if (!justPlaying)
+                       {
+                           await _driver.Stop();
+                       }
 
                        var msg = String.Empty;
 
@@ -1019,6 +1004,20 @@ namespace DVBTTelevizor
                            msg += $"EPG scan completed";
 
                            await RefreshEPG();
+
+                           if (showIfFound)
+                           {
+                               var ev = await GetChannelEPG(channel);
+                               if (ev != null)
+                               {
+                                   await ShowActualPlayingMessage(new PlayStreamInfo
+                                   {
+                                       Channel = channel,
+                                       CurrentEvent = ev,
+                                       ShortInfoWithoutChannelName = true
+                                   });
+                               }
+                           }
                        }
 
                        if (res.UnsupportedEncoding)
@@ -1035,7 +1034,10 @@ namespace DVBTTelevizor
 
                        if (!string.IsNullOrEmpty(msg))
                        {
-                           MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                           if (!silent)
+                           {
+                               MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
+                           }
                        }
                    });
             }
@@ -1043,7 +1045,10 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex, $"EPG scan failed");
 
-                MessagingCenter.Send($"EPG scan failed", BaseViewModel.MSG_ToastMessage);
+                if (!silent)
+                {
+                    MessagingCenter.Send($"EPG scan failed", BaseViewModel.MSG_ToastMessage);
+                }
             }
         }
 
