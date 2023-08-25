@@ -8,6 +8,10 @@ namespace DVBTTelevizor
     public class ChannelPageViewModel : BaseViewModel
     {
         private DVBTChannel _channel;
+
+        private bool _signalStrengthVisible = false;
+        private string _signalStrength = null;
+
         private bool _streamInfoVisible = false;
         private string _streamVideoSize = String.Empty;
         private string _streamAudioTracks = String.Empty;
@@ -39,6 +43,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool SignalStrengthVisible
+        {
+            get
+            {
+                return _signalStrengthVisible;
+            }
+            set
+            {
+                _signalStrengthVisible = value;
+            }
+        }
+
         public string StreamVideoSize
         {
             get
@@ -48,6 +64,18 @@ namespace DVBTTelevizor
             set
             {
                 _streamVideoSize = value;
+            }
+        }
+
+        public string SignalStrength
+        {
+            get
+            {
+                return _signalStrength;
+            }
+            set
+            {
+                _signalStrength = value;
             }
         }
 
@@ -79,6 +107,8 @@ namespace DVBTTelevizor
         {
             OnPropertyChanged(nameof(Channel));
             OnPropertyChanged(nameof(StreamInfoVisible));
+            OnPropertyChanged(nameof(SignalStrengthVisible));
+            OnPropertyChanged(nameof(SignalStrength));
             OnPropertyChanged(nameof(StreamVideoSize));
             OnPropertyChanged(nameof(StreamAudioTracks));
             OnPropertyChanged(nameof(StreamSubtitles));

@@ -1,4 +1,5 @@
-﻿using Android.Media;
+﻿using Android.Hardware.Camera2;
+using Android.Media;
 using LibVLCSharp.Shared;
 using LoggerService;
 using System;
@@ -1438,7 +1439,7 @@ namespace DVBTTelevizor
             _viewModel.NotifyToolBarChange();
         }
 
-        private void EditSelectedChannel()
+        private async void EditSelectedChannel()
         {
             _loggingService.Info($"EditSelectedChannel");
 
@@ -1491,9 +1492,29 @@ namespace DVBTTelevizor
                     _loggingService.Error(ex);
                 }
 
+                try
+                {
+                    if (_driver.Streaming)
+                    {
+                        var status = await _driver.GetStatus();
+                        if (status.SuccessFlag)
+                        {
+                            _editChannelPage.SignalStrength = $"{status.rfStrengthPercentage}%";
+                            _editChannelPage.SignalStrengthVisible = true;
+                        } else
+                        {
+                            _editChannelPage.SignalStrengthVisible = false;
+                        }
+                    }
+                } catch (Exception ex)
+                {
+                    _editChannelPage.SignalStrengthVisible = false;
+                    _loggingService.Error(ex);
+                }
+
                 _editChannelPage.Channel = ch;
 
-                Navigation.PushAsync(_editChannelPage);
+                await Navigation.PushAsync(_editChannelPage);
             }
         }
 

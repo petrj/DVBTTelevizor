@@ -133,6 +133,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool SignalStrengthVisible
+        {
+            get
+            {
+                return _viewModel.SignalStrengthVisible;
+            }
+            set
+            {
+                _viewModel.SignalStrengthVisible = value;
+            }
+        }
+
         public string StreamVideoSize
         {
             get
@@ -142,6 +154,18 @@ namespace DVBTTelevizor
             set
             {
                 _viewModel.StreamVideoSize = value;
+            }
+        }
+
+        public string SignalStrength
+        {
+            get
+            {
+                return _viewModel.SignalStrength;
+            }
+            set
+            {
+                _viewModel.SignalStrength = value;
             }
         }
 

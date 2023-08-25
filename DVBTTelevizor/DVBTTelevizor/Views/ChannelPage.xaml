@@ -119,6 +119,20 @@
                             <Label Grid.Row="1" Grid.Column="2" Text="{Binding Channel.ProgramMapPID}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
+                        <Grid RowSpacing="10" Margin="10,30,10,0" IsVisible="{Binding SignalStrengthVisible}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="34*" />
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="64*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrength}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        </Grid>
+
                         <Grid RowSpacing="10" Margin="10,30,10,0" IsVisible="{Binding StreamInfoVisible}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
