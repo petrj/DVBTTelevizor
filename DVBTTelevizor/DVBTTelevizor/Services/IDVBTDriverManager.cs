@@ -36,6 +36,8 @@ namespace DVBTTelevizor
 
         string DataStreamInfo { get; set; }
 
+        long Bitrate { get; }
+
         long LastTunedFreq { get; }
 
         bool DriverStreamDataAvailable { get; }
