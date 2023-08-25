@@ -42,6 +42,7 @@ namespace DVBTTelevizor
 
         private int _animePos = 2;
         private bool _animePosIncreasing = true;
+        private bool _scanningEPG = false;
 
         private bool _EPGDetailEnabled = true;
         private bool? _EPGDetailVisibleLastValue = null;
@@ -964,80 +965,94 @@ namespace DVBTTelevizor
             {
                 Task.Run(async () =>
                    {
-                       if (!silent)
+                       if (_scanningEPG)
                        {
-                           MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
+                           return;
                        }
 
-                       await Task.Delay(msRunTimeOut);
-
-                       var justPlaying = ((_playingChannel == channel || _recordingChannel == channel));
-
-                       if (!justPlaying)
+                       try
                        {
-                           var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
+                           _scanningEPG = true;
 
-                           if (tuned.Result != SearchProgramResultEnum.OK)
+                           if (!silent)
+                           {
+                               MessagingCenter.Send($"Scanning EPG ....", BaseViewModel.MSG_LongToastMessage);
+                           }
+
+                           await Task.Delay(msRunTimeOut);
+
+                           var justPlaying = ((_playingChannel == channel || _recordingChannel == channel));
+
+                           if (!justPlaying)
+                           {
+                               var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
+
+                               if (tuned.Result != SearchProgramResultEnum.OK)
+                               {
+                                   if (!silent)
+                                   {
+                                       MessagingCenter.Send($"Scanning EPG failed", BaseViewModel.MSG_ToastMessage);
+                                   }
+                                   return;
+                               }
+                           }
+
+                           var res = await EIT.Scan(msScanTimeOut);
+
+                           if (!justPlaying)
+                           {
+                               await _driver.Stop();
+                           }
+
+                           var msg = String.Empty;
+
+                           if (!res.OK)
+                           {
+                               msg += "EPG scan failed";
+                           }
+                           else
+                           {
+                               msg += $"EPG scan completed";
+
+                               await RefreshEPG();
+
+                               if (showIfFound)
+                               {
+                                   var ev = await GetChannelEPG(channel);
+                                   if (ev != null)
+                                   {
+                                       await ShowActualPlayingMessage(new PlayStreamInfo
+                                       {
+                                           Channel = channel,
+                                           CurrentEvent = ev,
+                                           ShortInfoWithoutChannelName = true
+                                       });
+                                   }
+                               }
+                           }
+
+                           if (res.UnsupportedEncoding)
+                           {
+                               if (msg != String.Empty)
+                               {
+                                   msg += " (unsupported encoding!)";
+                               }
+                               else
+                               {
+                                   msg = "Unsupported encoding";
+                               }
+                           }
+
+                           if (!string.IsNullOrEmpty(msg))
                            {
                                if (!silent)
                                {
-                                   MessagingCenter.Send($"Scanning EPG failed", BaseViewModel.MSG_ToastMessage);
-                               }
-                               return;
-                           }
-                       }
-
-                       var res = await EIT.Scan(msScanTimeOut);
-
-                       if (!justPlaying)
-                       {
-                           await _driver.Stop();
-                       }
-
-                       var msg = String.Empty;
-
-                       if (!res.OK)
-                       {
-                           msg += "EPG scan failed";
-                       } else
-                       {
-                           msg += $"EPG scan completed";
-
-                           await RefreshEPG();
-
-                           if (showIfFound)
-                           {
-                               var ev = await GetChannelEPG(channel);
-                               if (ev != null)
-                               {
-                                   await ShowActualPlayingMessage(new PlayStreamInfo
-                                   {
-                                       Channel = channel,
-                                       CurrentEvent = ev,
-                                       ShortInfoWithoutChannelName = true
-                                   });
+                                   MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
                                }
                            }
-                       }
-
-                       if (res.UnsupportedEncoding)
+                       } finally
                        {
-                           if (msg != String.Empty)
-                           {
-                               msg += " (unsupported encoding!)";
-                            }
-                           else
-                           {
-                               msg = "Unsupported encoding";
-                           }
-                       }
-
-                       if (!string.IsNullOrEmpty(msg))
-                       {
-                           if (!silent)
-                           {
-                               MessagingCenter.Send(msg, BaseViewModel.MSG_ToastMessage);
-                           }
+                           _scanningEPG = false;
                        }
                    });
             }

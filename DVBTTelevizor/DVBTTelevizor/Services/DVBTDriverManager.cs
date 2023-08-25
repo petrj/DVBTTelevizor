@@ -35,6 +35,7 @@ namespace DVBTTelevizor
 
         private long _lastTunedFreq = -1;
         private long _lastTunedDeliverySystem = -1;
+        private long _bitrate = 0;
         private List<long> _lastPIDs = new List<long>();
 
         private const int ReadBufferSize = 32768;
@@ -93,6 +94,14 @@ namespace DVBTTelevizor
                 }
 
                 return $"udp://@{_DVBUDPStreamer.IP}:{_DVBUDPStreamer.Port}";
+            }
+        }
+
+        public long Bitrate
+        {
+            get
+            {
+                return 0;
             }
         }
 
@@ -460,6 +469,7 @@ namespace DVBTTelevizor
             _log.Debug("Starting DVBT reader thread");
 
             var totalBytesRead = 0;
+            _bitrate = 0;
 
             try
             {
@@ -582,19 +592,19 @@ namespace DVBTTelevizor
 
                             if (bytesReadFromLastMeasureStartTime > 0)
                             {
-                                var bitsPerSec = bytesReadFromLastMeasureStartTime * 8;
+                                _bitrate = bytesReadFromLastMeasureStartTime * 8;
 
-                                if (bitsPerSec > 1000000)
+                                if (_bitrate > 1000000)
                                 {
-                                    status += $" ({Convert.ToInt32((bitsPerSec / 1000000.0)).ToString("N0")} Mb/sec)";
+                                    status += $" ({Convert.ToInt32((_bitrate / 1000000.0)).ToString("N0")} Mb/sec)";
                                 }
-                                else if (bitsPerSec > 1000)
+                                else if (_bitrate > 1000)
                                 {
-                                    status += $" ({Convert.ToInt32((bitsPerSec / 1000.0)).ToString("N0")} Kb/sec)";
+                                    status += $" ({Convert.ToInt32((_bitrate / 1000.0)).ToString("N0")} Kb/sec)";
                                 }
                                 else
                                 {
-                                    status += $" ({bitsPerSec} b/sec)";
+                                    status += $" ({_bitrate} b/sec)";
                                 }
                             }
 
