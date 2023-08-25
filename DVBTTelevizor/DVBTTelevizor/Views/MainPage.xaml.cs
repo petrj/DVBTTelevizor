@@ -1496,6 +1496,15 @@ namespace DVBTTelevizor
                 {
                     if (_driver.Streaming)
                     {
+                        if (_driver.Bitrate > 0)
+                        {
+                            _editChannelPage.StreamBitRateVisible = true;
+                            _editChannelPage.Bitrate = BaseViewModel.GetHumanReadableBitRate(_driver.Bitrate);
+                        } else
+                        {
+                            _editChannelPage.StreamBitRateVisible = false;
+                        }
+
                         var status = await _driver.GetStatus();
                         if (status.SuccessFlag)
                         {
@@ -1505,10 +1514,14 @@ namespace DVBTTelevizor
                         {
                             _editChannelPage.SignalStrengthVisible = false;
                         }
+                    } else
+                    {
+                        _editChannelPage.StreamBitRateVisible = false;
                     }
                 } catch (Exception ex)
                 {
                     _editChannelPage.SignalStrengthVisible = false;
+                    _editChannelPage.StreamBitRateVisible = false;
                     _loggingService.Error(ex);
                 }
 

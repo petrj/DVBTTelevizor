@@ -143,6 +143,22 @@ namespace DVBTTelevizor
             });
         }
 
+        public static string GetHumanReadableBitRate(long bitrate)
+        {
+            if (bitrate > 1000000)
+            {
+                return  $" {(bitrate / 1000000.0).ToString("N1")} Mb/sec";
+            }
+            else if (bitrate > 1000)
+            {
+                return $" {(bitrate / 1000.0).ToString("N1")} Kb/sec";
+            }
+            else
+            {
+                return $" {bitrate} b/sec";
+            }
+        }
+
         public string DriverConnectedIcon
         {
             get

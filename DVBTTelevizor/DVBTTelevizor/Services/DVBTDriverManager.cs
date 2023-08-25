@@ -101,7 +101,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return 0;
+                return _bitrate;
             }
         }
 
@@ -594,18 +594,7 @@ namespace DVBTTelevizor
                             {
                                 _bitrate = bytesReadFromLastMeasureStartTime * 8;
 
-                                if (_bitrate > 1000000)
-                                {
-                                    status += $" ({Convert.ToInt32((_bitrate / 1000000.0)).ToString("N0")} Mb/sec)";
-                                }
-                                else if (_bitrate > 1000)
-                                {
-                                    status += $" ({Convert.ToInt32((_bitrate / 1000.0)).ToString("N0")} Kb/sec)";
-                                }
-                                else
-                                {
-                                    status += $" ({_bitrate} b/sec)";
-                                }
+                                status += $"({BaseViewModel.GetHumanReadableBitRate(_bitrate)})";
                             }
 
                             _log.Debug($"{status}");
