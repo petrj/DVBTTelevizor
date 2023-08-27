@@ -101,9 +101,14 @@ namespace DVBTTelevizor
 
             _channelService = new ConfigChannelService(_loggingService, _config);
 
+            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
+
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
-            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, _channelService);
+            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, OnAnyChannelChanged)
+            {
+                Channels = _viewModel.Channels
+            };
 
             Core.Initialize();
 
@@ -111,7 +116,7 @@ namespace DVBTTelevizor
             _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
             videoView.MediaPlayer = _mediaPlayer;
 
-            BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
+
 
             if (_config.AutoInitAfterStart)
             {
@@ -132,7 +137,6 @@ namespace DVBTTelevizor
 
             _tuneOptionsPage.Disappearing += AnyPage_Disappearing;
             _settingsPage.Disappearing += AnyPage_Disappearing;
-            _editChannelPage.Disappearing += EditChannelPage_Disappearing;
 
             ChannelsListView.ItemSelected += ChannelsListView_ItemSelected;
 
@@ -482,18 +486,10 @@ namespace DVBTTelevizor
             });
         }
 
-        private void EditChannelPage_Disappearing(object sender, EventArgs e)
+        private async void OnAnyChannelChanged()
         {
-            Task.Run(async () =>
-            {
-                await _channelService.SaveChannels(_viewModel.Channels);
-
-                Device.BeginInvokeOnMainThread(
-                    delegate
-                    {
-                        _viewModel.RefreshCommand.Execute(null);
-                    });
-            });
+            await _channelService.SaveChannels(_viewModel.Channels);
+            _viewModel.RefreshCommand.Execute(null);
         }
 
         private void AnyPage_Disappearing(object sender, EventArgs e)

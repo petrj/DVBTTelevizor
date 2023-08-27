@@ -3,6 +3,7 @@ using Java.Lang;
 using LoggerService;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,19 +17,21 @@ namespace DVBTTelevizor
     public partial class ChannelPage : ContentPage, IOnKeyDown
     {
         private ChannelPageViewModel _viewModel;
-        private ChannelService _channelService;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         private KeyboardFocusableItemList _focusItems;
         private string _previousValue;
+        private Action _onChannelChanged = null;
 
-        public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
+
+        public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, Action onChannelChanged)
         {
             InitializeComponent();
 
             _loggingService = loggingService;
             _dialogService = dialogService;
-            _channelService = channelService;
+            _onChannelChanged = onChannelChanged;
 
             BindingContext = _viewModel = new ChannelPageViewModel(_loggingService, _dialogService, driver, config);
 
@@ -36,51 +39,105 @@ namespace DVBTTelevizor
 
             Appearing += ChannelPage_Appearing;
 
-            EntryName.Focused += delegate {
-                EntryName.CursorPosition = EntryName.Text.Length;
+            EntryName.Focused += delegate
+            {
+                EntryName.CursorPosition = EntryNumber.Text == null ? 0 : EntryName.Text.Length;
                 _previousValue = _viewModel.Channel.Name;
             };
             EntryNumber.Focused += delegate
             {
-                EntryNumber.CursorPosition = EntryNumber.Text.Length;
+                EntryNumber.CursorPosition = EntryNumber.Text == null ? 0 : EntryNumber.Text.Length;
                 _previousValue = _viewModel.Channel.Number;
             };
 
             EntryNumber.Unfocused += EntryNumber_Unfocused;
+            EntryName.Unfocused += EntryName_Unfocused;
         }
 
-        private void EntryNumber_Unfocused(object sender, FocusEventArgs e)
+
+        protected override bool OnBackButtonPressed()
         {
-            int num;
-            if (!int.TryParse(EntryNumber.Text, out num) || (num < 1) || (num>32000))
+            return base.OnBackButtonPressed();
+        }
+
+        private void EntryName_Unfocused(object sender, FocusEventArgs e)
+        {
+            if (_viewModel.Channel.Name == _previousValue)
             {
-                _dialogService.Error($"Invalid number");
-                _viewModel.Channel.Number = _previousValue;
-                _viewModel.NotifyChannelChange();
+                return;
             }
 
             Task.Run(async () =>
             {
-                foreach (var ch in await _channelService.LoadChannels())
+                if (string.IsNullOrEmpty(EntryName.Text))
                 {
-                    if (ch.FrequencyAndMapPID == _viewModel.Channel.FrequencyAndMapPID)
-                    {
-                        continue;
-                    }
+                    _viewModel.Channel.Name = _previousValue;
 
-                    if (ch.Number == num.ToString())
+                    Device.BeginInvokeOnMainThread( async () =>
                     {
-                        Device.BeginInvokeOnMainThread(
-                            delegate
-                            {
-                                _dialogService.Error($"Number {num} already used");
-                                _viewModel.Channel.Number = _previousValue;
-                                _viewModel.NotifyChannelChange();
-                            });
+                        await _dialogService.Error($"Invalid name");
+                        _viewModel.NotifyChannelChange();
+                    });
+                }
 
-                        break;
+                if (_viewModel.Channel.Name != _previousValue)
+                {
+                    // saving
+                    _onChannelChanged();
+                }
+
+                _previousValue = null;
+            });
+        }
+
+        private void EntryNumber_Unfocused(object sender, FocusEventArgs e)
+        {
+            if (_viewModel.Channel.Number == _previousValue)
+            {
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                int num;
+                if (!int.TryParse(EntryNumber.Text, out num) || (num < 1) || (num > 32000))
+                {
+                    await _dialogService.Error($"Invalid number");
+                    _viewModel.Channel.Number = _previousValue;
+                    _viewModel.NotifyChannelChange();
+                }
+                else
+                {
+                    foreach (var ch in Channels)
+                    {
+                        if (ch.FrequencyAndMapPID == _viewModel.Channel.FrequencyAndMapPID)
+                        {
+                            continue;
+                        }
+
+                        if (ch.Number == num.ToString())
+                        {
+                            _viewModel.Channel.Number = _previousValue;
+
+                            Device.BeginInvokeOnMainThread(
+                                delegate
+                                {
+                                    _dialogService.Error($"Number {num} already used");
+                                    _viewModel.NotifyChannelChange();
+                                });
+
+                            break;
+                        }
                     }
                 }
+
+                if (_viewModel.Channel.Number != _previousValue)
+                {
+                    // saving
+                    _onChannelChanged();
+                }
+
+                _previousValue = null;
             });
         }
 
