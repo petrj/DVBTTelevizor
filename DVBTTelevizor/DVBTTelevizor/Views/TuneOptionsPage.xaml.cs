@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using static DVBTTelevizor.MainPageViewModel;
 
 namespace DVBTTelevizor
 {
@@ -230,7 +231,17 @@ namespace DVBTTelevizor
                 _firstAppearing = false;
             }
 
+            UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "AutoManualTuning");
+
+            ToolBarSelected = false;
+
             _viewModel.NotifyFontSizeChange();
+        }
+
+        private async void ToolFindSignal_Clicked(object sender, EventArgs e)
+        {
+            var findSignalPage = new FindSignalPage(_loggingService, _dialogService, _driver, _config, _channelService);
+            await Navigation.PushAsync(findSignalPage);
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)
@@ -342,8 +353,11 @@ namespace DVBTTelevizor
                     break;
 
                 case KeyboardNavigationActionEnum.Right:
+                    SelectNextToolBarItem();
+                    break;
+
                 case KeyboardNavigationActionEnum.Left:
-                    ToolBarSelected = !ToolBarSelected;
+                    SelectPrevToolBarItem();
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
@@ -353,7 +367,14 @@ namespace DVBTTelevizor
                 case KeyboardNavigationActionEnum.OK:
                     if (ToolBarSelected)
                     {
-                        ToolConnect_Clicked(this, null);
+                        if (_viewModel.SelectedToolbarItemName == "ToolbarItemFindSignal")
+                        {
+                            ToolFindSignal_Clicked(this, null);
+                        }
+                        if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
+                        {
+                            ToolConnect_Clicked(this, null);
+                        }
                     }
                     else
                     {
@@ -405,6 +426,54 @@ namespace DVBTTelevizor
         public void OnTextSent(string text)
         {
 
+        }
+
+        private void SelectPrevToolBarItem()
+        {
+            _loggingService.Info($"SelectPrevToolBarItem");
+
+            if (!ToolBarSelected || _viewModel.SelectedToolbarItemName == null)
+            {
+                ToolBarSelected = true;
+                _viewModel.SelectedToolbarItemName = "ToolbarItemFindSignal";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemFindSignal")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
+            {
+                ToolBarSelected = false;
+                _viewModel.SelectedToolbarItemName = null;
+            }
+
+            _viewModel.NotifyToolBarChange();
+        }
+
+        private void SelectNextToolBarItem()
+        {
+            _loggingService.Info($"SelecNextToolBarItem");
+
+            if (!ToolBarSelected || _viewModel.SelectedToolbarItemName == null)
+            {
+                ToolBarSelected = true;
+                _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
+            {
+                _viewModel.SelectedToolbarItemName = "ToolbarItemFindSignal";
+            }
+            else
+            if (_viewModel.SelectedToolbarItemName == "ToolbarItemFindSignal")
+            {
+                ToolBarSelected = false;
+                _viewModel.SelectedToolbarItemName = null;
+            }
+
+            _viewModel.NotifyToolBarChange();
         }
     }
 }

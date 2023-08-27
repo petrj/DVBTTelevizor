@@ -140,6 +140,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(ToolbarItemTuneIcon));
                 OnPropertyChanged(nameof(ToolbarItemMenuIcon));
                 OnPropertyChanged(nameof(ToolbarItemSettingsIcon));
+                OnPropertyChanged(nameof(ToolbarItemFindSignalIcon));
             });
         }
 
@@ -218,6 +219,17 @@ namespace DVBTTelevizor
                     return "TuneSelected.png";
 
                 return "Tune.png";
+            }
+        }
+
+        public string ToolbarItemFindSignalIcon
+        {
+            get
+            {
+                if (SelectedToolbarItemName == "ToolbarItemFindSignal")
+                    return "FindSignalSelected.png";
+
+                return "FindSignal.png";
             }
         }
 
