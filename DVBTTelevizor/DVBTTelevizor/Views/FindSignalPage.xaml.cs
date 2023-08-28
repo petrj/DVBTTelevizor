@@ -108,12 +108,26 @@ namespace DVBTTelevizor
             {
                 try
                 {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        MainActivityIndicator.IsVisible = true;
+                    });
+
                     _tuning = true;
 
                     // this fix the "MUX switching no driver data error"
                     await _driver.Tune(0, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex);
 
-                    await _driver.TuneEnhanced(_viewModel.FrequencyKHz * 1000, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex, new List<long>() { 0, 17 }, false);
+                    var status = await _driver.TuneEnhanced(_viewModel.FrequencyKHz * 1000, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex, new List<long>() { 0, 17 }, false);
+                    switch (status.Result)
+                    {
+                        case SearchProgramResultEnum.NoSignal:
+                            MessagingCenter.Send($"No signal", BaseViewModel.MSG_ToastMessage);
+                            break;
+                        case SearchProgramResultEnum.Error:
+                            MessagingCenter.Send($"Tune error", BaseViewModel.MSG_ToastMessage);
+                            break;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -121,6 +135,11 @@ namespace DVBTTelevizor
                 } finally
                 {
                     _tuning = false;
+
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        MainActivityIndicator.IsVisible = false;
+                    });
                 }
             }
         }
@@ -133,10 +152,8 @@ namespace DVBTTelevizor
             {
                 try
                 {
-                    if (_driver.Connected)
+                    if (_driver.Connected && !_tuning)
                     {
-                        if (!_tuning)
-                        {
                             Task.Run(async () =>
                             {
                                 _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
@@ -150,10 +167,6 @@ namespace DVBTTelevizor
                                     _viewModel.SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
                                 }
                             }).Wait();
-                        } else
-                        {
-                            _viewModel.SignalStrengthProgress = 0;
-                        }
                     } else
                     {
                         _viewModel.SignalStrengthProgress = 0;
@@ -164,10 +177,7 @@ namespace DVBTTelevizor
                     _loggingService.Error(ex);
                 } finally
                 {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        MainActivityIndicator.IsVisible = _driver.Connected;
-                    });
+
                 }
 
                 Thread.Sleep(1000);
@@ -271,12 +281,20 @@ namespace DVBTTelevizor
                 _signalStrengthBackgroundWorker.RunWorkerAsync();
             });
 
+            _viewModel.SignalStrengthProgress = 0;
             _viewModel.NotifyFontSizeChange();
         }
 
         private void Page_Disappearing(object sender, EventArgs e)
         {
             _signalStrengthBackgroundWorker.CancelAsync();
+            Task.Run(async () =>
+            {
+                if (_driver.Connected)
+                {
+                    await _driver.SetPIDs(new List<long>() { });
+                }
+            });
         }
 
         private async void ToolConnect_Clicked(object sender, EventArgs e)

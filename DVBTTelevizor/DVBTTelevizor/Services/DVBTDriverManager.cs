@@ -1186,7 +1186,7 @@ namespace DVBTTelevizor
                 DVBTResponse tuneRes = null;
                 DVBTResponse setPIDres = null;
 
-                var attemptsCount = fastTuning ? 1 : 5;
+                var attemptsCount = fastTuning ? 1 : 6;
 
                 // five attempts
                 for (var i = 1; i <= attemptsCount; i++)
@@ -1199,8 +1199,13 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        if (!fastTuning)
+                        if (fastTuning)
+                        {
+                            await Task.Delay(50);
+                        } else
+                        {
                             await Task.Delay(500);
+                        }
                     }
                 }
 
@@ -1237,8 +1242,8 @@ namespace DVBTTelevizor
                 // timeout for get signal:
                 var startTime = DateTime.Now;
 
-                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
-                var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
+                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 14;
+                var timeoutforSignalLockSeconds = fastTuning ? 2 : 6;
 
                 DVBTStatus status = new DVBTStatus();
 

@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="DVBTTelevizor.FindSignalPage"
-             Title="Find signal">
+             Title="Signal meter">
 
     <ContentPage.Resources>
         <ResourceDictionary>
