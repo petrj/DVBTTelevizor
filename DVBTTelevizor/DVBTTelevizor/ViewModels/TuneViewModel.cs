@@ -928,24 +928,20 @@ namespace DVBTTelevizor
 
                 var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, new List<long>() { 0, 17, 18 }, FastTuning);
 
+                if (tuneResult.Result != SearchProgramResultEnum.Error)
+                {
+                    SignalStrengthProgress = tuneResult.SignalPercentStrength / 100.0;
+                }
+
                 switch (tuneResult.Result)
                 {
                     case SearchProgramResultEnum.Error:
                         _loggingService.Debug("Search error");
-
-                        SignalStrengthProgress = 0;
                         return;
 
                     case SearchProgramResultEnum.NoSignal:
                         _loggingService.Debug("No signal");
-
-                        SignalStrengthProgress = 0;
                         return;
-
-                    case SearchProgramResultEnum.OK:
-
-                        SignalStrengthProgress = tuneResult.SignalPercentStrength / 100.0;
-                        break;
                 }
 
                 var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(false);

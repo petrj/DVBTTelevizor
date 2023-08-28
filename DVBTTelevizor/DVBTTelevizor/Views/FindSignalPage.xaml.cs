@@ -110,6 +110,8 @@ namespace DVBTTelevizor
                 {
                     _tuning = true;
 
+                    // this fix the "MUX switching no driver data error"
+                    await _driver.Tune(0, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex);
 
                     var res = await _driver.SetPIDs(new List<long>() { 0, 17 });
                     if (res.SuccessFlag)

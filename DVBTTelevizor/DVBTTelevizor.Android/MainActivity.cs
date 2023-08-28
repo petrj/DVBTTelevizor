@@ -35,6 +35,7 @@ namespace DVBTTelevizor.Droid
 
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
+        private bool _driverInitializing = false;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -311,6 +312,11 @@ namespace DVBTTelevizor.Droid
 
         private void InitDriver()
         {
+            if (_driverInitializing)
+            {
+                return;
+            }
+
             try
             {
                 if (_driverManager.Connected)
@@ -318,7 +324,10 @@ namespace DVBTTelevizor.Droid
                     return;
                 }
 
+                _driverInitializing = true;
+
                 _loggingService.Info("Initializing device");
+
 
 #if TestingDVBTDriver
 
@@ -386,7 +395,11 @@ namespace DVBTTelevizor.Droid
                 _loggingService.Error(ex, "Driver initializing failed");
 
                 MessagingCenter.Send("connection failed", BaseViewModel.MSG_DVBTDriverConfigurationFailed);
+            } finally
+            {
+                _driverInitializing = false;
             }
+
         }
 
         private async void CheckIfUsbAttachedOrDetached(object sender, EventArgs e)

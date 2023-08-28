@@ -101,7 +101,6 @@
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="25*" />
@@ -112,12 +111,9 @@
                         <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                         <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
                         <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                        <ActivityIndicator x:Name="MainActivityIndicator" Grid.Row="1" Grid.Column="2"  IsVisible="true" IsRunning="true" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0"/>
-
                     </Grid>
 
-                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True"  VerticalOptions="Start" RowSpacing="0" Margin="10,10,10,0">
+                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True"  VerticalOptions="Start" RowSpacing="0" Margin="10,20,10,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -182,6 +178,8 @@
                         <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
                         <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Clicked="EditFrequencyButton_Clicked"/>
                     </Grid>
+
+                    <ActivityIndicator x:Name="MainActivityIndicator" IsVisible="true" IsRunning="true" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0"/>
 
                 </StackLayout>
 
