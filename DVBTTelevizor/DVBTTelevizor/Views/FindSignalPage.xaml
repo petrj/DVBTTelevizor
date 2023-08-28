@@ -103,9 +103,9 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="20*" />
                             <ColumnDefinition Width="65*" />
-                            <ColumnDefinition Width="10*" />
+                            <ColumnDefinition Width="15*" />
                         </Grid.ColumnDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Text="Signal strength" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>

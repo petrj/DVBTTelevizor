@@ -113,11 +113,7 @@ namespace DVBTTelevizor
                     // this fix the "MUX switching no driver data error"
                     await _driver.Tune(0, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex);
 
-                    var res = await _driver.SetPIDs(new List<long>() { 0, 17 });
-                    if (res.SuccessFlag)
-                    {
-                        await _driver.Tune(_viewModel.FrequencyKHz * 1000, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex);
-                    }
+                    await _driver.TuneEnhanced(_viewModel.FrequencyKHz * 1000, _viewModel.TuneBandWidthKHz * 1000, DVBTPicker.SelectedIndex, new List<long>() { 0, 17 }, false);
                 }
                 catch (Exception ex)
                 {
@@ -143,7 +139,12 @@ namespace DVBTTelevizor
                         {
                             Task.Run(async () =>
                             {
+                                _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
+
                                 var status = await _driver.GetStatus();
+
+                                _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
+
                                 if (status.SuccessFlag)
                                 {
                                     _viewModel.SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
