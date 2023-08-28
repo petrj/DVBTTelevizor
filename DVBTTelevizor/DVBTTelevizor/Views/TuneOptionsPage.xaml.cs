@@ -219,8 +219,6 @@ namespace DVBTTelevizor
         {
             if (_firstAppearing)
             {
-                _focusItemsAuto.DeFocusAll();
-                _focusItemsManual.DeFocusAll();
                 UpdateFocusedPart("AutoTuning", "TuneButton");
 
                 Task.Run(async () =>
@@ -231,7 +229,9 @@ namespace DVBTTelevizor
                 _firstAppearing = false;
             }
 
-            UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "AutoManualTuning");
+            UpdateFocusedPart(_viewModel.ManualTuning ? "ManualTuning" : "AutoTuning", "TuneButton");
+            _focusItemsAuto.DeFocusAll();
+            _focusItemsManual.DeFocusAll();
 
             ToolBarSelected = false;
 
@@ -241,6 +241,40 @@ namespace DVBTTelevizor
         private async void ToolFindSignal_Clicked(object sender, EventArgs e)
         {
             var findSignalPage = new FindSignalPage(_loggingService, _dialogService, _driver, _config, _channelService);
+
+            if (_viewModel.ManualTuning)
+            {
+                findSignalPage.SelectedFrequency = _viewModel.FrequencyKHz;
+            }
+            else
+            {
+                findSignalPage.SelectedFrequency = _viewModel.FrequencyFromKHz;
+            }
+
+            if (_viewModel.DVBT2Tuning)
+            {
+                findSignalPage.SelectedDeliverySystem = 1;
+            }
+
+            findSignalPage.Disappearing += delegate
+            {
+                if (_viewModel.ManualTuning)
+                {
+                    _viewModel.FrequencyKHz = findSignalPage.SelectedFrequency;
+                } else
+                {
+                    _viewModel.FrequencyFromKHz = findSignalPage.SelectedFrequency;
+                }
+                if (findSignalPage.SelectedDeliverySystem == 0)
+                {
+                    _viewModel.DVBTTuning = true;
+                }
+                if (findSignalPage.SelectedDeliverySystem == 1)
+                {
+                    _viewModel.DVBT2Tuning = true;
+                }
+            };
+
             await Navigation.PushAsync(findSignalPage);
         }
 

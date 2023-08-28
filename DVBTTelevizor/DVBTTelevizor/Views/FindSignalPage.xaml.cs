@@ -29,6 +29,9 @@ namespace DVBTTelevizor
         private bool _appeared = false;
         private bool _tuning = false;
 
+        private long _selectedFrequency = 0;
+        private int _selectedDeliverySystem = 0;
+
         public FindSignalPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
@@ -44,6 +47,7 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
                 _viewModel.UpdateDriverState();
+                Task.Run(async () => await ReTune());
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
@@ -72,6 +76,30 @@ namespace DVBTTelevizor
             Task.Run(async () => await ReTune());
         }
 
+        public long SelectedFrequency
+        {
+            get
+            {
+                return _selectedFrequency;
+            }
+            set
+            {
+                _selectedFrequency = value;
+            }
+        }
+
+        public int SelectedDeliverySystem
+        {
+            get
+            {
+                return _selectedDeliverySystem;
+            }
+            set
+            {
+                _selectedDeliverySystem = value;
+            }
+        }
+
         private async Task ReTune()
         {
             _loggingService.Info($"Retune {_viewModel.FrequencyKHz} KHz");
@@ -81,6 +109,7 @@ namespace DVBTTelevizor
                 try
                 {
                     _tuning = true;
+
 
                     var res = await _driver.SetPIDs(new List<long>() { 0, 17 });
                     if (res.SuccessFlag)
@@ -95,7 +124,6 @@ namespace DVBTTelevizor
                 {
                     _tuning = false;
                 }
-
             }
         }
 
@@ -127,9 +155,16 @@ namespace DVBTTelevizor
                     {
                         _viewModel.SignalStrengthProgress = 0;
                     }
+
                 } catch (Exception ex)
                 {
                     _loggingService.Error(ex);
+                } finally
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        MainActivityIndicator.IsVisible = _driver.Connected;
+                    });
                 }
 
                 Thread.Sleep(1000);
@@ -168,7 +203,8 @@ namespace DVBTTelevizor
             {
                 if (_viewModel.FrequencyKHz != freqPage.FrequencyKHz)
                 {
-                    _viewModel.FrequencyKHz = freqPage.FrequencyKHz;
+                    _viewModel.FrequencyKHz = SelectedFrequency = freqPage.FrequencyKHz;
+
                     Task.Run(async () => await ReTune());
                 }
             };
@@ -218,6 +254,12 @@ namespace DVBTTelevizor
                     _focusItems.DeFocusAll();
 
                     await _viewModel.SetFrequencies();
+                    if (SelectedFrequency != 0)
+                    {
+                        _viewModel.FrequencyKHz = SelectedFrequency;
+                    }
+                    DVBTPicker.SelectedIndex = SelectedDeliverySystem;
+
                     await ReTune();
 
                     _appeared = true;

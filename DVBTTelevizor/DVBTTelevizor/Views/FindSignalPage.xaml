@@ -101,6 +101,7 @@
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
+                            <RowDefinition Height="25" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="25*" />
@@ -112,8 +113,39 @@
                         <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
                         <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
+                        <ActivityIndicator x:Name="MainActivityIndicator" Grid.Row="1" Grid.Column="2"  IsVisible="true" IsRunning="true" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,10,0,0"/>
+
                     </Grid>
 
+                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True"  VerticalOptions="Start" RowSpacing="0" Margin="10,10,10,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*" />
+                            <ColumnDefinition Width="33*" />
+                            <ColumnDefinition Width="33*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                        <Label Grid.Row="0" Grid.Column="0" Text="System" Style="{DynamicResource CaptionStyle}"  FontSize="{Binding FontSizeForLabel}"/>
+
+                        <Picker
+                                    Grid.Row="0" Grid.Column="2"
+                                    x:Name="DVBTPicker"
+                                    Margin="20,0,0,0"
+                                    FontSize="{Binding FontSizeForPicker}"
+                                    Style="{StaticResource PickerStyle}"
+                                    SelectedIndex="{Binding TuneModeIndex, Mode=TwoWay}">
+                            <Picker.Items>
+                                <x:String>DVBT</x:String>
+                                <x:String>DVBT2</x:String>
+                            </Picker.Items>
+                        </Picker>
+
+                    </Grid>
 
                     <Label Margin="10,10,10,0" Text="BandWidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start"/>
 
@@ -149,34 +181,6 @@
                         <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
                         <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
                         <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Clicked="EditFrequencyButton_Clicked"/>
-                    </Grid>
-
-                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True" HorizontalOptions="Center" VerticalOptions="Start" RowSpacing="0" Margin="10,20,10,0">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="33*" />
-                            <ColumnDefinition Width="33*" />
-                            <ColumnDefinition Width="33*" />
-                        </Grid.ColumnDefinitions>
-
-                            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
-
-                            <Picker
-                                    Grid.Row="0" Grid.Column="1"
-                                    x:Name="DVBTPicker"
-                                    Margin="20,0,0,0"
-                                    FontSize="{Binding FontSizeForPicker}"
-                                    Style="{StaticResource PickerStyle}"
-                                    SelectedIndex="{Binding TuneModeIndex, Mode=TwoWay}">
-                                <Picker.Items>
-                                <x:String>     DVBT     </x:String>
-                                <x:String>DVBT2</x:String>
-                                </Picker.Items>
-                            </Picker>
-
                     </Grid>
 
                 </StackLayout>
