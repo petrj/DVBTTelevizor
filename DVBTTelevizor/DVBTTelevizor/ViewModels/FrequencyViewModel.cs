@@ -43,7 +43,7 @@ namespace DVBTTelevizor
                 return;
 
             var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - MinFrequencyKHz) / Convert.ToDecimal(FrequencyKHzSliderStep));
-            var freqRounded = Convert.ToInt64(MinFrequencyKHz + stepFreq * FrequencyKHzSliderStep) - FrequencyKHzSliderStep/2;
+            var freqRounded = Convert.ToInt64(MinFrequencyKHz + stepFreq * FrequencyKHzSliderStep);
             if (freqRounded > MaxFrequencyKHz)
             {
                 freqRounded = MaxFrequencyKHz;

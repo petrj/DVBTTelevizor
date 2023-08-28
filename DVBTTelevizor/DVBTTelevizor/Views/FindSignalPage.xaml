@@ -151,7 +151,7 @@
                         <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="EditFrequencyButton" Text="Edit" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource ButtonStyle}" Clicked="EditFrequencyButton_Clicked"/>
                     </Grid>
 
-                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True" HorizontalOptions="Center" VerticalOptions="Start" RowSpacing="0" Margin="10,10,10,0">
+                    <Grid x:Name="DeliverySystemOptionsGrid" IsVisible="True" HorizontalOptions="Center" VerticalOptions="Start" RowSpacing="0" Margin="10,20,10,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />

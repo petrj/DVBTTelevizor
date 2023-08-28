@@ -27,6 +27,7 @@ namespace DVBTTelevizor
         private string _previousFocusedItem = null;
         private BackgroundWorker _signalStrengthBackgroundWorker = null;
         private bool _appeared = false;
+        private bool _tuning = false;
 
         public FindSignalPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
@@ -57,7 +58,7 @@ namespace DVBTTelevizor
 
             _signalStrengthBackgroundWorker = new BackgroundWorker();
             _signalStrengthBackgroundWorker.WorkerSupportsCancellation = true;
-            _signalStrengthBackgroundWorker.DoWork += _signalStrengthBackgroundWorker_DoWork;
+            _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
 
 
             Appearing += Page_Appearing;
@@ -79,6 +80,8 @@ namespace DVBTTelevizor
             {
                 try
                 {
+                    _tuning = true;
+
                     var res = await _driver.SetPIDs(new List<long>() { 0, 17 });
                     if (res.SuccessFlag)
                     {
@@ -88,26 +91,38 @@ namespace DVBTTelevizor
                 catch (Exception ex)
                 {
                     _loggingService.Error(ex);
+                } finally
+                {
+                    _tuning = false;
                 }
+
             }
         }
 
-        private void _signalStrengthBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void SignalStrengthBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            _loggingService.Info("Starting SignalStrengthBackgroundWorker_DoWork");
+
             while (!_signalStrengthBackgroundWorker.CancellationPending)
             {
                 try
                 {
                     if (_driver.Connected)
                     {
-                        Task.Run(async () =>
+                        if (!_tuning)
                         {
-                            var status = await _driver.GetStatus();
-                            if (status.SuccessFlag)
+                            Task.Run(async () =>
                             {
-                                _viewModel.SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
-                            }
-                        }).Wait();
+                                var status = await _driver.GetStatus();
+                                if (status.SuccessFlag)
+                                {
+                                    _viewModel.SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
+                                }
+                            }).Wait();
+                        } else
+                        {
+                            _viewModel.SignalStrengthProgress = 0;
+                        }
                     } else
                     {
                         _viewModel.SignalStrengthProgress = 0;
@@ -117,8 +132,10 @@ namespace DVBTTelevizor
                     _loggingService.Error(ex);
                 }
 
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
             }
+
+            _loggingService.Info("SignalStrengthBackgroundWorker_DoWork finished");
         }
 
         private void BuildFocusableItems()

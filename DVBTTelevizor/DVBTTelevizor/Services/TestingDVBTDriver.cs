@@ -350,7 +350,7 @@ namespace DVBTTelevizor.Services
             lock(key)
             {
 
-                if (res.Length > 0)
+                if (res.Length > 0 && _deliverySystem == 1)
                 {
                     if (!_freqStreams.ContainsKey(_frequency))
                     {
