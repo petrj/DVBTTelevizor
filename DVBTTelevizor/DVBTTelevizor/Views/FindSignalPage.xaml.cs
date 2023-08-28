@@ -47,7 +47,16 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
                 _viewModel.UpdateDriverState();
-                Task.Run(async () => await ReTune());
+                if (_driver.Connected)
+                {
+                    Task.Run(async () => await ReTune());
+                } else
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        MainActivityIndicator.IsVisible = true;
+                    });
+                }
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
@@ -191,9 +200,9 @@ namespace DVBTTelevizor
             _focusItems = new KeyboardFocusableItemList();
 
             _focusItems
+                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTPicker }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("EditBandWidth", new List<View>() { EditBandWidthButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequency", new List<View>() { EditFrequencyButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTPicker }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("EditFrequency", new List<View>() { EditFrequencyButton }));
 
             _focusItems.OnItemFocusedEvent += TuneOptionsPage_OnItemFocusedEvent;
         }
@@ -238,16 +247,6 @@ namespace DVBTTelevizor
                     Task.Run(async () => await ReTune());
                 }
             };
-        }
-
-
-        private void TuneButtton_Clicked(object sender, EventArgs e)
-        {
-            if (!_driver.Connected)
-            {
-                _dialogService.Error($"Device not connected");
-                return;
-            }
         }
 
         private void TuneOptionsPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
@@ -395,10 +394,6 @@ namespace DVBTTelevizor
 
                             case "EditFrequency":
                                 EditFrequencyButton_Clicked(this, null);
-                                break;
-
-                            case "TuneButton":
-                                TuneButtton_Clicked(this, null);
                                 break;
 
                             case "DVBT":
