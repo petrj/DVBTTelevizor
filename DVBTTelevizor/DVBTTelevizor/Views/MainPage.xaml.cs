@@ -1441,8 +1441,9 @@ namespace DVBTTelevizor
             {
                 try
                 {
-                    // pass all channels!
-                    _editChannelPage.Channels = await _channelService.LoadChannels();
+                    // pass channels!
+                    var allChannels = await _channelService.LoadChannels();
+                    _editChannelPage.SetChannels(_viewModel.Channels, allChannels);
 
                     _editChannelPage.StreamInfoVisible = false;
                     _editChannelPage.StreamVideoSize = "";

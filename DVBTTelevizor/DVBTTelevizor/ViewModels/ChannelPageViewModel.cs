@@ -1,13 +1,20 @@
 ﻿using LoggerService;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace DVBTTelevizor
 {
     public class ChannelPageViewModel : BaseViewModel
     {
         private DVBTChannel _channel;
+
+        public Command UpCommand { get; set; }
+        public Command DownCommand { get; set; }
 
         private bool _signalStrengthVisible = false;
         private bool _streamBitRateVisible = false;
@@ -18,6 +25,11 @@ namespace DVBTTelevizor
         private string _bitrate = String.Empty;
         private string _streamAudioTracks = String.Empty;
         private string _streamSubTitles = String.Empty;
+
+        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
+        public ObservableCollection<DVBTChannel> AllChannels { get; set; } = new ObservableCollection<DVBTChannel>();
+
+        public Action OnChannelChanged { get; set; }
 
         public DVBTChannel Channel
         {
@@ -147,6 +159,37 @@ namespace DVBTTelevizor
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
+
+            UpCommand = new Command(async (itm) => await Up());
+            DownCommand = new Command(async (itm) => await Down());
+        }
+
+        private async Task Up()
+        {
+            var index = Channels.IndexOf(Channel);
+
+            if (index == -1 || index == 0)
+                return;
+
+            var channelPrev = Channels[index-1];
+
+            // swap numbers
+            var tempNum = channelPrev.Number;
+            channelPrev.Number = Channel.Number;
+            Channel.Number = tempNum;
+
+            // swap channels
+            var tmpCh = Channels[index - 1];
+            Channels[index - 1] = Channels[index];
+            Channels[index] = tmpCh;
+
+            OnChannelChanged();
+            NotifyChannelChange();
+        }
+
+        private async Task Down()
+        {
+
         }
     }
 }

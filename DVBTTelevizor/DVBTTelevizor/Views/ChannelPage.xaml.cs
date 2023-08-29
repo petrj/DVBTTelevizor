@@ -21,9 +21,6 @@ namespace DVBTTelevizor
         protected IDialogService _dialogService;
         private KeyboardFocusableItemList _focusItems;
         private string _previousValue;
-        private Action _onChannelChanged = null;
-
-        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
 
         public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, Action onChannelChanged)
         {
@@ -31,9 +28,10 @@ namespace DVBTTelevizor
 
             _loggingService = loggingService;
             _dialogService = dialogService;
-            _onChannelChanged = onChannelChanged;
 
             BindingContext = _viewModel = new ChannelPageViewModel(_loggingService, _dialogService, driver, config);
+
+            _viewModel.OnChannelChanged = onChannelChanged;
 
             BuildFocusableItems();
 
@@ -52,8 +50,26 @@ namespace DVBTTelevizor
 
             EntryNumber.Unfocused += EntryNumber_Unfocused;
             EntryName.Unfocused += EntryName_Unfocused;
+
+            ButtonUp.Clicked += ButtonUp_Clicked;
+            ButtonDown.Clicked += ButtonDown_Clicked;
         }
 
+        public void SetChannels(ObservableCollection<DVBTChannel> Channels, ObservableCollection<DVBTChannel> AllChannels)
+        {
+            _viewModel.Channels = Channels;
+            _viewModel.AllChannels = AllChannels;
+        }
+
+        private void ButtonDown_Clicked(object sender, EventArgs e)
+        {
+            _viewModel.DownCommand.Execute(null);
+        }
+
+        private void ButtonUp_Clicked(object sender, EventArgs e)
+        {
+            _viewModel.UpCommand.Execute(null);
+        }
 
         protected override bool OnBackButtonPressed()
         {
@@ -83,7 +99,7 @@ namespace DVBTTelevizor
                 if (_viewModel.Channel.Name != _previousValue)
                 {
                     // saving
-                    _onChannelChanged();
+                    _viewModel.OnChannelChanged();
                 }
 
                 _previousValue = null;
@@ -108,7 +124,7 @@ namespace DVBTTelevizor
                 }
                 else
                 {
-                    foreach (var ch in Channels)
+                    foreach (var ch in _viewModel.AllChannels)
                     {
                         if (ch.FrequencyAndMapPID == _viewModel.Channel.FrequencyAndMapPID)
                         {
@@ -134,7 +150,7 @@ namespace DVBTTelevizor
                 if (_viewModel.Channel.Number != _previousValue)
                 {
                     // saving
-                    _onChannelChanged();
+                    _viewModel.OnChannelChanged();
                 }
 
                 _previousValue = null;
@@ -148,6 +164,8 @@ namespace DVBTTelevizor
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryNumber }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryName }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Up", new List<View>() { ButtonUp }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Down", new List<View>() { ButtonDown }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ChannelEnd", new List<View>() { ChannelEndLabel }));
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
@@ -162,7 +180,7 @@ namespace DVBTTelevizor
         private void ChannelPage_Appearing(object sender, EventArgs e)
         {
             _viewModel.NotifyFontSizeChange();
-            _focusItems.FocusItem("OKButton");
+            _focusItems.DeFocusAll();
         }
 
         public DVBTChannel Channel
@@ -304,6 +322,14 @@ namespace DVBTTelevizor
 
                             case "Name":
                                 EntryName.Focus();
+                                break;
+
+                            case "Up":
+                                ButtonUp_Clicked(this, null);
+                                break;
+
+                            case "Down":
+                                ButtonDown_Clicked(this, null);
                                 break;
                     }
                     break;

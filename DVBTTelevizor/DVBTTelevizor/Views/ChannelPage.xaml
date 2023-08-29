@@ -29,6 +29,13 @@
                 <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
             </Style>
 
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -72,6 +79,21 @@
                                    Placeholder="Channel name"
                                    Style="{DynamicResource EntryStyle}"
                                    FontSize="{Binding FontSizeForEntry}" />
+                        </Grid>
+
+                        <Grid RowSpacing="0" Margin="10,10,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50*" />
+                                <ColumnDefinition Width="50*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="ButtonUp" Grid.Row="0" Grid.Column="0" Text="Move up" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
+                            <Button x:Name="ButtonDown" Grid.Row="0" Grid.Column="1" Text="Move down" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
+
                         </Grid>
 
                         <Grid RowSpacing="10" Margin="10,30,10,0">
