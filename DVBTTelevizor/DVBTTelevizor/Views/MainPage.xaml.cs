@@ -105,10 +105,7 @@ namespace DVBTTelevizor
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
-            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, OnAnyChannelChanged)
-            {
-                Channels = _viewModel.Channels
-            };
+            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, OnAnyChannelChanged);
 
             Core.Initialize();
 
@@ -1444,6 +1441,9 @@ namespace DVBTTelevizor
             {
                 try
                 {
+                    // pass all channels!
+                    _editChannelPage.Channels = await _channelService.LoadChannels();
+
                     _editChannelPage.StreamInfoVisible = false;
                     _editChannelPage.StreamVideoSize = "";
 
