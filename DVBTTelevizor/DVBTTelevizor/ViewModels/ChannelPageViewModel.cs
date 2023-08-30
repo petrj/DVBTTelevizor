@@ -29,7 +29,7 @@ namespace DVBTTelevizor
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
         public ObservableCollection<DVBTChannel> AllChannels { get; set; } = new ObservableCollection<DVBTChannel>();
 
-        public Action OnChannelChanged { get; set; }
+        public Action<string> OnEditedChannelChanged { get; set; }
 
         public DVBTChannel Channel
         {
@@ -183,13 +183,31 @@ namespace DVBTTelevizor
             Channels[index - 1] = Channels[index];
             Channels[index] = tmpCh;
 
-            OnChannelChanged();
+            OnEditedChannelChanged(Channel.FrequencyAndMapPID);
             NotifyChannelChange();
         }
 
         private async Task Down()
         {
+            var index = Channels.IndexOf(Channel);
 
+            if (index == -1 || index == Channels.Count-1)
+                return;
+
+            var channelNext = Channels[index + 1];
+
+            // swap numbers
+            var tempNum = channelNext.Number;
+            channelNext.Number = Channel.Number;
+            Channel.Number = tempNum;
+
+            // swap channels
+            var tmpCh = Channels[index];
+            Channels[index] = Channels[index+1];
+            Channels[index+1] = tmpCh;
+
+            OnEditedChannelChanged(Channel.FrequencyAndMapPID);
+            NotifyChannelChange();
         }
     }
 }

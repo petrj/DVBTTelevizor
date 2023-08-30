@@ -105,7 +105,7 @@ namespace DVBTTelevizor
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
-            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, OnAnyChannelChanged);
+            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, OnEditedChannelChanged);
 
             Core.Initialize();
 
@@ -483,10 +483,22 @@ namespace DVBTTelevizor
             });
         }
 
-        private async void OnAnyChannelChanged()
+        private async void OnEditedChannelChanged(string frequencyAndMapPID)
         {
             await _channelService.SaveChannels(_viewModel.Channels);
-            _viewModel.RefreshCommand.Execute(null);
+            await _viewModel.Refresh(); // this creates new Channels collection
+
+            foreach (var ch in _viewModel.Channels)
+            {
+                if (ch.FrequencyAndMapPID == frequencyAndMapPID)
+                {
+                    _editChannelPage.Channel = ch;
+                    break;
+                }
+            }
+
+            var allChannels = await _channelService.LoadChannels();
+            _editChannelPage.SetChannels(_viewModel.Channels, allChannels);
         }
 
         private void AnyPage_Disappearing(object sender, EventArgs e)

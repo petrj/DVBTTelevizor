@@ -1067,7 +1067,7 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task Refresh()
+        public async Task Refresh()
         {
             string selectedChanneFrequencyAndMapPID = null;
 

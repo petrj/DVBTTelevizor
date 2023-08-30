@@ -22,7 +22,7 @@ namespace DVBTTelevizor
         private KeyboardFocusableItemList _focusItems;
         private string _previousValue;
 
-        public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, Action onChannelChanged)
+        public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, Action<string> onEditedChannelChanged)
         {
             InitializeComponent();
 
@@ -31,7 +31,7 @@ namespace DVBTTelevizor
 
             BindingContext = _viewModel = new ChannelPageViewModel(_loggingService, _dialogService, driver, config);
 
-            _viewModel.OnChannelChanged = onChannelChanged;
+            _viewModel.OnEditedChannelChanged = onEditedChannelChanged;
 
             BuildFocusableItems();
 
@@ -99,7 +99,7 @@ namespace DVBTTelevizor
                 if (_viewModel.Channel.Name != _previousValue)
                 {
                     // saving
-                    _viewModel.OnChannelChanged();
+                    _viewModel.OnEditedChannelChanged(_viewModel.Channel.FrequencyAndMapPID);
                 }
 
                 _previousValue = null;
@@ -150,7 +150,7 @@ namespace DVBTTelevizor
                 if (_viewModel.Channel.Number != _previousValue)
                 {
                     // saving
-                    _viewModel.OnChannelChanged();
+                    _viewModel.OnEditedChannelChanged(_viewModel.Channel.FrequencyAndMapPID);
                 }
 
                 _previousValue = null;
