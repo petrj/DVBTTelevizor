@@ -267,8 +267,8 @@
     </ContentPage.Content>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
-        <ToolbarItem Name="ToolFindSignal" Text="Signal meter" Clicked="ToolFindSignal_Clicked" Icon="{Binding ToolbarItemFindSignalIcon}" />
+        <ToolbarItem x:Name="ToolConnect" Text="Connect/Disiconnect" Clicked="ToolConnect_Clicked" Icon="{Binding DriverConnectedIcon}" />
+        <ToolbarItem x:Name="ToolFindSignal" Text="Signal meter" Clicked="ToolFindSignal_Clicked" Icon="{Binding ToolbarItemFindSignalIcon}" />
     </ContentPage.ToolbarItems>
 
 </ContentPage>

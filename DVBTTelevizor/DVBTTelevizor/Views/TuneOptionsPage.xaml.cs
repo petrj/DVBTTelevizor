@@ -63,6 +63,8 @@ namespace DVBTTelevizor
             });
 
             BuildFocusableItems();
+
+            AutoManualPicker.SelectedIndexChanged += delegate { FindSignalToolVisible = _viewModel.ManualTuning; };
         }
 
         private void BuildFocusableItems()
@@ -91,6 +93,30 @@ namespace DVBTTelevizor
 
             _focusItemsAuto.OnItemFocusedEvent += TuneOptionsPage_OnItemFocusedEvent;
             _focusItemsManual.OnItemFocusedEvent += TuneOptionsPage_OnItemFocusedEvent;
+        }
+
+        public bool FindSignalToolVisible
+        {
+            get
+            {
+                return ToolbarItems.Contains(ToolFindSignal);
+            }
+            set
+            {
+                if (value)
+                {
+                    if (!ToolbarItems.Contains(ToolFindSignal))
+                    {
+                        ToolbarItems.Add(ToolFindSignal);
+                    }
+                } else
+                {
+                    if (ToolbarItems.Contains(ToolFindSignal))
+                    {
+                        ToolbarItems.Remove(ToolFindSignal);
+                    }
+                }
+            }
         }
 
         private void EditFrequencyButton_Clicked(object sender, EventArgs e)
@@ -235,6 +261,8 @@ namespace DVBTTelevizor
 
             ToolBarSelected = false;
 
+            FindSignalToolVisible = _viewModel.ManualTuning;
+
             _viewModel.NotifyFontSizeChange();
         }
 
@@ -242,38 +270,7 @@ namespace DVBTTelevizor
         {
             var findSignalPage = new FindSignalPage(_loggingService, _dialogService, _driver, _config, _channelService);
 
-            if (_viewModel.ManualTuning)
-            {
-                findSignalPage.SelectedFrequency = _viewModel.FrequencyKHz;
-            }
-            else
-            {
-                findSignalPage.SelectedFrequency = _viewModel.FrequencyFromKHz;
-            }
-
-            if (_viewModel.DVBT2Tuning)
-            {
-                findSignalPage.SelectedDeliverySystem = 1;
-            }
-
-            findSignalPage.Disappearing += delegate
-            {
-                if (_viewModel.ManualTuning)
-                {
-                    _viewModel.FrequencyKHz = findSignalPage.SelectedFrequency;
-                } else
-                {
-                    _viewModel.FrequencyFromKHz = findSignalPage.SelectedFrequency;
-                }
-                if (findSignalPage.SelectedDeliverySystem == 0)
-                {
-                    _viewModel.DVBTTuning = true;
-                }
-                if (findSignalPage.SelectedDeliverySystem == 1)
-                {
-                    _viewModel.DVBT2Tuning = true;
-                }
-            };
+            findSignalPage.SetFrequency(_viewModel.FrequencyKHz, _viewModel.TuneBandWidthKHz, _viewModel.DVBT2Tuning ? 1 : 0);
 
             await Navigation.PushAsync(findSignalPage);
         }
@@ -498,7 +495,14 @@ namespace DVBTTelevizor
             else
             if (_viewModel.SelectedToolbarItemName == "ToolbarItemDriver")
             {
-                _viewModel.SelectedToolbarItemName = "ToolbarItemFindSignal";
+                if (_viewModel.ManualTuning)
+                {
+                    _viewModel.SelectedToolbarItemName = "ToolbarItemFindSignal";
+                } else
+                {
+                    ToolBarSelected = false;
+                    _viewModel.SelectedToolbarItemName = null;
+                }
             }
             else
             if (_viewModel.SelectedToolbarItemName == "ToolbarItemFindSignal")
