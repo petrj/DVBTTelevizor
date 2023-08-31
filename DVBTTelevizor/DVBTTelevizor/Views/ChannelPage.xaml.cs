@@ -20,18 +20,17 @@ namespace DVBTTelevizor
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
         private KeyboardFocusableItemList _focusItems;
-        private string _previousValue;
+        private string _previousNumber;
+        private string _previousName;
 
-        public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, Action<string> onEditedChannelChanged)
+        public ChannelPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
         {
             InitializeComponent();
 
             _loggingService = loggingService;
             _dialogService = dialogService;
 
-            BindingContext = _viewModel = new ChannelPageViewModel(_loggingService, _dialogService, driver, config);
-
-            _viewModel.OnEditedChannelChanged = onEditedChannelChanged;
+            BindingContext = _viewModel = new ChannelPageViewModel(_loggingService, _dialogService, driver, config, channelService);
 
             BuildFocusableItems();
 
@@ -40,12 +39,12 @@ namespace DVBTTelevizor
             EntryName.Focused += delegate
             {
                 EntryName.CursorPosition = EntryNumber.Text == null ? 0 : EntryName.Text.Length;
-                _previousValue = _viewModel.Channel.Name;
+                _previousName = _viewModel.Channel.Name;
             };
             EntryNumber.Focused += delegate
             {
                 EntryNumber.CursorPosition = EntryNumber.Text == null ? 0 : EntryNumber.Text.Length;
-                _previousValue = _viewModel.Channel.Number;
+                _previousNumber = _viewModel.Channel.Number;
             };
 
             EntryNumber.Unfocused += EntryNumber_Unfocused;
@@ -55,10 +54,12 @@ namespace DVBTTelevizor
             ButtonDown.Clicked += ButtonDown_Clicked;
         }
 
-        public void SetChannels(ObservableCollection<DVBTChannel> Channels, ObservableCollection<DVBTChannel> AllChannels)
+        public bool Changed
         {
-            _viewModel.Channels = Channels;
-            _viewModel.AllChannels = AllChannels;
+            get
+            {
+                return _viewModel.Changed;
+            }
         }
 
         private void ButtonDown_Clicked(object sender, EventArgs e)
@@ -78,7 +79,7 @@ namespace DVBTTelevizor
 
         private void EntryName_Unfocused(object sender, FocusEventArgs e)
         {
-            if (_viewModel.Channel.Name == _previousValue)
+            if (_viewModel.Channel.Name == _previousName)
             {
                 return;
             }
@@ -87,7 +88,7 @@ namespace DVBTTelevizor
             {
                 if (string.IsNullOrEmpty(EntryName.Text))
                 {
-                    _viewModel.Channel.Name = _previousValue;
+                    _viewModel.Channel.Name = _previousName;
 
                     Device.BeginInvokeOnMainThread( async () =>
                     {
@@ -96,19 +97,19 @@ namespace DVBTTelevizor
                     });
                 }
 
-                if (_viewModel.Channel.Name != _previousValue)
+                if (_viewModel.Channel.Name != _previousName)
                 {
-                    // saving
-                    _viewModel.OnEditedChannelChanged(_viewModel.Channel.FrequencyAndMapPID);
+                    _viewModel.Changed = true;
+                    await _viewModel.SaveChannels();
                 }
 
-                _previousValue = null;
+                _previousName = null;
             });
         }
 
         private void EntryNumber_Unfocused(object sender, FocusEventArgs e)
         {
-            if (_viewModel.Channel.Number == _previousValue)
+            if (_viewModel.Channel.Number == _previousNumber)
             {
                 return;
             }
@@ -118,42 +119,28 @@ namespace DVBTTelevizor
                 int num;
                 if (!int.TryParse(EntryNumber.Text, out num) || (num < 1) || (num > 32000))
                 {
-                    await _dialogService.Error($"Invalid number");
-                    _viewModel.Channel.Number = _previousValue;
-                    _viewModel.NotifyChannelChange();
-                }
-                else
-                {
-                    foreach (var ch in _viewModel.AllChannels)
+                    _viewModel.Channel.Number = _previousNumber;
+                    Device.BeginInvokeOnMainThread(async () =>
                     {
-                        if (ch.FrequencyAndMapPID == _viewModel.Channel.FrequencyAndMapPID)
-                        {
-                            continue;
-                        }
-
-                        if (ch.Number == num.ToString())
-                        {
-                            _viewModel.Channel.Number = _previousValue;
-
-                            Device.BeginInvokeOnMainThread(
-                                delegate
-                                {
-                                    _dialogService.Error($"Number {num} already used");
-                                    _viewModel.NotifyChannelChange();
-                                });
-
-                            break;
-                        }
-                    }
+                        await _dialogService.Error($"Invalid number");
+                        _viewModel.NotifyChannelChange();
+                    });
                 }
-
-                if (_viewModel.Channel.Number != _previousValue)
+                else if (_viewModel.NumberUsed(EntryNumber.Text))
                 {
-                    // saving
-                    _viewModel.OnEditedChannelChanged(_viewModel.Channel.FrequencyAndMapPID);
+                    _viewModel.Channel.Number = _previousNumber;
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        await _dialogService.Error($"Number {num} is already used");
+                        _viewModel.NotifyChannelChange();
+                    });
+                } else
+                {
+                    _viewModel.Changed = true;
+                    await _viewModel.SaveChannels();
                 }
 
-                _previousValue = null;
+                _previousNumber = null;
             });
         }
 
@@ -183,17 +170,10 @@ namespace DVBTTelevizor
             _focusItems.DeFocusAll();
         }
 
-        public DVBTChannel Channel
+        public async Task Reload(string frequencyAndMapPID)
         {
-            get
-            {
-                return _viewModel.Channel;
-            }
-            set
-            {
-                _viewModel.Channel = value;
-                Title = _viewModel.Channel.Name;
-            }
+            _viewModel.Changed = false;
+            await _viewModel.Reload(frequencyAndMapPID);
         }
 
         public bool StreamInfoVisible

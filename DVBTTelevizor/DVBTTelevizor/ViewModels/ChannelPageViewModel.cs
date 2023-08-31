@@ -12,9 +12,14 @@ namespace DVBTTelevizor
     public class ChannelPageViewModel : BaseViewModel
     {
         private DVBTChannel _channel;
+        private string _channelFrequencyAndMapPID;
+
+        protected ChannelService _channelService;
 
         public Command UpCommand { get; set; }
         public Command DownCommand { get; set; }
+
+        public bool Changed { get; set; } = false;
 
         private bool _signalStrengthVisible = false;
         private bool _streamBitRateVisible = false;
@@ -27,21 +32,55 @@ namespace DVBTTelevizor
         private string _streamSubTitles = String.Empty;
 
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
-        public ObservableCollection<DVBTChannel> AllChannels { get; set; } = new ObservableCollection<DVBTChannel>();
 
-        public Action<string> OnEditedChannelChanged { get; set; }
+        public async Task Reload(string channelFrequencyAndMapPID)
+        {
+            var channels = await _channelService.LoadChannels();
+
+            Channels = new ObservableCollection<DVBTChannel>(channels.OrderBy(i => i.Number.PadLeft(4, '0')));
+
+            _channelFrequencyAndMapPID = channelFrequencyAndMapPID;
+
+            foreach (var channel in Channels)
+            {
+                if (channel.FrequencyAndMapPID ==  channelFrequencyAndMapPID)
+                {
+                    _channel = channel;
+                    break;
+                }
+            }
+
+            NotifyChannelChange();
+        }
+
+        public async Task SaveChannels()
+        {
+            await _channelService.SaveChannels(Channels);
+        }
+
+        public bool NumberUsed(string number)
+        {
+            foreach (var ch in Channels)
+            {
+                if (ch.FrequencyAndMapPID == _channelFrequencyAndMapPID)
+                {
+                    continue;
+                }
+
+                if (ch.Number == number.ToString())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         public DVBTChannel Channel
         {
             get
             {
                 return _channel;
-            }
-            set
-            {
-                _channel = value;
-
-                NotifyChannelChange();
             }
         }
 
@@ -154,60 +193,81 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(Bitrate));
         }
 
-        public ChannelPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
-            :base(loggingService, dialogService, driver, config)
+        public ChannelPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
+            : base(loggingService, dialogService, driver, config)
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
 
             UpCommand = new Command(async (itm) => await Up());
             DownCommand = new Command(async (itm) => await Down());
+            _channelService = channelService;
         }
 
         private async Task Up()
         {
-            var index = Channels.IndexOf(Channel);
+            try
+            {
+                _loggingService.Info($"Moving channel {Channel.Name} up");
 
-            if (index == -1 || index == 0)
-                return;
+                var index = Channels.IndexOf(Channel);
 
-            var channelPrev = Channels[index-1];
+                if (index == -1 || index == 0)
+                    return;
 
-            // swap numbers
-            var tempNum = channelPrev.Number;
-            channelPrev.Number = Channel.Number;
-            Channel.Number = tempNum;
+                var channelPrev = Channels[index - 1];
 
-            // swap channels
-            var tmpCh = Channels[index - 1];
-            Channels[index - 1] = Channels[index];
-            Channels[index] = tmpCh;
+                // swap numbers
+                var tempNum = channelPrev.Number;
+                channelPrev.Number = Channel.Number;
+                Channel.Number = tempNum;
 
-            OnEditedChannelChanged(Channel.FrequencyAndMapPID);
-            NotifyChannelChange();
+                // swap channels
+                var tmpCh = Channels[index - 1];
+                Channels[index - 1] = Channels[index];
+                Channels[index] = tmpCh;
+
+                Changed = true;
+                await SaveChannels();
+                NotifyChannelChange();
+
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
         private async Task Down()
         {
-            var index = Channels.IndexOf(Channel);
+            try
+            {
+                _loggingService.Info($"Moving channel {Channel.Name} down");
 
-            if (index == -1 || index == Channels.Count-1)
-                return;
+                var index = Channels.IndexOf(Channel);
 
-            var channelNext = Channels[index + 1];
+                if (index == -1 || index == Channels.Count - 1)
+                    return;
 
-            // swap numbers
-            var tempNum = channelNext.Number;
-            channelNext.Number = Channel.Number;
-            Channel.Number = tempNum;
+                var channelNext = Channels[index + 1];
 
-            // swap channels
-            var tmpCh = Channels[index];
-            Channels[index] = Channels[index+1];
-            Channels[index+1] = tmpCh;
+                // swap numbers
+                var tempNum = channelNext.Number;
+                channelNext.Number = Channel.Number;
+                Channel.Number = tempNum;
 
-            OnEditedChannelChanged(Channel.FrequencyAndMapPID);
-            NotifyChannelChange();
+                // swap channels
+                var tmpCh = Channels[index];
+                Channels[index] = Channels[index + 1];
+                Channels[index + 1] = tmpCh;
+
+                Changed = true;
+                await SaveChannels();
+                NotifyChannelChange();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
     }
 }

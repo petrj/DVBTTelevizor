@@ -105,7 +105,9 @@ namespace DVBTTelevizor
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
             _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
-            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, OnEditedChannelChanged);
+            _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, _channelService);
+
+            _editChannelPage.Disappearing += _editChannelPage_Disappearing;
 
             Core.Initialize();
 
@@ -277,6 +279,14 @@ namespace DVBTTelevizor
 
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
             RestartRemoteAccessService();
+        }
+
+        private void _editChannelPage_Disappearing(object sender, EventArgs e)
+        {
+            if (_editChannelPage.Changed)
+            {
+                _viewModel.RefreshCommand.Execute(null);
+            }
         }
 
         private void SetSubtitles(int id)
@@ -481,24 +491,6 @@ namespace DVBTTelevizor
                     return;
                 }
             });
-        }
-
-        private async void OnEditedChannelChanged(string frequencyAndMapPID)
-        {
-            await _channelService.SaveChannels(_viewModel.Channels);
-            await _viewModel.Refresh(); // this creates new Channels collection
-
-            foreach (var ch in _viewModel.Channels)
-            {
-                if (ch.FrequencyAndMapPID == frequencyAndMapPID)
-                {
-                    _editChannelPage.Channel = ch;
-                    break;
-                }
-            }
-
-            var allChannels = await _channelService.LoadChannels();
-            _editChannelPage.SetChannels(_viewModel.Channels, allChannels);
         }
 
         private void AnyPage_Disappearing(object sender, EventArgs e)
@@ -1453,10 +1445,6 @@ namespace DVBTTelevizor
             {
                 try
                 {
-                    // pass channels!
-                    var allChannels = await _channelService.LoadChannels();
-                    _editChannelPage.SetChannels(_viewModel.Channels, allChannels);
-
                     _editChannelPage.StreamInfoVisible = false;
                     _editChannelPage.StreamVideoSize = "";
 
@@ -1534,7 +1522,7 @@ namespace DVBTTelevizor
                     _loggingService.Error(ex);
                 }
 
-                _editChannelPage.Channel = ch;
+                await _editChannelPage.Reload(ch.FrequencyAndMapPID);
 
                 await Navigation.PushAsync(_editChannelPage);
             }
