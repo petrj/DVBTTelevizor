@@ -143,7 +143,7 @@
                                 <Label Grid.Row="0" Grid.Column="1"  Text="{Binding ActualTuningFrequencyDecimalPartMHzCaption}" IsVisible="{Binding TuningInProgress}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
                             </Grid>
 
-                            <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="0" Grid.Column="1" IsVisible="{Binding TuningInProgress}" Text="{Binding DeliverySystem}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                             <ActivityIndicator Grid.Row="0" Grid.Column="2" IsVisible="{Binding TuningInProgress}" IsRunning="{Binding TuningInProgress}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
                         </Grid>

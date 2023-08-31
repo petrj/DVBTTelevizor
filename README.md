@@ -13,9 +13,9 @@ Využívá ovladač "DVB-T Driver": https://play.google.com/store/apps/details?i
 - nahrávání vysílání do interního úložiště
 - automatické i ruční ladění
 - možnost importovat/exportovat naladěné kanály
-- EPG pro právě probíhající/následující program (podporováno pouze kódování Latin alphabet)
+- EPG pro právě probíhající/následující program (bez podpory čínských znaků)
 - možnost zvětšení fontu (ideální pro tablety a TV)
-- pro Android 4.4 a vyšší (architektury: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a) 
+- pro Android 5.0 a vyšší (architektury: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a) 
 - podpora titulků
 - podpora změny audio stopy
 - podpora teletextu
@@ -33,9 +33,9 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - recording to internal storage
 - automatic and manual tuning
 - possibility to export/import tuned channels
-- EPG for current/next program (only Latin alphabet support)
+- EPG for current/next program (chinese characters are not supported)
 - possibility to enlarge the font (ideal for tablets and TVs)
-- Android 4.4 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a
+- Android 5.0 and higher for architectures: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a
 - supporting subtitles
 - supporting teletext
 - remote access from other device
