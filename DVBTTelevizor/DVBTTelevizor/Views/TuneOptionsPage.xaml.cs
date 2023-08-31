@@ -192,11 +192,23 @@ namespace DVBTTelevizor
             };
         }
 
-        private void TuneButtton_Clicked(object sender, EventArgs e)
+        private async void TuneButtton_Clicked(object sender, EventArgs e)
         {
             if (!_driver.Connected)
             {
-                _dialogService.Error($"Device not connected");
+                await _dialogService.Error($"Device not connected");
+                return;
+            }
+
+            if (_driver.Recording)
+            {
+                await _dialogService.Error($"Rrecording in progress");
+                return;
+            }
+
+            if (_driver.Streaming)
+            {
+                await _dialogService.Error($"Playing in progress");
                 return;
             }
 
@@ -268,6 +280,18 @@ namespace DVBTTelevizor
 
         private async void ToolFindSignal_Clicked(object sender, EventArgs e)
         {
+            if (_driver.Recording)
+            {
+                await _dialogService.Error($"Rrecording in progress");
+                return;
+            }
+
+            if (_driver.Streaming)
+            {
+                await _dialogService.Error($"Playing in progress");
+                return;
+            }
+
             var findSignalPage = new FindSignalPage(_loggingService, _dialogService, _driver, _config, _channelService);
 
             findSignalPage.SetFrequency(_viewModel.FrequencyKHz, _viewModel.TuneBandWidthKHz, _viewModel.DVBT2Tuning ? 1 : 0);
