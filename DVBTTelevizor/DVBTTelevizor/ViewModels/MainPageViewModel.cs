@@ -1031,18 +1031,6 @@ namespace DVBTTelevizor
                                }
                            }
 
-                           if (res.UnsupportedEncoding)
-                           {
-                               if (msg != String.Empty)
-                               {
-                                   msg += " (unsupported encoding!)";
-                               }
-                               else
-                               {
-                                   msg = "Unsupported encoding";
-                               }
-                           }
-
                            if (!string.IsNullOrEmpty(msg))
                            {
                                if (!silent)

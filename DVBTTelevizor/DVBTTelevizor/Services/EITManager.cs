@@ -260,12 +260,6 @@ namespace DVBTTelevizor.Services
                     return scanRes;
                 }
 
-                if (scanRes.UnsupportedEncoding)
-                {
-                    _log.Debug($"[EIT] unsupported encoding");
-                    return scanRes;
-                }
-
                 ChannelEPG channelEPG = null;
 
                 if (!FreqEPG.ContainsKey(_driver.LastTunedFreq))
