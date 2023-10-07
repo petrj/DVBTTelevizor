@@ -1,5 +1,6 @@
 ﻿using Android.Hardware.Camera2;
 using Android.Media;
+using Java.Net;
 using LibVLCSharp.Shared;
 using LoggerService;
 using System;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using static Android.Resource;
 using static DVBTTelevizor.MainPageViewModel;
@@ -34,6 +36,7 @@ namespace DVBTTelevizor
         private SettingsPage _settingsPage;
         private ChannelService _channelService;
         private KeyboardFocusableItem _tuneFocusItem = null;
+        private KeyboardFocusableItem _installDriverFocusItem = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private DateTime _lastToggledAudioStreamTime = DateTime.MinValue;
         private DateTime _lastToggledSubtitlesTime = DateTime.MinValue;
@@ -197,8 +200,18 @@ namespace DVBTTelevizor
                 Device.BeginInvokeOnMainThread(delegate
                 {
                     _viewModel.UpdateDriverState();
+                    _viewModel.NotifyDriverOrChannelsChange();
 
                     MessagingCenter.Send($"Device connection error ({message})", BaseViewModel.MSG_ToastMessage);
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationChanged, (message) =>
+            {
+                Device.BeginInvokeOnMainThread(delegate
+                {
+                    _viewModel.UpdateDriverState();
+                    _viewModel.NotifyDriverOrChannelsChange();
                 });
             });
 
@@ -274,6 +287,9 @@ namespace DVBTTelevizor
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
             _tuneFocusItem.Focus();
+
+            _installDriverFocusItem = KeyboardFocusableItem.CreateFrom("DriverButton", new List<View> { DriverButton });
+            _installDriverFocusItem.Focus();
 
             Task.Run(async () => { await _settingsPage.AcknowledgePurchases(); });
 
@@ -515,6 +531,10 @@ namespace DVBTTelevizor
             if (_viewModel.TunningButtonVisible)
             {
                 _tuneFocusItem.Focus();
+            }
+            if (_viewModel.InstallDriverButtonVisible)
+            {
+                _installDriverFocusItem.Focus();
             }
 
             _viewModel.EPGDetailEnabled = false;
@@ -1000,6 +1020,11 @@ namespace DVBTTelevizor
 
             try
             {
+                if (_viewModel.InstallDriverButtonVisible && (_viewModel.SelectedPart != SelectedPartEnum.ToolBar))
+                {
+                    InstallDriver_Clicked(this, null);
+                }
+                else
                 if (_viewModel.TunningButtonVisible && (_viewModel.SelectedPart  != SelectedPartEnum.ToolBar))
                 {
                     ToolTune_Clicked(this, null);
@@ -1095,6 +1120,7 @@ namespace DVBTTelevizor
                             _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
                             _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
                             _tuneFocusItem.DeFocus();
+                            _installDriverFocusItem.DeFocus();
                         }
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
@@ -1106,6 +1132,10 @@ namespace DVBTTelevizor
                             if (_viewModel.TunningButtonVisible)
                             {
                                 _tuneFocusItem.Focus();
+                            }
+                            if (_viewModel.InstallDriverButtonVisible)
+                            {
+                                _installDriverFocusItem.Focus();
                             }
                         }
                         else
@@ -1155,6 +1185,7 @@ namespace DVBTTelevizor
                         _viewModel.SelectedToolbarItemName = "ToolbarItemSettings";
                         _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
                         _tuneFocusItem.DeFocus();
+                        _installDriverFocusItem.DeFocus();
 
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
@@ -1179,6 +1210,10 @@ namespace DVBTTelevizor
                                 if (_viewModel.TunningButtonVisible)
                                 {
                                     _tuneFocusItem.Focus();
+                                }
+                                if (_viewModel.InstallDriverButtonVisible)
+                                {
+                                    _installDriverFocusItem.Focus();
                                 }
                             }
                         }
@@ -1227,7 +1262,17 @@ namespace DVBTTelevizor
                 {
                     if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
                     {
-                        await _viewModel.SelectNextChannel(step);
+                        if (_viewModel.TunningButtonVisible || _viewModel.InstallDriverButtonVisible)
+                        {
+                            _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+                            _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                            _tuneFocusItem.DeFocus();
+                            _installDriverFocusItem.DeFocus();
+                        }
+                        else
+                        {
+                            await _viewModel.SelectNextChannel(step);
+                        }
                     }
                     else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
                     {
@@ -1237,12 +1282,89 @@ namespace DVBTTelevizor
                     {
                         _viewModel.SelectedToolbarItemName = null;
                         _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+                        if (_viewModel.TunningButtonVisible)
+                        {
+                            _tuneFocusItem.Focus();
+                        }
+                        if (_viewModel.InstallDriverButtonVisible)
+                        {
+                            _installDriverFocusItem.Focus();
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "ActionDown general error");
+            }
+        }
+
+        private async Task ActionUp(int step = 1)
+        {
+            _loggingService.Info($"ActionUp");
+
+            try
+            {
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    if (_viewModel.EPGDetailVisible)
+                    {
+                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
+                        {
+                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
+                        }
+                        else
+                        {
+                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
+                        }
+                    }
+                    else
+                    {
+                        if (!_viewModel.StandingOnStart)
+                        {
+                            await _viewModel.SelectPreviousChannel(step);
+                            await ActionPlay();
+                        }
+                    }
+                }
+                else
+                {
+                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
+                    {
+                        if (_viewModel.TunningButtonVisible || _viewModel.InstallDriverButtonVisible)
+                        {
+                            _viewModel.SelectedToolbarItemName = "ToolbarItemDriver";
+                            _viewModel.SelectedPart = SelectedPartEnum.ToolBar;
+                            _tuneFocusItem.DeFocus();
+                            _installDriverFocusItem.DeFocus();
+                        }
+                        else
+                        {
+                            await _viewModel.SelectPreviousChannel(step);
+                        }
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
+                    {
+                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
+                    }
+                    else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
+                    {
+                        _viewModel.SelectedToolbarItemName = null;
+                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+                        if (_viewModel.TunningButtonVisible)
+                        {
+                            _tuneFocusItem.Focus();
+                        }
+                        if (_viewModel.InstallDriverButtonVisible)
+                        {
+                            _installDriverFocusItem.Focus();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "ActionUp general error");
             }
         }
 
@@ -1297,57 +1419,6 @@ namespace DVBTTelevizor
             else
             {
                 MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_QuitApp);
-            }
-        }
-
-        private async Task ActionUp(int step = 1)
-        {
-            _loggingService.Info($"ActionUp");
-
-            try
-            {
-                if (PlayingState == PlayingStateEnum.Playing)
-                {
-                    if (_viewModel.EPGDetailVisible)
-                    {
-                        if (_viewModel.SelectedPart != SelectedPartEnum.EPGDetail)
-                        {
-                            _viewModel.SelectedPart = SelectedPartEnum.EPGDetail;
-                        }
-                        else
-                        {
-                            await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
-                        }
-                    }
-                    else
-                    {
-                        if (!_viewModel.StandingOnStart)
-                        {
-                            await _viewModel.SelectPreviousChannel(step);
-                            await ActionPlay();
-                        }
-                    }
-                }
-                else
-                {
-                    if (_viewModel.SelectedPart == SelectedPartEnum.ChannelsListOrVideo)
-                    {
-                        await _viewModel.SelectPreviousChannel(step);
-                    }
-                    else if (_viewModel.SelectedPart == SelectedPartEnum.EPGDetail)
-                    {
-                        await ScrollViewChannelEPGDescription.ScrollToAsync(ScrollViewChannelEPGDescription.ScrollX, ScrollViewChannelEPGDescription.ScrollY - (10 + (int)_config.AppFontSize), false);
-                    }
-                    else if (_viewModel.SelectedPart == SelectedPartEnum.ToolBar)
-                    {
-                        _viewModel.SelectedToolbarItemName = null;
-                        _viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex, "ActionUp general error");
             }
         }
 
@@ -1554,10 +1625,18 @@ namespace DVBTTelevizor
             }
             else
             {
-
-                if (await _dlgService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
+                if (_driver.Installed)
                 {
-                    MessagingCenter.Send("", BaseViewModel.MSG_Init);
+                    if (await _dlgService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
+                    {
+                        MessagingCenter.Send("", BaseViewModel.MSG_Init);
+                    }
+                } else
+                {
+                    if (await _dlgService.Confirm($"DVB-T Driver not installed.", $"Device status", "Install DVB-T Driver", "Back"))
+                    {
+                        InstallDriver_Clicked(this, null);
+                    }
                 }
             }
         }
@@ -1570,6 +1649,11 @@ namespace DVBTTelevizor
         private void ToolTune_Clicked(object sender, EventArgs e)
         {
             Navigation.PushAsync(_tuneOptionsPage);
+        }
+
+        private async void InstallDriver_Clicked(object sender, EventArgs e)
+        {
+            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
         }
 
         private async void ToolMenu_Clicked(object sender, EventArgs e)

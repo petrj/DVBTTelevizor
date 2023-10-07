@@ -297,6 +297,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public void NotifyDriverOrChannelsChange()
+        {
+            OnPropertyChanged(nameof(Channels));
+            OnPropertyChanged(nameof(TunningButtonVisible));
+            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+            OnPropertyChanged(nameof(MainLayoutVisible));
+        }
+
         public bool EPGDetailEnabled
         {
             get
@@ -882,7 +890,33 @@ namespace DVBTTelevizor
                     return false;
                 }
 
-                return (Channels == null || Channels.Count == 0);
+                return !InstallDriverButtonVisible && (Channels == null || Channels.Count == 0);
+            }
+        }
+
+        public bool InstallDriverButtonVisible
+        {
+            get
+            {
+                if (_refreshCounter == 0)
+                {
+                    return false;
+                }
+
+                if (_driver == null || _driver.Installed == false)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public bool MainLayoutVisible
+        {
+            get
+            {
+                return (_driver != null && _driver.Installed);
             }
         }
 
@@ -1124,8 +1158,8 @@ namespace DVBTTelevizor
                 _refreshCounter++;
                 IsRefreshing = false;
 
-                OnPropertyChanged(nameof(Channels));
-                OnPropertyChanged(nameof(TunningButtonVisible));
+                NotifyDriverOrChannelsChange();
+
                 OnPropertyChanged(nameof(SelectedChannelEPGTitle));
                 OnPropertyChanged(nameof(SelectedChannelEPGDescription));
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));

@@ -33,6 +33,7 @@ namespace DVBTTelevizor
         public DVBTDriverConfiguration Configuration { get; set; } = new DVBTDriverConfiguration();
 
         public bool Connected { get; set; } = false;
+        public bool Installed { get; set; } = true;
 
         public bool Recording { get; set; } = false;
 

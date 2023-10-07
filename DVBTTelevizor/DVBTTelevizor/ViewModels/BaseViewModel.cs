@@ -25,6 +25,7 @@ namespace DVBTTelevizor
 
         public const string MSG_DVBTDriverConfiguration = "DVBTDriverConfiguration";
         public const string MSG_DVBTDriverConfigurationFailed = "DVBTDriverConfigurationFailed";
+        public const string MSG_DVBTDriverConfigurationChanged = "DVBTDriverConfigurationChanged";
         public const string MSG_EnableFullScreen = "EnableFullScreen";
         public const string MSG_DisableFullScreen = "DisableFullScreen";
         public const string MSG_PlayStream = "PlayStream";

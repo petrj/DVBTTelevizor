@@ -159,8 +159,9 @@
     <StackLayout>
 
         <Button x:Name="TuneButton" Text="Tune" Clicked="ToolTune_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0"/>
+        <Button x:Name="DriverButton" Text="Install DVB-T Driver" Clicked="InstallDriver_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0"/>
 
-        <AbsoluteLayout x:Name="MainLayout">
+        <AbsoluteLayout x:Name="MainLayout" IsVisible="{Binding MainLayoutVisible}">
 
             <ListView
                     AbsoluteLayout.LayoutBounds="0,0,1,1"

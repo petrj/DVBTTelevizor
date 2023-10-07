@@ -22,6 +22,7 @@ namespace DVBTTelevizor
     {
         DVBTDriverConfiguration Configuration { get; set; }
 
+        bool Installed { get; set; }
         bool Connected { get; }
 
         DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }

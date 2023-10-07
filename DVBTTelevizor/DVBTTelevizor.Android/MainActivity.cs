@@ -331,6 +331,7 @@ namespace DVBTTelevizor.Droid
 
 #if TestingDVBTDriver
 
+                _driverManager.Installed = true;
                 var testingDVBTDriver = new TestingDVBTDriver(_loggingService);
                 testingDVBTDriver.Connect();
 
@@ -369,8 +370,12 @@ namespace DVBTTelevizor.Droid
 
                 StartActivityForResult(req, StartRequestCode);
 
+                // updating driver installed status
+                MessagingCenter.Send("", BaseViewModel.MSG_DVBTDriverConfigurationChanged);
+
 #if TestingDVBTDriverManager
 
+                _driverManager.Installed = true;
                 _waitingForInit = false;
 
                 var cfg = new DVBTDriverConfiguration()
@@ -380,10 +385,11 @@ namespace DVBTTelevizor.Droid
 
                 MessagingCenter.Send(cfg.ToString(), BaseViewModel.MSG_DVBTDriverConfiguration);
 #endif
-
+                _driverManager.Installed = true;
             }
             catch (ActivityNotFoundException ex)
             {
+                _driverManager.Installed = false;
                 _waitingForInit = false;
                 _loggingService.Error(ex, "Device initializing failed");
 
