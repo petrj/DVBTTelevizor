@@ -288,6 +288,20 @@ namespace DVBTTelevizor
                     _focusItems.FocusPreviousItem();
                     break;
 
+                case KeyboardNavigationActionEnum.Left:
+                    if (_focusItems.FocusedItemName == "Down")
+                    {
+                        _focusItems.FocusPreviousItem();
+                    }
+                    break;
+
+                case KeyboardNavigationActionEnum.Right:
+                    if (_focusItems.FocusedItemName == "Up")
+                    {
+                        _focusItems.FocusNextItem();
+                    }
+                    break;
+
                 case KeyboardNavigationActionEnum.Back:
                     await Navigation.PopAsync();
                     break;
