@@ -16,8 +16,8 @@ using Android.App;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("24.0.0.0")]
-[assembly: AssemblyFileVersion("24.0.0.0")]
+[assembly: AssemblyVersion("25.0.0.0")]
+[assembly: AssemblyFileVersion("25.0.0.0")]
 
 // Add some common permissions, these can be removed if not needed
 [assembly: UsesPermission(Android.Manifest.Permission.Internet)]
