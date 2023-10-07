@@ -23,7 +23,7 @@ namespace DVBTTelevizor
 {
     public class DVBTDriverManager : IDVBTDriverManager
     {
-        public bool Installed { get; set; } = false;
+        public bool Installed { get; set; } = true;
 
         DVBTDriverConfiguration _driverConfiguration;
 

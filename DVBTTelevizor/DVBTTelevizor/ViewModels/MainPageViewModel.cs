@@ -898,17 +898,12 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (_refreshCounter == 0)
+                if (_refreshCounter == 0 || _driver == null)
                 {
                     return false;
                 }
 
-                if (_driver == null || _driver.Installed == false)
-                {
-                    return true;
-                }
-
-                return false;
+                return (!_driver.Installed);
             }
         }
 
