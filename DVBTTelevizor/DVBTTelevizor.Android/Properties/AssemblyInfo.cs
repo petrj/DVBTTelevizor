@@ -11,13 +11,13 @@ using Android.App;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Petr Janousek")]
 [assembly: AssemblyProduct("DVBTTelevizor.Android")]
-[assembly: AssemblyCopyright("2019-2023")]
+[assembly: AssemblyCopyright("2019-2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("29.0.0.0")]
-[assembly: AssemblyFileVersion("29.0.0.0")]
+[assembly: AssemblyVersion("30.0.0.0")]
+[assembly: AssemblyFileVersion("30.0.0.0")]
 
 // Add some common permissions, these can be removed if not needed
 [assembly: UsesPermission(Android.Manifest.Permission.Internet)]
