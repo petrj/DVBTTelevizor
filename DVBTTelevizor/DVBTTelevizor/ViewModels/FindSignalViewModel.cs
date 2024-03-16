@@ -274,7 +274,7 @@ namespace DVBTTelevizor
 
             try
             {
-                var status = await _driver.TuneAndSetPIDsEnhanced(FrequencyKHz * 1000, TuneBandWidthKHz * 1000, DeliverySystem, new List<long>() { 0, 17 }, false);
+                var status = await _driver.TuneEnhanced(FrequencyKHz * 1000, TuneBandWidthKHz * 1000, DeliverySystem, false);
 
                 if (status.Result == SearchProgramResultEnum.OK)
                 {

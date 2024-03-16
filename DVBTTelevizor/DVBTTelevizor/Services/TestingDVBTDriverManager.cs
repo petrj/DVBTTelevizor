@@ -430,13 +430,13 @@ namespace DVBTTelevizor
 
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
         {
-            return await TuneEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { mapPID }, fastTuning);
+            LastPID = mapPID;
+            return await TuneEnhanced(frequency, bandWidth, deliverySystem, fastTuning);
         }
 
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             LastFreq = frequency;
-            LastPID = PIDs[0];
 
             System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
 

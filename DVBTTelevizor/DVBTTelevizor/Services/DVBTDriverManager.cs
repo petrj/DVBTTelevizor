@@ -806,6 +806,8 @@ namespace DVBTTelevizor
             _log.Debug($"--------------------------------------------------------------------");
             _log.Debug($"Wait For Buffer PIDs: {String.Join(",", PIDs)}");
 
+            _readingBuffer = true;
+
             var pidsFound = new Dictionary<long, int>();
             var wrongPIDsFound = new Dictionary<long, int>();
             foreach (var pid in PIDs)
@@ -867,6 +869,9 @@ namespace DVBTTelevizor
             } catch (Exception ex)
             {
                 _log.Error(ex);
+            } finally
+            {
+                _readingBuffer = false;
             }
         }
 
@@ -1167,6 +1172,12 @@ namespace DVBTTelevizor
 
             var res = new TuneResult();
 
+            double setZeroFreqTime = 0;
+            double tuneTime = 0;
+            double setPIDsTime = 0;
+
+            var startTime = DateTime.Now;
+
             try
             {
                 DVBTResponse tuneRes = null;
@@ -1174,9 +1185,9 @@ namespace DVBTTelevizor
 
                 var attemptsCount = fastTuning ? 1 : 6;
 
-                // this fix the "MUX switching no driver data error"
-                await Tune(0, bandWidth, deliverySystem);
-                await SetPIDs(new List<long>());
+                setZeroFreqTime = (DateTime.Now - startTime).TotalMilliseconds;
+
+                var startTuneTime = DateTime.Now;
 
                 // five attempts
                 for (var i = 1; i <= attemptsCount; i++)
@@ -1185,6 +1196,7 @@ namespace DVBTTelevizor
 
                     if (tuneRes.SuccessFlag)
                     {
+                        _log.Debug($"Tune response time: {(tuneRes.ResponseTime - tuneRes.RequestTime).TotalMilliseconds} ms");
                         break;
                     }
                     else
@@ -1206,6 +1218,10 @@ namespace DVBTTelevizor
                     return res;
                 }
 
+                tuneTime = (DateTime.Now - startTuneTime).TotalMilliseconds;
+
+                var startSetPIDsStartTime = DateTime.Now;
+
                 // set PIDs 0 and 17
                 for (var i = 1; i <= attemptsCount; i++)
                 {
@@ -1213,6 +1229,7 @@ namespace DVBTTelevizor
 
                     if (setPIDres.SuccessFlag)
                     {
+                        _log.Debug($"SetPIDs response time: {(setPIDres.ResponseTime - setPIDres.RequestTime).TotalMilliseconds} ms");
                         break;
                     }
                     else
@@ -1228,6 +1245,8 @@ namespace DVBTTelevizor
                     return res;
                 }
 
+                setPIDsTime = (DateTime.Now - startSetPIDsStartTime).TotalMilliseconds;
+
                 res.Result = SearchProgramResultEnum.OK;
 
                 return res;
@@ -1239,10 +1258,22 @@ namespace DVBTTelevizor
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
             }
+            finally
+            {
+                var totalTime = (DateTime.Now - startTime).TotalMilliseconds;
+
+                _log.Debug($"///////////// TuneAndSetPIDsEnhanced");
+                _log.Debug($"///////////// Set 0 freq:       {setZeroFreqTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Tune:             {tuneTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Set PIDS:         {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// --------------------------------");
+                _log.Debug($"///////////// Total time:      {totalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"");
+            }
         }
 
         /// <summary>
-        /// Tuning with timeout
+        /// Tuning with timeout (setting PIDs 0,17,18)
         /// </summary>
         /// <param name="frequency"></param>
         /// <param name="bandWidth"></param>
@@ -1250,7 +1281,7 @@ namespace DVBTTelevizor
         /// <param name="PIDs"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
 
@@ -1261,8 +1292,13 @@ namespace DVBTTelevizor
 
             var tuningStartTime = DateTime.Now;
 
+            var PIDs = new List<long>() { 0, 17, 18 };
+
             try
             {
+                // this fix the "MUX switching no driver data error"
+                //await Tune(0, bandWidth, deliverySystem);
+
                 res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, PIDs, fastTuning);
 
                 if (res.Result != SearchProgramResultEnum.OK)
@@ -1280,6 +1316,8 @@ namespace DVBTTelevizor
 
                 getSignalTime = (DateTime.Now - getSignalStartTime).TotalMilliseconds;
 
+                // TODO: use here WaitForBufferPIDs?
+
                 return res;
             }
             catch (Exception ex)
@@ -1293,10 +1331,12 @@ namespace DVBTTelevizor
             {
                 var totalTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
 
+                _log.Debug($"///////////// TunesEnhanced");
                 _log.Debug($"///////////// TuneAndSetPIDsEnhanced: {tuneAndSetPIDsEnhancedTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"///////////// Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"///////////// --------------------------------");
                 _log.Debug($"///////////// Tuning total time:      {totalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"");
             }
         }
 
@@ -1362,40 +1402,19 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, MapPID {mapPID}, type: {deliverySystem} fastTuning: {fastTuning}");
 
-            TuneResult res = null;
-
-            double tuneAndSetPIDsEnhancedTime = 0;
-            double getSignalTime = 0;
             double searchPIDsTime = 0;
             double setPIDsTime = 0;
 
-            var tuningStartTime = DateTime.Now;
+            TuneResult res = null;
 
             try
             {
-                res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { 0, 17 }, fastTuning);
-
-                tuneAndSetPIDsEnhancedTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
+                res = await TuneEnhanced(frequency, bandWidth, deliverySystem, fastTuning);
 
                 if (res.Result != SearchProgramResultEnum.OK)
                 {
                     return res;
                 }
-
-                // freq tuned
-
-                var getSignalStartTime = DateTime.Now;
-
-                var waitForsignalRes = await WaitForSignal(fastTuning);
-
-                if (waitForsignalRes.Result != SearchProgramResultEnum.OK)
-                {
-                    res.Result = waitForsignalRes.Result;
-                    res.SignalPercentStrength = waitForsignalRes.SignalPercentStrength;
-                    return res;
-                }
-
-                getSignalTime = (DateTime.Now - getSignalStartTime).TotalMilliseconds;
 
                 var searchPIDsStartTime = DateTime.Now;
 
@@ -1458,14 +1477,11 @@ namespace DVBTTelevizor
                 return res;
             } finally
             {
-                var totalTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
-
-                _log.Debug($"///////////// TuneAndSetPIDsEnhanced: {tuneAndSetPIDsEnhancedTime.ToString("N2").PadLeft(20, ' ')} ms");
-                _log.Debug($"///////////// Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// TunesEnhanced - SetPIDs");
                 _log.Debug($"///////////// Search PIDs:            {searchPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"///////////// Set PIDs:               {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"///////////// --------------------------------");
-                _log.Debug($"///////////// Tuning total time:      {totalTime.ToString("N2").PadLeft(20,' ')} ms");
+                _log.Debug($"");
             }
         }
 

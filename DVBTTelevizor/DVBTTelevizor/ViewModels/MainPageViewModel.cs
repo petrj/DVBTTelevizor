@@ -1014,7 +1014,7 @@ namespace DVBTTelevizor
 
                            if (!justPlaying)
                            {
-                               var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
+                               var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
 
                                if (tuned.Result != SearchProgramResultEnum.OK)
                                {
