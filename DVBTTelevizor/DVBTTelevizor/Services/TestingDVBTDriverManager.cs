@@ -464,6 +464,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public async Task<TuneResult> WaitForSignal(bool fastTuning)
+        {
+            return new TuneResult()
+            {
+                Result = SearchProgramResultEnum.OK
+            };
+        }
+
         public async Task<TuneResult> TuneAndSetPIDsEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
             LastFreq = frequency;

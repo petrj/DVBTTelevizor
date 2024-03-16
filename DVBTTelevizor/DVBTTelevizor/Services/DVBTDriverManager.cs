@@ -1254,60 +1254,33 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
 
-            var res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, PIDs, fastTuning);
+            TuneResult res = null;
 
-            if (res.Result != SearchProgramResultEnum.OK)
-            {
-                return res;
-            }
+            double tuneAndSetPIDsEnhancedTime = 0;
+            double getSignalTime = 0;
 
-            // freq tuned
+            var tuningStartTime = DateTime.Now;
+
             try
             {
-                // timeout for get signal:
-                var startTime = DateTime.Now;
+                res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, PIDs, fastTuning);
 
-                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 14;
-                var timeoutforSignalLockSeconds = fastTuning ? 2 : 6;
-
-                DVBTStatus status = new DVBTStatus();
-
-                while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
+                if (res.Result != SearchProgramResultEnum.OK)
                 {
-                    status = await GetStatus();
-
-                    if (!status.SuccessFlag)
-                    {
-                        res.Result = SearchProgramResultEnum.Error;
-                        return res;
-                    }
-
-                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
-                    {
-                        res.Result = SearchProgramResultEnum.NoSignal;
-                        break;
-                    }
-
-                    if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
-                    {
-                        res.Result = SearchProgramResultEnum.OK;
-                        break;
-                    }
-
-                    // waiting
-                    await Task.Delay(fastTuning ? 400 : 850);
-                }
-
-                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
-                {
-                    res.Result = SearchProgramResultEnum.NoSignal;
                     return res;
                 }
 
-                res.SignalPercentStrength = status.rfStrengthPercentage;
+                tuneAndSetPIDsEnhancedTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
+
+                // freq tuned
+
+                var getSignalStartTime = DateTime.Now;
+
+                res = await WaitForSignal(fastTuning);
+
+                getSignalTime = (DateTime.Now - getSignalStartTime).TotalMilliseconds;
 
                 return res;
-
             }
             catch (Exception ex)
             {
@@ -1316,6 +1289,64 @@ namespace DVBTTelevizor
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
             }
+            finally
+            {
+                var totalTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
+
+                _log.Debug($"///////////// TuneAndSetPIDsEnhanced: {tuneAndSetPIDsEnhancedTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// --------------------------------");
+                _log.Debug($"///////////// Tuning total time:      {totalTime.ToString("N2").PadLeft(20, ' ')} ms");
+            }
+        }
+
+        public async Task<TuneResult> WaitForSignal(bool fastTuning)
+        {
+            TuneResult res = new TuneResult() { Result = SearchProgramResultEnum.NoSignal };
+
+            // timeout for get signal:
+            var startTime = DateTime.Now;
+
+            var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
+            var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
+
+            DVBTStatus status = new DVBTStatus();
+
+            while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
+            {
+                status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
+                {
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    break;
+                }
+
+                if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
+                {
+                    res.Result = SearchProgramResultEnum.OK;
+                    break;
+                }
+
+                // waiting
+                await Task.Delay(fastTuning ? 400 : 850);
+            }
+
+            if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+            {
+                res.Result = SearchProgramResultEnum.NoSignal;
+                return res;
+            }
+
+            res.SignalPercentStrength = status.rfStrengthPercentage;
+
+            return res;
         }
 
         /// <summary>
@@ -1331,58 +1362,42 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, MapPID {mapPID}, type: {deliverySystem} fastTuning: {fastTuning}");
 
-            var res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { 0, 17 }, fastTuning);
+            TuneResult res = null;
 
-            if (res.Result != SearchProgramResultEnum.OK)
-            {
-                return res;
-            }
+            double tuneAndSetPIDsEnhancedTime = 0;
+            double getSignalTime = 0;
+            double searchPIDsTime = 0;
+            double setPIDsTime = 0;
 
-            // freq tuned
+            var tuningStartTime = DateTime.Now;
 
             try
             {
-                // timeout for get signal:
-                var startTime = DateTime.Now;
+                res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { 0, 17 }, fastTuning);
 
-                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
-                var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
+                tuneAndSetPIDsEnhancedTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
 
-                DVBTStatus status = new DVBTStatus();
-
-                while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
+                if (res.Result != SearchProgramResultEnum.OK)
                 {
-                    status = await GetStatus();
-
-                    if (!status.SuccessFlag)
-                    {
-                        res.Result = SearchProgramResultEnum.Error;
-                        return res;
-                    }
-
-                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
-                    {
-                        res.Result = SearchProgramResultEnum.NoSignal;
-                        break;
-                    }
-
-                    if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
-                    {
-                        res.Result = SearchProgramResultEnum.OK;
-                        break;
-                    }
-
-                    // waiting
-                    await Task.Delay(fastTuning ? 400 : 850);
-                }
-
-                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
-                {
-                    res.Result = SearchProgramResultEnum.NoSignal;
                     return res;
                 }
 
-                res.SignalPercentStrength = status.rfStrengthPercentage;
+                // freq tuned
+
+                var getSignalStartTime = DateTime.Now;
+
+                var waitForsignalRes = await WaitForSignal(fastTuning);
+
+                if (waitForsignalRes.Result != SearchProgramResultEnum.OK)
+                {
+                    res.Result = waitForsignalRes.Result;
+                    res.SignalPercentStrength = waitForsignalRes.SignalPercentStrength;
+                    return res;
+                }
+
+                getSignalTime = (DateTime.Now - getSignalStartTime).TotalMilliseconds;
+
+                var searchPIDsStartTime = DateTime.Now;
 
                 // set Map PID for getting PMT table
                 var pmtTableSearchRes = await SearchProgramPIDs(mapPID);
@@ -1392,6 +1407,10 @@ namespace DVBTTelevizor
                     res.Result = pmtTableSearchRes.Result;
                     return res;
                 }
+
+                searchPIDsTime = (DateTime.Now - searchPIDsStartTime).TotalMilliseconds;
+
+                var setPIDsStartTime = DateTime.Now;
 
                 pmtTableSearchRes.PIDs.Add(0);  // PAT
                 pmtTableSearchRes.PIDs.Add(16); // NIT
@@ -1425,6 +1444,8 @@ namespace DVBTTelevizor
                     return res;
                 }
 
+                setPIDsTime = (DateTime.Now - setPIDsStartTime).TotalMilliseconds;
+
                 res.Result = SearchProgramResultEnum.OK;
                 return res;
 
@@ -1435,6 +1456,16 @@ namespace DVBTTelevizor
 
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
+            } finally
+            {
+                var totalTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
+
+                _log.Debug($"///////////// TuneAndSetPIDsEnhanced: {tuneAndSetPIDsEnhancedTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Search PIDs:            {searchPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Set PIDs:               {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// --------------------------------");
+                _log.Debug($"///////////// Tuning total time:      {totalTime.ToString("N2").PadLeft(20,' ')} ms");
             }
         }
 
