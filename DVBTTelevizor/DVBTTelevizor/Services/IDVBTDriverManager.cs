@@ -58,14 +58,21 @@ namespace DVBTTelevizor
         Task<DVBTStatus> GetStatus();
         Task<DVBTVersion> GetVersion();
         Task<DVBTResponse> Tune(long frequency, long bandwidth, int deliverySystem);
+        Task<DVBTResponse> SetPIDs(List<long> PIDs);
+
         Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning);
         Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning);
-        Task<DVBTResponse> SetPIDs(List<long> PIDs);
+
+        Task<TuneResult> TuneAndSetPIDsEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning);
+
         Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000);
         Task<DVBTCapabilities> GetCapabalities();
         Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs);
         Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true);
 
         Task<EITScanResult> ScanEPG(int msTimeout = 2000);
+
+        //void StatusChangedEventHandler(object sender, StatusChangedEventArgs e);
+        event EventHandler StatusChanged;
     }
 }

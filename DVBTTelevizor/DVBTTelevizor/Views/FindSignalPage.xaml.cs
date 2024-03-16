@@ -39,6 +39,7 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
                 _viewModel.UpdateDriverState();
+                _viewModel.TuneState = FindSignalViewModel.TuneStateEnum.TuningInProgress;
                 if (_driver.Connected)
                 {
                     Task.Run(async () => await _viewModel.Tune());

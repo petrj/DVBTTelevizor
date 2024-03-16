@@ -14,6 +14,8 @@ namespace DVBTTelevizor
         private long LastFreq { get; set; }
         private long LastPID { get; set; }
 
+        public event EventHandler StatusChanged;
+
         public DVBTDriverStreamTypeEnum DVBTDriverStreamType
         {
             get
@@ -457,6 +459,37 @@ namespace DVBTTelevizor
                 return new TuneResult()
                 {
                     Result = SearchProgramResultEnum.NoSignal,
+                    SignalPercentStrength = 0
+                };
+            }
+        }
+
+        public async Task<TuneResult> TuneAndSetPIDsEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        {
+            LastFreq = frequency;
+            LastPID = PIDs[0];
+
+            System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
+
+            if (
+                (
+                    (frequency == 490000000) || (frequency == 514000000) || (frequency == 626000000)
+                ) &&
+                (bandWidth == 8000000) &&
+                (deliverySystem == 1)
+                )
+            {
+                return new TuneResult()
+                {
+                    Result = SearchProgramResultEnum.OK,
+                    SignalPercentStrength = 100
+                };
+            }
+            else
+            {
+                return new TuneResult()
+                {
+                    Result = SearchProgramResultEnum.OK,
                     SignalPercentStrength = 0
                 };
             }

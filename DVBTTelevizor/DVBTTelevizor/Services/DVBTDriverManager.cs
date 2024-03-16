@@ -59,6 +59,9 @@ namespace DVBTTelevizor
 
         private DVBUDPStreamer _DVBUDPStreamer;
 
+        public delegate void StatusChangedEventHandler(object sender, StatusChangedEventArgs e);
+        public event EventHandler StatusChanged;
+
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
             _log = loggingService;
@@ -693,6 +696,11 @@ namespace DVBTTelevizor
 
             _log.Debug($"Status response: {status.ToString()}");
 
+            if (StatusChanged != null)
+            {
+                StatusChanged(this, new StatusChangedEventArgs() { Status = status });
+            }
+
             return status;
         }
 
@@ -733,30 +741,6 @@ namespace DVBTTelevizor
 
             try
             {
-
-                //if (frequency == _lastTunedFreq && deliverySystem == _lastTunedDeliverySystem)
-                //{
-                //    _log.Debug($"Frequency already tuned");
-
-                //    return new DVBTResponse()
-                //    {
-                //        SuccessFlag = true,
-                //        RequestTime = DateTime.Now,
-                //        ResponseTime = DateTime.Now
-                //    };
-                //}
-
-                // 26 bytes
-
-                //List<byte> bytesToSend = new List<byte>();
-
-                //bytesToSend.Add(2); // REQ_TUNE
-                //bytesToSend.Add(3); // Payload for 3 longs
-
-                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
-                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
-                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
-
                 var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySystem) };
 
                 var responseSize = 10;
@@ -1169,7 +1153,7 @@ namespace DVBTTelevizor
         }
 
         /// <summary>
-        /// Tuning with timeout
+        /// Tune and set PIDS with timeout
         /// </summary>
         /// <param name="frequency"></param>
         /// <param name="bandWidth"></param>
@@ -1177,9 +1161,9 @@ namespace DVBTTelevizor
         /// <param name="PIDs"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        public async Task<TuneResult> TuneAndSetPIDsEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
         {
-            _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
+            _log.Debug($"Tune and set PIDs Enhanced: {frequency} MHz, type: {deliverySystem}, fastTuning: {fastTuning}");
 
             var res = new TuneResult();
 
@@ -1189,6 +1173,10 @@ namespace DVBTTelevizor
                 DVBTResponse setPIDres = null;
 
                 var attemptsCount = fastTuning ? 1 : 6;
+
+                // this fix the "MUX switching no driver data error"
+                await Tune(0, bandWidth, deliverySystem);
+                await SetPIDs(new List<long>());
 
                 // five attempts
                 for (var i = 1; i <= attemptsCount; i++)
@@ -1204,7 +1192,8 @@ namespace DVBTTelevizor
                         if (fastTuning)
                         {
                             await Task.Delay(50);
-                        } else
+                        }
+                        else
                         {
                             await Task.Delay(500);
                         }
@@ -1239,8 +1228,42 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                // freq tuned
+                res.Result = SearchProgramResultEnum.OK;
 
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+
+                res.Result = SearchProgramResultEnum.Error;
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// Tuning with timeout
+        /// </summary>
+        /// <param name="frequency"></param>
+        /// <param name="bandWidth"></param>
+        /// <param name="deliverySystem"></param>
+        /// <param name="PIDs"></param>
+        /// <param name="fastTuning"></param>
+        /// <returns></returns>
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        {
+            _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
+
+            var res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, PIDs, fastTuning);
+
+            if (res.Result != SearchProgramResultEnum.OK)
+            {
+                return res;
+            }
+
+            // freq tuned
+            try
+            {
                 // timeout for get signal:
                 var startTime = DateTime.Now;
 
@@ -1308,65 +1331,17 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, MapPID {mapPID}, type: {deliverySystem} fastTuning: {fastTuning}");
 
-            var res = new TuneResult();
+            var res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { 0, 17 }, fastTuning);
+
+            if (res.Result != SearchProgramResultEnum.OK)
+            {
+                return res;
+            }
+
+            // freq tuned
 
             try
             {
-                DVBTResponse tuneRes = null;
-                DVBTResponse setPIDres = null;
-
-                var attemptsCount = fastTuning ? 1 : 5;
-
-                // this fix the "MUX switching no driver data error"
-
-                var preTuneRes = await Tune(0, bandWidth, deliverySystem);
-
-                // set PIDs 0 and 17
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    setPIDres = await SetPIDs(new List<long>() { 0, 17 });
-
-                    if (setPIDres.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(100);
-                    }
-                }
-
-                if (!setPIDres.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // five attempts
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    tuneRes = await Tune(frequency, bandWidth, deliverySystem);
-
-                    if (tuneRes.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(500);
-                    }
-                }
-
-                if (!tuneRes.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // freq tuned
-
                 // timeout for get signal:
                 var startTime = DateTime.Now;
 
@@ -1424,6 +1399,9 @@ namespace DVBTTelevizor
                 pmtTableSearchRes.PIDs.Add(18); // EIT
                 pmtTableSearchRes.PIDs.Add(20); // TDT
                 pmtTableSearchRes.PIDs.Add(mapPID);
+
+                var attemptsCount = fastTuning ? 1 : 6;
+                DVBTResponse setPIDres = null;
 
                 // set all PIDs
                 for (var i = 1; i <= attemptsCount; i++)

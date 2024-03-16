@@ -95,15 +95,16 @@
 
             <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
-                <Grid x:Name="TuningInfoGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                <Grid x:Name="TuningInfoGrid" IsVisible="True" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0"  BackgroundColor="Transparent">
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="50*" />
-                        <ColumnDefinition Width="35*" />
-                        <ColumnDefinition Width="15*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="55*" />
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="10*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="0" RowSpacing="0" Margin="0,0,0,0">
@@ -120,25 +121,39 @@
                         <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
                     </Grid>
 
-                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding DeliverySystemCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                    <ActivityIndicator Grid.Row="0" Grid.Column="2" IsRunning="{Binding IsTuning}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
+                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding DeliverySystemCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <ActivityIndicator Grid.Row="0" Grid.Column="3" IsRunning="{Binding IsTuning}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
                 </Grid>
 
-                <Grid x:Name="SignalProgressGrid" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                <Grid x:Name="SignalProgressGrid" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0" BackgroundColor="Transparent" IsVisible="{Binding IsTuned}">
 
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="25*" />
                         <ColumnDefinition Width="55*" />
-                        <ColumnDefinition Width="20*" />
+                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="10*" />
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Row="0" Grid.Column="0" Text="Signal" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalStrengthProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Start" Margin="0,5,0,0" HeightRequest="10" />
-                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="2" Text="{Binding SignalStrengthProgressCaption}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <CheckBox Grid.Row="0" Grid.Column="3" IsChecked="{Binding HasSignal}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0"  />
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Carrier" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding HasCarrier}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0"  />
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Sync" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding HasSynced}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0"  />
+
+                    <Label Grid.Row="3" Grid.Column="0" Text="Lock" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding HasLocked}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0"  />
                 </Grid>
 
             </StackLayout>

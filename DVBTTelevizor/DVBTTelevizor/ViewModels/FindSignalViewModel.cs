@@ -1,4 +1,5 @@
-﻿using Android.Preferences;
+﻿using Android.Locations;
+using Android.Preferences;
 using LoggerService;
 using MPEGTS;
 using System;
@@ -19,6 +20,11 @@ namespace DVBTTelevizor
         private long _tuneBandWidthKHz;
         private int _deliverySystem;
 
+        private bool _hasSignal;
+        private bool _hasCarrier;
+        private bool _hasSynced;
+        private bool _hasLocked;
+
         private TuneStateEnum _tuneState = TuneStateEnum.TuningInProgress;
         private double _signalStrengthProgress = 0;
         protected IDVBTDriverManager _driver;
@@ -30,9 +36,35 @@ namespace DVBTTelevizor
         {
             _driver = driver;
 
+            _driver.StatusChanged += _driver_StatusChanged;
+
             _signalStrengthBackgroundWorker = new BackgroundWorker();
             _signalStrengthBackgroundWorker.WorkerSupportsCancellation = true;
             _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
+        }
+
+        private void _driver_StatusChanged(object sender, EventArgs e)
+        {
+            if (e is DVBTTelevizor.StatusChangedEventArgs statusArgs &&
+                statusArgs.Status != null &&
+                statusArgs.Status is DVBTStatus status)
+            {
+                if (status.SuccessFlag)
+                {
+                    SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
+                    HasCarrier = status.hasCarrier == 1;
+                    HasLocked = status.hasLock == 1;
+                    HasSignal = status.hasSignal == 1;
+                    HasSynced = status.hasSync == 1;
+                } else
+                {
+                    SignalStrengthProgress = 0;
+                    HasCarrier = false;
+                    HasSignal = false;
+                    HasSynced = false;
+                    HasLocked = false;
+                }
+            }
         }
 
         public enum TuneStateEnum
@@ -41,6 +73,62 @@ namespace DVBTTelevizor
             TuneFinishedOK = 2,
             TuneFinishedNoSignal = 3,
             TuneFailed = 4
+        }
+
+        public bool HasSignal
+        {
+            get
+            {
+                return _hasSignal;
+            }
+            set
+            {
+                _hasSignal = value;
+
+                OnPropertyChanged(nameof(HasSignal));
+            }
+        }
+
+        public bool HasCarrier
+        {
+            get
+            {
+                return _hasCarrier;
+            }
+            set
+            {
+                _hasCarrier = value;
+
+                OnPropertyChanged(nameof(HasCarrier));
+            }
+        }
+
+        public bool HasSynced
+        {
+            get
+            {
+                return _hasSynced;
+            }
+            set
+            {
+                _hasSynced = value;
+
+                OnPropertyChanged(nameof(HasSynced));
+            }
+        }
+
+        public bool HasLocked
+        {
+            get
+            {
+                return _hasLocked;
+            }
+            set
+            {
+                _hasLocked = value;
+
+                OnPropertyChanged(nameof(HasLocked));
+            }
         }
 
         public double SignalStrengthProgress
@@ -132,8 +220,8 @@ namespace DVBTTelevizor
             get
             {
                 return
-                    _tuneState == TuneStateEnum.TuneFinishedOK ||
-                    _tuneState == TuneStateEnum.TuneFinishedNoSignal;
+                    _driver.Connected &&
+                    _tuneState == TuneStateEnum.TuneFinishedOK;
             }
         }
 
@@ -167,6 +255,7 @@ namespace DVBTTelevizor
 
                 OnPropertyChanged(nameof(TuneState));
                 OnPropertyChanged(nameof(IsTuning));
+                OnPropertyChanged(nameof(IsTuned));
             }
         }
 
@@ -185,24 +274,15 @@ namespace DVBTTelevizor
 
             try
             {
-                // this fix the "MUX switching no driver data error"
-                await _driver.Tune(0, TuneBandWidthKHz * 1000, DeliverySystem);
+                var status = await _driver.TuneAndSetPIDsEnhanced(FrequencyKHz * 1000, TuneBandWidthKHz * 1000, DeliverySystem, new List<long>() { 0, 17 }, false);
 
-                var status = await _driver.TuneEnhanced(FrequencyKHz * 1000, TuneBandWidthKHz * 1000, DeliverySystem, new List<long>() { 0, 17 }, false);
-
-                switch (status.Result)
+                if (status.Result == SearchProgramResultEnum.OK)
                 {
-                    case SearchProgramResultEnum.NoSignal:
-                        MessagingCenter.Send($"No signal", BaseViewModel.MSG_ToastMessage);
-                        TuneState = TuneStateEnum.TuneFinishedNoSignal;
-                        break;
-                    case SearchProgramResultEnum.Error:
-                        MessagingCenter.Send($"Tune error", BaseViewModel.MSG_ToastMessage);
-                        TuneState = TuneStateEnum.TuneFailed;
-                        break;
-                    case SearchProgramResultEnum.OK:
-                        TuneState = TuneStateEnum.TuneFinishedOK;
-                        break;
+                    TuneState = TuneStateEnum.TuneFinishedOK;
+                } else
+                {
+                    MessagingCenter.Send($"Tune error", BaseViewModel.MSG_ToastMessage);
+                    TuneState = TuneStateEnum.TuneFailed;
                 }
             }
             catch (Exception ex)
@@ -243,12 +323,6 @@ namespace DVBTTelevizor
 
                             var status = await _driver.GetStatus();
 
-                            _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
-
-                            if (status.SuccessFlag)
-                            {
-                                SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
-                            }
                         }).Wait();
                     }
                     else
