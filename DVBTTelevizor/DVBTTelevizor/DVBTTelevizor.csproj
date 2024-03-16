@@ -15,7 +15,7 @@
     <PackageReference Include="LibVLCSharp" Version="3.7.0" />
     <PackageReference Include="LibVLCSharp.Forms" Version="3.7.0" />
     <PackageReference Include="LoggerService" Version="1.0.4" />
-    <PackageReference Include="MPEGTS" Version="1.0.16" />
+    <PackageReference Include="MPEGTS" Version="1.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Plugin.InAppBilling" Version="7.0.5" />
     <PackageReference Include="RemoteAccessService" Version="1.0.4" />
