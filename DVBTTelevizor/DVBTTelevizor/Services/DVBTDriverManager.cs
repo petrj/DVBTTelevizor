@@ -1214,7 +1214,6 @@ namespace DVBTTelevizor
         /// <param name="frequency"></param>
         /// <param name="bandWidth"></param>
         /// <param name="deliverySystem"></param>
-        /// <param name="PIDs"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
@@ -1388,38 +1387,23 @@ namespace DVBTTelevizor
         }
 
         /// <summary>
-        /// Tuning with timeout
+        /// Set up channles PIDs by map PID
         /// </summary>
-        /// <param name="frequency"></param>
-        /// <param name="bandWidth"></param>
-        /// <param name="deliverySystem"></param>
-        /// <param name="PID"></param>
+        /// <param name="mapPID"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
+        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
-            _log.Debug($"Tuning enhanced freq: {frequency} MHz, MapPID {mapPID}, type: {deliverySystem} fastTuning: {fastTuning}");
+            _log.Debug($"Set up channle PIDs for mapPID: {mapPID}, fastTuning: {fastTuning}");
 
             double searchPIDsTime = 0;
             double setPIDsTime = 0;
-            double tuneEnhancedTime = 0;
-
-            TuneResult res = null;
 
             var startTime = DateTime.Now;
 
             try
             {
-                var startTuneTime = DateTime.Now;
-
-                res = await TuneEnhanced(frequency, bandWidth, deliverySystem, fastTuning);
-
-                tuneEnhancedTime += (DateTime.Now - startTuneTime).TotalMilliseconds;
-
-                if (res.Result != SearchProgramResultEnum.OK)
-                {
-                    return res;
-                }
+                var res = new TuneResult();
 
                 var searchPIDsStartTime = DateTime.Now;
 
@@ -1457,20 +1441,11 @@ namespace DVBTTelevizor
 
                 res.Result = SearchProgramResultEnum.OK;
                 return res;
-
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex);
-
-                res.Result = SearchProgramResultEnum.Error;
-                return res;
             } finally
             {
                 var totalTime = (DateTime.Now - startTime).TotalMilliseconds;
 
-                _log.Debug($"-----------Tuning {(frequency / 1000).ToString("N0")} MHz + MapPID {mapPID} ---------------------");
-                _log.Debug($"TuneEnhanced:           {tuneEnhancedTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"-----------Set PIDs for MapPID {mapPID} ---------------------");
                 _log.Debug($"Search:                 {searchPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"Set PIDs:               {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"-----------------------------------------------------");
@@ -1479,6 +1454,11 @@ namespace DVBTTelevizor
             }
         }
 
+        /// <summary>
+        /// EPG scan
+        /// </summary>
+        /// <param name="msTimeout"></param>
+        /// <returns></returns>
         public async Task<EITScanResult> ScanEPG(int msTimeout = 2000)
         {
             _log.Debug($"Scanning EPG from Buffer");

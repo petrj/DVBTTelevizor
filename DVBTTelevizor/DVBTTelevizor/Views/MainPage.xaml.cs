@@ -2126,32 +2126,53 @@ namespace DVBTTelevizor
 
                 if (shouldDriverPlay)
                 {
-                    MessagingCenter.Send($"Tuning {channel.FrequencyShortLabel} ....", BaseViewModel.MSG_LongToastMessage);
+                    // tuning only when changing frequency, bandwidth or DVBTType
 
-                    //var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.PIDsArary, false);
-                    var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, channel.ProgramMapPID, false);
-                    if (tunedRes.Result != SearchProgramResultEnum.OK)
+                    var tuneNeeded = true;
+
+                    if (_viewModel.PlayingChannel != null &&
+                        _viewModel.PlayingChannel.Frequency == channel.Frequency &&
+                        _viewModel.PlayingChannel.Bandwdith == channel.Bandwdith &&
+                        _viewModel.PlayingChannel.DVBTType == channel.DVBTType)
                     {
-                        switch (tunedRes.Result)
+                        tuneNeeded = false;
+                        MessagingCenter.Send($"Tuning ....", BaseViewModel.MSG_LongToastMessage);
+                    }
+
+                    if (tuneNeeded)
+                    {
+                        MessagingCenter.Send($"Tuning {channel.FrequencyShortLabel} ....", BaseViewModel.MSG_LongToastMessage);
+
+                        var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
+                        if (tunedRes.Result != SearchProgramResultEnum.OK)
                         {
-                            case SearchProgramResultEnum.NoSignal:
-                                MessagingCenter.Send($"No signal", BaseViewModel.MSG_ToastMessage);
-                                break;
-                            default:
-                                MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
-                                break;
+                            switch (tunedRes.Result)
+                            {
+                                case SearchProgramResultEnum.NoSignal:
+                                    MessagingCenter.Send($"No signal", BaseViewModel.MSG_ToastMessage);
+                                    break;
+                                default:
+                                    MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
+                                    break;
+                            }
+
+                            return;
                         }
 
+                        signalStrengthPercentage = tunedRes.SignalPercentStrength;
+                    }
+
+                    var setupPIDsRes = await _driver.SetupChannelPIDs(channel.ProgramMapPID, false);
+
+                    if (setupPIDsRes.Result != SearchProgramResultEnum.OK)
+                    {
+                        MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
                         return;
                     }
 
                     _driver.StartStream();
 
                     _lastActionPlayTime = DateTime.Now;
-
-                    //await _viewModel.ScanEPG(channel, true, 2000);
-
-                    signalStrengthPercentage = tunedRes.SignalPercentStrength;
                 }
 
                 if (shouldMediaPlay)

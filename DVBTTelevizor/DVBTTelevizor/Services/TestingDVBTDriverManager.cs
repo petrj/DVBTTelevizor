@@ -125,6 +125,14 @@ namespace DVBTTelevizor
         {
         }
 
+        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        {
+            return new TuneResult()
+            {
+                Result = SearchProgramResultEnum.OK
+            };
+        }
+
         public async Task<bool> DriverSendingData(int readMsTimeout = 500)
         {
             return true;
@@ -433,12 +441,6 @@ namespace DVBTTelevizor
                 ResponseTime = DateTime.Now,
                 Bytes = new List<byte>()
             };
-        }
-
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
-        {
-            LastPID = mapPID;
-            return await TuneEnhanced(frequency, bandWidth, deliverySystem, fastTuning);
         }
 
         public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
