@@ -14,6 +14,8 @@ namespace DVBTTelevizor
         private long LastFreq { get; set; }
         private long LastPID { get; set; }
 
+        public event EventHandler StatusChanged;
+
         public DVBTDriverStreamTypeEnum DVBTDriverStreamType
         {
             get
@@ -39,7 +41,7 @@ namespace DVBTTelevizor
 
         public bool ReadingStream { get; set; } = false;
 
-        public bool Streaming { get; set; } = true;
+        public bool Streaming { get; set; } = false;
 
         public string StreamUrl { get; set; } = "udp://@localhost:9600";
 
@@ -85,10 +87,12 @@ namespace DVBTTelevizor
 
         public void StartStream()
         {
+            Streaming = true;
         }
 
         public void StopStream()
         {
+            Streaming = false;
         }
 
         public async Task<bool> Stop()
@@ -117,8 +121,21 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000)
+        public async Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
         {
+        }
+
+        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        {
+            return new TuneResult()
+            {
+                Result = SearchProgramResultEnum.OK
+            };
+        }
+
+        public async Task<bool> DriverSendingData(int readMsTimeout = 500)
+        {
+            return true;
         }
 
         public async Task<DVBTStatus> GetStatus()
@@ -426,15 +443,9 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
-        {
-            return await TuneEnhanced(frequency, bandWidth, deliverySystem, new List<long>() { mapPID }, fastTuning);
-        }
-
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             LastFreq = frequency;
-            LastPID = PIDs[0];
 
             System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
 
@@ -460,6 +471,14 @@ namespace DVBTTelevizor
                     SignalPercentStrength = 0
                 };
             }
+        }
+
+        public async Task<TuneResult> WaitForSignal(bool fastTuning)
+        {
+            return new TuneResult()
+            {
+                Result = SearchProgramResultEnum.OK
+            };
         }
 
         public Stream VideoStream

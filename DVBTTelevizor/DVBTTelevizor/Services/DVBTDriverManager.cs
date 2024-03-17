@@ -18,6 +18,7 @@ using Android.Net.Sip;
 using SQLite;
 using DVBTTelevizor.Services;
 using Java.IO;
+using System.Threading;
 
 namespace DVBTTelevizor
 {
@@ -58,6 +59,9 @@ namespace DVBTTelevizor
         private string _dataStreamInfo = "Data reading not initialized";
 
         private DVBUDPStreamer _DVBUDPStreamer;
+
+        public delegate void StatusChangedEventHandler(object sender, StatusChangedEventArgs e);
+        public event EventHandler StatusChanged;
 
         public DVBTDriverManager(ILoggingService loggingService, DVBTTelevizorConfiguration config)
         {
@@ -336,6 +340,16 @@ namespace DVBTTelevizor
 
                 _readBuffer.Clear();
                 _readingBuffer = true;
+            }
+        }
+
+        private bool BufferContainsData()
+        {
+            lock (_readThreadLock)
+            {
+                //_log.Debug($"Getting buffer count");
+
+                return _readBuffer.Count > 0;
             }
         }
 
@@ -693,6 +707,11 @@ namespace DVBTTelevizor
 
             _log.Debug($"Status response: {status.ToString()}");
 
+            if (StatusChanged != null)
+            {
+                StatusChanged(this, new StatusChangedEventArgs() { Status = status });
+            }
+
             return status;
         }
 
@@ -733,30 +752,6 @@ namespace DVBTTelevizor
 
             try
             {
-
-                //if (frequency == _lastTunedFreq && deliverySystem == _lastTunedDeliverySystem)
-                //{
-                //    _log.Debug($"Frequency already tuned");
-
-                //    return new DVBTResponse()
-                //    {
-                //        SuccessFlag = true,
-                //        RequestTime = DateTime.Now,
-                //        ResponseTime = DateTime.Now
-                //    };
-                //}
-
-                // 26 bytes
-
-                //List<byte> bytesToSend = new List<byte>();
-
-                //bytesToSend.Add(2); // REQ_TUNE
-                //bytesToSend.Add(3); // Payload for 3 longs
-
-                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(frequency)); // Payload[0] => frequency
-                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(bandwidth)); // Payload[1] => bandWidth
-                //bytesToSend.AddRange(DVBTStatus.GetByteArrayFromBigEndianLong(deliverySyetem));         // Payload[2] => DeliverySystem DVBT
-
                 var payload = new List<long>() { frequency, bandwidth, Convert.ToInt64(deliverySystem) };
 
                 var responseSize = 10;
@@ -817,20 +812,21 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000)
+        public async Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
         {
             _log.Debug($"--------------------------------------------------------------------");
             _log.Debug($"Wait For Buffer PIDs: {String.Join(",", PIDs)}");
 
-            var pidsFound = new Dictionary<long, int>();
-            var wrongPIDsFound = new Dictionary<long, int>();
-            foreach (var pid in PIDs)
-            {
-                pidsFound.Add(pid, 0);
-            }
-
             try
             {
+                StartReadBuffer();
+
+                // waiting
+                await Task.Delay(readMsTimeout);
+
+                var pidsFound = new Dictionary<long, int>();
+                var wrongPIDsFound = new Dictionary<long, int>();
+
                 var startTime = DateTime.Now;
 
                 while ((DateTime.Now - startTime).TotalMilliseconds < msTimeout)
@@ -845,22 +841,14 @@ namespace DVBTTelevizor
 
                     foreach (var pidPackets in packetsByPID)
                     {
-                        //_log.Debug($"  PID  : {pidPackets.Key.ToString().PadLeft(10)} {pidPackets.Value.Count.ToString().PadLeft(10)}(x)");
-
-                        if (!pidsFound.ContainsKey(pidPackets.Key))
-                        {
-                            if (!wrongPIDsFound.ContainsKey(pidPackets.Key))
-                            {
-                                wrongPIDsFound.Add(pidPackets.Key, 0);
-                            }
-                            wrongPIDsFound[pidPackets.Key] = pidPackets.Value.Count;
-                        }
-                        else
+                        if (PIDs.Contains(pidPackets.Key))
                         {
                             pidsFound[pidPackets.Key] = pidPackets.Value.Count;
+                        } else
+                        {
+                            wrongPIDsFound[pidPackets.Key] = pidPackets.Value.Count;
                         }
                     }
-
 
                     _log.Debug($"--Found:");
                     foreach (var pids in pidsFound)
@@ -876,13 +864,28 @@ namespace DVBTTelevizor
                         }
                     }
 
+                    if (pidsFound.Count == PIDs.Count &&
+                        wrongPIDsFound.Count == 0)
+                    {
+                        _log.Debug($"All PIDs found");
+                        return;
+                    }
 
-                    await Task.Delay(100);
+                    await Task.Delay(readMsTimeout);
+
+                    ClearReadBuffer();
+                    pidsFound.Clear();
+                    wrongPIDsFound.Clear();
                 }
+
+                _log.Debug($"Wait for PIDs timeout!");
 
             } catch (Exception ex)
             {
                 _log.Error(ex);
+            } finally
+            {
+                StopReadBuffer();
             }
         }
 
@@ -1168,123 +1171,154 @@ namespace DVBTTelevizor
             }
         }
 
+        public async Task<bool> DriverSendingData(int readMsTimeout = 500)
+        {
+            _log.Debug($"Testing driver data");
+
+            try
+            {
+                StartReadBuffer();
+
+                var startTime = DateTime.Now;
+
+                while ((DateTime.Now - startTime).TotalMilliseconds < readMsTimeout)
+                {
+                    // waiting
+                    await Task.Delay(50);
+
+                    if (BufferContainsData())
+                    {
+                        _log.Debug($"Non zero buffer (after {(DateTime.Now - startTime).TotalSeconds} ms)");
+                        return true;
+                    }
+                }
+
+                _log.Debug($"No data in Buffer!");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+                return false;
+            }
+            finally
+            {
+                ClearReadBuffer();
+                StopReadBuffer();
+            }
+        }
+
         /// <summary>
-        /// Tuning with timeout
+        /// Tuning with timeout (setting PIDs 0,17,18)
         /// </summary>
         /// <param name="frequency"></param>
         /// <param name="bandWidth"></param>
         /// <param name="deliverySystem"></param>
-        /// <param name="PIDs"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning)
+        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
 
-            var res = new TuneResult();
+            TuneResult res = null;
+            DVBTResponse tuneRes = null;
+            DVBTResponse setPIDres = null;
+
+            double getSignalTime = 0;
+            double testDataTime = 0;
+            double tuneTime = 0;
+            double setPIDsTime = 0;
+
+            var attemptsCount = fastTuning ? 2 : 6;
+            var tuneAttemptsCount = fastTuning ? 3 : 6;
+
+            var tuningStartTime = DateTime.Now;
+            var PIDs = new List<long>() { 0, 17, 18 };
 
             try
             {
-                DVBTResponse tuneRes = null;
-                DVBTResponse setPIDres = null;
-
-                var attemptsCount = fastTuning ? 1 : 6;
-
-                // five attempts
-                for (var i = 1; i <= attemptsCount; i++)
+                for (var j = 1; j < tuneAttemptsCount; j++)
                 {
-                    tuneRes = await Tune(frequency, bandWidth, deliverySystem);
+                    var startTuneTime = DateTime.Now;
 
-                    if (tuneRes.SuccessFlag)
+                    for (var i = 1; i < attemptsCount; i++)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        if (fastTuning)
+                        tuneRes = await Tune(frequency, bandWidth, deliverySystem);
+
+                        if (tuneRes.SuccessFlag)
                         {
-                            await Task.Delay(50);
-                        } else
+                            _log.Debug($"Tune response time: {(tuneRes.ResponseTime - tuneRes.RequestTime).TotalMilliseconds} ms");
+                            break;
+                        }
+                        else
                         {
-                            await Task.Delay(500);
+                            await Task.Delay(fastTuning ? 50 : 100);
                         }
                     }
-                }
 
-                if (!tuneRes.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
+                    tuneTime += (DateTime.Now - startTuneTime).TotalMilliseconds;
 
-                // set PIDs 0 and 17
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    setPIDres = await SetPIDs(PIDs);
-
-                    if (setPIDres.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(100);
-                    }
-                }
-
-                if (!setPIDres.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // freq tuned
-
-                // timeout for get signal:
-                var startTime = DateTime.Now;
-
-                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 14;
-                var timeoutforSignalLockSeconds = fastTuning ? 2 : 6;
-
-                DVBTStatus status = new DVBTStatus();
-
-                while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
-                {
-                    status = await GetStatus();
-
-                    if (!status.SuccessFlag)
+                    if (!tuneRes.SuccessFlag)
                     {
                         res.Result = SearchProgramResultEnum.Error;
                         return res;
                     }
 
-                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
+                    var startSetPIDsStartTime = DateTime.Now;
+
+                    // set PIDs 0 and 17
+                    for (var i = 1; i <= attemptsCount; i++)
                     {
-                        res.Result = SearchProgramResultEnum.NoSignal;
-                        break;
+                        setPIDres = await SetPIDs(PIDs);
+
+                        if (setPIDres.SuccessFlag)
+                        {
+                            _log.Debug($"SetPIDs response time: {(setPIDres.ResponseTime - setPIDres.RequestTime).TotalMilliseconds} ms");
+                            break;
+                        }
+                        else
+                        {
+                            await Task.Delay(fastTuning ? 50 : 100);
+                        }
                     }
 
-                    if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
+                    setPIDsTime += (DateTime.Now - startSetPIDsStartTime).TotalMilliseconds;
+
+                    if (!setPIDres.SuccessFlag)
                     {
-                        res.Result = SearchProgramResultEnum.OK;
-                        break;
+                        res.Result = SearchProgramResultEnum.Error;
+                        return res;
                     }
 
-                    // waiting
-                    await Task.Delay(fastTuning ? 400 : 850);
-                }
+                    var getSignalStartTime = DateTime.Now;
 
-                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
-                {
-                    res.Result = SearchProgramResultEnum.NoSignal;
-                    return res;
-                }
+                    res = await WaitForSignal(fastTuning);
 
-                res.SignalPercentStrength = status.rfStrengthPercentage;
+                    if (res.Result != SearchProgramResultEnum.OK)
+                    {
+                        return res;
+                    }
+
+                    getSignalTime += (DateTime.Now - getSignalStartTime).TotalMilliseconds;
+
+                    var testDataStartTime = DateTime.Now;
+
+                    var driverSendingData = await DriverSendingData(fastTuning ? 500 : 1000);
+
+                    testDataTime += (DateTime.Now - testDataStartTime).TotalMilliseconds;
+
+                    if (driverSendingData)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        _log.Info("No data after PIDs set and signal locked");
+                        //await Tune(0, bandWidth, deliverySystem);
+                    }
+                }
 
                 return res;
-
             }
             catch (Exception ex)
             {
@@ -1293,121 +1327,90 @@ namespace DVBTTelevizor
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
             }
+            finally
+            {
+                var totalTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
+
+                _log.Debug($"-----------Tuning {(frequency/1000).ToString("N0")} MHz ---------------------");
+                _log.Debug($"Tune:                   {tuneTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"Set PIDs:               {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"Test data:              {testDataTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"-----------------------------------------------------");
+                _log.Debug($"Tuning total time:      {totalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"-----------------------------------------------------");
+            }
+        }
+
+        public async Task<TuneResult> WaitForSignal(bool fastTuning)
+        {
+            TuneResult res = new TuneResult() { Result = SearchProgramResultEnum.NoSignal };
+
+            // timeout for get signal:
+            var startTime = DateTime.Now;
+
+            var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
+            var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
+
+            DVBTStatus status = new DVBTStatus();
+
+            while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
+            {
+                status = await GetStatus();
+
+                if (!status.SuccessFlag)
+                {
+                    res.Result = SearchProgramResultEnum.Error;
+                    return res;
+                }
+
+                if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
+                {
+                    res.Result = SearchProgramResultEnum.NoSignal;
+                    break;
+                }
+
+                if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
+                {
+                    res.Result = SearchProgramResultEnum.OK;
+                    break;
+                }
+
+                // waiting
+                await Task.Delay(fastTuning ? 400 : 850);
+            }
+
+            if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+            {
+                res.Result = SearchProgramResultEnum.NoSignal;
+                return res;
+            }
+
+            res.SignalPercentStrength = status.rfStrengthPercentage;
+
+            return res;
         }
 
         /// <summary>
-        /// Tuning with timeout
+        /// Set up channles PIDs by map PID
         /// </summary>
-        /// <param name="frequency"></param>
-        /// <param name="bandWidth"></param>
-        /// <param name="deliverySystem"></param>
-        /// <param name="PID"></param>
+        /// <param name="mapPID"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, long mapPID, bool fastTuning)
+        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
-            _log.Debug($"Tuning enhanced freq: {frequency} MHz, MapPID {mapPID}, type: {deliverySystem} fastTuning: {fastTuning}");
+            _log.Debug($"Set up channle PIDs for mapPID: {mapPID}, fastTuning: {fastTuning}");
 
-            var res = new TuneResult();
+            double searchPIDsTime = 0;
+            double setPIDsTime = 0;
+
+            var startTime = DateTime.Now;
 
             try
             {
-                DVBTResponse tuneRes = null;
-                DVBTResponse setPIDres = null;
+                var res = new TuneResult();
 
-                var attemptsCount = fastTuning ? 1 : 5;
-
-                // this fix the "MUX switching no driver data error"
-
-                var preTuneRes = await Tune(0, bandWidth, deliverySystem);
-
-                // set PIDs 0 and 17
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    setPIDres = await SetPIDs(new List<long>() { 0, 17 });
-
-                    if (setPIDres.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(100);
-                    }
-                }
-
-                if (!setPIDres.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // five attempts
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    tuneRes = await Tune(frequency, bandWidth, deliverySystem);
-
-                    if (tuneRes.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(500);
-                    }
-                }
-
-                if (!tuneRes.SuccessFlag)
-                {
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
-
-                // freq tuned
-
-                // timeout for get signal:
-                var startTime = DateTime.Now;
-
-                var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
-                var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
-
-                DVBTStatus status = new DVBTStatus();
-
-                while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
-                {
-                    status = await GetStatus();
-
-                    if (!status.SuccessFlag)
-                    {
-                        res.Result = SearchProgramResultEnum.Error;
-                        return res;
-                    }
-
-                    if (status.hasSignal == 0 && status.hasCarrier == 0 && (DateTime.Now - startTime).TotalSeconds > timeoutforSignalLockSeconds)
-                    {
-                        res.Result = SearchProgramResultEnum.NoSignal;
-                        break;
-                    }
-
-                    if (status.hasSignal == 1 && status.hasSync == 1 && status.hasLock == 1)
-                    {
-                        res.Result = SearchProgramResultEnum.OK;
-                        break;
-                    }
-
-                    // waiting
-                    await Task.Delay(fastTuning ? 400 : 850);
-                }
-
-                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
-                {
-                    res.Result = SearchProgramResultEnum.NoSignal;
-                    return res;
-                }
-
-                res.SignalPercentStrength = status.rfStrengthPercentage;
+                var searchPIDsStartTime = DateTime.Now;
 
                 // set Map PID for getting PMT table
                 var pmtTableSearchRes = await SearchProgramPIDs(mapPID);
@@ -1418,6 +1421,10 @@ namespace DVBTTelevizor
                     return res;
                 }
 
+                searchPIDsTime += (DateTime.Now - searchPIDsStartTime).TotalMilliseconds;
+
+                var setPIDsStartTime = DateTime.Now;
+
                 pmtTableSearchRes.PIDs.Add(0);  // PAT
                 pmtTableSearchRes.PIDs.Add(16); // NIT
                 pmtTableSearchRes.PIDs.Add(17); // SDT
@@ -1425,21 +1432,9 @@ namespace DVBTTelevizor
                 pmtTableSearchRes.PIDs.Add(20); // TDT
                 pmtTableSearchRes.PIDs.Add(mapPID);
 
-                // set all PIDs
-                for (var i = 1; i <= attemptsCount; i++)
-                {
-                    setPIDres = await SetPIDs(pmtTableSearchRes.PIDs);
+                DVBTResponse setPIDres = null;
 
-                    if (setPIDres.SuccessFlag)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (!fastTuning)
-                            await Task.Delay(100);
-                    }
-                }
+                setPIDres = await SetPIDs(pmtTableSearchRes.PIDs);
 
                 if (!setPIDres.SuccessFlag)
                 {
@@ -1447,19 +1442,28 @@ namespace DVBTTelevizor
                     return res;
                 }
 
+                setPIDsTime += (DateTime.Now - setPIDsStartTime).TotalMilliseconds;
+
                 res.Result = SearchProgramResultEnum.OK;
                 return res;
-
-            }
-            catch (Exception ex)
+            } finally
             {
-                _log.Error(ex);
+                var totalTime = (DateTime.Now - startTime).TotalMilliseconds;
 
-                res.Result = SearchProgramResultEnum.Error;
-                return res;
+                _log.Debug($"-----------Set PIDs for MapPID {mapPID} ---------------------");
+                _log.Debug($"Search:                 {searchPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"Set PIDs:               {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"-----------------------------------------------------");
+                _log.Debug($"Total time:             {totalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"-----------------------------------------------------");
             }
         }
 
+        /// <summary>
+        /// EPG scan
+        /// </summary>
+        /// <param name="msTimeout"></param>
+        /// <returns></returns>
         public async Task<EITScanResult> ScanEPG(int msTimeout = 2000)
         {
             _log.Debug($"Scanning EPG from Buffer");
@@ -1522,14 +1526,26 @@ namespace DVBTTelevizor
                 PSITable psiTable = null;
                 Dictionary<ServiceDescriptor, long> serviceDescriptors = null;
 
+                List<MPEGTransportStreamPacket> packets = null;
+
                 while ((DateTime.Now-startTime).TotalSeconds < timeoutForReadingBuffer)
                 {
                     // searching for PID 0 (PSI) and 17 (SDT) packets ..
 
-                    var packets = MPEGTransportStreamPacket.Parse(Buffer);
+                    try
+                    {
+                        packets = MPEGTransportStreamPacket.Parse(Buffer);
 
-                    sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
-                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
+                        sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
+                        psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
+
+                    } catch (Exception e)
+                    {
+                        _log.Debug($"Wrong data in Buffer");
+                        await Task.Delay(200);
+                        ClearReadBuffer();
+                        continue;
+                    }
 
                     if (sdtTable != null && psiTable != null)
                     {

@@ -63,6 +63,7 @@
 
                             <Label Grid.Row="0" Grid.Column="0" Text="Number" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                             <Entry Grid.Row="0" Grid.Column="2"
+                                   Margin="0,2,0,2"
                                    x:Name="EntryNumber"
                                    Text="{Binding Channel.Number, Mode=TwoWay}"
                                    Placeholder="Channel number"
@@ -74,6 +75,7 @@
 
                             <Label Grid.Row="1" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                             <Entry Grid.Row="1" Grid.Column="2"
+                                   Margin="0,2,0,2"
                                    x:Name="EntryName"
                                    Text="{Binding Channel.Name, Mode=TwoWay}"
                                    Placeholder="Channel name"

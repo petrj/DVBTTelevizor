@@ -17,10 +17,27 @@ namespace DVBTTelevizor
 
         public Command SetDefaultFrequencyCommand { get; set; }
 
+        public Command RightFrequencyCommand { get; set; }
+        public Command LeftFrequencyCommand { get; set; }
+
         public FrequencyViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config)
          : base(loggingService, dialogService, driver, config)
         {
             SetDefaultFrequencyCommand = new Command(() => { FrequencyKHz = FrequencyKHzDefault; });
+
+            LeftFrequencyCommand = new Command(() => { ChangeFreq(false); });
+            RightFrequencyCommand = new Command(() => { ChangeFreq(true); });
+        }
+
+        private void ChangeFreq(bool upOrDown)
+        {
+            //var freqOld = FrequencyKHz;
+            var freq = FrequencyKHz += upOrDown ? FrequencyKHzSliderStep : -FrequencyKHzSliderStep;
+
+            if (ValidFrequency(freq))
+            {
+                FrequencyKHz = freq;
+            }
         }
 
         public string Title

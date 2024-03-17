@@ -902,31 +902,7 @@ namespace DVBTTelevizor
         {
             try
             {
-
-                //#if DEBUG
-                //                await Task.Delay(1000);
-
-                //                var channel = new DVBTChannel();
-                //                channel.PIDs = "0,16,17";
-                //                channel.ProgramMapPID = 5000;
-                //                channel.Name = "Channel name";
-                //                channel.ProviderName = "Multiplex";
-                //                channel.Frequency = freq;
-                //                channel.Bandwdith = bandWidth;
-                //                channel.Number = String.Empty;
-                //                channel.DVBTType = dvbtTypeIndex;
-                //                channel.Type = ServiceTypeEnum.DigitalTelevisionService;
-
-                //                TunedChannels.Add(channel);
-
-                //                Device.BeginInvokeOnMainThread(() =>
-                //                {
-                //                    SelectedChannel = channel;
-                //                });
-                //#endif
-
-
-                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, new List<long>() { 0, 17, 18 }, FastTuning);
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, FastTuning);
 
                 if (tuneResult.Result != SearchProgramResultEnum.Error)
                 {

@@ -39,10 +39,8 @@ namespace DVBTTelevizor
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_UpdateDriverState, (message) =>
             {
                 _viewModel.UpdateDriverState();
-                if (_driver.Connected)
-                {
-                    Task.Run(async () => await _viewModel.Tune());
-                }
+                _viewModel.TuneState = FindSignalViewModel.TuneStateEnum.TuningInProgress;
+                Task.Run(async () => await _viewModel.Tune());
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_DVBTDriverConfigurationFailed, (message) =>
@@ -50,6 +48,8 @@ namespace DVBTTelevizor
                 Device.BeginInvokeOnMainThread(delegate
                 {
                     _viewModel.UpdateDriverState();
+                    _viewModel.TuneState = FindSignalViewModel.TuneStateEnum.TuningInProgress;
+                    Task.Run(async () => await _viewModel.Tune());
                 });
             });
 

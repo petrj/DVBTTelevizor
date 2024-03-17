@@ -210,6 +210,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public double CurrentEPGEventProgress
+        {
+            get
+            {
+                var epg = CurrentEventItem;
+
+                return (epg == null)
+                    ? 0
+                    : epg.Progress;
+            }
+        }
+
         public string CurrentEPGEventTime
         {
             get
@@ -257,6 +269,7 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(CurrentEPGEventTitle));
             OnPropertyChanged(nameof(NextEPGEventTitle));
             OnPropertyChanged(nameof(CurrentEPGEventTime));
+            OnPropertyChanged(nameof(CurrentEPGEventProgress));
         }
 
         public string Icon

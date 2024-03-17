@@ -631,7 +631,7 @@ namespace DVBTTelevizor
                     await ShowAspectMenu(ch);
                     break;
                 case "Scan EPG":
-                    await ScanEPG(ch, false, false, 0, 5000);
+                    await ScanEPG(ch, false, false, 0, 8000);
                     break;
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStream);
@@ -1014,7 +1014,7 @@ namespace DVBTTelevizor
 
                            if (!justPlaying)
                            {
-                               var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, new List<long>() { 0, 17, 18 }, false);
+                               var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
 
                                if (tuned.Result != SearchProgramResultEnum.OK)
                                {
