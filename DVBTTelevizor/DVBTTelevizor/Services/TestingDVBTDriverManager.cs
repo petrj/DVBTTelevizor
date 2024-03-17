@@ -41,7 +41,7 @@ namespace DVBTTelevizor
 
         public bool ReadingStream { get; set; } = false;
 
-        public bool Streaming { get; set; } = true;
+        public bool Streaming { get; set; } = false;
 
         public string StreamUrl { get; set; } = "udp://@localhost:9600";
 
@@ -87,10 +87,12 @@ namespace DVBTTelevizor
 
         public void StartStream()
         {
+            Streaming = true;
         }
 
         public void StopStream()
         {
+            Streaming = false;
         }
 
         public async Task<bool> Stop()

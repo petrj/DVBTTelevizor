@@ -1541,14 +1541,26 @@ namespace DVBTTelevizor
                 PSITable psiTable = null;
                 Dictionary<ServiceDescriptor, long> serviceDescriptors = null;
 
+                List<MPEGTransportStreamPacket> packets = null;
+
                 while ((DateTime.Now-startTime).TotalSeconds < timeoutForReadingBuffer)
                 {
                     // searching for PID 0 (PSI) and 17 (SDT) packets ..
 
-                    var packets = MPEGTransportStreamPacket.Parse(Buffer);
+                    try
+                    {
+                        packets = MPEGTransportStreamPacket.Parse(Buffer);
 
-                    sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
-                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
+                        sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
+                        psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
+
+                    } catch (Exception e)
+                    {
+                        _log.Debug($"Wrong data in Buffer");
+                        await Task.Delay(200);
+                        ClearReadBuffer();
+                        continue;
+                    }
 
                     if (sdtTable != null && psiTable != null)
                     {
