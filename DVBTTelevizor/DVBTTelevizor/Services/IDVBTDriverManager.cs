@@ -66,7 +66,8 @@ namespace DVBTTelevizor
         Task<TuneResult> TuneAndSetPIDsEnhanced(long frequency, long bandWidth, int deliverySystem, List<long> PIDs, bool fastTuning);
         Task<TuneResult> WaitForSignal(bool fastTuning);
 
-        Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000);
+        Task<bool> DriverSendingData(int readMsTimeout = 500);
+        Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000);
         Task<DVBTCapabilities> GetCapabalities();
         Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs);
         Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true);

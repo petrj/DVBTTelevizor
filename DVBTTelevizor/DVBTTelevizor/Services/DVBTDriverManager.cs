@@ -18,6 +18,7 @@ using Android.Net.Sip;
 using SQLite;
 using DVBTTelevizor.Services;
 using Java.IO;
+using System.Threading;
 
 namespace DVBTTelevizor
 {
@@ -339,6 +340,16 @@ namespace DVBTTelevizor
 
                 _readBuffer.Clear();
                 _readingBuffer = true;
+            }
+        }
+
+        private bool BufferContainsData()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"Getting buffer count");
+
+                return _readBuffer.Count > 0;
             }
         }
 
@@ -801,22 +812,21 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000)
+        public async Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
         {
             _log.Debug($"--------------------------------------------------------------------");
             _log.Debug($"Wait For Buffer PIDs: {String.Join(",", PIDs)}");
 
-            _readingBuffer = true;
-
-            var pidsFound = new Dictionary<long, int>();
-            var wrongPIDsFound = new Dictionary<long, int>();
-            foreach (var pid in PIDs)
-            {
-                pidsFound.Add(pid, 0);
-            }
-
             try
             {
+                StartReadBuffer();
+
+                // waiting
+                await Task.Delay(readMsTimeout);
+
+                var pidsFound = new Dictionary<long, int>();
+                var wrongPIDsFound = new Dictionary<long, int>();
+
                 var startTime = DateTime.Now;
 
                 while ((DateTime.Now - startTime).TotalMilliseconds < msTimeout)
@@ -831,22 +841,14 @@ namespace DVBTTelevizor
 
                     foreach (var pidPackets in packetsByPID)
                     {
-                        //_log.Debug($"  PID  : {pidPackets.Key.ToString().PadLeft(10)} {pidPackets.Value.Count.ToString().PadLeft(10)}(x)");
-
-                        if (!pidsFound.ContainsKey(pidPackets.Key))
-                        {
-                            if (!wrongPIDsFound.ContainsKey(pidPackets.Key))
-                            {
-                                wrongPIDsFound.Add(pidPackets.Key, 0);
-                            }
-                            wrongPIDsFound[pidPackets.Key] = pidPackets.Value.Count;
-                        }
-                        else
+                        if (PIDs.Contains(pidPackets.Key))
                         {
                             pidsFound[pidPackets.Key] = pidPackets.Value.Count;
+                        } else
+                        {
+                            wrongPIDsFound[pidPackets.Key] = pidPackets.Value.Count;
                         }
                     }
-
 
                     _log.Debug($"--Found:");
                     foreach (var pids in pidsFound)
@@ -862,16 +864,28 @@ namespace DVBTTelevizor
                         }
                     }
 
+                    if (pidsFound.Count == PIDs.Count &&
+                        wrongPIDsFound.Count == 0)
+                    {
+                        _log.Debug($"All PIDs found");
+                        return;
+                    }
 
-                    await Task.Delay(100);
+                    await Task.Delay(readMsTimeout);
+
+                    ClearReadBuffer();
+                    pidsFound.Clear();
+                    wrongPIDsFound.Clear();
                 }
+
+                _log.Debug($"Wait for PIDs timeout!");
 
             } catch (Exception ex)
             {
                 _log.Error(ex);
             } finally
             {
-                _readingBuffer = false;
+                StopReadBuffer();
             }
         }
 
@@ -1272,6 +1286,43 @@ namespace DVBTTelevizor
             }
         }
 
+        public async Task<bool> DriverSendingData(int readMsTimeout = 500)
+        {
+            _log.Debug($"Testing driver data");
+
+            try
+            {
+                StartReadBuffer();
+
+                var startTime = DateTime.Now;
+
+                while ((DateTime.Now - startTime).TotalMilliseconds < readMsTimeout)
+                {
+                    // waiting
+                    await Task.Delay(50);
+
+                    if (BufferContainsData())
+                    {
+                        _log.Debug($"Non zero buffer (after {(DateTime.Now - startTime).TotalSeconds} ms)");
+                        return true;
+                    }
+                }
+
+                _log.Debug($"No data in Buffer!");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+                return false;
+            }
+            finally
+            {
+                ClearReadBuffer();
+                StopReadBuffer();
+            }
+        }
+
         /// <summary>
         /// Tuning with timeout (setting PIDs 0,17,18)
         /// </summary>
@@ -1289,34 +1340,49 @@ namespace DVBTTelevizor
 
             double tuneAndSetPIDsEnhancedTime = 0;
             double getSignalTime = 0;
+            double testDataTime = 0;
+
+            var attemptsCount = fastTuning ? 2 : 6;
 
             var tuningStartTime = DateTime.Now;
-
             var PIDs = new List<long>() { 0, 17, 18 };
 
             try
             {
-                // this fix the "MUX switching no driver data error"
-                //await Tune(0, bandWidth, deliverySystem);
-
-                res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, PIDs, fastTuning);
-
-                if (res.Result != SearchProgramResultEnum.OK)
+                for (var i = 1; i < attemptsCount; i++)
                 {
-                    return res;
+                    res = await TuneAndSetPIDsEnhanced(frequency, bandWidth, deliverySystem, PIDs, fastTuning);
+
+                    if (res.Result != SearchProgramResultEnum.OK)
+                    {
+                        return res;
+                    }
+
+                    tuneAndSetPIDsEnhancedTime += (DateTime.Now - tuningStartTime).TotalMilliseconds;
+
+                    // freq tuned
+
+                    var getSignalStartTime = DateTime.Now;
+
+                    res = await WaitForSignal(fastTuning);
+
+                    getSignalTime += (DateTime.Now - getSignalStartTime).TotalMilliseconds;
+
+                    var testDataStartTime = DateTime.Now;
+
+                    var driverSendingData = await DriverSendingData();
+
+                    testDataTime += (DateTime.Now - testDataStartTime).TotalMilliseconds;
+
+                    if (driverSendingData)
+                    {
+                        break;
+                    } else
+                    {
+                        _log.Info("No data after PIDs set and signal locked");
+                        //await Tune(0, bandWidth, deliverySystem);
+                    }
                 }
-
-                tuneAndSetPIDsEnhancedTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
-
-                // freq tuned
-
-                var getSignalStartTime = DateTime.Now;
-
-                res = await WaitForSignal(fastTuning);
-
-                getSignalTime = (DateTime.Now - getSignalStartTime).TotalMilliseconds;
-
-                // TODO: use here WaitForBufferPIDs?
 
                 return res;
             }
@@ -1334,6 +1400,7 @@ namespace DVBTTelevizor
                 _log.Debug($"///////////// TunesEnhanced");
                 _log.Debug($"///////////// TuneAndSetPIDsEnhanced: {tuneAndSetPIDsEnhancedTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"///////////// Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
+                _log.Debug($"///////////// Test data:              {testDataTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"///////////// --------------------------------");
                 _log.Debug($"///////////// Tuning total time:      {totalTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"");

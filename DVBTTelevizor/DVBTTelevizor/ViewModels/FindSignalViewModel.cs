@@ -24,6 +24,7 @@ namespace DVBTTelevizor
         private bool _hasCarrier;
         private bool _hasSynced;
         private bool _hasLocked;
+        private long _snr;
 
         private TuneStateEnum _tuneState = TuneStateEnum.TuningInProgress;
         private double _signalStrengthProgress = 0;
@@ -56,6 +57,7 @@ namespace DVBTTelevizor
                     HasLocked = status.hasLock == 1;
                     HasSignal = status.hasSignal == 1;
                     HasSynced = status.hasSync == 1;
+                    SNR = status.snr;
                 } else
                 {
                     SignalStrengthProgress = 0;
@@ -63,6 +65,7 @@ namespace DVBTTelevizor
                     HasSignal = false;
                     HasSynced = false;
                     HasLocked = false;
+                    SNR = 0;
                 }
             }
         }
@@ -100,6 +103,29 @@ namespace DVBTTelevizor
                 _hasCarrier = value;
 
                 OnPropertyChanged(nameof(HasCarrier));
+            }
+        }
+
+        public long SNR
+        {
+            get
+            {
+                return _snr;
+            }
+            set
+            {
+                _snr = value;
+
+                OnPropertyChanged(nameof(SNR));
+                OnPropertyChanged(nameof(SNRLabel));
+            }
+        }
+
+        public string SNRLabel
+        {
+            get
+            {
+                return _snr.ToString("N0");
             }
         }
 

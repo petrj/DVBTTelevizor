@@ -119,8 +119,13 @@ namespace DVBTTelevizor
             };
         }
 
-        public async Task WaitForBufferPIDs(List<long> PIDs, int msTimeout = 3000)
+        public async Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
         {
+        }
+
+        public async Task<bool> DriverSendingData(int readMsTimeout = 500)
+        {
+            return true;
         }
 
         public async Task<DVBTStatus> GetStatus()
