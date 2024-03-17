@@ -89,15 +89,15 @@
                         <Label Grid.Row="1" Grid.Column="2" Text="MHz" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End"/>
                     </Grid>
 
-                    <Grid x:Name="SliderGrid" IsVisible="True" RowSpacing="0" Margin="10,20,10,0">
+                    <Grid x:Name="SliderGrid" IsVisible="True" RowSpacing="0" Margin="0,20,0,0">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="5*" />
-                            <ColumnDefinition Width="90*" />
-                            <ColumnDefinition Width="5*" />
+                            <ColumnDefinition Width="10*" />
+                            <ColumnDefinition Width="80*" />
+                            <ColumnDefinition Width="10*" />
                         </Grid.ColumnDefinitions>
 
                         <Button  Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForLabel}" Command="{Binding LeftFrequencyCommand}" Style="{DynamicResource ButtonStyle}"/>

@@ -101,10 +101,10 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="25*" />
                         <ColumnDefinition Width="55*" />
-                        <ColumnDefinition Width="10*" />
-                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="15*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="0" RowSpacing="0" Margin="0,0,0,0">
