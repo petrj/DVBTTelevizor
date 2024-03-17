@@ -71,7 +71,9 @@ namespace DVBTTelevizor
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("FrequencyKHz", new List<View>() { FrequencyKHzBoxView, EntryFrequencyKHz }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("FrequencyMHz", new List<View>() { FrequencyMHzBoxView, EntryFrequencyMHz }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("LeftFrequency", new List<View>() { LeftButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("SliderFrequency", new List<View>() { SliderFrequencyBoxView }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("RightFrequency", new List<View>() { RightButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DefaultButton", new List<View>() { DefaultButton }));
 
             SliderFrequency.DragCompleted += SliderFrequency_DragCompleted;
@@ -175,6 +177,14 @@ namespace DVBTTelevizor
 
                         case "FrequencyMHz":
                             EntryFrequencyMHz.Focus();
+                            break;
+
+                        case "LeftFrequency":
+                            _viewModel.LeftFrequencyCommand.Execute(null);
+                            break;
+
+                        case "RightFrequency":
+                            _viewModel.RightFrequencyCommand.Execute(null);
                             break;
 
                         case "DefaultButton":

@@ -116,7 +116,7 @@
                         <Picker
                                 Grid.Row="0" Grid.Column="1"
                                 x:Name="AutoManualPicker"
-                                Margin="20,0,0,0"
+                                Margin="20,2,2,2"
                                 FontSize="{Binding FontSizeForPicker}"
                                 Style="{StaticResource PickerStyle}"
                                 SelectedIndex="{Binding TuneModeIndex, Mode=TwoWay}">
