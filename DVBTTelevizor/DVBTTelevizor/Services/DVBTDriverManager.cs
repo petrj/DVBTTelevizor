@@ -1294,11 +1294,16 @@ namespace DVBTTelevizor
 
                     res = await WaitForSignal(fastTuning);
 
+                    if (res.Result != SearchProgramResultEnum.OK)
+                    {
+                        return res;
+                    }
+
                     getSignalTime += (DateTime.Now - getSignalStartTime).TotalMilliseconds;
 
                     var testDataStartTime = DateTime.Now;
 
-                    var driverSendingData = await DriverSendingData();
+                    var driverSendingData = await DriverSendingData(fastTuning ? 500 : 1000);
 
                     testDataTime += (DateTime.Now - testDataStartTime).TotalMilliseconds;
 
