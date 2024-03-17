@@ -214,7 +214,7 @@
 
                                     <Label Grid.Row="3" Grid.Column="1"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                    <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
+                                    <ProgressBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Progress="{Binding CurrentEPGEventProgress}" ProgressColor="#41b3ff" BackgroundColor="White"/>
                                 </Grid>
 
                             </ViewCell.View>
