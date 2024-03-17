@@ -347,7 +347,7 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _log.Debug($"Getting buffer count");
+                //_log.Debug($"Getting buffer count");
 
                 return _readBuffer.Count > 0;
             }

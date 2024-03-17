@@ -122,7 +122,9 @@
                     </Grid>
 
                     <Label Grid.Row="0" Grid.Column="2" Text="{Binding DeliverySystemCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
                     <ActivityIndicator Grid.Row="0" Grid.Column="3" IsRunning="{Binding IsTuning}" IsEnabled="True" HorizontalOptions="End" VerticalOptions="Start"/>
+                    <Label Grid.Row="0" Grid.Column="3" Text="{Binding TuningStateTitle}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                 </Grid>
 
                 <Grid x:Name="SignalProgressGrid" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0" BackgroundColor="Transparent" IsVisible="{Binding IsTuned}">

@@ -251,6 +251,21 @@ namespace DVBTTelevizor
             }
         }
 
+        public string TuningStateTitle
+        {
+            get
+            {
+                switch (_tuneState)
+                {
+                    case TuneStateEnum.TuneFailed: return "Error";
+                    case TuneStateEnum.TuneFinishedNoSignal: return "No signal";
+                    case TuneStateEnum.TuneFinishedOK: return "Tuned";
+                    default:
+                        return "";
+                }
+            }
+        }
+
         public long FrequencyWholePartMHz
         {
             get
@@ -282,6 +297,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(TuneState));
                 OnPropertyChanged(nameof(IsTuning));
                 OnPropertyChanged(nameof(IsTuned));
+                OnPropertyChanged(nameof(TuningStateTitle));
             }
         }
 
