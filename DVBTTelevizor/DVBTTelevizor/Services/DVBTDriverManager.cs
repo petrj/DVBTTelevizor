@@ -1231,7 +1231,7 @@ namespace DVBTTelevizor
             double setPIDsTime = 0;
 
             var attemptsCount = fastTuning ? 2 : 6;
-            var tuneAttemptsCount = fastTuning ? 2 : 3;
+            var tuneAttemptsCount = fastTuning ? 3 : 6;
 
             var tuningStartTime = DateTime.Now;
             var PIDs = new List<long>() { 0, 17, 18 };
