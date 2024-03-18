@@ -39,6 +39,9 @@
 
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
             </Style>
 
         </ResourceDictionary>
@@ -100,8 +103,8 @@
                             <ColumnDefinition Width="10*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button  Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForLabel}" Command="{Binding LeftFrequencyCommand}" Style="{DynamicResource ButtonStyle}"/>
-                        <Button  Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForLabel}" Command="{Binding RightFrequencyCommand}" Style="{DynamicResource ButtonStyle}"/>
+                        <Button  Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}" Command="{Binding LeftFrequencyCommand}" Style="{DynamicResource ButtonStyle}"/>
+                        <Button  Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Command="{Binding RightFrequencyCommand}" Style="{DynamicResource ButtonStyle}"/>
 
                         <BoxView x:Name="SliderFrequencyBoxView" Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent"/>
                         <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding MaxFrequencyKHz}" Value="{Binding FrequencyKHz}" Minimum="{Binding MinFrequencyKHz}"  />
