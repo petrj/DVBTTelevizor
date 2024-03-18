@@ -86,6 +86,14 @@
                 <Setter Property="Margin" Value="0,0,5,0"/>
             </Style>
 
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="20,0,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -103,8 +111,8 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="55*" />
                         <ColumnDefinition Width="5*" />
-                        <ColumnDefinition Width="25*" />
-                        <ColumnDefinition Width="15*" />
+                        <ColumnDefinition Width="20*" />
+                        <ColumnDefinition Width="20*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Row="0" Grid.Column="0" RowSpacing="0" Margin="0,0,0,0">
@@ -161,6 +169,8 @@
                     <Label Grid.Row="4" Grid.Column="0" Text="SNR" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Label Grid.Row="4" Grid.Column="3" Text="{Binding SNRLabel}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0" Style="{DynamicResource LabelStyle}" />
                 </Grid>
+
+                <Button x:Name="ReTuneButton" Text="Retune" Clicked="ReToolTune_Clicked" IsVisible="{Binding RetuneButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0" />
 
             </StackLayout>
 

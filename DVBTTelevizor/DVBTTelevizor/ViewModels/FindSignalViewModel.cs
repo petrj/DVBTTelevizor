@@ -247,7 +247,22 @@ namespace DVBTTelevizor
             {
                 return
                     _driver.Connected &&
-                    _tuneState == TuneStateEnum.TuneFinishedOK;
+                    (
+                        _tuneState == TuneStateEnum.TuneFinishedOK ||
+                        _tuneState == TuneStateEnum.TuneFinishedNoSignal
+                    );
+            }
+        }
+
+        public bool RetuneButtonVisible
+        {
+            get
+            {
+                if (!_driver.Connected)
+                    return false;
+
+                return
+                    _tuneState != TuneStateEnum.TuningInProgress;
             }
         }
 
@@ -258,8 +273,6 @@ namespace DVBTTelevizor
                 switch (_tuneState)
                 {
                     case TuneStateEnum.TuneFailed: return "Error";
-                    case TuneStateEnum.TuneFinishedNoSignal: return "No signal";
-                    case TuneStateEnum.TuneFinishedOK: return "Tuned";
                     default:
                         return "";
                 }
@@ -297,6 +310,7 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(TuneState));
                 OnPropertyChanged(nameof(IsTuning));
                 OnPropertyChanged(nameof(IsTuned));
+                OnPropertyChanged(nameof(RetuneButtonVisible));
                 OnPropertyChanged(nameof(TuningStateTitle));
             }
         }
@@ -321,7 +335,12 @@ namespace DVBTTelevizor
                 if (status.Result == SearchProgramResultEnum.OK)
                 {
                     TuneState = TuneStateEnum.TuneFinishedOK;
-                } else
+                }
+                if (status.Result == SearchProgramResultEnum.NoSignal)
+                {
+                    TuneState = TuneStateEnum.TuneFinishedNoSignal;
+                }
+                else
                 {
                     MessagingCenter.Send($"Tune error", BaseViewModel.MSG_ToastMessage);
                     TuneState = TuneStateEnum.TuneFailed;
@@ -363,7 +382,7 @@ namespace DVBTTelevizor
                         {
                             _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
 
-                            var status = await _driver.GetStatus();
+                            await _driver.GetStatus();
 
                         }).Wait();
                     }

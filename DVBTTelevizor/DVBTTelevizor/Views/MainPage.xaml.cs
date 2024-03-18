@@ -2159,7 +2159,7 @@ namespace DVBTTelevizor
                             return;
                         }
 
-                        signalStrengthPercentage = tunedRes.SignalPercentStrength;
+                        signalStrengthPercentage = tunedRes.SignalState.rfStrengthPercentage;
                     }
 
                     var setupPIDsRes = await _driver.SetupChannelPIDs(channel.ProgramMapPID, false);

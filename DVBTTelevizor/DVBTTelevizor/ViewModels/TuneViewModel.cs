@@ -906,7 +906,7 @@ namespace DVBTTelevizor
 
                 if (tuneResult.Result != SearchProgramResultEnum.Error)
                 {
-                    SignalStrengthProgress = tuneResult.SignalPercentStrength / 100.0;
+                    SignalStrengthProgress = tuneResult.SignalState.rfStrengthPercentage / 100.0;
                 }
 
                 switch (tuneResult.Result)

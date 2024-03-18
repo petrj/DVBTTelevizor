@@ -7,14 +7,14 @@ namespace DVBTTelevizor
 {
     public class DVBTStatus : DVBTResponse
     {
-        public long snr { get; set; }
-        public long bitErrorRate { get; set; }
-        public long droppedUsbFps { get; set; }
-        public long rfStrengthPercentage { get; set; }
-        public long hasSignal { get; set; }
-        public long hasCarrier { get; set; }
-        public long hasSync { get; set; }
-        public long hasLock { get; set; }
+        public long snr { get; set; } = 0;
+        public long bitErrorRate { get; set; } = 0;
+        public long droppedUsbFps { get; set; } = 0;
+        public long rfStrengthPercentage { get; set; } = 0;
+        public long hasSignal { get; set; } = 0;
+        public long hasCarrier { get; set; } = 0;
+        public long hasSync { get; set; } = 0;
+        public long hasLock { get; set; } = 0;
 
         public void ParseFromByteArray(byte[]ar, int offset)
         {

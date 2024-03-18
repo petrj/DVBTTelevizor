@@ -6,6 +6,6 @@ namespace DVBTTelevizor
 {
     public class TuneResult : SearchResult
     {
-        public long SignalPercentStrength { get; set; }
+        public DVBTStatus SignalState { get; set; } = new DVBTStatus();
     }
 }

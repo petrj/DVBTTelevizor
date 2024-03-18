@@ -449,6 +449,8 @@ namespace DVBTTelevizor
 
             System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
 
+            var res = new TuneResult();
+
             if (
                 (
                     (frequency == 490000000) || (frequency == 514000000) || (frequency == 626000000)
@@ -457,20 +459,16 @@ namespace DVBTTelevizor
                 (deliverySystem == 1)
                 )
             {
-                return new TuneResult()
-                {
-                    Result = SearchProgramResultEnum.OK,
-                    SignalPercentStrength = 100
-                };
+                res.Result = SearchProgramResultEnum.OK;
+                res.SignalState.rfStrengthPercentage = 100;
             }
             else
             {
-                return new TuneResult()
-                {
-                    Result = SearchProgramResultEnum.NoSignal,
-                    SignalPercentStrength = 0
-                };
+                res.Result = SearchProgramResultEnum.NoSignal;
+                res.SignalState.rfStrengthPercentage = 0;
             }
+
+            return res;
         }
 
         public async Task<TuneResult> WaitForSignal(bool fastTuning)

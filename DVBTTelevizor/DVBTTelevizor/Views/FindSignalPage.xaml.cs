@@ -22,6 +22,8 @@ namespace DVBTTelevizor
         protected DVBTTelevizorConfiguration _config;
         protected ChannelService _channelService;
 
+        private KeyboardFocusableItemList _focusItems;
+
         private bool _toolBarFocused = false;
 
         public FindSignalPage(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
@@ -53,8 +55,19 @@ namespace DVBTTelevizor
                 });
             });
 
+            _focusItems = new KeyboardFocusableItemList();
+            _focusItems.AddItem(KeyboardFocusableItem.CreateFrom("ReTuneButton", new List<View>() { ReTuneButton }));
+
             Appearing += Page_Appearing;
             Disappearing += Page_Disappearing;
+        }
+
+        private async void ReToolTune_Clicked(object sender, EventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await _viewModel.Tune();
+            });
         }
 
         public void SetFrequency(long freq, long bandWidth, int deliverySystem)
@@ -121,6 +134,7 @@ namespace DVBTTelevizor
             }
         }
 
+
         public async void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"FindSignalPage OnKeyDown {key}");
@@ -130,22 +144,22 @@ namespace DVBTTelevizor
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Down:
-                    if (ToolBarSelected)
-                    {
-                        ToolBarSelected = false;
-                    }
-                    break;
-
                 case KeyboardNavigationActionEnum.Up:
-                    if (ToolBarSelected)
-                    {
-                        ToolBarSelected = false;
-                    }
-                    break;
-
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Left:
-                    ToolBarSelected = !ToolBarSelected;
+                    if (ToolBarSelected)
+                    {
+                        ToolBarSelected = false;
+
+                        if (_viewModel.TuneState != FindSignalViewModel.TuneStateEnum.TuningInProgress)
+                        {
+                            _focusItems.FocusItem("ReTuneButton");
+                        }
+                    } else
+                    {
+                        _focusItems.DeFocusAll();
+                        ToolBarSelected = true;
+                    }
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
@@ -156,6 +170,12 @@ namespace DVBTTelevizor
                     if (ToolBarSelected)
                     {
                         ToolConnect_Clicked(this, null);
+                    } else
+                    {
+                        if (_focusItems.FocusedItemName == "ReTuneButton")
+                        {
+                            ReToolTune_Clicked(this, null);
+                        }
                     }
                     break;
             }

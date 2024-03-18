@@ -1352,13 +1352,14 @@ namespace DVBTTelevizor
             var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
             var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
 
-            DVBTStatus status = new DVBTStatus();
+            DVBTStatus status = null;
 
             while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
             {
                 status = await GetStatus();
+                res.SignalState = status;
 
-                if (!status.SuccessFlag)
+                if (!res.SignalState.SuccessFlag)
                 {
                     res.Result = SearchProgramResultEnum.Error;
                     return res;
@@ -1385,8 +1386,6 @@ namespace DVBTTelevizor
                 res.Result = SearchProgramResultEnum.NoSignal;
                 return res;
             }
-
-            res.SignalPercentStrength = status.rfStrengthPercentage;
 
             return res;
         }
