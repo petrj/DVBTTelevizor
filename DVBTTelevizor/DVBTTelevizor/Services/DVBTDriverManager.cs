@@ -1224,7 +1224,11 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Tuning enhanced freq: {frequency} MHz, type: {deliverySystem} fastTuning: {fastTuning}");
 
-            TuneResult res = null;
+            var res = new TuneResult()
+            {
+                SignalState = new DVBTStatus()
+            };
+
             DVBTResponse tuneRes = null;
             DVBTResponse setPIDres = null;
 
