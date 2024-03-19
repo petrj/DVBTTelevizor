@@ -32,7 +32,7 @@ namespace DVBTTelevizor
         private void ChangeFreq(bool upOrDown)
         {
             //var freqOld = FrequencyKHz;
-            var freq = FrequencyKHz += upOrDown ? FrequencyKHzSliderStep : -FrequencyKHzSliderStep;
+            var freq = FrequencyKHz + (upOrDown ? FrequencyKHzSliderStep : -FrequencyKHzSliderStep);
 
             if (ValidFrequency(freq) &&
                 freq>=MinFrequencyKHz &&
