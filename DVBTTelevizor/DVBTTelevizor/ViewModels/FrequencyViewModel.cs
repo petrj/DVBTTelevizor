@@ -34,9 +34,7 @@ namespace DVBTTelevizor
             //var freqOld = FrequencyKHz;
             var freq = FrequencyKHz + (upOrDown ? FrequencyKHzSliderStep : -FrequencyKHzSliderStep);
 
-            if (ValidFrequency(freq) &&
-                freq>=MinFrequencyKHz &&
-                freq <= MaxFrequencyKHz)
+            if (ValidFrequency(freq))
             {
                 FrequencyKHz = freq;
             }
