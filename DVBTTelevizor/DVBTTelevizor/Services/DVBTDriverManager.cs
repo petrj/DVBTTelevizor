@@ -1541,8 +1541,8 @@ namespace DVBTTelevizor
                     } catch (Exception e)
                     {
                         _log.Debug($"Wrong data in Buffer");
-                        await Task.Delay(200);
                         ClearReadBuffer();
+                        await Task.Delay(200);
                         continue;
                     }
 
