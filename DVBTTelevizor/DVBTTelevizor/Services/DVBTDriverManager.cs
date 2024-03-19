@@ -171,17 +171,6 @@ namespace DVBTTelevizor
             }
         }
 
-        private List<byte> Buffer
-        {
-            get
-            {
-                lock (_readThreadLock)
-                {
-                    return _readBuffer;
-                }
-            }
-        }
-
         public bool Connected
         {
             get
@@ -343,6 +332,17 @@ namespace DVBTTelevizor
             }
         }
 
+        private byte[] GetReadBufferData()
+        {
+            lock (_readThreadLock)
+            {
+                if (_readBuffer.Count == 0)
+                    return null;
+
+                return _readBuffer.ToArray();
+            }
+        }
+
         private bool BufferContainsData()
         {
             lock (_readThreadLock)
@@ -367,7 +367,7 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _log.Debug($"Stopping read buffer (total bytes found: {Buffer.Count})");
+                _log.Debug($"Stopping read buffer (total bytes found: {_readBuffer.Count})");
 
                 _readingBuffer = false;
             }
@@ -571,7 +571,7 @@ namespace DVBTTelevizor
                             if (readingBuffer)
                             {
                                 for (var i = 0; i < bytesRead; i++)
-                                    Buffer.Add(buffer[i]);
+                                    _readBuffer.Add(buffer[i]);
                             }
                             if (streaming)
                             {
@@ -831,9 +831,11 @@ namespace DVBTTelevizor
 
                 while ((DateTime.Now - startTime).TotalMilliseconds < msTimeout)
                 {
-                    _log.Debug($"Buffer size: {Buffer.Count}");
+                    var buffer = GetReadBufferData();
 
-                    var packets = MPEGTransportStreamPacket.Parse(Buffer);
+                    _log.Debug($"Buffer size: {buffer.Length}");
+
+                    var packets = MPEGTransportStreamPacket.Parse(buffer);
 
                     _log.Debug($"Packets found: {packets.Count}");
 
@@ -1017,7 +1019,7 @@ namespace DVBTTelevizor
 
                     while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
                     {
-                        var allPackets = MPEGTransportStreamPacket.Parse(Buffer);
+                        var allPackets = MPEGTransportStreamPacket.Parse(GetReadBufferData());
 
                         foreach (var mapPID in MapPIDs)
                         {
@@ -1039,6 +1041,7 @@ namespace DVBTTelevizor
                 finally
                 {
                     StopReadBuffer();
+                    ClearReadBuffer();
                 }
 
                 if (pmtTables.Count == 0)
@@ -1125,7 +1128,7 @@ namespace DVBTTelevizor
 
                     while ((DateTime.Now - startTime).TotalMilliseconds < timeoutForReadingBuffer)
                     {
-                        var allPackets = MPEGTransportStreamPacket.Parse(Buffer);
+                        var allPackets = MPEGTransportStreamPacket.Parse(GetReadBufferData());
                         if (allPackets.Count > 0)
                         {
                             pmtTable = DVBTTable.CreateFromPackets<PMTTable>(allPackets, mapPID);
@@ -1142,6 +1145,7 @@ namespace DVBTTelevizor
                 finally
                 {
                     StopReadBuffer();
+                    ClearReadBuffer();
                 }
 
                 if (pmtTable == null)
@@ -1477,7 +1481,7 @@ namespace DVBTTelevizor
                 StopReadBuffer();
 
                 var eitService = new EITService(_log);
-                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(Buffer));
+                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(GetReadBufferData()));
 
                 return scanResult;
             }
@@ -1489,6 +1493,9 @@ namespace DVBTTelevizor
                 {
                     OK = false
                 };
+            } finally
+            {
+                ClearReadBuffer();
             }
         }
 
@@ -1533,7 +1540,7 @@ namespace DVBTTelevizor
 
                     try
                     {
-                        packets = MPEGTransportStreamPacket.Parse(Buffer);
+                        packets = MPEGTransportStreamPacket.Parse(GetReadBufferData());
 
                         sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
                         psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
