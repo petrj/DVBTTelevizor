@@ -631,7 +631,7 @@ namespace DVBTTelevizor
                     await ShowAspectMenu(ch);
                     break;
                 case "Scan EPG":
-                    await ScanEPG(ch, false, false, 0, 8000);
+                    await ScanEPG(ch, false, false, 0, 5000);
                     break;
                 case "Record":
                     MessagingCenter.Send(new PlayStreamInfo { Channel = SelectedChannel }, BaseViewModel.MSG_RecordStream);

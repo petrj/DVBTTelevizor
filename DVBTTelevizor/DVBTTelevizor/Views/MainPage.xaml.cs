@@ -2226,7 +2226,7 @@ namespace DVBTTelevizor
 
                 if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
                 {
-                    await _viewModel.ScanEPG(channel, true, true, 2000, 7000);
+                    await _viewModel.ScanEPG(channel, true, true, 2000, 3000);
                 }
 
                 await _viewModel.ShowActualPlayingMessage(playInfo);

@@ -218,7 +218,7 @@
                         Grid.ColumnSpan="3"
                         ItemsSource="{Binding TunedChannels}"
                         CachingStrategy="RecycleElement"
-                        HasUnevenRows="True"
+                        HasUnevenRows="true"
                         Style="{StaticResource ListViewStyle}"
                         SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
 

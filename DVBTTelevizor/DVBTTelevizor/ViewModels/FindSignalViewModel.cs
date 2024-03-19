@@ -74,7 +74,6 @@ namespace DVBTTelevizor
         {
             TuningInProgress = 1,
             TuneFinishedOK = 2,
-            TuneFinishedNoSignal = 3,
             TuneFailed = 4
         }
 
@@ -248,8 +247,7 @@ namespace DVBTTelevizor
                 return
                     _driver.Connected &&
                     (
-                        _tuneState == TuneStateEnum.TuneFinishedOK ||
-                        _tuneState == TuneStateEnum.TuneFinishedNoSignal
+                        _tuneState == TuneStateEnum.TuneFinishedOK
                     );
             }
         }
@@ -258,9 +256,6 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (!_driver.Connected)
-                    return false;
-
                 return
                     _tuneState != TuneStateEnum.TuningInProgress;
             }
@@ -272,7 +267,7 @@ namespace DVBTTelevizor
             {
                 switch (_tuneState)
                 {
-                    case TuneStateEnum.TuneFailed: return "Error";
+                    case TuneStateEnum.TuneFailed: return "Tune failed";
                     default:
                         return "";
                 }
@@ -330,19 +325,27 @@ namespace DVBTTelevizor
 
             try
             {
-                var status = await _driver.TuneEnhanced(FrequencyKHz * 1000, TuneBandWidthKHz * 1000, DeliverySystem, false);
+                var ok = true;
 
-                if (status.Result == SearchProgramResultEnum.OK)
+                var tuneRes = await _driver.Tune(FrequencyKHz * 1000, TuneBandWidthKHz * 1000, DeliverySystem);
+
+                if (!tuneRes.SuccessFlag)
+                {
+                    ok = false;
+                } else
+                {
+                    var setPIDres = await _driver.SetPIDs(new List<long>() { 0, 17, 18 });
+
+                    ok = setPIDres.SuccessFlag;
+                }
+
+                if (ok)
                 {
                     TuneState = TuneStateEnum.TuneFinishedOK;
                 }
-                if (status.Result == SearchProgramResultEnum.NoSignal)
-                {
-                    TuneState = TuneStateEnum.TuneFinishedNoSignal;
-                }
                 else
                 {
-                    MessagingCenter.Send($"Tune error", BaseViewModel.MSG_ToastMessage);
+                    //MessagingCenter.Send($"Tune error", BaseViewModel.MSG_ToastMessage);
                     TuneState = TuneStateEnum.TuneFailed;
                 }
             }
