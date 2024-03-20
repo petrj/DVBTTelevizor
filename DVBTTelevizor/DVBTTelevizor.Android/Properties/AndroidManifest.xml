@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="39" android:versionName="39.0" package="net.petrjanousek.DVBTTelevizor" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="40" android:versionName="40.0" package="net.petrjanousek.DVBTTelevizor" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
 	<application android:label="DVBT Televizor" android:icon="@drawable/icon" />
 	<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
-	<uses-feature android:name="android.software.leanback" android:required="true" />
 </manifest>
