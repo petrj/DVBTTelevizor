@@ -17,7 +17,7 @@ using DVBTTelevizor.Services;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/Icon", Theme = "@style/MainTheme", MainLauncher = false, Exported = false, Banner = "@drawable/banner", ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "DVBT Televizor", Name= "net.petrjanousek.DVBTTelevizor.MainActivity", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = false, Exported = false, Banner = "@drawable/banner", ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     [IntentFilter(new[] { Intent.ActionView, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryLeanbackLauncher }, DataMimeType = "*/*", DataSchemes = new[] { "file", "content" }, DataPathPattern = ".*\\.json")]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
