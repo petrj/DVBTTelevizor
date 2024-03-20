@@ -8,7 +8,7 @@ using Android.Webkit;
 
 namespace DVBTTelevizor.Droid
 {
-    [Activity(Name= "net.petrjanousek.DVBTTelevizor.SplashActivity", Label = "DVBT Televizor", Theme = "@style/SplashTheme", MainLauncher = true, Banner = "@drawable/banner", NoHistory = true, Exported = true)]
+    [Activity(Name= "net.petrjanousek.DVBTTelevizor.SplashActivity", Label = "DVBT Televizor", Theme = "@style/SplashTheme", MainLauncher = true, Icon = "@drawable/icon", Banner = "@drawable/banner", NoHistory = true, Exported = true)]
     [IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
     public class SplashActivity : AppCompatActivity
     {
