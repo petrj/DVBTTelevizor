@@ -63,6 +63,7 @@
     <AndroidUseAapt2>true</AndroidUseAapt2>
     <DefineConstants>
     </DefineConstants>
+    <MandroidI18n>CJK;Mideast;Rare;West;Other</MandroidI18n>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AndroidTV|AnyCPU'">
     <AndroidManifest>Properties\AndroidTVManifest.xml</AndroidManifest>
