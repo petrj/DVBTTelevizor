@@ -1,6 +1,6 @@
 # DVBT Televizor
 
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/banner.png)
 
 #### CZ
 Android aplikace pro příjem TV pomocí USB DVBT/DVBT2 tuneru 
@@ -39,6 +39,8 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - subtitles
 - teletext
 - remote access from other (Android) device
+
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
 
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot1.png" width="400" alt="Screenshot1"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot2.png" width="400" alt="Screenshot2"/>
