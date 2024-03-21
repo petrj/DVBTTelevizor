@@ -1,6 +1,6 @@
 # DVBT Televizor
 
-![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/banner.png)
+![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/logo.png)
 
 #### CZ
 Android aplikace pro příjem TV pomocí USB DVBT/DVBT2 tuneru 
