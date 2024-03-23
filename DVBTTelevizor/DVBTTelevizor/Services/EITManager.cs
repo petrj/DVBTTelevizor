@@ -3,6 +3,7 @@ using LoggerService;
 using MPEGTS;
 using SQLite;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -14,19 +15,17 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.Services
 {
-    public class EITManager
+    public class EITManager : IDVBTManager<EventItem>
     {
-        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
-        private bool _scanning = false;
-        private ILoggingService _log;
-        private IDVBTDriverManager _driver;
+        public override string Key { get; set; } = "EIT";
+        protected bool _scanning = false;
+
         private Dictionary<int,List<EventItem>> _eventsToSave = new Dictionary<int, List<EventItem>>();
+        private Dictionary<long, ChannelEPG> FreqEPG { get; set; } = new Dictionary<long, ChannelEPG>();
 
-        public EITManager(ILoggingService loggingService, IDVBTDriverManager driver)
+        public EITManager(ILoggingService loggingService, IDVBTDriverManager driver):
+            base(loggingService,driver)
         {
-            _log = loggingService;
-            _driver = driver;
-
             var saveDBsWorker = new BackgroundWorker();
             saveDBsWorker.DoWork += SaveDBsWorker_DoWork;
             saveDBsWorker.RunWorkerAsync();
@@ -136,6 +135,16 @@ namespace DVBTTelevizor.Services
             }
         }
 
+
+        public virtual bool Scanning
+        {
+            get
+            {
+                return _scanning;
+            }
+        }
+
+
         private static string GetDBPath(long freq, long programMapPID)
         {
             var folder = Path.Combine(BaseViewModel.AndroidAppDirectory, "EIT");
@@ -144,16 +153,6 @@ namespace DVBTTelevizor.Services
                 Directory.CreateDirectory(folder);
             }
             return Path.Combine(folder, $"EIT.{freq}.{programMapPID}.sqllite");
-        }
-
-        private Dictionary<long, ChannelEPG> FreqEPG { get; set; } = new Dictionary<long, ChannelEPG>();
-
-        public bool Scanning
-        {
-            get
-            {
-                return _scanning;
-            }
         }
 
         public EPGCurrentEvent GetEvent(DateTime date, long freq, long programMapPID)

@@ -67,8 +67,10 @@ namespace DVBTTelevizor
 
         Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000);
         Task<DVBTCapabilities> GetCapabalities();
+        Task<SearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync);
         Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs);
         Task<SearchMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true);
+
 
         Task<EITScanResult> ScanEPG(int msTimeout = 2000);
 

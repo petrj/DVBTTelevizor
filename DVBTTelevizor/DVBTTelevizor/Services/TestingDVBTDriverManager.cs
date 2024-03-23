@@ -1,4 +1,5 @@
-﻿using DVBTTelevizor.Models;
+﻿using Android.Media.Audiofx;
+using DVBTTelevizor.Models;
 using LoggerService;
 using MPEGTS;
 using System;
@@ -365,6 +366,19 @@ namespace DVBTTelevizor
                     Result = SearchProgramResultEnum.NoProgramFound
                 };
             }
+        }
+
+        public async Task<SearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
+        {
+            var searchRes = await SearchProgramPIDs(new List<long> { mapPID });
+            if (!searchRes.PIDs.ContainsKey(mapPID))
+                    return new SearchPIDsResult();
+
+            return new SearchPIDsResult()
+            {
+                Result = SearchProgramResultEnum.OK,
+                PIDs = searchRes.PIDs[mapPID]
+            };
         }
 
         public async Task<SearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs)
