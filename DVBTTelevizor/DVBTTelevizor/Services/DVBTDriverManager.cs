@@ -1407,7 +1407,7 @@ namespace DVBTTelevizor
         /// <param name="mapPID"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        public async Task<SearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
             _log.Debug($"Set up channle PIDs for mapPID: {mapPID}, fastTuning: {fastTuning}");
 
@@ -1418,7 +1418,7 @@ namespace DVBTTelevizor
 
             try
             {
-                var res = new TuneResult();
+                var res = new SearchPIDsResult();
 
                 var searchPIDsStartTime = DateTime.Now;
 
@@ -1454,7 +1454,9 @@ namespace DVBTTelevizor
 
                 setPIDsTime += (DateTime.Now - setPIDsStartTime).TotalMilliseconds;
 
+                res.PIDs = pmtTableSearchRes.PIDs;
                 res.Result = SearchProgramResultEnum.OK;
+
                 return res;
             } finally
             {

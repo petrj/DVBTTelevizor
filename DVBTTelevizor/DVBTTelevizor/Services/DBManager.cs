@@ -13,9 +13,9 @@ using System.Threading;
 
 namespace DVBTTelevizor.Services
 {
-    public abstract class IDVBTManager<T> where T : new()
+    public abstract class DBManager<T> where T : new()
     {
-        public virtual string Key { get; set; } = "DVB";
+        public virtual string Key { get; set; } = "DB";
 
         protected static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
@@ -25,7 +25,7 @@ namespace DVBTTelevizor.Services
         private ConcurrentQueue<Dictionary<string, List<T>>> _saveQueue = new ConcurrentQueue<Dictionary<string, List<T>>>();
         private Dictionary<string, List<T>> _freqValues { get; set; } = new Dictionary<string, List<T>>();
 
-        public IDVBTManager(ILoggingService loggingService, IDVBTDriverManager driver)
+        public DBManager(ILoggingService loggingService, IDVBTDriverManager driver)
         {
             _log = loggingService;
             _driver = driver;
@@ -90,7 +90,7 @@ namespace DVBTTelevizor.Services
 
         public virtual void Clear()
         {
-            _log.Debug($"[IDVBTManager] Clear");
+            _log.Debug($"[IDBManager] Clear");
 
             try
             {

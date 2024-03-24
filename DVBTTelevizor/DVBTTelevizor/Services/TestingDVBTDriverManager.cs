@@ -126,10 +126,13 @@ namespace DVBTTelevizor
         {
         }
 
-        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        public async Task<SearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
-            return new TuneResult()
+            var searchRes = await SearchProgramPIDs(mapPID, false);
+
+            return new SearchPIDsResult()
             {
+                PIDs = searchRes.PIDs,
                 Result = SearchProgramResultEnum.OK
             };
         }

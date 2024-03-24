@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.Services
 {
-    public class EITManager : IDVBTManager<EventItem>
+    public class EITManager : DBManager<EventItem>
     {
         public override string Key { get; set; } = "EIT";
         protected bool _scanning = false;
