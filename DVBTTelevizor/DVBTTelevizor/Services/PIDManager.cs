@@ -55,18 +55,5 @@ namespace DVBTTelevizor.Services
 
             AddItemsToDB(freq, programMapPID, channelPIDS);
         }
-
-        public async Task<List<long>> Scan(long programMapPID, int msTimeout = 2000)
-        {
-            //var searchPIDsres = await _driver.SearchProgramPIDs(programMapPID, false);
-
-            //if (searchPIDsres.Result == SearchProgramResultEnum.OK)
-            //{
-            //    AddItemsToDB(_driver.LastTunedFreq, programMapPID, searchPIDsres.PIDs);
-            //}
-
-            return null;
-        }
-
     }
 }

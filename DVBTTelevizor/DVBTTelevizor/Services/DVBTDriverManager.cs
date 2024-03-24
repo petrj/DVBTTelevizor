@@ -1085,7 +1085,7 @@ namespace DVBTTelevizor
 
             try
             {
-                if (!setPIDsAndSync)
+                if (setPIDsAndSync)
                 {
                     // setting PIDs filter
 

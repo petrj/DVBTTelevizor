@@ -282,7 +282,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearEPG, (msg) =>
             {
-                _viewModel.EIT.ClearAll();
+                _viewModel.EIT.Clear();
             });
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });

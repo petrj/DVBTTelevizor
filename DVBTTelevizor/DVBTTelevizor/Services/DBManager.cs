@@ -23,7 +23,7 @@ namespace DVBTTelevizor.Services
         protected IDVBTDriverManager _driver;
 
         private ConcurrentQueue<Dictionary<string, List<T>>> _saveQueue = new ConcurrentQueue<Dictionary<string, List<T>>>();
-        private Dictionary<string, List<T>> _freqValues { get; set; } = new Dictionary<string, List<T>>();
+        protected ConcurrentDictionary<string, List<T>> _freqValues { get; set; } = new ConcurrentDictionary<string, List<T>>();
 
         public DBManager(ILoggingService loggingService, IDVBTDriverManager driver)
         {
@@ -38,8 +38,13 @@ namespace DVBTTelevizor.Services
         public virtual void AddItemsToDB(long freq, long programMapPID, List<T> items)
         {
             var freqKey = GetKey(freq, programMapPID);
+            AddItemsToDB(freqKey, items);
+        }
+
+        public virtual void AddItemsToDB(string key, List<T> items)
+        {
             var dict = new Dictionary<string, List<T>>();
-            dict.Add(freqKey, items);
+            dict.Add(key, items);
             _saveQueue.Enqueue(dict);
         }
 
@@ -72,6 +77,8 @@ namespace DVBTTelevizor.Services
                             }
 
                             db.Close();
+
+                            _freqValues[kvp.Key] = kvp.Value;
                         }
                     }
                 }
@@ -83,7 +90,7 @@ namespace DVBTTelevizor.Services
             }
         }
 
-        private string GetKey(long freq, long programMapPID)
+        protected string GetKey(long freq, long programMapPID)
         {
             return $"{freq}.{programMapPID}";
         }
@@ -127,42 +134,50 @@ namespace DVBTTelevizor.Services
 
         public virtual List<T> GetValues(long freq, long programMapPID)
         {
-            var res = new List<T>();
-
-            var freqKey = GetKey(freq, programMapPID);
-
-            if (_freqValues.ContainsKey(freqKey) &&
-                _freqValues[freqKey] != null &&
-                _freqValues[freqKey].Count > 0)
+            try
             {
-                // in cache
+                var res = new List<T>();
 
-                return _freqValues[freqKey];
-            }
+                var freqKey = GetKey(freq, programMapPID);
 
-            if (!_freqValues.ContainsKey(freqKey))
+                if (_freqValues.ContainsKey(freqKey) &&
+                    _freqValues[freqKey] != null &&
+                    _freqValues[freqKey].Count > 0)
+                {
+                    // in cache
+
+                    return _freqValues[freqKey];
+                }
+
+                if (!_freqValues.ContainsKey(freqKey))
+                {
+                    _freqValues.TryAdd(freqKey, res);
+                }
+
+                var dbPath = GetDBFullPath(freq, programMapPID);
+                if (!File.Exists(dbPath))
+                {
+                    return null;
+                }
+
+                // adding to cache
+
+                var db = new SQLiteConnection(dbPath);
+
+                foreach (var item in db.Table<T>())
+                {
+                    res.Add(item);
+                }
+
+                db.Close();
+
+                return res;
+            } catch (Exception ex)
             {
-                _freqValues.Add(freqKey, res);
-            }
+                _log.Error(ex);
 
-            var dbPath = GetDBFullPath(freq, programMapPID);
-            if (!File.Exists(dbPath))
-            {
                 return null;
             }
-
-            // adding to cache
-
-            var db = new SQLiteConnection(dbPath);
-
-            foreach (var item in db.Table<T>())
-            {
-                res.Add(item);
-            }
-
-            db.Close();
-
-            return res;
         }
     }
 }
