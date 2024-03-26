@@ -27,8 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Java.Interop">
+      <HintPath>..\..\..\..\Visual Studio\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v1.0\Java.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Android">
-      <HintPath>..\..\..\MonoAndroid\v9.0\Mono.Android.dll</HintPath>
+      <HintPath>..\..\..\Visual Studio\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v13.0\Mono.Android.dll</HintPath>
     </Reference>
   </ItemGroup>
 
