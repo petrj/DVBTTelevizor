@@ -282,7 +282,7 @@ namespace DVBTTelevizor
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearEPG, (msg) =>
             {
-                _viewModel.EIT.ClearAll();
+                _viewModel.EIT.Clear();
             });
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
@@ -2162,12 +2162,30 @@ namespace DVBTTelevizor
                         signalStrengthPercentage = tunedRes.SignalState.rfStrengthPercentage;
                     }
 
-                    var setupPIDsRes = await _driver.SetupChannelPIDs(channel.ProgramMapPID, false);
+                    var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.Frequency, channel.ProgramMapPID);
 
-                    if (setupPIDsRes.Result != SearchProgramResultEnum.OK)
+                    if (cachedPIDs != null &&
+                        cachedPIDs.Count > 0)
                     {
-                        MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
-                        return;
+                        var setPIDres = await _driver.SetPIDs(cachedPIDs);
+
+                        if (!setPIDres.SuccessFlag)
+                        {
+                            MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        var setupPIDsRes = await _driver.SetupChannelPIDs(channel.ProgramMapPID, false);
+
+                        if (setupPIDsRes.Result != SearchProgramResultEnum.OK)
+                        {
+                            MessagingCenter.Send($"Playing failed", BaseViewModel.MSG_ToastMessage);
+                            return;
+                        }
+
+                        _viewModel.PID.AddChannelPIDs(channel.Frequency, channel.ProgramMapPID, setupPIDsRes.PIDs);
                     }
 
                     _driver.StartStream();

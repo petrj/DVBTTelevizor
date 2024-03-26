@@ -60,6 +60,7 @@ namespace DVBTTelevizor
         private bool _autoPlayProcessed = false;
 
         public EITManager EIT { get; set; }
+        public PIDManager PID { get; set; }
 
         public enum SelectedPartEnum
         {
@@ -89,6 +90,7 @@ namespace DVBTTelevizor
             _channelService = channelService;
 
             EIT = new EITManager(loggingService, driver);
+            PID = new PIDManager(loggingService, driver);
 
             RefreshCommand = new Command(async () => await Refresh());
             RefreshEPGCommand = new Command(async () => await RefreshEPG());

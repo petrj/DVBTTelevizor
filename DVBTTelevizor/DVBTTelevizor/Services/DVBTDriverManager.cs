@@ -1077,7 +1077,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public async Task<SearchPIDsResult> SearchProgramPIDs(long mapPID)
+        public async Task<SearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
             _log.Debug($"Searching PIDS of Map PID: {mapPID}");
 
@@ -1085,33 +1085,36 @@ namespace DVBTTelevizor
 
             try
             {
-                // setting PIDs filter
-
-                var pidRes = await SetPIDs(new List<long>() { mapPID });
-
-                if (!pidRes.SuccessFlag)
+                if (setPIDsAndSync)
                 {
-                    _log.Debug($"Setting PID {mapPID} failed");
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
+                    // setting PIDs filter
 
-                // getting status
+                    var pidRes = await SetPIDs(new List<long>() { mapPID });
 
-                var status = await GetStatus();
+                    if (!pidRes.SuccessFlag)
+                    {
+                        _log.Debug($"Setting PID {mapPID} failed");
+                        res.Result = SearchProgramResultEnum.Error;
+                        return res;
+                    }
 
-                if (!status.SuccessFlag)
-                {
-                    _log.Debug($"Getting status failed");
-                    res.Result = SearchProgramResultEnum.Error;
-                    return res;
-                }
+                    // getting status
 
-                if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
-                {
-                    _log.Debug($"No signal");
-                    res.Result = SearchProgramResultEnum.NoSignal;
-                    return res;
+                    var status = await GetStatus();
+
+                    if (!status.SuccessFlag)
+                    {
+                        _log.Debug($"Getting status failed");
+                        res.Result = SearchProgramResultEnum.Error;
+                        return res;
+                    }
+
+                    if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+                    {
+                        _log.Debug($"No signal");
+                        res.Result = SearchProgramResultEnum.NoSignal;
+                        return res;
+                    }
                 }
 
                 PMTTable pmtTable = null;
@@ -1404,7 +1407,7 @@ namespace DVBTTelevizor
         /// <param name="mapPID"></param>
         /// <param name="fastTuning"></param>
         /// <returns></returns>
-        public async Task<TuneResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        public async Task<SearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
             _log.Debug($"Set up channle PIDs for mapPID: {mapPID}, fastTuning: {fastTuning}");
 
@@ -1415,12 +1418,12 @@ namespace DVBTTelevizor
 
             try
             {
-                var res = new TuneResult();
+                var res = new SearchPIDsResult();
 
                 var searchPIDsStartTime = DateTime.Now;
 
                 // set Map PID for getting PMT table
-                var pmtTableSearchRes = await SearchProgramPIDs(mapPID);
+                var pmtTableSearchRes = await SearchProgramPIDs(mapPID, true);
 
                 if (pmtTableSearchRes.Result != SearchProgramResultEnum.OK)
                 {
@@ -1451,7 +1454,9 @@ namespace DVBTTelevizor
 
                 setPIDsTime += (DateTime.Now - setPIDsStartTime).TotalMilliseconds;
 
+                res.PIDs = pmtTableSearchRes.PIDs;
                 res.Result = SearchProgramResultEnum.OK;
+
                 return res;
             } finally
             {
