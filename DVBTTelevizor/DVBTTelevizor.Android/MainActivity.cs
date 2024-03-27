@@ -14,6 +14,7 @@ using Android.Hardware.Usb;
 using Google.Android.Material.Snackbar;
 using Plugin.CurrentActivity;
 using DVBTTelevizor.Services;
+using Android.Graphics;
 
 namespace DVBTTelevizor.Droid
 {
@@ -32,6 +33,7 @@ namespace DVBTTelevizor.Droid
         private App _app;
         private IDVBTDriverManager _driverManager;
         private NotificationHelper _notificationHelper;
+        private static Android.Widget.Toast _instance;
 
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
@@ -573,13 +575,33 @@ namespace DVBTTelevizor.Droid
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
-                    _loggingService.Debug($"ToastMessage:{message}");
 
-                    var view = FindViewById(Android.Resource.Id.Content);
+                    _instance?.Cancel();
+                    _instance = Android.Widget.Toast.MakeText(Android.App.Application.Context, message, ToastLength.Short);
 
-                    var snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
+                    TextView textView;
+                    Snackbar snackBar = null;
 
-                    var textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
+                    var tView = _instance.View;
+                    if (tView == null)
+                    {
+                        // Since Android 11, custom toast is deprecated - using snackbar instead:
+
+                        Activity activity = CrossCurrentActivity.Current.Activity;
+                        var view = activity.FindViewById(Android.Resource.Id.Content);
+
+                        snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
+
+                        textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
+                    }
+                    else
+                    {
+                        // using Toast
+
+                        tView.Background.SetColorFilter(Android.Graphics.Color.Gray, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
+                        textView = (TextView)tView.FindViewById(Android.Resource.Id.Message);
+                        textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
+                    }
 
                     var minTextSize = textView.TextSize; // 16
 
@@ -587,32 +609,28 @@ namespace DVBTTelevizor.Droid
 
                     var screenHeightRate = 0;
 
-                    /*
-                            appFontSize:
+                    //configuration font size:
 
-                            Normal = 0,
-                            AboveNormal = 1,
-                            Big = 2,
-                            Biger = 3,
-                            VeryBig = 4,
-                            Huge = 5
-
-                          */
-
+                    //Normal = 0,
+                    //AboveNormal = 1,
+                    //Big = 2,
+                    //Biger = 3,
+                    //VeryBig = 4,
+                    //Huge = 5
 
                     if (DeviceDisplay.MainDisplayInfo.Height < DeviceDisplay.MainDisplayInfo.Width)
                     {
                         // Landscape
 
                         screenHeightRate = Convert.ToInt32(DeviceDisplay.MainDisplayInfo.Height / 16.0);
-                        textView.SetMaxLines(2);
+                        textView.SetMaxLines(5);
                     }
                     else
                     {
                         // Portrait
 
                         screenHeightRate = Convert.ToInt32(DeviceDisplay.MainDisplayInfo.Height / 32.0);
-                        textView.SetMaxLines(4);
+                        textView.SetMaxLines(5);
                     }
 
                     var fontSizeRange = screenHeightRate - minTextSize;
@@ -622,12 +640,14 @@ namespace DVBTTelevizor.Droid
 
                     textView.SetTextSize(Android.Util.ComplexUnitType.Px, Convert.ToSingle(fontSize));
 
-                    if (duration != 0)
+                    if (snackBar != null)
                     {
-                        snackBar.SetDuration(duration);
+                        snackBar.Show();
                     }
-
-                    snackBar.Show();
+                    else
+                    {
+                        _instance.Show();
+                    }
                 });
             }
             catch (Exception ex)
