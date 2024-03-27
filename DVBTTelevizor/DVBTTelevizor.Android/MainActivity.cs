@@ -15,6 +15,9 @@ using Google.Android.Material.Snackbar;
 using Plugin.CurrentActivity;
 using DVBTTelevizor.Services;
 using Android.Graphics;
+using Android.Graphics.Drawables;
+using Android.Media.TV;
+using static Google.Android.Material.Snackbar.Snackbar;
 
 namespace DVBTTelevizor.Droid
 {
@@ -587,12 +590,27 @@ namespace DVBTTelevizor.Droid
                     {
                         // Since Android 11, custom toast is deprecated - using snackbar instead:
 
-                        Activity activity = CrossCurrentActivity.Current.Activity;
-                        var view = activity.FindViewById(Android.Resource.Id.Content);
-
+                        var activity = CrossCurrentActivity.Current.Activity;
+                        var view = activity.FindViewById(Android.Resource.Id.Content);                        
+                        
                         snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
-
+                        
                         textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
+
+                        // rounded corners:
+                        var pd = new PaintDrawable(Android.Graphics.Color.Gray);
+                        pd.SetCornerRadius(15);                        
+                        snackBar.View.Background = pd;
+
+                        // text in center
+                        textView.Gravity = GravityFlags.Center;
+
+                        // view in center / autoSize
+                        var snackbarLayout = (Snackbar.SnackbarLayout)snackBar.View;
+                        var layoutParams = (Snackbar.SnackbarLayout.LayoutParams)snackbarLayout.LayoutParameters;
+                        layoutParams.Gravity = GravityFlags.Bottom | GravityFlags.CenterHorizontal;
+                        layoutParams.Width = ViewGroup.LayoutParams.WrapContent;
+                        snackBar.View.LayoutParameters = layoutParams;
                     }
                     else
                     {
