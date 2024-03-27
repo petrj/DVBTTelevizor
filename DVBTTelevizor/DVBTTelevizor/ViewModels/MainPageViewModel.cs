@@ -947,7 +947,7 @@ namespace DVBTTelevizor
             // showing signal percents only for the first time
             if (playStreamInfo.SignalStrengthPercentage > 0)
             {
-                msg += $" (signal {playStreamInfo.SignalStrengthPercentage}%)";
+                msg += $"{Environment.NewLine}(signal {playStreamInfo.SignalStrengthPercentage}%)";
                 playStreamInfo.SignalStrengthPercentage = 0;
             }
 
