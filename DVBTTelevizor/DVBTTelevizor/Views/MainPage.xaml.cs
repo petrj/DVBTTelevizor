@@ -1536,7 +1536,14 @@ namespace DVBTTelevizor
                             foreach (var audioTrack in (_viewModel.PlayingChannelAudioTracks))
                             {
                                 if (audioTrack.Key != -1)
-                                    audioTracks += $"{audioTrack.Value} [{audioTrack.Key}]{Environment.NewLine}";
+                                    audioTracks += $"{audioTrack.Value} [{audioTrack.Key}]";
+
+                                if (audioTrack.Key == _viewModel.AudioTrack)
+                                {
+                                    audioTracks += "*";
+                                }
+
+                                audioTracks += $"{Environment.NewLine}";
                             }
                         }
 

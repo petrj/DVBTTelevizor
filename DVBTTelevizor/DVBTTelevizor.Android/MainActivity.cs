@@ -585,6 +585,9 @@ namespace DVBTTelevizor.Droid
                     TextView textView;
                     Snackbar snackBar = null;
 
+                    var backgroundColor = Android.Graphics.Color.Rgb(38, 38, 38);
+                    var textColor = Android.Graphics.Color.Rgb(55, 98, 255);
+
                     var tView = _instance.View;
                     if (tView == null)
                     {
@@ -598,7 +601,7 @@ namespace DVBTTelevizor.Droid
                         textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
 
                         // rounded corners:
-                        var pd = new PaintDrawable(Android.Graphics.Color.Gray);
+                        var pd = new PaintDrawable(backgroundColor);
                         pd.SetCornerRadius(15);                        
                         snackBar.View.Background = pd;
 
@@ -616,14 +619,14 @@ namespace DVBTTelevizor.Droid
                     {
                         // using Toast
 
-                        tView.Background.SetColorFilter(Android.Graphics.Color.Gray, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
+                        tView.Background.SetColorFilter(backgroundColor, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
                         textView = (TextView)tView.FindViewById(Android.Resource.Id.Message);
                         textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
                     }
 
                     var minTextSize = textView.TextSize; // 16
 
-                    textView.SetTextColor(Android.Graphics.Color.White);
+                    textView.SetTextColor(textColor);
 
                     var screenHeightRate = 0;
 
