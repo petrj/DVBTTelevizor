@@ -594,15 +594,15 @@ namespace DVBTTelevizor.Droid
                         // Since Android 11, custom toast is deprecated - using snackbar instead:
 
                         var activity = CrossCurrentActivity.Current.Activity;
-                        var view = activity.FindViewById(Android.Resource.Id.Content);                        
-                        
+                        var view = activity.FindViewById(Android.Resource.Id.Content);
+
                         snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
-                        
+
                         textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
 
                         // rounded corners:
                         var pd = new PaintDrawable(backgroundColor);
-                        pd.SetCornerRadius(15);                        
+                        pd.SetCornerRadius(15);
                         snackBar.View.Background = pd;
 
                         // text in center

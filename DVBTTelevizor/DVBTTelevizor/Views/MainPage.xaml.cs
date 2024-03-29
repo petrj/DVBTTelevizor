@@ -163,6 +163,38 @@ namespace DVBTTelevizor
                     });
             });
 
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAudioTrackRequest, (message) =>
+            {
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(async () =>
+                {
+                    if (_viewModel.PlayingChannel != null)
+                    {
+                        await _viewModel.ShowAudioTrackMenu(_viewModel.PlayingChannel);
+
+                        if (_editChannelPage != null)
+                        {
+                            _editChannelPage.SetAudioTracks(_viewModel.PlayingChannel == _viewModel.SelectedChannel, _viewModel.PlayingChannelAudioTracks, _viewModel.AudioTrack);
+                        }
+                    }
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeSubtitlesRequest, (message) =>
+            {
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(async () =>
+                {
+                    if (_viewModel.PlayingChannel != null)
+                    {
+                        await _viewModel.ShowSubtitlesMenu(_viewModel.PlayingChannel);
+
+                        if (_editChannelPage != null)
+                        {
+                            _editChannelPage.SetSubtitles(_viewModel.PlayingChannel == _viewModel.SelectedChannel, _viewModel.PlayingChannelSubtitles, _viewModel.Subtitles);
+                        }
+                    }
+                });
+            });
+
             MessagingCenter.Subscribe<PlayStreamInfo>(this, BaseViewModel.MSG_PlayStream, (playStreamInfo) =>
             {
                 Task.Run(async () =>
@@ -1528,39 +1560,12 @@ namespace DVBTTelevizor
                             _editChannelPage.StreamVideoSize = $"{videoTrack.Value.Data.Video.Width}x{videoTrack.Value.Data.Video.Height}";
                         }
 
-                        var audioTracks = System.String.Empty;
-                        if (_viewModel.PlayingChannelAudioTracks.Count > 0)
-                        {
-                            _editChannelPage.StreamInfoVisible = true;
-
-                            foreach (var audioTrack in (_viewModel.PlayingChannelAudioTracks))
-                            {
-                                if (audioTrack.Key != -1)
-                                    audioTracks += $"{audioTrack.Value} [{audioTrack.Key}]";
-
-                                if (audioTrack.Key == _viewModel.AudioTrack)
-                                {
-                                    audioTracks += "*";
-                                }
-
-                                audioTracks += $"{Environment.NewLine}";
-                            }
-                        }
-
-                        var subs = System.String.Empty;
-                        if (_viewModel.PlayingChannelSubtitles.Count > 0)
-                        {
-                            _editChannelPage.StreamInfoVisible = true;
-
-                            foreach (var subTrack in (_viewModel.PlayingChannelSubtitles))
-                            {
-                                if (subTrack.Key != -1)
-                                    subs += $"{subTrack.Value} [{subTrack.Key}]{Environment.NewLine}";
-                            }
-                        }
-
-                        _editChannelPage.StreamAudioTracks = audioTracks;
-                        _editChannelPage.StreamSubtitles = subs;
+                        _editChannelPage.SetAudioTracks(true,_viewModel.PlayingChannelAudioTracks, _viewModel.AudioTrack);
+                        _editChannelPage.SetSubtitles(true, _viewModel.PlayingChannelSubtitles, _viewModel.Subtitles);
+                    } else
+                    {
+                        _editChannelPage.SetAudioTracks(false, _viewModel.PlayingChannelAudioTracks, -1);
+                        _editChannelPage.SetSubtitles(false, _viewModel.PlayingChannelSubtitles, -1);
                     }
                 } catch (Exception ex)
                 {
@@ -2570,7 +2575,7 @@ namespace DVBTTelevizor
             });
         }
 
-        private MediaTrack? GetVideoTrack()
+        private LibVLCSharp.Shared.MediaTrack? GetVideoTrack()
         {
             if (_media.Tracks != null &&
                 _media.Tracks.Length > 0 &&

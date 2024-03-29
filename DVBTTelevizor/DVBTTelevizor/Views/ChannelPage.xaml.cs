@@ -54,6 +54,30 @@ namespace DVBTTelevizor
             ButtonDown.Clicked += ButtonDown_Clicked;
         }
 
+        public void SetAudioTracks(bool enabled, Dictionary<int, string> playingChannelAudioTracks, int activeId)
+        {
+            AudioTracksInfoVisible = enabled && playingChannelAudioTracks.Count > 0;
+
+            _viewModel.SetAudioTracks(enabled ? playingChannelAudioTracks : new Dictionary<int, string>(), activeId);
+
+            var rowHeight = _viewModel.GetScaledSize(50);
+            AudioTracksListView.RowHeight = rowHeight;
+            AudioTracksGrid.HeightRequest = rowHeight * _viewModel.AudioTracks.Count;
+            AudioTracksListView.HeightRequest = rowHeight * _viewModel.AudioTracks.Count;
+        }
+
+        public void SetSubtitles(bool enabled, Dictionary<int, string> playingChannelSubtitles, int activeId)
+        {
+            SubtitlesTracksInfoVisible = enabled && playingChannelSubtitles.Count > 0;
+
+            _viewModel.SetSubtitleTracks(enabled ? playingChannelSubtitles : new Dictionary<int, string>(), activeId);
+
+            var rowHeight = _viewModel.GetScaledSize(50);
+            SubtitlesListView.RowHeight = rowHeight;
+            SubtitlesGrid.HeightRequest = rowHeight * _viewModel.Subtitles.Count;
+            SubtitlesListView.HeightRequest = rowHeight * _viewModel.Subtitles.Count;
+        }
+
         public bool Changed
         {
             get
@@ -153,6 +177,8 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryName }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Up", new List<View>() { ButtonUp }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Down", new List<View>() { ButtonDown }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Audio", new List<View>() { ButtonChangeAudio }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Subtitles", new List<View>() { ButtonChangeSubtitles }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ChannelEnd", new List<View>() { ChannelEndLabel }));
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
@@ -185,6 +211,30 @@ namespace DVBTTelevizor
             set
             {
                 _viewModel.StreamInfoVisible = value;
+            }
+        }
+
+        public bool SubtitlesTracksInfoVisible
+        {
+            get
+            {
+                return _viewModel.SubtitlesTracksInfoVisible;
+            }
+            set
+            {
+                _viewModel.SubtitlesTracksInfoVisible = value;
+            }
+        }
+
+        public bool AudioTracksInfoVisible
+        {
+            get
+            {
+                return _viewModel.AudioTracksInfoVisible;
+            }
+            set
+            {
+                _viewModel.AudioTracksInfoVisible = value;
             }
         }
 
@@ -245,30 +295,6 @@ namespace DVBTTelevizor
             set
             {
                 _viewModel.SignalStrength = value;
-            }
-        }
-
-        public string StreamAudioTracks
-        {
-            get
-            {
-                return _viewModel.StreamAudioTracks;
-            }
-            set
-            {
-                _viewModel.StreamAudioTracks = value;
-            }
-        }
-
-        public string StreamSubtitles
-        {
-            get
-            {
-                return _viewModel.StreamSubtitles;
-            }
-            set
-            {
-                _viewModel.StreamSubtitles = value;
             }
         }
 
@@ -341,6 +367,16 @@ namespace DVBTTelevizor
                     EntryName.Text = text;
                     break;
             }
+        }
+
+        private void ButtonChangeAudio_Clicked(object sender, EventArgs e)
+        {
+            MessagingCenter.Send("", BaseViewModel.MSG_ChangeAudioTrackRequest);
+        }
+
+        private void ButtonChangeSubtitles_Clicked(object sender, EventArgs e)
+        {
+            MessagingCenter.Send("", BaseViewModel.MSG_ChangeSubtitlesRequest);
         }
     }
 }
