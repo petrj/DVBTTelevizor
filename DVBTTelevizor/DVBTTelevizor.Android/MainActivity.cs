@@ -586,7 +586,7 @@ namespace DVBTTelevizor.Droid
                     Snackbar snackBar = null;
 
                     var backgroundColor = Android.Graphics.Color.Rgb(38, 38, 38);
-                    var textColor = Android.Graphics.Color.Rgb(55, 98, 255);
+                    var textColor = Android.Graphics.Color.Rgb(65, 179, 255);
 
                     var tView = _instance.View;
                     if (tView == null)
@@ -597,13 +597,15 @@ namespace DVBTTelevizor.Droid
                         var view = activity.FindViewById(Android.Resource.Id.Content);
 
                         snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
+                        snackBar.View.Background.SetAlpha(0);
 
                         textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
 
                         // rounded corners:
                         var pd = new PaintDrawable(backgroundColor);
-                        pd.SetCornerRadius(15);
-                        snackBar.View.Background = pd;
+                        pd.SetCornerRadius(30);
+                        pd.SetAlpha(200);
+                        textView.Background = pd;
 
                         // text in center
                         textView.Gravity = GravityFlags.Center;
@@ -614,6 +616,8 @@ namespace DVBTTelevizor.Droid
                         layoutParams.Gravity = GravityFlags.Bottom | GravityFlags.CenterHorizontal;
                         layoutParams.Width = ViewGroup.LayoutParams.WrapContent;
                         snackBar.View.LayoutParameters = layoutParams;
+
+                        snackbarLayout.SetPadding(0, 0, 0, 85);
                     }
                     else
                     {
