@@ -49,6 +49,8 @@ namespace DVBTTelevizor
         public const string MSG_EPGDetailVisibilityChange = "EPGDetailVisibilityChange";
         public const string MSG_ChangeSubtitleId = "ChangeSubtitleId";
         public const string MSG_ChangeAudioTrackId = "ChangeAudioTrackId";
+        public const string MSG_ChangeAudioTrackRequest = "ChangeAudioTrackRequest";
+        public const string MSG_ChangeSubtitlesRequest = "ChangeSubtitlesRequest";
         public const string MSG_ChangeAspect = "ChangeAspect";
         public const string MSG_TeletextPageNumber = "TeletextPageNumber";
 

@@ -20,6 +20,13 @@
                 <Setter Property="HorizontalOptions" Value="End"/>
             </Style>
 
+            <Style x:Key="ListLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+            </Style>
+
             <Style x:Key="EntryStyle" TargetType="Entry">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
@@ -36,15 +43,22 @@
                 <Setter Property="VerticalOptions" Value="FillAndExpand"/>
             </Style>
 
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="False"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ContentPage.Content>
-        <StackLayout Margin="0,0,0,0">
+
+        <ContentView> <!-- https://github.com/xamarin/Xamarin.Forms/issues/1332 -->
 
             <ScrollView x:Name="ChannelPageScrollView" Margin="10,10,10,0" >
 
-                <StackLayout>
+                <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" >
 
                     <StackLayout Margin="0,0,0,30" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
 
@@ -174,8 +188,6 @@
                         <Grid RowSpacing="10" Margin="10,30,10,0" IsVisible="{Binding StreamInfoVisible}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="34*" />
@@ -185,19 +197,129 @@
 
                             <Label Grid.Row="0" Grid.Column="0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                             <Label Grid.Row="0" Grid.Column="2" Text="{Binding StreamVideoSize}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-
-                            <Label Grid.Row="1" Grid.Column="0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="1" Grid.Column="2" Text="{Binding StreamAudioTracks}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalTextAlignment="End"/>
-
-                            <Label Grid.Row="2" Grid.Column="0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                            <Label Grid.Row="2" Grid.Column="2" Text="{Binding StreamSubtitles}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalTextAlignment="End"/>
                         </Grid>
+
+                        <Grid x:Name="AudioTracksGrid"
+                              Margin="10,30,10,0"
+                              IsVisible="{Binding AudioTracksInfoVisible}"
+                              VerticalOptions="Start"
+                              HorizontalOptions="Start"
+                              BackgroundColor="Transparent"
+                              HeightRequest="150"
+                              RowSpacing="0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="34*" />
+                                <ColumnDefinition Width="66*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                            <ListView x:Name="AudioTracksListView"
+                                Grid.Row="0" Grid.Column="1"
+                                ItemsSource="{Binding AudioTracks}"
+                                CachingStrategy="RecycleElement"
+                                Style="{StaticResource ListViewStyle}"
+                                HeightRequest="120"
+                                BackgroundColor="Transparent">
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <ViewCell IsEnabled="False">
+                                            <ViewCell.View>
+
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="50" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="95*" />
+                                                        <ColumnDefinition Width="5*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Value}" Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference AudioTracksListView}, Path=BindingContext.FontSizeForLabel}" />
+                                                    <Image Source="Audio.png" IsVisible="{Binding Active}" Grid.Row="0" Grid.Column="1" />
+
+                                                </Grid>
+
+                                            </ViewCell.View>
+
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+
+                            </ListView>
+                        </Grid>
+
+                        <Button Margin="10,0,10,0" x:Name="ButtonChangeAudio" Text="Change audio track" IsVisible="{Binding AudioTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
+
+                        <Grid x:Name="SubtitlesGrid"
+                              Margin="10,30,10,0"
+                              IsVisible="{Binding SubtitlesTracksInfoVisible}"
+                              VerticalOptions="Start"
+                              HorizontalOptions="Start"
+                              BackgroundColor="Transparent"
+                              HeightRequest="100"
+                              RowSpacing="0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="34*" />
+                                <ColumnDefinition Width="66*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                            <ListView x:Name="SubtitlesListView"
+                                Grid.Row="0" Grid.Column="1"
+                                ItemsSource="{Binding Subtitles}"
+                                CachingStrategy="RecycleElement"
+                                Style="{StaticResource ListViewStyle}"
+                                HeightRequest="120"
+                                BackgroundColor="Transparent">
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <ViewCell IsEnabled="False">
+                                            <ViewCell.View>
+
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="50" />
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="95*" />
+                                                        <ColumnDefinition Width="5*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Value}" Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference SubtitlesListView}, Path=BindingContext.FontSizeForLabel}" />
+                                                    <Image Source="Hand.png" IsVisible="{Binding Active}" Grid.Row="0" Grid.Column="1" />
+
+                                                </Grid>
+
+                                            </ViewCell.View>
+
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+
+                            </ListView>
+                        </Grid>
+
+                        <Button Margin="10,0,10,0" x:Name="ButtonChangeSubtitles" Text="Change subtitles" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
 
                         <Label Margin="10,30,10,0" x:Name="ChannelEndLabel"/>
 
                     </StackLayout>
                 </StackLayout>
             </ScrollView>
-        </StackLayout>
+
+        </ContentView>
+
     </ContentPage.Content>
 </ContentPage>

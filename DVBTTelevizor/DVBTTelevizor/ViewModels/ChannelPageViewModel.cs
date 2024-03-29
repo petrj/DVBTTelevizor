@@ -26,12 +26,57 @@ namespace DVBTTelevizor
         private string _signalStrength = null;
 
         private bool _streamInfoVisible = false;
+        private bool _audioTracksInfoVisible = false;
+        private bool _subtitlesTracksInfoVisible = false;
         private string _streamVideoSize = String.Empty;
         private string _bitrate = String.Empty;
         private string _streamAudioTracks = String.Empty;
         private string _streamSubTitles = String.Empty;
 
         public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>();
+
+        public ObservableCollection<MediaTrack> AudioTracks { get; set; } = new ObservableCollection<MediaTrack>();
+        public ObservableCollection<MediaTrack> Subtitles { get; set; } = new ObservableCollection<MediaTrack>();
+
+        public void SetAudioTracks(Dictionary<int, string> playingChannelAudioTracks, int activeId)
+        {
+            AudioTracks.Clear();
+
+            foreach (var kvp in playingChannelAudioTracks)
+            {
+                if (kvp.Key == -1)
+                    continue;
+
+                AudioTracks.Add(new MediaTrack()
+                {
+                     Key = kvp.Key,
+                     Value = kvp.Value,
+                     Active = kvp.Key == activeId
+                });
+            }
+
+            OnPropertyChanged(nameof(AudioTracks));
+        }
+
+        public void SetSubtitleTracks(Dictionary<int, string> playingChannelSubtitles, int activeId)
+        {
+            Subtitles.Clear();
+
+            foreach (var kvp in playingChannelSubtitles)
+            {
+                if (kvp.Key == -1)
+                    continue;
+
+                Subtitles.Add(new MediaTrack()
+                {
+                    Key = kvp.Key,
+                    Value = kvp.Value,
+                    Active = kvp.Key == activeId
+                });
+            }
+
+            OnPropertyChanged(nameof(Subtitles));
+        }
 
         public async Task Reload(string channelFrequencyAndMapPID)
         {
@@ -81,6 +126,31 @@ namespace DVBTTelevizor
             get
             {
                 return _channel;
+            }
+        }
+
+
+        public bool SubtitlesTracksInfoVisible
+        {
+            get
+            {
+                return _subtitlesTracksInfoVisible;
+            }
+            set
+            {
+                _subtitlesTracksInfoVisible = value;
+            }
+        }
+
+        public bool AudioTracksInfoVisible
+        {
+            get
+            {
+                return _audioTracksInfoVisible;
+            }
+            set
+            {
+                _audioTracksInfoVisible = value;
             }
         }
 
@@ -156,41 +226,20 @@ namespace DVBTTelevizor
             }
         }
 
-        public string StreamAudioTracks
-        {
-            get
-            {
-                return _streamAudioTracks;
-            }
-            set
-            {
-                _streamAudioTracks = value;
-            }
-        }
-
-        public string StreamSubtitles
-        {
-            get
-            {
-                return _streamSubTitles;
-            }
-            set
-            {
-                _streamSubTitles = value;
-            }
-        }
 
         public void NotifyChannelChange()
         {
             OnPropertyChanged(nameof(Channel));
             OnPropertyChanged(nameof(StreamInfoVisible));
+            OnPropertyChanged(nameof(AudioTracksInfoVisible));
+            OnPropertyChanged(nameof(SubtitlesTracksInfoVisible));
             OnPropertyChanged(nameof(SignalStrengthVisible));
             OnPropertyChanged(nameof(StreamBitRateVisible));
             OnPropertyChanged(nameof(SignalStrength));
             OnPropertyChanged(nameof(StreamVideoSize));
-            OnPropertyChanged(nameof(StreamAudioTracks));
-            OnPropertyChanged(nameof(StreamSubtitles));
             OnPropertyChanged(nameof(Bitrate));
+            OnPropertyChanged(nameof(AudioTracks));
+            OnPropertyChanged(nameof(Subtitles));
         }
 
         public ChannelPageViewModel(ILoggingService loggingService, IDialogService dialogService, IDVBTDriverManager driver, DVBTTelevizorConfiguration config, ChannelService channelService)
