@@ -170,11 +170,6 @@ namespace DVBTTelevizor
                     if (_viewModel.PlayingChannel != null)
                     {
                         await _viewModel.ShowAudioTrackMenu(_viewModel.PlayingChannel);
-
-                        if (_editChannelPage != null)
-                        {
-                            _editChannelPage.SetAudioTracks(_viewModel.PlayingChannel == _viewModel.SelectedChannel, _viewModel.PlayingChannelAudioTracks, _viewModel.AudioTrack);
-                        }
                     }
                 });
             });
@@ -187,10 +182,6 @@ namespace DVBTTelevizor
                     {
                         await _viewModel.ShowSubtitlesMenu(_viewModel.PlayingChannel);
 
-                        if (_editChannelPage != null)
-                        {
-                            _editChannelPage.SetSubtitles(_viewModel.PlayingChannel == _viewModel.SelectedChannel, _viewModel.PlayingChannelSubtitles, _viewModel.Subtitles);
-                        }
                     }
                 });
             });
@@ -286,6 +277,11 @@ namespace DVBTTelevizor
                 }
 
                 SetSubtitles(id);
+
+                if (_editChannelPage != null)
+                {
+                    _editChannelPage.SetSubtitles(_viewModel.PlayingChannel == _viewModel.SelectedChannel, _viewModel.PlayingChannelSubtitles, id);
+                }
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAudioTrackId, (trackId) =>
@@ -297,6 +293,11 @@ namespace DVBTTelevizor
                 }
 
                 SetAudioTrack(id);
+
+                if (_editChannelPage != null)
+                {
+                    _editChannelPage.SetAudioTracks(_viewModel.PlayingChannel == _viewModel.SelectedChannel, _viewModel.PlayingChannelAudioTracks, id);
+                }
             });
 
             MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ChangeAspect, (aspect) =>
