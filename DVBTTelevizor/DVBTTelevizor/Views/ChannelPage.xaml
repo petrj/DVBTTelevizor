@@ -113,52 +113,52 @@
 
                         </Grid>
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
-                        <Label Margin="10,10,10,0" Text="Provider" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
-                        <Label Margin="10,0,10,10" Text="{Binding Channel.ProviderName}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+                        <Label Margin="10,10,10,0" Text="Provider" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.ProviderName}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
-                        <Label Margin="10,10,10,0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
-                        <Label Margin="10,0,10,10" Text="{Binding Channel.FrequencyLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+                        <Label Margin="10,10,10,0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.FrequencyLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
-                        <Label Margin="10,10,10,0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
-                        <Label Margin="10,0,10,10" Text="{Binding Channel.BandwdithLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+                        <Label Margin="10,10,10,0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.BandwdithLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
-                        <Label Margin="10,10,10,0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
-                        <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+                        <Label Margin="10,10,10,0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
-                        <Label Margin="10,10,10,0" Text="Service type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
-                        <Label Margin="10,0,10,10" Text="{Binding Channel.ServiceTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+                        <Label Margin="10,10,10,0" Text="Service type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.ServiceTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
-                        <Label Margin="10,10,10,0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
-                        <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+                        <Label Margin="10,10,10,0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" ></BoxView>
 
                         <Label Margin="10,10,10,0" Text="Signal strength" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
                         <Label Margin="10,0,10,10" Text="{Binding SignalStrength}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray"  IsVisible="{Binding SignalStrengthVisible}"></BoxView>
 
                         <Label Margin="10,10,10,0" Text="Bitrate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamBitRateVisible}" />
                         <Label Margin="10,0,10,10" Text="{Binding Bitrate}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamBitRateVisible}" />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" IsVisible="{Binding StreamBitRateVisible}" ></BoxView>
 
                         <Label Margin="10,10,10,0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamInfoVisible}" />
                         <Label Margin="10,0,10,10" Text="{Binding StreamVideoSize}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamInfoVisible}" />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" IsVisible="{Binding StreamInfoVisible}"></BoxView>
 
                         <Label Margin="10,10,10,0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding AudioTracksInfoVisible}" />
                         <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding AudioTracks, Mode=OneWay}" IsVisible="{Binding AudioTracksInfoVisible}" x:Name="AudioTracksStackLayout">
@@ -172,7 +172,7 @@
                         </StackLayout>
                         <Button Margin="10,20,10,10" x:Name="ButtonChangeAudio" Text="Change audio track" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
 
-                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="DarkGray" ></BoxView>
+                        <BoxView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" HeightRequest="1" Color="Gray" IsVisible="{Binding AudioTracksInfoVisible}"></BoxView>
 
                         <Label Margin="10,10,10,0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SubtitlesTracksInfoVisible}" />
                         <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding Subtitles, Mode=OneWay}" IsVisible="{Binding SubtitlesTracksInfoVisible}" x:Name="SubtitlesStackLayout">
