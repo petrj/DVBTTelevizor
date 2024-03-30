@@ -17,5 +17,21 @@ namespace DVBTTelevizor
                 return Active ? "*" : "";
             }
         }
+
+        public string ValueWithDot
+        {
+            get
+            {
+                return "● " + Value;
+            }
+        }
+
+        public string Colour
+        {
+            get
+            {
+                return Active ? "White" : "Gray";
+            }
+        }
     }
 }

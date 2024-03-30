@@ -26,7 +26,7 @@ namespace DVBTTelevizor
         private string _signalStrength = null;
 
         private bool _streamInfoVisible = false;
-        private bool _audioTracksInfoVisible = false;
+        private bool _audioTracksInfoVisible = true;
         private bool _subtitlesTracksInfoVisible = false;
         private string _streamVideoSize = String.Empty;
         private string _bitrate = String.Empty;

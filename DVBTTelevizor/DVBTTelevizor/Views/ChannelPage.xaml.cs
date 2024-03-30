@@ -56,14 +56,9 @@ namespace DVBTTelevizor
 
         public void SetAudioTracks(bool enabled, Dictionary<int, string> playingChannelAudioTracks, int activeId)
         {
-            AudioTracksInfoVisible = enabled && playingChannelAudioTracks.Count > 0;
+             AudioTracksInfoVisible = enabled && playingChannelAudioTracks.Count > 0;
 
             _viewModel.SetAudioTracks(enabled ? playingChannelAudioTracks : new Dictionary<int, string>(), activeId);
-
-            var rowHeight = _viewModel.GetScaledSize(50);
-            AudioTracksListView.RowHeight = rowHeight;
-            AudioTracksGrid.HeightRequest = rowHeight * _viewModel.AudioTracks.Count;
-            AudioTracksListView.HeightRequest = rowHeight * _viewModel.AudioTracks.Count;
         }
 
         public void SetSubtitles(bool enabled, Dictionary<int, string> playingChannelSubtitles, int activeId)
@@ -71,11 +66,6 @@ namespace DVBTTelevizor
             SubtitlesTracksInfoVisible = enabled && playingChannelSubtitles.Count > 0;
 
             _viewModel.SetSubtitleTracks(enabled ? playingChannelSubtitles : new Dictionary<int, string>(), activeId);
-
-            var rowHeight = _viewModel.GetScaledSize(50);
-            SubtitlesListView.RowHeight = rowHeight;
-            SubtitlesGrid.HeightRequest = rowHeight * _viewModel.Subtitles.Count;
-            SubtitlesListView.HeightRequest = rowHeight * _viewModel.Subtitles.Count;
         }
 
         public bool Changed
@@ -194,6 +184,7 @@ namespace DVBTTelevizor
         {
             _viewModel.NotifyFontSizeChange();
             _focusItems.DeFocusAll();
+           // AudioTracksListView.HeightRequest = _audioTracksListViewHeight;
         }
 
         public async Task Reload(string frequencyAndMapPID)

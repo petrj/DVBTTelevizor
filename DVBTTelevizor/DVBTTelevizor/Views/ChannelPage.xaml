@@ -199,119 +199,30 @@
                             <Label Grid.Row="0" Grid.Column="2" Text="{Binding StreamVideoSize}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
-                        <Grid x:Name="AudioTracksGrid"
-                              Margin="10,30,10,0"
-                              IsVisible="{Binding AudioTracksInfoVisible}"
-                              VerticalOptions="Start"
-                              HorizontalOptions="Start"
-                              BackgroundColor="Transparent"
-                              HeightRequest="150"
-                              RowSpacing="0">
+                        <Label Margin="10,30,10,0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding AudioTracksInfoVisible}" />
+                        <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding AudioTracks, Mode=OneWay}" IsVisible="{Binding AudioTracksInfoVisible}" x:Name="AudioTracksStackLayout">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame BackgroundColor="Transparent" Padding="5">
+                                        <Label Text="{Binding ValueWithDot, Mode=OneWay}" TextColor="{Binding Colour}" VerticalOptions="Center" HorizontalOptions="End"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference AudioTracksStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                                    </Frame>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                        <Button Margin="10,20,10,0" x:Name="ButtonChangeAudio" Text="Change audio track" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="34*" />
-                                <ColumnDefinition Width="66*" />
-                            </Grid.ColumnDefinitions>
 
-                            <Label Grid.Row="0" Grid.Column="0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-
-                            <ListView x:Name="AudioTracksListView"
-                                Grid.Row="0" Grid.Column="1"
-                                ItemsSource="{Binding AudioTracks}"
-                                CachingStrategy="RecycleElement"
-                                Style="{StaticResource ListViewStyle}"
-                                HeightRequest="120"
-                                BackgroundColor="Transparent">
-
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <ViewCell IsEnabled="False">
-                                            <ViewCell.View>
-
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="50" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="95*" />
-                                                        <ColumnDefinition Width="5*" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Value}" Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference AudioTracksListView}, Path=BindingContext.FontSizeForLabel}" />
-                                                    <Image Source="Audio.png" IsVisible="{Binding Active}" Grid.Row="0" Grid.Column="1" />
-
-                                                </Grid>
-
-                                            </ViewCell.View>
-
-                                        </ViewCell>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-
-                            </ListView>
-                        </Grid>
-
-                        <Button Margin="10,0,10,0" x:Name="ButtonChangeAudio" Text="Change audio track" IsVisible="{Binding AudioTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
-
-                        <Grid x:Name="SubtitlesGrid"
-                              Margin="10,30,10,0"
-                              IsVisible="{Binding SubtitlesTracksInfoVisible}"
-                              VerticalOptions="Start"
-                              HorizontalOptions="Start"
-                              BackgroundColor="Transparent"
-                              HeightRequest="100"
-                              RowSpacing="0">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="34*" />
-                                <ColumnDefinition Width="66*" />
-                            </Grid.ColumnDefinitions>
-
-                            <Label Grid.Row="0" Grid.Column="0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
-
-                            <ListView x:Name="SubtitlesListView"
-                                Grid.Row="0" Grid.Column="1"
-                                ItemsSource="{Binding Subtitles}"
-                                CachingStrategy="RecycleElement"
-                                Style="{StaticResource ListViewStyle}"
-                                HeightRequest="120"
-                                BackgroundColor="Transparent">
-
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <ViewCell IsEnabled="False">
-                                            <ViewCell.View>
-
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="50" />
-                                                    </Grid.RowDefinitions>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="95*" />
-                                                        <ColumnDefinition Width="5*" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding Value}" Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference SubtitlesListView}, Path=BindingContext.FontSizeForLabel}" />
-                                                    <Image Source="Hand.png" IsVisible="{Binding Active}" Grid.Row="0" Grid.Column="1" />
-
-                                                </Grid>
-
-                                            </ViewCell.View>
-
-                                        </ViewCell>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-
-                            </ListView>
-                        </Grid>
-
-                        <Button Margin="10,0,10,0" x:Name="ButtonChangeSubtitles" Text="Change subtitles" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
+                        <Label Margin="10,30,10,0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SubtitlesTracksInfoVisible}" />
+                        <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding Subtitles, Mode=OneWay}" IsVisible="{Binding SubtitlesTracksInfoVisible}" x:Name="SubtitlesStackLayout">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame BackgroundColor="Transparent" Padding="5">
+                                        <Label Text="{Binding ValueWithDot, Mode=OneWay}" TextColor="{Binding Colour}" VerticalOptions="Center" HorizontalOptions="End"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference SubtitlesStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                                    </Frame>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                        <Button Margin="10,20,10,0" x:Name="ButtonChangeSubtitles" Text="Change subtitles" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
 
                         <Label Margin="10,30,10,0" x:Name="ChannelEndLabel"/>
 
