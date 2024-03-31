@@ -71,6 +71,13 @@
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
             </Style>
 
+            <Style x:Key="SeparatorBoxViewStyle" TargetType="BoxView">
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="HeightRequest" Value="1"/>
+                <Setter Property="Color" Value="Gray"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -80,7 +87,7 @@
 
             <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-                <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,10">
 
                     <Label Text="Channels list" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -119,7 +126,9 @@
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,0">
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+                <StackLayout Margin="0,10,0,0">
 
                     <Label Text="System settings" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -199,13 +208,15 @@
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30">
+                <StackLayout Margin="0,0,0,10">
 
                     <Button x:Name="ClearEPGButton" Text="Clear EPG"  Command="{Binding ClearEPGCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30">
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+                <StackLayout Margin="0,10,0,10">
 
                     <Label Text="Remote accesss" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -280,7 +291,9 @@
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30" x:Name="StackLayoutLogging">
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutLogging">
 
                     <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
@@ -314,7 +327,9 @@
 
                 </StackLayout>
 
-                <StackLayout Margin="0,0,0,30" x:Name="StackLayoutDonate">
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+                <StackLayout Margin="0,10,0,30" x:Name="StackLayoutDonate">
 
                     <Label Text="Donate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
 
