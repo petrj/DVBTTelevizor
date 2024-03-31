@@ -616,16 +616,18 @@ namespace DVBTTelevizor.Droid
                         layoutParams.Gravity = GravityFlags.Bottom | GravityFlags.CenterHorizontal;
                         layoutParams.Width = ViewGroup.LayoutParams.WrapContent;
                         snackBar.View.LayoutParameters = layoutParams;
-
-                        snackbarLayout.SetPadding(0, 0, 0, 85);
                     }
                     else
                     {
                         // using Toast
 
+                        backgroundColor = Android.Graphics.Color.Rgb(128, 128, 128);
+
                         tView.Background.SetColorFilter(backgroundColor, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
                         textView = (TextView)tView.FindViewById(Android.Resource.Id.Message);
                         textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
+
+                        _instance.SetGravity(GravityFlags.Bottom | GravityFlags.CenterHorizontal, 0, 0);
                     }
 
                     var minTextSize = textView.TextSize; // 16
