@@ -9,13 +9,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>$(DefineConstants);TestingDVBTDriver</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.8.2" />
     <PackageReference Include="LibVLCSharp.Forms" Version="3.8.2" />
     <PackageReference Include="LoggerService" Version="1.0.4" />
-    <PackageReference Include="MPEGTS" Version="1.0.20" />
+    <PackageReference Include="MPEGTS" Version="1.0.23" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Plugin.InAppBilling" Version="7.1.0" />
     <PackageReference Include="RemoteAccessService" Version="1.0.4" />

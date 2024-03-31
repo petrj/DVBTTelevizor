@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.Services
 {
@@ -61,6 +62,53 @@ namespace DVBTTelevizor.Services
             _transferWorker.DoWork += _transferWorker_DoWork;
 
             _freqStreams = new Dictionary<long, List<byte>>();
+        }
+
+        public static bool EncodingTest(byte[] bytes = null)
+        {
+            var ok = true;
+
+            if (bytes == null)
+                bytes = new byte[] { 65, 66, 67 };
+
+            var index = 0;
+            var count = 3;
+
+            // Xamarin does not suport this encodings:
+            // iso-8859-10: "'iso-8859-10' is not a supported encoding name. For information on defining a custom encoding, see the documentation for the Encoding.RegisterProvider method.\nParameter name: name"
+            // iso-8859-13: {System.NotSupportedException: No data is available for encoding 28603. For information on defining a custom encoding, see the documentation for the Encoding.RegisterProvider method.  at ....
+
+            foreach (var enc in new string[] { "iso-8859-5", "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-9", "iso-8859-10", "iso-8859-11", "iso-8859-13", "iso-8859-15" })
+            {
+                try
+                {
+                    var txt = System.Text.Encoding.GetEncoding(enc).GetString(bytes, index, count);
+                }
+                catch (Exception ex)
+                {
+                    ok = false;
+                }
+            }
+
+            try
+            {
+                var unicodeTest = System.Text.Encoding.Unicode.GetString(bytes, index, count);
+            }
+            catch (Exception ex)
+            {
+                ok = false;
+            }
+
+            try
+            {
+                var utf8Test = System.Text.Encoding.UTF8.GetString(bytes, index, count);
+            }
+            catch (Exception ex)
+            {
+                ok = false;
+            }
+
+            return ok;
         }
 
         public void Connect()

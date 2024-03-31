@@ -1471,6 +1471,48 @@ namespace DVBTTelevizor
             }
         }
 
+        // only for debugging purposes
+        private void MoveEIT(EITScanResult scanResult)
+        {
+            // find min/max of current events:
+
+            var min = DateTime.MaxValue;
+            var max = DateTime.MinValue;
+
+            foreach (var ev in scanResult.CurrentEvents)
+            {
+                if (ev.Value.StartTime < min)
+                {
+                    min = ev.Value.StartTime;
+                }
+
+                if (ev.Value.StartTime > max)
+                {
+                    max = ev.Value.StartTime;
+                }
+            }
+
+            var middleTime = min.AddSeconds((max - min).TotalSeconds/2.0);
+            var moveTime = DateTime.Now - middleTime;
+
+            // move all
+
+            foreach (var ev in scanResult.CurrentEvents)
+            {
+                ev.Value.StartTime = ev.Value.StartTime.AddSeconds(moveTime.TotalSeconds);
+                ev.Value.FinishTime = ev.Value.FinishTime.AddSeconds(moveTime.TotalSeconds);
+            }
+
+            foreach (var sev in scanResult.ScheduledEvents)
+            {
+                foreach (var ev in sev.Value)
+                {
+                    ev.StartTime = ev.StartTime.AddSeconds(moveTime.TotalSeconds);
+                    ev.FinishTime = ev.FinishTime.AddSeconds(moveTime.TotalSeconds);
+                }
+            }
+        }
+
         /// <summary>
         /// EPG scan
         /// </summary>
@@ -1490,7 +1532,13 @@ namespace DVBTTelevizor
                 StopReadBuffer();
 
                 var eitService = new EITService(_log);
+
+#if TestingDVBTDriver
+                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(GetReadBufferData()), true);
+                MoveEIT(scanResult);
+#else
                 var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(GetReadBufferData()));
+#endif
 
                 return scanResult;
             }
