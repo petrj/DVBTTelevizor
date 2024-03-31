@@ -154,7 +154,7 @@
 
                     </Grid>
 
-                    <Grid Margin="30,10,10,0">
+                    <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -183,7 +183,7 @@
                         </Picker>
                     </Grid>
 
-                    <Grid Margin="30,10,10,0">
+                    <Grid Margin="30,0,10,0" RowSpacing="0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
