@@ -18,6 +18,7 @@ using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.Media.TV;
 using static Google.Android.Material.Snackbar.Snackbar;
+using Javax.Crypto;
 
 namespace DVBTTelevizor.Droid
 {
@@ -585,7 +586,7 @@ namespace DVBTTelevizor.Droid
                     TextView textView;
                     Snackbar snackBar = null;
 
-                    var backgroundColor = Android.Graphics.Color.Rgb(38, 38, 38);
+                    var backgroundColor = Android.Graphics.Color.Rgb(128, 128, 128);
                     var textColor = Android.Graphics.Color.Rgb(65, 179, 255);
 
                     var tView = _instance.View;
@@ -620,8 +621,6 @@ namespace DVBTTelevizor.Droid
                     else
                     {
                         // using Toast
-
-                        backgroundColor = Android.Graphics.Color.Rgb(128, 128, 128);
 
                         tView.Background.SetColorFilter(backgroundColor, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
                         textView = (TextView)tView.FindViewById(Android.Resource.Id.Message);
