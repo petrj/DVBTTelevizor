@@ -587,7 +587,8 @@ namespace DVBTTelevizor.Droid
                     Snackbar snackBar = null;
 
                     var backgroundColor = Android.Graphics.Color.Rgb(128, 128, 128);
-                    var textColor = Android.Graphics.Color.Rgb(65, 179, 255);
+                    //var textColor = Android.Graphics.Color.Rgb(0, 0, 220);
+                    var textColor = Android.Graphics.Color.White;
 
                     var tView = _instance.View;
                     if (tView == null)

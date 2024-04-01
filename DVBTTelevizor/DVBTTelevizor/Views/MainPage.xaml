@@ -155,7 +155,7 @@
 
     <NavigationPage.TitleView>
         <StackLayout Orientation="Horizontal" VerticalOptions="Center" Spacing="10">
-            <Image Source="icon256x256.png" WidthRequest="45" />
+            <Image Source="icon128x128.png" WidthRequest="45" />
         </StackLayout>
     </NavigationPage.TitleView>
 
