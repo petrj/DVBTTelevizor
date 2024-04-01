@@ -543,6 +543,8 @@ namespace DVBTTelevizor
                     }
 
                     actions.Add("Scan EPG");
+
+                    actions.Add("Detail...");
                 } else
                 {
                     actions.Add("Stop");
