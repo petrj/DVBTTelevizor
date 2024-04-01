@@ -1,4 +1,5 @@
-﻿using DVBTTelevizor.Models;
+﻿using Android.Database;
+using DVBTTelevizor.Models;
 using DVBTTelevizor.Services;
 using LoggerService;
 using Newtonsoft.Json;
@@ -542,16 +543,21 @@ namespace DVBTTelevizor
                     }
 
                     actions.Add("Scan EPG");
-
-                    if (RecordingChannel == null)
-                    {
-                        actions.Add("Delete");
-                    }
                 } else
                 {
                     actions.Add("Stop");
 
                     actions.Add("Scan EPG");
+
+                    if (PlayingChannel != null && SelectedChannel.FrequencyAndMapPID != PlayingChannel.FrequencyAndMapPID)
+                    {
+                        selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
+                    }
+                    else
+                    {
+                        selectedChannelDetailAction = $"Detail...";
+                    }
+                    actions.Add(selectedChannelDetailAction);
 
                     if (PlayingChannelSubtitles.Count > 0)
                     {
@@ -576,18 +582,6 @@ namespace DVBTTelevizor
                 {
                     actions.Add("Show record location");
                     actions.Add("Stop record");
-                }
-
-                if (SelectedChannel != null)
-                {
-                    if (PlayingChannel != null && SelectedChannel.FrequencyAndMapPID != PlayingChannel.FrequencyAndMapPID)
-                    {
-                        selectedChannelDetailAction = $"Detail ({SelectedChannel.Name})...";
-                    } else
-                    {
-                        selectedChannelDetailAction = $"Detail...";
-                    }
-                    actions.Add(selectedChannelDetailAction);
                 }
 
                 if (ch.CurrentEventItem != null)
@@ -643,9 +637,6 @@ namespace DVBTTelevizor
                     break;
                 case "Stop record":
                     MessagingCenter.Send(string.Empty, BaseViewModel.MSG_StopRecord);
-                    break;
-                case "Delete":
-                    await DeleteChannel(ch);
                     break;
                 case "Quit app":
                     if (await _dialogService.Confirm("Are you sure to quit DVBT televizor?"))
@@ -734,15 +725,45 @@ namespace DVBTTelevizor
             }
         }
 
-        private async Task DeleteChannel(DVBTChannel channel)
+        public async Task DeleteChannel(DVBTChannel channel)
         {
-            if (await _dialogService.Confirm($"Are you sure to delete channel {channel.Name}?"))
+            try
             {
+                if (PlayingChannel != null && PlayingChannel.FrequencyAndMapPID == channel.FrequencyAndMapPID)
+                {
+                    await _dialogService.Error("Delete failed: The channel is currently running");
+                    return;
+                }
+
+                if (RecordingChannel != null && RecordingChannel.FrequencyAndMapPID == channel.FrequencyAndMapPID)
+                {
+                    await _dialogService.Error("Delete failed: Record in progress");
+                    return;
+                }
+
                 _loggingService.Info($"Deleting channel {channel.Name})");
 
-                Channels.Remove(channel);
-                await _channelService.SaveChannels(Channels);
-                await Refresh();
+                DVBTChannel chToDelete = null;
+
+                foreach (var ch in Channels)
+                {
+                    if (ch.FrequencyAndMapPID == channel.FrequencyAndMapPID)
+                    {
+                        chToDelete = ch;
+                        break;
+                    }
+                }
+
+                if (chToDelete != null)
+                {
+                    Channels.Remove(chToDelete);
+                    await _channelService.SaveChannels(Channels);
+                    await SelectPreviousChannel();
+                    await Refresh();
+                }
+            } catch (Exception ex) 
+            {
+                _loggingService.Error(ex);
             }
         }
 

@@ -10,12 +10,17 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using static Android.Print.PrintAttributes;
+using static Java.Util.Jar.Attributes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ChannelPage : ContentPage, IOnKeyDown
     {
+        public DVBTChannel ChannelToDelete { get; set; } = null;
+
         private ChannelPageViewModel _viewModel;
         protected ILoggingService _loggingService;
         protected IDialogService _dialogService;
@@ -66,7 +71,7 @@ namespace DVBTTelevizor
             SubtitlesTracksInfoVisible = enabled && playingChannelSubtitles.Count > 0;
 
             _viewModel.SetSubtitleTracks(enabled ? playingChannelSubtitles : new Dictionary<int, string>(), activeId);
-        }
+        }        
 
         public bool Changed
         {
@@ -167,15 +172,38 @@ namespace DVBTTelevizor
                 .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryNumber }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Up", new List<View>() { ButtonUp }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Down", new List<View>() { ButtonDown }))
+
+                .AddItem(KeyboardFocusableItem.CreateFrom("KeyStop01", new List<View>() { KeyStop01 }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("KeyStop02", new List<View>() { KeyStop02 }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("KeyStop03", new List<View>() { KeyStop02 }))
+
                 .AddItem(KeyboardFocusableItem.CreateFrom("Audio", new List<View>() { ButtonChangeAudio }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Subtitles", new List<View>() { ButtonChangeSubtitles }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("ChannelEnd", new List<View>() { ChannelEndLabel }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("Delete", new List<View>() { ButtonDeleteChannel }));            
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
         }
 
         private void ChannelPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
-        {
+        {            
+            if ( ((args.FocusedItem.Name == "Audio") && (!_viewModel.AudioTracksInfoVisible)) ||
+                 ((args.FocusedItem.Name == "Subtitles") && (!_viewModel.SubtitlesTracksInfoVisible)) ||
+                 ((args.FocusedItem.Name == "Delete") && (!_viewModel.DeleteVisible))
+                )
+            {
+                Action action = null;
+
+                switch (_focusItems.LastFocusDirection)
+                {
+                    case KeyboardFocusDirection.Next: action = delegate { _focusItems.FocusNextItem(); }; break;
+                    case KeyboardFocusDirection.Previous: action = delegate { _focusItems.FocusPreviousItem(); }; break;
+                    default: action = delegate { args.FocusedItem.DeFocus(); }; break;
+                }
+
+                action();
+                return;
+            }        
+
             // scroll to item
             ChannelPageScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height / 2, false);
         }
@@ -202,6 +230,18 @@ namespace DVBTTelevizor
             set
             {
                 _viewModel.StreamInfoVisible = value;
+            }
+        }
+
+        public bool DeleteVisible
+        {
+            get
+            {
+                return _viewModel.DeleteVisible;
+            }
+            set
+            {
+                _viewModel.DeleteVisible = value;
             }
         }
 
@@ -325,23 +365,35 @@ namespace DVBTTelevizor
 
                 case KeyboardNavigationActionEnum.OK:
 
-                        switch (_focusItems.FocusedItemName)
-                        {
-                            case "Number":
-                                EntryNumber.Focus();
-                                break;
+                    switch (_focusItems.FocusedItemName)
+                    {
+                        case "Number":
+                            EntryNumber.Focus();
+                            break;
 
-                            case "Name":
-                                EntryName.Focus();
-                                break;
+                        case "Name":
+                            EntryName.Focus();
+                            break;
 
-                            case "Up":
-                                ButtonUp_Clicked(this, null);
-                                break;
+                        case "Up":
+                            ButtonUp_Clicked(this, null);
+                            break;
 
-                            case "Down":
-                                ButtonDown_Clicked(this, null);
-                                break;
+                        case "Down":
+                            ButtonDown_Clicked(this, null);
+                            break;
+
+                        case "Audio":
+                            ButtonChangeAudio_Clicked(this, null);
+                            break;
+
+                        case "Subtitles":
+                            ButtonChangeSubtitles_Clicked(this, null);
+                            break;
+
+                        case "Delete":
+                            ButtonDeleteChannel_Clicked(this, null);
+                            break;
                     }
                     break;
             }
@@ -354,6 +406,7 @@ namespace DVBTTelevizor
                 case "Number":
                     EntryNumber.Text = text;
                     break;
+                
                 case "Name":
                     EntryName.Text = text;
                     break;
@@ -368,6 +421,15 @@ namespace DVBTTelevizor
         private void ButtonChangeSubtitles_Clicked(object sender, EventArgs e)
         {
             MessagingCenter.Send("", BaseViewModel.MSG_ChangeSubtitlesRequest);
+        }
+
+        private async void ButtonDeleteChannel_Clicked(object sender, EventArgs e)
+        {
+            if (await _dialogService.Confirm($"Are you sure to delete channel {_viewModel.Channel.Name}?"))
+            {
+                ChannelToDelete = _viewModel.Channel;
+                await Navigation.PopAsync();
+            }
         }
     }
 }

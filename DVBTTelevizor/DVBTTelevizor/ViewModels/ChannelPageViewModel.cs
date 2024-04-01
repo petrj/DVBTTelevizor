@@ -26,6 +26,7 @@ namespace DVBTTelevizor
         private string _signalStrength = null;
 
         private bool _streamInfoVisible = false;
+        private bool _deleteVisible = false;
         private bool _audioTracksInfoVisible = true;
         private bool _subtitlesTracksInfoVisible = false;
         private string _streamVideoSize = String.Empty;
@@ -166,6 +167,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool DeleteVisible
+        {
+            get
+            {
+                return _deleteVisible;
+            }
+            set
+            {
+                _deleteVisible = value;
+            }
+        }
+
         public bool SignalStrengthVisible
         {
             get
@@ -231,6 +244,7 @@ namespace DVBTTelevizor
         {
             OnPropertyChanged(nameof(Channel));
             OnPropertyChanged(nameof(StreamInfoVisible));
+            OnPropertyChanged(nameof(DeleteVisible));
             OnPropertyChanged(nameof(AudioTracksInfoVisible));
             OnPropertyChanged(nameof(SubtitlesTracksInfoVisible));
             OnPropertyChanged(nameof(SignalStrengthVisible));

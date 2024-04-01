@@ -151,6 +151,8 @@
 
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
+                        <Label Margin="10,0,10,0" x:Name="KeyStop01"/>
+
                         <Label Margin="10,10,10,0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                         <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
@@ -163,6 +165,8 @@
 
                         <Label Margin="10,10,10,0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                         <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+                        <Label Margin="10,0,10,0" x:Name="KeyStop02"/>
 
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
@@ -179,6 +183,8 @@
                         <Label Margin="10,10,10,0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamInfoVisible}" />
                         <Label Margin="10,0,10,10" Text="{Binding StreamVideoSize}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamInfoVisible}" />
 
+                        <Label Margin="10,0,10,0" x:Name="KeyStop03"/>
+
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}"></BoxView>
 
                         <Label Margin="10,10,10,0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding AudioTracksInfoVisible}" />
@@ -193,8 +199,6 @@
                         </StackLayout>
                         <Button Margin="10,20,10,10" x:Name="ButtonChangeAudio" Text="Change audio track" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
 
-                        <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding AudioTracksInfoVisible}"></BoxView>
-
                         <Label Margin="10,10,10,0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SubtitlesTracksInfoVisible}" />
                         <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding Subtitles, Mode=OneWay}" IsVisible="{Binding SubtitlesTracksInfoVisible}" x:Name="SubtitlesStackLayout">
                             <BindableLayout.ItemTemplate>
@@ -207,7 +211,7 @@
                         </StackLayout>
                         <Button Margin="10,20,10,0" x:Name="ButtonChangeSubtitles" Text="Change subtitles" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
 
-                        <Label Margin="10,30,10,0" x:Name="ChannelEndLabel"/>
+                        <Button Margin="10,20,10,0" x:Name="ButtonDeleteChannel" Text="Delete"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
 
                     </StackLayout>
                 </StackLayout>

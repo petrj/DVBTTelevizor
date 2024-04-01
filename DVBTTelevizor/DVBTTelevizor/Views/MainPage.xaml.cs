@@ -330,11 +330,17 @@ namespace DVBTTelevizor
             RestartRemoteAccessService();
         }
 
-        private void _editChannelPage_Disappearing(object sender, EventArgs e)
+        private async void _editChannelPage_Disappearing(object sender, EventArgs e)
         {
             if (_editChannelPage.Changed)
             {
                 _viewModel.RefreshCommand.Execute(null);
+            }
+
+            if (_editChannelPage.ChannelToDelete != null)
+            {
+                await _viewModel.DeleteChannel(_editChannelPage.ChannelToDelete);
+                _editChannelPage.ChannelToDelete = null;
             }
         }
 
@@ -1563,11 +1569,21 @@ namespace DVBTTelevizor
 
                         _editChannelPage.SetAudioTracks(true,_viewModel.PlayingChannelAudioTracks, _viewModel.AudioTrack);
                         _editChannelPage.SetSubtitles(true, _viewModel.PlayingChannelSubtitles, _viewModel.Subtitles);
+
+                        _editChannelPage.DeleteVisible = false;
                     } else
                     {
                         _editChannelPage.SetAudioTracks(false, _viewModel.PlayingChannelAudioTracks, -1);
                         _editChannelPage.SetSubtitles(false, _viewModel.PlayingChannelSubtitles, -1);
+
+                        _editChannelPage.DeleteVisible = true;
                     }
+
+                    if (_viewModel.RecordingChannel != null && (ch.FrequencyAndMapPID == _viewModel.RecordingChannel.FrequencyAndMapPID))
+                    {
+                        _editChannelPage.DeleteVisible = false;
+                    }
+
                 } catch (Exception ex)
                 {
                     _loggingService.Error(ex);
@@ -1606,7 +1622,7 @@ namespace DVBTTelevizor
                     _loggingService.Error(ex);
                 }
 
-                await _editChannelPage.Reload(ch.FrequencyAndMapPID);
+                await _editChannelPage.Reload(ch.FrequencyAndMapPID);                
 
                 await Navigation.PushAsync(_editChannelPage);
             }
