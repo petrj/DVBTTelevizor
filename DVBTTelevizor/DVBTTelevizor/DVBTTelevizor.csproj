@@ -9,7 +9,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>$(DefineConstants);TestingDVBTDriver</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
