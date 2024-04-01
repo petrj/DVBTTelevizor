@@ -76,6 +76,25 @@ namespace DVBTTelevizor
             {
                 MessagingCenter.Send(string.Empty, BaseViewModel.MSG_CloseTuningPage);
             });
+
+            driver.StatusChanged += Driver_StatusChanged;
+        }
+
+        private void Driver_StatusChanged(object sender, EventArgs e)
+        {
+            if (e is DVBTTelevizor.StatusChangedEventArgs statusArgs &&
+               statusArgs.Status != null &&
+               statusArgs.Status is DVBTStatus status)
+            {
+                if (status.SuccessFlag)
+                {
+                    SignalStrengthProgress = status.rfStrengthPercentage / 100.0;
+                }
+                else
+                {
+                    SignalStrengthProgress = 0;
+                }
+            }
         }
 
         public bool ManualTuning
@@ -889,6 +908,7 @@ namespace DVBTTelevizor
                 }
 
                 State = TuneState.TuneFinishedOK;
+                SignalStrengthProgress = 0;
                 MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
 
             } catch (Exception ex)
@@ -902,12 +922,9 @@ namespace DVBTTelevizor
         {
             try
             {
-                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, FastTuning);
+                SignalStrengthProgress = 0;
 
-                if (tuneResult.Result != SearchProgramResultEnum.Error)
-                {
-                    SignalStrengthProgress = tuneResult.SignalState.rfStrengthPercentage / 100.0;
-                }
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, FastTuning);
 
                 switch (tuneResult.Result)
                 {
