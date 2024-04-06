@@ -59,6 +59,7 @@ namespace DVBTTelevizor
         private List<string> _remoteDevicesConnected = new List<string>();
 
         public Command CheckStreamCommand { get; set; }
+        public Command CheckPIDsCommand { get; set; }
 
         // EPGDetailGrid
         private Rectangle LandscapeEPGDetailGridPosition { get; set; } = new Rectangle(1.0, 1.0, 0.3, 1.0);
@@ -134,8 +135,13 @@ namespace DVBTTelevizor
             }
 
             CheckStreamCommand = new Command(async () => await CheckStream());
+            CheckPIDsCommand = new Command(async () => await _driver.CheckPIDs());
 
             BackgroundCommandWorker.RunInBackground(CheckStreamCommand, 3, 5);
+
+#if CHECKPIDS
+            BackgroundCommandWorker.RunInBackground(CheckPIDsCommand, 60, 10);
+#endif
 
             _tuneOptionsPage.Disappearing += AnyPage_Disappearing;
             _settingsPage.Disappearing += AnyPage_Disappearing;
@@ -2528,8 +2534,8 @@ namespace DVBTTelevizor
                     var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                     var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
 
-                    //_loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
-                    //_loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+                    _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                    _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
 
                     // setting subtitles
                     foreach (var desc in videoView.MediaPlayer.SpuDescription)

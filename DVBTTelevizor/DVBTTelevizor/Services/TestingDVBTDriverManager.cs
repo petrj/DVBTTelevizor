@@ -496,6 +496,11 @@ namespace DVBTTelevizor
             };
         }
 
+        public async Task CheckPIDs()
+        {
+            await Task.Delay(100);
+        }
+
         public Stream VideoStream
         {
             get

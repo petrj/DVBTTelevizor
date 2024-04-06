@@ -19,6 +19,7 @@ using SQLite;
 using DVBTTelevizor.Services;
 using Java.IO;
 using System.Threading;
+using static Java.Util.Jar.Pack200;
 
 namespace DVBTTelevizor
 {
@@ -527,7 +528,7 @@ namespace DVBTTelevizor
                     if (!readingStream)
                     {
                         status += ", not reading";
-                        System.Threading.Thread.Sleep(200);
+                        System.Threading.Thread.Sleep(100);
                     }
                     else
                     {
@@ -588,7 +589,7 @@ namespace DVBTTelevizor
                         }
                         else
                         {
-                            System.Threading.Thread.Sleep(100);
+                            System.Threading.Thread.Sleep(50);
                         }
 
                         if (!rec && recordFileStream != null)
@@ -1074,6 +1075,45 @@ namespace DVBTTelevizor
                 _log.Error(ex);
                 res.Result = SearchProgramResultEnum.Error;
                 return res;
+            }
+        }
+
+        public async Task CheckPIDs()
+        {
+            _log.Debug($"Checking PIDS");
+
+            try
+            {
+                try
+                {
+                    StartReadBuffer();
+
+                    // reading 13 s
+                    await Task.Delay(3000);                  
+
+                    var buffer = GetReadBufferData();
+
+                    var packetsByPID = MPEGTransportStreamPacket.SortPacketsByPID(MPEGTransportStreamPacket.Parse(buffer));
+
+                    _log.Info("PID:             Packets count");
+                    _log.Info("-------------------------------");
+
+                    foreach (var kvp in packetsByPID)
+                    {
+                        _log.Info($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value.Count,8}");
+                    }                    
+
+                }
+                finally
+                {
+                    StopReadBuffer();
+                    ClearReadBuffer();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
             }
         }
 
