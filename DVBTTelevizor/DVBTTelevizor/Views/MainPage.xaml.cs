@@ -1628,7 +1628,7 @@ namespace DVBTTelevizor
                     _loggingService.Error(ex);
                 }
 
-                await _editChannelPage.Reload(ch.FrequencyAndMapPID);                
+                await _editChannelPage.Reload(ch.FrequencyAndMapPID);
 
                 await Navigation.PushAsync(_editChannelPage);
             }
@@ -2534,8 +2534,8 @@ namespace DVBTTelevizor
                     var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                     var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
 
-                    _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
-                    _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+                    //_loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                    //_loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
 
                     // setting subtitles
                     foreach (var desc in videoView.MediaPlayer.SpuDescription)

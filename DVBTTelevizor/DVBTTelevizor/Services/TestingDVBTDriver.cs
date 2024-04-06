@@ -1,3 +1,4 @@
+using Java.Nio;
 using LoggerService;
 using MPEGTS;
 using Newtonsoft.Json;
@@ -146,6 +147,130 @@ namespace DVBTTelevizor.Services
             }
         }
 
+        private long FindPCRPID(byte[] buffer)
+        {
+            try
+            {
+                _loggingService.Info("Finding PCR PID");
+
+                SDTTable sDTTable = null;
+                PSITable psiTable = null;
+                PMTTable pmtTable = null;
+
+                var allPackets = MPEGTransportStreamPacket.Parse(buffer);
+
+                if (psiTable == null)
+                {
+                    psiTable = DVBTTable.CreateFromPackets<PSITable>(allPackets, 0);
+                }
+                if (sDTTable == null)
+                {
+                    sDTTable = DVBTTable.CreateFromPackets<SDTTable>(allPackets, 17);
+                }
+                if (pmtTable == null && psiTable != null && sDTTable != null)
+                {
+                    pmtTable = MPEGTransportStreamPacket.GetPMTTable(allPackets, sDTTable, psiTable);
+                    if (pmtTable != null)
+                    {
+                        _loggingService.Info($"PCR PID found: {pmtTable.PCRPID}");
+                        return pmtTable.PCRPID;
+                    }
+                }
+
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error whiel getting PCR PID");
+            }
+
+            _loggingService.Info($"NO PCR PID found");
+            return -1;
+        }
+
+        public ulong? GetFirstPCRClock(long PID, byte[] buffer)
+        {
+            try
+            {
+                if (buffer.Length < 188 * 2)
+                    return null;
+
+                var offset = 0;
+                var pos = 0;
+
+                while (pos < 188)
+                {
+                    if (
+                            (buffer[pos] == MPEGTransportStreamPacket.MPEGTSSyncByte) &&
+                            (buffer[pos + 188] == MPEGTransportStreamPacket.MPEGTSSyncByte)
+                       )
+                    {
+                        offset = pos;
+                    }
+                    pos++;
+                }
+
+                while (offset + 188 <= buffer.Length)
+                {
+                    if (buffer[offset] != MPEGTransportStreamPacket.MPEGTSSyncByte)
+                    {
+                        throw new Exception("invalid packet, no sync byte found");
+                    }
+
+                    if (((buffer[offset + 1] & 0x1F) << 8) + buffer[offset + 2] == PID && (buffer[offset + 1] & 0x80) != 128)
+                    {
+                        AdaptationFieldControlEnum adaptationFieldControlEnum = (AdaptationFieldControlEnum)((buffer[offset + 3] & 0x30) >> 4);
+                        if ((adaptationFieldControlEnum == AdaptationFieldControlEnum.AdaptationFieldFollowedByPayload || adaptationFieldControlEnum == AdaptationFieldControlEnum.AdaptationFieldOnlyNoPayload) && buffer[offset + 4] > 6 && (buffer[offset + 5] & 0x10) == 16)
+                        {
+                            return MPEGTransportStreamPacket.GetPCRClock(new List<byte>
+                    {
+                        buffer[offset + 6],
+                        buffer[offset + 7],
+                        buffer[offset + 8],
+                        buffer[offset + 9],
+                        buffer[offset + 10],
+                        buffer[offset + 11]
+                    }) / 27000000;
+                        }
+                    }
+
+                    offset += 188;
+                }
+
+                return null;
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                return null;
+            }
+        }
+
+        private string GetHumanReadableSize(double bytes, bool highPrecision = false)
+        {
+            var frm = highPrecision ? "N2" : "N0";
+
+            if (bytes > 1000000)
+            {
+                return Math.Round(bytes / 1000000.0, 2).ToString(frm) + " MB";
+            }
+
+            if (bytes > 1000)
+            {
+                return Math.Round(bytes / 1000.0, 2).ToString(frm) + " kB";
+            }
+
+            return bytes.ToString(frm) + " B";
+        }
+
+        private int GetCorrectedBufferSize(int bufferSize)
+        {
+            // divisible by 188
+            while (bufferSize % 188 != 0)
+            {
+                bufferSize++;
+            }
+
+            return bufferSize;
+        }
+
         private void _transferWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             try
@@ -154,6 +279,13 @@ namespace DVBTTelevizor.Services
                 var bufferSize = 250000; // constant speed cca 4 MB
                 var lastSpeedCalculationTime = DateTime.MinValue;
                 var lastSpeedCalculationTimeLog = DateTime.MinValue;
+
+                var frequencyPCRPID = new Dictionary<long, long>();
+                var firstPCRTimeStamp = ulong.MinValue;
+                var firstPCRTimeStampTime = DateTime.MinValue;
+
+                var loopsPerSecond = 5;
+                var PCR = "";
 
                 _loggingService.Info($"TestingDVBTDriver transfer endpoint: {_transferIPEndPoint.Address}:{_transferIPEndPoint.Port}");
 
@@ -173,7 +305,7 @@ namespace DVBTTelevizor.Services
                             {
                                 if ((_sendingDataFrequency != 0) && (_freqStreams.ContainsKey(_sendingDataFrequency)) && _PIDFilter.Count>0 && !SendingDataDisabled)
                                 {
-                                    if ((DateTime.Now-lastSpeedCalculationTime).TotalMilliseconds>200)
+                                    if ((DateTime.Now-lastSpeedCalculationTime).TotalMilliseconds> (1000 / loopsPerSecond))
                                     {
                                         // calculate speed
 
@@ -210,47 +342,79 @@ namespace DVBTTelevizor.Services
 
                                             // calculating buffer size for balancing bitrate
 
-                                            var packets = MPEGTransportStreamPacket.Parse(thisSecBytes);
-                                            var tdtTable = DVBTTable.CreateFromPackets<TDTTable>(packets, 20);
-                                            if (tdtTable != null && tdtTable.UTCTime != DateTime.MinValue)
+                                            if (!frequencyPCRPID.ContainsKey(_sendingDataFrequency))
                                             {
-                                                //_loggingService.Debug($" .. !!!!!!!! TDT table time: {tdtTable.UTCTime}");
+                                                frequencyPCRPID[_sendingDataFrequency] = -1;
+                                            }
 
-                                                if (_timeShift == TimeSpan.MinValue)
-                                                {
-                                                    _timeShift = DateTime.Now - tdtTable.UTCTime;
-                                                } else
-                                                {
-                                                    var expectedTime = tdtTable.UTCTime.Add(_timeShift);
-                                                    var timeDiff = DateTime.Now - expectedTime;
-                                                    //_loggingService.Debug($" .. timeDiff: {timeDiff.TotalMilliseconds} ms");
+                                            if (frequencyPCRPID[_sendingDataFrequency] == -1)
+                                            {
+                                                frequencyPCRPID[_sendingDataFrequency] = FindPCRPID(thisSecBytes);
+                                            } else
+                                            {
+                                                var PCRPID = frequencyPCRPID[_sendingDataFrequency];
 
-                                                    if (timeDiff.TotalMilliseconds > 0)
+                                                var timeStamp = GetFirstPCRClock(PCRPID, thisSecBytes);
+
+                                                if (timeStamp.HasValue && timeStamp.Value != ulong.MinValue)
+                                                {
+                                                    _loggingService.Debug($"Timestamp: {timeStamp}");
+
+                                                    if (firstPCRTimeStamp == ulong.MinValue)
                                                     {
-                                                        // increasing buffer size
-                                                        bufferSize = Convert.ToInt32(bufferSize * 1.2);
-                                                        if (bufferSize > MaxBufferSize)
-                                                        {
-                                                            _loggingService.Debug($" .. cannot increase buffer size!");
-                                                            bufferSize = MaxBufferSize;
-                                                        } else
-                                                        {
-                                                            _loggingService.Debug($" .. >>> increasing buffer size to: {bufferSize/1000} KB  [{timeDiff.TotalMilliseconds}]");
-                                                        }
+                                                        firstPCRTimeStamp = timeStamp.Value;
+                                                        firstPCRTimeStampTime = DateTime.Now;
                                                     }
-                                                    else if (timeDiff.TotalMilliseconds < 0)
+                                                    else
                                                     {
-                                                        // decreasing buffer size
-                                                        bufferSize = Convert.ToInt32(bufferSize * 0.8);
-                                                        if (bufferSize < MinBufferSize)
+                                                        var streamTimeSpan = DateTime.Now - firstPCRTimeStampTime;
+                                                        var dataTime = timeStamp.Value - firstPCRTimeStamp;
+                                                        var shift = (streamTimeSpan).TotalSeconds - (dataTime);
+                                                        //var speedCorrectionLShiftPerSec = shift / (streamTimeSpan).TotalSeconds;
+                                                        var missingBytesForWholeStream = Math.Round((shift / loopsPerSecond) * bufferSize, 2);
+
+                                                        PCR = $" (PCR time shift: {Math.Round(shift, 2).ToString("N2")} s, missingBytes: {GetHumanReadableSize(missingBytesForWholeStream)})";
+
+                                                        var newBufferSize = GetCorrectedBufferSize(Convert.ToInt32(bufferSize + missingBytesForWholeStream));
+
+                                                        if (newBufferSize > bufferSize)
                                                         {
-                                                            _loggingService.Debug($" .. cannot decrease buffer size!");
-                                                            bufferSize = MinBufferSize;
+                                                            if (newBufferSize > MaxBufferSize)
+                                                            {
+                                                                PCR += $" cannot increase buffer to {GetHumanReadableSize(newBufferSize)}";
+                                                                newBufferSize = MaxBufferSize;
+                                                            }
+
+                                                            PCR += $" >>> {GetHumanReadableSize(newBufferSize)}";
+
                                                         }
                                                         else
+                                                        if (newBufferSize < bufferSize)
                                                         {
-                                                            _loggingService.Debug($" .. <<< desreasing buffer size to: {bufferSize / 1000} KB [{timeDiff.TotalMilliseconds}]");
+                                                            if (newBufferSize < MinBufferSize)
+                                                            {
+                                                                PCR += $" cannot decrease buffer to {GetHumanReadableSize(newBufferSize)}";
+                                                                newBufferSize = MinBufferSize;
+                                                            }
+
+                                                            PCR += $" <<< {GetHumanReadableSize(newBufferSize)}";
                                                         }
+
+                                                        // calculate percentage change
+                                                        var diff = newBufferSize - bufferSize;
+                                                        var percChange = diff / (bufferSize / 100.0);
+
+                                                        PCR += $" %%% change: {percChange.ToString("N2")}";
+
+                                                        if (Math.Abs(percChange) > 25)
+                                                        {
+                                                            PCR += $"  TOO HIGH !!";
+                                                            newBufferSize = bufferSize + Convert.ToInt32(Math.Sign(percChange) * 0.25 * bufferSize);
+                                                        }
+
+                                                        PCR += $" %%% change: {percChange.ToString("N2")}";
+
+                                                        bufferSize = GetCorrectedBufferSize(Convert.ToInt32(newBufferSize));
                                                     }
                                                 }
                                             }
@@ -258,13 +422,15 @@ namespace DVBTTelevizor.Services
                                             if ((DateTime.Now - lastSpeedCalculationTimeLog).TotalMilliseconds > 1000)
                                             {
                                                 lastSpeedCalculationTimeLog = DateTime.Now;
-                                                _loggingService.Debug($"TestingDVBTDriver sending data: {speed}, time for parse & send: {(DateTime.Now - lastSpeedCalculationTime).TotalMilliseconds} ms");
+                                                _loggingService.Debug($"TestingDVBTDriver sending data: {speed}, time for parse & send: {(DateTime.Now - lastSpeedCalculationTime).TotalMilliseconds} ms, {PCR}");
                                             }
                                         }
                                         else
                                         {
                                             _sendingDataPosition = 0;
                                             _timeShift = TimeSpan.MinValue;
+                                            firstPCRTimeStamp = ulong.MinValue;
+                                            firstPCRTimeStampTime = DateTime.MinValue;
                                         }
                                     }
                                 }
