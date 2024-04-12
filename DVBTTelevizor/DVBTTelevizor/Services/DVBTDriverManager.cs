@@ -528,7 +528,7 @@ namespace DVBTTelevizor
                     if (!readingStream)
                     {
                         status += ", not reading";
-                        System.Threading.Thread.Sleep(100);
+                        System.Threading.Thread.Sleep(50);
                     }
                     else
                     {
@@ -1089,7 +1089,7 @@ namespace DVBTTelevizor
                     StartReadBuffer();
 
                     // reading 13 s
-                    await Task.Delay(3000);                  
+                    await Task.Delay(3000);
 
                     var buffer = GetReadBufferData();
 
@@ -1101,7 +1101,7 @@ namespace DVBTTelevizor
                     foreach (var kvp in packetsByPID)
                     {
                         _log.Info($"{kvp.Key,6} ({"0x" + Convert.ToString(kvp.Key, 16),6}): {kvp.Value.Count,8}");
-                    }                    
+                    }
 
                 }
                 finally
