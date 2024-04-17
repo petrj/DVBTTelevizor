@@ -957,14 +957,6 @@ namespace DVBTTelevizor
                         return;
                 }
 
-                var mapPIDs = new List<long>();
-
-                foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
-                {
-                    mapPIDs.Add(sd.Value);
-                }
-                _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
-
                 if (State == TuneState.TuneAborted)
                 {
                     _loggingService.Debug($"Tuning aborted");
@@ -973,9 +965,20 @@ namespace DVBTTelevizor
 
                 var totalChannelsAddedCount = 0;
 
-                // searching PIDs not neccessary from version 14
+                var mapPIDToServiceDescriptor = new Dictionary<long, ServiceDescriptor>();
+
                 foreach (var serviceDescriptor in searchMapPIDsResult.ServiceDescriptors)
                 {
+                    // ProgramMapPID must be unique!
+                    if (!(mapPIDToServiceDescriptor.ContainsKey(serviceDescriptor.Value)))
+                    {
+                        mapPIDToServiceDescriptor.Add(serviceDescriptor.Value, null);
+                    } else
+                    {
+                        _loggingService.Debug($"Not unique MapPID {serviceDescriptor.Value}!");
+                        continue;
+                    }
+
                     var ch = new DVBTChannel();
                     ch.ProgramMapPID = serviceDescriptor.Value;
                     ch.Name = serviceDescriptor.Key.ServiceName;
