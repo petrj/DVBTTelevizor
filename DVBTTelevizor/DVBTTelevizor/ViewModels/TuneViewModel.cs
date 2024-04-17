@@ -958,12 +958,10 @@ namespace DVBTTelevizor
                 }
 
                 var mapPIDs = new List<long>();
-                var mapPIDToServiceDescriptor = new Dictionary<long, ServiceDescriptor>();
 
                 foreach (var sd in searchMapPIDsResult.ServiceDescriptors)
                 {
                     mapPIDs.Add(sd.Value);
-                    mapPIDToServiceDescriptor.Add(sd.Value, sd.Key);
                 }
                 _loggingService.Debug($"Program MAP PIDs found: {String.Join(",", mapPIDs)}");
 
