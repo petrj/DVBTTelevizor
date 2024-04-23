@@ -74,7 +74,7 @@ namespace DVBTTelevizor
 
         Task<EITScanResult> ScanEPG(int msTimeout = 2000);
         Task CheckPIDs();
-        
+
 
         //void StatusChangedEventHandler(object sender, StatusChangedEventArgs e);
         event EventHandler StatusChanged;
