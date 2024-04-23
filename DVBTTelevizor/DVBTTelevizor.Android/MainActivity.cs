@@ -267,6 +267,8 @@ namespace DVBTTelevizor.Droid
             {
                 HandleImportFile(Intent);
             }
+
+            //TestingDVBTDriver.EncodingTest();
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -412,7 +414,6 @@ namespace DVBTTelevizor.Droid
             //{
             //    _driverInitializing = false;
             //}
-
         }
 
         private async void CheckIfUsbAttachedOrDetached(object sender, EventArgs e)

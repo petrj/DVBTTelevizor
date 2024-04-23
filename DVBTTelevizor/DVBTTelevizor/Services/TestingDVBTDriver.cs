@@ -79,7 +79,18 @@ namespace DVBTTelevizor.Services
             // iso-8859-10: "'iso-8859-10' is not a supported encoding name. For information on defining a custom encoding, see the documentation for the Encoding.RegisterProvider method.\nParameter name: name"
             // iso-8859-13: {System.NotSupportedException: No data is available for encoding 28603. For information on defining a custom encoding, see the documentation for the Encoding.RegisterProvider method.  at ....
 
-            foreach (var enc in new string[] { "iso-8859-5", "iso-8859-6", "iso-8859-7", "iso-8859-8", "iso-8859-9", "iso-8859-10", "iso-8859-11", "iso-8859-13", "iso-8859-15" })
+            foreach (var enc in new string[] {
+                "iso-8859-1",
+                "iso-8859-2",
+                "iso-8859-3",
+                "iso-8859-4",
+                "iso-8859-5",
+                "iso-8859-6",
+                "iso-8859-7",
+                "iso-8859-8",
+                "iso-8859-9",
+                "iso-8859-11",
+                "iso-8859-15" })
             {
                 try
                 {
