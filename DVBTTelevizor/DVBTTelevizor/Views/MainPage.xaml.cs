@@ -316,6 +316,7 @@ namespace DVBTTelevizor
                 CallWithTimeout(delegate
                 {
                     videoView.MediaPlayer.Teletext = Convert.ToInt32(pageNum);
+                    MessagingCenter.Send($"Teletext: {pageNum}", BaseViewModel.MSG_ToastMessage);
                 });
             });
 
@@ -335,7 +336,7 @@ namespace DVBTTelevizor
                 CallWithTimeout(delegate
                 {
                     SetSubtitles(-1);
-                    MessagingCenter.Send("Teletext Deactivated", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send("Teletext deactivated", BaseViewModel.MSG_ToastMessage);
                 });
             });
 
@@ -1084,7 +1085,7 @@ namespace DVBTTelevizor
                             }
                         } else
                         {
-                            videoView.MediaPlayer.Teletext = Convert.ToInt32(_numberPressed);
+                            MessagingCenter.Send(_numberPressed, BaseViewModel.MSG_TeletextPageNumber);
                         }
                     });
                 }
@@ -1329,10 +1330,18 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        if (!_viewModel.StandingOnEnd)
+                        if (_viewModel.TeletextEnabled)
                         {
-                            await _viewModel.SelectNextChannel(step);
-                            await ActionPlay();
+                            videoView.MediaPlayer.Teletext += 1;
+                            MessagingCenter.Send(videoView.MediaPlayer.Teletext.ToString(), BaseViewModel.MSG_TeletextPageNumber);
+                        }
+                        else
+                        {
+                            if (!_viewModel.StandingOnEnd)
+                            {
+                                await _viewModel.SelectNextChannel(step);
+                                await ActionPlay();
+                            }
                         }
                     }
                 }
@@ -1398,10 +1407,18 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        if (!_viewModel.StandingOnStart)
+                        if (_viewModel.TeletextEnabled)
                         {
-                            await _viewModel.SelectPreviousChannel(step);
-                            await ActionPlay();
+                            videoView.MediaPlayer.Teletext -= 1;
+                            MessagingCenter.Send(videoView.MediaPlayer.Teletext.ToString(), BaseViewModel.MSG_TeletextPageNumber);
+                        }
+                        else
+                        {
+                            if (!_viewModel.StandingOnStart)
+                            {
+                                await _viewModel.SelectPreviousChannel(step);
+                                await ActionPlay();
+                            }
                         }
                     }
                 }
