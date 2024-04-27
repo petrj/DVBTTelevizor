@@ -27,8 +27,13 @@ namespace DVBTTelevizor
 
         public Command Donate1command { get; set; }
         public Command Donate2Command { get; set; }
+        public Command Donate3command { get; set; }
         public Command Donate5command { get; set; }
-        public Command Donate10command { get; set; }
+
+        public bool Donate1Visible { get; set; } = true;
+        public bool Donate2Visible { get; set; } = true;
+        public bool Donate3Visible { get; set; } = true;
+        public bool Donate5Visible { get; set; } = true;
 
         public ObservableCollection<DVBTChannel> AutoPlayChannels { get; set; } = new ObservableCollection<DVBTChannel>();
         public DVBTChannel _selectedChannel = null;
@@ -51,10 +56,68 @@ namespace DVBTTelevizor
 
             ShareChannelsCommand = new Command(async  () => { await ShareLog(); });
 
-            Donate1command = new Command(async () => { await Donate("donation.1"); });
-            Donate2Command = new Command(async () => { await Donate("donation.2"); });
-            Donate5command = new Command(async () => { await Donate("donation.5"); });
-            Donate10command = new Command(async () => { await Donate("donation.10"); });
+            Donate1command = new Command(async () => { await Donate("donation.2024.1"); });
+            Donate2Command = new Command(async () => { await Donate("donation.2024.2"); });
+            Donate3command = new Command(async () => { await Donate("donation.2024.3"); });
+            Donate5command = new Command(async () => { await Donate("donation.2024.5"); });
+        }
+
+        public void HideDonateButton(string productId)
+        {
+            switch (productId)
+            {
+                case "donation.2024.1":
+                    Donate1Visible = false;
+                    OnPropertyChanged(nameof(Donate1Visible));
+                    break;
+                case "donation.2024.2":
+                    Donate2Visible = false;
+                    OnPropertyChanged(nameof(Donate2Visible));
+                    break;
+                case "donation.2024.3":
+                    Donate3Visible = false;
+                    OnPropertyChanged(nameof(Donate3Visible));
+                    break;
+                case "donation.2024.5":
+                    Donate5Visible = false;
+                    OnPropertyChanged(nameof(Donate5Visible));
+                    break;
+            }
+        }
+
+        public async Task CheckPurchases()
+        {
+            try
+            {
+                // contacting service
+
+                var connected = await CrossInAppBilling.Current.ConnectAsync();
+
+                if (!connected)
+                {
+                    _loggingService.Info($"Connection to AppBilling service failed");
+                    return;
+                }
+
+                var purchases = await CrossInAppBilling.Current.GetPurchasesAsync(ItemType.InAppPurchase);
+                foreach (var purchase in purchases)
+                {
+                    if (purchase.State == PurchaseState.Purchased)
+                    {
+                        HideDonateButton(purchase.ProductId);
+                    }
+                }
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while checking purchases");
+            }
+            finally
+            {
+                await CrossInAppBilling.Current.DisconnectAsync();
+            }
         }
 
         public async void FillAutoPlayChannels()
@@ -198,7 +261,6 @@ namespace DVBTTelevizor
                 OnPropertyChanged(nameof(IsFullScreen));
             }
         }
-
 
         public int AppFontSizeIndex
         {
@@ -369,6 +431,7 @@ namespace DVBTTelevizor
                 {
                     if (purchase.Success)
                     {
+                        HideDonateButton(purchase.Id);
                         _loggingService.Info($"Successfully acknowledged");
                     }
                     else
@@ -386,10 +449,6 @@ namespace DVBTTelevizor
         public async Task AcknowledgePurchases()
         {
             _loggingService.Info($"AcknowledgePurchases");
-
-//#if DEBUG
-//            return; // no check in debug mode, purchased state is managed by configuration
-//#endif
 
             try
             {
@@ -485,6 +544,8 @@ namespace DVBTTelevizor
             {
                 await CrossInAppBilling.Current.DisconnectAsync();
             }
+
+            await CheckPurchases();
         }
 
         public bool AllowRemoteAccessService

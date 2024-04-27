@@ -345,10 +345,10 @@
                             <ColumnDefinition Width="25*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="1$"  Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button x:Name="Donate2Button" Grid.Row="0" Grid.Column="1" Text="2$"  Command="{Binding Donate2Command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="2" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Button x:Name="Donate10Button" Grid.Row="0" Grid.Column="3" Text="10$"  Command="{Binding Donate10command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Button x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="1$"  Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate1Visible}"/>
+                        <Button x:Name="Donate2Button" Grid.Row="0" Grid.Column="1" Text="2$"  Command="{Binding Donate2Command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate2Visible}"/>
+                        <Button x:Name="Donate3Button" Grid.Row="0" Grid.Column="2" Text="3$"  Command="{Binding Donate3command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate3Visible}"/>
+                        <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="3" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate5Visible}"/>
                     </Grid>
 
                 </StackLayout>
