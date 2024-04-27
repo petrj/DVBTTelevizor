@@ -53,6 +53,8 @@ namespace DVBTTelevizor
         public const string MSG_ChangeSubtitlesRequest = "ChangeSubtitlesRequest";
         public const string MSG_ChangeAspect = "ChangeAspect";
         public const string MSG_TeletextPageNumber = "TeletextPageNumber";
+        public const string MSG_TeletextOn = "TeletextOn";
+        public const string MSG_TeletextOff = "TeletextOff";
 
         public const string MSG_CloseTuningPage = "CloseTuningPage";
         public const string MSG_QuitApp = "QuitApp";

@@ -316,6 +316,27 @@ namespace DVBTTelevizor
                 CallWithTimeout(delegate
                 {
                     videoView.MediaPlayer.Teletext = Convert.ToInt32(pageNum);
+                    MessagingCenter.Send($"Teletext: {pageNum}", BaseViewModel.MSG_ToastMessage);
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_TeletextOn, (pageNum) =>
+            {
+                CallWithTimeout(delegate
+                {
+                    SetSubtitles(-1);
+                    videoView.MediaPlayer.ToggleTeletext();
+                    videoView.MediaPlayer.Teletext = 100;
+                    MessagingCenter.Send("Teletext activated, page: 100", BaseViewModel.MSG_ToastMessage);
+                });
+            });
+
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_TeletextOff, (pageNum) =>
+            {
+                CallWithTimeout(delegate
+                {
+                    SetSubtitles(-1);
+                    MessagingCenter.Send("Teletext deactivated", BaseViewModel.MSG_ToastMessage);
                 });
             });
 
@@ -996,7 +1017,14 @@ namespace DVBTTelevizor
             _lastNumPressedTime = DateTime.Now;
             _numberPressed += number;
 
-            MessagingCenter.Send(_numberPressed, BaseViewModel.MSG_ToastMessage);
+            if (_viewModel.TeletextEnabled)
+            {
+                MessagingCenter.Send($"Teletext: {_numberPressed}", BaseViewModel.MSG_ToastMessage);
+            }
+            else
+            {
+                MessagingCenter.Send(_numberPressed, BaseViewModel.MSG_ToastMessage);
+            }
 
             new Thread(() =>
             {
@@ -1010,48 +1038,54 @@ namespace DVBTTelevizor
                 {
                     Task.Run(async () =>
                     {
-                        if (_numberPressed == "0")
+                        if (!_viewModel.TeletextEnabled)
                         {
-                            switch (_viewModel.PlayingState)
+                            if (_numberPressed == "0")
                             {
-                                case PlayingStateEnum.Playing:
-                                    await ActionLeft();
-                                    break;
-                                case PlayingStateEnum.PlayingInPreview:
-                                    _viewModel.SelectedChannel = _viewModel.PlayingChannel;
-                                    await ActionPlay(_viewModel.PlayingChannel);
-                                    break;
-                                case PlayingStateEnum.Stopped:
-                                    if (_viewModel.StandingOnEnd)
-                                    {
-                                        await ActionFirstOrLast(true);
-                                        _lastTimeHome = true;
-                                    }
-                                    else
-                                        if (_viewModel.StandingOnStart)
-                                    {
-                                        await ActionFirstOrLast(false);
-                                        _lastTimeHome = false;
-                                    }
-                                    else
-                                    {
-                                        await ActionFirstOrLast(_lastTimeHome);
-                                        _lastTimeHome = !_lastTimeHome;
-                                    }
-                                    break;
-                            };
+                                switch (_viewModel.PlayingState)
+                                {
+                                    case PlayingStateEnum.Playing:
+                                        await ActionLeft();
+                                        break;
+                                    case PlayingStateEnum.PlayingInPreview:
+                                        _viewModel.SelectedChannel = _viewModel.PlayingChannel;
+                                        await ActionPlay(_viewModel.PlayingChannel);
+                                        break;
+                                    case PlayingStateEnum.Stopped:
+                                        if (_viewModel.StandingOnEnd)
+                                        {
+                                            await ActionFirstOrLast(true);
+                                            _lastTimeHome = true;
+                                        }
+                                        else
+                                            if (_viewModel.StandingOnStart)
+                                        {
+                                            await ActionFirstOrLast(false);
+                                            _lastTimeHome = false;
+                                        }
+                                        else
+                                        {
+                                            await ActionFirstOrLast(_lastTimeHome);
+                                            _lastTimeHome = !_lastTimeHome;
+                                        }
+                                        break;
+                                };
 
-                            return;
-                        }
+                                return;
+                            }
 
-                        await _viewModel.SelectChannelByNumber(_numberPressed);
+                            await _viewModel.SelectChannelByNumber(_numberPressed);
 
-                        if (
-                                (_viewModel.SelectedChannel != null) &&
-                                (_numberPressed == _viewModel.SelectedChannel.Number)
-                            )
+                            if (
+                                    (_viewModel.SelectedChannel != null) &&
+                                    (_numberPressed == _viewModel.SelectedChannel.Number)
+                                )
+                            {
+                                await ActionPlay();
+                            }
+                        } else
                         {
-                            await ActionPlay();
+                            MessagingCenter.Send(_numberPressed, BaseViewModel.MSG_TeletextPageNumber);
                         }
                     });
                 }
@@ -1296,10 +1330,18 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        if (!_viewModel.StandingOnEnd)
+                        if (_viewModel.TeletextEnabled)
                         {
-                            await _viewModel.SelectNextChannel(step);
-                            await ActionPlay();
+                            videoView.MediaPlayer.Teletext += 1;
+                            MessagingCenter.Send(videoView.MediaPlayer.Teletext.ToString(), BaseViewModel.MSG_TeletextPageNumber);
+                        }
+                        else
+                        {
+                            if (!_viewModel.StandingOnEnd)
+                            {
+                                await _viewModel.SelectNextChannel(step);
+                                await ActionPlay();
+                            }
                         }
                     }
                 }
@@ -1365,10 +1407,18 @@ namespace DVBTTelevizor
                     }
                     else
                     {
-                        if (!_viewModel.StandingOnStart)
+                        if (_viewModel.TeletextEnabled)
                         {
-                            await _viewModel.SelectPreviousChannel(step);
-                            await ActionPlay();
+                            videoView.MediaPlayer.Teletext -= 1;
+                            MessagingCenter.Send(videoView.MediaPlayer.Teletext.ToString(), BaseViewModel.MSG_TeletextPageNumber);
+                        }
+                        else
+                        {
+                            if (!_viewModel.StandingOnStart)
+                            {
+                                await _viewModel.SelectPreviousChannel(step);
+                                await ActionPlay();
+                            }
                         }
                     }
                 }
@@ -2247,6 +2297,7 @@ namespace DVBTTelevizor
 
                     SetSubtitles(-1);
                     SetAudioTrack(-100);
+                    _viewModel.TeletextEnabled = false;
                 }
 
                 var playInfo = new PlayStreamInfo
@@ -2568,8 +2619,7 @@ namespace DVBTTelevizor
                         }
                     }
 
-                    // check subtitles
-                    if (actualSubtitleTrack != _viewModel.Subtitles)
+                    if ((!_viewModel.TeletextEnabled) && (actualSubtitleTrack != _viewModel.Subtitles))
                     {
                         _loggingService.Debug($"CheckStream - invalid subtitles {actualSubtitleTrack}, setting {_viewModel.Subtitles}");
                         videoView.MediaPlayer.SetSpu(_viewModel.Subtitles);
