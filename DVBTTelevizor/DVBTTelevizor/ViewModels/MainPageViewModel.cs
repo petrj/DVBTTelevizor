@@ -56,6 +56,7 @@ namespace DVBTTelevizor
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
 
         public int AudioTrack { get; set; } = -100;
+        public bool TeletextEnabled { get; set; } = false;
         public int Subtitles { get; set; } = -1;
 
         private bool _autoPlayProcessed = false;
@@ -656,12 +657,40 @@ namespace DVBTTelevizor
 
         public async Task TeletextMenu()
         {
-            string pageNumber = await _dialogService.GetNumberDialog("Set page number", "Teletext", _lastTeltetextPageNumber.ToString());
-            int num;
-            if (int.TryParse(pageNumber, out num))
+            var actions = new List<string>();
+
+            if (TeletextEnabled)
             {
-                _lastTeltetextPageNumber = num;
-                MessagingCenter.Send(pageNumber, BaseViewModel.MSG_TeletextPageNumber);
+                actions.Add("Off");
+            } else
+            {
+                actions.Add("On");
+            }
+
+            actions.Add("Set page...");
+
+            var action = await _dialogService.DisplayActionSheet("Teletext", "Cancel", actions);
+
+            switch (action)
+            {
+                case "Set page...":
+                    string pageNumber = await _dialogService.GetNumberDialog("Set page number", "Teletext", _lastTeltetextPageNumber.ToString());
+                    int num;
+                    if (int.TryParse(pageNumber, out num))
+                    {
+                        _lastTeltetextPageNumber = num;
+                        MessagingCenter.Send(pageNumber, BaseViewModel.MSG_TeletextPageNumber);
+                    }
+                    break;
+
+                case "On":
+                    TeletextEnabled = true;
+                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_TeletextOn);
+                    break;
+                case "Off":
+                    TeletextEnabled = false;
+                    MessagingCenter.Send(String.Empty, BaseViewModel.MSG_TeletextOff);
+                    break;
             }
         }
 
@@ -763,7 +792,7 @@ namespace DVBTTelevizor
                     await SelectPreviousChannel();
                     await Refresh();
                 }
-            } catch (Exception ex) 
+            } catch (Exception ex)
             {
                 _loggingService.Error(ex);
             }
@@ -1418,3 +1447,5 @@ namespace DVBTTelevizor
         }
     }
 }
+
+
