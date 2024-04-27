@@ -85,7 +85,11 @@ namespace DVBTTelevizor
             _focusItems.DeFocusAll();
 
             if (_viewModel != null)
+            {
                 _viewModel.FillAutoPlayChannels();
+
+                Task.Run(async () => await _viewModel.CheckPurchases());
+            }
 
             base.OnAppearing();
         }
@@ -120,8 +124,8 @@ namespace DVBTTelevizor
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Donate10", new List<View>() { Donate10Button }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("Donate3", new List<View>() { Donate3Button }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }));
 
             _focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
         }
@@ -148,16 +152,30 @@ namespace DVBTTelevizor
                 default: action = delegate { args.FocusedItem.DeFocus(); }; break;
             }
 
+            var itemName = args.FocusedItem.Name;
+
             if (
-                    (args.FocusedItem.Name == "RemoteAccessIP" ||
-                    args.FocusedItem.Name == "RemoteAccessPort" ||
-                    args.FocusedItem.Name == "RemoteAccessSecurityKey")
+                    (itemName == "RemoteAccessIP" ||
+                    itemName == "RemoteAccessPort" ||
+                    itemName == "RemoteAccessSecurityKey")
                     && (!_config.AllowRemoteAccessService)
                )
             {
                 action();
                 return;
             }
+
+            if (
+                ((itemName == "Donate1") && !Donate1Button.IsVisible) ||
+                ((itemName == "Donate2") && !Donate2Button.IsVisible) ||
+                ((itemName == "Donate3") && !Donate3Button.IsVisible) ||
+                ((itemName == "Donate5") && !Donate5Button.IsVisible)
+                )
+            {
+                action();
+                return;
+            }
+
         }
 
         public async void OnKeyDown(string key, bool longPress)
@@ -244,12 +262,12 @@ namespace DVBTTelevizor
                             _viewModel.Donate2Command.Execute(null);
                             break;
 
-                        case "Donate5":
-                            _viewModel.Donate5command.Execute(null);
+                        case "Donate3":
+                            _viewModel.Donate3command.Execute(null);
                             break;
 
-                        case "Donate10":
-                            _viewModel.Donate10command.Execute(null);
+                        case "Donate5":
+                            _viewModel.Donate5command.Execute(null);
                             break;
 
                         case "RemoteAccessEnabled":
