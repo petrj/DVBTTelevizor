@@ -286,7 +286,7 @@
             </StackLayout>
 
             <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" xct:TouchEffect.LongPressCommand="{Binding VideoLongPressCommand}">
-                <Label Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Label Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
                 <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
                 <StackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />

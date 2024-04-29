@@ -151,7 +151,7 @@
 
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                        <Label Margin="10,0,10,0" x:Name="KeyStop01"/>
+                        <Label Margin="10,0,10,0" x:Name="KeyStop01" HeightRequest="0" />
 
                         <Label Margin="10,10,10,0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                         <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
@@ -166,7 +166,7 @@
                         <Label Margin="10,10,10,0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                         <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                        <Label Margin="10,0,10,0" x:Name="KeyStop02"/>
+                        <Label Margin="10,0,10,0" x:Name="KeyStop02" HeightRequest="0" />
 
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
@@ -183,7 +183,7 @@
                         <Label Margin="10,10,10,0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamInfoVisible}" />
                         <Label Margin="10,0,10,10" Text="{Binding StreamVideoSize}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamInfoVisible}" />
 
-                        <Label Margin="10,0,10,0" x:Name="KeyStop03"/>
+                        <Label Margin="10,0,10,0" x:Name="KeyStop03" HeightRequest="0" />
 
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}"></BoxView>
 
