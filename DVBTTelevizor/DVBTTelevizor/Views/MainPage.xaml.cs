@@ -1858,6 +1858,11 @@ namespace DVBTTelevizor
                     if (_viewModel.EPGDetailVisible)
                     {
                         _viewModel.EPGDetailEnabled = false;
+                    } else
+                    if (_viewModel.TeletextEnabled)
+                    {
+                        videoView.MediaPlayer.Teletext += 1;
+                        MessagingCenter.Send(videoView.MediaPlayer.Teletext.ToString(), BaseViewModel.MSG_TeletextPageNumber);
                     }
                     else
                     {
@@ -1881,6 +1886,12 @@ namespace DVBTTelevizor
                     if (_viewModel.EPGDetailVisible)
                     {
                         _viewModel.EPGDetailEnabled = false;
+                    }
+                    else
+                    if (_viewModel.TeletextEnabled)
+                    {
+                        videoView.MediaPlayer.Teletext -= 1;
+                        MessagingCenter.Send(videoView.MediaPlayer.Teletext.ToString(), BaseViewModel.MSG_TeletextPageNumber);
                     }
                     else
                     {

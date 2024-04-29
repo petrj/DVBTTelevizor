@@ -661,13 +661,12 @@ namespace DVBTTelevizor
 
             if (TeletextEnabled)
             {
+                actions.Add("Set page...");
                 actions.Add("Off");
             } else
             {
                 actions.Add("On");
             }
-
-            actions.Add("Set page...");
 
             var action = await _dialogService.DisplayActionSheet("Teletext", "Cancel", actions);
 
