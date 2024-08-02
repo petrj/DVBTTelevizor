@@ -16,31 +16,40 @@ namespace DVBTTelevizor
         public string Number { get; set; }
 
         public long Frequency { get; set; }
-
         public long ProgramMapPID { get; set; }
-
         public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
-
         public DVBTServiceType ServiceType { get; set; } = DVBTServiceType.Other;
-
         public EventItem CurrentEventItem { get; set; }
         public EventItem NextEventItem { get; set; }
+        public long Bandwdith { get; set; }
+        public int DVBTType { get; set; }
+        public string Name { get; set; }
+        public string ProviderName { get; set; }
+        public bool NonFree { get; set; } = false; // backward compatibility!!!
 
         private bool _recording = false;
-
-        public long Bandwdith { get; set; }
-
-        public int DVBTType { get; set; }
-
-        public string Name { get; set; }
-
-        public string ProviderName { get; set; }
 
         public string BandwdithLabel
         {
             get
             {
                 return (Bandwdith / 1000000).ToString("N3") + " MHz";
+            }
+        }
+
+        public string CALabel
+        {
+            get
+            {
+                return NonFree ? "CA" : "";
+            }
+        }
+
+        public string LockIcon
+        {
+            get
+            {
+                return NonFree ? "Lock.png" : "Empty.png";
             }
         }
 
@@ -300,6 +309,7 @@ namespace DVBTTelevizor
             channel.Bandwdith = Bandwdith;
             channel.DVBTType = DVBTType;
             channel.Number = Number;
+            channel.NonFree = NonFree;
 
             return channel;
         }

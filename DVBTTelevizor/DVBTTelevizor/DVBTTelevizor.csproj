@@ -15,7 +15,7 @@
     <PackageReference Include="LibVLCSharp" Version="3.8.2" />
     <PackageReference Include="LibVLCSharp.Forms" Version="3.8.2" />
     <PackageReference Include="LoggerService" Version="1.0.4" />
-    <PackageReference Include="MPEGTS" Version="1.0.25" />
+    <PackageReference Include="MPEGTS" Version="1.0.26" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Plugin.InAppBilling" Version="7.1.0" />
     <PackageReference Include="RemoteAccessService" Version="1.0.4" />
@@ -29,10 +29,10 @@
 
   <ItemGroup>
     <Reference Include="Java.Interop">
-      <HintPath>..\..\..\..\Visual Studio\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v1.0\Java.Interop.dll</HintPath>
+      <HintPath>..\..\..\Program Files\dotnet\packs\Microsoft.Android.Runtime.34.android-x86\34.0.95\runtimes\android-x86\lib\net8.0\Java.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Android">
-      <HintPath>..\..\..\Visual Studio\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v13.0\Mono.Android.dll</HintPath>
+      <HintPath>..\..\..\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v13.0\Mono.Android.dll</HintPath>
     </Reference>
   </ItemGroup>
 

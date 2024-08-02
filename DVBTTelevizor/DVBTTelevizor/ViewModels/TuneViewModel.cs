@@ -988,6 +988,7 @@ namespace DVBTTelevizor
                     ch.Number = String.Empty;
                     ch.DVBTType = dvbtTypeIndex;
                     ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
+                    ch.NonFree = !serviceDescriptor.Key.Free;
 
                     Device.BeginInvokeOnMainThread(() =>
                     {
