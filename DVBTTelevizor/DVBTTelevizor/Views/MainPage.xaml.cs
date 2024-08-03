@@ -2171,6 +2171,12 @@ namespace DVBTTelevizor
                     return;
                 }
 
+                if (channel.NonFree)
+                {
+                    MessagingCenter.Send($"Playing {channel.Name} failed, channel is not free channel (conditional access not supported)", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
                 long? signalStrengthPercentage = null;
 
                 var shouldDriverPlay = true;
