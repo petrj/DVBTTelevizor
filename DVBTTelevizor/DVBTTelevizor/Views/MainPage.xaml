@@ -199,9 +199,9 @@
                                         <RowDefinition Height="1" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="12*" />
-                                        <ColumnDefinition Width="8*" />
-                                        <ColumnDefinition Width="20*" />
+                                        <ColumnDefinition Width="10*" />
+                                        <ColumnDefinition Width="6*" />
+                                        <ColumnDefinition Width="24*" />
                                         <ColumnDefinition Width="50*" />
                                         <ColumnDefinition Width="10*" />
                                     </Grid.ColumnDefinitions>
