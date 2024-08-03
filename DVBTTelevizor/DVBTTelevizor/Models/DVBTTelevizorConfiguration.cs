@@ -81,6 +81,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool ShowNonFreeChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowNonFreeChannels", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowNonFreeChannels", value);
+            }
+        }
+
         public bool ShowRadioChannels
         {
             get

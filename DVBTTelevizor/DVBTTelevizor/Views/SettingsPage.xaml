@@ -96,6 +96,7 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
@@ -114,8 +115,11 @@
 
                         <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                        <Label  Grid.Row="2" Grid.Column="0" Text="Show other channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}"/>
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Show non free channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowNonFreeSwitch"  IsToggled="{Binding Config.ShowNonFreeChannels, Mode=TwoWay}"/>
+
+                        <Label  Grid.Row="3" Grid.Column="0" Text="Show other channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}"/>
                     </Grid>
 
                     <Button x:Name="ClearChannelsButton" Text="Clear"  Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>

@@ -1183,6 +1183,9 @@ namespace DVBTTelevizor
                     if (ch.SimplifiedServiceType == DVBTServiceType.Other && !_config.ShowOtherChannels)
                         continue;
 
+                    if (ch.NonFree && !Config.ShowNonFreeChannels)
+                        continue;
+
                     if (_recordingChannel != null &&
                         _recordingChannel.Frequency == ch.Frequency &&
                         _recordingChannel.Name == ch.Name &&
