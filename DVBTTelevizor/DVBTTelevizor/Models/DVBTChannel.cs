@@ -37,11 +37,11 @@ namespace DVBTTelevizor
             }
         }
 
-        public string CALabel
+        public string FreeLabel
         {
             get
             {
-                return NonFree ? "CA" : "";
+                return NonFree ? "No (CA)" : "Yes";
             }
         }
 
