@@ -147,8 +147,8 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="25*" />
-                        <ColumnDefinition Width="55*" />
-                        <ColumnDefinition Width="10*" />
+                        <ColumnDefinition Width="50*" />
+                        <ColumnDefinition Width="15*" />
                         <ColumnDefinition Width="10*" />
                     </Grid.ColumnDefinitions>
 
@@ -167,7 +167,7 @@
                     <CheckBox Grid.Row="3" Grid.Column="3" IsChecked="{Binding HasLocked}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0"  />
 
                     <Label Grid.Row="4" Grid.Column="0" Text="SNR" HorizontalOptions="Start" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <Label Grid.Row="4" Grid.Column="3" Text="{Binding SNRLabel}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0" Style="{DynamicResource LabelStyle}" />
+                    <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding SNRLabel}" HorizontalOptions="End" VerticalOptions="Start" Margin="0,5,0,0" Style="{DynamicResource LabelStyle}" />
                 </Grid>
 
                 <Button x:Name="ReTuneButton" Text="Retune" Clicked="ReToolTune_Clicked" IsVisible="{Binding RetuneButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0" />

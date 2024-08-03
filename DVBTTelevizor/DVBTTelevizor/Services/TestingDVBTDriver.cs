@@ -527,7 +527,7 @@ namespace DVBTTelevizor.Services
                 }
                 else
                 {
-                    payload.Add(0); // snr
+                    payload.Add(100000); // snr
                     payload.Add(0); // bitErrorRate
                     payload.Add(0); // droppedUsbFps
                     payload.Add(100); // rfStrengthPercentage
