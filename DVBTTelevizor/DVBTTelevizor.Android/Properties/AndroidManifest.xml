@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="57" android:versionName="57.0" package="net.petrjanousek.DVBTTelevizor" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="58" android:versionName="58.0" package="net.petrjanousek.DVBTTelevizor" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
 	<application android:label="DVBT Televizor" android:icon="@drawable/icon" android:banner="@drawable/banner" />
 	<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
