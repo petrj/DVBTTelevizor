@@ -2173,7 +2173,7 @@ namespace DVBTTelevizor
 
                 if (channel.NonFree)
                 {
-                    MessagingCenter.Send($"Playing {channel.Name} failed, channel is not free channel (conditional access not supported)", BaseViewModel.MSG_ToastMessage);
+                    MessagingCenter.Send($"Playing {channel.Name} failed (non free channel)", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 
