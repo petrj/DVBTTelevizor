@@ -189,7 +189,7 @@
                             <Label Grid.Row="2" Grid.Column="1" IsVisible="True" Text="{Binding NewTunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
-                        <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                        <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningProgressVisible}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
