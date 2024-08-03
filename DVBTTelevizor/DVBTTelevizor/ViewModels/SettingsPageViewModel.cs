@@ -37,13 +37,15 @@ namespace DVBTTelevizor
 
         public ObservableCollection<DVBTChannel> AutoPlayChannels { get; set; } = new ObservableCollection<DVBTChannel>();
         public DVBTChannel _selectedChannel = null;
+        private IDVBTDriverManager _driver;
 
-        public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public SettingsPageViewModel(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService, IDVBTDriverManager driver)
             :base(config)
         {
             _loggingService = loggingService;
             _dialogService = dialogService;
             _channelService = channelService;
+            _driver = driver;
 
             _config = config;
 
@@ -392,6 +394,18 @@ namespace DVBTTelevizor
             if (chs.Count == 0)
             {
                 await _dialogService.Information("Channel list is empty");
+                return;
+            }
+
+            if (_driver.Connected && _driver.Recording)
+            {
+                await _dialogService.Information("Recording in progress");
+                return;
+            }
+
+            if (_driver.Connected && _driver.Streaming)
+            {
+                await _dialogService.Information("Playing in progress");
                 return;
             }
 

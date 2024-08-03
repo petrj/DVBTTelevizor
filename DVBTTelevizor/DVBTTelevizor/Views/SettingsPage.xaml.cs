@@ -20,7 +20,7 @@ namespace DVBTTelevizor
 
         private KeyboardFocusableItemList _focusItems;
 
-        public SettingsPage(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService)
+        public SettingsPage(ILoggingService loggingService, IDialogService dialogService, DVBTTelevizorConfiguration config, ChannelService channelService, IDVBTDriverManager driver)
         {
             InitializeComponent();
 
@@ -28,7 +28,7 @@ namespace DVBTTelevizor
             _dialogService = dialogService;
             _config = config;
 
-            BindingContext = _viewModel = new SettingsPageViewModel(_loggingService, _dialogService, config, channelService);
+            BindingContext = _viewModel = new SettingsPageViewModel(_loggingService, _dialogService, config, channelService, driver);
 
             PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
 

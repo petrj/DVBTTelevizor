@@ -108,7 +108,7 @@ namespace DVBTTelevizor
             BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
-            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
+            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService, _driver);
             _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, _channelService);
 
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
