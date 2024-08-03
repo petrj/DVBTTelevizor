@@ -108,7 +108,7 @@ namespace DVBTTelevizor
             BindingContext = _viewModel = new MainPageViewModel(_loggingService, _dlgService, _driver, _config, _channelService);
 
             _tuneOptionsPage = new TuneOptionsPage(_loggingService, _dlgService, _driver, _config, _channelService);
-            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService);
+            _settingsPage = new SettingsPage(_loggingService, _dlgService, _config, _channelService, _driver);
             _editChannelPage = new ChannelPage(_loggingService, _dlgService, _driver, _config, _channelService);
 
             _editChannelPage.Disappearing += _editChannelPage_Disappearing;
@@ -340,9 +340,10 @@ namespace DVBTTelevizor
                 });
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearEPG, (msg) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearCache, (msg) =>
             {
                 _viewModel.EIT.Clear();
+                _viewModel.PID.Clear();
             });
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });
@@ -2167,6 +2168,12 @@ namespace DVBTTelevizor
                 if (_viewModel.RecordingChannel != null && _viewModel.RecordingChannel != channel)
                 {
                     MessagingCenter.Send($"Playing {channel.Name} failed (recording in progress)", BaseViewModel.MSG_ToastMessage);
+                    return;
+                }
+
+                if (channel.NonFree)
+                {
+                    MessagingCenter.Send($"Playing {channel.Name} failed (non free channel)", BaseViewModel.MSG_ToastMessage);
                     return;
                 }
 

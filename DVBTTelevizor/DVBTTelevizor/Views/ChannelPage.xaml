@@ -146,6 +146,11 @@
 
                         <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
+                        <Label Margin="10,10,10,0" Text="Free" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                        <Label Margin="10,0,10,10" Text="{Binding Channel.FreeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+                        <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
                         <Label Margin="10,10,10,0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                         <Label Margin="10,0,10,10" Text="{Binding Channel.BandwdithLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 

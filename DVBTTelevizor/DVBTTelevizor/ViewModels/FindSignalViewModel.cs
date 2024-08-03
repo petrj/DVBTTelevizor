@@ -124,7 +124,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return _snr.ToString("N0");
+                return _snr.ToString();
             }
         }
 
@@ -175,7 +175,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return (_signalStrengthProgress * 100).ToString("N0") + " %";
+                return (_signalStrengthProgress * 100).ToString("N0") + "%";
             }
         }
 

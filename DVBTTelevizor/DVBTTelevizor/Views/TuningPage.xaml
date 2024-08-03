@@ -189,7 +189,7 @@
                             <Label Grid.Row="2" Grid.Column="1" IsVisible="True" Text="{Binding NewTunedChannelsCount}" HorizontalOptions="End" VerticalOptions="Start" Style="{DynamicResource LabelStyle}"  FontSize="{Binding FontSizeForLabel}"/>
                         </Grid>
 
-                        <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningInProgress}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
+                        <Grid x:Name="ProgressGrid" IsVisible="{Binding TuningProgressVisible}" VerticalOptions="Start" RowSpacing="0"  Margin="10,10,10,0">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
@@ -237,20 +237,21 @@
                                             </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="12*" />
-                                                <ColumnDefinition Width="78*" />
+                                                <ColumnDefinition Width="6*" />
+                                                <ColumnDefinition Width="72*" />
                                                 <ColumnDefinition Width="10*" />
                                             </Grid.ColumnDefinitions>
 
                                             <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
 
-                                            <Label Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
+                                            <Image Grid.Row="0" Grid.Column="1" Source="{Binding LockIcon}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  Style="{DynamicResource IconStyle}" />
+                                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
+                                            <Image Grid.Row="0" Grid.Column="3" Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
 
-                                            <Image Grid.Row="0" Grid.Column="2" Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+                                            <Label Grid.Row="1" Grid.Column="2" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
+                                            <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                            <Label Grid.Row="1" Grid.Column="1" Text="{Binding FrequencyLabel}" Style="{DynamicResource DetailLabelsTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
-                                            <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-
-                                            <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="White"/>
+                                            <BoxView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="White"/>
                                         </Grid>
 
                                     </ViewCell.View>

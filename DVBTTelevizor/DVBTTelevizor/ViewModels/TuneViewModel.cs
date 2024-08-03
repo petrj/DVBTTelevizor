@@ -711,6 +711,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public bool TuningProgressVisible
+        {
+            get
+            {
+                return TuningInProgress && AutomaticTuning;
+            }
+        }
+
         public bool AddChannelsVisible
         {
             get
@@ -851,12 +859,12 @@ namespace DVBTTelevizor
         public void UpdateTuningProperties()
         {
             OnPropertyChanged(nameof(TuningFinished));
-            OnPropertyChanged(nameof(TuningInProgress));
             OnPropertyChanged(nameof(ActualTuningState));
             OnPropertyChanged(nameof(ActualTuningFrequencyWholePartMHz));
             OnPropertyChanged(nameof(ActualTuningFrequencyDecimalPartMHzCaption));
             OnPropertyChanged(nameof(DeliverySystem));
             OnPropertyChanged(nameof(TuningInProgress));
+            OnPropertyChanged(nameof(TuningProgressVisible));
             OnPropertyChanged(nameof(TuningProgress));
             OnPropertyChanged(nameof(TuningProgressCaption));
             OnPropertyChanged(nameof(SignalStrengthProgress));
@@ -988,6 +996,7 @@ namespace DVBTTelevizor
                     ch.Number = String.Empty;
                     ch.DVBTType = dvbtTypeIndex;
                     ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
+                    ch.NonFree = !serviceDescriptor.Key.Free;
 
                     Device.BeginInvokeOnMainThread(() =>
                     {

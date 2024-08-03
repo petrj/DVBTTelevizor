@@ -72,7 +72,7 @@ namespace DVBTTelevizor
         public const string MSG_RemoteKeyAction = "RemoteKeyAction";
 
         public const string MSG_SettingsPageForceLayout = "SettingsPageForceLayout";
-        public const string MSG_ClearEPG = "ClearEPG";
+        public const string MSG_ClearCache = "ClearEPG";
 
         public string SelectedToolbarItemName { get; set; } = null;
 
