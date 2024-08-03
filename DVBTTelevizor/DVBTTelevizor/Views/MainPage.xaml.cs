@@ -340,9 +340,10 @@ namespace DVBTTelevizor
                 });
             });
 
-            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearEPG, (msg) =>
+            MessagingCenter.Subscribe<string>(this, BaseViewModel.MSG_ClearCache, (msg) =>
             {
                 _viewModel.EIT.Clear();
+                _viewModel.PID.Clear();
             });
 
             _tuneFocusItem = KeyboardFocusableItem.CreateFrom("TuneButton", new List<View> { TuneButton });

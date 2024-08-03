@@ -101,6 +101,7 @@ namespace DVBTTelevizor
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowTVChannels", new List<View>() { ShowTVChannelsBoxView, ShowTVSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowRadioChannels", new List<View>() { ShowRadioChannelsBoxView, ShowRadioSwitch }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("ShowNonFreeChannels", new List<View>() { ShowNonFreeChannelsBoxView, ShowNonFreeSwitch }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ShowOtherChannels", new List<View>() { ShowOtherChannelsBoxView, ShowOtherSwitch }))
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("ClearChannels", new List<View>() { ClearChannelsButton }))
@@ -208,6 +209,10 @@ namespace DVBTTelevizor
 
                         case "ShowRadioChannels":
                             ShowRadioSwitch.IsToggled = !ShowRadioSwitch.IsToggled;
+                            break;
+
+                        case "ShowNonFreeChannels":
+                            ShowNonFreeSwitch.IsToggled = !ShowNonFreeSwitch.IsToggled;
                             break;
 
                         case "ShowOtherChannels":

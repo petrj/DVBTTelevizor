@@ -381,6 +381,14 @@ namespace DVBTTelevizor.Services
                                                         var streamTimeSpan = DateTime.Now - firstPCRTimeStampTime;
                                                         var dataTime = timeStamp.Value - firstPCRTimeStamp;
                                                         var shift = (streamTimeSpan).TotalSeconds - (dataTime);
+
+                                                        if (shift < 0)
+                                                        {
+                                                            _timeShift = TimeSpan.MinValue;
+                                                            firstPCRTimeStamp = ulong.MinValue;
+                                                            firstPCRTimeStampTime = DateTime.MinValue;
+                                                            continue;
+                                                        }
                                                         //var speedCorrectionLShiftPerSec = shift / (streamTimeSpan).TotalSeconds;
                                                         var missingBytesForWholeStream = Math.Round((shift / loopsPerSecond) * bufferSize, 2);
 
