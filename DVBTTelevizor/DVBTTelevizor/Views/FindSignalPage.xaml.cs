@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using static Android.Renderscripts.Sampler;
 
 namespace DVBTTelevizor
 {

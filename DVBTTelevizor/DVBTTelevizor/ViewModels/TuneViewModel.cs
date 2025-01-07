@@ -1,5 +1,4 @@
-﻿using Android.Preferences;
-using LoggerService;
+﻿using LoggerService;
 using MPEGTS;
 using System;
 using System.Collections.Generic;

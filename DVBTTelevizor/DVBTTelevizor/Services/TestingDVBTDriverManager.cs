@@ -1,5 +1,4 @@
-﻿using Android.Media.Audiofx;
-using DVBTTelevizor.Models;
+﻿using DVBTTelevizor.Models;
 using LoggerService;
 using MPEGTS;
 using System;

@@ -7,7 +7,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using Android.Content;
 using Plugin.InAppBilling;
 
 namespace DVBTTelevizor

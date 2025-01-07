@@ -1,5 +1,4 @@
 ﻿using DVBTTelevizor.Models;
-using Java.Security.Interfaces;
 using LoggerService;
 using MPEGTS;
 using SQLite;
@@ -13,7 +12,6 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static Android.Content.ClipData;
 
 namespace DVBTTelevizor.Services
 {

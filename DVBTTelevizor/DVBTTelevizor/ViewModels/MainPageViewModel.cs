@@ -1,5 +1,4 @@
-﻿using Android.Database;
-using DVBTTelevizor.Models;
+﻿using DVBTTelevizor.Models;
 using DVBTTelevizor.Services;
 using LoggerService;
 using Newtonsoft.Json;
@@ -1449,5 +1448,3 @@ namespace DVBTTelevizor
         }
     }
 }
-
-

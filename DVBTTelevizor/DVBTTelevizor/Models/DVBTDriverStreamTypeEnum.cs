@@ -1,7 +1,4 @@
-﻿using Android.Media;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace DVBTTelevizor.Models
 {

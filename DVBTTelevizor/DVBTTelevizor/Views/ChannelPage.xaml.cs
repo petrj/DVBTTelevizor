@@ -1,18 +1,12 @@
-﻿using Android.Widget;
-using Java.Lang;
-using LoggerService;
+﻿using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using static Android.Print.PrintAttributes;
-using static Java.Util.Jar.Attributes;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor
 {
@@ -71,7 +65,7 @@ namespace DVBTTelevizor
             SubtitlesTracksInfoVisible = enabled && playingChannelSubtitles.Count > 0;
 
             _viewModel.SetSubtitleTracks(enabled ? playingChannelSubtitles : new Dictionary<int, string>(), activeId);
-        }        
+        }
 
         public bool Changed
         {
@@ -179,13 +173,13 @@ namespace DVBTTelevizor
 
                 .AddItem(KeyboardFocusableItem.CreateFrom("Audio", new List<View>() { ButtonChangeAudio }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("Subtitles", new List<View>() { ButtonChangeSubtitles }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("Delete", new List<View>() { ButtonDeleteChannel }));            
+                .AddItem(KeyboardFocusableItem.CreateFrom("Delete", new List<View>() { ButtonDeleteChannel }));
 
             _focusItems.OnItemFocusedEvent += ChannelPage_OnItemFocusedEvent;
         }
 
         private void ChannelPage_OnItemFocusedEvent(KeyboardFocusableItemEventArgs args)
-        {            
+        {
             if ( ((args.FocusedItem.Name == "Audio") && (!_viewModel.AudioTracksInfoVisible)) ||
                  ((args.FocusedItem.Name == "Subtitles") && (!_viewModel.SubtitlesTracksInfoVisible)) ||
                  ((args.FocusedItem.Name == "Delete") && (!_viewModel.DeleteVisible))
@@ -202,7 +196,7 @@ namespace DVBTTelevizor
 
                 action();
                 return;
-            }        
+            }
 
             // scroll to item
             ChannelPageScrollView.ScrollToAsync(0, args.FocusedItem.MaxYPosition - Height / 2, false);
@@ -406,7 +400,7 @@ namespace DVBTTelevizor
                 case "Number":
                     EntryNumber.Text = text;
                     break;
-                
+
                 case "Name":
                     EntryName.Text = text;
                     break;
