@@ -14,6 +14,8 @@ namespace DVBTTelevizor.MAUI
 
         private LibVLC LibVLC { get; set; }
 
+        public bool MainLayoutVisible { get; set; } = true;
+
         private LibVLCSharp.Shared.MediaPlayer _mediaPlayer;
         public LibVLCSharp.Shared.MediaPlayer MediaPlayer
         {

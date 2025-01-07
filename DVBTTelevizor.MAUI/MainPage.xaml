@@ -4,6 +4,30 @@
              xmlns:vlc="clr-namespace:LibVLCSharp.MAUI;assembly=LibVLCSharp.MAUI"
              x:Class="DVBTTelevizor.MAUI.MainPage">
 
-    <vlc:VideoView x:Name="VideoView"  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+
+    <StackLayout BackgroundColor="Black" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+        <Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="{Binding TunningButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0"/>
+        <Button x:Name="DriverButton" Text="Install DVB-T Driver" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}" Margin="0,20,0,0"/>
+
+        <AbsoluteLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="MainLayout" IsVisible="{Binding MainLayoutVisible}" BackgroundColor="Transparent">
+
+            <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
+                <vlc:VideoView  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
+                <StackLayout.GestureRecognizers >
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1" NumberOfTapsRequired="2" />
+                    <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped_1"/>
+                    <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped_2"/>
+                    <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Swiped_3"/>
+                    <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Swiped_4"/>
+                </StackLayout.GestureRecognizers>
+            </StackLayout>
+
+    <!--vlc:VideoView x:Name="VideoView"  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" /-->
+
+    </AbsoluteLayout>
+
+    </StackLayout>
 
 </ContentPage>
