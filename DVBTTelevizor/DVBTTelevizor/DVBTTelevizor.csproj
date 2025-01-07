@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <Reference Include="Java.Interop">
-      <HintPath>..\..\..\Program Files\dotnet\packs\Microsoft.Android.Runtime.34.android-x86\34.0.143\runtimes\android-x86\lib\net8.0\Java.Interop.dll</HintPath>
+      <HintPath>..\..\..\Program Files\dotnet\packs\Microsoft.Android.Runtime.35.android-x86\35.0.24\runtimes\android-x86\lib\net9.0\Java.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Android">
       <HintPath>..\..\..\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v13.0\Mono.Android.dll</HintPath>
