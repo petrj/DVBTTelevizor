@@ -12,4 +12,13 @@
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
+    <ShellContent
+        Title="Connect"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
+
+    <ShellContent
+        Title="Disconnect"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
 </Shell>

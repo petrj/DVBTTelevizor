@@ -1,4 +1,6 @@
-﻿using LibVLCSharp.Shared;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LibVLCSharp.Shared;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -69,6 +71,11 @@ namespace DVBTTelevizor.MAUI
         private void SwipeGestureRecognizer_Swiped_4(object sender, SwipedEventArgs e)
         {
 
+        }
+
+        private void ConnectButton_Clicked(object sender, EventArgs e)
+        {
+            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
         }
     }
 

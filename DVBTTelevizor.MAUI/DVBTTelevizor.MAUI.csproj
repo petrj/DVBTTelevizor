@@ -71,7 +71,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="LibVLCSharp" Version="3.9.1" />
+		<PackageReference Include="LoggerService" Version="1.0.4" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.93" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.21" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
@@ -97,6 +99,10 @@
 	  <PackageReference Include="LibVLCSharp.MAUI">
 	    <Version>3.9.1</Version>
 	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj" />
 	</ItemGroup>
 
 </Project>
