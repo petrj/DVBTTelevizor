@@ -11,6 +11,7 @@ using Google.Android.Material.Snackbar;
 using LoggerService;
 using NLog;
 using System.Reflection;
+using Environment = System.Environment;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -30,6 +31,8 @@ namespace DVBTTelevizor.MAUI
             _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
 
             SubscribeMessages();
+
+            var dir = GetAndroidDirectory(null);
 
             base.OnCreate(savedInstanceState);
         }
@@ -161,6 +164,59 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Info("Starting activity");
             StartActivityForResult(req, StartRequestCode);
         }
+
+        private static string GetAndroidDirectory(string specialFolder)
+        {
+            try
+            {
+                if (specialFolder == null)
+                {
+                    // internal storage - always writable directory
+                    try
+                    {
+                        var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
+
+                        if (pathToExternalMediaDirs.Length == 0)
+                            throw new DirectoryNotFoundException("No external media directory found");
+
+                        return pathToExternalMediaDirs[0].AbsolutePath;
+                    }
+                    catch
+                    {
+                        // fallback for older API:
+
+                        var internalStorageDir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+
+                        return internalStorageDir.AbsolutePath;
+                    }
+                }
+                else
+                {
+                    // external storage
+
+                    // Android 11 has no access to external files -> using internal storage
+                    if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.P)
+                    {
+                        var internalStorageDir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+                        return internalStorageDir.AbsolutePath;
+                    }
+                    else
+                    {
+
+                        var externalFolderPath = Android.OS.Environment.GetExternalStoragePublicDirectory(specialFolder);
+                        return externalFolderPath.AbsolutePath;
+                    }
+                }
+
+            }
+            catch
+            {
+                var dir = Android.App.Application.Context.GetExternalFilesDir("");
+
+                return dir.AbsolutePath;
+            }
+        }
+
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {

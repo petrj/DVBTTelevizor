@@ -12,6 +12,7 @@ namespace DVBTTelevizor.MAUI
 
         MainViewModel? _mainViewModel = null;
         private ILoggingService _loggingService { get; set; }
+        private IDVBTDriver _driver { get; set; }
 
         public MainPage(ILoggingProvider loggingProvider)
         {
@@ -21,6 +22,8 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Info("MainPage starting");
 
+            _driver = new TestingDVBTDriver(_loggingService);
+
             BindingContext = _mainViewModel = new MainViewModel(_loggingService);
         }
 
@@ -28,6 +31,8 @@ namespace DVBTTelevizor.MAUI
         {
             base.OnAppearing();
             _mainViewModel?.OnAppearing();
+
+            _driver.Connect();
         }
 
         private void VideoView_MediaPlayerChanged(object sender, MediaPlayerChangedEventArgs e)
