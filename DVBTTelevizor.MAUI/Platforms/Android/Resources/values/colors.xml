@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#512BD4</color>
-    <color name="colorPrimaryDark">#2B0B98</color>
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#111111</color>
     <color name="colorAccent">#2B0B98</color>
 	<color name="splash_screen_background">#000000</color>
 	<color name="launcher_background">#000000</color>
+	<color name="launcher_foreground">#000000</color>
 	<color name="splash_background">#000000</color>
 
 </resources>
