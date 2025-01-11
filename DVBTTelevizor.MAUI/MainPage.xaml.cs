@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
+using LoggerService;
 
 
 namespace DVBTTelevizor.MAUI
@@ -10,12 +11,17 @@ namespace DVBTTelevizor.MAUI
         int count = 0;
 
         MainViewModel? _mainViewModel = null;
+        private ILoggingService _loggingService { get; set; }
 
-        public MainPage()
+        public MainPage(ILoggingProvider loggingProvider)
         {
             InitializeComponent();
 
-            BindingContext = _mainViewModel = new MainViewModel();
+            _loggingService = loggingProvider.GetLoggingService();
+
+            _loggingService.Info("MainPage starting");
+
+            BindingContext = _mainViewModel = new MainViewModel(_loggingService);
         }
 
         protected override void OnAppearing()

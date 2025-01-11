@@ -3,11 +3,14 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Android.Util;
 using Android.Widget;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
 using LoggerService;
+using NLog;
+using System.Reflection;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -21,7 +24,10 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            _loggingService = new BasicLoggingService();
+            Assembly assembly = typeof(App).GetTypeInfo().Assembly;
+            NLog.Config.ISetupBuilder setupBuilder = NLog.LogManager.Setup();
+            NLog.Config.ISetupBuilder configuredSetupBuilder = setupBuilder.LoadConfigurationFromAssemblyResource(assembly);
+            _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
 
             SubscribeMessages();
 
@@ -158,35 +164,49 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            if (requestCode == StartRequestCode && resultCode == Result.Ok)
+            if (requestCode == StartRequestCode)
             {
-                _waitingForInit = false;
-
-                if (data != null)
+                if (resultCode == Result.Ok)
                 {
-                    var cfg = new DVBTDriverConfiguration();
+                    _waitingForInit = false;
 
-                    if (data.HasExtra("ControlPort"))
-                        cfg.ControlPort = data.GetIntExtra("ControlPort", 0);
+                    if (data != null)
+                    {
+                        var cfg = new DVBTDriverConfiguration();
 
-                    if (data.HasExtra("TransferPort"))
-                        cfg.TransferPort = data.GetIntExtra("TransferPort", 0);
+                        if (data.HasExtra("ControlPort"))
+                            cfg.ControlPort = data.GetIntExtra("ControlPort", 0);
 
-                    if (data.HasExtra("DeviceName"))
-                        cfg.DeviceName = data.GetStringExtra("DeviceName");
+                        if (data.HasExtra("TransferPort"))
+                            cfg.TransferPort = data.GetIntExtra("TransferPort", 0);
 
-                    if (data.HasExtra("ProductIds"))
-                        cfg.ProductIds = data.GetIntArrayExtra("ProductIds");
+                        if (data.HasExtra("DeviceName"))
+                            cfg.DeviceName = data.GetStringExtra("DeviceName");
 
-                    if (data.HasExtra("VendorIds"))
-                        cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
+                        if (data.HasExtra("ProductIds"))
+                            cfg.ProductIds = data.GetIntArrayExtra("ProductIds");
 
-                    _loggingService.Info($"Received device configuration: {cfg}");
+                        if (data.HasExtra("VendorIds"))
+                            cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
-                }
-                else
+                        _loggingService.Info($"Received device configuration: {cfg}");
+
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad activity result"));
+                    }
+                } else
                 {
+                    if (data.Extras != null && !data.Extras.IsEmpty)
+                    {
+                        foreach (var key in data.Extras.KeySet())
+                        {
+                            var value = data.Extras.Get(key);
+                            _loggingService.Info($"Key: {key}, Value: {value}");
+                        }
+                    }
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad activity result"));
                 }
             }

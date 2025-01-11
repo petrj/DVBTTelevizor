@@ -16,7 +16,7 @@ using LoggerService;
 
 namespace DVBTTelevizor
 {
-    public class DVBTDriver : IDVBTDriver
+    public class AndroidDVBTDriver : IDVBTDriver
     {
         public bool Installed { get; set; } = true;
 
@@ -59,7 +59,7 @@ namespace DVBTTelevizor
 
         public string PublicDirectory { get; set; } = "";
 
-        public DVBTDriver(ILoggingService loggingService, DVBTDriverConfiguration config)
+        public AndroidDVBTDriver(ILoggingService loggingService, DVBTDriverConfiguration config)
         {
             _log = loggingService;
 

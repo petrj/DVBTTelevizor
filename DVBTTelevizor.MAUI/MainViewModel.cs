@@ -1,4 +1,5 @@
 ﻿using LibVLCSharp.Shared;
+using LoggerService;
 using System.ComponentModel;
 
 namespace DVBTTelevizor.MAUI
@@ -6,9 +7,12 @@ namespace DVBTTelevizor.MAUI
     public class MainViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        private ILoggingService _loggingService;
 
-        public MainViewModel()
+        public MainViewModel(ILoggingService loggingService)
         {
+            _loggingService = loggingService;
+
             Initialize();
         }
 
@@ -37,6 +41,8 @@ namespace DVBTTelevizor.MAUI
 
         private void Initialize()
         {
+            _loggingService.Info("Initializing LibVLC");
+
             LibVLC = new LibVLC(enableDebugLogs: true);
             using var media = new Media(LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
 
@@ -48,12 +54,16 @@ namespace DVBTTelevizor.MAUI
 
         public void OnAppearing()
         {
+            _loggingService.Info("OnAppearing");
+
             IsLoaded = true;
             Play();
         }
 
         internal void OnDisappearing()
         {
+            _loggingService.Info("OnDisAppearing");
+
             MediaPlayer.Dispose();
             LibVLC.Dispose();
         }
@@ -66,6 +76,8 @@ namespace DVBTTelevizor.MAUI
 
         private void Play()
         {
+            _loggingService.Info("Play");
+
             if (IsLoaded && IsVideoViewInitialized)
             {
                 MediaPlayer.Play();

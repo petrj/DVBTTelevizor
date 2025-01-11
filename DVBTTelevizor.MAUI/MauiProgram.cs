@@ -18,6 +18,10 @@ namespace DVBTTelevizor.MAUI
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddSingleton<MainViewModel>();
+            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddSingleton<LoggerProvider>();
+            builder.Services.AddSingleton<ILoggingProvider, LoggerProvider>();
 
 #if DEBUG
             builder.Logging.AddDebug();
