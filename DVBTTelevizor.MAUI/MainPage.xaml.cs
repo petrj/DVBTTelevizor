@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
-using LibVLCSharp.Shared;
+
 
 namespace DVBTTelevizor.MAUI
 {
@@ -23,10 +23,10 @@ namespace DVBTTelevizor.MAUI
             _mainViewModel?.OnAppearing();
         }
 
-        private void VideoView_MediaPlayerChanged(object sender, MediaPlayerChangedEventArgs e)
-        {
-            _mainViewModel.OnVideoViewInitialized();
-        }
+        //private void VideoView_MediaPlayerChanged(object sender, MediaPlayerChangedEventArgs e)
+        //{
+        //    _mainViewModel.OnVideoViewInitialized();
+        //}
 
         private void TuneButton_Clicked(object sender, EventArgs e)
         {

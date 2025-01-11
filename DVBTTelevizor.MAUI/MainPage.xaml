@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vlc="clr-namespace:LibVLCSharp.MAUI;assembly=LibVLCSharp.MAUI"
              x:Class="DVBTTelevizor.MAUI.MainPage">
+
+    <!-- xmlns:vlc="clr-namespace:LibVLCSharp.MAUI;assembly=LibVLCSharp.MAUI" -->
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -19,7 +20,7 @@
     <AbsoluteLayout>
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0.0,1,1.0,0.5" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
-            <vlc:VideoView  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
+            <!--vlc:VideoView  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" /-->
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1" NumberOfTapsRequired="2" />
