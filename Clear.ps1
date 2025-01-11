@@ -7,6 +7,10 @@ foreach ($folder in `
     "DVBTTelevizor\DVBTTelevizor\obj",
     "DVBTTelevizor\DVBTTelevizor.Android\bin",
     "DVBTTelevizor\DVBTTelevizor.Android\obj",
+    "DVBTTelevizor.Driver\bin",
+    "DVBTTelevizor.Driver\obj",
+    "DVBTTelevizor.MAUI\bin",
+    "DVBTTelevizor.MAUI\obj",
     "packages",
     ".vs"
      ))

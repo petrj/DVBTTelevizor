@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using LibVLCSharp.Shared;
+using System.ComponentModel;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -11,16 +12,16 @@ namespace DVBTTelevizor.MAUI
             Initialize();
         }
 
-        //private LibVLC LibVLC { get; set; }
+        private LibVLC LibVLC { get; set; }
 
         public bool MainLayoutVisible { get; set; } = true;
 
-        //private LibVLCSharp.Shared.MediaPlayer _mediaPlayer;
-        //public LibVLCSharp.Shared.MediaPlayer MediaPlayer
-        //{
-        //    get => _mediaPlayer;
-        //    private set => Set(nameof(MediaPlayer), ref _mediaPlayer, value);
-        //}
+        private LibVLCSharp.Shared.MediaPlayer _mediaPlayer;
+        public LibVLCSharp.Shared.MediaPlayer MediaPlayer
+        {
+            get => _mediaPlayer;
+            private set => Set(nameof(MediaPlayer), ref _mediaPlayer, value);
+        }
 
         private bool IsLoaded { get; set; }
         private bool IsVideoViewInitialized { get; set; }
@@ -36,13 +37,13 @@ namespace DVBTTelevizor.MAUI
 
         private void Initialize()
         {
-            //LibVLC = new LibVLC(enableDebugLogs: true);
-            //using var media = new Media(LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+            LibVLC = new LibVLC(enableDebugLogs: true);
+            using var media = new Media(LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
 
-            //MediaPlayer = new LibVLCSharp.Shared.MediaPlayer(LibVLC)
-            //{
-            //    Media = media
-            //};
+            MediaPlayer = new LibVLCSharp.Shared.MediaPlayer(LibVLC)
+            {
+                Media = media
+            };
         }
 
         public void OnAppearing()
@@ -53,8 +54,8 @@ namespace DVBTTelevizor.MAUI
 
         internal void OnDisappearing()
         {
-            //MediaPlayer.Dispose();
-            //LibVLC.Dispose();
+            MediaPlayer.Dispose();
+            LibVLC.Dispose();
         }
 
         public void OnVideoViewInitialized()
@@ -67,7 +68,7 @@ namespace DVBTTelevizor.MAUI
         {
             if (IsLoaded && IsVideoViewInitialized)
             {
-                //MediaPlayer.Play();
+                MediaPlayer.Play();
             }
         }
     }
