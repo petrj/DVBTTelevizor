@@ -31,9 +31,23 @@
         </StackLayout>
 
 
-        <Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
-        <Button x:Name="DriverButton" Text="Install DVB-T Driver" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.16,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
-        <Button x:Name="ConnectButton" Text="Connect" Clicked="ConnectButton_Clicked" IsVisible="True"  Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.32,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.15,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <Button x:Name="InstallDriverButton" Text="Install DVB-T Driver" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <Button x:Name="ConnectButton" Text="Connect" Clicked="ConnectButton_Clicked" IsVisible="True"  Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.47,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.06" AbsoluteLayout.LayoutFlags="All" BackgroundColor="DarkGray">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+            <ImageButton x:Name="DriverStateButton" Grid.Column="4" Grid.Row="0" Source="disconnected.png" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" />
+        </Grid>
 
     </AbsoluteLayout>
 

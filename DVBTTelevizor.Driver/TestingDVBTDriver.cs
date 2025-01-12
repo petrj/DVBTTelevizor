@@ -10,6 +10,8 @@ namespace DVBTTelevizor
 {
     public class TestingDVBTDriver : IDVBTDriver
     {
+        public DVBTDriverStateEnum State { get; private set; }
+
         private long LastFreq { get; set; }
         private long LastPID { get; set; }
 

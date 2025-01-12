@@ -141,28 +141,42 @@ namespace DVBTTelevizor.MAUI
 
         public void InitDriver()
         {
-            var req = new Intent(Intent.ActionView);
-            req.SetData(new Android.Net.Uri.Builder().Scheme("dtvdriver").Build());
-            req.PutExtra(Intent.ExtraReturnResult, true);
-
-            _waitingForInit = true;
-
-            Task.Run(async () =>
+            try
             {
-                await Task.Delay(10000); // wait 10 secs;
+                var req = new Intent(Intent.ActionView);
+                var scheme = new Android.Net.Uri.Builder().Scheme("dtvdriver");
+                req.SetData(scheme.Build());
+                req.PutExtra(Intent.ExtraReturnResult, true);
 
-                if (_waitingForInit)
+                _waitingForInit = true;
+
+                Task.Run(async () =>
                 {
-                    _waitingForInit = false;
+                    await Task.Delay(10000); // wait 10 secs;
 
-                    _loggingService.Info("Device response timeout");
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Device response timeout"));
-                }
+                    if (_waitingForInit)
+                    {
+                        _waitingForInit = false;
 
-            });
+                        _loggingService.Info("Device response timeout");
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Device response timeout"));
+                    }
 
-            _loggingService.Info("Starting activity");
-            StartActivityForResult(req, StartRequestCode);
+                });
+
+                _loggingService.Info("Starting activity");
+                StartActivityForResult(req, StartRequestCode);
+
+            } catch (ActivityNotFoundException e)
+            {
+                _loggingService.Info("InitDriver");
+                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout"));
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "InitDriver");
+                _waitingForInit = false;
+            }
         }
 
         private static string GetAndroidDirectory(string specialFolder)
@@ -222,10 +236,15 @@ namespace DVBTTelevizor.MAUI
         {
             if (requestCode == StartRequestCode)
             {
+                _waitingForInit = false;
+
+                if (resultCode == Result.Canceled)
+                {
+                    return;
+                }
+
                 if (resultCode == Result.Ok)
                 {
-                    _waitingForInit = false;
-
                     if (data != null)
                     {
                         var cfg = new DVBTDriverConfiguration();
@@ -255,15 +274,20 @@ namespace DVBTTelevizor.MAUI
                     }
                 } else
                 {
-                    if (data.Extras != null && !data.Extras.IsEmpty)
+                    var errorCodeString = "Bad activity result";
+
+                    if (data != null && data.Extras != null && !data.Extras.IsEmpty)
                     {
+                        if (data.HasExtra("ErrorCode"))
+                            errorCodeString = data.GetStringExtra("ErrorCode");
+
                         foreach (var key in data.Extras.KeySet())
                         {
                             var value = data.Extras.Get(key);
                             _loggingService.Info($"Key: {key}, Value: {value}");
                         }
                     }
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad activity result"));
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorCodeString));
                 }
             }
         }

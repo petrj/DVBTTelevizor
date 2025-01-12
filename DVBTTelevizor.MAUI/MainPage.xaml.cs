@@ -24,15 +24,13 @@ namespace DVBTTelevizor.MAUI
 
             _driver = new TestingDVBTDriver(_loggingService);
 
-            BindingContext = _mainViewModel = new MainViewModel(_loggingService);
+            BindingContext = _mainViewModel = new MainViewModel(_loggingService, _driver);
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
             _mainViewModel?.OnAppearing();
-
-            _driver.Connect();
         }
 
         private void VideoView_MediaPlayerChanged(object sender, MediaPlayerChangedEventArgs e)
@@ -88,6 +86,14 @@ namespace DVBTTelevizor.MAUI
         private void ConnectButton_Clicked(object sender, EventArgs e)
         {
             WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+        }
+
+        private void DriverStateButton_Clicked(object sender, EventArgs e)
+        {
+            if (!_driver.Connected)
+            {
+                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+            }
         }
     }
 

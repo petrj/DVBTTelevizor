@@ -1,4 +1,6 @@
-﻿using LibVLCSharp.Shared;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LibVLCSharp.Shared;
 using LoggerService;
 using System.ComponentModel;
 
@@ -6,14 +8,42 @@ namespace DVBTTelevizor.MAUI
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private ILoggingService _loggingService;
+        public event PropertyChangedEventHandler? PropertyChanged = null;
+        private ILoggingService? _loggingService = null;
+        IDVBTDriver? _driver = null;
+        private bool _driverInstalled = false;
 
-        public MainViewModel(ILoggingService loggingService)
+        public MainViewModel(ILoggingService loggingService, IDVBTDriver driver)
         {
             _loggingService = loggingService;
+            _driver = driver;
 
-            Initialize();
+            InitializeVLC();
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage(m.Value));
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed"));
+            });
+        }
+
+        public string DriverIconImage
+        {
+            get
+            {
+                if (_driver == null ||
+                    !_driverInstalled ||
+                    !_driver.Connected)
+                {
+                    return "disconnected.png";
+                }
+
+                return "connected.png";
+            }
         }
 
         private LibVLC LibVLC { get; set; }
@@ -21,6 +51,7 @@ namespace DVBTTelevizor.MAUI
         public bool MainLayoutVisible { get; set; } = true;
 
         private LibVLCSharp.Shared.MediaPlayer _mediaPlayer;
+
         public LibVLCSharp.Shared.MediaPlayer MediaPlayer
         {
             get => _mediaPlayer;
@@ -39,7 +70,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void Initialize()
+        private void InitializeVLC()
         {
             _loggingService.Info("Initializing LibVLC");
 

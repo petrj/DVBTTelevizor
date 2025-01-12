@@ -18,22 +18,18 @@ namespace DVBTTelevizor
 {
     public class AndroidDVBTDriver : IDVBTDriver
     {
-        public bool Installed { get; set; } = true;
+        public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
-        DVBTDriverConfiguration _driverConfiguration;
-
-        ILoggingService _log;
-
-        private TcpClient _controlClient;
-        private TcpClient _transferClient;
-        private NetworkStream _controlStream;
-        private NetworkStream _transferStream;
-        private DVBTDriverConfiguration _config;
+        private ILoggingService _log;
+        private DVBTDriverConfiguration _driverConfiguration;
+        private TcpClient? _controlClient = null;
+        private TcpClient? _transferClient = null;
+        private NetworkStream? _controlStream = null;
+        private NetworkStream? _transferStream = null;
 
         private long _lastTunedFreq = -1;
         private long _lastTunedDeliverySystem = -1;
         private long _bitrate = 0;
-        private List<long> _lastPIDs = new List<long>();
 
         private const int ReadBufferSize = 32768;
 
@@ -42,10 +38,10 @@ namespace DVBTTelevizor
         private bool _recording = false;
         private bool _readingBuffer = false;
         private bool _driverStreamDataAvailable = false;
-        private string _recordingFileName = null;
+        private string? _recordingFileName = null;
 
         List<byte> _readBuffer = new List<byte>();
-        private string _lastSpeedCalculationSec = null;
+        private string? _lastSpeedCalculationSec = null;
 
         private static object _readThreadLock = new object();
         private static object _infoLock = new object();
@@ -55,19 +51,18 @@ namespace DVBTTelevizor
         private UDPStreamer _UDPStreamer;
 
         public delegate void StatusChangedEventHandler(object sender, DVBTDriverStatusChangedEventArgs e);
-        public event EventHandler StatusChanged;
+        public event EventHandler? StatusChanged = null;
 
         public string PublicDirectory { get; set; } = "";
 
-        public AndroidDVBTDriver(ILoggingService loggingService, DVBTDriverConfiguration config)
+        public AndroidDVBTDriver(ILoggingService loggingService)
         {
             _log = loggingService;
 
             _log.Debug($"Initializing DVBT driver manager");
 
-            _config = config;
-
             _UDPStreamer = new UDPStreamer(_log);
+            _driverConfiguration = new DVBTDriverConfiguration();
         }
 
         public DVBTDriverStreamTypeEnum DVBTDriverStreamType
@@ -195,6 +190,8 @@ namespace DVBTTelevizor
             _lastTunedDeliverySystem = -1;
 
             StartBackgroundReading();
+
+            State = DVBTDriverStateEnum.Connected;
         }
 
         private void StartBackgroundReading()
@@ -909,7 +906,6 @@ namespace DVBTTelevizor
             {
 
                 _log.Debug($"Setting PIDs: {String.Join(",", PIDs)}");
-                _lastPIDs = PIDs;
 
                 var responseSize = 10;
 
