@@ -39,7 +39,14 @@ namespace DVBTTelevizor.MAUI
                 _firstAppearing = false;
                 _loggingService.Info("First appearing - sending Connect message");
 
-                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                if (_driver is TestingDVBTDriver)
+                {
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+                }
+                else
+                {
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                }
             }
         }
 
@@ -113,7 +120,13 @@ namespace DVBTTelevizor.MAUI
                 {
                     if (await _dialogService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
                     {
-                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                        if (_driver is TestingDVBTDriver)
+                        {
+                            WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+                        } else
+                        {
+                            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                        }
                     }
                 }
             }

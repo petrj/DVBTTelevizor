@@ -48,6 +48,14 @@ namespace DVBTTelevizor.MAUI
             {
                 InitDriver();
             });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
+                {
+                    DeviceName = "Testing device"
+                }));
+            });
         }
 
         private void ShowToastMessage(string message, int AppFontSize = 0)

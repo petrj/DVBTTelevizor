@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using Android.Util;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
@@ -6,7 +7,7 @@ using System.ComponentModel;
 
 namespace DVBTTelevizor.MAUI
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : BaseNotifableObject
     {
         public event PropertyChangedEventHandler? PropertyChanged = null;
         private ILoggingService _loggingService;
@@ -49,7 +50,7 @@ namespace DVBTTelevizor.MAUI
             _driver.Configuration = config;
             _driver.Connect();
 
-            //OnPropertyChanged(nameof(DriverIconImage));
+            OnPropertyChanged(nameof(DriverIconImage));
         }
 
         private void ConnectDriverFailed(string message)
@@ -57,6 +58,8 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Info($"Connection failed: {message}");
 
             _driverInstalled = true;
+
+            OnPropertyChanged(nameof(DriverIconImage));
 
             WeakReferenceMessenger.Default.Send(new ToastMessage($"Connection failed: {message}"));
         }
@@ -67,6 +70,7 @@ namespace DVBTTelevizor.MAUI
 
             _driverInstalled = false;
 
+            OnPropertyChanged(nameof(DriverIconImage));
             WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed"));
         }
 

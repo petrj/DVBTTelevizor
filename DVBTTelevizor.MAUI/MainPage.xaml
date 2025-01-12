@@ -46,7 +46,7 @@
                 <ColumnDefinition Width="20*" />
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
-            <ImageButton x:Name="DriverStateButton" Grid.Column="4" Grid.Row="0" Source="disconnected.png" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" />
+            <ImageButton x:Name="DriverStateButton" Grid.Column="4" Grid.Row="0" Source="{Binding DriverIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" />
         </Grid>
 
     </AbsoluteLayout>
