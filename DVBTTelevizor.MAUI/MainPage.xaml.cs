@@ -8,11 +8,11 @@ namespace DVBTTelevizor.MAUI
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
-
-        MainViewModel? _mainViewModel = null;
+        private MainViewModel _mainViewModel;
         private ILoggingService _loggingService { get; set; }
         private IDVBTDriver _driver { get; set; }
+        private IDialogService _dialogService;
+        private bool _firstAppearing = true;
 
         public MainPage(ILoggingProvider loggingProvider)
         {
@@ -21,6 +21,8 @@ namespace DVBTTelevizor.MAUI
             _loggingService = loggingProvider.GetLoggingService();
 
             _loggingService.Info("MainPage starting");
+
+            _dialogService = new DialogService(this);
 
             _driver = new TestingDVBTDriver(_loggingService);
 
@@ -31,6 +33,14 @@ namespace DVBTTelevizor.MAUI
         {
             base.OnAppearing();
             _mainViewModel?.OnAppearing();
+
+            if (_firstAppearing)
+            {
+                _firstAppearing = false;
+                _loggingService.Info("First appearing - sending Connect message");
+
+                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+            }
         }
 
         private void VideoView_MediaPlayerChanged(object sender, MediaPlayerChangedEventArgs e)
@@ -88,11 +98,31 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
         }
 
-        private void DriverStateButton_Clicked(object sender, EventArgs e)
+        private async void DriverStateButton_Clicked(object sender, EventArgs e)
         {
-            if (!_driver.Connected)
+            if (_mainViewModel.DriverInstalled)
             {
-                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                if (_driver.Connected)
+                {
+                    if (!(await _dialogService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"Device status", "Back", "Disconnect")))
+                    {
+                        //await _viewModel.DisconnectDriver();
+                    }
+                }
+                else
+                {
+                    if (await _dialogService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
+                    {
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                    }
+                }
+            }
+            else
+            {
+                if (await _dialogService.Confirm($"DVB-T Driver not installed.", $"Device status", "Install DVB-T Driver", "Back"))
+                {
+                    //InstallDriver_Clicked(this, null);
+                }
             }
         }
     }

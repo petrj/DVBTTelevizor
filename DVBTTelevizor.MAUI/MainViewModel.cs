@@ -9,9 +9,11 @@ namespace DVBTTelevizor.MAUI
     public class MainViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged = null;
-        private ILoggingService? _loggingService = null;
-        IDVBTDriver? _driver = null;
+        private ILoggingService _loggingService;
+        private IDVBTDriver _driver;
         private bool _driverInstalled = false;
+        private LibVLC? LibVLC { get; set; }
+        private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
 
         public MainViewModel(ILoggingService loggingService, IDVBTDriver driver)
         {
@@ -20,15 +22,52 @@ namespace DVBTTelevizor.MAUI
 
             InitializeVLC();
 
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
+            {
+                ConnectDriver(m.Value);
+            });
+
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
             {
-                WeakReferenceMessenger.Default.Send(new ToastMessage(m.Value));
+                ConnectDriverFailed(m.Value);
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
             {
-                WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed"));
+                DriverNotInstalled();
             });
+        }
+
+        private void ConnectDriver(DVBTDriverConfiguration config)
+        {
+            _loggingService.Info("Connecting device: " + config.DeviceName);
+
+            _driverInstalled = true;
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage($"Device found: {config.DeviceName}"));
+
+            _driver.Configuration = config;
+            _driver.Connect();
+
+            //OnPropertyChanged(nameof(DriverIconImage));
+        }
+
+        private void ConnectDriverFailed(string message)
+        {
+            _loggingService.Info($"Connection failed: {message}");
+
+            _driverInstalled = true;
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage($"Connection failed: {message}"));
+        }
+
+        private void DriverNotInstalled()
+        {
+            _loggingService.Info($"Driver is not installed");
+
+            _driverInstalled = false;
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed"));
         }
 
         public string DriverIconImage
@@ -46,11 +85,12 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private LibVLC LibVLC { get; set; }
+        public bool DriverInstalled
+        {
+            get { return _driverInstalled; }
+        }
 
         public bool MainLayoutVisible { get; set; } = true;
-
-        private LibVLCSharp.Shared.MediaPlayer _mediaPlayer;
 
         public LibVLCSharp.Shared.MediaPlayer MediaPlayer
         {
@@ -69,7 +109,6 @@ namespace DVBTTelevizor.MAUI
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
         private void InitializeVLC()
         {
             _loggingService.Info("Initializing LibVLC");
