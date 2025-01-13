@@ -1,20 +1,40 @@
-﻿using Android.Util;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace DVBTTelevizor.MAUI
 {
     public class MainViewModel : BaseNotifableObject
     {
-        public event PropertyChangedEventHandler? PropertyChanged = null;
+        //public event PropertyChangedEventHandler? PropertyChanged = null;
+        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>()
+        {
+           new DVBTChannel()
+           {
+                Number = "1",
+                Frequency = 1,
+                Name = "Channel",
+                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
+                ServiceType = DVBTDriverServiceType.TV
+           }
+        };
+
         private ILoggingService _loggingService;
         private IDVBTDriver _driver;
         private bool _driverInstalled = false;
         private LibVLC? LibVLC { get; set; }
-        private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
+        private MediaPlayer? _mediaPlayer;
+
+        public bool InstallDriverButtonVisible
+        {
+            get
+            {
+                return _driver == null || !_driverInstalled;
+            }
+        }
 
         public MainViewModel(ILoggingService loggingService, IDVBTDriver driver)
         {
@@ -39,6 +59,19 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public void UpdateDriverState()
+        {
+            OnPropertyChanged(nameof(DriverIconImage));
+            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+        }
+
+        public async void DisconnectDriver()
+        {
+            await _driver.Disconnect();
+
+            UpdateDriverState();
+        }
+
         private void ConnectDriver(DVBTDriverConfiguration config)
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
@@ -50,7 +83,7 @@ namespace DVBTTelevizor.MAUI
             _driver.Configuration = config;
             _driver.Connect();
 
-            OnPropertyChanged(nameof(DriverIconImage));
+            UpdateDriverState();
         }
 
         private void ConnectDriverFailed(string message)
@@ -59,9 +92,9 @@ namespace DVBTTelevizor.MAUI
 
             _driverInstalled = true;
 
-            OnPropertyChanged(nameof(DriverIconImage));
-
             WeakReferenceMessenger.Default.Send(new ToastMessage($"Connection failed: {message}"));
+
+            UpdateDriverState();
         }
 
         private void DriverNotInstalled()
@@ -70,8 +103,9 @@ namespace DVBTTelevizor.MAUI
 
             _driverInstalled = false;
 
-            OnPropertyChanged(nameof(DriverIconImage));
             WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed"));
+
+            UpdateDriverState();
         }
 
         public string DriverIconImage
@@ -99,20 +133,11 @@ namespace DVBTTelevizor.MAUI
         public LibVLCSharp.Shared.MediaPlayer MediaPlayer
         {
             get => _mediaPlayer;
-            private set => Set(nameof(MediaPlayer), ref _mediaPlayer, value);
         }
 
         private bool IsLoaded { get; set; }
         private bool IsVideoViewInitialized { get; set; }
 
-        private void Set<T>(string propertyName, ref T field, T value)
-        {
-            if (field == null && value != null || field != null && !field.Equals(value))
-            {
-                field = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
         private void InitializeVLC()
         {
             _loggingService.Info("Initializing LibVLC");
@@ -120,10 +145,12 @@ namespace DVBTTelevizor.MAUI
             LibVLC = new LibVLC(enableDebugLogs: true);
             using var media = new Media(LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
 
-            MediaPlayer = new LibVLCSharp.Shared.MediaPlayer(LibVLC)
+            _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(LibVLC)
             {
                 Media = media
             };
+
+            OnPropertyChanged(nameof(MediaPlayer));
         }
 
         public void OnAppearing()

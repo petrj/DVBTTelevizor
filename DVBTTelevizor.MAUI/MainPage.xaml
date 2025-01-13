@@ -7,16 +7,147 @@
     <ContentPage.Resources>
         <ResourceDictionary>
 
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="True"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="NoVideoChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="ProviderNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="Margin" Value="0,0,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="DetailLabelsTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="LightGray"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+            </Style>
+
+            <Style x:Key="RecTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="Red"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="TextColor" Value="Black"/>
-                <Setter Property="BackgroundColor" Value="LightBlue"/>
-                <Setter Property="Margin" Value="20,20,20,0"/>
+                <Setter Property="Margin" Value="20,0,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+            </Style>
+
+            <Style x:Key="ChannelEPGTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="15,0,0,0"/>
+            </Style>
+
+            <Style x:Key="NextTitleTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="LineBreakMode" Value="TailTruncation"/>
+                <Setter Property="Margin" Value="10,0,5,0"/>
+            </Style>
+
+            <Style x:Key="IconStyle" TargetType="Image">
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
+            </Style>
+
+            <Style x:Key="LayoutGridStyle" TargetType="Grid">
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+            </Style>
+
+            <Style x:Key="TitleTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="MaxLines" Value="2"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="TimeFromTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="Start"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="TimeToTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="DescriptionTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="5,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="RecordingLabelTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="Red"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <AbsoluteLayout>
+    <AbsoluteLayout BackgroundColor="Black">
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0.0,1,1.0,0.5" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
             <vlc:VideoView  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
@@ -30,10 +161,62 @@
             </StackLayout.GestureRecognizers>
         </StackLayout>
 
-
-        <Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.15,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <!--Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.15,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/-->
         <Button x:Name="InstallDriverButton" Text="Install DVB-T Driver" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
-        <Button x:Name="ConnectButton" Text="Connect" Clicked="ConnectButton_Clicked" IsVisible="True"  Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.47,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+
+        <ListView
+          AbsoluteLayout.LayoutBounds="0,0.1,1,0.3"
+          AbsoluteLayout.LayoutFlags="All"
+          x:Name="ChannelsListView"
+          ItemsSource="{Binding Channels}"
+          CachingStrategy="RecycleElement"
+          RefreshCommand="{Binding RefreshCommand}"
+          IsRefreshing="{Binding IsRefreshing}"
+          Style="{StaticResource ListViewStyle}"
+          SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <ViewCell.View>
+                            <Grid RowSpacing="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="1" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10*" />
+                                    <ColumnDefinition Width="6*" />
+                                    <ColumnDefinition Width="24*" />
+                                    <ColumnDefinition Width="50*" />
+                                    <ColumnDefinition Width="10*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+                                <Label Grid.Row="0" Grid.Column="2"  Grid.ColumnSpan="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
+                                <Image Grid.Row="0" Grid.Column="1"                   Source="{Binding LockIcon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+
+                                <Image Grid.Row="0" Grid.Column="4"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+                                <Label Grid.Row="1" Grid.Column="4"                   Text="{Binding RecordingLabel}" Style="{DynamicResource RecTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}"/>
+
+                                <Label Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                <Label Grid.Row="2" Grid.Column="2"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+
+                                <Label Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+
+                                <ProgressBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Progress="{Binding CurrentEPGEventProgress}" ProgressColor="#41b3ff" BackgroundColor="White"/>
+                            </Grid>
+
+                        </ViewCell.View>
+
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
         <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.06" AbsoluteLayout.LayoutFlags="All" BackgroundColor="DarkGray">
             <Grid.RowDefinitions>
