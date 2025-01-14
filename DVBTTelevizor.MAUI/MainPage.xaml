@@ -150,7 +150,7 @@
     <AbsoluteLayout BackgroundColor="Black">
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0.0,1,1.0,0.5" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
-            <vlc:VideoView  MediaPlayer="{Binding MediaPlayer}" MediaPlayerChanged="VideoView_MediaPlayerChanged" IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
+            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1" NumberOfTapsRequired="2" />
@@ -173,7 +173,8 @@
           RefreshCommand="{Binding RefreshCommand}"
           IsRefreshing="{Binding IsRefreshing}"
           Style="{StaticResource ListViewStyle}"
-          SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+          SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
+          ItemTapped="ChannelsListView_ItemTapped">
 
             <ListView.ItemTemplate>
                 <DataTemplate>
