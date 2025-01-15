@@ -22,6 +22,7 @@ namespace DVBTTelevizor.MAUI
         private bool _waitingForInit = false;
         private static Android.Widget.Toast _instance;
         private ILoggingService _loggingService = null;
+        private TestDVBTDriver _testDVBTDriver = null;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -51,11 +52,27 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
             {
-                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
-                {
-                    DeviceName = "Testing device"
-                }));
+                ConnectTestDriver();
             });
+        }
+
+        private void ConnectTestDriver()
+        {
+            var publicDirectory = GetAndroidDirectory(null);
+
+            _testDVBTDriver = new TestDVBTDriver(_loggingService);
+            _testDVBTDriver.Connect();
+            _testDVBTDriver.PublicDirectory = publicDirectory;
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
+            {
+                DeviceName = "Testing device",
+                ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
+                TransferPort = _testDVBTDriver.TransferIPEndPoint.Port,
+                PublicDiretory = publicDirectory
+            }));
+
+            return;
         }
 
         private void ShowToastMessage(string message, int AppFontSize = 0)
@@ -273,6 +290,8 @@ namespace DVBTTelevizor.MAUI
                             cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
 
                         _loggingService.Info($"Received device configuration: {cfg}");
+
+                        cfg.PublicDiretory = GetAndroidDirectory(null);
 
                         WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
                     }

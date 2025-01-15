@@ -23,10 +23,12 @@ namespace DVBTTelevizor.MAUI
            new DVBTChannel()
            {
                 Number = "1",
-                Frequency = 490000000,
+                Frequency = 514000000,
                 Name = "Channel",
                 Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                ServiceType = DVBTDriverServiceType.TV
+                ServiceType = DVBTDriverServiceType.TV,
+                ProgramMapPID = 2200,
+                DVBTType = 1
            }
         };
 
@@ -37,7 +39,7 @@ namespace DVBTTelevizor.MAUI
         private bool _EPGDetailEnabled = true;
 
         private ILoggingService _loggingService;
-        private IDVBTDriver _driver;
+        private ITV _driver;
         private bool _driverInstalled = false;
 
         private DVBTChannel _selectedChannel;
@@ -77,7 +79,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public MainViewModel(ILoggingService loggingService, IDVBTDriver driver)
+        public MainViewModel(ILoggingService loggingService, ITV driver)
         {
             _loggingService = loggingService;
             _driver = driver;

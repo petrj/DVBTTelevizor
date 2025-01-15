@@ -14,5 +14,7 @@ namespace DVBTTelevizor
         public string DeviceName { get; set; }
         public int[] ProductIds { get; set; }
         public int[] VendorIds { get; set; }
+
+        public string PublicDiretory { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace DVBTTelevizor.MAUI
     {
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
-        private IDVBTDriver _driver { get; set; }
+        private ITV _driver { get; set; }
         private IDialogService _dialogService;
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
@@ -35,7 +35,7 @@ namespace DVBTTelevizor.MAUI
 
             _dialogService = new DialogService(this);
 
-            _driver = new TestingDVBTDriver(_loggingService);
+            _driver = new DVBTDriverTV(_loggingService);
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver);
         }
@@ -71,14 +71,8 @@ namespace DVBTTelevizor.MAUI
 
                 _loggingService.Info("First appearing - sending Connect message");
 
-                if (_driver is TestingDVBTDriver)
-                {
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
-                }
-                else
-                {
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
-                }
+                WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+                //    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
             }
         }
 
@@ -94,20 +88,10 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("Initializing LibVLC");
 
-            _LibVLC = new LibVLC(enableDebugLogs: true);
-            _media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
-
-
-            _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC)
-            {
-                Media = _media
-            };
-
+            _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
+            _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
             videoView.MediaPlayer = _mediaPlayer;
-
-            _mediaPlayer.Play();
         }
-
 
         private void TuneButton_Clicked(object sender, EventArgs e)
         {
@@ -421,13 +405,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     if (await _dialogService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
                     {
-                        if (_driver is TestingDVBTDriver)
-                        {
-                            WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
-                        } else
-                        {
-                            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
-                        }
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+                        //WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
                     }
                 }
             }
@@ -440,7 +419,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async Task ChannelsListView_ItemTapped(object sender, ItemTappedEventArgs e)
+        private async void ChannelsListView_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             _loggingService.Info("ChannelsListView_ItemTapped");
             _loggingService.Info($"{e.Item.GetType().FullName}");

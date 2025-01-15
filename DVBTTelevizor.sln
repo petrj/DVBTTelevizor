@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.MAUI", "DVBTT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.Driver", "DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj", "{9B023BD9-C561-4342-9C53-FB9FD5112641}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.TV", "DVBTTelevizor.TV\DVBTTelevizor.TV.csproj", "{FED9F232-E440-4504-9627-A7D4DA1258D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AndroidTV|Any CPU = AndroidTV|Any CPU
@@ -77,6 +79,12 @@ Global
 		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

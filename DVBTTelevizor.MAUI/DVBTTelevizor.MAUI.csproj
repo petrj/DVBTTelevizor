@@ -102,10 +102,6 @@
 	  </PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj" />
-	</ItemGroup>
-
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
 	    <Version>3.9.1</Version>
@@ -113,9 +109,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\DVBTTelevizor.TV\DVBTTelevizor.TV.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Update="Platforms\Windows\NLog.config">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj" />
 	</ItemGroup>
 
 </Project>
