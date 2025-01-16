@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class DVBTDriverNotInstalledMessage : ValueChangedMessage<string>
+    public class DVBTDriverNotInstalledMessage : DVBTDriverConnectMessages<string>
     {
         public DVBTDriverNotInstalledMessage(string value) : base(value)
         {

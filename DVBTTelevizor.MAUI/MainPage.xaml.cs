@@ -15,7 +15,7 @@ namespace DVBTTelevizor.MAUI
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
 
-        private DVBTChannel[] _lastPlayedChannels = new DVBTChannel[2];
+        private Channel[] _lastPlayedChannels = new Channel[2];
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
@@ -25,7 +25,9 @@ namespace DVBTTelevizor.MAUI
         private MediaPlayer? _mediaPlayer;
         private Media _media;
 
-        public MainPage(ILoggingProvider loggingProvider)
+        public string PublicDirectory { get; set; }
+
+        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {
             InitializeComponent();
 
@@ -37,7 +39,10 @@ namespace DVBTTelevizor.MAUI
 
             _driver = new DVBTDriverTV(_loggingService);
 
-            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver);
+            PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+
+            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, _dialogService);
+            _viewModel.PublicDirectory = PublicDirectory;
         }
 
         public PlayingStateEnum PlayingState
@@ -73,6 +78,9 @@ namespace DVBTTelevizor.MAUI
 
                 WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
                 //    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+
+
+                _viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
             }
         }
 
@@ -157,7 +165,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async Task ActionPlay(DVBTChannel channel = null)
+        public async Task ActionPlay(Channel channel = null)
         {
             _loggingService.Debug($"ActionPlay");
 
@@ -423,7 +431,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("ChannelsListView_ItemTapped");
             _loggingService.Info($"{e.Item.GetType().FullName}");
-            if (e.Item is DVBTChannel channel)
+            if (e.Item is Channel channel)
             {
                 _loggingService.Info($"ChannelsListView_ItemTapped: {channel.Name}");
                 MainThread.BeginInvokeOnMainThread( async () =>

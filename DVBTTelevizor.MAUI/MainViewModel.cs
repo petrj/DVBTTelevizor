@@ -2,6 +2,7 @@
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading;
@@ -13,14 +14,16 @@ namespace DVBTTelevizor.MAUI
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
+        private IDialogService _dialogService;
+
 
         //public EITManager EIT { get; set; }
         //public PIDManager PID { get; set; }
 
         //public event PropertyChangedEventHandler? PropertyChanged = null;
-        public ObservableCollection<DVBTChannel> Channels { get; set; } = new ObservableCollection<DVBTChannel>()
+        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>()/*
         {
-           new DVBTChannel()
+           new Channel()
            {
                 Number = "1",
                 Frequency = 514000000,
@@ -30,7 +33,7 @@ namespace DVBTTelevizor.MAUI
                 ProgramMapPID = 2200,
                 DVBTType = 1
            }
-        };
+        }*/;
 
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
@@ -42,9 +45,73 @@ namespace DVBTTelevizor.MAUI
         private ITV _driver;
         private bool _driverInstalled = false;
 
-        private DVBTChannel _selectedChannel;
-        private DVBTChannel _playingChannel;
-        private DVBTChannel _recordingChannel;
+        private Channel _selectedChannel;
+        private Channel _playingChannel;
+        private Channel _recordingChannel;
+
+        public string PublicDirectory { get; set; }
+
+        public MainViewModel(ILoggingService loggingService, ITV driver, IDialogService dialogService)
+        {
+            _loggingService = loggingService;
+            _driver = driver;
+            _dialogService = dialogService;
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
+            {
+                ConnectDriver(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
+            {
+                ConnectDriverFailed(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
+            {
+                DriverNotInstalled();
+            });
+        }
+
+        public async Task Import(string filename)
+        {
+            try
+            {
+                _loggingService.Info($"Importing channels from file");
+
+                if (!File.Exists(filename))
+                {
+                    await _dialogService.Information($"File {filename} not found");
+                    return;
+                }
+
+                var jsonFromFile = File.ReadAllText(filename);
+
+                var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<Channel>>(jsonFromFile);
+
+                var count = 0;
+                foreach (var ch in importedChannels)
+                {
+                    /*
+                    if (!ConfigViewModel.ChannelExists(chs, ch.FrequencyAndMapPID))
+                    {
+                        count++;
+                        ch.Number = ConfigViewModel.GetNextChannelNumber(chs).ToString();
+                        chs.Add(ch);
+                    }
+                    */
+
+                    Channels.Add(ch.Clone());
+                }
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage($"Imported channels count: {count}"));
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Import failed");
+                await _dialogService.Information($"Import failed");
+            }
+        }
 
         public bool EPGDetailEnabled
         {
@@ -77,27 +144,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return _driver == null || !_driverInstalled;
             }
-        }
-
-        public MainViewModel(ILoggingService loggingService, ITV driver)
-        {
-            _loggingService = loggingService;
-            _driver = driver;
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
-            {
-                ConnectDriver(m.Value);
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
-            {
-                ConnectDriverFailed(m.Value);
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
-            {
-                DriverNotInstalled();
-            });
         }
 
         public void UpdateDriverState()
@@ -172,6 +218,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Send(new ToastMessage($"Device found: {config.DeviceName}"));
 
             _driver.Configuration = config;
+            _driver.PublicDirectory = PublicDirectory;
             _driver.Connect();
 
             UpdateDriverState();
@@ -226,7 +273,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public DVBTChannel SelectedChannel
+        public Channel SelectedChannel
         {
             get
             {
@@ -269,7 +316,7 @@ namespace DVBTTelevizor.MAUI
         }
 
 
-        public DVBTChannel PlayingChannel
+        public Channel PlayingChannel
         {
             get { return _playingChannel; }
             set
@@ -374,7 +421,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public DVBTChannel RecordingChannel
+        public Channel RecordingChannel
         {
             get
             {

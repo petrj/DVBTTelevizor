@@ -7,8 +7,8 @@ namespace DVBTTelevizor.MAUI
 {
     public class PlayStreamInfo
     {
-        public DVBTChannel Channel { get; set; }
-        public  EPGCurrentEvent CurrentEvent { get; set; }
+        public Channel Channel { get; set; }
+        public EPGCurrentEvent CurrentEvent { get; set; }
         public string RecordingStream { get; set; } = null;
         public int SignalStrengthPercentage { get; set; } = 0;
         public bool ShortInfoWithoutChannelName { get; set; } = false;

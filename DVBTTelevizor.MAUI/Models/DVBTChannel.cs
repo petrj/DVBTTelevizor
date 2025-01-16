@@ -1,5 +1,6 @@
-﻿using MPEGTS;
-//using SQLite;
+﻿using DVBTTelevizor;
+using MPEGTS;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,8 +9,8 @@ using System.Text;
 
 namespace DVBTTelevizor.MAUI
 {
-    //[Table("Channels")]
-    public class DVBTChannel : JSONObject
+    [Table("Channels")]
+    public class Channel : JSONObject
     {
         //[PrimaryKey, Column("Number")]
         public string Number { get; set; } = "0";
@@ -295,9 +296,9 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public DVBTChannel Clone()
+        public Channel Clone()
         {
-            var channel = new DVBTChannel();
+            var channel = new Channel();
 
             channel.Name = Name;
             channel.ProviderName = ProviderName;

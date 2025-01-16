@@ -21,6 +21,8 @@ namespace DVBTTelevizor.MAUI
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<LoggerProvider>();
+            builder.Services.AddSingleton<PublicDirectoryProvider>();
+            builder.Services.AddSingleton<IPublicDirectoryProvider, PublicDirectoryProvider>();
             builder.Services.AddSingleton<ILoggingProvider, LoggerProvider>();
 
 #if DEBUG

@@ -58,19 +58,18 @@ namespace DVBTTelevizor.MAUI
 
         private void ConnectTestDriver()
         {
-            var publicDirectory = GetAndroidDirectory(null);
-
             _testDVBTDriver = new TestDVBTDriver(_loggingService);
+            _testDVBTDriver.PublicDirectory = GetAndroidDirectory(null);
             _testDVBTDriver.Connect();
-            _testDVBTDriver.PublicDirectory = publicDirectory;
 
-            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
-            {
-                DeviceName = "Testing device",
-                ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
-                TransferPort = _testDVBTDriver.TransferIPEndPoint.Port,
-                PublicDiretory = publicDirectory
-            }));
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                new DVBTDriverConfiguration()
+                {
+                    DeviceName = "Testing device",
+                    ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
+                    TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
+                }));
 
             return;
         }
@@ -256,7 +255,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             if (requestCode == StartRequestCode)
@@ -318,7 +316,5 @@ namespace DVBTTelevizor.MAUI
                 }
             }
         }
-
-
     }
 }
