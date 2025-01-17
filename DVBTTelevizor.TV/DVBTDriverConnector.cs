@@ -16,7 +16,7 @@ using LoggerService;
 
 namespace DVBTTelevizor
 {
-    public class DVBTDriverTV : ITV
+    public class DVBTDriverConnector : IDriverConnector
     {
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
@@ -55,7 +55,7 @@ namespace DVBTTelevizor
 
         public string PublicDirectory { get; set; } = "";
 
-        public DVBTDriverTV(ILoggingService loggingService)
+        public DVBTDriverConnector(ILoggingService loggingService)
         {
             _log = loggingService;
 

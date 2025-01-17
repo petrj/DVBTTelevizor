@@ -3,16 +3,17 @@ using MPEGTS;
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace DVBTTelevizor.MAUI
+namespace DVBTTelevizor
 {
     [Table("Channels")]
     public class Channel : JSONObject
     {
-        //[PrimaryKey, Column("Number")]
+        [PrimaryKey, Column("Number")]
         public string Number { get; set; } = "0";
 
         public long Frequency { get; set; }
@@ -321,6 +322,39 @@ namespace DVBTTelevizor.MAUI
             {
                 return Frequency.ToString() + "[" + ProgramMapPID.ToString() + "]";
             }
+        }
+
+        public bool ChannelExists(ObservableCollection<Channel> channels)
+        {
+            foreach (var ch in channels)
+            {
+                if (ch.FrequencyAndMapPID == FrequencyAndMapPID)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        public static int GetNextChannelNumber(ObservableCollection<Channel> channels)
+        {
+            var res = 0;
+
+            foreach (var ch in channels)
+            {
+                int n;
+                if (int.TryParse(ch.Number, out n))
+                {
+                    if (n > res)
+                    {
+                        res = n;
+                    }
+                }
+            }
+
+            return res + 1;
         }
     }
 }

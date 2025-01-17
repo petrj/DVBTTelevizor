@@ -10,7 +10,7 @@ namespace DVBTTelevizor.MAUI
     {
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
-        private ITV _driver { get; set; }
+        private IDriverConnector _driver { get; set; }
         private IDialogService _dialogService;
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
@@ -27,7 +27,7 @@ namespace DVBTTelevizor.MAUI
 
         public string PublicDirectory { get; set; }
 
-        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
+        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVCConfiguration tvConfiguration)
         {
             InitializeComponent();
 
@@ -37,11 +37,11 @@ namespace DVBTTelevizor.MAUI
 
             _dialogService = new DialogService(this);
 
-            _driver = new DVBTDriverTV(_loggingService);
+            _driver = new DVBTDriverConnector(_loggingService);
 
             PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, _dialogService);
+            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService);
             _viewModel.PublicDirectory = PublicDirectory;
         }
 

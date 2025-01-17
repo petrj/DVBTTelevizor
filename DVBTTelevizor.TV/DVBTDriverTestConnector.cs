@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor
 {
-    public class DVBTTestDriver : ITV
+    public class DVBTDriverTestConnector : IDriverConnector
     {
         public DVBTDriverStateEnum State { get; private set; }
 
@@ -18,7 +18,7 @@ namespace DVBTTelevizor
         public event EventHandler? StatusChanged = null;
         ILoggingService _log;
 
-        public DVBTTestDriver(ILoggingService loggingService)
+        public DVBTDriverTestConnector(ILoggingService loggingService)
         {
             _log = loggingService;
         }

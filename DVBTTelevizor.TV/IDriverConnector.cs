@@ -13,7 +13,7 @@ using MPEGTS;
 
 namespace DVBTTelevizor
 {
-    public interface ITV
+    public interface IDriverConnector
     {
         DVBTDriverStateEnum State { get; }
 

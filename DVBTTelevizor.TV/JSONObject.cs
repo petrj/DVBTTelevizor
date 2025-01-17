@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace DVBTTelevizor.MAUI
+namespace DVBTTelevizor
 {
     public class JSONObject : BaseNotifableObject
     {

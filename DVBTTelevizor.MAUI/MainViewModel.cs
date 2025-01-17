@@ -16,7 +16,6 @@ namespace DVBTTelevizor.MAUI
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
         private IDialogService _dialogService;
 
-
         //public EITManager EIT { get; set; }
         //public PIDManager PID { get; set; }
 
@@ -42,7 +41,8 @@ namespace DVBTTelevizor.MAUI
         private bool _EPGDetailEnabled = true;
 
         private ILoggingService _loggingService;
-        private ITV _driver;
+        private IDriverConnector _driver;
+        private ITVCConfiguration _configuration;
         private bool _driverInstalled = false;
 
         private Channel _selectedChannel;
@@ -51,11 +51,12 @@ namespace DVBTTelevizor.MAUI
 
         public string PublicDirectory { get; set; }
 
-        public MainViewModel(ILoggingService loggingService, ITV driver, IDialogService dialogService)
+        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService)
         {
             _loggingService = loggingService;
             _driver = driver;
             _dialogService = dialogService;
+            _configuration = tvConfiguration;
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
             {
@@ -73,6 +74,19 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public async Task RefreshChannels()
+        {
+            _configuration.Load();
+
+            Channels.Clear();
+            foreach (var channel in _configuration.Channels)
+            {
+                Channels.Add(channel.Clone());
+            }
+
+            OnPropertyChanged(nameof(Channels));
+        }
+
         public async Task Import(string filename)
         {
             try
@@ -85,24 +99,10 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
-                var jsonFromFile = File.ReadAllText(filename);
+                var count = _configuration.ImportChannelsFromJSON(File.ReadAllText(filename));
+                _configuration.Save();
 
-                var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<Channel>>(jsonFromFile);
-
-                var count = 0;
-                foreach (var ch in importedChannels)
-                {
-                    /*
-                    if (!ConfigViewModel.ChannelExists(chs, ch.FrequencyAndMapPID))
-                    {
-                        count++;
-                        ch.Number = ConfigViewModel.GetNextChannelNumber(chs).ToString();
-                        chs.Add(ch);
-                    }
-                    */
-
-                    Channels.Add(ch.Clone());
-                }
+                await RefreshChannels();
 
                 WeakReferenceMessenger.Default.Send(new ToastMessage($"Imported channels count: {count}"));
             }
