@@ -16,5 +16,7 @@ namespace DVBTTelevizor
         void Save();
 
         int ImportChannelsFromJSON(string fileName);
+
+
     }
 }

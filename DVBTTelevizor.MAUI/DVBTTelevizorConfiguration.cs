@@ -11,10 +11,14 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI
 {
+    [JsonObject(MemberSerialization.OptIn)]
     internal class DVBTTelevizorConfiguration : ITVCConfiguration
     {
         private ILoggingService _loggingService;
         private string _configPath = string.Empty;
+
+        [JsonProperty]
+        public bool Fullscreen { get; set; } = true;
 
         public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {
@@ -28,7 +32,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Path.Join(_configPath,"config.json");
+                return Path.Join(_configPath, "config.json");
             }
         }
 
@@ -68,38 +72,62 @@ namespace DVBTTelevizor.MAUI
 
         public void Load()
         {
-            if (!File.Exists(ChannelsConfigFileName))
+            try
             {
-                return;
-            }
+                if (File.Exists(ChannelsConfigFileName))
+                {
+                    var json = File.ReadAllText(ChannelsConfigFileName);
 
-            var json = File.ReadAllText(ChannelsConfigFileName);
+                    var loadedChannels = JsonConvert.DeserializeObject<ObservableCollection<Channel>>(json);
 
-            var loadedChannels = JsonConvert.DeserializeObject<ObservableCollection<Channel>>(json);
+                    if (loadedChannels != null && loadedChannels.Count > 0)
+                    {
+                        Channels.Clear();
 
-            if (loadedChannels == null || loadedChannels.Count == 0)
+                        foreach (var channel in loadedChannels)
+                        {
+                            Channels.Add(channel.Clone());
+                        }
+                    }
+                }
+
+                if (File.Exists(ConfigFileName))
+                {
+                    var jsonAll = File.ReadAllText(ConfigFileName);
+
+                    var cfg = JsonConvert.DeserializeObject<DVBTTelevizorConfiguration>(jsonAll);
+
+                    if (cfg != null)
+                    {
+                        Fullscreen = cfg.Fullscreen;
+                    }
+                }
+
+            } catch (Exception ex)
             {
-                return;
-            }
-
-            Channels.Clear();
-
-            foreach (var channel in loadedChannels)
-            {
-                Channels.Add(channel.Clone());
+                _loggingService.Error(ex);
             }
         }
 
-        public void LoadChannels()
-        {
-            //throw new NotImplementedException();
-        }
 
         public void Save()
         {
-            var json = JsonConvert.SerializeObject(Channels);
-            File.WriteAllText(ChannelsConfigFileName, json);
-        }
+            try
+            {
+                _loggingService.Info("Saving channels");
 
+                var json = JsonConvert.SerializeObject(Channels);
+                File.WriteAllText(ChannelsConfigFileName, json);
+
+                _loggingService.Info("Saving configuration");
+
+                var jsonAll = JsonConvert.SerializeObject(this);
+                File.WriteAllText(ConfigFileName, jsonAll);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
     }
 }

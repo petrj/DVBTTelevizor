@@ -12,6 +12,7 @@ namespace DVBTTelevizor.MAUI
         private ILoggingService _loggingService { get; set; }
         private IDriverConnector _driver { get; set; }
         private IDialogService _dialogService;
+        private ITVCConfiguration _configuration;
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
 
@@ -34,6 +35,9 @@ namespace DVBTTelevizor.MAUI
             _loggingService = loggingProvider.GetLoggingService();
 
             _loggingService.Info("MainPage starting");
+
+            _configuration = tvConfiguration;
+            _configuration.Load();
 
             _dialogService = new DialogService(this);
 
@@ -66,7 +70,8 @@ namespace DVBTTelevizor.MAUI
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            _viewModel?.OnAppearing();
+
+            _viewModel.OnAppearing();
 
             if (_firstAppearing)
             {
@@ -77,10 +82,14 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info("First appearing - sending Connect message");
 
                 WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+
+                Task.Run(async () =>
+                {
+                    await _viewModel.RefreshChannels();
+                });
+
                 //    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
-
-
-                _viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
             }
         }
 
