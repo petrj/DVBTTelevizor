@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="white" stroke-width="2">
+  <!-- Antenna -->
+  <line x1="50" y1="60" x2="50" y2="90" stroke="white" />
+  <circle cx="50" cy="50" r="5" fill="white" />
+  
+  <!-- Signal Waves Left -->
+  <path d="M35,50 A15,15 0 0,1 35,35" />
+  <path d="M25,50 A25,25 0 0,1 25,25" />
+  <path d="M15,50 A35,35 0 0,1 15,15" />
+  
+  <!-- Signal Waves Right -->
+  <path d="M65,50 A15,15 0 0,0 65,35" />
+  <path d="M75,50 A25,25 0 0,0 75,25" />
+  <path d="M85,50 A35,35 0 0,0 85,15" />
+</svg>

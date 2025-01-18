@@ -193,19 +193,19 @@ namespace DVBTTelevizor.MAUI
 
                 if (!_driver.Connected)
                 {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Playing {channel.Name} failed (device not connected)"));
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (device not connected)".Translated(channel.Name)));
                     return;
                 }
 
                 if (_viewModel.RecordingChannel != null && _viewModel.RecordingChannel != channel)
                 {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Playing {channel.Name} failed (recording in progress)"));
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (recording in progress)".Translated(channel.Name)));
                     return;
                 }
 
                 if (channel.NonFree)
                 {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Playing {channel.Name} failed (non free channel)"));
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (non free channel)".Translated(channel.Name)));
                     return;
                 }
 
@@ -272,12 +272,12 @@ namespace DVBTTelevizor.MAUI
                         _viewModel.PlayingChannel.DVBTType == channel.DVBTType)
                     {
                         tuneNeeded = false;
-                        WeakReferenceMessenger.Default.Send(new LongToastMessage("Tuning ...."));
+                        WeakReferenceMessenger.Default.Send(new LongToastMessage("Tuning ....".Translated()));
                     }
 
                     if (tuneNeeded)
                     {
-                        WeakReferenceMessenger.Default.Send(new ToastMessage($"Tuning {channel.FrequencyShortLabel} ...."));
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Tuning {0} ....".Translated(channel.FrequencyShortLabel)));
 
                         var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
@@ -285,10 +285,10 @@ namespace DVBTTelevizor.MAUI
                             switch (tunedRes.Result)
                             {
                                 case DVBTDriverSearchProgramResultEnum.NoSignal:
-                                    WeakReferenceMessenger.Default.Send(new ToastMessage("No signal"));
+                                    WeakReferenceMessenger.Default.Send(new ToastMessage("No signal".Translated()));
                                     break;
                                 default:
-                                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed"));
+                                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
                                     break;
                             }
 
@@ -308,7 +308,7 @@ namespace DVBTTelevizor.MAUI
 
                         if (!setPIDres.SuccessFlag)
                         {
-                            WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed"));
+                            WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
                             return;
                         }
                     }
@@ -318,7 +318,7 @@ namespace DVBTTelevizor.MAUI
 
                         if (setupPIDsRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
-                            WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed"));
+                            WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
                             return;
                         }
 
@@ -413,14 +413,18 @@ namespace DVBTTelevizor.MAUI
             {
                 if (_driver.Connected)
                 {
-                    if (!(await _dialogService.Confirm($"Connected device: {_driver.Configuration.DeviceName}.", $"Device status", "Back", "Disconnect")))
+                    if (!(await _dialogService.Confirm("Connected device: {0}".Translated(_driver.Configuration.DeviceName),
+                        "Device status".Translated(),
+                        "Back".Translated(),
+                        "Disconnect".Translated())))
                     {
                         //await _viewModel.DisconnectDriver();
                     }
                 }
                 else
                 {
-                    if (await _dialogService.Confirm($"Disconnected.", $"Device status", "Connect", "Back"))
+                    if (await _dialogService.Confirm("Disconnected.".Translated(),
+                        "Device status".Translated(), "Connect".Translated(), "Back".Translated()))
                     {
                         WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
                         //WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
@@ -429,7 +433,10 @@ namespace DVBTTelevizor.MAUI
             }
             else
             {
-                if (await _dialogService.Confirm($"DVB-T Driver not installed.", $"Device status", "Install DVB-T Driver", "Back"))
+                if (await _dialogService.Confirm($"DVB-T Driver not installed.".Translated(),
+                    "Device status".Translated(),
+                    "Install DVB-T Driver".Translated(),
+                    "Back".Translated()))
                 {
                     //InstallDriver_Clicked(this, null);
                 }
@@ -439,6 +446,7 @@ namespace DVBTTelevizor.MAUI
         private async void ChannelsListView_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             _loggingService.Info("ChannelsListView_ItemTapped");
+
             _loggingService.Info($"{e.Item.GetType().FullName}");
             if (e.Item is Channel channel)
             {
@@ -448,6 +456,31 @@ namespace DVBTTelevizor.MAUI
                     await ActionPlay(channel);
                 });
             }
+        }
+
+        private void DriverStateButton_Clicked_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MenuButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SettingsButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TuneButton_Clicked_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
+        {
+
         }
     }
 

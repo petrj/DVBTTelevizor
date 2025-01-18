@@ -95,7 +95,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (!File.Exists(filename))
                 {
-                    await _dialogService.Information($"File {filename} not found");
+                    await _dialogService.Information("File {0} not found".Translated(filename));
                     return;
                 }
 
@@ -104,12 +104,12 @@ namespace DVBTTelevizor.MAUI
 
                 await RefreshChannels();
 
-                WeakReferenceMessenger.Default.Send(new ToastMessage($"Imported channels count: {count}"));
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Imported channels count: {0}".Translated(count.ToString())));
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Import failed");
-                await _dialogService.Information($"Import failed");
+                await _dialogService.Information("Import failed".Translated());
             }
         }
 
@@ -182,7 +182,7 @@ namespace DVBTTelevizor.MAUI
             // showing signal percents only for the first time
             if (playStreamInfo.SignalStrengthPercentage > 0)
             {
-                msg += $"{Environment.NewLine}(signal {playStreamInfo.SignalStrengthPercentage}%)";
+                msg += Environment.NewLine + "(signal {0}%)".Translated(playStreamInfo.SignalStrengthPercentage.ToString());
                 playStreamInfo.SignalStrengthPercentage = 0;
             }
 
@@ -215,7 +215,7 @@ namespace DVBTTelevizor.MAUI
 
             _driverInstalled = true;
 
-            WeakReferenceMessenger.Default.Send(new ToastMessage($"Device found: {config.DeviceName}"));
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 
             _driver.Configuration = config;
             _driver.PublicDirectory = PublicDirectory;
@@ -230,7 +230,7 @@ namespace DVBTTelevizor.MAUI
 
             _driverInstalled = true;
 
-            WeakReferenceMessenger.Default.Send(new ToastMessage($"Connection failed: {message}"));
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(message)));
 
             UpdateDriverState();
         }
@@ -241,7 +241,7 @@ namespace DVBTTelevizor.MAUI
 
             _driverInstalled = false;
 
-            WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed"));
+            WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed".Translated()));
 
             UpdateDriverState();
         }
@@ -270,6 +270,31 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return "connected.png";
+            }
+        }
+
+        public string TuneIconImage
+        {
+            get
+            {
+                return "tune.svg";
+            }
+        }
+
+
+        public string SettingsIconImage
+        {
+            get
+            {
+                return "settings.svg";
+            }
+        }
+
+        public string MenuIconImage
+        {
+            get
+            {
+                return "menu.svg";
             }
         }
 
