@@ -31,11 +31,18 @@ namespace DVBTTelevizor.MAUI
             NLog.Config.ISetupBuilder configuredSetupBuilder = setupBuilder.LoadConfigurationFromAssemblyResource(assembly);
             _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
 
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException; ;
+
             SubscribeMessages();
 
             var dir = GetAndroidDirectory(null);
 
             base.OnCreate(savedInstanceState);
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _loggingService.Error(e.ExceptionObject as Exception, "CurrentDomain_UnhandledException");
         }
 
         private void SubscribeMessages()

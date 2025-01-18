@@ -4,7 +4,7 @@
              xmlns:vlc="clr-namespace:LibVLCSharp.MAUI;assembly=LibVLCSharp.MAUI"
              x:Class="DVBTTelevizor.MAUI.MainPage">
 
-    <ContentPage.Resources>
+<ContentPage.Resources>
         <ResourceDictionary>
 
             <Style x:Key="ListViewStyle" TargetType="ListView">

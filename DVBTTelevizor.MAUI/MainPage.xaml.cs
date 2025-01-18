@@ -28,6 +28,8 @@ namespace DVBTTelevizor.MAUI
 
         public string PublicDirectory { get; set; }
 
+        private NavigationPage _settingsPage = null;
+
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVCConfiguration tvConfiguration)
         {
             InitializeComponent();
@@ -47,6 +49,10 @@ namespace DVBTTelevizor.MAUI
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService);
             _viewModel.PublicDirectory = PublicDirectory;
+
+            _settingsPage = new NavigationPage(new SettingsPage());
+
+            NavigationPage.SetHasNavigationBar(this, false);
         }
 
         public PlayingStateEnum PlayingState
@@ -97,8 +103,8 @@ namespace DVBTTelevizor.MAUI
         {
             base.OnDisappearing();
 
-            _mediaPlayer?.Dispose();
-            _LibVLC?.Dispose();
+            //_mediaPlayer?.Dispose();
+            //_LibVLC?.Dispose();
         }
 
         private void InitializeVLC()
@@ -468,9 +474,9 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void SettingsButton_Clicked(object sender, EventArgs e)
+        private async void SettingsButton_Clicked(object sender, EventArgs e)
         {
-
+            await Navigation.PushAsync(_settingsPage);
         }
 
         private void TuneButton_Clicked_1(object sender, EventArgs e)
