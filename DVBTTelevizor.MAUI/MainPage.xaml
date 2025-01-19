@@ -219,7 +219,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.06" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a">
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.06" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a">
             <Grid.RowDefinitions>
                 <RowDefinition Height="100*" />
             </Grid.RowDefinitions>
@@ -230,11 +230,11 @@
                 <ColumnDefinition Width="20*" />
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
-            <ImageButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" Source="icon.png" IsEnabled="True" Margin="5,5,5,5" Clicked="DVBTTelevizorButton_Clicked" />
+            <ImageButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" Source="dvbttelevizor.svg" IsEnabled="True" Margin="5,5,5,5" Clicked="DVBTTelevizorButton_Clicked" />
             <ImageButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" Source="{Binding DriverIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" />
             <ImageButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" Source="{Binding TuneIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="TuneButton_Clicked" />
             <ImageButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" Source="{Binding MenuIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="MenuButton_Clicked" />
-            <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" />
+            <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" BackgroundColor="#0000BB" />
         </Grid>
 
     </AbsoluteLayout>
