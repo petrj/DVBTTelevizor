@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
 using LoggerService;
+using Microsoft.Maui.Controls.Compatibility;
 using NLog;
 using System.Reflection;
 using Environment = System.Environment;
@@ -26,6 +27,7 @@ namespace DVBTTelevizor.MAUI
         private TestDVBTDriver _testDVBTDriver = null;
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
+        private NotificationHelper _notificationHelper;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -34,6 +36,10 @@ namespace DVBTTelevizor.MAUI
             NLog.Config.ISetupBuilder configuredSetupBuilder = setupBuilder.LoadConfigurationFromAssemblyResource(assembly);
             _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
 
+            // prevent sleep:
+            var  win = (this as Activity).Window;
+            win.AddFlags(WindowManagerFlags.KeepScreenOn);
+
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException; ;
 
             SubscribeMessages();
@@ -41,6 +47,65 @@ namespace DVBTTelevizor.MAUI
             var dir = GetAndroidDirectory(null);
 
             base.OnCreate(savedInstanceState);
+        }
+
+        private async Task ShowPlayingNotification(PlayStreamInfo playStreamInfo)
+        {
+            try
+            {
+                var msg = playStreamInfo == null || playStreamInfo.Channel == null ? "" : $"Playing {playStreamInfo.Channel.Name}";
+                _notificationHelper.ShowPlayNotification(1, msg, string.Empty, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task ShowRecordNotification(PlayStreamInfo recStreamInfo)
+        {
+            try
+            {
+                var msg = recStreamInfo == null || recStreamInfo.Channel == null ? "" : $"Recording {recStreamInfo.Channel.Name}";
+                _notificationHelper.ShowRecordNotification(2, msg, string.Empty, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void StopNotification(int notificationId)
+        {
+            try
+            {
+                _notificationHelper.CloseNotification(notificationId);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task ShareFile(string fileName)
+        {
+            try
+            {
+                var intent = new Intent(Intent.ActionSend);
+                var file = new Java.IO.File(fileName);
+                var uri = Android.Net.Uri.FromFile(file);
+
+                intent.PutExtra(Intent.ExtraStream, uri);
+                intent.SetDataAndType(uri, "text/plain");
+                intent.SetFlags(ActivityFlags.GrantReadUriPermission);
+                intent.SetFlags(ActivityFlags.NewTask);
+
+                Android.App.Application.Context.StartActivity(intent);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -73,6 +138,56 @@ namespace DVBTTelevizor.MAUI
                 {
                     _dispatchKeyEventEnabledAt = DateTime.Now;
                 }
+            });
+
+            WeakReferenceMessenger.Default.Register<PlayInBackgroundNotificationMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShowPlayingNotification(m.Value));
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<ShowRecordNotificationMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShowRecordNotification(m.Value));
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<StopRecordNotificationMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    StopNotification(2);
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<StopPlayInBackgroundNotificationMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    StopNotification(1);
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<ShareFileMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Task.Run(async () => await ShareFile(m.Value));
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<QuitAppMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    StopNotification(1);
+                    StopNotification(2);
+                    Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
+                });
             });
         }
 
