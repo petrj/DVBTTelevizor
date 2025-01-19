@@ -4,6 +4,7 @@ using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
 using Android.Util;
+using Android.Views;
 using Android.Widget;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
@@ -23,6 +24,8 @@ namespace DVBTTelevizor.MAUI
         private static Android.Widget.Toast _instance;
         private ILoggingService _loggingService = null;
         private TestDVBTDriver _testDVBTDriver = null;
+        private bool _dispatchKeyEventEnabled = false;
+        private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -61,6 +64,81 @@ namespace DVBTTelevizor.MAUI
             {
                 ConnectTestDriver();
             });
+
+
+            WeakReferenceMessenger.Default.Register<DispatchKeyEventEnabledMessage>(this, (r, m) =>
+            {
+                _dispatchKeyEventEnabled = m.Value;
+                if (m.Value)
+                {
+                    _dispatchKeyEventEnabledAt = DateTime.Now;
+                }
+            });
+        }
+
+        public override bool DispatchKeyEvent(KeyEvent e)
+        {
+            try
+            {
+                if (e.Action == KeyEventActions.Up)
+                {
+                    return true;
+                }
+
+                var code = e.KeyCode.ToString();
+                var keyAction = KeyboardDeterminer.GetKeyAction(code);
+                var res = new KeyDownMessage(e.KeyCode.ToString());
+
+                if (e.IsLongPress)
+                {
+                    res.Long = true;
+                }
+
+                if (_dispatchKeyEventEnabled)
+                {
+                    // ignoring ENTER 1 second after DispatchKeyEvent enabled
+
+                    var ms = (DateTime.Now - _dispatchKeyEventEnabledAt).TotalMilliseconds;
+
+                    if (keyAction == KeyboardNavigationActionEnum.OK && ms < 1000)
+                    {
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> ignoring OK action");
+
+                        return true;
+                    }
+                    else
+                    {
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to ancestor");
+                        return base.DispatchKeyEvent(e);
+                    }
+                }
+                else
+                {
+                    if (keyAction != KeyboardNavigationActionEnum.Unknown)
+                    {
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to application, time: {e.EventTime - e.DownTime}");
+
+                        WeakReferenceMessenger.Default.Send(res);
+
+                        return true;
+                    }
+                    else
+                    {
+                        // unknown key
+
+                        _loggingService.Debug($"DispatchKeyEvent: {code} -> unknown key sending to ancestor");
+#if DEBUG
+                        ShowToastMessage($"<{code}>");
+#endif
+                        return base.DispatchKeyEvent(e);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, $"DispatchKeyEvent error:");
+                return true;
+            }
         }
 
         private void ConnectTestDriver()
