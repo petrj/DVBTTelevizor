@@ -95,7 +95,7 @@ namespace DVBTTelevizor.MAUI
                 });
 
                 //    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
-                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+                _viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
             }
         }
 
@@ -111,9 +111,12 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("Initializing LibVLC");
 
-            _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
-            _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
-            videoView.MediaPlayer = _mediaPlayer;
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
+                _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
+                videoView.MediaPlayer = _mediaPlayer;
+            }
         }
 
         private void TuneButton_Clicked(object sender, EventArgs e)
