@@ -262,17 +262,20 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                /*
                 if (_driver == null ||
-                    !_driverInstalled ||
-                    !_driver.Connected)
+                    !_driverInstalled)
                 {
-                    return "disconnected.png";
+                    return "uninstalled.png";
                 }
 
-                return "connected.png";
-                */
-                return "uninstalled.png";
+
+                if (_driver.Connected)
+                {
+                    return "connected.png";
+
+                }
+
+                return "disconnected.png";
             }
         }
 
