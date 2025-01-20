@@ -262,6 +262,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                /*
                 if (_driver == null ||
                     !_driverInstalled ||
                     !_driver.Connected)
@@ -270,6 +271,8 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return "connected.png";
+                */
+                return "uninstalled.png";
             }
         }
 
@@ -277,7 +280,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return "tune.svg";
+                return "tune.png";
             }
         }
 
@@ -286,7 +289,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return "settings.svg";
+                return "settings.png";
             }
         }
 
@@ -294,7 +297,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return "menu.svg";
+                return "menu.png";
             }
         }
 

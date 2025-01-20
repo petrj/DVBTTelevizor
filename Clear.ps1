@@ -9,8 +9,12 @@ foreach ($folder in `
     "DVBTTelevizor\DVBTTelevizor.Android\obj",
     "DVBTTelevizor.Driver\bin",
     "DVBTTelevizor.Driver\obj",
+    "DVBTTelevizor.TV\bin",
+    "DVBTTelevizor.TV\obj",    
     "DVBTTelevizor.MAUI\bin",
     "DVBTTelevizor.MAUI\obj",
+    "LibVLCSharp.MAUI.Windows\bin",
+    "LibVLCSharp.MAUI.Windows\obj",
     "packages",
     ".vs"
      ))
