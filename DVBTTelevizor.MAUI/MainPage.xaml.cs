@@ -53,6 +53,11 @@ namespace DVBTTelevizor.MAUI
             _settingsPage = new NavigationPage(new SettingsPage());
 
             NavigationPage.SetHasNavigationBar(this, false);
+
+            WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, (r, m) =>
+            {
+
+            });
         }
 
         public PlayingStateEnum PlayingState
