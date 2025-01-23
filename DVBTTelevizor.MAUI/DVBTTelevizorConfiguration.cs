@@ -19,10 +19,9 @@ namespace DVBTTelevizor.MAUI
         [JsonProperty]
         public bool Fullscreen { get; set; } = true;
 
-        public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
+        public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider)
         {
             _loggingService = loggingProvider.GetLoggingService();
-            _configPath = publicDirectoryProvider.GetPublicDirectoryPath();
         }
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
@@ -31,7 +30,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Path.Join(_configPath, "config.json");
+                return Path.Join(_configPath, "DVBTTelevizor.MAUI.config.json");
             }
         }
 
@@ -39,7 +38,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Path.Join(_configPath, "channels.json");
+                return Path.Join(_configPath, "DVBTTelevizor.MAUI.channels.json");
             }
         }
 

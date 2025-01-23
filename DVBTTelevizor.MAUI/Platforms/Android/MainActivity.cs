@@ -262,7 +262,6 @@ namespace DVBTTelevizor.MAUI
             _testDVBTDriver.PublicDirectory = GetAndroidDirectory(null);
             _testDVBTDriver.Connect();
 
-
             WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
                 new DVBTDriverConfiguration()
                 {

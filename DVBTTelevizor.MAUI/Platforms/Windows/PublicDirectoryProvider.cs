@@ -11,7 +11,7 @@ namespace DVBTTelevizor.MAUI
     {
         public string GetPublicDirectoryPath()
         {
-            return "";
+            return System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
         }
     }
 }

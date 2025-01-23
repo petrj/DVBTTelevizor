@@ -6,7 +6,7 @@ using LoggerService;
 
 namespace DVBTTelevizor.MAUI
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage : ContentPage, IOnKeyDown
     {
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
@@ -17,6 +17,8 @@ namespace DVBTTelevizor.MAUI
         private DateTime _lastActionPlayTime = DateTime.MinValue;
 
         private Channel[] _lastPlayedChannels = new Channel[2];
+
+        private KeyboardFocusableItemList _focusItems;
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
@@ -56,8 +58,26 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, (r, m) =>
             {
-
+                OnKeyDown(m.Value, m.Long);
             });
+
+            BuildFocusableItems();
+        }
+
+        private void BuildFocusableItems()
+        {
+            _focusItems = new KeyboardFocusableItemList();
+
+            _focusItems
+                .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsListView", new List<View>() { ChannelsListView }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("DVBTTelevizorButton", new List<View>() { DVBTTelevizorButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
+
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }));
+
+            //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
         }
 
         public PlayingStateEnum PlayingState
@@ -81,6 +101,8 @@ namespace DVBTTelevizor.MAUI
         protected override void OnAppearing()
         {
             base.OnAppearing();
+
+            _focusItems.DeFocusAll();
 
             _viewModel.OnAppearing();
 
@@ -493,6 +515,51 @@ namespace DVBTTelevizor.MAUI
         }
 
         private void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
+        public void OnKeyDown(string key, bool longPress)
+        {
+            _loggingService.Debug($"Main Page OnKeyDown {key}");
+
+            var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+            switch (keyAction)
+            {
+                case KeyboardNavigationActionEnum.Right:
+                case KeyboardNavigationActionEnum.Down:
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        _focusItems.FocusNextItem();
+                    });
+                    break;
+
+                case KeyboardNavigationActionEnum.Left:
+                case KeyboardNavigationActionEnum.Up:
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        _focusItems.FocusPreviousItem();
+                    });
+                    break;
+
+                case KeyboardNavigationActionEnum.Back:
+                    //
+                    break;
+
+                case KeyboardNavigationActionEnum.OK:
+
+                    switch (_focusItems.FocusedItemName)
+                    {
+                        case "ChannelsListView":
+                            break;
+                    }
+
+                    break;
+            }
+        }
+
+        public void OnTextSent(string text)
         {
 
         }

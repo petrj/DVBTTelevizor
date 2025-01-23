@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using Microsoft.Graphics.Canvas.Printing;
 using Microsoft.UI.Xaml;
 using SharpHook;
 using System.Threading;
@@ -29,7 +30,6 @@ namespace DVBTTelevizor.MAUI.WinUI
             _loggingService = new BasicLoggingService();
             this.InitializeComponent();
 
-
             var hook = new SharpHook.TaskPoolGlobalHook();
             hook.KeyPressed += Hook_KeyPressed; ;       // EventHandler<KeyboardHookEventArgs>
 
@@ -37,16 +37,18 @@ namespace DVBTTelevizor.MAUI.WinUI
             {
                 await hook.RunAsync();
             });
-
         }
 
         private void Hook_KeyPressed(object? sender, KeyboardHookEventArgs e)
         {
             var code = e.Data.KeyCode.ToString();
+            if (code.StartsWith("Vc"))
+            {
+                code = code.Substring(2);
+            }
             var keyAction = KeyboardDeterminer.GetKeyAction(code);
-            var res = new KeyDownMessage(e.Data.KeyCode.ToString());
 
-            WeakReferenceMessenger.Default.Send(res);
+            WeakReferenceMessenger.Default.Send(new KeyDownMessage(code));
         }
 
         protected override MauiApp CreateMauiApp()

@@ -22,10 +22,12 @@ namespace DVBTTelevizor.MAUI
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<LoggerProvider>();
             builder.Services.AddSingleton<PublicDirectoryProvider>();
-            builder.Services.AddSingleton<DVBTTelevizorConfiguration>();
+
             builder.Services.AddSingleton<IPublicDirectoryProvider, PublicDirectoryProvider>();
             builder.Services.AddSingleton<ITVCConfiguration, DVBTTelevizorConfiguration>();
             builder.Services.AddSingleton<ILoggingProvider, LoggerProvider>();
+
+            builder.Services.AddSingleton<DVBTTelevizorConfiguration>();
 
 #if DEBUG
             builder.Logging.AddDebug();
