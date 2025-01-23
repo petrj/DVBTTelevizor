@@ -61,8 +61,15 @@
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="20,0,20,0"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
+            </Style>
+
+            <Style x:Key="ImageButtonStyle" TargetType="ImageButton">
+                <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="BorderWidth" Value="0"/>
                 <Setter Property="CornerRadius" Value="7"/>
@@ -230,11 +237,11 @@
                 <ColumnDefinition Width="20*" />
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
-            <ImageButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" Source="dvbttelevizor.png" IsEnabled="True" Margin="5,5,5,5" Clicked="DVBTTelevizorButton_Clicked" />
-            <ImageButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" Source="{Binding DriverIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" />
-            <ImageButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" Source="{Binding TuneIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="TuneButton_Clicked" />
-            <ImageButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" Source="{Binding MenuIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="MenuButton_Clicked" />
-            <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" BackgroundColor="#0000BB" />
+            <ImageButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" Source="dvbttelevizor.png" IsEnabled="True" Margin="5,5,5,5" Clicked="DVBTTelevizorButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
+            <ImageButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" Source="{Binding DriverIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
+            <ImageButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" Source="{Binding TuneIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="TuneButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
+            <ImageButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" Source="{Binding MenuIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="MenuButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
+            <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
         </Grid>
 
     </AbsoluteLayout>
