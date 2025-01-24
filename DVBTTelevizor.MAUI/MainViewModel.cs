@@ -85,15 +85,40 @@ namespace DVBTTelevizor.MAUI
 
         public async Task RefreshChannels()
         {
-            _configuration.Load();
+            _loggingService.Debug($"Refreshing EPG");
 
-            Channels.Clear();
-            foreach (var channel in _configuration.Channels)
+            try
             {
-                Channels.Add(channel.Clone());
-            }
+                await _semaphoreSlim.WaitAsync();
 
-            OnPropertyChanged(nameof(Channels));
+                _configuration.Load();
+
+                Channels.Clear();
+                foreach (var channel in _configuration.Channels)
+                {
+                    Channels.Add(channel.Clone());
+                }
+
+                OnPropertyChanged(nameof(Channels));
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Refreshing EPG failed");
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+
+                OnPropertyChanged(nameof(Channels));
+                OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                //NotifyEPGDetailVisibilityChange();
+            }
         }
 
         public async Task Import(string filename)

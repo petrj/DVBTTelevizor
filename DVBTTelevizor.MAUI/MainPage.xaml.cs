@@ -368,14 +368,17 @@ namespace DVBTTelevizor.MAUI
 
                 if (shouldMediaPlay)
                 {
-                    switch (_driver.DVBTDriverStreamType)
+                    if (DeviceInfo.Platform == DevicePlatform.Android)
                     {
-                        case DVBTDriverStreamTypeEnum.UDP:
-                            _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
-                            break;
-                        case DVBTDriverStreamTypeEnum.Stream:
-                            _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
-                            break;
+                        switch (_driver.DVBTDriverStreamType)
+                        {
+                            case DVBTDriverStreamTypeEnum.UDP:
+                                _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
+                                break;
+                            case DVBTDriverStreamTypeEnum.Stream:
+                                _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                                break;
+                        }
                     }
 
                     CallWithTimeout(delegate
