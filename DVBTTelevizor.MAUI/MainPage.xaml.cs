@@ -40,17 +40,17 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Info("MainPage starting");
 
+            PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+
             _configuration = tvConfiguration;
+            _configuration.ConfigDirectory = PublicDirectory;
             _configuration.Load();
 
             _dialogService = new DialogService(this);
 
             _driver = new DVBTDriverConnector(_loggingService);
 
-            PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-
-            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService);
-            _viewModel.PublicDirectory = PublicDirectory;
+            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
             _settingsPage = new NavigationPage(new SettingsPage());
 

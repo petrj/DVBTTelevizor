@@ -18,7 +18,7 @@ namespace DVBTTelevizor.MAUI.WinUI
     /// </summary>
     public partial class App : MauiWinUIApplication
     {
-        private ILoggingService _loggingService = null;
+        private ILoggingService _loggingService;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -35,7 +35,22 @@ namespace DVBTTelevizor.MAUI.WinUI
 
             Task.Run(async () =>
             {
-                await hook.RunAsync();
+            //    await hook.RunAsync();
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
+            {
+                var testDVBTDriver = new TestDVBTDriver(_loggingService);
+                testDVBTDriver.PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath();
+                testDVBTDriver.Connect();
+
+                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                    new DVBTDriverConfiguration()
+                    {
+                        DeviceName = "Testing device",
+                        ControlPort = testDVBTDriver.ControlIPEndPoint.Port,
+                        TransferPort = testDVBTDriver.TransferIPEndPoint.Port
+                    }));
             });
         }
 

@@ -10,6 +10,8 @@ namespace DVBTTelevizor
 {
     public interface ITVCConfiguration
     {
+        public string ConfigDirectory { get; set; }
+
         public ObservableCollection<Channel> Channels { get; set; }
 
         void Load();

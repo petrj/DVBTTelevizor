@@ -11,7 +11,12 @@ namespace DVBTTelevizor.MAUI
     {
         public string GetPublicDirectoryPath()
         {
-            return System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+            var dir = Path.Join(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal), "DVBTTelevizor");
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            return dir;
         }
     }
 }

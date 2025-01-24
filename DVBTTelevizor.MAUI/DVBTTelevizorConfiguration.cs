@@ -14,14 +14,20 @@ namespace DVBTTelevizor.MAUI
     internal class DVBTTelevizorConfiguration : ITVCConfiguration
     {
         private ILoggingService _loggingService;
-        private string _configPath = string.Empty;
+        private string _configDirectory = string.Empty;
 
         [JsonProperty]
         public bool Fullscreen { get; set; } = true;
 
         public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider)
         {
-            _loggingService = loggingProvider.GetLoggingService();
+            if (loggingProvider != null)
+            {
+                _loggingService = loggingProvider.GetLoggingService();
+            } else
+            {
+                _loggingService = new BasicLoggingService();
+            }
         }
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
@@ -30,7 +36,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Path.Join(_configPath, "DVBTTelevizor.MAUI.config.json");
+                return Path.Join(ConfigDirectory, "DVBTTelevizor.MAUI.config.json");
             }
         }
 
@@ -38,7 +44,19 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Path.Join(_configPath, "DVBTTelevizor.MAUI.channels.json");
+                return Path.Join(ConfigDirectory, "DVBTTelevizor.MAUI.channels.json");
+            }
+        }
+
+        public string ConfigDirectory
+        {
+            get
+            {
+                return _configDirectory;
+            }
+            set
+            {
+                _configDirectory = value;
             }
         }
 
@@ -99,6 +117,10 @@ namespace DVBTTelevizor.MAUI
                     {
                         Fullscreen = cfg.Fullscreen;
                     }
+                } else
+                {
+                    // Saving default configuration
+                    Save();
                 }
 
             } catch (Exception ex)
@@ -106,7 +128,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
-
 
         public void Save()
         {

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
@@ -49,14 +50,22 @@ namespace DVBTTelevizor.MAUI
         private Channel _playingChannel;
         private Channel _recordingChannel;
 
-        public string PublicDirectory { get; set; }
+        public EITManager EIT { get; set; }
+        public PIDManager PID { get; set; }
 
-        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService)
+        private string _publicDirectory { get; set; }
+
+        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
         {
             _loggingService = loggingService;
             _driver = driver;
             _dialogService = dialogService;
             _configuration = tvConfiguration;
+
+            _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+
+            EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
+            PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
             {
@@ -218,7 +227,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 
             _driver.Configuration = config;
-            _driver.PublicDirectory = PublicDirectory;
+            _driver.PublicDirectory = _publicDirectory;
             _driver.Connect();
 
             UpdateDriverState();
