@@ -127,7 +127,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DVBTTelevizor.TV\DVBTTelevizor.TV.csproj" />
-	  <ProjectReference Include="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" />
 		<!--ProjectReference Include="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" /-->
 	</ItemGroup>
 
@@ -142,6 +141,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Platforms\Android\DVBTTelevizorConfiguration.cs">
+	    <ExcludeFromCurrentConfiguration>true</ExcludeFromCurrentConfiguration>
+	  </Compile>
 	  <Compile Update="SettingsPage.xaml.cs">
 	    <DependentUpon>SettingsPage.xaml</DependentUpon>
 	  </Compile>
