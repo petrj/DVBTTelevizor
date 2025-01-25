@@ -2,6 +2,7 @@
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
+using Microsoft.Maui.Layouts;
 
 
 namespace DVBTTelevizor.MAUI
@@ -15,6 +16,7 @@ namespace DVBTTelevizor.MAUI
         private ITVCConfiguration _configuration;
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
+        private Size _lastAllocatedSize = new Size(-1, -1);
 
         private Channel[] _lastPlayedChannels = new Channel[2];
 
@@ -31,6 +33,40 @@ namespace DVBTTelevizor.MAUI
         public string PublicDirectory { get; set; }
 
         private NavigationPage _settingsPage = null;
+
+        private bool IsPortrait { get; set; } = false;
+
+
+        // EPGDetailGrid
+        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
+        private Rect LandscapePreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.7);
+        private Rect LandscapePlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
+        private Rect PortraitPlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+        private Rect PortraitEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+        private Rect PortraitPreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+
+        // VideoStackLayout
+        private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.3, 0.3);
+        private Rect LandscapeVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 0.7, 1.0);
+        private Rect PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
+        private Rect PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.5, 0.3);
+
+        // VideoStackLayout must be visible when initializing VLC window!
+        private Rect NoVideoStackLayoutPosition { get; set; } = new Rect(-10, -10, -5, -5);
+
+        // RecordingLabel
+        private Rect LandscapeRecordingLabelPosition { get; set; } = new Rect(1.0, 1.0, 0.1, 0.1);
+        private Rect LandscapePreviewRecordingLabelPosition { get; set; } = new Rect(1.0, 0.25, 0.1, 0.1);
+        private Rect LandscapeRecordingLabelPositionWhenEPGDetailVisible { get; set; } = new Rect(0.65, 1.0, 0.1, 0.1);
+        private Rect PotraitRecordingLabelPosition { get; set; } = new Rect(1.0, 1.0, 0.1, 0.1);
+        private Rect PortraitRecordingLabelPositionWhenEPGDetailVisible { get; set; } = new Rect(1.0, 0.65, 0.1, 0.1);
+        private Rect PortraitPreviewRecordingLabelPosition { get; set; } = new Rect(1.0, 0.25, 0.1, 0.1);
+
+        // ChannelsListView
+        private Rect LandscapeChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 1.0, 0.7, 1.0);
+        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0, 0, 1, 1);
+        private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
+
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVCConfiguration tvConfiguration)
         {
@@ -80,6 +116,218 @@ namespace DVBTTelevizor.MAUI
             //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
         }
 
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            //System.Diagnostics.Debug.WriteLine($"OnSizeAllocated: {width}/{height}");
+
+            base.OnSizeAllocated(width, height);
+
+            if (_lastAllocatedSize.Width == width &&
+                _lastAllocatedSize.Height == height)
+            {
+                // no size changed
+                return;
+            }
+
+            if (width > height)
+            {
+                IsPortrait = false;
+            }
+            else
+            {
+                IsPortrait = true;
+            }
+
+            _lastAllocatedSize.Width = width;
+            _lastAllocatedSize.Height = height;
+
+            //_viewModel.NotifyToolBarChange();
+
+            RefreshGUI();
+        }
+
+        public void RefreshGUI()
+        {
+            if (!_refreshGUIEnabled)
+                return;
+
+            //_loggingService.Info("RefreshGUI");
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                try
+                {
+                    await _semaphoreSlimForRefreshGUI.WaitAsync();
+
+                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                    AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+
+                    //_loggingService.Debug($"PlayingState: {PlayingState}");
+
+                    switch (PlayingState)
+                    {
+                        case PlayingStateEnum.Playing:
+
+                            //MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_EnableFullScreen);
+
+                            // VideoStackLayout must be visible before changing Layout
+                            VideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = false;
+                            //ChannelsListView.IsVisible = false;
+
+                            if (IsPortrait)
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPlayingEPGDetailGridPosition);
+                                    //MainLayout.RaiseChild(EPGDetailGrid);
+
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitRecordingLabelPositionWhenEPGDetailVisible);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, PotraitRecordingLabelPosition);
+                                }
+                            }
+                            else
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePlayingEPGDetailGridPosition);
+                                    //MainLayout.RaiseChild(EPGDetailGrid);
+
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPositionWhenEPGDetailVisible);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPosition);
+                                }
+                            }
+
+                            //MainLayout.RaiseChild(VideoStackLayout);
+                            //CheckStreamCommand.Execute(null);
+
+                            break;
+                        case PlayingStateEnum.PlayingInPreview:
+
+                            if (!NavigationPage.GetHasNavigationBar(this))
+                            {
+                                NavigationPage.SetHasNavigationBar(this, true);
+                            }
+
+                            //ChannelsListView.IsVisible = true;
+
+                            //if (!_config.Fullscreen)
+                            //{
+                            //    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                            //}
+
+                            if (IsPortrait)
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPreviewEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0, 0, 1, 1));
+                                }
+
+                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitPreviewRecordingLabelPosition);
+                            }
+                            else
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePreviewEPGDetailGridPosition);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0, 0, 1, 1));
+                                }
+
+                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
+                            }
+
+                            //CheckStreamCommand.Execute(null);
+
+                            break;
+                        case PlayingStateEnum.Stopped:
+
+                            //if (!NavigationPage.GetHasNavigationBar(this))
+                            //{
+                            //    NavigationPage.SetHasNavigationBar(this, true);
+                            //}
+
+                            //ChannelsListView.IsVisible = true;
+
+                            //if (!_config.Fullscreen)
+                            //{
+                            //    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
+                            //}
+
+                            //VideoStackLayout.IsVisible = false;
+                            NoVideoStackLayout.IsVisible = false;
+
+                            if (IsPortrait)
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
+                                }
+                            }
+                            else // landscape
+                            {
+                                if (_viewModel.EPGDetailVisible)
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
+                                }
+                                else
+                                {
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
+                                }
+                            }
+
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+
+
+                            break;
+                    }
+
+                    //_loggingService.Info("RefreshGUI completed");
+
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+                finally
+                {
+                    _semaphoreSlimForRefreshGUI.Release();
+                }
+            });
+        }
+
         public PlayingStateEnum PlayingState
         {
             get
@@ -91,10 +339,10 @@ namespace DVBTTelevizor.MAUI
                 var oldValue = _viewModel.PlayingState;
                 _viewModel.PlayingState = value;
 
-                //if (oldValue != value)
-                //{
-                //    RefreshGUI();
-                //}
+                if (oldValue != value)
+                {
+                    RefreshGUI();
+                }
             }
         }
 

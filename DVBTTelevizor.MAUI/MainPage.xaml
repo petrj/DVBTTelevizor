@@ -168,8 +168,69 @@
             </StackLayout.GestureRecognizers>
         </StackLayout>
 
+        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" >
+            <Label Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
+            <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
+            <!--StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnVideoSingleTapped" NumberOfTapsRequired="1" />
+                <TapGestureRecognizer Tapped="OnVideoDoubleTapped" NumberOfTapsRequired="2" />
+                <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped"/>
+                <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Up"/>
+                <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
+            </StackLayout.GestureRecognizers-->
+        </StackLayout>
+
+        <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
+
         <!--Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.15,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/-->
         <Button x:Name="InstallDriverButton" Text="Install DVB-T Driver" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+
+        <Grid
+            AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
+            AbsoluteLayout.LayoutFlags="All"
+            x:Name="EPGDetailGrid"
+            BackgroundColor="#262626"
+            Margin="0,0,0,0"
+            Padding="0,0,0,0"
+            IsVisible="{Binding EPGDetailVisible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="60*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
+
+            <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
+            <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
+
+            <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" x:Name="ProgresssBarGrid" BackgroundColor="Aqua" VerticalOptions="CenterAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
+            </Grid>
+
+            <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Margin="5,5,5,5">
+                <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"/>
+            </ScrollView>
+
+            <!--Grid.GestureRecognizers >
+                <SwipeGestureRecognizer Direction="Right" Swiped="EPDDetail_SwipedRight"/>
+                <SwipeGestureRecognizer Direction="Down" Swiped="EPDDetail_SwipedDown"/>
+            </Grid.GestureRecognizers-->
+
+        </Grid>
 
         <ListView
           AbsoluteLayout.LayoutBounds="0,0.1,1,0.3"
