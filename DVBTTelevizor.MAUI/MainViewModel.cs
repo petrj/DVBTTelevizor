@@ -10,30 +10,14 @@ using System.Threading;
 
 namespace DVBTTelevizor.MAUI
 {
-    public class MainViewModel : BaseNotifableObject
+    public class MainViewModel : BaseViewModel
     {
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
-        private IDialogService _dialogService;
-
-        //public EITManager EIT { get; set; }
-        //public PIDManager PID { get; set; }
 
         //public event PropertyChangedEventHandler? PropertyChanged = null;
-        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>()/*
-        {
-           new Channel()
-           {
-                Number = "1",
-                Frequency = 514000000,
-                Name = "Channel",
-                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                ServiceType = DVBTDriverServiceType.TV,
-                ProgramMapPID = 2200,
-                DVBTType = 1
-           }
-        }*/;
+        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
@@ -41,9 +25,6 @@ namespace DVBTTelevizor.MAUI
 
         private bool _EPGDetailEnabled = true;
 
-        private ILoggingService _loggingService;
-        private IDriverConnector _driver;
-        private ITVCConfiguration _configuration;
         private bool _driverInstalled = false;
 
         private Channel _selectedChannel;
@@ -53,17 +34,9 @@ namespace DVBTTelevizor.MAUI
         public EITManager EIT { get; set; }
         public PIDManager PID { get; set; }
 
-        private string _publicDirectory { get; set; }
-
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+            :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            _loggingService = loggingService;
-            _driver = driver;
-            _dialogService = dialogService;
-            _configuration = tvConfiguration;
-
-            _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 

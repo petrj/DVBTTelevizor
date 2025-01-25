@@ -10,10 +10,13 @@ namespace DVBTTelevizor.MAUI
     public partial class MainPage : ContentPage, IOnKeyDown
     {
         private MainViewModel _viewModel;
+
         private ILoggingService _loggingService { get; set; }
         private IDriverConnector _driver { get; set; }
         private IDialogService _dialogService;
         private ITVCConfiguration _configuration;
+        public string PublicDirectory { get; set; }
+
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
         private Size _lastAllocatedSize = new Size(-1, -1);
@@ -29,8 +32,6 @@ namespace DVBTTelevizor.MAUI
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
         private Media _media;
-
-        public string PublicDirectory { get; set; }
 
         private NavigationPage _settingsPage = null;
 
@@ -88,7 +89,7 @@ namespace DVBTTelevizor.MAUI
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
-            _settingsPage = new NavigationPage(new SettingsPage());
+            _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
 
             NavigationPage.SetHasNavigationBar(this, false);
 
