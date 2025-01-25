@@ -36,6 +36,33 @@
                 "${workspaceFolder}/DVBTTelevizor.sln"
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
+        {
+            "label": "MAUI Android Linux build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+              "build",
+              "DVBTTelevizor.MAUI/DVBTTelevizor.MAUI.csproj",
+              "/p:AndroidSdkDirectory=/home/kirk/Android/Sdk/"
+            ],
+            "group": {
+              "kind": "build",
+              "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+          },
+          {
+            "label": "MAUI Android Liknux deploy APK to Emulator",
+            "dependsOn": "MAUI Android Linux build",
+            "type": "shell",
+            "command": "adb",
+            "args": [
+              "install",
+              "-r",
+              "${workspaceFolder}/DVBTTelevizor.MAUI/bin/Debug/net9.0-android35.0/net.petrjanousek.DVBTTelevizor.MAUI-x86-Signed.apk"
+            ],
+            "problemMatcher": []
+          }
     ]
 }

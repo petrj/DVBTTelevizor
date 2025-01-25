@@ -21,6 +21,21 @@
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
-        }
+        },
+        {
+            "name": "MAUI on Android Emulator",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "MAUI Android Liknux deploy APK to Emulator",
+            "program": "${workspaceFolder}/DVBTTelevizor.MAUI/bin/Debug/net8.0-android/com.example.myapp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "env": {
+              "DOTNET_WORKLOAD_MANIFEST_SKIP_UPDATE": "true"
+            }
+          }
     ]
 }
