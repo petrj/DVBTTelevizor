@@ -12,6 +12,23 @@ namespace DVBTTelevizor.MAUI
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+
         }
+
+        public int AppFontSizeIndex
+        {
+            get
+            {
+                return (int)_configuration.AppFontSize;
+            }
+            set
+            {
+                _configuration.AppFontSize = (AppFontSizeEnum)value;
+
+                OnPropertyChanged(nameof(AppFontSizeIndex));
+                NotifyFontSizeChange();
+            }
+        }
+
     }
 }

@@ -28,6 +28,19 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public AppFontSizeEnum AppFontSize
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("AppFontSize");
+                return (AppFontSizeEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("AppFontSize", (int)value);
+            }
+        }
+
         public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {
             if (loggingProvider != null)

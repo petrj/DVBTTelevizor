@@ -65,6 +65,7 @@ namespace DVBTTelevizor.MAUI
                 await _semaphoreSlim.WaitAsync();
 
                 _configuration.Load();
+                NotifyFontSizeChange();
 
                 Channels.Clear();
                 foreach (var channel in _configuration.Channels)

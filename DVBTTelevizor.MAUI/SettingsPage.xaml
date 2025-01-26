@@ -29,6 +29,7 @@
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="30,0,20,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
+
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="BorderWidth" Value="0"/>
                 <Setter Property="CornerRadius" Value="7"/>
@@ -93,7 +94,7 @@
             <BoxView x:Name="FontSizeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
             <Label Grid.Row="0" Grid.Column="0" Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <!--Picker
+            <Picker
               Grid.Row="0" Grid.Column="1"
               x:Name="FontSizePicker"
               FontSize="{Binding FontSizeForPicker}"
@@ -107,7 +108,7 @@
                     <x:String>Very big</x:String>
                     <x:String>Huge</x:String>
                 </Picker.Items>
-            </Picker-->
+            </Picker>
         </Grid>
 
     </VerticalStackLayout>

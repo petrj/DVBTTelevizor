@@ -14,6 +14,9 @@ namespace DVBTTelevizor
 
         public ObservableCollection<Channel> Channels { get; set; }
 
+        public AppFontSizeEnum AppFontSize { get; set; }
+        public bool Fullscreen { get; set; }
+
         void Load();
         void Save();
 

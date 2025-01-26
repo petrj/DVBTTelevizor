@@ -15,9 +15,36 @@ namespace DVBTTelevizor.MAUI
     {
         private ILoggingService _loggingService;
         private string _configDirectory = string.Empty;
+        private bool _fullscreen = true;
+        private AppFontSizeEnum _appFontSize = AppFontSizeEnum.Normal;
 
         [JsonProperty]
-        public bool Fullscreen { get; set; } = true;
+        public bool Fullscreen
+        {
+            get
+            {
+                return _fullscreen;
+            }
+            set
+            {
+                _fullscreen = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public AppFontSizeEnum AppFontSize
+        {
+            get
+            {
+                return _appFontSize;
+            }
+            set
+            {
+                _appFontSize = value;
+                Save();
+            }
+        }
 
         public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider)
         {
@@ -116,6 +143,7 @@ namespace DVBTTelevizor.MAUI
                     if (cfg != null)
                     {
                         Fullscreen = cfg.Fullscreen;
+                        AppFontSize = cfg.AppFontSize;
                     }
                 } else
                 {
