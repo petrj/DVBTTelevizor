@@ -28,6 +28,14 @@ namespace DVBTTelevizor.MAUI
             _dialogService = dialogService;
         }
 
+        public ITVCConfiguration Config
+        {
+            get
+            {
+                return _configuration;
+            }
+        }
+
         public void NotifyFontSizeChange()
         {
             MainThread.BeginInvokeOnMainThread(async () =>

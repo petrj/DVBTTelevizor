@@ -16,6 +16,7 @@ namespace DVBTTelevizor
 
         public AppFontSizeEnum AppFontSize { get; set; }
         public bool Fullscreen { get; set; }
+        public bool PlayOnBackground { get; set; }
 
         void Load();
         void Save();

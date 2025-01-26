@@ -41,6 +41,20 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+
+        public bool PlayOnBackground
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("PlayOnBackground");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("PlayOnBackground", value);
+            }
+        }
+
+
         public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {
             if (loggingProvider != null)

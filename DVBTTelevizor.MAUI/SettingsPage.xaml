@@ -82,6 +82,28 @@
 
     <VerticalStackLayout>
 
+        <Grid Margin="30,10,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70*" />
+                <ColumnDefinition Width="30*" />
+            </Grid.ColumnDefinitions>
+
+            <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="0" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+            <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="1" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+        </Grid>
+
         <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

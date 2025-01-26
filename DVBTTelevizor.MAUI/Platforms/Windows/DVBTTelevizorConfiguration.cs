@@ -16,6 +16,7 @@ namespace DVBTTelevizor.MAUI
         private ILoggingService _loggingService;
         private string _configDirectory = string.Empty;
         private bool _fullscreen = true;
+        private bool _playOnBackground = true;
         private AppFontSizeEnum _appFontSize = AppFontSizeEnum.Normal;
 
         [JsonProperty]
@@ -28,6 +29,20 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _fullscreen = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool PlayOnBackground
+        {
+            get
+            {
+                return _playOnBackground;
+            }
+            set
+            {
+                _playOnBackground = value;
                 Save();
             }
         }
