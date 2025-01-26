@@ -139,10 +139,15 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                return true;
+                // TODO: remove after debugged!
+
+                /*
                 return
                     EPGDetailEnabled &&
                     SelectedChannel != null &&
                     SelectedChannel.CurrentEventItem != null;
+                */
             }
         }
 
@@ -387,7 +392,7 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
-                    return String.Empty;
+                    return "- no channel -";
 
                 return SelectedChannel.CurrentEventItem.EventName;
             }

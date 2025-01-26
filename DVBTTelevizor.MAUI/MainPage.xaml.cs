@@ -39,12 +39,14 @@ namespace DVBTTelevizor.MAUI
 
 
         // EPGDetailGrid
-        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
+        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
         private Rect LandscapePreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.7);
         private Rect LandscapePlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
-        private Rect PortraitPlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
-        private Rect PortraitEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+
+        private Rect PortraitEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.22);
         private Rect PortraitPreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+        private Rect PortraitPlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+
 
         // VideoStackLayout
         private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.3, 0.3);
@@ -64,9 +66,9 @@ namespace DVBTTelevizor.MAUI
         private Rect PortraitPreviewRecordingLabelPosition { get; set; } = new Rect(1.0, 0.25, 0.1, 0.1);
 
         // ChannelsListView
-        private Rect LandscapeChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 1.0, 0.7, 1.0);
+        private Rect LandscapeChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.92, 0.7, 0.92);
         private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0, 0.92, 1, 0.92);
-        private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
+        private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.3, 1.0, 0.7);
 
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVCConfiguration tvConfiguration)
@@ -152,7 +154,7 @@ namespace DVBTTelevizor.MAUI
             if (!_refreshGUIEnabled)
                 return;
 
-            //_loggingService.Info("RefreshGUI");
+            _loggingService.Debug("RefreshGUI");
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
@@ -628,12 +630,12 @@ namespace DVBTTelevizor.MAUI
                                 _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
                                 break;
                         }
-                    }
 
-                    CallWithTimeout(delegate
-                    {
-                        videoView.MediaPlayer.Play(_media);
-                    });
+                        CallWithTimeout(delegate
+                        {
+                            videoView.MediaPlayer.Play(_media);
+                        });
+                    }
 
                     //SetSubtitles(-1);
                     //SetAudioTrack(-100);
