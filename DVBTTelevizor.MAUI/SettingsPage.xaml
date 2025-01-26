@@ -26,6 +26,11 @@
                 <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
 
+            <Style x:Key="SwitchStyle" TargetType="Switch">
+                <Setter Property="HorizontalOptions" Value="EndAndExpand"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="30,0,20,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
@@ -80,58 +85,285 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <VerticalStackLayout>
+    <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-        <Grid Margin="30,10,10,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70*" />
-                <ColumnDefinition Width="30*" />
-            </Grid.ColumnDefinitions>
+        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-            <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <StackLayout Margin="0,0,0,10">
 
-            <Label  Grid.Row="0" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                <Label Text="Channels list" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-            <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                <Grid Margin="30,10,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
 
-            <Label  Grid.Row="1" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                    <BoxView x:Name="ShowTVChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-        </Grid>
+                    <Label  Grid.Row="0" Grid.Column="0" Text="Show TV channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
-        <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70*" />
-                <ColumnDefinition Width="30*" />
-            </Grid.ColumnDefinitions>
+                    <BoxView x:Name="ShowRadioChannelsBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-            <BoxView x:Name="FontSizeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                    <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch"  IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
-            <Label Grid.Row="0" Grid.Column="0" Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <Picker
-              Grid.Row="0" Grid.Column="1"
-              x:Name="FontSizePicker"
-              FontSize="{Binding FontSizeForPicker}"
-              Style="{StaticResource CommonPickerTextStyle}"
-              SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}">
-                <Picker.Items>
-                    <x:String>Normal</x:String>
-                    <x:String>Above normal</x:String>
-                    <x:String>Big</x:String>
-                    <x:String>Bigger</x:String>
-                    <x:String>Very big</x:String>
-                    <x:String>Huge</x:String>
-                </Picker.Items>
-            </Picker>
-        </Grid>
+                    <BoxView x:Name="ShowNonFreeChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-    </VerticalStackLayout>
+                    <Label  Grid.Row="2" Grid.Column="0" Text="Show non free channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowNonFreeSwitch"  IsToggled="{Binding Config.ShowNonFreeChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+
+                    <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label  Grid.Row="3" Grid.Column="0" Text="Show other channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+                </Grid>
+
+                <Button x:Name="ClearChannelsButton" Text="DELETE"  Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                <Button x:Name="ExportToFileButton" Text="Export to file"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Margin="30,30,20,0"/>
+                <Button x:Name="ImportChannelsButton" Text="Import from file"  Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+
+            </StackLayout>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <StackLayout Margin="0,10,0,0">
+
+                <Label Text="System settings" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                <Grid Margin="30,10,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label  Grid.Row="0" Grid.Column="0" Text="Full screen" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding IsFullScreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+                    <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label  Grid.Row="1" Grid.Column="0" Text="Play on background" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+
+                </Grid>
+
+                <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="FontSizeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="0" Grid.Column="0" Text="Font size" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Picker
+                            Grid.Row="0" Grid.Column="1"
+                            x:Name="FontSizePicker"
+                            FontSize="{Binding FontSizeForPicker}"
+                            Style="{StaticResource CommonPickerTextStyle}"
+                            SelectedIndex="{Binding AppFontSizeIndex, Mode=TwoWay}">
+                        <Picker.Items>
+                            <x:String>Normal</x:String>
+                            <x:String>Above normal</x:String>
+                            <x:String>Big</x:String>
+                            <x:String>Bigger</x:String>
+                            <x:String>Very big</x:String>
+                            <x:String>Huge</x:String>
+                        </Picker.Items>
+                    </Picker>
+                </Grid>
+
+                <Grid Margin="30,0,10,0" RowSpacing="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="AutoStartBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="0" Grid.Column="0" Text="Startup auto play" x:Name="AutoStartLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Picker
+                            Grid.Row="1" Grid.Column="0"
+                            x:Name="ChannelAutoPlayedAfterStartPicker"
+                            FontSize="{Binding FontSizeForPicker}"
+                            Style="{StaticResource CommonPickerTextStyle}"
+                            SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
+                            ItemsSource="{Binding AutoPlayChannels}"
+                            ItemDisplayBinding="{Binding Name}"
+                            Title="Startup auto play"/>
+                </Grid>
+
+            </StackLayout>
+
+            <StackLayout Margin="0,0,0,10">
+
+                <Button x:Name="ClearEPGButton" Text="CLEAR CACHE"  Command="{Binding ClearEPGCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+            </StackLayout>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <StackLayout Margin="0,10,0,10">
+
+                <Label Text="Remote accesss" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                <Grid Margin="30,10,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80*" />
+                        <ColumnDefinition Width="20*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="RemoteAccessEnabledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Enabled" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="RemoteAccessSwitch" IsToggled="{Binding AllowRemoteAccessService, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                </Grid>
+
+                <StackLayout IsVisible="{Binding Config.AllowRemoteAccessService}">
+
+                    <Grid Margin="30,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="RemoteAccessIPBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="IP" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Entry  Grid.Row="1" Grid.Column="0" x:Name="IPEntry" Text="{Binding Config.RemoteAccessServiceIP, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
+
+                        <BoxView x:Name="RemoteAccessPortBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                        <Label  Grid.Row="2" Grid.Column="0" Text="Port" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Entry  Grid.Row="3" Grid.Column="0" x:Name="PortEntry" Text="{Binding Config.RemoteAccessServicePort, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
+
+                        <BoxView x:Name="RemoteAccessSecurityKeyBoxView" Grid.Row="4" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                        <Label  Grid.Row="4" Grid.Column="0" Text="Security key" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="5" Grid.Column="0"  x:Name="SecurityKeyEntry" Text="{Binding Config.RemoteAccessServiceSecurityKey, Mode=TwoWay}" Style="{StaticResource EntryStyle}" />
+
+                        <Grid Grid.Row="6" Grid.Column="0" HorizontalOptions="End">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="100" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Source="RemoteTelevizor" Aspect="AspectFit" VerticalOptions="Start" HorizontalOptions="Center">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />
+                                </Image.GestureRecognizers>
+                            </Image>
+                            <Label Grid.Row="0" Grid.Column="0" Text="Use app" Style="{StaticResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="Remote Televizor" Style="{StaticResource LinkStyle}" FontSize="{Binding FontSizeForDetailNote}" >
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />
+                                </Label.GestureRecognizers>
+                            </Label>
+
+                        </Grid>
+                    </Grid>
+
+                </StackLayout>
+
+            </StackLayout>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <StackLayout Margin="0,10,0,10" x:Name="StackLayoutLogging">
+
+                <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                <Grid Margin="30,10,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
+
+                </Grid>
+
+                <Grid Margin="30,10,0,0" IsVisible="{Binding EnableLogging}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label  Grid.Row="0" Grid.Column="0" Text="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/DVBTTelevizor.log" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+                </Grid>
+
+
+            </StackLayout>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <StackLayout Margin="0,10,0,30" x:Name="StackLayoutDonate">
+
+                <Label Text="Donate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+
+                <Grid Margin="30,10,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="25*" />
+                        <ColumnDefinition Width="25*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="1$"  Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate1Visible}"/>
+                    <Button x:Name="Donate2Button" Grid.Row="0" Grid.Column="1" Text="2$"  Command="{Binding Donate2Command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate2Visible}"/>
+                    <Button x:Name="Donate3Button" Grid.Row="0" Grid.Column="2" Text="3$"  Command="{Binding Donate3command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate3Visible}"/>
+                    <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="3" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate5Visible}"/>
+                </Grid>
+
+            </StackLayout>
+
+        </StackLayout>
+
+    </ScrollView>
+
+
 </ContentPage>

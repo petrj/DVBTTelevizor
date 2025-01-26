@@ -33,4 +33,9 @@ public partial class SettingsPage : ContentPage
             navigationPage.BarTextColor = Colors.White;
         }
     }
+
+    private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
+    {
+
+    }
 }
