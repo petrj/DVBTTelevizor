@@ -36,6 +36,16 @@ public partial class SettingsPage : ContentPage
         if (_settingsPageViewModel != null)
         {
             _settingsPageViewModel.FillAutoPlayChannels();
+
+            if (_settingsPageViewModel.FontSizes.Count == 0)
+            {
+                _settingsPageViewModel.FillFontSizes();
+            }
+
+            if (_settingsPageViewModel.DVBTDrivers.Count == 0)
+            {
+                _settingsPageViewModel.FillDVBTDrivers();
+            }
         }
     }
 

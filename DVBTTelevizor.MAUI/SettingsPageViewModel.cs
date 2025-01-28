@@ -11,6 +11,9 @@ namespace DVBTTelevizor.MAUI
     public class SettingsPageViewModel : BaseViewModel
     {
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
+        public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<string> FontSizes { get; set; } = new ObservableCollection<string>();
+
         public Channel _selectedChannel = null;
 
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
@@ -33,6 +36,39 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(SelectedChannel));
             }
+        }
+
+        public async void FillDVBTDrivers()
+        {
+            DVBTDrivers.Clear();
+
+            DVBTDrivers.Add("Android DVBT driver".Translated());
+            DVBTDrivers.Add("Android testing DVBT Driver".Translated());
+            DVBTDrivers.Add("Test tune driver".Translated());
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(DVBTDrivers));
+                OnPropertyChanged(nameof(DVBTDriverTypeIndex));
+            });
+        }
+
+        public async void FillFontSizes()
+        {
+            FontSizes.Clear();
+
+            FontSizes.Add("Normal".Translated());
+            FontSizes.Add("Above normal".Translated());
+            FontSizes.Add("Big".Translated());
+            FontSizes.Add("Bigger".Translated());
+            FontSizes.Add("Very big".Translated());
+            FontSizes.Add("Huge".Translated());
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(FontSizes));
+                OnPropertyChanged(nameof(AppFontSizeIndex));
+            });
         }
 
         public async void FillAutoPlayChannels()
@@ -65,7 +101,7 @@ namespace DVBTTelevizor.MAUI
 
             foreach (var ch in _configuration.Channels)
             {
-                AutoPlayChannels.Add(ch);
+                AutoPlayChannels.Add(ch.Clone());
 
                 if (ch.FrequencyAndMapPID == Config.AutoPlayedChannelFrequencyAndMapPID)
                 {
@@ -90,8 +126,11 @@ namespace DVBTTelevizor.MAUI
                 SelectedChannel = noChannel;
             }
 
-            OnPropertyChanged(nameof(AutoPlayChannels));
-            OnPropertyChanged(nameof(SelectedChannel));
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(AutoPlayChannels));
+                OnPropertyChanged(nameof(SelectedChannel));
+            });
         }
 
         public int AppFontSizeIndex
