@@ -400,6 +400,7 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
 
                     _testDVBTDriver = new TestDVBTDriver(_loggingService);
+                    _testDVBTDriver.PublicDirectory = PublicDirectory;
                     _testDVBTDriver.Connect();
 
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
