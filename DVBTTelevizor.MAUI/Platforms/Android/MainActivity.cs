@@ -24,7 +24,7 @@ namespace DVBTTelevizor.MAUI
         private bool _waitingForInit = false;
         private static Android.Widget.Toast _instance;
         private ILoggingService _loggingService = null;
-        private TestDVBTDriver _testDVBTDriver = null;
+
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
         private NotificationHelper _notificationHelper;
@@ -124,12 +124,6 @@ namespace DVBTTelevizor.MAUI
             {
                 InitDriver();
             });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
-            {
-                ConnectTestDriver();
-            });
-
 
             WeakReferenceMessenger.Default.Register<DispatchKeyEventEnabledMessage>(this, (r, m) =>
             {
@@ -254,23 +248,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, $"DispatchKeyEvent error:");
                 return true;
             }
-        }
-
-        private void ConnectTestDriver()
-        {
-            _testDVBTDriver = new TestDVBTDriver(_loggingService);
-            _testDVBTDriver.PublicDirectory = GetAndroidDirectory(null);
-            _testDVBTDriver.Connect();
-
-            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
-                new DVBTDriverConfiguration()
-                {
-                    DeviceName = "Testing device",
-                    ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
-                    TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
-                }));
-
-            return;
         }
 
         private void ShowToastMessage(string message, int AppFontSize = 0)

@@ -180,7 +180,13 @@ namespace DVBTTelevizor
 
         public void Connect()
         {
-            _log.Debug($"Starting");
+            _log.Debug($"Connecting");
+
+            if (State == DVBTDriverStateEnum.Connected)
+            {
+                _log.Debug($"Already connected");
+                //return;
+            }
 
             try
             {

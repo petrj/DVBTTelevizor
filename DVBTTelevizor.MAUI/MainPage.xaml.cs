@@ -17,6 +17,8 @@ namespace DVBTTelevizor.MAUI
         private ITVCConfiguration _configuration;
         public string PublicDirectory { get; set; }
 
+        private TestDVBTDriver _testDVBTDriver = null;
+
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
         private Size _lastAllocatedSize = new Size(-1, -1);
@@ -36,7 +38,6 @@ namespace DVBTTelevizor.MAUI
         private NavigationPage _settingsPage = null;
 
         private bool IsPortrait { get; set; } = false;
-
 
         // EPGDetailGrid
         private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
@@ -391,20 +392,31 @@ namespace DVBTTelevizor.MAUI
             switch (_configuration.DVBTDriverType)
             {
                 case DVBTDriverTypeEnum.AndroidDVBTDriver:
-                    _driver = new DVBTDriverConnector(_loggingService);
+
                     _loggingService.Info("Sending connect message");
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
                     break;
+
                 case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
-                    _loggingService.Info("Sending connect message");
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+
+                    _testDVBTDriver = new TestDVBTDriver(_loggingService);
+                    _testDVBTDriver.Connect();
+
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                        new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "Testing DVBT driver",
+                            ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
+                            TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
+                        }));
                     break;
+
                 case DVBTDriverTypeEnum.TestTuneDriver:
 
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
                         new DVBTDriverConfiguration()
                         {
-                            DeviceName = "Test tune device"
+                            DeviceName = "Test tune driver"
                         }));
 
                     break;
