@@ -1,5 +1,4 @@
 ﻿using DVBTTelevizor.MAUI;
-using DVBTTelevizor.Models;
 using LoggerService;
 using MPEGTS;
 using System;

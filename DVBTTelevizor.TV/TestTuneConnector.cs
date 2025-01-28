@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor
 {
-    public class DVBTDriverTestConnector : IDriverConnector
+    public class TestTuneConnector : IDriverConnector
     {
         public DVBTDriverStateEnum State { get; private set; }
 
@@ -18,7 +18,7 @@ namespace DVBTTelevizor
         public event EventHandler? StatusChanged = null;
         ILoggingService _log;
 
-        public DVBTDriverTestConnector(ILoggingService loggingService)
+        public TestTuneConnector(ILoggingService loggingService)
         {
             _log = loggingService;
         }
@@ -382,7 +382,7 @@ namespace DVBTTelevizor
         public async Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
             var searchRes = await SearchProgramPIDs(new List<long> { mapPID });
-            if (!searchRes.PIDs.ContainsKey(mapPID))
+            if (searchRes.PIDs == null || !searchRes.PIDs.ContainsKey(mapPID))
                     return new DVBTDriverSearchPIDsResult();
 
             return new DVBTDriverSearchPIDsResult()

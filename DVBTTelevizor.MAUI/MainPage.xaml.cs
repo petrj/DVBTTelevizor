@@ -87,7 +87,18 @@ namespace DVBTTelevizor.MAUI
 
             _dialogService = new DialogService(this);
 
-            _driver = new DVBTDriverConnector(_loggingService);
+            switch (_configuration.DVBTDriverType)
+            {
+                case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                    _driver = new DVBTDriverConnector(_loggingService);
+                    break;
+                case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
+                    _driver = new DVBTDriverConnector(_loggingService);
+                    break;
+                case DVBTDriverTypeEnum.TestTuneDriver:
+                    _driver = new TestTuneConnector(_loggingService);
+                    break;
+            }
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
@@ -363,9 +374,7 @@ namespace DVBTTelevizor.MAUI
 
                 InitializeVLC();
 
-                _loggingService.Info("First appearing - sending Connect message");
-
-                WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+                ConnectDriver();
 
                 Task.Run(async () =>
                 {
@@ -374,6 +383,31 @@ namespace DVBTTelevizor.MAUI
 
                 //    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
                 _viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+            }
+        }
+
+        private void ConnectDriver()
+        {
+            switch (_configuration.DVBTDriverType)
+            {
+                case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                    _driver = new DVBTDriverConnector(_loggingService);
+                    _loggingService.Info("Sending connect message");
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                    break;
+                case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
+                    _loggingService.Info("Sending connect message");
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
+                    break;
+                case DVBTDriverTypeEnum.TestTuneDriver:
+
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                        new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "Test tune device"
+                        }));
+
+                    break;
             }
         }
 

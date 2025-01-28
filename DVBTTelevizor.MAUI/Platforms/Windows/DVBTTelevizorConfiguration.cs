@@ -18,6 +18,7 @@ namespace DVBTTelevizor.MAUI
         private bool _fullscreen = true;
         private bool _playOnBackground = true;
         private AppFontSizeEnum _appFontSize = AppFontSizeEnum.Normal;
+        private DVBTDriverTypeEnum _DVBTDriverType = DVBTDriverTypeEnum.AndroidDVBTDriver;
 
         [JsonProperty]
         public bool Fullscreen
@@ -57,6 +58,20 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _appFontSize = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public DVBTDriverTypeEnum DVBTDriverType
+        {
+            get
+            {
+                return _DVBTDriverType;
+            }
+            set
+            {
+                _DVBTDriverType = value;
                 Save();
             }
         }
@@ -159,6 +174,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         Fullscreen = cfg.Fullscreen;
                         AppFontSize = cfg.AppFontSize;
+                        DVBTDriverType = cfg.DVBTDriverType;
                     }
                 } else
                 {

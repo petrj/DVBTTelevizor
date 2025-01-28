@@ -41,6 +41,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public DVBTDriverTypeEnum DVBTDriverType
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("DVBTDriverType");
+                return (DVBTDriverTypeEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("DVBTDriverType", (int)value);
+            }
+        }
 
         public bool PlayOnBackground
         {

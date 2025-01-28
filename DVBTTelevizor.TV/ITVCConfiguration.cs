@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DVBTTelevizor.MAUI;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +14,8 @@ namespace DVBTTelevizor
         public string ConfigDirectory { get; set; }
 
         public ObservableCollection<Channel> Channels { get; set; }
+
+        public DVBTDriverTypeEnum DVBTDriverType { get; set; }
 
         public AppFontSizeEnum AppFontSize { get; set; }
         public bool Fullscreen { get; set; }

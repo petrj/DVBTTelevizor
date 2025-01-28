@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DVBTTelevizor.Models
+namespace DVBTTelevizor.MAUI
 {
     public class ChannelPID
     {

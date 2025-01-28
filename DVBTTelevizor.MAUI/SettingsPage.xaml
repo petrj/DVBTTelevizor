@@ -301,6 +301,38 @@
 
             <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
+            <StackLayout Margin="0,10,0,10" x:Name="StackLayoutDriver">
+
+                <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="DriverBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding DriverLabelText}" x:Name="DriverLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Picker
+                            Grid.Row="0" Grid.Column="1"
+                            x:Name="DriverPicker"
+                            FontSize="{Binding FontSizeForPicker}"
+                            Style="{StaticResource CommonPickerTextStyle}"
+                            SelectedIndex="{Binding DVBTDriverTypeIndex, Mode=TwoWay}">
+                        <Picker.Items>
+                            <x:String>Android DVBT driver</x:String>
+                            <x:String>Android testing DVBT Driver</x:String>
+                            <x:String>Test tune driver</x:String>
+                        </Picker.Items>
+                    </Picker>
+                </Grid>
+
+            </StackLayout>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
             <StackLayout Margin="0,10,0,10" x:Name="StackLayoutLogging">
 
                 <Label Text="Logging" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>

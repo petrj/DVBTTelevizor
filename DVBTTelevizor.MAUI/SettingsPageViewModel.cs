@@ -30,5 +30,22 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public int DVBTDriverTypeIndex
+        {
+            get
+            {
+                return (int)_configuration.DVBTDriverType;
+            }
+            set
+            {
+                _configuration.DVBTDriverType = (DVBTDriverTypeEnum)value;
+
+                OnPropertyChanged(nameof(DVBTDriverTypeIndex));
+            }
+        }
+        public string DriverLabelText
+        {
+            get { return "Driver".Translated(); }
+        }
     }
 }
