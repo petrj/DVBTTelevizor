@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              x:Class="DVBTTelevizor.MAUI.SettingsPage"
              BackgroundColor="Black"
-             Title="Settings">
+             Title="{local:LngXamlExt Input='Settings'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -57,6 +58,7 @@
 
             <Style x:Key="CommonSwitchTextStyle" TargetType="Switch">
                 <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
             <Style x:Key="EntryStyle" TargetType="Entry">
@@ -91,7 +93,7 @@
 
             <StackLayout Margin="0,0,0,10">
 
-                <Label Text="Channels list" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                <Label Text="{local:LngXamlExt Input='Channels list'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
                 <Grid Margin="30,10,10,0">
                     <Grid.RowDefinitions>
@@ -107,29 +109,29 @@
 
                     <BoxView x:Name="ShowTVChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                    <Label  Grid.Row="0" Grid.Column="0" Text="Show TV channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show TV Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                     <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
                     <BoxView x:Name="ShowRadioChannelsBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                    <Label  Grid.Row="1" Grid.Column="0" Text="Show radio channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Show Radio Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch"  IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
                     <BoxView x:Name="ShowNonFreeChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                    <Label  Grid.Row="2" Grid.Column="0" Text="Show non free channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Show Non Free Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowNonFreeSwitch"  IsToggled="{Binding Config.ShowNonFreeChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
                     <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                    <Label  Grid.Row="3" Grid.Column="0" Text="Show other channels" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Show Other Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                     <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
                 </Grid>
 
-                <Button x:Name="ClearChannelsButton" Text="DELETE"  Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                <Button x:Name="ClearChannelsButton" Text="{local:LngXamlExt Input='Delete all channels'}"  Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                <Button x:Name="ExportToFileButton" Text="Export to file"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Margin="30,30,20,0"/>
-                <Button x:Name="ImportChannelsButton" Text="Import from file"  Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                <Button x:Name="ExportToFileButton" Text="{local:LngXamlExt Input='Export To File'}"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Margin="30,30,20,0"/>
+                <Button x:Name="ImportChannelsButton" Text="{local:LngXamlExt Input='Import from file'}"  Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
                 <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
             </StackLayout>
@@ -314,7 +316,7 @@
 
                     <BoxView x:Name="DriverBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding DriverLabelText}" x:Name="DriverLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver'}" x:Name="DriverLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                     <Picker
                             Grid.Row="0" Grid.Column="1"
                             x:Name="DriverPicker"
@@ -349,7 +351,7 @@
                     <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                     <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding EnableLogging, Mode=TwoWay}" />
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding EnableLogging, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
 
                 </Grid>
 

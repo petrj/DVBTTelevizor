@@ -32,6 +32,11 @@ public partial class SettingsPage : ContentPage
             navigationPage.BarBackgroundColor = Color.FromArgb("#29242a");
             navigationPage.BarTextColor = Colors.White;
         }
+
+        if (_settingsPageViewModel != null)
+        {
+            _settingsPageViewModel.FillAutoPlayChannels();
+        }
     }
 
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)

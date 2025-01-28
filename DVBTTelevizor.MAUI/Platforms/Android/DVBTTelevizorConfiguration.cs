@@ -66,6 +66,89 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool ShowTVChannels
+        {
+            get
+            {
+                return !HideTVChannels;
+            }
+            set
+            {
+                HideTVChannels = !value;
+            }
+        }
+
+        public bool HideTVChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("HideTVChannels", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("HideTVChannels", value);
+            }
+        }
+
+        public bool ShowNonFreeChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowNonFreeChannels", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowNonFreeChannels", value);
+            }
+        }
+
+        public bool ShowRadioChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowRadioChannels");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowRadioChannels", value);
+            }
+        }
+
+        public bool ShowOtherChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("ShowOtherChannels");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("ShowOtherChannels", value);
+            }
+        }
+
+        public bool EnableLogging
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("EnableLogging");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("EnableLogging", value);
+            }
+        }
+
+        public string AutoPlayedChannelFrequencyAndMapPID
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("ChannelAutoPlayedAfterStart");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("ChannelAutoPlayedAfterStart", value);
+            }
+        }
 
         public DVBTTelevizorConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {

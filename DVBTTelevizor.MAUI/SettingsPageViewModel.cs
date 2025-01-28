@@ -1,6 +1,7 @@
 ﻿using LoggerService;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,10 +10,88 @@ namespace DVBTTelevizor.MAUI
 {
     public class SettingsPageViewModel : BaseViewModel
     {
+        public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
+        public Channel _selectedChannel = null;
+
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+        }
 
+        public Channel SelectedChannel
+        {
+            get
+            {
+                return _selectedChannel;
+            }
+            set
+            {
+                _selectedChannel = value;
+
+                if (value != null)
+                    Config.AutoPlayedChannelFrequencyAndMapPID = value.FrequencyAndMapPID;
+
+                OnPropertyChanged(nameof(SelectedChannel));
+            }
+        }
+
+        public async void FillAutoPlayChannels()
+        {
+            AutoPlayChannels.Clear();
+
+            var noChannel = new Channel()
+            {
+                Name = "<no channel>".Translated(),
+                Frequency = -1,
+                ProgramMapPID = -1
+            };
+            var lastChannel = new Channel()
+            {
+                Name = "<last channel>".Translated(),
+                Frequency = 0,
+                ProgramMapPID = 0
+            };
+
+            if (_configuration.Channels.Count == 0)
+            {
+                SelectedChannel = noChannel;
+                return;
+            }
+
+            AutoPlayChannels.Add(noChannel);
+            AutoPlayChannels.Add(lastChannel);
+
+            var anythingSelected = false;
+
+            foreach (var ch in _configuration.Channels)
+            {
+                AutoPlayChannels.Add(ch);
+
+                if (ch.FrequencyAndMapPID == Config.AutoPlayedChannelFrequencyAndMapPID)
+                {
+                    anythingSelected = true;
+                    SelectedChannel = ch;
+                }
+            }
+
+            if (!anythingSelected && (!string.IsNullOrEmpty(Config.AutoPlayedChannelFrequencyAndMapPID)))
+            {
+                if (Config.AutoPlayedChannelFrequencyAndMapPID == noChannel.FrequencyAndMapPID)
+                {
+                    SelectedChannel = noChannel;
+                }
+                else
+                {
+                    SelectedChannel = lastChannel;
+                }
+            }
+            else
+            {
+                SelectedChannel = noChannel;
+            }
+
+            OnPropertyChanged(nameof(AutoPlayChannels));
+            OnPropertyChanged(nameof(SelectedChannel));
         }
 
         public int AppFontSizeIndex
@@ -43,9 +122,6 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(DVBTDriverTypeIndex));
             }
         }
-        public string DriverLabelText
-        {
-            get { return "Driver".Translated(); }
-        }
     }
 }
+

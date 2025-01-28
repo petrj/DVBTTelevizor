@@ -20,6 +20,15 @@ namespace DVBTTelevizor.MAUI
         private AppFontSizeEnum _appFontSize = AppFontSizeEnum.Normal;
         private DVBTDriverTypeEnum _DVBTDriverType = DVBTDriverTypeEnum.AndroidDVBTDriver;
 
+        private bool _showTVChannels = true;
+        private bool _showNonFreeChannels = false;
+        private bool _showRadioChannels = false;
+        private bool _showOtherChannels = false;
+
+        private bool _enableLogging = false;
+
+        private string _autoPlayedChannelFrequencyAndMapPID = string.Empty;
+
         [JsonProperty]
         public bool Fullscreen
         {
@@ -72,6 +81,89 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _DVBTDriverType = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool ShowTVChannels
+        {
+            get
+            {
+                return _showTVChannels;
+            }
+            set
+            {
+                _showTVChannels = !value;
+            }
+        }
+
+        [JsonProperty]
+        public bool ShowNonFreeChannels
+        {
+            get
+            {
+                return _showNonFreeChannels;
+            }
+            set
+            {
+                _showNonFreeChannels = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool ShowRadioChannels
+        {
+            get
+            {
+                return _showRadioChannels;
+            }
+            set
+            {
+                _showRadioChannels = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool ShowOtherChannels
+        {
+            get
+            {
+                return _showOtherChannels;
+            }
+            set
+            {
+                _showOtherChannels = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool EnableLogging
+        {
+            get
+            {
+                return _enableLogging;
+            }
+            set
+            {
+                _enableLogging = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public string AutoPlayedChannelFrequencyAndMapPID
+        {
+            get
+            {
+                return _autoPlayedChannelFrequencyAndMapPID;
+            }
+            set
+            {
+                _autoPlayedChannelFrequencyAndMapPID = value;
                 Save();
             }
         }
@@ -175,6 +267,12 @@ namespace DVBTTelevizor.MAUI
                         Fullscreen = cfg.Fullscreen;
                         AppFontSize = cfg.AppFontSize;
                         DVBTDriverType = cfg.DVBTDriverType;
+                        ShowNonFreeChannels = cfg.ShowNonFreeChannels;
+                        ShowTVChannels = cfg.ShowTVChannels;
+                        ShowOtherChannels = cfg.ShowOtherChannels;
+                        ShowRadioChannels = cfg.ShowRadioChannels;
+                        EnableLogging = cfg.EnableLogging;
+                        AutoPlayedChannelFrequencyAndMapPID = cfg.AutoPlayedChannelFrequencyAndMapPID;
                     }
                 } else
                 {

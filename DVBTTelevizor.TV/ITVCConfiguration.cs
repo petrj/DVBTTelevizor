@@ -15,11 +15,20 @@ namespace DVBTTelevizor
 
         public ObservableCollection<Channel> Channels { get; set; }
 
-        public DVBTDriverTypeEnum DVBTDriverType { get; set; }
+        public string AutoPlayedChannelFrequencyAndMapPID { get; set; }
 
+        public DVBTDriverTypeEnum DVBTDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }
+
         public bool Fullscreen { get; set; }
         public bool PlayOnBackground { get; set; }
+
+        public bool ShowTVChannels { get; set; }
+        public bool ShowNonFreeChannels { get; set; }
+        public bool ShowRadioChannels { get; set; }
+        public bool ShowOtherChannels { get; set; }
+
+        public bool EnableLogging { get; set; }
 
         void Load();
         void Save();
