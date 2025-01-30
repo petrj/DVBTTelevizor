@@ -80,6 +80,15 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Info("MainPage starting");
 
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                _loggingService.Error(e.ExceptionObject as Exception);
+            };
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                _loggingService.Error(e.Exception);
+            };
+
             PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
             _configuration = tvConfiguration;
@@ -807,7 +816,10 @@ namespace DVBTTelevizor.MAUI
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(_settingsPage);
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Navigation.PushAsync(_settingsPage);
+            });
         }
 
         private void TuneButton_Clicked_1(object sender, EventArgs e)

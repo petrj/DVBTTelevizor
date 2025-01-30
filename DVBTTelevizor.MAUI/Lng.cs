@@ -14,9 +14,12 @@ namespace DVBTTelevizor.MAUI
 
         public static string Translate(string value, params string[] arguments)
         {
-            _dict.Add(value,string.Empty);
+            if (_dict.ContainsKey(value))
+            {
+                _dict.Add(value, string.Empty);
+            }
 
-            Debug.WriteLine(value);
+            //Debug.WriteLine(value);
 
             return String.Format(value, arguments);
         }
@@ -25,5 +28,6 @@ namespace DVBTTelevizor.MAUI
         {
             return Translate(value, arguments);
         }
+
     }
 }
