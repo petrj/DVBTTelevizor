@@ -28,6 +28,14 @@ namespace DVBTTelevizor.MAUI
             _dialogService = dialogService;
         }
 
+        public static string DeviceFriendlyName
+        {
+            get
+            {
+                return $"{DeviceInfo.Manufacturer} {DeviceInfo.Model}";
+            }
+        }
+
         public ITVCConfiguration Config
         {
             get

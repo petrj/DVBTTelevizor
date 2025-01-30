@@ -161,6 +161,20 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(DVBTDriverTypeIndex));
             }
         }
+
+        public bool AllowRemoteAccessService
+        {
+            get
+            {
+                return Config.AllowRemoteAccessService;
+            }
+            set
+            {
+                Config.AllowRemoteAccessService = value;
+
+                OnPropertyChanged(nameof(Config));
+            }
+        }
     }
 }
 

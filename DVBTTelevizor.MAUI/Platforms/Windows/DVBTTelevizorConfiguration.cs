@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +26,12 @@ namespace DVBTTelevizor.MAUI
         private bool _showNonFreeChannels = false;
         private bool _showRadioChannels = false;
         private bool _showOtherChannels = false;
+
+        private string? _remoteAccessServiceIP = null;
+        private int _remoteAccessServicePort = 0;
+        public string? _remoteAccessServiceSecurityKey = null;
+
+        public bool _allowRemoteAccessService { get; set; }
 
         private bool _enableLogging = false;
 
@@ -94,7 +102,8 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                _showTVChannels = !value;
+                _showTVChannels = value;
+                Save();
             }
         }
 
@@ -209,6 +218,92 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        [JsonProperty]
+        public int RemoteAccessServicePort
+        {
+            get
+            {
+                if (_remoteAccessServicePort == default(int))
+                {
+                    _remoteAccessServicePort = 49152;
+                }
+
+                return _remoteAccessServicePort;
+            }
+            set
+            {
+                _remoteAccessServicePort = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public string RemoteAccessServiceSecurityKey
+        {
+            get
+            {
+                if (_remoteAccessServiceSecurityKey == default(string))
+                {
+                    _remoteAccessServiceSecurityKey = "DVBTTelevizor";
+                }
+
+                return _remoteAccessServiceSecurityKey;
+            }
+            set
+            {
+                _remoteAccessServiceSecurityKey = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public string RemoteAccessServiceIP
+        {
+            get
+            {
+                if (_remoteAccessServiceIP == default(string))
+                {
+                    try
+                    {
+                        var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                        foreach (IPAddress ip in ipHostInfo.AddressList)
+                        {
+                            if (ip.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                _remoteAccessServiceIP = ip.ToString();
+                                return _remoteAccessServiceIP;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        _remoteAccessServiceIP = "192.168.1.10";
+                    }
+                }
+
+                return _remoteAccessServiceIP;
+            }
+            set
+            {
+                _remoteAccessServiceIP = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool AllowRemoteAccessService
+        {
+            get
+            {
+                return _allowRemoteAccessService;
+            }
+            set
+            {
+                _allowRemoteAccessService = value;
+                Save();
+            }
+        }
+
         public int ImportChannelsFromJSON(string json)
         {
             try
@@ -273,6 +368,11 @@ namespace DVBTTelevizor.MAUI
                         ShowRadioChannels = cfg.ShowRadioChannels;
                         EnableLogging = cfg.EnableLogging;
                         AutoPlayedChannelFrequencyAndMapPID = cfg.AutoPlayedChannelFrequencyAndMapPID;
+
+                        AllowRemoteAccessService = cfg.AllowRemoteAccessService;
+                        RemoteAccessServiceIP = cfg.RemoteAccessServiceIP;
+                        RemoteAccessServicePort = cfg.RemoteAccessServicePort;
+                        RemoteAccessServiceSecurityKey = cfg.RemoteAccessServiceSecurityKey;
                     }
                 } else
                 {

@@ -28,6 +28,11 @@ namespace DVBTTelevizor
         public bool ShowRadioChannels { get; set; }
         public bool ShowOtherChannels { get; set; }
 
+        public bool AllowRemoteAccessService { get; set; }
+        public string RemoteAccessServiceIP { get; set; }
+        public int RemoteAccessServicePort { get; set; }
+        public string RemoteAccessServiceSecurityKey { get; set; }
+
         public bool EnableLogging { get; set; }
 
         void Load();

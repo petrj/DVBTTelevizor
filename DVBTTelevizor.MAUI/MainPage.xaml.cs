@@ -18,6 +18,8 @@ namespace DVBTTelevizor.MAUI
         public string PublicDirectory { get; set; }
 
         private TestDVBTDriver _testDVBTDriver = null;
+        private RemoteAccessService.RemoteAccessService _remoteAccessService;
+        private List<string> _remoteDevicesConnected = new List<string>();
 
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
@@ -130,6 +132,65 @@ namespace DVBTTelevizor.MAUI
             });
 
             BuildFocusableItems();
+
+            _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
+            RestartRemoteAccessService();
+        }
+
+        private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)
+        {
+            if (message == null)
+                return;
+
+            var senderFriendlyName = message.GetSenderFriendlyName();
+            if (!_remoteDevicesConnected.Contains(senderFriendlyName))
+            {
+                _remoteDevicesConnected.Add(senderFriendlyName);
+                var msg = "Remote device connected".Translated();
+                if (!string.IsNullOrEmpty(senderFriendlyName))
+                {
+                    msg += $" ({senderFriendlyName})";
+                }
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
+            }
+
+            if (message.command == "keyDown")
+            {
+                // TODO: use Instrumentation().SendKeyDownUpSync(keyCode);
+                OnKeyDown(message.commandArg1, false);
+            }
+            if (message.command == "sendText")
+            {
+                OnTextSent(message.commandArg1);
+            }
+        }
+
+        private void RestartRemoteAccessService()
+        {
+            _loggingService.Info("RestartRemoteAccessService");
+
+            if (_configuration.AllowRemoteAccessService)
+            {
+                if (_remoteAccessService.IsBusy)
+                {
+                    if (_remoteAccessService.ParamsChanged(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey))
+                    {
+                        _remoteAccessService.StopListening();
+                        _remoteAccessService.SetConnection(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey);
+                        _remoteAccessService.StartListening(OnRemoteMessageReceived, BaseViewModel.DeviceFriendlyName);
+                    }
+                }
+                else
+                {
+                    _remoteAccessService.SetConnection(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey);
+                    _remoteAccessService.StartListening(OnRemoteMessageReceived, BaseViewModel.DeviceFriendlyName);
+                }
+            }
+            else
+            {
+                _remoteAccessService.StopListening();
+            }
         }
 
         private void BuildFocusableItems()
