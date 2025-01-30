@@ -208,7 +208,102 @@ $msg = @"
 "@
 
 
+Add-Type -AssemblyName System.Windows.Forms
 
-$encryptedMessage = $msg | Encrypt-Message  -Key "DVBTTelevizor"
 
-$encryptedMessage | Send-TCPMessage -Port 49152 -IP 10.0.0.2 | Decrypt-Message -Key "DVBTTelevizor"
+function Get-KeyDownMessage 
+{
+    [CmdletBinding()]
+    param(
+            [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
+            [ValidateNotNullOrEmpty()]
+            [string]$keyCode
+        )
+    
+    Process {
+
+$msgTemplate = @"
+{
+ "sender":"Powershell ISE",
+ "securityKey":"DVBTTelevizor",
+ "command":"keyDown",
+ "commandArg1":"{keyCode}"
+}
+"@
+        return $msgTemplate.Replace("{keyCode}",$keyCode)
+        
+    }
+}
+
+function Show-GUI {
+    [CmdletBinding()]
+    param(
+            [Parameter(Mandatory=$true, ValueFromPipeline = $false)]
+            [ValidateNotNullOrEmpty()]
+            [string]$SecurityKey,
+
+            [Parameter(Mandatory=$true, ValueFromPipeline = $false)]
+            [ValidateNotNullOrEmpty()]
+            [string]$IP,
+
+            [Parameter(Mandatory=$true, ValueFromPipeline = $false)]
+            [ValidateNotNullOrEmpty()]
+            [string]$Port
+    )
+    
+    Process {
+        # Create the Form
+        $form = New-Object System.Windows.Forms.Form
+        $form.Text = "Simple Navigation"
+        $form.Size = New-Object System.Drawing.Size(250, 200)
+        $form.StartPosition = "CenterScreen"
+
+        # Create Buttons
+        $btnLeft = New-Object System.Windows.Forms.Button
+        $btnLeft.Text = "Left"
+        $btnLeft.Location = New-Object System.Drawing.Point(20, 70)
+        $btnLeft.Add_Click(
+        { 
+            Get-KeyDownMessage -keyCode "left" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+        })
+
+        $btnRight = New-Object System.Windows.Forms.Button
+        $btnRight.Text = "Right"
+        $btnRight.Location = New-Object System.Drawing.Point(120, 70)
+        $btnRight.Add_Click(
+        { 
+         
+            Get-KeyDownMessage -keyCode "right" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP        
+        })
+
+        $btnUp = New-Object System.Windows.Forms.Button
+        $btnUp.Text = "Up"
+        $btnUp.Location = New-Object System.Drawing.Point(70, 40)
+        $btnUp.Add_Click(
+        { 
+            Get-KeyDownMessage -keyCode "up" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+        })
+
+        $btnDown = New-Object System.Windows.Forms.Button
+        $btnDown.Text = "Down"
+        $btnDown.Location = New-Object System.Drawing.Point(70, 100)
+        $btnDown.Add_Click(
+        { 
+            Get-KeyDownMessage -keyCode "down" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+        })
+
+        # Add buttons to the form
+        $form.Controls.Add($btnLeft)
+        $form.Controls.Add($btnRight)
+        $form.Controls.Add($btnUp)
+        $form.Controls.Add($btnDown)
+
+        # Show the Form
+        $form.ShowDialog()
+    }
+}
+
+Show-GUI -SecurityKey "DVBTTelevizor" -IP 10.0.0.2 -Port 49152
+
+#$encryptedMessage = $msg | Encrypt-Message  -Key "DVBTTelevizor"
+#$encryptedMessage | Send-TCPMessage -Port 49152 -IP 10.0.0.2 | Decrypt-Message -Key "DVBTTelevizor"
