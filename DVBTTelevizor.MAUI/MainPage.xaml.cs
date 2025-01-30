@@ -95,6 +95,14 @@ namespace DVBTTelevizor.MAUI
             _configuration.ConfigDirectory = PublicDirectory;
             _configuration.Load();
 
+            var language = "cz";
+            var languageFileName = Path.Join(PublicDirectory, "lng", $"{language}.lng");
+
+            if (File.Exists(languageFileName))
+            {
+                Lng.LoadLanguage(languageFileName);
+            }
+
             _dialogService = new DialogService(this);
 
             switch (_configuration.DVBTDriverType)
@@ -391,8 +399,7 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
 
-                //    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
-                _viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
             }
         }
 
@@ -816,10 +823,12 @@ namespace DVBTTelevizor.MAUI
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            if (_settingsPage.IsLoaded)
             {
-                await Navigation.PushAsync(_settingsPage);
-            });
+                // preventing click when the settings page is just (or yet) loaded
+                return;
+            }
+            await Navigation.PushAsync(_settingsPage);
         }
 
         private void TuneButton_Clicked_1(object sender, EventArgs e)

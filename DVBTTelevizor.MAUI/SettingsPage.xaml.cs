@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 
 namespace DVBTTelevizor.MAUI;
@@ -11,6 +13,8 @@ public partial class SettingsPage : ContentPage
     private IDialogService _dialogService;
     private ITVCConfiguration _configuration;
 
+    private string _publicDirectory = "";
+
     public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
 	{
         InitializeComponent();
@@ -19,8 +23,16 @@ public partial class SettingsPage : ContentPage
         _driver = driver;
         _configuration = tvConfiguration;
         _dialogService = dialogService;
+        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+
+        this.Unloaded += SettingsPage_Unloaded;
+    }
+
+    private void SettingsPage_Unloaded(object? sender, EventArgs e)
+    {
+
     }
 
     protected override void OnAppearing()
@@ -49,8 +61,21 @@ public partial class SettingsPage : ContentPage
         }
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+    }
+
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
     {
 
+    }
+
+    private void ExportLanguageButton_Clicked(object sender, EventArgs e)
+    {
+        var fileName = Path.Join(_publicDirectory, "en.lng");
+        Lng.SaveToFile(fileName);
+
+        WeakReferenceMessenger.Default.Send(new ToastMessage($"Language exported to {fileName}"));
     }
 }
