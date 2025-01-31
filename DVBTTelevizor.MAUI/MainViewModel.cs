@@ -27,7 +27,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _driverInstalled = false;
 
-        private Channel _selectedChannel;
+        private Channel? _selectedChannel;
         private Channel _playingChannel;
         private Channel _recordingChannel;
 
@@ -60,9 +60,17 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"Refreshing EPG");
 
+            string? selectedChanneFrequencyAndMapPID = null;
+
             try
             {
                 await _semaphoreSlim.WaitAsync();
+
+                if (SelectedChannel != null)
+                {
+                    selectedChanneFrequencyAndMapPID = SelectedChannel.FrequencyAndMapPID;
+                    SelectedChannel = null;
+                }
 
                 _configuration.Load();
                 NotifyFontSizeChange();
@@ -83,6 +91,17 @@ namespace DVBTTelevizor.MAUI
             {
                 _semaphoreSlim.Release();
 
+                //NotifyEPGDetailVisibilityChange();
+
+                if (selectedChanneFrequencyAndMapPID != null)
+                {
+                    var selectedChannel = await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
+                    if (selectedChannel == null)
+                    {
+                        await SelectFirstChannel();
+                    }
+                }
+
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(SelectedChannel));
                 OnPropertyChanged(nameof(SelectedChannelEPGTitle));
@@ -91,8 +110,55 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-                //NotifyEPGDetailVisibilityChange();
             }
+        }
+
+        public async Task SelectFirstChannel()
+        {
+            _loggingService.Info($"Selecting first channel");
+
+            await Task.Run(
+                () =>
+                {
+                    if (Channels.Count == 0)
+                    {
+                        SelectedChannel = null;
+                        return;
+                    }
+
+                    foreach (var ch in Channels)
+                    {
+                        SelectedChannel = ch;
+                        return;
+                    }
+                });
+        }
+
+        public async Task<Channel> SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
+        {
+            _loggingService.Info($"Selecting channel by frequency and mapPID {frequencyAndMapPID}");
+
+            return await Task.Run<Channel>(
+                () =>
+                {
+                    if (Channels.Count == 0)
+                    {
+                        SelectedChannel = null;
+                        return null;
+                    }
+
+                    foreach (var ch in Channels)
+                    {
+
+                        if (ch.FrequencyAndMapPID == frequencyAndMapPID)
+                        {
+                            SelectedChannel = ch;
+                            return ch;
+                        }
+                    }
+
+                    return null;
+                });
         }
 
         public async Task Import(string filename)
@@ -317,7 +383,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public Channel SelectedChannel
+        public Channel? SelectedChannel
         {
             get
             {

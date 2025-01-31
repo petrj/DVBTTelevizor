@@ -215,23 +215,30 @@ function Get-KeyDownMessage
 {
     [CmdletBinding()]
     param(
+            [Parameter(Mandatory=$true, ValueFromPipeline = $false)]
+            [ValidateNotNullOrEmpty()]
+            [string]$SecurityKey,
+
             [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
             [ValidateNotNullOrEmpty()]
-            [string]$keyCode
+            [string]$keyCode,
+
+            [Parameter(Mandatory=$false, ValueFromPipeline = $false)]
+            [ValidateNotNullOrEmpty()]
+            [string]$Sender= "Powershell ISE"
         )
     
     Process {
 
 $msgTemplate = @"
 {
- "sender":"Powershell ISE",
- "securityKey":"DVBTTelevizor",
+ "sender":"{Sender}",
+ "securityKey":"{SecurityKey}",
  "command":"keyDown",
  "commandArg1":"{keyCode}"
 }
 "@
-        return $msgTemplate.Replace("{keyCode}",$keyCode)
-        
+        return $msgTemplate.Replace("{keyCode}",$keyCode).Replace("{SecurityKey}",$SecurityKey).Replace("{Sender}",$Sender)
     }
 }
 
@@ -264,7 +271,7 @@ function Show-GUI {
         $btnLeft.Location = New-Object System.Drawing.Point(20, 70)
         $btnLeft.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "left" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "left" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $btnRight = New-Object System.Windows.Forms.Button
@@ -273,7 +280,7 @@ function Show-GUI {
         $btnRight.Add_Click(
         { 
          
-            Get-KeyDownMessage -keyCode "right" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP        
+            Get-KeyDownMessage -keyCode "right" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP        
         })
 
         $btnUp = New-Object System.Windows.Forms.Button
@@ -281,7 +288,7 @@ function Show-GUI {
         $btnUp.Location = New-Object System.Drawing.Point(70, 40)
         $btnUp.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "up" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "up" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $btnDown = New-Object System.Windows.Forms.Button
@@ -289,7 +296,7 @@ function Show-GUI {
         $btnDown.Location = New-Object System.Drawing.Point(70, 100)
         $btnDown.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "down" | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "down" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         # Add buttons to the form

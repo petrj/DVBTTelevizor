@@ -118,6 +118,9 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
+                default:
+                    _driver = new TestTuneConnector(_loggingService);
+                    break;
             }
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
@@ -458,6 +461,7 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
+                    await _viewModel.SelectFirstChannel();
                 });
 
                 //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));

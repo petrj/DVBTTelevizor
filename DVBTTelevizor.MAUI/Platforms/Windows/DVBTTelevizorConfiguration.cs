@@ -84,6 +84,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (((int)_DVBTDriverType < 0)
+                    ||
+                    ((int)_DVBTDriverType > 2))
+
+                {
+                    _DVBTDriverType = DVBTDriverTypeEnum.AndroidDVBTDriver;
+                }
                 return _DVBTDriverType;
             }
             set
