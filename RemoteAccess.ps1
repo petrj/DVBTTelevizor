@@ -262,13 +262,13 @@ function Show-GUI {
         # Create the Form
         $form = New-Object System.Windows.Forms.Form
         $form.Text = "Simple Navigation"
-        $form.Size = New-Object System.Drawing.Size(250, 200)
+        $form.Size = New-Object System.Drawing.Size(350, 250)
         $form.StartPosition = "CenterScreen"
 
         # Create Buttons
         $btnLeft = New-Object System.Windows.Forms.Button
         $btnLeft.Text = "Left"
-        $btnLeft.Location = New-Object System.Drawing.Point(20, 70)
+        $btnLeft.Location = New-Object System.Drawing.Point(20, 100)
         $btnLeft.Add_Click(
         { 
             Get-KeyDownMessage -keyCode "left" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
@@ -276,7 +276,7 @@ function Show-GUI {
 
         $btnRight = New-Object System.Windows.Forms.Button
         $btnRight.Text = "Right"
-        $btnRight.Location = New-Object System.Drawing.Point(120, 70)
+        $btnRight.Location = New-Object System.Drawing.Point(220, 100)
         $btnRight.Add_Click(
         { 
          
@@ -285,7 +285,7 @@ function Show-GUI {
 
         $btnUp = New-Object System.Windows.Forms.Button
         $btnUp.Text = "Up"
-        $btnUp.Location = New-Object System.Drawing.Point(70, 40)
+        $btnUp.Location = New-Object System.Drawing.Point(120, 50)
         $btnUp.Add_Click(
         { 
             Get-KeyDownMessage -keyCode "up" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
@@ -293,10 +293,26 @@ function Show-GUI {
 
         $btnDown = New-Object System.Windows.Forms.Button
         $btnDown.Text = "Down"
-        $btnDown.Location = New-Object System.Drawing.Point(70, 100)
+        $btnDown.Location = New-Object System.Drawing.Point(120, 150)
         $btnDown.Add_Click(
         { 
             Get-KeyDownMessage -keyCode "down" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+        })
+
+        $okDown = New-Object System.Windows.Forms.Button
+        $okDown.Text = "OK"
+        $okDown.Location = New-Object System.Drawing.Point(120, 100)
+        $okDown.Add_Click(
+        { 
+            Get-KeyDownMessage -keyCode "enter" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+        })
+
+        $backDown = New-Object System.Windows.Forms.Button
+        $backDown.Text = "Back"
+        $backDown.Location = New-Object System.Drawing.Point(20, 20)
+        $backDown.Add_Click(
+        { 
+            Get-KeyDownMessage -keyCode "back" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         # Add buttons to the form
@@ -304,6 +320,8 @@ function Show-GUI {
         $form.Controls.Add($btnRight)
         $form.Controls.Add($btnUp)
         $form.Controls.Add($btnDown)
+        $form.Controls.Add($okDown)
+        $form.Controls.Add($backDown)
 
         # Show the Form
         $form.ShowDialog()

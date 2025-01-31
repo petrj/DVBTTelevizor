@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Graphics.Canvas.Printing;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.UI.Xaml;
 using SharpHook;
 using System.Threading;
@@ -52,6 +54,12 @@ namespace DVBTTelevizor.MAUI.WinUI
                         TransferPort = testDVBTDriver.TransferIPEndPoint.Port
                     }));
             });
+
+            WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new KeyDownMessage(m.Value));
+            });
+
         }
 
         private void Hook_KeyPressed(object? sender, KeyboardHookEventArgs e)

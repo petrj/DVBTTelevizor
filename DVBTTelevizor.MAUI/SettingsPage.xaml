@@ -326,7 +326,11 @@
 
             <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-            <Button x:Name="ExportLanguageButton" Text="{local:LngXamlExt Input='Export language'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="ExportLanguageButton_Clicked" />
+            <StackLayout Margin="0,10,0,10">
+
+                <Button x:Name="ExportLanguageButton" Text="{local:LngXamlExt Input='Export language'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="ExportLanguageButton_Clicked" />
+
+            </StackLayout>
 
             <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 

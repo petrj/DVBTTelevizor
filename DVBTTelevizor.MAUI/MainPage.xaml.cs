@@ -160,8 +160,7 @@ namespace DVBTTelevizor.MAUI
 
             if (message.command == "keyDown")
             {
-                // TODO: use Instrumentation().SendKeyDownUpSync(keyCode);
-                OnKeyDown(message.commandArg1, false);
+                WeakReferenceMessenger.Default.Send(new RemoteKeyPlatformActionMessage(message.commandArg1));
             }
             if (message.command == "sendText")
             {
@@ -461,7 +460,11 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
-                    await _viewModel.SelectFirstChannel();
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await _viewModel.SelectFirstChannel();
+                    });
                 });
 
                 //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
@@ -910,6 +913,25 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"Main Page OnKeyDown {key}");
 
+            var stack = Navigation.NavigationStack;
+            if (stack[stack.Count - 1].GetType() != typeof(MainPage))
+            {
+                // different page on navigation top
+
+                var pageOnTop = stack[stack.Count - 1];
+                if (pageOnTop is NavigationPage np)
+                {
+                    pageOnTop = np.CurrentPage;
+                }
+
+                if (pageOnTop is IOnKeyDown)
+                {
+                    (pageOnTop as IOnKeyDown).OnKeyDown(key, longPress);
+                }
+
+                return;
+            }
+
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
             switch (keyAction)
@@ -939,6 +961,12 @@ namespace DVBTTelevizor.MAUI
                     switch (_focusItems.FocusedItemName)
                     {
                         case "ChannelsListView":
+                            break;
+                        case "SettingsButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                SettingsButton_Clicked(this, new EventArgs());
+                            });
                             break;
                     }
 

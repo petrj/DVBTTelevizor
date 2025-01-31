@@ -183,6 +183,26 @@ namespace DVBTTelevizor.MAUI
                     Android.OS.Process.KillProcess(Android.OS.Process.MyPid());
                 });
             });
+
+            WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
+            {
+                SendRemoteKey(m.Value);
+            });
+        }
+
+        private void SendRemoteKey(string code)
+        {
+            _loggingService.Debug($"SendRemoteKey: {code}");
+
+            Android.Views.Keycode keyCode;
+            if (Enum.TryParse<Android.Views.Keycode>(code, out keyCode))
+            {
+                new Instrumentation().SendKeyDownUpSync(keyCode);
+            }
+            else
+            {
+                _loggingService.Info("SendRemoteKey: invalid key code");
+            }
         }
 
         public override bool DispatchKeyEvent(KeyEvent e)
