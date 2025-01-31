@@ -1,6 +1,4 @@
-﻿using Android.Content;
-using Android.Preferences;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

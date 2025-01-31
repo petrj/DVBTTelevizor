@@ -10,6 +10,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
 
+
             <Style x:Key="LabelStyle" TargetType="Label">
                 <!--Setter Property="TextColor" Value="#41b3ff"/-->
                 <Setter Property="TextColor" Value="White"/>

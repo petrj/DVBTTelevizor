@@ -14,12 +14,9 @@ using LoggerService;
 using System.Runtime.InteropServices;
 using MPEGTS;
 using DVBTTelevizor.Models;
-using Android.Net.Sip;
 using SQLite;
 using DVBTTelevizor.Services;
-using Java.IO;
 using System.Threading;
-using static Java.Util.Jar.Pack200;
 
 namespace DVBTTelevizor
 {

@@ -1,7 +1,4 @@
-﻿using Android.Hardware.Camera2;
-using Android.Media;
-using Java.Net;
-using LibVLCSharp.Shared;
+﻿using LibVLCSharp.Shared;
 using LoggerService;
 using System;
 using System.Collections.Generic;
@@ -12,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-using static Android.Resource;
 using static DVBTTelevizor.MainPageViewModel;
 
 
