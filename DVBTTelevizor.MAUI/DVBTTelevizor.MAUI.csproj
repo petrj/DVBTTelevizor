@@ -142,10 +142,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Pages\TuningWelcomePage.xaml.cs">
+	    <DependentUpon>TuningWelcomePage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Platforms\Android\DVBTTelevizorConfiguration.cs">
 	    <ExcludeFromCurrentConfiguration>true</ExcludeFromCurrentConfiguration>
 	  </Compile>
-	  <Compile Update="SettingsPage.xaml.cs">
+	  <Compile Update="Pages\SettingsPage.xaml.cs">
 	    <DependentUpon>SettingsPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Platforms\Android\LoggingProvider.cs">
@@ -157,7 +160,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="SettingsPage.xaml">
+	  <MauiXaml Update="Pages\TuningWelcomePage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\SettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

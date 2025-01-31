@@ -8,14 +8,13 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 {
     private SettingsPageViewModel _settingsPageViewModel;
 
-    private ILoggingService _loggingService { get; set; }
-    private IDriverConnector _driver { get; set; }
+    private ILoggingService _loggingService;
+    private IDriverConnector _driver;
     private IDialogService _dialogService;
     private ITVCConfiguration _configuration;
+    private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
-
-    private string _publicDirectory = "";
 
     public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
 	{
@@ -81,12 +80,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         base.OnAppearing();
 
         _focusItems.DeFocusAll();
-
-        if (Parent is NavigationPage navigationPage)
-        {
-            navigationPage.BarBackgroundColor = Color.FromArgb("#29242a");
-            navigationPage.BarTextColor = Colors.White;
-        }
+        MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
         if (_settingsPageViewModel != null)
         {

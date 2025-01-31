@@ -38,6 +38,7 @@ namespace DVBTTelevizor.MAUI
         private Media _media;
 
         private NavigationPage _settingsPage = null;
+        private NavigationPage _tuneWelcomePage = null;
 
         private bool IsPortrait { get; set; } = false;
 
@@ -126,6 +127,7 @@ namespace DVBTTelevizor.MAUI
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
             _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -528,9 +530,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void TuneButton_Clicked(object sender, EventArgs e)
+        private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-
+            if (_tuneWelcomePage.IsLoaded)
+            {
+                // preventing click when the settings page is just (or yet) loaded
+                return;
+            }
+            await Navigation.PushAsync(_tuneWelcomePage);
         }
 
         private void DriverButton_Clicked(object sender, EventArgs e)
@@ -827,7 +834,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-
         private async void DriverStateButton_Clicked(object sender, EventArgs e)
         {
             if (_viewModel.DriverInstalled)
@@ -968,6 +974,12 @@ namespace DVBTTelevizor.MAUI
                                 SettingsButton_Clicked(this, new EventArgs());
                             });
                             break;
+                        case "TuneButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                TuneButton_Clicked(this, new EventArgs());
+                            });
+                            break;
                     }
 
                     break;
@@ -977,6 +989,15 @@ namespace DVBTTelevizor.MAUI
         public void OnTextSent(string text)
         {
 
+        }
+
+        public static void SetToolBarColors(NavigationPage navigationPage, Color textColor, Color background)
+        {
+            if (navigationPage != null)
+            {
+                navigationPage.BarBackgroundColor = background;
+                navigationPage.BarTextColor = textColor;
+            }
         }
     }
 
