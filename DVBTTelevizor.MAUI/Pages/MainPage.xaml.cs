@@ -39,6 +39,7 @@ namespace DVBTTelevizor.MAUI
 
         private NavigationPage _settingsPage = null;
         private NavigationPage _tuneWelcomePage = null;
+        private NavigationPage _aboutPage = null;
 
         private bool IsPortrait { get; set; } = false;
 
@@ -128,6 +129,7 @@ namespace DVBTTelevizor.MAUI
 
             _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -206,7 +208,6 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBTTelevizorButton", new List<View>() { DVBTTelevizorButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
-
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }));
 
@@ -910,9 +911,14 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
+        private async void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
         {
-
+            if (_aboutPage.IsLoaded)
+            {
+                // preventing click when the settings page is just (or yet) loaded
+                return;
+            }
+            await Navigation.PushAsync(_aboutPage);
         }
 
         public void OnKeyDown(string key, bool longPress)
@@ -978,6 +984,12 @@ namespace DVBTTelevizor.MAUI
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
                                 TuneButton_Clicked(this, new EventArgs());
+                            });
+                            break;
+                        case "DVBTTelevizorButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                DVBTTelevizorButton_Clicked(this, new EventArgs());
                             });
                             break;
                     }

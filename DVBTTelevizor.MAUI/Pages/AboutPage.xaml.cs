@@ -3,9 +3,9 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningWelcomePage : ContentPage, IOnKeyDown
+public partial class AboutPage : ContentPage, IOnKeyDown
 {
-    private TuningWelcomePageViewModel _tuningWelcomePageViewModel;
+    private AboutPageViewModel _aboutPageViewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -15,7 +15,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
-    public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public AboutPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
@@ -25,7 +25,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _tuningWelcomePageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _aboutPageViewModel = new AboutPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -35,9 +35,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Donate3", new List<View>() { Donate3Button }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -52,7 +53,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     public void OnKeyDown(string key, bool longPress)
     {
-        _loggingService.Debug($"TuningWelcomePage Page OnKeyDown {key}");
+        _loggingService.Debug($"AboutPage Page OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
@@ -90,14 +91,17 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "Auto":
-                            _loggingService.Debug($"TuningWelcomePage: Auto");
+                        case "Donate1":
+                            _loggingService.Debug($"AboutPage: Donate1");
                             break;
-                        case "Manual":
-                            _loggingService.Debug($"TuningWelcomePage: Manual");
+                        case "Donate2":
+                            _loggingService.Debug($"AboutPage: Donate2");
                             break;
-                        case "Tune":
-                            _loggingService.Debug($"TuningWelcomePage: Tune");
+                        case "Donate3":
+                            _loggingService.Debug($"AboutPage: Donate3");
+                            break;
+                        case "Donate4":
+                            _loggingService.Debug($"AboutPage: Donate4");
                             break;
                     }
                 });
@@ -107,6 +111,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"TuningWelcomePage Page OnTextSent {text}");
+        _loggingService.Debug($"AboutPage Page OnTextSent {text}");
     }
 }
