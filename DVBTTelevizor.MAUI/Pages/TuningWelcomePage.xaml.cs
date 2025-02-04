@@ -5,7 +5,7 @@ namespace DVBTTelevizor.MAUI;
 
 public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 {
-    private TuningWelcomePageViewModel _tuningWelcomePageViewModel;
+    private TuningWelcomePageViewModel _driverPageViewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -25,7 +25,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _tuningWelcomePageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }

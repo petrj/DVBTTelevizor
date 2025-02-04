@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.DriverPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='Device status'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="30,20,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+            <Label Text="{local:LngXamlExt Input='Connected device'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" HorizontalOptions="StartAndExpand" VerticalOptions="Start"/>
+            <Label Text="{local:LngXamlExt Input='Test device'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="EndAndExpand" VerticalOptions="Start"/>
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -145,6 +145,9 @@
 	  <Compile Update="Pages\AboutPage.xaml.cs">
 	    <DependentUpon>AboutPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\DriverPage.xaml.cs">
+	    <DependentUpon>DriverPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\TuningWelcomePage.xaml.cs">
 	    <DependentUpon>TuningWelcomePage.xaml</DependentUpon>
 	  </Compile>
@@ -164,6 +167,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Pages\AboutPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\DriverPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\TuningWelcomePage.xaml">

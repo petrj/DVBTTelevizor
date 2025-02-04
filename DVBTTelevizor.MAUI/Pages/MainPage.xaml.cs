@@ -40,6 +40,7 @@ namespace DVBTTelevizor.MAUI
         private NavigationPage _settingsPage = null;
         private NavigationPage _tuneWelcomePage = null;
         private NavigationPage _aboutPage = null;
+        private NavigationPage _driverPage = null;
 
         private bool IsPortrait { get; set; } = false;
 
@@ -130,6 +131,7 @@ namespace DVBTTelevizor.MAUI
             _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -891,9 +893,14 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void MenuButton_Clicked(object sender, EventArgs e)
+        private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-
+            if (_driverPage.IsLoaded)
+            {
+                // preventing click when the settings page is just (or yet) loaded
+                return;
+            }
+            await Navigation.PushAsync(_driverPage);
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
