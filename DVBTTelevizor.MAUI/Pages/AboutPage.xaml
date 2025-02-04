@@ -4,7 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.AboutPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="DVBT Televizor">
+             Title="{local:LngXamlExt Input='About'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -36,6 +36,8 @@
     </ContentPage.Resources>
 
     <AbsoluteLayout BackgroundColor="Black">
+
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLargeCaption}"/>
 
         <Image AbsoluteLayout.LayoutBounds="0.5,0.4,0.8,0.5" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
 

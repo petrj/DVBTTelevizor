@@ -59,27 +59,33 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
-        public void FocusNextItem()
+        public void FocusNextItem(bool onlyVisible=false)
         {
             if (Items.Count == 0)
                 return;
 
-            if (_focusedItem == null)
-            {
-                FocusItem(Items[0].Name, KeyboardFocusDirection.Next);
-                return;
-            }
-
             var selectNext = false;
 
-            KeyboardFocusableItem itemToSelect = null;
-            KeyboardFocusableItem firstItem = null;
+            KeyboardFocusableItem? itemToSelect = null;
+            KeyboardFocusableItem? firstItem = null;
 
             foreach (var item in Items)
             {
                 if (firstItem == null)
                 {
                     firstItem = item;
+                }
+
+                // select first available
+                if (
+                    (_focusedItem == null) &&
+                    (
+                        (onlyVisible == false) || (onlyVisible && item.IsVisible)
+                    )
+                   )
+                {
+                    itemToSelect = item;
+                    break;
                 }
 
                 if (selectNext)
@@ -99,10 +105,13 @@ namespace DVBTTelevizor.MAUI
                 itemToSelect = firstItem;
             }
 
-            FocusItem(itemToSelect.Name, KeyboardFocusDirection.Next);
+            if (itemToSelect != null)
+            {
+                FocusItem(itemToSelect.Name, KeyboardFocusDirection.Next);
+            }
         }
 
-        public void FocusPreviousItem()
+        public void FocusPreviousItem(bool onlyVisible = false)
         {
             if (Items.Count == 0)
                 return;
@@ -113,35 +122,44 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            KeyboardFocusableItem itemToSelect = null;
-            KeyboardFocusableItem prevItem = null;
+            KeyboardFocusableItem? itemToSelect = null;
+            KeyboardFocusableItem? prevItem = null;
 
             foreach (var item in Items)
             {
+                // select last available
+                if (
+                        (_focusedItem == null) &&
+                        (
+                            (onlyVisible == false) || (onlyVisible && item.IsVisible)
+                        )
+                   )
+                {
+                    itemToSelect = item;
+                }
+                else
                 if (prevItem == null)
                 {
                     prevItem = item;
                 }
                 else
                 {
+                    if ((onlyVisible == false) || (onlyVisible && item.IsVisible))
+                    {
+                        itemToSelect = item;
+                    }
+
                     if (item == _focusedItem)
                     {
-                        itemToSelect = prevItem;
                         break;
-                    }
-                    else
-                    {
-                        prevItem = item;
                     }
                 }
             }
 
-            if (itemToSelect == null)
+            if (itemToSelect != null)
             {
-                itemToSelect = prevItem; // the last one item in collection
+                FocusItem(itemToSelect.Name, KeyboardFocusDirection.Previous);
             }
-
-            FocusItem(itemToSelect.Name, KeyboardFocusDirection.Previous);
         }
 
         public void FocusItem(string name, KeyboardFocusDirection focusDirection = KeyboardFocusDirection.UnKnown)

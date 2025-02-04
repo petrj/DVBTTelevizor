@@ -18,6 +18,19 @@ namespace DVBTTelevizor.MAUI
             Parts = new List<View>();
         }
 
+        public bool IsVisible
+        {
+            get
+            {
+                if (Parts == null || Parts.Count == 0)
+                {
+                    return false;
+                }
+
+                return Parts[0].IsVisible;
+            }
+        }
+
         public static KeyboardFocusableItem CreateFrom(string name, IList<View> parts)
         {
             var keyboardFocusableItem = new KeyboardFocusableItem();
