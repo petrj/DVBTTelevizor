@@ -4,13 +4,15 @@
              x:Class="DVBTTelevizor.MAUI.DriverPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Device status'}">
+             Title="{local:LngXamlExt Input='Driver status'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
 
             <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="Start" />
             </Style>
 
 
@@ -19,8 +21,15 @@
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
             </Style>
 
+            <Style x:Key="CommonSwitchStyle" TargetType="Switch">
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="30,20,20,0"/>
@@ -40,8 +49,40 @@
 
         <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-            <Label Text="{local:LngXamlExt Input='Connected device'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" HorizontalOptions="StartAndExpand" VerticalOptions="Start"/>
-            <Label Text="{local:LngXamlExt Input='Test device'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="EndAndExpand" VerticalOptions="Start"/>
+            <!--Label Text="{local:LngXamlExt Input='Connected device'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" HorizontalOptions="StartAndExpand" VerticalOptions="Start"/>
+            <Label Text="{Binding ConnectedDevice}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="EndAndExpand" VerticalOptions="Start"/-->
+
+            <Grid Margin="30,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40*" />
+                    <ColumnDefinition Width="60*" />
+                </Grid.ColumnDefinitions>
+
+                <BoxView x:Name="InstalledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver installed'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+                <Switch Grid.Row="0" Grid.Column="1" x:Name="InstalledSwitch"  IsToggled="{Binding DriverInstalle}" Style="{DynamicResource CommonSwitchStyle}" IsEnabled="False" />
+
+                <BoxView x:Name="ConnectedDeviceBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Connected device'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+                <Label  Grid.Row="1" Grid.Column="1" Text="{Binding ConnectedDevice}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+                <BoxView x:Name="BitrateBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Bitrate'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+                <Label  Grid.Row="2" Grid.Column="1" Text="{Binding Bitrate}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+
+            </Grid>
+
+
 
         </StackLayout>
     </ScrollView>

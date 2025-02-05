@@ -642,7 +642,7 @@ namespace DVBTTelevizor
             DataStreamInfo = "Reading data finished";
         }
 
-        private static string GetHumanReadableBitRate(long bitrate)
+        public static string GetHumanReadableBitRate(long bitrate)
         {
             if (bitrate > 1000000)
             {

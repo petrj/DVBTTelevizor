@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -28,6 +30,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
+
     }
 
     private void BuildFocusableItems()
@@ -43,6 +46,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
+
+
 
     public void OnKeyDown(string key, bool longPress)
     {

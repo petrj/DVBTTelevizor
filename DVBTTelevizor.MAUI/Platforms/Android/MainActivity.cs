@@ -485,7 +485,7 @@ namespace DVBTTelevizor.MAUI
 
                         _loggingService.Info($"Received device configuration: {cfg}");
 
-                        cfg.PublicDiretory = GetAndroidDirectory(null);
+                        cfg.PublicDirectory = GetAndroidDirectory(null);
 
                         WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
                     }
