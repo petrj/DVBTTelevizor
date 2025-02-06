@@ -839,7 +839,7 @@ namespace DVBTTelevizor.MAUI
 
         private async void DriverStateButton_Clicked(object sender, EventArgs e)
         {
-            if (_viewModel.DriverInstalled)
+            if (_driver.DriverInstalled)
             {
                 if (_driver.Connected)
                 {

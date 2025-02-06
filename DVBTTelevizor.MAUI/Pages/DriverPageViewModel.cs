@@ -15,25 +15,22 @@ namespace DVBTTelevizor.MAUI
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
-            {
-                NotifyChange();
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
-            {
-                NotifyChange();
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<DVBTDriverStateChangedMessages>(this, (r, m) =>
             {
                 NotifyChange();
             });
         }
 
-        private void NotifyChange()
+        public void NotifyChange()
         {
             OnPropertyChanged(nameof(ConnectedDevice));
+            OnPropertyChanged(nameof(DriverIconImage));
+            OnPropertyChanged(nameof(Bitrate));
+            OnPropertyChanged(nameof(ConnectedDeviceVisible));
+            OnPropertyChanged(nameof(DriverStateStatus));
+            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+            OnPropertyChanged(nameof(DisconnectButtonVisible));
+            OnPropertyChanged(nameof(ConnectButtonVisible));
         }
 
         public string ConnectedDevice
@@ -59,6 +56,76 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return DVBTDriverConnector.GetHumanReadableBitRate(_driver.Bitrate);
+            }
+        }
+
+        public string DriverIconImage
+        {
+            get
+            {
+                if (_driver == null || !_driver.DriverInstalled)
+                {
+                    return "dongleorange.png";
+                }
+
+
+                if (_driver.Connected)
+                {
+                    return "donglegreen.png";
+
+                }
+
+                return "donglered.png";
+            }
+        }
+
+        public bool ConnectedDeviceVisible
+        {
+            get
+            {
+                return (_driver != null) && _driver.DriverInstalled && (_driver.Connected);
+            }
+        }
+
+        public string DriverStateStatus
+        {
+            get
+            {
+                if (_driver == null || !_driver.DriverInstalled)
+                {
+                    return "Not installed".Translated();
+                }
+
+                if (_driver.Connected)
+                {
+                    return "Connected".Translated();
+                }
+
+                return "Disconnected".Translated();
+            }
+        }
+
+        public bool InstallDriverButtonVisible
+        {
+            get
+            {
+                return (_driver == null || !_driver.DriverInstalled);
+            }
+        }
+
+        public bool DisconnectButtonVisible
+        {
+            get
+            {
+                return (_driver != null && _driver.DriverInstalled && _driver.Connected);
+            }
+        }
+
+        public bool ConnectButtonVisible
+        {
+            get
+            {
+                return (_driver != null && _driver.DriverInstalled && !_driver.Connected);
             }
         }
     }

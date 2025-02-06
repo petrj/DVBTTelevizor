@@ -47,8 +47,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
 
-
-
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"DriverPage OnKeyDown {key}");

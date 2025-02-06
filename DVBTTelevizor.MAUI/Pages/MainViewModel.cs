@@ -25,8 +25,6 @@ namespace DVBTTelevizor.MAUI
 
         private bool _EPGDetailEnabled = true;
 
-        private bool _driverInstalled = false;
-
         private Channel? _selectedChannel;
         private Channel _playingChannel;
         private Channel _recordingChannel;
@@ -221,7 +219,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _driver == null || !_driverInstalled;
+                return _driver == null || !_driver.DriverInstalled;
             }
         }
 
@@ -229,6 +227,8 @@ namespace DVBTTelevizor.MAUI
         {
             OnPropertyChanged(nameof(DriverIconImage));
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(String.Empty));
         }
 
         public async Task ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)
@@ -292,7 +292,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
-            _driverInstalled = true;
+            _driver.DriverInstalled = true;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 
@@ -307,7 +307,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Connection failed: {message}");
 
-            _driverInstalled = true;
+            _driver.DriverInstalled = true;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(message)));
 
@@ -318,7 +318,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Driver is not installed");
 
-            _driverInstalled = false;
+            _driver.DriverInstalled = false;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed".Translated()));
 
@@ -341,8 +341,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null ||
-                    !_driverInstalled)
+                if (_driver == null ||!_driver.DriverInstalled)
                 {
                     return "uninstalled.png";
                 }
@@ -357,6 +356,7 @@ namespace DVBTTelevizor.MAUI
                 return "disconnected.png";
             }
         }
+
 
         public string TuneIconImage
         {
@@ -411,11 +411,6 @@ namespace DVBTTelevizor.MAUI
                     _semaphoreSlim.Release();
                 };
             }
-        }
-
-        public bool DriverInstalled
-        {
-            get { return _driverInstalled; }
         }
 
         public bool MainLayoutVisible { get; set; } = true;

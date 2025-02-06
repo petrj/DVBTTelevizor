@@ -45,14 +45,15 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+    <AbsoluteLayout BackgroundColor="Black">
 
-            <!--Label Text="{local:LngXamlExt Input='Connected device'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" HorizontalOptions="StartAndExpand" VerticalOptions="Start"/>
-            <Label Text="{Binding ConnectedDevice}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="EndAndExpand" VerticalOptions="Start"/-->
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.0,0.8,0.5" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
 
-            <Grid Margin="30,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.55,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding DriverStateStatus}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.65,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.88,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding ConnectedDeviceVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
@@ -64,27 +65,27 @@
                     <ColumnDefinition Width="60*" />
                 </Grid.ColumnDefinitions>
 
-                <BoxView x:Name="InstalledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="BitrateBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver installed'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
-                <Switch Grid.Row="0" Grid.Column="1" x:Name="InstalledSwitch"  IsToggled="{Binding DriverInstalle}" Style="{DynamicResource CommonSwitchStyle}" IsEnabled="False" />
+            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Bitrate'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="0" Grid.Column="1" Text="{Binding Bitrate}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
-                <BoxView x:Name="ConnectedDeviceBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="FrequencyBoxView" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Connected device'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
-                <Label  Grid.Row="1" Grid.Column="1" Text="{Binding ConnectedDevice}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="1" Grid.Column="1" Text="{Binding Bitrate}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
-                <BoxView x:Name="BitrateBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="SignalStrengthBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Bitrate'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
-                <Label  Grid.Row="2" Grid.Column="1" Text="{Binding Bitrate}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Signal strength'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="2" Grid.Column="1" Text="{Binding Bitrate}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
+        </Grid>
 
-            </Grid>
+        <Button x:Name="InstallDriverButton" AbsoluteLayout.LayoutBounds="0.5,0.65,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}"/>
+        <Button x:Name="ConnectButton" AbsoluteLayout.LayoutBounds="0.5,0.65,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Connect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectButtonVisible}"/>
+        <Button x:Name="DisconnectButton" AbsoluteLayout.LayoutBounds="0.5,0.95,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Disconnect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DisconnectButtonVisible}"/>
 
-
-
-        </StackLayout>
-    </ScrollView>
+    </AbsoluteLayout>
 
 </ContentPage>

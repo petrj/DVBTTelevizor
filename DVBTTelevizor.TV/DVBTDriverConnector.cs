@@ -27,6 +27,8 @@ namespace DVBTTelevizor
         private NetworkStream? _controlStream = null;
         private NetworkStream? _transferStream = null;
 
+        public bool DriverInstalled { get; set; } = false;
+
         private long _lastTunedFreq = -1;
         private long _lastTunedDeliverySystem = -1;
         private long _bitrate = 0;

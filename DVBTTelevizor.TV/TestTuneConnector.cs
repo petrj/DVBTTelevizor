@@ -18,6 +18,8 @@ namespace DVBTTelevizor
         public event EventHandler? StatusChanged = null;
         ILoggingService _log;
 
+        public bool DriverInstalled { get; set; } = true;
+
         public TestTuneConnector(ILoggingService loggingService)
         {
             _log = loggingService;
