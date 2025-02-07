@@ -24,6 +24,14 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
+
             <Style x:Key="DonateButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="20,10,20,10"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
@@ -37,13 +45,18 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.025,0.9,0.08" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/>
 
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.5" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.4" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="DVBT/DVBT2 TV Player"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+        <StackLayout AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.25" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Spacing="10">
+                <Label Text="Free DVBT/DVBT2 TV Player"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
+                <Label Text="https://github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
+                <Label Text="https://www.dvbttelevizor.petrjanousek.net/"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
+                <Label Text="email@petrjanousek.net"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
+        </StackLayout>
 
-        <Grid AbsoluteLayout.LayoutBounds="1,1,1,0.1" AbsoluteLayout.LayoutFlags="All">
+        <Grid AbsoluteLayout.LayoutBounds="1,0.95,1,0.1" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>

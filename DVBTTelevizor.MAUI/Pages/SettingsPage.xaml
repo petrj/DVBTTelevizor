@@ -235,7 +235,7 @@
 
                 <StackLayout IsVisible="{Binding Config.AllowRemoteAccessService}">
 
-                    <Grid Margin="30,10,0,0">
+                    <Grid Margin="30,10,30,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />

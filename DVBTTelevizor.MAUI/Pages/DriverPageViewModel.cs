@@ -83,7 +83,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && _driver.DriverInstalled;
+                return (_driver != null) && _driver.DriverInstalled && _driver.Connected;
             }
         }
 
