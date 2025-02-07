@@ -148,6 +148,9 @@
 	  <Compile Update="Pages\DriverPage.xaml.cs">
 	    <DependentUpon>DriverPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\TuningSelectDVBTPage.xaml.cs">
+	    <DependentUpon>TuningSelectDVBTPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\TuningWelcomePage.xaml.cs">
 	    <DependentUpon>TuningWelcomePage.xaml</DependentUpon>
 	  </Compile>
@@ -170,6 +173,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\DriverPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\TuningSelectDVBTPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\TuningWelcomePage.xaml">

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.TuningSelectDVBTPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='Tuning'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="30,20,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style x:Key="SwitchStyle" TargetType="Switch">
+                <Setter Property="HorizontalOptions" Value="EndAndExpand"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout BackgroundColor="Black">
+
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='DVBT standard'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="True" BackgroundColor="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTSwitch"  IsToggled="{Binding DVBT, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+
+            <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT 2'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2Switch"  IsToggled="{Binding DVBT2, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+
+        </Grid>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.9,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="BackButton_Clicked"/>
+            <Button x:Name="NextButton" Grid.Column="1" Text="{local:LngXamlExt Input='Next'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding NextVisible}" Clicked="NextButton_Clicked"/>
+
+        </Grid>
+
+    </AbsoluteLayout>
+
+</ContentPage>

@@ -27,23 +27,14 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+    <AbsoluteLayout BackgroundColor="Black">
 
-        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Select tuning mode'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-            <StackLayout Margin="0,0,0,10">
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.30,0.8,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic quick scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.45,0.8,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.60,0.8,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
 
-                <StackLayout>
-
-                    <Button x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic quick scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Button x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}"/>
-                    <Button x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}"/>
-
-                </StackLayout>
-
-            </StackLayout>
-
-        </StackLayout>
-    </ScrollView>
+    </AbsoluteLayout>
 
 </ContentPage>

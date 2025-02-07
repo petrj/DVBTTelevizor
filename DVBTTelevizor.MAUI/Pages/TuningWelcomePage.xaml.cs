@@ -15,6 +15,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
+    private TuningSelectDVBTPage _selectDVBTPage;
+
     public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
@@ -26,6 +28,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+
+        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -91,13 +95,13 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                     switch (_focusItems.FocusedItem.Name)
                     {
                         case "Auto":
-                            _loggingService.Debug($"TuningWelcomePage: Auto");
+                            AutoScanButton_Clicked(this, new EventArgs());
                             break;
                         case "Manual":
-                            _loggingService.Debug($"TuningWelcomePage: Manual");
+                            ManualScanButton_Clicked(this, new EventArgs());
                             break;
                         case "Tune":
-                            _loggingService.Debug($"TuningWelcomePage: Tune");
+                            TuneButton_Clicked(this, new EventArgs());
                             break;
                     }
                 });
@@ -108,5 +112,28 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     public void OnTextSent(string text)
     {
         _loggingService.Debug($"TuningWelcomePage Page OnTextSent {text}");
+    }
+
+    private async void AutoScanButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
+
+        if (_selectDVBTPage.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
+
+        await Navigation.PushAsync(_selectDVBTPage);
+    }
+
+    private void ManualScanButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
+    }
+
+    private void TuneButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
     }
 }
