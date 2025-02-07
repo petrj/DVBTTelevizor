@@ -65,6 +65,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessPort", new List<View>() { RemoteAccessPortBoxView, PortEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessSecurityKey", new List<View>() { RemoteAccessSecurityKeyBoxView, SecurityKeyEntry }))
 
+            .AddItem(KeyboardFocusableItem.CreateFrom("SelectDriver", new List<View>() { DriverBoxView, DriverPicker }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("ExportLanguage", new List<View>() { ExportLanguageButton }))
+
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }));
 
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
@@ -120,6 +123,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         switch (keyAction)
         {
             case KeyboardNavigationActionEnum.Down:
+            case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusNextItem();
@@ -127,6 +131,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 break;
 
             case KeyboardNavigationActionEnum.Up:
+            case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusPreviousItem();
