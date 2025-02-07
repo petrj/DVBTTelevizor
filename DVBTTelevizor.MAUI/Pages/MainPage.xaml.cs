@@ -144,6 +144,11 @@ namespace DVBTTelevizor.MAUI
 
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
             RestartRemoteAccessService();
+
+            WeakReferenceMessenger.Default.Register<ConnectMessage>(this, (r, m) =>
+            {
+                ConnectDriver();
+            });
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)
@@ -460,7 +465,7 @@ namespace DVBTTelevizor.MAUI
 
                 InitializeVLC();
 
-                ConnectDriver();
+                //ConnectDriver();
 
                 Task.Run(async () =>
                 {
@@ -483,7 +488,7 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverTypeEnum.AndroidDVBTDriver:
 
                     _loggingService.Info("Sending connect message");
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
                     break;
 
                 case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
@@ -585,7 +590,7 @@ namespace DVBTTelevizor.MAUI
 
         private void ConnectButton_Clicked(object sender, EventArgs e)
         {
-            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
+            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
         }
 
         private void CallWithTimeout(Action action, int miliseconds = 1000)

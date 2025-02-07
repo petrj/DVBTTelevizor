@@ -56,4 +56,23 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage OnTextSent {text}");
     }
+
+    private async void InstallDriverButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"DriverPage InstallDriverButton_Clicked");
+
+        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+    }
+
+    private void ConnectButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"DriverPage ConnectButton_Clicked");
+
+        WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+    }
+
+    private void DisconnectButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"DriverPage DisconnectButton_Clicked");
+    }
 }

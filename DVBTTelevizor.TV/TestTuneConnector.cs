@@ -12,13 +12,27 @@ namespace DVBTTelevizor
     {
         public DVBTDriverStateEnum State { get; private set; }
 
-        private long LastFreq { get; set; }
-        private long LastPID { get; set; }
+        private long _lastFreq { get; set; }
+        private long _lastPID { get; set; }
+
+        private bool _driverInstalled = true;
 
         public event EventHandler? StatusChanged = null;
         ILoggingService _log;
 
-        public bool DriverInstalled { get; set; } = true;
+        //public bool DriverInstalled { get; set; } = false;
+
+        public bool DriverInstalled
+        {
+            get
+            {
+                return _driverInstalled;
+            }
+            set
+            {
+                _driverInstalled = value;
+            }
+        }
 
         public TestTuneConnector(ILoggingService loggingService)
         {
@@ -37,7 +51,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return LastFreq;
+                return _lastFreq;
             }
         }
 
@@ -108,7 +122,7 @@ namespace DVBTTelevizor
 
         public async Task<bool> Stop()
         {
-            LastPID = 0;
+            _lastPID = 0;
             return true;
         }
 
@@ -190,7 +204,7 @@ namespace DVBTTelevizor
 
             var loremIpsumText = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Integer pellentesque quam vel velit. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus porttitor turpis ac leo. Praesent dapibus. Aliquam erat volutpat. Etiam commodo dui eget wisi. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Quisque porta. Phasellus faucibus molestie nisl. Aenean id metus id velit ullamcorper pulvinar. Suspendisse sagittis ultrices augue. In rutrum. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Integer tempor. Mauris metus. In laoreet, magna id viverra tincidunt, sem odio bibendum justo, vel imperdiet sapien wisi sed libero. In convallis. Fusce nibh. Integer in sapien. Aenean vel massa quis mauris vehicula lacinia. Aliquam erat volutpat. Fusce tellus. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Maecenas sollicitudin. Curabitur bibendum justo non orci. Maecenas libero. Nullam eget nisl. Nullam justo enim, consectetuer nec, ullamcorper ac, vestibulum in, elit. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur? Nullam sapien sem, ornare ac, nonummy non, lobortis a enim. Vestibulum erat nulla, ullamcorper nec, rutrum non, nonummy ac, erat. Curabitur vitae diam non enim vestibulum interdum. Aenean placerat. Pellentesque ipsum. Etiam dui sem, fermentum vitae, sagittis id, malesuada in, quam. Duis ante orci, molestie vitae vehicula venenatis, tincidunt ac pede. Mauris metus. Sed vel lectus.";
 
-            if (LastFreq == 490000000)
+            if (_lastFreq == 490000000)
             {
                 res.CurrentEvents.Add(310,
                     new EventItem()
@@ -229,7 +243,7 @@ namespace DVBTTelevizor
                 });
             }
 
-            if (LastFreq == 514000000)
+            if (_lastFreq == 514000000)
             {
                 res.ScheduledEvents.Add(2400, new List<EventItem>()
                 {
@@ -289,7 +303,7 @@ namespace DVBTTelevizor
                 });
             }
 
-            if (LastFreq == 626000000)
+            if (_lastFreq == 626000000)
             {
                 res.ScheduledEvents.Add(8888, new List<EventItem>()
                 {
@@ -310,11 +324,11 @@ namespace DVBTTelevizor
 
         public async Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            if ((LastFreq == 490000000) || (LastFreq == 514000000) || (LastFreq == 626000000))
+            if ((_lastFreq == 490000000) || (_lastFreq == 514000000) || (_lastFreq == 626000000))
             {
                 var serviceDescriptors = new Dictionary<ServiceDescriptor, long>();
 
-                if (LastFreq == 490000000)
+                if (_lastFreq == 490000000)
                 {
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
@@ -324,7 +338,7 @@ namespace DVBTTelevizor
                     }, 310);
                 }
 
-                if (LastFreq == 514000000)
+                if (_lastFreq == 514000000)
                 {
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
@@ -347,7 +361,7 @@ namespace DVBTTelevizor
                 }
 
 
-                if (LastFreq == 626000000)
+                if (_lastFreq == 626000000)
                 {
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
@@ -472,7 +486,7 @@ namespace DVBTTelevizor
 
         public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
-            LastFreq = frequency;
+            _lastFreq = frequency;
 
             System.Threading.Thread.Sleep(fastTuning ? 100 : 1000);
 
@@ -517,9 +531,9 @@ namespace DVBTTelevizor
             {
                 var streamName = "stream.ts";
 
-                if (LastPID != 0)
+                if (_lastPID != 0)
                 {
-                    streamName = LastPID.ToString()+".ts";
+                    streamName = _lastPID.ToString()+".ts";
                     var fName = Path.Combine(PublicDirectory, streamName);
                     if (!File.Exists(fName))
                     {

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class DVBTDriverConnectMessage : ValueChangedMessage<string>
+    public class DVBTDriverConnectAndroidMessage : ValueChangedMessage<string>
     {
-        public DVBTDriverConnectMessage(string value) : base(value)
+        public DVBTDriverConnectAndroidMessage(string value) : base(value)
         {
 
         }

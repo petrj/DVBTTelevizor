@@ -93,7 +93,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (_driver == null || !_driver.DriverInstalled)
                 {
-                    return "Not installed".Translated();
+                    return "Driver not installed!".Translated();
                 }
 
                 if (_driver.Connected)
@@ -125,7 +125,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null && _driver.DriverInstalled && !_driver.Connected);
+                return (_driver != null && !_driver.Connected);
             }
         }
     }

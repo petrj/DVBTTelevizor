@@ -120,7 +120,7 @@ namespace DVBTTelevizor.MAUI
                 ShowToastMessage(m.Value);
             });
 
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
             {
                 InitDriver();
             });
