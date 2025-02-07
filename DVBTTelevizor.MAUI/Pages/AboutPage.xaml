@@ -37,9 +37,9 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLargeCaption}"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.025,0.9,0.08" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent"/>
 
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.4,0.8,0.5" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.5" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="DVBT/DVBT2 TV Player"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
 

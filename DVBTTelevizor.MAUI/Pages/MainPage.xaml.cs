@@ -844,38 +844,12 @@ namespace DVBTTelevizor.MAUI
 
         private async void DriverStateButton_Clicked(object sender, EventArgs e)
         {
-            if (_driver.DriverInstalled)
+            if (_driverPage.IsLoaded)
             {
-                if (_driver.Connected)
-                {
-                    if (!(await _dialogService.Confirm("Connected device: {0}".Translated(_driver.Configuration.DeviceName),
-                        "Device status".Translated(),
-                        "Back".Translated(),
-                        "Disconnect".Translated())))
-                    {
-                        //await _viewModel.DisconnectDriver();
-                    }
-                }
-                else
-                {
-                    if (await _dialogService.Confirm("Disconnected.".Translated(),
-                        "Device status".Translated(), "Connect".Translated(), "Back".Translated()))
-                    {
-                        WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage("Connect"));
-                        //WeakReferenceMessenger.Default.Send(new DVBTDriverConnectMessage("Connect"));
-                    }
-                }
+                // preventing click when the settings page is just (or yet) loaded
+                return;
             }
-            else
-            {
-                if (await _dialogService.Confirm($"DVB-T Driver not installed.".Translated(),
-                    "Device status".Translated(),
-                    "Install DVB-T Driver".Translated(),
-                    "Back".Translated()))
-                {
-                    //InstallDriver_Clicked(this, null);
-                }
-            }
+            await Navigation.PushAsync(_driverPage);
         }
 
         private async void ChannelsListView_ItemTapped(object sender, ItemTappedEventArgs e)
@@ -893,19 +867,8 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void DriverStateButton_Clicked_1(object sender, EventArgs e)
-        {
-
-        }
-
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-            if (_driverPage.IsLoaded)
-            {
-                // preventing click when the settings page is just (or yet) loaded
-                return;
-            }
-            await Navigation.PushAsync(_driverPage);
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)

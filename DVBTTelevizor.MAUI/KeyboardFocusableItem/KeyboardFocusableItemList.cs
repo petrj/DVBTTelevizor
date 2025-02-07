@@ -67,15 +67,9 @@ namespace DVBTTelevizor.MAUI
             var selectNext = false;
 
             KeyboardFocusableItem? itemToSelect = null;
-            KeyboardFocusableItem? firstItem = null;
 
             foreach (var item in Items)
             {
-                if (firstItem == null)
-                {
-                    firstItem = item;
-                }
-
                 // select first available
                 if (
                     (_focusedItem == null) &&
@@ -88,21 +82,21 @@ namespace DVBTTelevizor.MAUI
                     break;
                 }
 
-                if (selectNext)
+                if (selectNext &&
+                    (
+                        (onlyVisible == false) || (onlyVisible && item.IsVisible)
+                    )
+                   )
                 {
                     itemToSelect = item;
                     break;
-                }
-
-                if (item == _focusedItem)
+                } else
                 {
-                    selectNext = true;
+                    if (item == _focusedItem)
+                    {
+                        selectNext = true;
+                    }
                 }
-            }
-
-            if (itemToSelect == null)
-            {
-                itemToSelect = firstItem;
             }
 
             if (itemToSelect != null)

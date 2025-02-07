@@ -30,12 +30,16 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
-
     }
 
     private void BuildFocusableItems()
     {
         _focusItems = new KeyboardFocusableItemList();
+        _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DisConnect", new List<View>() { DisconnectButton }));
+
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
 
@@ -50,6 +54,60 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"DriverPage OnKeyDown {key}");
+
+        var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+            case KeyboardNavigationActionEnum.Down:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _focusItems.FocusNextItem(true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Left:
+            case KeyboardNavigationActionEnum.Up:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _focusItems.FocusPreviousItem(true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Back:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Navigation.PopAsync();
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+
+                switch (_focusItems.FocusedItemName)
+                {
+                    case "Install":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            InstallDriverButton_Clicked(this, new EventArgs());
+                        });
+                        break;
+                    case "Connect":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            ConnectButton_Clicked(this, new EventArgs());
+                        });
+                        break;
+                    case "DisConnect":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            DisconnectButton_Clicked(this, new EventArgs());
+                        });
+                        break;
+                }
+
+                break;
+        }
     }
 
     public void OnTextSent(string text)
@@ -74,5 +132,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private void DisconnectButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"DriverPage DisconnectButton_Clicked");
+
+        WeakReferenceMessenger.Default.Send(new DisConnectMessage(String.Empty));
     }
 }

@@ -196,7 +196,7 @@ namespace DVBTTelevizor
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
-                    await Navigation.PopAsync();
+                    await Navigation.PopModalAsync();
                     break;
 
                 case KeyboardNavigationActionEnum.OK:

@@ -37,9 +37,9 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null || _driver.Configuration == null)
+                if (_driver == null || _driver.Configuration == null  || String.IsNullOrWhiteSpace(_driver.Configuration.DeviceName))
                 {
-                    return "No device connected".Translated();
+                    return "Plug in compatible device".Translated();
                 }
 
                 return _driver.Configuration.DeviceName;
@@ -83,7 +83,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && _driver.DriverInstalled && (_driver.Connected);
+                return (_driver != null) && _driver.DriverInstalled;
             }
         }
 

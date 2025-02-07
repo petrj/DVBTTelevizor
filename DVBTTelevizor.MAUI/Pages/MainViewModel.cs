@@ -52,6 +52,11 @@ namespace DVBTTelevizor.MAUI
             {
                 DriverNotInstalled();
             });
+
+            WeakReferenceMessenger.Default.Register<DisConnectMessage>(this, (r, m) =>
+            {
+                DisconnectDriver();
+            });
         }
 
         public async Task RefreshChannels()
