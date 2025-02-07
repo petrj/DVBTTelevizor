@@ -133,7 +133,6 @@ namespace DVBTTelevizor.MAUI
             }
 
             KeyboardFocusableItem? itemToSelect = null;
-            KeyboardFocusableItem? prevItem = null;
 
             foreach (var item in Items)
             {
@@ -148,13 +147,8 @@ namespace DVBTTelevizor.MAUI
                     itemToSelect = item;
                 }
                 else
-                if (prevItem == null)
                 {
-                    prevItem = item;
-                }
-                else
-                {
-                    if (item == _focusedItem)
+                    if (item == _focusedItem && (itemToSelect != null))
                     {
                         break;
                     }
@@ -164,11 +158,6 @@ namespace DVBTTelevizor.MAUI
                         itemToSelect = item;
                     }
                 }
-            }
-
-            if (itemToSelect == null)
-            {
-                itemToSelect = prevItem;
             }
 
             if (itemToSelect != null)

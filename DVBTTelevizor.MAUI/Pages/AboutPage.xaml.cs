@@ -63,7 +63,7 @@ public partial class AboutPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusNextItem();
+                    _focusItems.FocusNextItem(true);
                 });
                 break;
 
@@ -71,7 +71,7 @@ public partial class AboutPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem();
+                    _focusItems.FocusPreviousItem(true);
                 });
                 break;
 
