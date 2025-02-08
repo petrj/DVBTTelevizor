@@ -1,4 +1,5 @@
 ﻿using LoggerService;
+using Microsoft.Maui;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,9 +14,60 @@ namespace DVBTTelevizor.MAUI
         private bool _dvbt = true;
         private bool _dvbt2 = true;
 
+        private string? _selectedBandwidth = null;
+        private Dictionary<string, int> _dict = new Dictionary<string, int>();
+
+        public ObservableCollection<string> Bandwidths { get; set; } = new ObservableCollection<string>();
+
         public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+
+        }
+
+        public async void FillBandwidths()
+        {
+            Bandwidths.Clear();
+            _dict.Clear();
+
+            // Mhz string => Hz
+
+            _dict.Add("1.7 MHz", 1700000);
+            _dict.Add("5 MHz", 5000000);
+            _dict.Add("6 MHz", 6000000);
+            _dict.Add("7 MHz", 7000000);
+            _dict.Add("8 MHz", 8000000);
+            _dict.Add("10 MHz", 10000000);
+
+            foreach (var kvp in _dict)
+            {
+                Bandwidths.Add(kvp.Key);
+            }
+
+            if (_selectedBandwidth == null)
+            {
+                _selectedBandwidth = "8 MHz";
+            }
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(Bandwidths));
+                OnPropertyChanged(nameof(SelectedBandwidth));
+            });
+        }
+
+        public string? SelectedBandwidth
+        {
+            get
+            {
+                return _selectedBandwidth;
+            }
+            set
+            {
+                _selectedBandwidth = value;
+
+                OnPropertyChanged(nameof(SelectedBandwidth));
+            }
         }
 
         public bool DVBT

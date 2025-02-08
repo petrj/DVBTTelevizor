@@ -35,6 +35,14 @@
                 <Setter Property="VerticalOptions" Value="Center"/>
             </Style>
 
+            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -44,6 +52,7 @@
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="True" BackgroundColor="Transparent">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -61,6 +70,18 @@
 
             <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT 2'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2Switch"  IsToggled="{Binding DVBT2, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+
+            <BoxView x:Name="BandwidthBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Bandwidth'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Picker
+                Grid.Row="2" Grid.Column="1"
+                x:Name="BandwidthPicker"
+                FontSize="{Binding FontSizeForPicker}"
+                Style="{StaticResource CommonPickerTextStyle}"
+                ItemsSource="{Binding Bandwidths}"
+                SelectedItem="{Binding SelectedBandwidth, Mode=TwoWay}">
+            </Picker>
 
         </Grid>
 

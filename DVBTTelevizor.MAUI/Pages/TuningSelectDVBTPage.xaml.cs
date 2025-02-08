@@ -16,7 +16,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
-    private string? _lastSelectedDVBTSwitch = null;
+    private string? _lastSelectedCenterItem = null;
 
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -40,6 +40,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2Switch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Bandwidth", new List<View>() { BandwidthBoxView, BandwidthPicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Next", new List<View>() { NextButton }));
 
@@ -55,18 +56,25 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         if (_focusItems.FocusedItem.Name == "DVBT")
         {
-            _lastSelectedDVBTSwitch = "DVBT";
+            _lastSelectedCenterItem = "DVBT";
         }
         else
         if (_focusItems.FocusedItem.Name == "DVBT2")
         {
-            _lastSelectedDVBTSwitch = "DVBT2";
+            _lastSelectedCenterItem = "DVBT2";
+        }
+        else
+        if (_focusItems.FocusedItem.Name == "Bandwidth")
+        {
+            _lastSelectedCenterItem = "Bandwidth";
         }
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
+        _driverPageViewModel.FillBandwidths();
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
@@ -127,6 +135,9 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                         case "DVBT2":
                             DVBT2Switch.IsToggled = !DVBT2Switch.IsToggled;
                             break;
+                        case "Bandwidth":
+                            BandwidthPicker.Focus();
+                            break;
                         case "Back":
                             BackButton_Clicked(this, new EventArgs());
                             break;
@@ -148,10 +159,11 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         {
             case "DVBT":
             case "DVBT2":
+            case "Bandwidth":
                 _focusItems.FocusItem("Next", KeyboardFocusDirection.Next);
                 break;
             case "Back":
-                _focusItems.FocusItem(_lastSelectedDVBTSwitch == null ? "DVBT" : _lastSelectedDVBTSwitch, KeyboardFocusDirection.Next);
+                _focusItems.FocusItem(_lastSelectedCenterItem == null ? "DVBT" : _lastSelectedCenterItem, KeyboardFocusDirection.Next);
                 break;
             case "Next":
                 _focusItems.FocusItem("Back", KeyboardFocusDirection.Next);
@@ -171,13 +183,14 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         {
             case "DVBT":
             case "DVBT2":
+            case "Bandwidth":
                 _focusItems.FocusItem("Back", KeyboardFocusDirection.Next);
                 break;
             case "Back":
                 _focusItems.FocusItem("Next", KeyboardFocusDirection.Next);
                 break;
             case "Next":
-                _focusItems.FocusItem(_lastSelectedDVBTSwitch == null ? "DVBT" : _lastSelectedDVBTSwitch, KeyboardFocusDirection.Next);
+                _focusItems.FocusItem(_lastSelectedCenterItem == null ? "DVBT" : _lastSelectedCenterItem, KeyboardFocusDirection.Next);
                 break;
         }
     }
