@@ -175,7 +175,7 @@
             <Label Grid.Row="5" Grid.Column="2" Text="4 MB/s"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
         </Grid>
 
-        <BoxView AbsoluteLayout.LayoutBounds="0.5,0.5,0.005,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Grey" />
+        <BoxView AbsoluteLayout.LayoutBounds="0.5,0.5,0.005,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a" />
 
         <Label AbsoluteLayout.LayoutBounds="1.0,0.05,0.5,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tune result'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/>
         <!--BoxView AbsoluteLayout.LayoutBounds="0.9,0.2,0.4,0.2" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Grey" /-->
@@ -264,7 +264,7 @@
 
                                 <Image Grid.Row="0" Grid.Column="4"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
 
-                                <Label Grid.Row="3" Grid.Column="2" Text="{Binding FrequencyShortLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForLabel}" />
+                                <Label Grid.Row="3" Grid.Column="2" Text="{Binding FrequencyShortLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" />
 
                                 <Label Grid.Row="3" Grid.Column="3"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" BackgroundColor="Transparent"/>
 

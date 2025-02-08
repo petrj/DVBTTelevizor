@@ -7,6 +7,9 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
 {
     private TuningProgressPageViewModel _viewModel;
 
+    private Size _lastAllocatedSize = new Size(-1, -1);
+    private bool IsPortrait { get; set; } = false;
+
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private IDialogService _dialogService;
@@ -40,6 +43,33 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         //    .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
+    }
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+
+        if (_lastAllocatedSize.Width == width &&
+            _lastAllocatedSize.Height == height)
+        {
+            // no size changed
+            return;
+        }
+
+        if (width > height)
+        {
+            IsPortrait = false;
+        }
+        else
+        {
+            IsPortrait = true;
+        }
+
+        _lastAllocatedSize.Width = width;
+        _lastAllocatedSize.Height = height;
+
+        //_viewModel.NotifyToolBarChange();
+        //RefreshGUI();
     }
 
     protected override void OnAppearing()
