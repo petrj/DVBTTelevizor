@@ -218,7 +218,7 @@
         </Grid>
 
 
-        <Grid RowSpacing="0" AbsoluteLayout.LayoutBounds="0.95,0.95,0.45,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+        <Grid RowSpacing="0" AbsoluteLayout.LayoutBounds="1,1,0.5,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="30,0,30,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1" />
             </Grid.RowDefinitions>
@@ -230,7 +230,8 @@
         </Grid>
 
         <ListView
-          AbsoluteLayout.LayoutBounds="0.95,0.95,0.45,0.6" AbsoluteLayout.LayoutFlags="All"
+          AbsoluteLayout.LayoutBounds="1,1,0.5,0.6" AbsoluteLayout.LayoutFlags="All"
+          Margin="30,0,30,0"
           x:Name="ChannelsListView"
           ItemsSource="{Binding Channels}"
           CachingStrategy="RecycleElement"
