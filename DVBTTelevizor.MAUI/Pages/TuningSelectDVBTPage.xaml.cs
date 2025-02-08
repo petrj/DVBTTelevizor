@@ -18,6 +18,8 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private string? _lastSelectedCenterItem = null;
 
+    private TuningProgressPage _tuningProgress;
+
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
@@ -29,6 +31,8 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _driverPageViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+
+        _tuningProgress = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -141,6 +145,9 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                         case "Back":
                             BackButton_Clicked(this, new EventArgs());
                             break;
+                        case "Next":
+                            NextButton_Clicked(this, new EventArgs());
+                            break;
                     }
                 });
                 break;
@@ -210,8 +217,14 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         });
     }
 
-    private void NextButton_Clicked(object sender, EventArgs e)
+    private async void NextButton_Clicked(object sender, EventArgs e)
     {
+        if (_tuningProgress.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
 
+        await Navigation.PushAsync(_tuningProgress);
     }
 }

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.TuningProgressPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='Tuning'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
+            <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="Color" Value="Blue"/>
+            </Style>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="30,20,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="True"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="ProviderNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="Margin" Value="0,0,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout BackgroundColor="Black">
+
+        <!--BoxView AbsoluteLayout.LayoutBounds="0.125,0.05,0.25,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="LightBlue" /-->
+
+        <Grid AbsoluteLayout.LayoutBounds="0.125,0.05,0.25,0.1" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Center" VerticalOptions="Start">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70*" />
+                <RowDefinition Height="30*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
+            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding DeliverySystemCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLable}" HorizontalOptions="Center" VerticalOptions="Start"/>
+        </Grid>
+
+        <ActivityIndicator AbsoluteLayout.LayoutBounds="0.125,0.15,0.25,0.1" AbsoluteLayout.LayoutFlags="All"  IsRunning="True" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Center" Color="#41b3ff" IsVisible="{Binding TuningInProgress}"/>
+
+        <!--BoxView AbsoluteLayout.LayoutBounds="0,0.15,0.5,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="LightYellow" /-->
+
+        <Grid AbsoluteLayout.LayoutBounds="0,0.25,0.5,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="ProgressGrid" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="66*" />
+                <RowDefinition Height="34*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Text="{local:LngXamlExt Input='Progress'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+            <ProgressBar Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />
+
+            <Label Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+            <Label Grid.Row="1" Grid.Column="1" Text="{Binding FrequencyFromMHz}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <Label Grid.Row="1" Grid.Column="2" Text="MHz" HorizontalOptions="Center" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <Label Grid.Row="1" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+        </Grid>
+
+        <!--BoxView AbsoluteLayout.LayoutBounds="0,0.3,0.5,0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Green" />
+        <BoxView AbsoluteLayout.LayoutBounds="0,0.5,0.5,0.2" AbsoluteLayout.LayoutFlags="All" BackgroundColor="LightBlue" /-->
+
+        <Grid AbsoluteLayout.LayoutBounds="0,0.4,0.5,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="SignalGrid" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="60*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Signal'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />
+            <Label Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Text="{Binding SignalProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+        </Grid>
+
+        <Grid AbsoluteLayout.LayoutBounds="0,0.75,0.5,0.3" AbsoluteLayout.LayoutFlags="All" x:Name="SignalDetailsGrid" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Signal present'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="0" Grid.Column="2" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+
+            <Label Grid.Row="1" Grid.Column="1" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+
+            <Label Grid.Row="2" Grid.Column="1" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+
+            <Label Grid.Row="3" Grid.Column="1" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+
+            <Label Grid.Row="4" Grid.Column="1" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="4" Grid.Column="2" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
+
+            <Label Grid.Row="5" Grid.Column="1" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="5" Grid.Column="2" Text="4 MB/s"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
+        </Grid>
+
+        <BoxView AbsoluteLayout.LayoutBounds="0.5,0.5,0.005,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Grey" />
+
+        <Label AbsoluteLayout.LayoutBounds="1.0,0.05,0.5,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tune result'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/>
+        <!--BoxView AbsoluteLayout.LayoutBounds="0.9,0.2,0.4,0.2" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Grey" /-->
+
+        <Grid AbsoluteLayout.LayoutBounds="0.9,0.2,0.4,0.2" AbsoluteLayout.LayoutFlags="All" x:Name="TuneResultDetailsGrid" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Multiplexes'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="0" Grid.Column="1" Text="{Binding DeliverySystemCaption}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
+
+            <Label Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Channels'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+
+            <Label Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='New channels'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+        </Grid>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.05,0.95,0.45,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="33*" />
+                <ColumnDefinition Width="33*" />
+                <ColumnDefinition Width="33*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True"/>
+            <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding NextVisible}" Clicked="StartButton_Clicked"/>
+            <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding NextVisible}"/>
+        </Grid>
+
+
+        <Grid RowSpacing="0" AbsoluteLayout.LayoutBounds="0.95,0.95,0.45,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*" />
+            </Grid.ColumnDefinitions>
+
+            <BoxView Grid.Row="0" Grid.Column="0" BackgroundColor="White" />
+        </Grid>
+
+        <ListView
+          AbsoluteLayout.LayoutBounds="0.95,0.95,0.45,0.6" AbsoluteLayout.LayoutFlags="All"
+          x:Name="ChannelsListView"
+          ItemsSource="{Binding Channels}"
+          CachingStrategy="RecycleElement"
+          Style="{StaticResource ListViewStyle}"
+          SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <ViewCell.View>
+                            <Grid RowSpacing="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="1" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10*" />
+                                    <ColumnDefinition Width="6*" />
+                                    <ColumnDefinition Width="24*" />
+                                    <ColumnDefinition Width="50*" />
+                                    <ColumnDefinition Width="10*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
+                                <Label Grid.Row="0" Grid.Column="2"  Grid.ColumnSpan="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
+                                <Image Grid.Row="0" Grid.Column="1"                   Source="{Binding LockIcon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+
+                                <Image Grid.Row="0" Grid.Column="4"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
+
+                                <Label Grid.Row="3" Grid.Column="2" Text="{Binding FrequencyShortLabel}" Style="{DynamicResource LabelStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForLabel}" />
+
+                                <Label Grid.Row="3" Grid.Column="3"  Grid.ColumnSpan="3" Text="{Binding ProviderName}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" BackgroundColor="Transparent"/>
+
+                                <BoxView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" BackgroundColor="White" />
+                            </Grid>
+
+                        </ViewCell.View>
+
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!--BoxView AbsoluteLayout.LayoutBounds="0.95,0.95,0.45,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Yellow" /-->
+
+    </AbsoluteLayout>
+
+</ContentPage>

@@ -465,7 +465,7 @@ namespace DVBTTelevizor.MAUI
 
                 InitializeVLC();
 
-                //ConnectDriver();
+                ConnectDriver();
 
                 Task.Run(async () =>
                 {

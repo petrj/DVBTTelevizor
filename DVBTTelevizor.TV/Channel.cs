@@ -51,7 +51,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return NonFree ? "Lock.png" : "Empty.png";
+                return NonFree ? "lock.png" : "empty.png";
             }
         }
 
@@ -289,8 +289,8 @@ namespace DVBTTelevizor
             {
                 switch (SimplifiedServiceType)
                 {
-                    case DVBTDriverServiceType.TV: return "TV.png";
-                    case DVBTDriverServiceType.Radio: return "Radio.png";
+                    case DVBTDriverServiceType.TV: return "tv.png";
+                    case DVBTDriverServiceType.Radio: return "radio.png";
                 }
 
                 return null;
