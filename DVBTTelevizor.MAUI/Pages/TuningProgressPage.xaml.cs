@@ -1,4 +1,5 @@
 using LoggerService;
+using Microsoft.Maui.Layouts;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -8,7 +9,8 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     private TuningProgressPageViewModel _viewModel;
 
     private Size _lastAllocatedSize = new Size(-1, -1);
-    private bool IsPortrait { get; set; } = false;
+    private bool _isPortrait { get; set; } = false;
+    private bool? _isPortraitPreviousValue { get; set; } = null;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -58,18 +60,53 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
 
         if (width > height)
         {
-            IsPortrait = false;
+            _isPortrait = false;
         }
         else
         {
-            IsPortrait = true;
+            _isPortrait = true;
         }
 
         _lastAllocatedSize.Width = width;
         _lastAllocatedSize.Height = height;
 
-        //_viewModel.NotifyToolBarChange();
-        //RefreshGUI();
+        if (_isPortrait != _isPortraitPreviousValue)
+        {
+            RefreshGUI();
+        }
+
+        _isPortraitPreviousValue = _isPortrait;
+    }
+
+    private void RefreshGUI()
+    {
+        if (_isPortrait)
+        {
+            AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.5, 0.01, 0.95, 0.1));
+            AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.5, 0.1, 0.25, 0.1));
+            AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.5, 0.14, 0.95, 0.1));
+            AbsoluteLayout.SetLayoutBounds(SignalGrid, new Rect(0.5, 0.24, 0.95, 0.1));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.5, 0.34, 0.9, 0.16));
+            AbsoluteLayout.SetLayoutBounds(SplitterBoxView, new Rect(0.5, 0.47, 1, 0.005));
+            AbsoluteLayout.SetLayoutBounds(ResultLabel, new Rect(0.5, 0.5, 0.5, 0.1));
+            AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.5, 0.58, 0.8, 0.1));
+            AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.98, 0.95, 0.1));
+            AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, 0.85, 1, 0.25));
+            AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0.5, 0.85, 1, 0.25));
+        } else
+        {
+            AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.125, 0.05, 0.25, 0.1));
+            AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.125, 0.15, 0.25, 0.1));
+            AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.1, 0.25, 0.4, 0.1));
+            AbsoluteLayout.SetLayoutBounds(SignalGrid, new Rect(0.1, 0.4, 0.4, 0.1));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.15, 0.7, 0.3, 0.3));
+            AbsoluteLayout.SetLayoutBounds(SplitterBoxView, new Rect(0.5, 0.5, 0.005, 1));
+            AbsoluteLayout.SetLayoutBounds(ResultLabel, new Rect(1.0, 0.05, 0.5, 0.1));
+            AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.9, 0.2, 0.4, 0.2));
+            AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.95, 0.45, 0.1));
+            AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(1, 1, 0.5, 0.6));
+            AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(1, 1, 0.5, 0.6));
+        }
     }
 
     protected override void OnAppearing()
@@ -130,22 +167,20 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
 
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"TuningProgressPage Page OnTextSent {text}");
-    }
-
-    private void AbortButton_Clicked(object sender, EventArgs e)
-    {
-
+        _loggingService.Debug($"TuningProgressPage OnTextSent {text}");
     }
 
     private void StartButton_Clicked(object sender, EventArgs e)
     {
-        if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Inactive)
-        {
-            _viewModel.StartTune();
-        } else
-        {
-            _viewModel.State = TuningProgressPageViewModel.TuneStateEnum.InProgress;
-        }
+        _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
+
+        _viewModel.StartTune();
+    }
+
+    private void StopButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningProgressPage StopButton_Clicked");
+
+        _viewModel.StopTune();
     }
 }

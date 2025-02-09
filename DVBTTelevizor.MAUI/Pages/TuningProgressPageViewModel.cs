@@ -30,49 +30,65 @@ namespace DVBTTelevizor.MAUI
         private Channel? _selectedChannel;
 
         private Dictionary<long,string> _tunedMultiplexes = new Dictionary<long,string>();
+        private int _tunedNewChannels = 0;
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
 
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            Channels.Add(new Channel()
-            {
-                Number = "1",
-                Name = "CT1",
-                ProviderName = "Cesta televize",
-                Bandwdith = 8,
-                DVBTType = 1,
-                Frequency = 484000000,
-                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                NonFree = true
-            });
-            Channels.Add(new Channel()
-            {
-                Number = "2",
-                Name = "CT2",
-                ProviderName = "Cesta televize",
-                Bandwdith = 8,
-                DVBTType = 1,
-                Frequency = 484000000,
-                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                NonFree = false
-            });
+
         }
 
         public void StartTune()
         {
-            _tunedMultiplexes.Clear();
-
-            _actualTuningDVBTType = 0;
-            if (!DVBTTuning)
+            if (State == TuneStateEnum.Inactive)
             {
-                _actualTuningDVBTType = 1;
+                _tunedMultiplexes.Clear();
+                _tunedNewChannels = 0;
+                Channels.Clear();
+
+
+                Channels.Add(new Channel()
+                {
+                    Number = "1",
+                    Name = "CT1",
+                    ProviderName = "Cesta televize",
+                    Bandwdith = 8,
+                    DVBTType = 1,
+                    Frequency = 484000000,
+                    Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
+                    NonFree = true
+                });
+                Channels.Add(new Channel()
+                {
+                    Number = "2",
+                    Name = "CT2",
+                    ProviderName = "Cesta televize",
+                    Bandwdith = 8,
+                    DVBTType = 1,
+                    Frequency = 484000000,
+                    Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
+                    NonFree = false
+                });
+
+                _actualTuningDVBTType = 0;
+                if (!DVBTTuning)
+                {
+                    _actualTuningDVBTType = 1;
+                }
+
+                _actualTunningFreqKHz = FrequencyFromKHz;
             }
 
-            _actualTunningFreqKHz = FrequencyFromKHz;
-
             _tuneState = TuneStateEnum.InProgress;
+
+            NotifyChange();
+        }
+
+        public void StopTune()
+        {
+            _tuneState = TuneStateEnum.Stopped;
 
             NotifyChange();
         }
@@ -144,6 +160,13 @@ namespace DVBTTelevizor.MAUI
 
             OnPropertyChanged(nameof(Channels));
             OnPropertyChanged(nameof(SelectedChannel));
+
+            OnPropertyChanged(nameof(StartButtonVisible));
+            OnPropertyChanged(nameof(StopButtonVisible));
+
+            OnPropertyChanged(nameof(TunedMultiplexesCount));
+            OnPropertyChanged(nameof(TunedChannelsCount));
+            OnPropertyChanged(nameof(TunedNewChannelsCount));
         }
 
         public TuneStateEnum State
@@ -156,6 +179,40 @@ namespace DVBTTelevizor.MAUI
             {
                 _tuneState = value;
                 NotifyChange();
+            }
+        }
+
+        public int TunedMultiplexesCount
+        {
+            get
+            {
+                if (_tunedMultiplexes == null)
+                {
+                    return 0;
+                }
+
+                return _tunedMultiplexes.Count;
+            }
+        }
+
+        public int TunedChannelsCount
+        {
+            get
+            {
+                if (Channels == null)
+                {
+                    return 0;
+                }
+
+                return Channels.Count;
+            }
+        }
+
+        public int TunedNewChannelsCount
+        {
+            get
+            {
+                return _tunedNewChannels;
             }
         }
 
@@ -355,6 +412,22 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return (_signalProgress * 100).ToString("N0") + "%";
+            }
+        }
+
+        public bool StartButtonVisible
+        {
+            get
+            {
+                return State != TuneStateEnum.InProgress;
+            }
+        }
+
+        public bool StopButtonVisible
+        {
+            get
+            {
+                return State == TuneStateEnum.InProgress;
             }
         }
     }
