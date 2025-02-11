@@ -24,7 +24,7 @@
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="10,10,10,0"/>
+                <Setter Property="Margin" Value="5,5,5,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
 
                 <Setter Property="Padding" Value="0,0,0,0"/>
@@ -94,8 +94,9 @@
         <Grid x:Name="ProgressGrid" AbsoluteLayout.LayoutBounds="0.1,0.15,0.4,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="66*" />
+                <RowDefinition Height="33*" />
                 <RowDefinition Height="34*" />
+                <RowDefinition Height="33*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20*" />
@@ -105,15 +106,16 @@
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Text="{local:LngXamlExt Input='Tune'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Tune'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
             <ProgressBar Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" />
+            <ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding FrequencyProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" />
 
-            <Label Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="2" Grid.Column="1" Text="{Binding FrequencyFromMHz}" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" />
+            <Label Grid.Row="2" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
-            <Label Grid.Row="1" Grid.Column="1" Text="{Binding FrequencyFromMHz}" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" />
-            <Label Grid.Row="1" Grid.Column="2" Text="MHz" HorizontalOptions="Center" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-            <Label Grid.Row="1" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <Label Grid.Row="0" Grid.Column="4" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="1" Grid.Column="4" Text="MHz" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
         </Grid>
 
         <Grid x:Name="SignalGrid" AbsoluteLayout.LayoutBounds="0.5,0.24,0.95,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
@@ -188,24 +190,6 @@
             <Label Grid.Row="2" Grid.Column="1" Text="{Binding TunedNewChannelsCount}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
         </Grid>
 
-        <Grid x:Name="ButtonsGrid" AbsoluteLayout.LayoutBounds="0.05,0.98,0.95,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="33*" />
-                <ColumnDefinition Width="33*" />
-                <ColumnDefinition Width="33*" />
-            </Grid.ColumnDefinitions>
-
-            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}"/>
-
-            <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
-            <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
-
-            <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding FinishButtonVisible}"/>
-        </Grid>
-
         <Grid x:Name="ChannelsSplitterGrid" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5,0.85,0.85,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="10,0,10,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1" />
@@ -264,6 +248,25 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <Grid x:Name="ButtonsGrid" AbsoluteLayout.LayoutBounds="0.05,0.98,0.95,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True" Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="33*" />
+                <ColumnDefinition Width="33*" />
+                <ColumnDefinition Width="33*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="BackButton_Clicked"/>
+
+            <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
+            <!--Button x:Name="ContinueButton" Grid.Column="2" Text="{local:LngXamlExt Input='Continue'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ContinueButtonVisible}" Clicked="ContinueButton_Clicked"/-->
+            <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
+
+            <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding FinishButtonVisible}" Clicked="FinishButton_Clicked"/>
+        </Grid>
 
     </AbsoluteLayout>
 

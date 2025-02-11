@@ -4,6 +4,7 @@ using MPEGTS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -27,6 +28,9 @@ namespace DVBTTelevizor.MAUI
         private bool _DVBTTuning = true;
         private bool _DVBT2Tuning = true;
 
+        private BackgroundWorker? _signalStrengthBackgroundWorker = null;
+        private double _signalStrengthProgress = 0;
+
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
         private Channel? _selectedChannel;
 
@@ -38,10 +42,12 @@ namespace DVBTTelevizor.MAUI
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-
+            _signalStrengthBackgroundWorker = new BackgroundWorker();
+            _signalStrengthBackgroundWorker.WorkerSupportsCancellation = true;
+            _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
         }
 
-        private void RestartTune()
+        public void RestartTune()
         {
             _tunedMultiplexes.Clear();
             _tunedNewChannels = 0;
@@ -99,6 +105,11 @@ namespace DVBTTelevizor.MAUI
 
                 //_savedChannels = await _channelService.LoadChannels();
 
+                if (!_signalStrengthBackgroundWorker.IsBusy)
+                {
+                    _signalStrengthBackgroundWorker.RunWorkerAsync();
+                }
+
                 NotifyChange();
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
@@ -132,6 +143,12 @@ namespace DVBTTelevizor.MAUI
                         NotifyChange();
 
                     } while (_actualTunningFreqKHz <= FrequencyToKHz);
+
+                    if (dvbtTypeIndex == 0)
+                    {
+                        // reset position to DVBT2
+                        _actualTunningFreqKHz = FrequencyFromKHz;
+                    }
                 }
 
                 State = TuneStateEnum.Finished;
@@ -146,6 +163,7 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 _loggingService.Info("Tuning finished");
+                _signalStrengthBackgroundWorker.CancelAsync();
                 NotifyChange();
             }
         }
@@ -339,6 +357,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(DeliverySystemCaption));
 
             OnPropertyChanged(nameof(TuningProgress));
+            OnPropertyChanged(nameof(FrequencyProgress));
             OnPropertyChanged(nameof(TuningInProgress));
             OnPropertyChanged(nameof(TuningProgressVisible));
             OnPropertyChanged(nameof(TuningProgressCaption));
@@ -359,6 +378,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(SelectedChannel));
 
             OnPropertyChanged(nameof(StartButtonVisible));
+            OnPropertyChanged(nameof(ContinueButtonVisible));
             OnPropertyChanged(nameof(StopButtonVisible));
             OnPropertyChanged(nameof(BackButtonVisible));
             OnPropertyChanged(nameof(FinishButtonVisible));
@@ -366,6 +386,8 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(TunedMultiplexesCount));
             OnPropertyChanged(nameof(TunedChannelsCount));
             OnPropertyChanged(nameof(TunedNewChannelsCount));
+
+            OnPropertyChanged(nameof(SignalStrengthProgress));
         }
 
         public TuneStateEnum State
@@ -554,25 +576,21 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public double TuningProgress
+        public double FrequencyProgress
         {
             get
             {
+                if (_actualTunningFreqKHz < FrequencyFromKHz)
+                    return 0.0;
+
+                if (_actualTunningFreqKHz > FrequencyToKHz)
+                    return 100.0;
+
                 var onePerc = (FrequencyToKHz - FrequencyFromKHz) / 100.0;
                 if (onePerc == 0)
                     return 0.0;
 
                 var perc = (_actualTunningFreqKHz - FrequencyFromKHz) / onePerc;
-
-                if (DVBTTuning && DVBT2Tuning)
-                {
-                    perc = perc / 2;
-
-                    if (_actualTuningDVBTType == 1)
-                    {
-                        perc += 50;
-                    }
-                }
 
                 if (perc < 0)
                     return 0.0;
@@ -581,6 +599,27 @@ namespace DVBTTelevizor.MAUI
                     return 100.0;
 
                 return perc / 100.0;
+            }
+        }
+
+
+        public double TuningProgress
+        {
+            get
+            {
+                if (DVBTTuning && DVBT2Tuning)
+                {
+                    var perc = FrequencyProgress / 2.0;
+                    if (_actualTuningDVBTType == 1)
+                    {
+                        perc += 0.5;
+                    }
+                    return perc;
+                }
+                else
+                {
+                    return FrequencyProgress;
+                }
             }
         }
 
@@ -611,6 +650,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return (_signalProgress * 100).ToString("N0") + "%";
+            }
+        }
+
+        public bool ContinueButtonVisible
+        {
+            get
+            {
+                return State == TuneStateEnum.Stopped;
             }
         }
 
@@ -649,6 +696,59 @@ namespace DVBTTelevizor.MAUI
                     ||
                     (State == TuneStateEnum.Stopped);
             }
+        }
+
+        public double SignalStrengthProgress
+        {
+            get
+            {
+                return _signalStrengthProgress;
+            }
+            set
+            {
+                _signalStrengthProgress = value;
+            }
+        }
+
+        private void SignalStrengthBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _loggingService.Info("Starting SignalStrengthBackgroundWorker_DoWork");
+
+            if (_signalStrengthBackgroundWorker == null)
+                return;
+
+            while (!_signalStrengthBackgroundWorker.CancellationPending)
+            {
+                try
+                {
+                    if (_driver.Connected)
+                    {
+                        Task.Run(async () =>
+                        {
+                            _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
+
+                            await _driver.GetStatus();
+
+                        }).Wait();
+                    }
+                    else
+                    {
+                        SignalStrengthProgress = 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+                finally
+                {
+
+                }
+
+                System.Threading.Thread.Sleep(1000);
+            }
+
+            _loggingService.Info("SignalStrengthBackgroundWorker_DoWork finished");
         }
     }
 }

@@ -8,6 +8,8 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
 {
     private TuningProgressPageViewModel _viewModel;
 
+    public bool Finished { get; set; } = false;
+
     private Size _lastAllocatedSize = new Size(-1, -1);
     private bool _isPortrait { get; set; } = false;
     private bool? _isPortraitPreviousValue { get; set; } = null;
@@ -170,9 +172,21 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"TuningProgressPage OnTextSent {text}");
     }
 
-    private void StartButton_Clicked(object sender, EventArgs e)
+    private async void StartButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
+
+        if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped)
+        {
+            if (!await _dialogService.Confirm(
+                "Tuning is in progress".Translated(),
+                "Start tuning".Translated(),
+                "Continue".Translated(),
+                "Start from beginning".Translated()))
+            {
+                _viewModel.RestartTune();
+            }
+        }
 
         _viewModel.StartTune();
     }
@@ -182,5 +196,34 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"TuningProgressPage StopButton_Clicked");
 
         _viewModel.StopTune();
+    }
+
+    private void ContinueButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningProgressPage ContinueButton_Clicked");
+
+        _viewModel.StartTune();
+    }
+
+    private void BackButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningProgressPage BackButton_Clicked");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Navigation.PopAsync();
+        });
+    }
+
+    private async void FinishButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            Finished = true;
+            await Navigation.PopAsync();
+            //Navigation.RemovePage(Navigation.ModalStack.Last());
+        });
     }
 }

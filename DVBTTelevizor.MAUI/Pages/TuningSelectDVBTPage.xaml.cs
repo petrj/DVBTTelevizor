@@ -18,6 +18,8 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private string? _lastSelectedCenterItem = null;
 
+    public bool Finished { get; set; } = false;
+
     private TuningProgressPage _tuningProgress;
 
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
@@ -33,6 +35,18 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         BindingContext = _driverPageViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _tuningProgress = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+
+        _tuningProgress.Disappearing += delegate
+            {
+                if (_tuningProgress.Finished)
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        Finished = true;
+                        await Navigation.PopAsync();
+                    });
+                }
+            };
 
         BuildFocusableItems();
     }
