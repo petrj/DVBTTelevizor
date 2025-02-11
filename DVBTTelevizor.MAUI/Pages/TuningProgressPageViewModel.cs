@@ -1,5 +1,6 @@
 ﻿using LoggerService;
 using Microsoft.Maui;
+using MPEGTS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +15,7 @@ namespace DVBTTelevizor.MAUI
     {
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        private int _actualTuningDVBTType = 1; // 0 .. DVBT, 1 .. DVBT2
+        private int _actualTuningDVBTType = 0; // 0 .. DVBT, 1 .. DVBT2
         private long _actualTunningFreqKHz = 474000;
         private long _tuneBandWidthKHz = 8000;
 
@@ -40,50 +41,232 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        public void StartTune()
+        private void RestartTune()
+        {
+            _tunedMultiplexes.Clear();
+            _tunedNewChannels = 0;
+            Channels.Clear();
+
+            Channels.Add(new Channel()
+            {
+                Number = "1",
+                Name = "CT1",
+                ProviderName = "Cesta televize",
+                Bandwdith = 8,
+                DVBTType = 1,
+                Frequency = 484000000,
+                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
+                NonFree = true
+            });
+            Channels.Add(new Channel()
+            {
+                Number = "2",
+                Name = "CT2",
+                ProviderName = "Cesta televize",
+                Bandwdith = 8,
+                DVBTType = 1,
+                Frequency = 484000000,
+                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
+                NonFree = false
+            });
+
+            _actualTuningDVBTType = 0;
+            if (!DVBTTuning)
+            {
+                _actualTuningDVBTType = 1;
+            }
+
+            _actualTunningFreqKHz = FrequencyFromKHz;
+        }
+
+        public async void StartTune()
         {
             if (State == TuneStateEnum.Inactive)
             {
-                _tunedMultiplexes.Clear();
-                _tunedNewChannels = 0;
-                Channels.Clear();
-
-
-                Channels.Add(new Channel()
-                {
-                    Number = "1",
-                    Name = "CT1",
-                    ProviderName = "Cesta televize",
-                    Bandwdith = 8,
-                    DVBTType = 1,
-                    Frequency = 484000000,
-                    Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                    NonFree = true
-                });
-                Channels.Add(new Channel()
-                {
-                    Number = "2",
-                    Name = "CT2",
-                    ProviderName = "Cesta televize",
-                    Bandwdith = 8,
-                    DVBTType = 1,
-                    Frequency = 484000000,
-                    Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                    NonFree = false
-                });
-
-                _actualTuningDVBTType = 0;
-                if (!DVBTTuning)
-                {
-                    _actualTuningDVBTType = 1;
-                }
-
-                _actualTunningFreqKHz = FrequencyFromKHz;
+                RestartTune();
             }
 
-            _tuneState = TuneStateEnum.InProgress;
+            await Task.Run( async () => { await Tune(); });
+        }
 
-            NotifyChange();
+        private async Task Tune()
+        {
+            try
+            {
+                _loggingService.Info("Tuning started");
+
+                _tuneState = TuneStateEnum.InProgress;
+
+                //_savedChannels = await _channelService.LoadChannels();
+
+                NotifyChange();
+
+                for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
+                {
+                    if (!DVBTTuning && dvbtTypeIndex == 0)
+                        continue;
+                    if (!DVBT2Tuning && dvbtTypeIndex == 1)
+                        continue;
+                    if (_actualTuningDVBTType>dvbtTypeIndex)
+                    {
+                        continue;
+                    }
+                    _actualTuningDVBTType = dvbtTypeIndex;
+
+                    do
+                    {
+                        _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
+
+                        await Tune(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
+
+                        if (FrequencyToKHz != FrequencyFromKHz)
+                        {
+                            _actualTunningFreqKHz += TuneBandWidthKHz;
+                        }
+
+                        if (State != TuneStateEnum.InProgress)
+                        {
+                            return;
+                        }
+
+                        NotifyChange();
+
+                    } while (_actualTunningFreqKHz <= FrequencyToKHz);
+                }
+
+                State = TuneStateEnum.Finished;
+                //SignalStrengthProgress = 0;
+                //MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                State = TuneStateEnum.Failed;
+            }
+            finally
+            {
+                _loggingService.Info("Tuning finished");
+                NotifyChange();
+            }
+        }
+
+        private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
+        {
+            try
+            {
+                //SignalStrengthProgress = 0;
+
+                var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, false);
+
+                switch (tuneResult.Result)
+                {
+                    case DVBTDriverSearchProgramResultEnum.Error:
+                        _loggingService.Debug("Search error");
+                        return;
+
+                    case DVBTDriverSearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+                        return;
+                }
+
+                var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(false);
+
+                switch (searchMapPIDsResult.Result)
+                {
+                    case DVBTDriverSearchProgramResultEnum.Error:
+                        _loggingService.Debug("Search error");
+
+                        return;
+
+                    case DVBTDriverSearchProgramResultEnum.NoSignal:
+                        _loggingService.Debug("No signal");
+
+                        return;
+
+                    case DVBTDriverSearchProgramResultEnum.NoProgramFound:
+                        _loggingService.Debug("No program found");
+
+                        return;
+                }
+
+                if (State != TuneStateEnum.InProgress)
+                {
+                    _loggingService.Debug($"Tuning aborted");
+                    return;
+                }
+
+                var totalChannelsAddedCount = 0;
+
+                var mapPIDToServiceDescriptor = new Dictionary<long, MPEGTS.ServiceDescriptor>();
+
+                foreach (var serviceDescriptor in searchMapPIDsResult.ServiceDescriptors)
+                {
+                    // ProgramMapPID must be unique!
+                    if (!(mapPIDToServiceDescriptor.ContainsKey(serviceDescriptor.Value)))
+                    {
+                        mapPIDToServiceDescriptor.Add(serviceDescriptor.Value, null);
+                    }
+                    else
+                    {
+                        _loggingService.Debug($"Not unique MapPID {serviceDescriptor.Value}!");
+                        continue;
+                    }
+
+                    var ch = new Channel();
+                    ch.ProgramMapPID = serviceDescriptor.Value;
+                    ch.Name = serviceDescriptor.Key.ServiceName;
+                    ch.ProviderName = serviceDescriptor.Key.ProviderName;
+                    ch.Frequency = freq;
+                    ch.Bandwdith = bandWidth;
+                    ch.Number = String.Empty;
+                    ch.DVBTType = dvbtTypeIndex;
+                    ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
+                    ch.NonFree = !serviceDescriptor.Key.Free;
+
+                    /*
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        TunedChannels.Add(ch);
+                        OnPropertyChanged(nameof(TunedChannelsCount));
+                        OnPropertyChanged(nameof(NewTunedChannelsCount));
+                        OnPropertyChanged(nameof(TunedMultiplexesCount));
+                    });
+                    */
+                    _loggingService.Debug($"Found channel \"{serviceDescriptor.Key.ServiceName}\"");
+
+                    /*
+                    // automatically adding new tuned channel if does not exist
+                    if (!ConfigViewModel.ChannelExists(_savedChannels, ch.FrequencyAndMapPID))
+                    {
+                        ch.Number = ConfigViewModel.GetNextChannelNumber(_savedChannels).ToString();
+
+                        _savedChannels.Add(ch);
+
+                        await _channelService.SaveChannels(_savedChannels);
+                        totalChannelsAddedCount++;
+                        _newTunedChannelsCount++;
+                    }
+                    */
+                }
+
+                /*
+                if (totalChannelsAddedCount > 0)
+                {
+                    if (totalChannelsAddedCount > 1)
+                    {
+                        MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);
+                    }
+                    else
+                    {
+                        MessagingCenter.Send($"Channel saved", BaseViewModel.MSG_ToastMessage);
+                    }
+                }
+                */
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public void StopTune()
@@ -100,6 +283,20 @@ namespace DVBTTelevizor.MAUI
             Stopped = 2,
             Finished = 3,
             Failed = 4
+        }
+
+        public long TuneBandWidthKHz
+        {
+            get
+            {
+                return _tuneBandWidthKHz;
+            }
+            set
+            {
+                _tuneBandWidthKHz = value;
+
+                OnPropertyChanged(nameof(TuneBandWidthKHz));
+            }
         }
 
         public Channel? SelectedChannel
@@ -163,6 +360,8 @@ namespace DVBTTelevizor.MAUI
 
             OnPropertyChanged(nameof(StartButtonVisible));
             OnPropertyChanged(nameof(StopButtonVisible));
+            OnPropertyChanged(nameof(BackButtonVisible));
+            OnPropertyChanged(nameof(FinishButtonVisible));
 
             OnPropertyChanged(nameof(TunedMultiplexesCount));
             OnPropertyChanged(nameof(TunedChannelsCount));
@@ -330,11 +529,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _frequencyFromKHz;
+                return _frequencyToKHz;
             }
             set
             {
-                _frequencyFromKHz = value;
+                _frequencyToKHz = value;
                 NotifyChange();
             }
         }
@@ -428,6 +627,27 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return State == TuneStateEnum.InProgress;
+            }
+        }
+
+        public bool BackButtonVisible
+        {
+            get
+            {
+                return State != TuneStateEnum.InProgress;
+            }
+        }
+
+        public bool FinishButtonVisible
+        {
+            get
+            {
+                return
+                    (State == TuneStateEnum.Finished)
+                    ||
+                    (State == TuneStateEnum.Failed)
+                    ||
+                    (State == TuneStateEnum.Stopped);
             }
         }
     }

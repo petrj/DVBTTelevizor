@@ -198,12 +198,12 @@
                 <ColumnDefinition Width="33*" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True"/>
+            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}"/>
 
             <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
             <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
 
-            <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding NextVisible}"/>
+            <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding FinishButtonVisible}"/>
         </Grid>
 
         <Grid x:Name="ChannelsSplitterGrid" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5,0.85,0.85,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="10,0,10,0">
