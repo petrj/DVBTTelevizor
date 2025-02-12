@@ -149,6 +149,28 @@ namespace DVBTTelevizor.MAUI
             {
                 ConnectDriver();
             });
+            /*
+            Task.Run(async () =>
+            {
+                var timeout = 60 * 60;
+                var actTime = 0;
+                while (actTime < timeout)
+                {
+                    var stack = Navigation.NavigationStack;
+                    if (stack.Count >0)
+                    {
+                        var pageonTop = stack[stack.Count - 1];
+                        _loggingService.Info($"Page on top: {pageonTop.Title}");
+                    } else
+                    {
+                        _loggingService.Info($"No page on top");
+                    }
+
+                    actTime++;
+                    await Task.Delay(1000);
+                }
+            });
+            */
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)

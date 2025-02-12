@@ -20,7 +20,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     public bool Finished { get; set; } = false;
 
-    private TuningProgressPage _tuningProgress;
+    private NavigationPage _tuningProgressPage;
 
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -34,17 +34,37 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         BindingContext = _driverPageViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _tuningProgress = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _tuningProgressPage = new NavigationPage(new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider));
 
-        _tuningProgress.Disappearing += delegate
+        _tuningProgressPage.Disappearing += delegate
             {
-                if (_tuningProgress.Finished)
+                _loggingService.Info($"_tuningProgressPage Disappearing");
+                var nextPage = (_tuningProgressPage.RootPage as TuningProgressPage);
+
+                if (nextPage.Finished)
                 {
+                    Finished = true;
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        Finished = true;
+                        _loggingService.Info($"Calling PopAsync");
                         await Navigation.PopAsync();
                     });
+                    /*
+                    Task.Run(async () =>
+                    {
+                        var stack = Navigation.NavigationStack;
+
+                        var timeout = 5;
+                        var actTime = 0;
+                        while (actTime < timeout)
+                        {
+                            var pageonTop = stack[stack.Count - 1];
+                            _loggingService.Info($"Page on top: {pageonTop}");
+
+                            actTime++;
+                            await Task.Delay(1000);
+                        }
+                        */
                 }
             };
 
@@ -233,12 +253,12 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private async void NextButton_Clicked(object sender, EventArgs e)
     {
-        if (_tuningProgress.IsLoaded)
+        if (_tuningProgressPage.IsLoaded)
         {
             // preventing click when the settings page is just (or yet) loaded
             return;
         }
 
-        await Navigation.PushAsync(_tuningProgress);
+        await Navigation.PushAsync(_tuningProgressPage);
     }
 }

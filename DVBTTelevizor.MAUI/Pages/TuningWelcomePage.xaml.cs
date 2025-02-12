@@ -15,7 +15,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
-    private TuningSelectDVBTPage _selectDVBTPage;
+    private NavigationPage _selectDVBTPage;
 
     public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -29,14 +29,36 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _selectDVBTPage = new NavigationPage(new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider));
 
         _selectDVBTPage.Disappearing += delegate
         {
-            if (_selectDVBTPage.Finished)
+            _loggingService.Info($"_selectDVBTPage Disappearing");
+
+            var nextPage = (_selectDVBTPage.RootPage as TuningSelectDVBTPage);
+            if (nextPage.Finished)
             {
+                /*
+                Task.Run(async () =>
+                {
+                    var stack = Navigation.NavigationStack;
+
+                    var timeout = 10;
+                    var actTime = 0;
+                    while (actTime < timeout)
+                    {
+                        var pageonTop = stack[stack.Count - 1];
+                        _loggingService.Info($"Page on top: {pageonTop}");
+
+                        actTime++;
+                        await Task.Delay(1000);
+                    }
+                });
+                */
+
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
+                    _loggingService.Info($"Calling closing Tuning Welcome Page");
                     await Navigation.PopAsync();
                 });
             }
@@ -135,7 +157,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             return;
         }
 
-        await Navigation.PushAsync(_selectDVBTPage);
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Navigation.PushAsync(_selectDVBTPage);
+        });
     }
 
     private void ManualScanButton_Clicked(object sender, EventArgs e)
