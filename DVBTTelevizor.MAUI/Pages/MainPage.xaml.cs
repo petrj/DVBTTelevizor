@@ -38,7 +38,7 @@ namespace DVBTTelevizor.MAUI
         private Media _media;
 
         private NavigationPage _settingsPage = null;
-        private NavigationPage _tuneWelcomePage = null;
+        private TuningWelcomePage _tuneWelcomePage = null;
         private NavigationPage _aboutPage = null;
         private NavigationPage _driverPage = null;
 
@@ -129,7 +129,7 @@ namespace DVBTTelevizor.MAUI
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
             _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
-            _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
             _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
 
@@ -149,7 +149,7 @@ namespace DVBTTelevizor.MAUI
             {
                 ConnectDriver();
             });
-            /*
+
             Task.Run(async () =>
             {
                 var timeout = 60 * 60;
@@ -159,8 +159,14 @@ namespace DVBTTelevizor.MAUI
                     var stack = Navigation.NavigationStack;
                     if (stack.Count >0)
                     {
-                        var pageonTop = stack[stack.Count - 1];
-                        _loggingService.Info($"Page on top: {pageonTop.Title}");
+                        int i = 0;
+                        _loggingService.Info($"Pages on stack:");
+                        foreach (var p in stack)
+                        {
+                            _loggingService.Info($"{new string(' ',i*2)}: {p.GetType().Name}");
+                            i++;
+                        }
+
                     } else
                     {
                         _loggingService.Info($"No page on top");
@@ -170,7 +176,6 @@ namespace DVBTTelevizor.MAUI
                     await Task.Delay(1000);
                 }
             });
-            */
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)

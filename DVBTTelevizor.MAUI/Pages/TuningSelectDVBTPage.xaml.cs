@@ -20,7 +20,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     public bool Finished { get; set; } = false;
 
-    private NavigationPage _tuningProgressPage;
+    private TuningProgressPage _tuningProgressPage;
 
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -34,14 +34,13 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         BindingContext = _driverPageViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _tuningProgressPage = new NavigationPage(new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider));
+        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _tuningProgressPage.Disappearing += delegate
             {
                 _loggingService.Info($"_tuningProgressPage Disappearing");
-                var nextPage = (_tuningProgressPage.RootPage as TuningProgressPage);
 
-                if (nextPage.Finished)
+                if (_tuningProgressPage.Finished)
                 {
                     Finished = true;
                     MainThread.BeginInvokeOnMainThread(async () =>

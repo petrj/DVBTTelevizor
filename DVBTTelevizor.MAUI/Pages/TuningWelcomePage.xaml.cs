@@ -15,7 +15,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
-    private NavigationPage _selectDVBTPage;
+    private TuningSelectDVBTPage _selectDVBTPage;
 
     public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -29,14 +29,13 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _selectDVBTPage = new NavigationPage(new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider));
+        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _selectDVBTPage.Disappearing += delegate
         {
             _loggingService.Info($"_selectDVBTPage Disappearing");
 
-            var nextPage = (_selectDVBTPage.RootPage as TuningSelectDVBTPage);
-            if (nextPage.Finished)
+            if (_selectDVBTPage.Finished)
             {
                 /*
                 Task.Run(async () =>
