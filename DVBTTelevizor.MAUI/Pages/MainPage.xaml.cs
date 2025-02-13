@@ -76,7 +76,6 @@ namespace DVBTTelevizor.MAUI
         private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0, 0.92, 1, 0.92);
         private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.3, 1.0, 0.7);
 
-
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVCConfiguration tvConfiguration)
         {
             InitializeComponent();
@@ -150,32 +149,54 @@ namespace DVBTTelevizor.MAUI
                 ConnectDriver();
             });
 
-            Task.Run(async () =>
+            WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
             {
-                var timeout = 60 * 60;
-                var actTime = 0;
-                while (actTime < timeout)
-                {
-                    var stack = Navigation.NavigationStack;
-                    if (stack.Count >0)
-                    {
-                        int i = 0;
-                        _loggingService.Info($"Pages on stack:");
-                        foreach (var p in stack)
-                        {
-                            _loggingService.Info($"{new string(' ',i*2)}: {p.GetType().Name}");
-                            i++;
-                        }
+                _loggingService.Info($"FinishTuning");
 
-                    } else
+                CloseAllPages();
+            });
+        }
+
+        private void CloseAllPages()
+        {
+            var max = 5; // max 5 pages
+            var current = 0;
+
+            while (current < max)
+            {
+                var stack = Navigation.NavigationStack;
+                if (stack.Count > 0)
+                {
+                    int i = 0;
+                    _loggingService.Info($"Pages on stack:");
+                    foreach (var p in stack)
                     {
-                        _loggingService.Info($"No page on top");
+                        _loggingService.Info($"{new string(' ', i * 2)}: {p.GetType().Name}");
+                        i++;
                     }
 
-                    actTime++;
-                    await Task.Delay(1000);
+                    var pageOnTop = stack[stack.Count - 1];
+
+                    if (pageOnTop != this)
+                    {
+                        _loggingService.Info($"Closing page in top: {pageOnTop.GetType().Name}");
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            await Navigation.PopAsync();
+                        });
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-            });
+                else
+                {
+                    _loggingService.Info($"No page on top");
+                }
+
+                current++;
+            }
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)

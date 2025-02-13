@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Layouts;
 using static System.Net.Mime.MediaTypeNames;
@@ -219,11 +221,6 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            Finished = true;
-            await Navigation.PopAsync();
-            //Navigation.RemovePage(Navigation.ModalStack.Last());
-        });
+        WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
     }
 }

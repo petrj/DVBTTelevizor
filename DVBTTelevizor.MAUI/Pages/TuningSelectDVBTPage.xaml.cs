@@ -36,37 +36,6 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _tuningProgressPage.Disappearing += delegate
-            {
-                _loggingService.Info($"_tuningProgressPage Disappearing");
-
-                if (_tuningProgressPage.Finished)
-                {
-                    Finished = true;
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        _loggingService.Info($"Calling PopAsync");
-                        await Navigation.PopAsync();
-                    });
-                    /*
-                    Task.Run(async () =>
-                    {
-                        var stack = Navigation.NavigationStack;
-
-                        var timeout = 5;
-                        var actTime = 0;
-                        while (actTime < timeout)
-                        {
-                            var pageonTop = stack[stack.Count - 1];
-                            _loggingService.Info($"Page on top: {pageonTop}");
-
-                            actTime++;
-                            await Task.Delay(1000);
-                        }
-                        */
-                }
-            };
-
         BuildFocusableItems();
     }
 

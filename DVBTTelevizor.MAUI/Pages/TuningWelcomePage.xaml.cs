@@ -31,38 +31,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _selectDVBTPage.Disappearing += delegate
-        {
-            _loggingService.Info($"_selectDVBTPage Disappearing");
-
-            if (_selectDVBTPage.Finished)
-            {
-                /*
-                Task.Run(async () =>
-                {
-                    var stack = Navigation.NavigationStack;
-
-                    var timeout = 10;
-                    var actTime = 0;
-                    while (actTime < timeout)
-                    {
-                        var pageonTop = stack[stack.Count - 1];
-                        _loggingService.Info($"Page on top: {pageonTop}");
-
-                        actTime++;
-                        await Task.Delay(1000);
-                    }
-                });
-                */
-
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _loggingService.Info($"Calling closing Tuning Welcome Page");
-                    await Navigation.PopAsync();
-                });
-            }
-        };
-
         BuildFocusableItems();
     }
 
