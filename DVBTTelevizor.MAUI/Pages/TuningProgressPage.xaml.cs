@@ -37,6 +37,46 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         BindingContext = _viewModel = new TuningProgressPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
+
+        _viewModel.ChannelFound += ChannelFound;
+    }
+
+    public bool DVBTTuning
+    {
+        get
+        {
+            return _viewModel == null ? false : _viewModel.DVBTTuning;
+        }
+        set
+        {
+            if (_viewModel == null)
+                return;
+
+            _viewModel.DVBTTuning = value;
+        }
+    }
+
+    public bool DVBT2Tuning
+    {
+        get
+        {
+            return _viewModel == null ? false : _viewModel.DVBT2Tuning;
+        }
+        set
+        {
+            if (_viewModel == null)
+                return;
+
+            _viewModel.DVBT2Tuning = value;
+        }
+    }
+
+    private void ChannelFound(object? sender, EventArgs e)
+    {
+        if (e is ChannelFoundEventArgs che)
+        {
+            _loggingService.Info($"Adding new channel: {che.Channel.Name}");
+        }
     }
 
     private void BuildFocusableItems()

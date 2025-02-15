@@ -134,6 +134,38 @@
             <Label Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Text="{Binding SignalProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
         </Grid>
 
+
+        <!--Grid x:Name="SignalDetailGrid" AbsoluteLayout.LayoutBounds="0.5,0.30,0.9,0.05" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Gray" ColumnSpacing="5">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="25*" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <Label Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+            <CheckBox Grid.Row="0" Grid.Column="2" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <Label Grid.Row="0" Grid.Column="3" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+            <CheckBox Grid.Row="0" Grid.Column="4" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <Label Grid.Row="0" Grid.Column="5" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+
+            <Label Grid.Row="0" Grid.Column="6" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="0" Grid.Column="7" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
+
+        </Grid-->
+
         <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.5,0.34,0.9,0.16" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>

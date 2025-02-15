@@ -35,6 +35,9 @@ namespace DVBTTelevizor.MAUI
 
         private bool _enableLogging = false;
 
+        private bool _tuneDVBTEnabled = true;
+        private bool _tuneDVBT2Enabled = true;
+
         private string _autoPlayedChannelFrequencyAndMapPID = string.Empty;
 
         [JsonProperty]
@@ -180,6 +183,34 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _autoPlayedChannelFrequencyAndMapPID = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool TuneDVBTEnabled
+        {
+            get
+            {
+                return _tuneDVBTEnabled;
+            }
+            set
+            {
+                _tuneDVBTEnabled = value;
+                Save();
+            }
+        }
+
+        [JsonProperty]
+        public bool TuneDVBT2Enabled
+        {
+            get
+            {
+                return _tuneDVBT2Enabled;
+            }
+            set
+            {
+                _tuneDVBT2Enabled = value;
                 Save();
             }
         }
@@ -375,6 +406,8 @@ namespace DVBTTelevizor.MAUI
                         ShowRadioChannels = cfg.ShowRadioChannels;
                         EnableLogging = cfg.EnableLogging;
                         AutoPlayedChannelFrequencyAndMapPID = cfg.AutoPlayedChannelFrequencyAndMapPID;
+                        TuneDVBTEnabled = cfg.TuneDVBTEnabled;
+                        TuneDVBT2Enabled = cfg.TuneDVBT2Enabled;
 
                         AllowRemoteAccessService = cfg.AllowRemoteAccessService;
                         RemoteAccessServiceIP = cfg.RemoteAccessServiceIP;

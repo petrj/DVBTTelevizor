@@ -82,6 +82,9 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         _driverPageViewModel.FillBandwidths();
 
+        _driverPageViewModel.DVBT = _configuration.TuneDVBTEnabled;
+        _driverPageViewModel.DVBT2 = _configuration.TuneDVBT2Enabled;
+
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
@@ -226,6 +229,9 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
             // preventing click when the settings page is just (or yet) loaded
             return;
         }
+
+        _tuningProgressPage.DVBTTuning = _driverPageViewModel.DVBT;
+        _tuningProgressPage.DVBT2Tuning = _driverPageViewModel.DVBT2;
 
         await Navigation.PushAsync(_tuningProgressPage);
     }

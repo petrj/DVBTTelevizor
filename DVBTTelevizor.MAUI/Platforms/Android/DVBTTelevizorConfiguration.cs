@@ -91,6 +91,30 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool TuneDVBTEnabled
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("TuneDVBTEnabled", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("TuneDVBTEnabled", value);
+            }
+        }
+
+        public bool TuneDVBT2Enabled
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("TuneDVBT2Enabled", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("TuneDVBT2Enabled", value);
+            }
+        }
+
         public bool ShowNonFreeChannels
         {
             get

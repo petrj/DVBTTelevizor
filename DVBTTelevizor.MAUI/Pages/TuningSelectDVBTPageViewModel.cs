@@ -81,6 +81,7 @@ namespace DVBTTelevizor.MAUI
                 _dvbt = value;
                 OnPropertyChanged(nameof(DVBT));
                 OnPropertyChanged(nameof(NextVisible));
+                _configuration.TuneDVBTEnabled = value;
             }
         }
 
@@ -95,6 +96,7 @@ namespace DVBTTelevizor.MAUI
                 _dvbt2 = value;
                 OnPropertyChanged(nameof(DVBT2));
                 OnPropertyChanged(nameof(NextVisible));
+                _configuration.TuneDVBT2Enabled = value;
             }
         }
 

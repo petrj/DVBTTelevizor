@@ -35,6 +35,9 @@ namespace DVBTTelevizor
 
         public bool EnableLogging { get; set; }
 
+        public bool TuneDVBTEnabled { get; set; }
+        public bool TuneDVBT2Enabled { get; set; }
+
         void Load();
         void Save();
 

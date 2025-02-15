@@ -39,6 +39,8 @@ namespace DVBTTelevizor.MAUI
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
 
+        public event EventHandler? ChannelFound = null;
+
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
@@ -47,12 +49,17 @@ namespace DVBTTelevizor.MAUI
             _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
         }
 
-        public void RestartTune()
+        public void RestartTune(bool clearChannels = true)
         {
-            _tunedMultiplexes.Clear();
-            _tunedNewChannels = 0;
-            Channels.Clear();
+            if (clearChannels)
+            {
 
+                _tunedMultiplexes.Clear();
+                _tunedNewChannels = 0;
+                Channels.Clear();
+            }
+
+            /*
             Channels.Add(new Channel()
             {
                 Number = "1",
@@ -75,6 +82,7 @@ namespace DVBTTelevizor.MAUI
                 Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
                 NonFree = false
             });
+            */
 
             _actualTuningDVBTType = 0;
             if (!DVBTTuning)
@@ -90,6 +98,11 @@ namespace DVBTTelevizor.MAUI
             if (State == TuneStateEnum.Inactive)
             {
                 RestartTune();
+            }
+
+            if (State == TuneStateEnum.Finished)
+            {
+                RestartTune(false);
             }
 
             await Task.Run( async () => { await Tune(); });
@@ -251,6 +264,12 @@ namespace DVBTTelevizor.MAUI
                     });
                     */
                     _loggingService.Debug($"Found channel \"{serviceDescriptor.Key.ServiceName}\"");
+
+                    if (ChannelFound != null)
+                    {
+                        ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
+                    }
+
 
                     /*
                     // automatically adding new tuned channel if does not exist
