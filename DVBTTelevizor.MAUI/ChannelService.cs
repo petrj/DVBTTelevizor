@@ -12,9 +12,9 @@ namespace DVBTTelevizor.MAUI
     public abstract class ChannelService
     {
         protected ILoggingService _log = new BasicLoggingService();
-        protected ITVCConfiguration _config;
+        protected ITVConfiguration _config;
 
-        public ChannelService(ILoggingService logingService, ITVCConfiguration config)
+        public ChannelService(ILoggingService logingService, ITVConfiguration config)
         {
             _log = logingService;
             _config = config;

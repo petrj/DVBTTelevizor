@@ -25,7 +25,7 @@ namespace DVBTTelevizor.MAUI
             builder.Services.AddSingleton<DVBTTelevizorConfiguration>();
 
             builder.Services.AddSingleton<IPublicDirectoryProvider, PublicDirectoryProvider>();
-            builder.Services.AddSingleton<ITVCConfiguration, DVBTTelevizorConfiguration>();
+            builder.Services.AddSingleton<ITVConfiguration, DVBTTelevizorConfiguration>();
             builder.Services.AddSingleton<ILoggingProvider, LoggerProvider>();
 
 

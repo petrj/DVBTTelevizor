@@ -11,12 +11,12 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private IDialogService _dialogService;
-    private ITVCConfiguration _configuration;
+    private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
 
-    public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
 	{
         InitializeComponent();
 

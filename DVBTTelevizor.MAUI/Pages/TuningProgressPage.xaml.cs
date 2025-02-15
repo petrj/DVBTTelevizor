@@ -19,12 +19,12 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private IDialogService _dialogService;
-    private ITVCConfiguration _configuration;
+    private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
 
-    public TuningProgressPage(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public TuningProgressPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 

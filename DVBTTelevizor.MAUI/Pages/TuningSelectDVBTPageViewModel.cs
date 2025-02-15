@@ -19,7 +19,7 @@ namespace DVBTTelevizor.MAUI
 
         public ObservableCollection<string> Bandwidths { get; set; } = new ObservableCollection<string>();
 
-        public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
 

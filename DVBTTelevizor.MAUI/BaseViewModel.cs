@@ -12,12 +12,12 @@ namespace DVBTTelevizor.MAUI
         protected ILoggingService _loggingService;
         protected IDriverConnector _driver;
         protected string _publicDirectory;
-        protected ITVCConfiguration _configuration;
+        protected ITVConfiguration _configuration;
         protected IDialogService _dialogService;
 
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
-            ITVCConfiguration tvConfiguration,
+            ITVConfiguration tvConfiguration,
             IDialogService dialogService,
             IPublicDirectoryProvider publicDirectoryProvider)
         {
@@ -36,7 +36,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public ITVCConfiguration Config
+        public ITVConfiguration Config
         {
             get
             {

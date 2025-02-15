@@ -41,7 +41,7 @@ namespace DVBTTelevizor.MAUI
 
         public event EventHandler? ChannelFound = null;
 
-        public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
             _signalStrengthBackgroundWorker = new BackgroundWorker();

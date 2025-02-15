@@ -14,7 +14,7 @@ namespace DVBTTelevizor.MAUI
         private ILoggingService _loggingService { get; set; }
         private IDriverConnector _driver { get; set; }
         private IDialogService _dialogService;
-        private ITVCConfiguration _configuration;
+        private ITVConfiguration _configuration;
         public string PublicDirectory { get; set; }
 
         private TestDVBTDriver _testDVBTDriver = null;
@@ -76,7 +76,7 @@ namespace DVBTTelevizor.MAUI
         private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0, 0.92, 1, 0.92);
         private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.3, 1.0, 0.7);
 
-        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVCConfiguration tvConfiguration)
+        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
             InitializeComponent();
 

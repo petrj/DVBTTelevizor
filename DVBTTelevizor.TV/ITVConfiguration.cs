@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor
 {
-    public interface ITVCConfiguration
+    public interface ITVConfiguration
     {
         public string ConfigDirectory { get; set; }
 

@@ -32,7 +32,7 @@ namespace DVBTTelevizor.MAUI
         public EITManager EIT { get; set; }
         public PIDManager PID { get; set; }
 
-        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVCConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);

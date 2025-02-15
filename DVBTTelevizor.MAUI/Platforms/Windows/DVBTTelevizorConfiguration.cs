@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace DVBTTelevizor.MAUI
 {
     [JsonObject(MemberSerialization.OptIn)]
-    internal class DVBTTelevizorConfiguration : ITVCConfiguration
+    internal class DVBTTelevizorConfiguration : ITVConfiguration
     {
         private ILoggingService _loggingService;
         private string _configDirectory = string.Empty;
