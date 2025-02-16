@@ -21,11 +21,11 @@ namespace DVBTTelevizor
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
-        public SQLiteTVConfiguration(ILoggingService loggingService, string publicDirectory)
+        public SQLiteTVConfiguration(ILoggingService loggingService, IPublicDirectoryProvider publicDirectoryProvider)
         {
             _loggingService = loggingService;
-            _configDirectory = publicDirectory;
-            _configDBPath = Path.Join(publicDirectory, "DVBTTelevizor.MAUI.config.sqlite");
+            _configDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+            _configDBPath = Path.Join(_configDirectory, "DVBTTelevizor.MAUI.config.sqlite");
 
             InitDB();
         }
