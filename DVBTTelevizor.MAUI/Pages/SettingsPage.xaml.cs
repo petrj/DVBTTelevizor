@@ -150,4 +150,23 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     public void OnTextSent(string text)
     {
     }
+
+    private async void ClearChannelsButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Info("Clearing channels");
+
+        if (_configuration.Channels.Count==0)
+        {
+            await _dialogService.Information("No channel found".Translated());
+            return;
+        }
+
+        if (!await _dialogService.Confirm("Are you sure to delete all channels?".Translated(),"Confirm".Translated(),"Yes".Translated(), "No".Translated()))
+        {
+            return;
+        }
+
+        _configuration.Channels.Clear();
+        _configuration.Save();
+    }
 }

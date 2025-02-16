@@ -155,6 +155,14 @@ namespace DVBTTelevizor.MAUI
 
                 CloseAllPages();
             });
+
+            _settingsPage.Disappearing += delegate
+            {
+                Task.Run( async () =>
+                {
+                    await _viewModel.RefreshChannels();
+                });
+            };
         }
 
         private void CloseAllPages()

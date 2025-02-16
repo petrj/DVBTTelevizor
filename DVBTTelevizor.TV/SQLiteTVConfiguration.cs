@@ -40,23 +40,21 @@ namespace DVBTTelevizor
 
         private void InitDB()
         {
-            using (var connection = new SqliteConnection(ConnectionString))
+            try
             {
-                connection.Open();
-
-                string createTableQuery = "CREATE TABLE IF NOT EXISTS Configuration (Key TEXT PRIMARY KEY, Value TEXT);";
-                using (var command = new SqliteCommand(createTableQuery, connection))
+                using (var connection = new SqliteConnection(ConnectionString))
                 {
-                    command.ExecuteNonQuery();
+                    connection.Open();
+
+                    string createTableQuery = "CREATE TABLE IF NOT EXISTS Configuration (Key TEXT PRIMARY KEY, Value TEXT);";
+                    using (var command = new SqliteCommand(createTableQuery, connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
                 }
-
-                // Vložení nebo aktualizace hodnoty v konfiguraci
-                //SetConfigValue(connection, "AppName", "MojeAplikace");
-                //SetConfigValue(connection, "Version", "1.0.0");
-
-                // Čtení hodnoty z konfigurace
-                //string appName = GetConfigValue(connection, "AppName");
-                //Console.WriteLine($"AppName: {appName}");
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         }
 
@@ -84,7 +82,7 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex);
             }
 
-            return String.Empty;
+            return defaultValue;
         }
 
         protected T GetPersistingSettingValue<T>(string key, T defaultValue = default(T))
@@ -241,8 +239,6 @@ namespace DVBTTelevizor
             }
         }
 
-
-
         public bool PlayOnBackground
         {
             get
@@ -379,12 +375,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                var port = GetPersistingSettingValue<int>("RemoteAccessServicePort");
-                if (port == default(int))
-                {
-                    port = 49152;
-                }
-
+                var port = GetPersistingSettingValue<int>("RemoteAccessServicePort", 49152);
                 return port;
             }
             set
@@ -397,17 +388,11 @@ namespace DVBTTelevizor
         {
             get
             {
-                var key = GetPersistingSettingValue<string>("RemoteAccessServiceSecurityKey");
-                if (key == default(string))
-                {
-                    key = "DVBTTelevizor";
-                }
-
+                var key = GetPersistingSettingValue<string>("RemoteAccessServiceSecurityKey", "DVBTTelevizor");
                 return key;
             }
             set { SavePersistingSettingValue<string>("RemoteAccessServiceSecurityKey", value); }
         }
-
 
         public bool EnableLogging
         {

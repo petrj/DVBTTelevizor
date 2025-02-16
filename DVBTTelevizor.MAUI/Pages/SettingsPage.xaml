@@ -122,7 +122,7 @@
                     <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
                 </Grid>
 
-                <Button x:Name="ClearChannelsButton" Text="{local:LngXamlExt Input='Delete all channels'}"  Command="{Binding ClearChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                <Button x:Name="ClearChannelsButton" Text="{local:LngXamlExt Input='Delete all channels'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="ClearChannelsButton_Clicked"/>
 
                 <Button x:Name="ExportToFileButton" Text="{local:LngXamlExt Input='Export To File'}"  Command="{Binding ExportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Margin="30,30,20,0"/>
                 <Button x:Name="ImportChannelsButton" Text="{local:LngXamlExt Input='Import from file'}"  Command="{Binding ImportChannelsCommand}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>

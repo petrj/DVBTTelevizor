@@ -20,6 +20,8 @@ namespace DVBTTelevizor
         public DVBTDriverTypeEnum DVBTDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }
 
+        public Band AppFontSize { get; set; }
+
         public bool Fullscreen { get; set; }
         public bool PlayOnBackground { get; set; }
 
