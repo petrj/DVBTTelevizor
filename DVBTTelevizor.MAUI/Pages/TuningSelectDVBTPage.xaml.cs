@@ -82,9 +82,6 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         _driverPageViewModel.FillBandwidths();
 
-        _driverPageViewModel.DVBT = _configuration.TuneDVBTEnabled;
-        _driverPageViewModel.DVBT2 = _configuration.TuneDVBT2Enabled;
-
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }

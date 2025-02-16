@@ -22,7 +22,8 @@ namespace DVBTTelevizor.MAUI
         public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-
+            _dvbt = tvConfiguration.TuneDVBTEnabled;
+            _dvbt2 = tvConfiguration.TuneDVBT2Enabled;
         }
 
         public async void FillBandwidths()

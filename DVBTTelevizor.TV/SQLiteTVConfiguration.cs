@@ -21,9 +21,9 @@ namespace DVBTTelevizor
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
-        public SQLiteTVConfiguration(ILoggingService loggingService, IPublicDirectoryProvider publicDirectoryProvider)
+        public SQLiteTVConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {
-            _loggingService = loggingService;
+            _loggingService = loggingProvider.GetLoggingService();
             _configDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
             _configDBPath = Path.Join(_configDirectory, "DVBTTelevizor.MAUI.config.sqlite");
 
@@ -34,7 +34,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return $"Data Source={_configDBPath};Version=3;";
+                return $"Data Source={_configDBPath};";
             }
         }
 
@@ -93,30 +93,36 @@ namespace DVBTTelevizor
 
             try
             {
+                var stringVal = GetPersistingSettingStringValue(key);
+                if (String.IsNullOrEmpty(stringVal))
+                {
+                    return defaultValue;
+                }
+
                 object val;
 
                 if (typeof(T) == typeof(string))
                 {
-                    val = GetPersistingSettingStringValue(key);
+                    val = stringVal;
                 }
                 else
                 if (typeof(T) == typeof(bool))
                 {
-                    val = Convert.ToBoolean(GetPersistingSettingStringValue(key));
+                    val = Convert.ToBoolean(stringVal);
                 }
                 else
                 if (typeof(T) == typeof(int))
                 {
-                    val = Convert.ToInt32(GetPersistingSettingStringValue(key));
+                    val = Convert.ToInt32(stringVal);
                 }
                 else
                 if (typeof(T) == typeof(long))
                 {
-                    val = Convert.ToInt64(GetPersistingSettingStringValue(key));
+                    val = Convert.ToInt64(stringVal);
                 }
                 else
                 {
-                    val = default(T);
+                    return defaultValue;
                 }
 
                 result = (T)Convert.ChangeType(val, typeof(T));
@@ -124,7 +130,9 @@ namespace DVBTTelevizor
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                result = defaultValue;
+
+                _loggingService.Error(ex);
             }
 
             return result;
@@ -138,7 +146,7 @@ namespace DVBTTelevizor
                 {
                     connection.Open();
 
-                    string insertQuery = "INSERT INTO Config (Key, Value) VALUES (@key, @value) " +
+                    string insertQuery = "INSERT INTO Configuration (Key, Value) VALUES (@key, @value) " +
                                "ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
                     using (var command = new SqliteCommand(insertQuery, connection))
                     {
