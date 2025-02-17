@@ -214,6 +214,19 @@ namespace DVBTTelevizor
             }
         }
 
+        public DVBTBandwidthEnum DVBTBandwidth
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("DVBTBandwidth", 0);
+                return (DVBTBandwidthEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("DVBTBandwidth", (int)value);
+            }
+        }
+
         public AppFontSizeEnum AppFontSize
         {
             get

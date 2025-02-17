@@ -60,6 +60,12 @@ namespace DVBTTelevizor.MAUI.WinUI
                 WeakReferenceMessenger.Default.Send(new KeyDownMessage(m.Value));
             });
 
+            UnhandledException += App_UnhandledException;
+        }
+
+        private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+        {
+            _loggingService.Error(e.Exception);
         }
 
         private void Hook_KeyPressed(object? sender, KeyboardHookEventArgs e)

@@ -24,6 +24,8 @@ namespace DVBTTelevizor.MAUI
         {
             _dvbt = tvConfiguration.TuneDVBTEnabled;
             _dvbt2 = tvConfiguration.TuneDVBT2Enabled;
+
+            _selectedBandwidth = Bandwidth.BandWidthTitle[tvConfiguration.DVBTBandwidth];
         }
 
         public async void FillBandwidths()
@@ -31,18 +33,9 @@ namespace DVBTTelevizor.MAUI
             Bandwidths.Clear();
             _dict.Clear();
 
-            // Mhz string => Hz
-
-            _dict.Add("1.7 MHz", 1700000);
-            _dict.Add("5 MHz", 5000000);
-            _dict.Add("6 MHz", 6000000);
-            _dict.Add("7 MHz", 7000000);
-            _dict.Add("8 MHz", 8000000);
-            _dict.Add("10 MHz", 10000000);
-
-            foreach (var kvp in _dict)
+            foreach (var key in Bandwidth.TitleBandWidthHz.Keys)
             {
-                Bandwidths.Add(kvp.Key);
+                Bandwidths.Add(key);
             }
 
             if (_selectedBandwidth == null)
@@ -65,7 +58,17 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                if (value == null)
+                {
+                    return;
+                }
+
                 _selectedBandwidth = value;
+
+                if (Bandwidth.TitleBandWidth.ContainsKey(value))
+                {
+                    _configuration.DVBTBandwidth = Bandwidth.TitleBandWidth[value];
+                }
 
                 OnPropertyChanged(nameof(SelectedBandwidth));
             }

@@ -42,6 +42,19 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public DVBTBandwidthEnum DVBTBandwidth
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("DVBTBandwidth");
+                return (DVBTBandwidthEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("DVBTBandwidth", (int)value);
+            }
+        }
+
         public DVBTDriverTypeEnum DVBTDriverType
         {
             get
