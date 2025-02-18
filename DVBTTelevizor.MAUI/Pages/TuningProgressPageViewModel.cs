@@ -373,7 +373,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
 
             OnPropertyChanged(nameof(DeliverySystem));
-            OnPropertyChanged(nameof(DeliverySystemCaption));
+            OnPropertyChanged(nameof(SubTitleCaption));
 
             OnPropertyChanged(nameof(TuningProgress));
             OnPropertyChanged(nameof(FrequencyProgress));
@@ -469,11 +469,21 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string DeliverySystemCaption
+        public string SubTitleCaption
         {
             get
             {
-                return DeliverySystem == 0 ? "DVBT" : "DVBT2";
+                var res = "";
+                res += DeliverySystem == 0 ? "DVBT" : "DVBT2";
+                /*
+                if (FrequencyFromKHz != FrequencyToKHz)
+                {
+                    res += $" ({FrequencyFromMHz}-{FrequencyToMHz})";
+                }
+                res += " MHz";
+                */
+
+                return res;
             }
         }
 

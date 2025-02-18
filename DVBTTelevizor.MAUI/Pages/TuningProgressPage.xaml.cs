@@ -157,8 +157,23 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
+        SetTitle();
+
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+    }
+
+    private void SetTitle()
+    {
+        var title = "Tuning ".Translated();
+        title += _viewModel.FrequencyFromMHz;
+        if (_viewModel.FrequencyFromKHz != _viewModel.FrequencyToKHz)
+        {
+            title += " - " + _viewModel.FrequencyToMHz;
+        }
+        title += " MHz";
+
+        Title = title;
     }
 
     public void OnKeyDown(string key, bool longPress)

@@ -73,8 +73,8 @@
         <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5,0.01,0.95,0.1" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Center" VerticalOptions="Start">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="70*" />
-                <RowDefinition Height="30*" />
+                <RowDefinition Height="75*" />
+                <RowDefinition Height="25*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -86,7 +86,7 @@
             <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
             <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
 
-            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding DeliverySystemCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLable}" HorizontalOptions="Center" VerticalOptions="Start"/>
+            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SubTitleCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Start"/>
         </Grid>
 
         <ActivityIndicator x:Name="TuneIndicator" AbsoluteLayout.LayoutBounds="0.5,0.1,0.25,0.1" AbsoluteLayout.LayoutFlags="All"  IsRunning="True" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Center" Color="#41b3ff" IsVisible="{Binding TuningInProgress}"/>
@@ -94,9 +94,7 @@
         <Grid x:Name="ProgressGrid" AbsoluteLayout.LayoutBounds="0.1,0.15,0.4,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="33*" />
-                <RowDefinition Height="34*" />
-                <RowDefinition Height="33*" />
+                <RowDefinition Height="100*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20*" />
@@ -106,16 +104,16 @@
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Tune'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Tuning'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
             <ProgressBar Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" />
-            <ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding FrequencyProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" />
-
-            <Label Grid.Row="2" Grid.Column="1" Text="{Binding FrequencyFromMHz}" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" />
-            <Label Grid.Row="2" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-
             <Label Grid.Row="0" Grid.Column="4" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Label Grid.Row="1" Grid.Column="4" Text="MHz" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+
+            <!--ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding FrequencyProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" /-->
+            <!--Label Grid.Row="1" Grid.Column="4" Text="MHz" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/-->
+
+            <!--Label Grid.Row="2" Grid.Column="1" Text="{Binding FrequencyFromMHz}" HorizontalOptions="Start" VerticalOptions="Start" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" /-->
+            <!--Label Grid.Row="2" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/-->
         </Grid>
 
         <Grid x:Name="SignalGrid" AbsoluteLayout.LayoutBounds="0.5,0.24,0.95,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
