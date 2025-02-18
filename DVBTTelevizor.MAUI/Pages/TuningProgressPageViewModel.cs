@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -176,7 +177,7 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 _loggingService.Info("Tuning finished");
-                _signalStrengthBackgroundWorker.CancelAsync();
+                _signalStrengthBackgroundWorker?.CancelAsync();
                 NotifyChange();
             }
         }
@@ -474,7 +475,7 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 var res = "";
-                res += DeliverySystem == 0 ? "DVBT" : "DVBT2";
+                res += DeliverySystem == 0 ? "     DVBT" : "     DVBT2";
                 /*
                 if (FrequencyFromKHz != FrequencyToKHz)
                 {
@@ -612,8 +613,13 @@ namespace DVBTTelevizor.MAUI
                 if (_actualTunningFreqKHz < FrequencyFromKHz)
                     return 0.0;
 
-                if (_actualTunningFreqKHz > FrequencyToKHz)
+                if (_actualTunningFreqKHz >= FrequencyToKHz)
                     return 100.0;
+
+                if (FrequencyFromKHz == FrequencyToKHz)
+                {
+                    return 0.0;
+                }
 
                 var onePerc = (FrequencyToKHz - FrequencyFromKHz) / 100.0;
                 if (onePerc == 0)
@@ -627,6 +633,7 @@ namespace DVBTTelevizor.MAUI
                 if (perc > 100)
                     return 100.0;
 
+                Debug.WriteLine(perc);
                 return perc / 100.0;
             }
         }
@@ -656,7 +663,8 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (TuningProgress * 100).ToString("N0") + " %";
+                var tpr = Convert.ToInt32(TuningProgress * 100.0);
+                return (tpr > 100 ? 100 : tpr).ToString() + " %";
             }
         }
 
