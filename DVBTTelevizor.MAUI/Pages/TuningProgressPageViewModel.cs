@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -29,6 +30,13 @@ namespace DVBTTelevizor.MAUI
         private bool _DVBTTuning = true;
         private bool _DVBT2Tuning = true;
 
+        private bool _signalSynced { get; set; } = false;
+        private bool _signalLocked { get; set; } = false;
+        private bool _signalCarrier { get; set; } = false;
+        private long _signalSNR { get; set; } = 0;
+
+        private long _bitrate { get; set; } = 0;
+
         private BackgroundWorker? _signalStrengthBackgroundWorker = null;
         private double _signalStrengthProgress = 0;
 
@@ -41,6 +49,7 @@ namespace DVBTTelevizor.MAUI
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
 
         public event EventHandler? ChannelFound = null;
+        public event EventHandler? SignalChanged = null;
 
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -50,6 +59,19 @@ namespace DVBTTelevizor.MAUI
             _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
+            SignalChanged += TuningProgressPageViewModel_SignalChanged;
+        }
+
+        private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
+        {
+            if (e is DVBTDriverStatusChangedEventArgs se)
+            {
+                _signalProgress = se.Status.rfStrengthPercentage;
+                _signalCarrier = se.Status.hasCarrier > 0;
+                _signalLocked = se.Status.hasLock > 0;
+                _signalSynced = se.Status.hasSync > 0;
+                _signalSNR = se.Status.snr;
+            }
         }
 
         private void TuningProgressPageViewModel_ChannelFound(object? sender, EventArgs e)
@@ -69,7 +91,6 @@ namespace DVBTTelevizor.MAUI
         {
             if (clearChannels)
             {
-
                 _tunedMultiplexes.Clear();
                 _tunedNewChannels = 0;
                 Channels.Clear();
@@ -107,6 +128,14 @@ namespace DVBTTelevizor.MAUI
             }
 
             _actualTunningFreqKHz = FrequencyFromKHz;
+
+            _bitrate = 0;
+            _signalSNR = 0;
+            _signalCarrier = false;
+            _signalLocked = false;
+            _signalSynced = false;
+
+            NotifyChange();
         }
 
         public async void StartTune()
@@ -412,6 +441,12 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(SignalProgressCaption));
             OnPropertyChanged(nameof(SignalProgress));
 
+            OnPropertyChanged(nameof(SignalCarrier));
+            OnPropertyChanged(nameof(SignalLocked));
+            OnPropertyChanged(nameof(SignalSynced));
+            OnPropertyChanged(nameof(SignalSNR));
+            OnPropertyChanged(nameof(Bitrate));
+
             OnPropertyChanged(nameof(Channels));
             OnPropertyChanged(nameof(SelectedChannel));
 
@@ -568,6 +603,76 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool SignalCarrier
+        {
+            get
+            {
+                return _signalCarrier;
+            }
+            set
+            {
+                _signalCarrier = value;
+
+                NotifyChange();
+            }
+        }
+
+        public bool SignalLocked
+        {
+            get
+            {
+                return _signalLocked;
+            }
+            set
+            {
+                _signalLocked = value;
+
+                NotifyChange();
+            }
+        }
+
+        public bool SignalSynced
+        {
+            get
+            {
+                return _signalSynced;
+            }
+            set
+            {
+                _signalSynced = value;
+
+                NotifyChange();
+            }
+        }
+
+        public long SignalSNR
+        {
+            get
+            {
+                return _signalSNR;
+            }
+            set
+            {
+                _signalSNR = value;
+
+                NotifyChange();
+            }
+        }
+
+        public long Bitrate
+        {
+            get
+            {
+                return _bitrate;
+            }
+            set
+            {
+                _bitrate = value;
+
+                NotifyChange();
+            }
+        }
+
         public bool DVBT2Tuning
         {
             get
@@ -620,7 +725,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return "<" + FrequencyFromMHz.ToString();
+                return "< " + FrequencyFromMHz.ToString();
             }
         }
 
@@ -628,7 +733,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return FrequencyToMHz.ToString() + ">";
+                return FrequencyToMHz.ToString() + " >";
             }
         }
 
@@ -796,7 +901,16 @@ namespace DVBTTelevizor.MAUI
                         {
                             _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
 
-                            await _driver.GetStatus();
+                            var status = await _driver.GetStatus();
+
+                            if (SignalChanged != null)
+                            {
+                                _bitrate = _driver.Bitrate;
+                                SignalChanged(this, new DVBTDriverStatusChangedEventArgs()
+                                {
+                                    Status = status
+                                });
+                            }
 
                         }).Wait();
                     }

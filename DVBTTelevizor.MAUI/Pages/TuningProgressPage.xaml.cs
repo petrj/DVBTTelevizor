@@ -83,10 +83,11 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
 
-        //_focusItems
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
+        _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -137,7 +138,7 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
             AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0.5, 0.815, 0.95, 0.325));
         } else
         {
-            AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.05, 0.05, 0.45, 0.1));
+            AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.05, 0.00, 0.45, 0.1));
             AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.125, 0.15, 0.25, 0.1));
             AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.05, 0.25, 0.45, 0.1));
             AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.05, 0.4, 0.45, 0.15));
@@ -184,7 +185,7 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusNextItem();
+                    _focusItems.FocusNextItem(true);
                 });
                 break;
 
@@ -192,14 +193,14 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem();
+                    _focusItems.FocusPreviousItem(true);
                 });
                 break;
 
             case KeyboardNavigationActionEnum.Back:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    //await Navigation.PopAsync();
+                    await Navigation.PopAsync();
                 });
                 break;
 
@@ -212,7 +213,20 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "ABC":
+                        case "Back":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                await Navigation.PopAsync();
+                            });
+                            break;
+                        case "Stop":
+                            StopButton_Clicked(this,new EventArgs());
+                            break;
+                        case "Start":
+                            StartButton_Clicked(this, new EventArgs());
+                            break;
+                        case "Finish":
+                            FinishButton_Clicked(this, new EventArgs());
                             break;
                     }
                 });
@@ -237,7 +251,7 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
                 "Continue".Translated(),
                 "Start from beginning".Translated()))
             {
-                _viewModel.RestartTune();
+                _viewModel.RestartTune(true);
             }
         }
 

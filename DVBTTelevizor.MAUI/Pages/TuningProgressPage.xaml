@@ -139,20 +139,20 @@
                 <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
-            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding SignalCarrier}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
             <Label Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding SignalSynced}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
             <Label Grid.Row="1" Grid.Column="1" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding SignalLocked}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
             <Label Grid.Row="2" Grid.Column="1" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
             <Label Grid.Row="0" Grid.Column="2" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Label Grid.Row="0" Grid.Column="3" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
+            <Label Grid.Row="0" Grid.Column="3" Text="{Binding SignalSNR}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
 
             <Label Grid.Row="2" Grid.Column="2" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Label Grid.Row="2" Grid.Column="3" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
+            <Label Grid.Row="2" Grid.Column="3" Text="{Binding Bitrate}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
 
         </Grid>
 
@@ -182,7 +182,7 @@
             <Label Grid.Row="2" Grid.Column="1" Text="{Binding TunedNewChannelsCount}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
         </Grid>
 
-        <Grid x:Name="ChannelsSplitterGrid" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5,0.815,0.95,0.325" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="10,0,10,0">
+        <Grid x:Name="ChannelsSplitterGrid" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5,0.815,0.95,0.325" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="5,0,5,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1" />
             </Grid.RowDefinitions>
@@ -196,7 +196,7 @@
         <ListView x:Name="ChannelsListView"
           AbsoluteLayout.LayoutBounds="1.0,0.5,0.5,1" AbsoluteLayout.LayoutFlags="All"
           BackgroundColor="Transparent"
-          Margin="0,0,0,0"
+          Margin="5,0,5,0"
           ItemsSource="{Binding Channels}"
           CachingStrategy="RecycleElement"
           Style="{StaticResource ListViewStyle}"
