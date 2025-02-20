@@ -168,18 +168,26 @@ namespace DVBTTelevizor
 
         public async Task<DVBTDriverStatus> GetStatus()
         {
+            long ok = 0;
+            long snr = 0;
+            if ((_lastFreq == 490000000) || (_lastFreq == 514000000) || (_lastFreq == 626000000))
+            {
+                ok = 1;
+                snr = 40000;
+            }
+
             return new DVBTDriverStatus()
             {
                 SuccessFlag = true,
 
-                snr = 0,
+                snr = 40000,
                 bitErrorRate  = 0,
                 droppedUsbFps  = 0,
                 rfStrengthPercentage  = 100,
-                hasSignal  = 1,
-                hasCarrier = 1,
-                hasSync  = 1,
-                hasLock  = 1
+                hasSignal  = ok,
+                hasCarrier = ok,
+                hasSync  = ok,
+                hasLock  = ok
             };
         }
 
