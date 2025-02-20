@@ -70,44 +70,53 @@
 
     <AbsoluteLayout x:Name="MainLayout" BackgroundColor="Black">
 
-        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5,0.01,0.95,0.1" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="Center" VerticalOptions="Start">
+        <!--BoxView x:Name="TestBoxView" AbsoluteLayout.LayoutBounds="0.05, 0.05, 0.45, 0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a" /-->
+
+        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5, 0.01, 0.95, 0.1" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="70*" />
                 <RowDefinition Height="30*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="Start" VerticalOptions="End"/>
-            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="Start" VerticalOptions="End"/>
+            <Label Grid.Row="0" Grid.Column="0" Text="{Binding FrequencyFromMHzTitle}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End" BackgroundColor="Transparent"/>
 
-            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SubTitleCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Start" BackgroundColor="Transparent"/>
+            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
+            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+            <Label Grid.Row="0" Grid.Column="3" Text="{Binding FrequencyToMHzTitle}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="End" VerticalOptions="End" BackgroundColor="Transparent"/>
+
+
+            <Label Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding SubTitleCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="Start" BackgroundColor="Transparent"/>
         </Grid>
 
         <ActivityIndicator x:Name="TuneIndicator" AbsoluteLayout.LayoutBounds="0.5,0.1,0.25,0.1" AbsoluteLayout.LayoutFlags="All"  IsRunning="True" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Center" Color="#41b3ff" IsVisible="{Binding TuningInProgress}"/>
 
-        <Grid x:Name="ProgressGrid" AbsoluteLayout.LayoutBounds="0.1,0.15,0.4,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
+        <Grid x:Name="ProgressGrid" AbsoluteLayout.LayoutBounds="0.05, 0.25, 0.45, 0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="100*" />
+                <RowDefinition Height="50*" />
+                <RowDefinition Height="50*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="25*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Tuning'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Tune'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />
+            <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-            <ProgressBar Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" />
-            <Label Grid.Row="0" Grid.Column="4" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Signal'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <ProgressBar Grid.Row="1" Grid.Column="1" Progress="{Binding SignalProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />
+            <Label Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Text="{Binding SignalProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
             <!--ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Progress="{Binding FrequencyProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="End" Margin="0,5,0,0" HeightRequest="10" /-->
             <!--Label Grid.Row="1" Grid.Column="4" Text="MHz" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/-->
@@ -116,89 +125,42 @@
             <!--Label Grid.Row="2" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/-->
         </Grid>
 
-        <Grid x:Name="SignalGrid" AbsoluteLayout.LayoutBounds="0.5,0.24,0.95,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
+        <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.05, 0.4, 0.45, 0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent" ColumnSpacing="5">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="100*" />
+                <RowDefinition Height="33*" />
+                <RowDefinition Height="33*" />
+                <RowDefinition Height="33*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="60*" />
-                <ColumnDefinition Width="20*" />
-            </Grid.ColumnDefinitions>
-
-            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Signal'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding SignalProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />
-            <Label Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Text="{Binding SignalProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-        </Grid>
-
-
-        <!--Grid x:Name="SignalDetailGrid" AbsoluteLayout.LayoutBounds="0.5,0.30,0.9,0.05" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Gray" ColumnSpacing="5">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5*" />
-                <ColumnDefinition Width="15*" />
-                <ColumnDefinition Width="5*" />
-                <ColumnDefinition Width="15*" />
-                <ColumnDefinition Width="5*" />
-                <ColumnDefinition Width="15*" />
-                <ColumnDefinition Width="15*" />
-                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="10*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
             <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
             <Label Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-            <CheckBox Grid.Row="0" Grid.Column="2" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-            <Label Grid.Row="0" Grid.Column="3" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <Label Grid.Row="1" Grid.Column="1" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-            <CheckBox Grid.Row="0" Grid.Column="4" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-            <Label Grid.Row="0" Grid.Column="5" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <Label Grid.Row="2" Grid.Column="1" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
+            <Label Grid.Row="0" Grid.Column="2" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="0" Grid.Column="3" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
 
-            <Label Grid.Row="0" Grid.Column="6" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Label Grid.Row="0" Grid.Column="7" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
+            <Label Grid.Row="2" Grid.Column="2" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <Label Grid.Row="2" Grid.Column="3" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
 
-        </Grid-->
-
-        <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.5,0.34,0.9,0.16" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
-            </Grid.ColumnDefinitions>
-
-            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-
-            <Label Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-
-            <Label Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="True" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-
-            <Label Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Label Grid.Row="3" Grid.Column="1" Text="-"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}"/>
-
-            <Label Grid.Row="4" Grid.Column="0" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <Label Grid.Row="4" Grid.Column="1" Text="4 MB/s"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
         </Grid>
 
-        <BoxView x:Name="SplitterBoxView" AbsoluteLayout.LayoutBounds="0.5,0.47,1,0.005" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a" />
+        <BoxView x:Name="SplitterBoxView" AbsoluteLayout.LayoutBounds="0.5,0.4,1,0.005" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a" />
 
-        <Label x:Name="ResultLabel" AbsoluteLayout.LayoutBounds="0.5,0.5,0.5,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tune result'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/>
+        <!--Label x:Name="ResultLabel" AbsoluteLayout.LayoutBounds="0.5,0.5,0.5,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tune result'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/-->
 
-        <Grid x:Name="TuneResultDetailsGrid" AbsoluteLayout.LayoutBounds="0.5,0.58,0.8,0.1" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent">
+        <Grid x:Name="TuneResultDetailsGrid" AbsoluteLayout.LayoutBounds="0.5, 0.46, 0.95, 0.14" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -220,7 +182,7 @@
             <Label Grid.Row="2" Grid.Column="1" Text="{Binding TunedNewChannelsCount}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" />
         </Grid>
 
-        <Grid x:Name="ChannelsSplitterGrid" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5,0.85,0.85,0.6" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="10,0,10,0">
+        <Grid x:Name="ChannelsSplitterGrid" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5,0.815,0.95,0.325" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" Margin="10,0,10,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1" />
             </Grid.RowDefinitions>
@@ -232,8 +194,9 @@
         </Grid>
 
         <ListView x:Name="ChannelsListView"
-          AbsoluteLayout.LayoutBounds="0.5,0.85,1,0.25" AbsoluteLayout.LayoutFlags="All"
-          Margin="10,0,10,0"
+          AbsoluteLayout.LayoutBounds="1.0,0.5,0.5,1" AbsoluteLayout.LayoutFlags="All"
+          BackgroundColor="Transparent"
+          Margin="0,0,0,0"
           ItemsSource="{Binding Channels}"
           CachingStrategy="RecycleElement"
           Style="{StaticResource ListViewStyle}"

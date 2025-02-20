@@ -48,6 +48,21 @@ namespace DVBTTelevizor.MAUI
             _signalStrengthBackgroundWorker = new BackgroundWorker();
             _signalStrengthBackgroundWorker.WorkerSupportsCancellation = true;
             _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
+
+            ChannelFound += TuningProgressPageViewModel_ChannelFound;
+        }
+
+        private void TuningProgressPageViewModel_ChannelFound(object? sender, EventArgs e)
+        {
+            if (e is ChannelFoundEventArgs che)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    Channels.Add(che.Channel);
+
+                    NotifyChange();
+                });
+            }
         }
 
         public void RestartTune(bool clearChannels = true)
@@ -303,6 +318,7 @@ namespace DVBTTelevizor.MAUI
             }
             catch (Exception ex)
             {
+                _loggingService.Error(ex);
                 throw;
             }
         }
@@ -389,7 +405,9 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(FrequencyFromKHz));
             OnPropertyChanged(nameof(FrequencyToKHz));
             OnPropertyChanged(nameof(FrequencyFromMHz));
+            OnPropertyChanged(nameof(FrequencyFromMHzTitle));
             OnPropertyChanged(nameof(FrequencyToMHz));
+            OnPropertyChanged(nameof(FrequencyToMHzTitle));
 
             OnPropertyChanged(nameof(SignalProgressCaption));
             OnPropertyChanged(nameof(SignalProgress));
@@ -598,6 +616,22 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public string FrequencyFromMHzTitle
+        {
+            get
+            {
+                return "<" + FrequencyFromMHz.ToString();
+            }
+        }
+
+        public string FrequencyToMHzTitle
+        {
+            get
+            {
+                return FrequencyToMHz.ToString() + ">";
+            }
+        }
+
         public long FrequencyToMHz
         {
             get
@@ -633,11 +667,9 @@ namespace DVBTTelevizor.MAUI
                 if (perc > 100)
                     return 100.0;
 
-                Debug.WriteLine(perc);
                 return perc / 100.0;
             }
         }
-
 
         public double TuningProgress
         {
@@ -686,7 +718,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_signalProgress * 100).ToString("N0") + "%";
+                return (_signalProgress * 100).ToString("N0") + " %";
             }
         }
 
