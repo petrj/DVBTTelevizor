@@ -1,4 +1,6 @@
-﻿using LoggerService;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +15,11 @@ namespace DVBTTelevizor.MAUI
         public TuningWelcomePageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                _loggingService.Info($"TuningWelcomePageViewModel: FontSizeChanged");
+                NotifyFontSizeChange();
+            });
         }
     }
 }

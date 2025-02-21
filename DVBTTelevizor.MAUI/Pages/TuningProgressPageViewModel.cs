@@ -1,4 +1,6 @@
-﻿using LoggerService;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LoggerService;
 using Microsoft.Maui;
 using MPEGTS;
 using System;
@@ -60,6 +62,12 @@ namespace DVBTTelevizor.MAUI
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             SignalChanged += TuningProgressPageViewModel_SignalChanged;
+
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                _loggingService.Info($"TuningProgressPageViewModel: FontSizeChanged");
+                NotifyFontSizeChange();
+            });
         }
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
@@ -91,9 +99,12 @@ namespace DVBTTelevizor.MAUI
         {
             if (clearChannels)
             {
-                _tunedMultiplexes.Clear();
-                _tunedNewChannels = 0;
-                Channels.Clear();
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _tunedMultiplexes.Clear();
+                    _tunedNewChannels = 0;
+                    Channels.Clear();
+                });
             }
 
             /*
@@ -134,6 +145,7 @@ namespace DVBTTelevizor.MAUI
             _signalCarrier = false;
             _signalLocked = false;
             _signalSynced = false;
+            _signalProgress = 0;
 
             NotifyChange();
         }
@@ -659,17 +671,11 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public long Bitrate
+        public string Bitrate
         {
             get
             {
-                return _bitrate;
-            }
-            set
-            {
-                _bitrate = value;
-
-                NotifyChange();
+                return DVBTDriverConnector.GetHumanReadableBitRate(_bitrate);
             }
         }
 
@@ -823,7 +829,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_signalProgress * 100).ToString("N0") + " %";
+                return (_signalProgress).ToString("N0") + " %";
             }
         }
 

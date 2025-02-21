@@ -1,4 +1,6 @@
-﻿using LoggerService;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LoggerService;
 using Microsoft.Maui;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,12 @@ namespace DVBTTelevizor.MAUI
             _dvbt2 = tvConfiguration.TuneDVBT2Enabled;
 
             _selectedBandwidth = Bandwidth.BandWidthTitle[tvConfiguration.DVBTBandwidth];
+
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                _loggingService.Info($"TuningSelectDVBTPageViewModel: FontSizeChanged");
+                NotifyFontSizeChange();
+            });
         }
 
         public async void FillBandwidths()

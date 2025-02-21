@@ -1,4 +1,6 @@
-﻿using LoggerService;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -145,6 +147,7 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(AppFontSizeIndex));
                 NotifyFontSizeChange();
+                WeakReferenceMessenger.Default.Send(new FontSizeChangedMessage(AppFontSizeIndex));
             }
         }
 

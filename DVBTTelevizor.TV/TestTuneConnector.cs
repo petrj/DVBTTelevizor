@@ -68,7 +68,24 @@ namespace DVBTTelevizor
 
         public string StreamUrl { get; set; } = "udp://@localhost:9600";
 
-        public long Bitrate { get; set; } = 4000000; // 4 Mb/s
+        public long Bitrate
+        {
+            get
+            {
+                if ((_lastFreq == 490000000) || (_lastFreq == 514000000) || (_lastFreq == 626000000))
+                {
+                    return 4000000; // 4 Mb/s
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                // test driver => empty setter
+            }
+        }
 
         public bool DriverStreamDataAvailable { get; set; } = true;
 
@@ -169,21 +186,24 @@ namespace DVBTTelevizor
         public async Task<DVBTDriverStatus> GetStatus()
         {
             long ok = 0;
-            long snr = 0;
+            long snrValue = 0;
+            long percentValue = 0;
+
             if ((_lastFreq == 490000000) || (_lastFreq == 514000000) || (_lastFreq == 626000000))
             {
                 ok = 1;
-                snr = 40000;
+                snrValue = 40000;
+                percentValue = 100;
             }
 
             return new DVBTDriverStatus()
             {
                 SuccessFlag = true,
 
-                snr = 40000,
+                snr = snrValue,
                 bitErrorRate  = 0,
                 droppedUsbFps  = 0,
-                rfStrengthPercentage  = 100,
+                rfStrengthPercentage  = percentValue,
                 hasSignal  = ok,
                 hasCarrier = ok,
                 hasSync  = ok,
