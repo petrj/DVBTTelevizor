@@ -97,8 +97,12 @@ namespace DVBTTelevizor.MAUI
 
         public void RestartTune(bool clearChannels = true)
         {
+            _loggingService.Info("RestartTune");
+
             if (clearChannels)
             {
+                _loggingService.Info("Clearing channels");
+
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _tunedMultiplexes.Clear();
@@ -426,53 +430,59 @@ namespace DVBTTelevizor.MAUI
 
         public void NotifyChange()
         {
-            OnPropertyChanged(nameof(FrequencyKHz));
-            OnPropertyChanged(nameof(FrequencyWholePartMHz));
-            OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
+            _loggingService.Debug("NotifyChange");
 
-            OnPropertyChanged(nameof(DeliverySystem));
-            OnPropertyChanged(nameof(SubTitleCaption));
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
 
-            OnPropertyChanged(nameof(TuningProgress));
-            OnPropertyChanged(nameof(FrequencyProgress));
-            OnPropertyChanged(nameof(TuningInProgress));
-            OnPropertyChanged(nameof(TuningProgressVisible));
-            OnPropertyChanged(nameof(TuningProgressCaption));
-            OnPropertyChanged(nameof(State));
+                OnPropertyChanged(nameof(FrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
 
-            OnPropertyChanged(nameof(DVBTTuning));
-            OnPropertyChanged(nameof(DVBT2Tuning));
+                OnPropertyChanged(nameof(DeliverySystem));
+                OnPropertyChanged(nameof(SubTitleCaption));
 
-            OnPropertyChanged(nameof(FrequencyFromKHz));
-            OnPropertyChanged(nameof(FrequencyToKHz));
-            OnPropertyChanged(nameof(FrequencyFromMHz));
-            OnPropertyChanged(nameof(FrequencyFromMHzTitle));
-            OnPropertyChanged(nameof(FrequencyToMHz));
-            OnPropertyChanged(nameof(FrequencyToMHzTitle));
+                OnPropertyChanged(nameof(TuningProgress));
+                OnPropertyChanged(nameof(FrequencyProgress));
+                OnPropertyChanged(nameof(TuningInProgress));
+                OnPropertyChanged(nameof(TuningProgressVisible));
+                OnPropertyChanged(nameof(TuningProgressCaption));
+                OnPropertyChanged(nameof(State));
 
-            OnPropertyChanged(nameof(SignalProgressCaption));
-            OnPropertyChanged(nameof(SignalProgress));
+                OnPropertyChanged(nameof(DVBTTuning));
+                OnPropertyChanged(nameof(DVBT2Tuning));
 
-            OnPropertyChanged(nameof(SignalCarrier));
-            OnPropertyChanged(nameof(SignalLocked));
-            OnPropertyChanged(nameof(SignalSynced));
-            OnPropertyChanged(nameof(SignalSNR));
-            OnPropertyChanged(nameof(Bitrate));
+                OnPropertyChanged(nameof(FrequencyFromKHz));
+                OnPropertyChanged(nameof(FrequencyToKHz));
+                OnPropertyChanged(nameof(FrequencyFromMHz));
+                OnPropertyChanged(nameof(FrequencyFromMHzTitle));
+                OnPropertyChanged(nameof(FrequencyToMHz));
+                OnPropertyChanged(nameof(FrequencyToMHzTitle));
 
-            OnPropertyChanged(nameof(Channels));
-            OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SignalProgressCaption));
+                OnPropertyChanged(nameof(SignalProgress));
 
-            OnPropertyChanged(nameof(StartButtonVisible));
-            OnPropertyChanged(nameof(ContinueButtonVisible));
-            OnPropertyChanged(nameof(StopButtonVisible));
-            OnPropertyChanged(nameof(BackButtonVisible));
-            OnPropertyChanged(nameof(FinishButtonVisible));
+                OnPropertyChanged(nameof(SignalCarrier));
+                OnPropertyChanged(nameof(SignalLocked));
+                OnPropertyChanged(nameof(SignalSynced));
+                OnPropertyChanged(nameof(SignalSNR));
+                OnPropertyChanged(nameof(Bitrate));
 
-            OnPropertyChanged(nameof(TunedMultiplexesCount));
-            OnPropertyChanged(nameof(TunedChannelsCount));
-            OnPropertyChanged(nameof(TunedNewChannelsCount));
+                OnPropertyChanged(nameof(Channels));
+                OnPropertyChanged(nameof(SelectedChannel));
 
-            OnPropertyChanged(nameof(SignalStrengthProgress));
+                OnPropertyChanged(nameof(StartButtonVisible));
+                OnPropertyChanged(nameof(ContinueButtonVisible));
+                OnPropertyChanged(nameof(StopButtonVisible));
+                OnPropertyChanged(nameof(BackButtonVisible));
+                OnPropertyChanged(nameof(FinishButtonVisible));
+
+                OnPropertyChanged(nameof(TunedMultiplexesCount));
+                OnPropertyChanged(nameof(TunedChannelsCount));
+                OnPropertyChanged(nameof(TunedNewChannelsCount));
+
+                OnPropertyChanged(nameof(SignalStrengthProgress));
+            });
         }
 
         public TuneStateEnum State

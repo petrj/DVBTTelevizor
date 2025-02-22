@@ -75,5 +75,22 @@ namespace DVBTTelevizor
                 return res;
             }
         }
+
+        public static Dictionary<long, string> BandWidthHzTitle
+        {
+            get
+            {
+                var res = new Dictionary<long, string>();
+
+                res.Add(8000000, "8 MHz");
+                res.Add(7000000, "7 MHz");
+                res.Add(6000000, "6 MHz");
+                res.Add(5000000, "5 MHz");
+                res.Add(10000000, "10 MHz");
+                res.Add(5000000, "1.7 MHz");
+
+                return res;
+            }
+        }
     }
 }

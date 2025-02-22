@@ -82,6 +82,37 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public long SelectedBandwidthKHz
+        {
+            get
+            {
+                if (_selectedBandwidth == null)
+                {
+                    return 8000;
+                }
+
+                if (Bandwidth.TitleBandWidth.ContainsKey(_selectedBandwidth))
+                {
+                    return Bandwidth.TitleBandWidthHz[_selectedBandwidth] / 1000;
+                }
+
+                return 8000;
+            }
+            set
+            {
+
+                if (Bandwidth.BandWidthHzTitle.ContainsKey(value*1000))
+                {
+                    _selectedBandwidth = Bandwidth.BandWidthHzTitle[value * 1000];
+                } else
+                {
+                    _selectedBandwidth = "8 MHz";
+                }
+
+                OnPropertyChanged(nameof(SelectedBandwidth));
+            }
+        }
+
         public bool DVBT
         {
             get

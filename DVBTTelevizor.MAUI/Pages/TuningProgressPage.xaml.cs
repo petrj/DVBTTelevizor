@@ -71,6 +71,18 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         }
     }
 
+    public long TuneBandWidthKHz
+    {
+        get
+        {
+            return _viewModel == null ? 8000 : _viewModel.TuneBandWidthKHz;
+        }
+        set
+        {
+            _viewModel.TuneBandWidthKHz = value;
+        }
+    }
+
     private void ChannelFound(object? sender, EventArgs e)
     {
         if (e is ChannelFoundEventArgs che)

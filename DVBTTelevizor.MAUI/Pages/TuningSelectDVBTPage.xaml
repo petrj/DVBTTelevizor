@@ -36,14 +36,14 @@
                 <Setter Property="BackgroundColor" Value="Transparent"/>
                 <!--Setter Property="FlowDirection" Value="RightToLeft"/-->
                 <Setter Property="ThumbColor" Value="Blue"/>
-                <Setter Property="OnColor" Value="SkyBlue"/>
+                <Setter Property="OnColor" Value="CornflowerBlue"/>
                 <Setter Property="BackgroundColor" Value="Transparent"/>
             </Style>
 
             <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="BackgroundColor" Value="Black"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
 
@@ -69,7 +69,8 @@
             <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
             <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <Switch Grid.Row="0" Grid.Column="1" x:Name="DVBTSwitch"  IsToggled="{Binding DVBT, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+            <Switch BackgroundColor="Transparent"  Grid.Row="0" Grid.Column="1" x:Name="DVBTSwitch"  IsToggled="{Binding DVBT, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}">
+            </Switch>
 
             <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
@@ -84,7 +85,7 @@
                 x:Name="BandwidthPicker"
                 HorizontalOptions="Start"
                 BackgroundColor="Transparent"
-                TextColor="Blue"
+                TextColor="White"
                 FontSize="{Binding FontSizeForPicker}"
                 Style="{StaticResource CommonPickerTextStyle}"
                 ItemsSource="{Binding Bandwidths}"

@@ -229,6 +229,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         _tuningProgressPage.DVBTTuning = _driverPageViewModel.DVBT;
         _tuningProgressPage.DVBT2Tuning = _driverPageViewModel.DVBT2;
+        _tuningProgressPage.TuneBandWidthKHz = _driverPageViewModel.SelectedBandwidthKHz;
 
         await Navigation.PushAsync(_tuningProgressPage);
     }
