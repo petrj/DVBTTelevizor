@@ -5,7 +5,7 @@ namespace DVBTTelevizor.MAUI;
 
 public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 {
-    private TuningWelcomePageViewModel _driverPageViewModel;
+    private TuningFrequenciesViewModel _tuningFrequenciesViewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -27,7 +27,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
@@ -58,7 +58,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
     public void OnKeyDown(string key, bool longPress)
     {
-        _loggingService.Debug($"TuningFrequencies Page OnKeyDown {key}");
+        _loggingService.Debug($"TuningFrequenciesPage OnKeyDown {key}");
 
         /*
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
@@ -115,6 +115,84 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"TuningFrequencies Page OnTextSent {text}");
+        _loggingService.Debug($"TuningFrequenciesPage Page OnTextSent {text}");
+    }
+
+    private void BackButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningSelectDVBTPage BackButton_Clicked");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Navigation.PopAsync();
+        });
+    }
+
+    private async void NextButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningSelectDVBTPage NextButton_Clicked");
+
+        if (_tuningProgressPage.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
+
+        _tuningProgressPage.DVBTTuning = _tuningFrequenciesViewModel.DVBT;
+        _tuningProgressPage.DVBT2Tuning = _tuningFrequenciesViewModel.DVBT2;
+        _tuningProgressPage.TuneBandWidthKHz = _tuningFrequenciesViewModel.TuneBandWidthKHz;
+
+        await Navigation.PushAsync(_tuningProgressPage);
+    }
+
+    public long TuneBandWidthKHz
+    {
+        get
+        {
+            return _tuningFrequenciesViewModel == null ? 8000 : _tuningFrequenciesViewModel.TuneBandWidthKHz;
+        }
+        set
+        {
+            if (_tuningFrequenciesViewModel == null)
+            {
+                return;
+            }
+
+            _tuningFrequenciesViewModel.TuneBandWidthKHz = value;
+        }
+    }
+
+    public bool DVBT
+    {
+        get
+        {
+            return _tuningFrequenciesViewModel == null ? true : _tuningFrequenciesViewModel.DVBT;
+        }
+        set
+        {
+            if (_tuningFrequenciesViewModel == null)
+            {
+                return;
+            }
+
+            _tuningFrequenciesViewModel.DVBT = value;
+        }
+    }
+
+    public bool DVBT2
+    {
+        get
+        {
+            return _tuningFrequenciesViewModel == null ? true : _tuningFrequenciesViewModel.DVBT2;
+        }
+        set
+        {
+            if (_tuningFrequenciesViewModel == null)
+            {
+                return;
+            }
+
+            _tuningFrequenciesViewModel.DVBT2 = value;
+        }
     }
 }

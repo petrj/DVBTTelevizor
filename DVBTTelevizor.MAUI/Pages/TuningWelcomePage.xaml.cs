@@ -16,6 +16,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     private KeyboardFocusableItemList _focusItems;
 
     private TuningSelectDVBTPage _selectDVBTPage;
+    private TuningProgressPage _tuningProgressPage;
 
     public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -30,6 +31,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -118,29 +120,41 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
 
-        ShowSelectDVBTPage(TuneModeEnum.Automatic);
+        ShowPage(_tuningProgressPage, TuneModeEnum.Automatic);
     }
 
     private void ManualScanButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
 
-        ShowSelectDVBTPage(TuneModeEnum.Manual);
+        ShowPage(_selectDVBTPage, TuneModeEnum.Manual);
     }
 
-    private void ShowSelectDVBTPage(TuneModeEnum mode)
+    private void ShowPage(Page page, TuneModeEnum mode)
     {
-        if (_selectDVBTPage.IsLoaded)
+        if (page.IsLoaded)
         {
             // preventing click when the settings page is just (or yet) loaded
             return;
         }
 
-        _selectDVBTPage.TuneMode = mode;
+        if (page is TuningSelectDVBTPage sPage)
+        {
+            sPage.TuneMode = mode;
+        }
+        if (page is TuningProgressPage pPage)
+        {
+            pPage.DVBTTuning = true;
+            pPage.DVBT2Tuning = true;
+
+            // TODO detect DVBT by region
+            // TODO set default BandBandWidth in config
+            pPage.TuneBandWidthKHz = 8000;
+        }
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await Navigation.PushAsync(_selectDVBTPage);
+            await Navigation.PushAsync(page);
         });
     }
 
@@ -148,6 +162,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
 
-        ShowSelectDVBTPage(TuneModeEnum.Frequency);
+        ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
     }
 }

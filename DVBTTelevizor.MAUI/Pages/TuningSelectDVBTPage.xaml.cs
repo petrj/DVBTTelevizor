@@ -6,7 +6,7 @@ namespace DVBTTelevizor.MAUI;
 
 public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 {
-    private TuningSelectDVBTPageViewModel _driverPageViewModel;
+    private TuningSelectDVBTPageViewModel _tuningSelectDVBTViewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -35,7 +35,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _driverPageViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _tuningSelectDVBTViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
@@ -84,7 +84,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
-        _driverPageViewModel.FillBandwidths();
+        _tuningSelectDVBTViewModel.FillBandwidths();
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
@@ -234,9 +234,9 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                     return;
                 }
 
-                _tuningProgressPage.DVBTTuning = _driverPageViewModel.DVBT;
-                _tuningProgressPage.DVBT2Tuning = _driverPageViewModel.DVBT2;
-                _tuningProgressPage.TuneBandWidthKHz = _driverPageViewModel.SelectedBandwidthKHz;
+                _tuningProgressPage.DVBTTuning = _tuningSelectDVBTViewModel.DVBT;
+                _tuningProgressPage.DVBT2Tuning = _tuningSelectDVBTViewModel.DVBT2;
+                _tuningProgressPage.TuneBandWidthKHz = _tuningSelectDVBTViewModel.SelectedBandwidthKHz;
 
                 await Navigation.PushAsync(_tuningProgressPage);
             break;
@@ -246,6 +246,8 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                     // preventing click when the settings page is just (or yet) loaded
                     return;
                 }
+
+                _tuningFrequenciesPage.DVBT = _tuningSelectDVBTViewModel.DVBT;
 
                 await Navigation.PushAsync(_tuningFrequenciesPage);
                 break;

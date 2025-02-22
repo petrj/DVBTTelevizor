@@ -32,6 +32,20 @@
         <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Frequencies'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
 
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.9,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="BackButton_Clicked"/>
+            <Button x:Name="NextButton" Grid.Column="1" Text="{local:LngXamlExt Input='Next'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding NextVisible}" Clicked="NextButton_Clicked"/>
+
+        </Grid>
+
     </AbsoluteLayout>
 
 </ContentPage>
