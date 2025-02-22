@@ -1,0 +1,26 @@
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LoggerService;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DVBTTelevizor.MAUI
+{
+    public class TuningFrequenciesViewModel : BaseViewModel
+    {
+        public TuningFrequenciesViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+          : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
+        {
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                _loggingService.Info($"TuningFrequenciesViewModel: FontSizeChanged");
+                NotifyFontSizeChange();
+            });
+        }
+    }
+}
+

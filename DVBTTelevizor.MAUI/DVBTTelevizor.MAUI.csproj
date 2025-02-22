@@ -154,6 +154,9 @@
 	  <Compile Update="Pages\TuningProgressPage.xaml.cs">
 	    <DependentUpon>TuningProgressPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\TuningFrequenciesPage.xaml.cs">
+	    <DependentUpon>TuningFrequenciesPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\TuningWelcomePage.xaml.cs">
 	    <DependentUpon>TuningWelcomePage.xaml</DependentUpon>
 	  </Compile>
@@ -182,6 +185,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\TuningProgressPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\TuningFrequenciesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\TuningWelcomePage.xaml">

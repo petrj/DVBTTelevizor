@@ -3,7 +3,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningWelcomePage : ContentPage, IOnKeyDown
+public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 {
     private TuningWelcomePageViewModel _driverPageViewModel;
 
@@ -15,9 +15,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
-    private TuningSelectDVBTPage _selectDVBTPage;
+    private TuningProgressPage _tuningProgressPage;
 
-    public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public TuningFrequenciesPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
@@ -29,7 +29,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -38,10 +38,12 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
 
+        /*
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
+        */
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -56,8 +58,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     public void OnKeyDown(string key, bool longPress)
     {
-        _loggingService.Debug($"TuningWelcomePage Page OnKeyDown {key}");
+        _loggingService.Debug($"TuningFrequencies Page OnKeyDown {key}");
 
+        /*
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
         switch (keyAction)
@@ -107,47 +110,11 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                 });
                 break;
         }
+        */
     }
 
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"TuningWelcomePage Page OnTextSent {text}");
-    }
-
-    private async void AutoScanButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
-
-        ShowSelectDVBTPage(TuneModeEnum.Automatic);
-    }
-
-    private void ManualScanButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
-
-        ShowSelectDVBTPage(TuneModeEnum.Manual);
-    }
-
-    private void ShowSelectDVBTPage(TuneModeEnum mode)
-    {
-        if (_selectDVBTPage.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
-
-        _selectDVBTPage.TuneMode = mode;
-
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Navigation.PushAsync(_selectDVBTPage);
-        });
-    }
-
-    private void TuneButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
-
-        ShowSelectDVBTPage(TuneModeEnum.Frequency);
+        _loggingService.Debug($"TuningFrequencies Page OnTextSent {text}");
     }
 }
