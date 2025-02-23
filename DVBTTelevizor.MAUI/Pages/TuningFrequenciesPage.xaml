@@ -31,12 +31,11 @@
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Frequencies'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5, 0.3, 0.95, 0.4" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
+        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5, 0.3, 0.95, 0.3" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="10*" />
-                <RowDefinition Height="30*" />
-                <RowDefinition Height="10*" />
+                <RowDefinition Height="20*" />
+                <RowDefinition Height="60*" />
                 <RowDefinition Height="20*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -56,11 +55,28 @@
             <Label Grid.Row="1" Grid.Column="2"  Text="{Binding FrequencyToWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
             <Label Grid.Row="1" Grid.Column="3"  Text="{Binding FrequencyToDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
 
-            <Label Grid.Row="2" Grid.Column="1"  Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
 
-            <Button x:Name="EditFreqFromButton" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='Edit'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="EditFreqFromButton_Clicked"/>
-            <Button x:Name="EditFreqToButton" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='Edit'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="EditFreqToButton_Clicked"/>
         </Grid>
+
+        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5, 0.6, 0.95, 0.1" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="27*" />
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="27*" />
+                <ColumnDefinition Width="15*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="EditFreqFromButton" Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Edit'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="EditFreqFromButton_Clicked"/>
+            <Button x:Name="EditFreqToButton" Grid.Row="0" Grid.Column="3" Text="{local:LngXamlExt Input='Edit'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="EditFreqToButton_Clicked"/>
+
+        </Grid>
+
 
 
         <!--Grid x:Name="FrequencyFromGrid" AbsoluteLayout.LayoutBounds="0.5, 0.55, 0.95, 0.2" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">

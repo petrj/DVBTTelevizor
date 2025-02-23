@@ -55,7 +55,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-
         public long TuneBandWidthKHz
         {
             get
