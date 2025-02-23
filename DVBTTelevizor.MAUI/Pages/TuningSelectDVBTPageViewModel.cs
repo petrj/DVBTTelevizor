@@ -13,19 +13,17 @@ namespace DVBTTelevizor.MAUI
 {
     public class TuningSelectDVBTPageViewModel : BaseViewModel
     {
-        private bool _dvbt = true;
-        private bool _dvbt2 = true;
-
         private string? _selectedBandwidth = null;
         private Dictionary<string, int> _dict = new Dictionary<string, int>();
 
         public ObservableCollection<string> Bandwidths { get; set; } = new ObservableCollection<string>();
 
+        public TuningSettings Settings { get; set; }
+
         public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            _dvbt = tvConfiguration.TuneDVBTEnabled;
-            _dvbt2 = tvConfiguration.TuneDVBT2Enabled;
+            Settings = new TuningSettings();
 
             _selectedBandwidth = Bandwidth.BandWidthTitle[tvConfiguration.DVBTBandwidth];
 
@@ -117,11 +115,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _dvbt;
+                return Settings.DVBT;
             }
             set
             {
-                _dvbt = value;
+                Settings.DVBT = value;
                 OnPropertyChanged(nameof(DVBT));
                 OnPropertyChanged(nameof(NextVisible));
                 _configuration.TuneDVBTEnabled = value;
@@ -132,11 +130,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _dvbt2;
+                return Settings.DVBT2;
             }
             set
             {
-                _dvbt2 = value;
+                Settings.DVBT2 = value;
                 OnPropertyChanged(nameof(DVBT2));
                 OnPropertyChanged(nameof(NextVisible));
                 _configuration.TuneDVBT2Enabled = value;

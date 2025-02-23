@@ -14,7 +14,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
-    public TuneModeEnum TuneMode { get; set; } = TuneModeEnum.Automatic;
+    public TuningSettings Settings { get; set; }
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -34,6 +34,8 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _configuration = tvConfiguration;
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+
+        Settings = new TuningSettings();
 
         BindingContext = _tuningSelectDVBTViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
@@ -225,7 +227,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private async void NextButton_Clicked(object sender, EventArgs e)
     {
-        switch (TuneMode)
+        switch (Settings.TuningMode)
         {
             case TuneModeEnum.Automatic:
                 if (_tuningProgressPage.IsLoaded)
@@ -234,9 +236,12 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                     return;
                 }
 
-                _tuningProgressPage.DVBTTuning = _tuningSelectDVBTViewModel.DVBT;
-                _tuningProgressPage.DVBT2Tuning = _tuningSelectDVBTViewModel.DVBT2;
-                _tuningProgressPage.TuneBandWidthKHz = _tuningSelectDVBTViewModel.SelectedBandwidthKHz;
+                if (_tuningProgressPage.Settings != null)
+                {
+                    _tuningProgressPage.Settings.DVBT = _tuningSelectDVBTViewModel.DVBT;
+                    _tuningProgressPage.Settings.DVBT2 = _tuningSelectDVBTViewModel.DVBT2;
+                    _tuningProgressPage.Settings.BandwidthKHz = _tuningSelectDVBTViewModel.SelectedBandwidthKHz;
+                }
 
                 await Navigation.PushAsync(_tuningProgressPage);
             break;

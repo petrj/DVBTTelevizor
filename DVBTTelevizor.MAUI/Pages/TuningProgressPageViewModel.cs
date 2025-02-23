@@ -20,17 +20,19 @@ namespace DVBTTelevizor.MAUI
     {
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
+        public TuningSettings Settings { get; set; }
+
         private int _actualTuningDVBTType = 0; // 0 .. DVBT, 1 .. DVBT2
         private long _actualTunningFreqKHz = 474000;
-        private long _tuneBandWidthKHz = 8000;
+        //private long _tuneBandWidthKHz = 8000;
 
-        private long _frequencyFromKHz = 474000;
-        private long _frequencyToKHz = 852000;
+        //private long _frequencyFromKHz = 474000;
+        //private long _frequencyToKHz = 852000;
 
         private double _signalProgress = 0;
 
-        private bool _DVBTTuning = true;
-        private bool _DVBT2Tuning = true;
+        //private bool _DVBTTuning = true;
+        //private bool _DVBT2Tuning = true;
 
         private bool _signalSynced { get; set; } = false;
         private bool _signalLocked { get; set; } = false;
@@ -59,6 +61,8 @@ namespace DVBTTelevizor.MAUI
             _signalStrengthBackgroundWorker = new BackgroundWorker();
             _signalStrengthBackgroundWorker.WorkerSupportsCancellation = true;
             _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
+
+            Settings = new TuningSettings();
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             SignalChanged += TuningProgressPageViewModel_SignalChanged;
@@ -388,13 +392,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _tuneBandWidthKHz;
+                return Settings.BandwidthKHz;
             }
             set
             {
-                _tuneBandWidthKHz = value;
+                Settings.BandwidthKHz = value;
 
-                OnPropertyChanged(nameof(TuneBandWidthKHz));
+                NotifyChange();
             }
         }
 
@@ -434,7 +438,6 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyWholePartMHz));
                 OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
@@ -449,6 +452,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TuningProgressCaption));
                 OnPropertyChanged(nameof(State));
 
+                OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(DVBTTuning));
                 OnPropertyChanged(nameof(DVBT2Tuning));
 
@@ -615,11 +619,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _DVBTTuning;
+                return Settings.DVBT;
             }
             set
             {
-                _DVBTTuning = value;
+                Settings.DVBT = value;
 
                 NotifyChange();
             }
@@ -693,11 +697,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _DVBT2Tuning;
+                return Settings.DVBT2;
             }
             set
             {
-                _DVBT2Tuning = value;
+                Settings.DVBT2 = value;
 
                 NotifyChange();
             }
@@ -707,11 +711,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _frequencyFromKHz;
+                return Settings.FrequencyFromKHz;
             }
             set
             {
-                _frequencyFromKHz = value;
+                Settings.FrequencyFromKHz = value;
                 NotifyChange();
             }
         }
@@ -720,11 +724,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _frequencyToKHz;
+                return Settings.FrequencyToKHz;
             }
             set
             {
-                _frequencyToKHz = value;
+                Settings.FrequencyToKHz = value;
                 NotifyChange();
             }
         }
@@ -733,7 +737,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _frequencyFromKHz / 1000;
+                return Settings.FrequencyFromKHz / 1000;
             }
         }
 
@@ -757,7 +761,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _frequencyToKHz / 1000;
+                return Settings.FrequencyToKHz / 1000;
             }
         }
 

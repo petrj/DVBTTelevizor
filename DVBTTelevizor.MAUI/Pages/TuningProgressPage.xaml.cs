@@ -41,45 +41,11 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         _viewModel.ChannelFound += ChannelFound;
     }
 
-    public bool DVBTTuning
+    public TuningSettings? Settings
     {
         get
         {
-            return _viewModel == null ? false : _viewModel.DVBTTuning;
-        }
-        set
-        {
-            if (_viewModel == null)
-                return;
-
-            _viewModel.DVBTTuning = value;
-        }
-    }
-
-    public bool DVBT2Tuning
-    {
-        get
-        {
-            return _viewModel == null ? false : _viewModel.DVBT2Tuning;
-        }
-        set
-        {
-            if (_viewModel == null)
-                return;
-
-            _viewModel.DVBT2Tuning = value;
-        }
-    }
-
-    public long TuneBandWidthKHz
-    {
-        get
-        {
-            return _viewModel == null ? 8000 : _viewModel.TuneBandWidthKHz;
-        }
-        set
-        {
-            _viewModel.TuneBandWidthKHz = value;
+            return _viewModel?.Settings;
         }
     }
 
