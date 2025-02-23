@@ -94,6 +94,42 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(DVBT2));
             }
         }
+
+        public long FrequencyFromWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyFromKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyFromDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyFromKHz / 1000.0) - FrequencyFromWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000}";
+            }
+        }
+
+        public long FrequencyToWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyToKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyToDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyToKHz / 1000.0) - FrequencyToWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000}";
+            }
+        }
     }
 }
 

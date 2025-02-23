@@ -38,12 +38,11 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
 
-        /*
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
-        */
+            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreqFrom", new List<View>() { EditFreqFromButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreqTo", new List<View>() { EditFreqToButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Next", new List<View>() { NextButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -60,7 +59,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningFrequenciesPage OnKeyDown {key}");
 
-        /*
+
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
         switch (keyAction)
@@ -69,7 +68,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusNextItem();
+                    _focusItems.FocusNextItem(true);
                 });
                 break;
 
@@ -77,7 +76,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem();
+                    _focusItems.FocusPreviousItem(true);
                 });
                 break;
 
@@ -93,6 +92,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
                 if (_focusItems.FocusedItem == null)
                     return;
 
+                /*
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     switch (_focusItems.FocusedItem.Name)
@@ -108,9 +108,9 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
                             break;
                     }
                 });
+                */
                 break;
         }
-        */
     }
 
     public void OnTextSent(string text)
@@ -194,5 +194,15 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
             _tuningFrequenciesViewModel.DVBT2 = value;
         }
+    }
+
+    private void EditFreqToButton_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void EditFreqFromButton_Clicked(object sender, EventArgs e)
+    {
+
     }
 }
