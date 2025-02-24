@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vlc="clr-namespace:LibVLCSharp.MAUI;assembly=LibVLCSharp.MAUI"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              x:Class="DVBTTelevizor.MAUI.MainPage">
 
 <ContentPage.Resources>
@@ -183,8 +184,8 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <!--Button x:Name="TuneButton" Text="Tune" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.15,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/-->
-        <Button x:Name="InstallDriverButton" Text="Install DVB-T Driver" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <Button x:Name="TuneChannelsButton" Text="{local:LngXamlExt Input='Tune'}" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.35,0.5,0.1"  AbsoluteLayout.LayoutFlags="All" BackgroundColor="Yellow"/>
+        <Button x:Name="InstallDriverButton" Text="{local:LngXamlExt Input='Install DVB-T Driver'}" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
 
         <Grid
             AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
