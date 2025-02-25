@@ -12,16 +12,13 @@ namespace DVBTTelevizor.MAUI
 {
     public class TuningFrequenciesViewModel : BaseViewModel
     {
-        private bool _dvbt = true;
-        private bool _dvbt2 = true;
-        private long _tuneBandWidthKHz = 8000;
-
-        private long _frequencyFromKHz = 474000;
-        private long _frequencyToKHz = 852000;
+        public TuningSettings _tuneSettings { get; set; }
 
         public TuningFrequenciesViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+            _tuneSettings = new TuningSettings();
+
             WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
             {
                 _loggingService.Info($"TuningFrequenciesViewModel: FontSizeChanged");
@@ -29,16 +26,43 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public void NotifyChange()
+        {
+            OnPropertyChanged(nameof(FrequencyFromKHz));
+            OnPropertyChanged(nameof(FrequencyFromKHz));
+            OnPropertyChanged(nameof(FrequencyToKHz));
+            OnPropertyChanged(nameof(TuneBandWidthKHz));
+            OnPropertyChanged(nameof(DVBT));
+            OnPropertyChanged(nameof(DVBT2));
+            OnPropertyChanged(nameof(FrequencyFromWholePartMHz));
+            OnPropertyChanged(nameof(FrequencyFromDecimalPartMHzCaption));
+            OnPropertyChanged(nameof(FrequencyToWholePartMHz));
+            OnPropertyChanged(nameof(FrequencyToDecimalPartMHzCaption));
+        }
+
+        public TuningSettings Settings
+        {
+            get
+            {
+                return _tuneSettings;
+            }
+            set
+            {
+                _tuneSettings = value;
+                NotifyChange();
+            }
+        }
+
         public long FrequencyFromKHz
         {
             get
             {
-                return _frequencyFromKHz;
+                return _tuneSettings.FrequencyFromKHz;
             }
             set
             {
-                _frequencyFromKHz = value;
-                OnPropertyChanged(nameof(FrequencyFromKHz));
+                _tuneSettings.FrequencyFromKHz = value;
+                NotifyChange();
             }
         }
 
@@ -46,12 +70,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _frequencyToKHz;
+                return _tuneSettings.FrequencyToKHz;
             }
             set
             {
-                _frequencyToKHz = value;
-                OnPropertyChanged(nameof(FrequencyToKHz));
+                _tuneSettings.FrequencyToKHz = value;
+                NotifyChange();
             }
         }
 
@@ -59,12 +83,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _tuneBandWidthKHz;
+                return _tuneSettings.BandwidthKHz;
             }
             set
             {
-                _tuneBandWidthKHz = value;
-                OnPropertyChanged(nameof(TuneBandWidthKHz));
+                _tuneSettings.BandwidthKHz = value;
+                NotifyChange();
             }
         }
 
@@ -72,12 +96,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _dvbt;
+                return _tuneSettings.DVBT;
             }
             set
             {
-                _dvbt = value;
-                OnPropertyChanged(nameof(DVBT));
+                _tuneSettings.DVBT = value;
+                NotifyChange();
             }
         }
 
@@ -85,12 +109,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _dvbt2;
+                return _tuneSettings.DVBT2;
             }
             set
             {
-                _dvbt2 = value;
-                OnPropertyChanged(nameof(DVBT2));
+                _tuneSettings.DVBT2 = value;
+                NotifyChange();
             }
         }
 

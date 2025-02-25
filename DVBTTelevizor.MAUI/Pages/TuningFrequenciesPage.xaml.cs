@@ -15,6 +15,9 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
+    public TuningSettings _tuneSettings { get; set; }
+
+    private FrequencyPage _frequencyPage;
     private TuningProgressPage _tuningProgressPage;
 
     public TuningFrequenciesPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
@@ -27,11 +30,30 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
+        _tuneSettings = new TuningSettings();
+
         BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
+    }
+
+    public TuningSettings? Settings
+    {
+        get
+        {
+            return _tuningFrequenciesViewModel?.Settings;
+        }
+        set
+        {
+            if (value == null)
+            {
+                return;
+            }
+            _tuningFrequenciesViewModel.Settings = value;
+        }
     }
 
     private void BuildFocusableItems()
@@ -201,11 +223,32 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
     private void EditFreqToButton_Clicked(object sender, EventArgs e)
     {
-
+        ShowFreqPage(false);
     }
 
     private void EditFreqFromButton_Clicked(object sender, EventArgs e)
     {
+        ShowFreqPage(true);
+    }
 
+    private void ShowFreqPage(bool from)
+    {
+        if (_frequencyPage.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
+
+        if (_frequencyPage.Settings != null && Settings != null)
+        {
+            _frequencyPage.Settings.BandwidthKHz = Settings.BandwidthKHz;
+            _frequencyPage.Settings.FrequencyKHz = from ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
+            _frequencyPage.NotifyChange();
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Navigation.PushAsync(_frequencyPage);
+        });
     }
 }

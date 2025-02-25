@@ -16,5 +16,10 @@ namespace DVBTTelevizor.MAUI
 
         public long FrequencyFromKHz { get; set; } = 474000;
         public long FrequencyToKHz { get; set; } = 852000;
+
+        public long FrequencyMinKHz { get; set; } = 400000;
+        public long FrequencyMaxKHz { get; set; } = 900000;
+
+        public long FrequencyKHz { get; set; } = 474000;
     }
 }
