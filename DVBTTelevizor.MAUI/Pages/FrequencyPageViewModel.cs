@@ -74,6 +74,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(FrequencyMinKHz));
                 OnPropertyChanged(nameof(FrequencyMaxKHz));
                 OnPropertyChanged(nameof(FrequencyMinMHz));
+                OnPropertyChanged(nameof(FrequencyMaxMHz));
                 OnPropertyChanged(nameof(FrequencyToMHz));
 
             });
@@ -142,6 +143,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.FrequencyMinKHz / 1000;
+            }
+        }
+
+        public long FrequencyMaxMHz
+        {
+            get
+            {
+                return Settings.FrequencyMaxKHz / 1000;
             }
         }
 

@@ -129,16 +129,31 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
 
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"TuningProgressPage OnTextSent {text}");
+        _loggingService.Debug($"FrequencyPage OnTextSent {text}");
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningProgressPage BackButton_Clicked");
+        _loggingService.Debug($"FrequencyPage BackButton_Clicked");
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
             await Navigation.PopAsync();
         });
+    }
+
+    private void SliderFrequency_ValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage SliderFrequency_ValueChanged");
+    }
+
+    private void LeftButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage LeftButton_Clicked");
+    }
+
+    private void RightButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage RightButton_Clicked");
     }
 }
