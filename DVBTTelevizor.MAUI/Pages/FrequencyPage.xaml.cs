@@ -36,7 +36,19 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         MHZEntry.Focused += MHZEntry_Focused;
         MHZEntry.Unfocused += MHZEntry_Unfocused;
 
+        SliderFrequency.DragCompleted += SliderFrequency_DragCompleted;
+
         BuildFocusableItems();
+    }
+
+    private void SliderFrequency_DragCompleted(object? sender, EventArgs e)
+    {
+        _viewModel.RoundFrequency();
+    }
+
+    private void SliderFrequency_Unfocused(object? sender, FocusEventArgs e)
+    {
+
     }
 
     private void MHZEntry_Focused(object? sender, FocusEventArgs e)
@@ -113,13 +125,12 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
 
-        /*
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }));
-        */
+            .AddItem(KeyboardFocusableItem.CreateFrom("Left", new List<View>() { LeftButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Right", new List<View>() { RightButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("KHz", new List<View>() { KHzEntryBoxView, KHZEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("MHz", new List<View>() { MHzEntryBoxView , MHZEntry}))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -174,6 +185,18 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
+                        case "Left":
+                            LeftButton_Clicked(this, new EventArgs());
+                            break;
+                        case "Right":
+                            RightButton_Clicked(this, new EventArgs());
+                            break;
+                        case "KHz":
+                            KHZEntry.Focus();
+                            break;
+                        case "MHz":
+                            MHZEntry.Focus();
+                            break;
                         case "Back":
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
@@ -209,10 +232,16 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
     private void LeftButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"FrequencyPage LeftButton_Clicked");
+
+        _viewModel.DecreaseFreq();
+        _viewModel.RoundFrequency();
     }
 
     private void RightButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"FrequencyPage RightButton_Clicked");
+
+        _viewModel.IncreaseFreq();
+        _viewModel.RoundFrequency();
     }
 }

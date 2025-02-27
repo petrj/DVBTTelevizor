@@ -199,6 +199,49 @@ namespace DVBTTelevizor.MAUI
                 return Settings.FrequencyMaxKHz / 1000;
             }
         }
+
+        public void IncreaseFreq()
+        {
+            var freq = FrequencyKHz + TuneBandWidthKHz;
+            if (!ValidFrequencyKHz(freq))
+            {
+                freq = FrequencyMaxKHz;
+            }
+            FrequencyKHz = freq;
+        }
+
+        public void DecreaseFreq()
+        {
+            var freq = FrequencyKHz - TuneBandWidthKHz;
+            if (!ValidFrequencyKHz(freq))
+            {
+                freq = FrequencyMinKHz;
+            }
+            FrequencyKHz = freq;
+        }
+
+        public void RoundFrequency()
+        {
+            if (!ValidFrequencyKHz(FrequencyKHz))
+                return;
+
+            // rounding to start freq 474 MHZ
+            var startFreq = Settings.DefaultFrequencyKHz;
+
+            var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz));
+
+            var freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
+            if (freqRounded > Settings.FrequencyMaxKHz)
+            {
+                freqRounded = Settings.FrequencyMaxKHz;
+            }
+            if (freqRounded < Settings.FrequencyMinKHz)
+            {
+                freqRounded = Settings.FrequencyMinKHz;
+            }
+
+            FrequencyKHz = freqRounded;
+        }
     }
 }
 

@@ -19,6 +19,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
     private FrequencyPage _frequencyPage;
     private TuningProgressPage _tuningProgressPage;
+    private bool _editingFrom = false;
 
     public TuningFrequenciesPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -36,6 +37,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _frequencyPage.Disappearing += _frequencyPage_Disappearing;
 
         BuildFocusableItems();
     }
@@ -165,6 +167,9 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
             _tuningProgressPage.Settings.DVBT = _tuningFrequenciesViewModel.DVBT;
             _tuningProgressPage.Settings.DVBT2 = _tuningFrequenciesViewModel.DVBT2;
             _tuningProgressPage.Settings.BandwidthKHz = _tuningFrequenciesViewModel.TuneBandWidthKHz;
+            _tuningProgressPage.Settings.FrequencyFromKHz = _tuningFrequenciesViewModel.FrequencyFromKHz;
+            _tuningProgressPage.Settings.FrequencyToKHz = _tuningFrequenciesViewModel.FrequencyToKHz;
+            _tuningProgressPage.UpdateActualFreq();
         }
 
         await Navigation.PushAsync(_tuningProgressPage);
@@ -223,15 +228,32 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
     private void EditFreqToButton_Clicked(object sender, EventArgs e)
     {
-        ShowFreqPage(false);
+        _editingFrom = false;
+        ShowFreqPage();
+    }
+
+    private void _frequencyPage_Disappearing(object? sender, EventArgs e)
+    {
+        if (Settings == null)
+            return;
+
+        if (_editingFrom)
+        {
+            _tuningFrequenciesViewModel.FrequencyFromKHz = _frequencyPage.Settings.FrequencyKHz;
+        }
+        else
+        {
+            _tuningFrequenciesViewModel.FrequencyToKHz = _frequencyPage.Settings.FrequencyKHz;
+        }
     }
 
     private void EditFreqFromButton_Clicked(object sender, EventArgs e)
     {
-        ShowFreqPage(true);
+        _editingFrom = true;
+        ShowFreqPage();
     }
 
-    private void ShowFreqPage(bool from)
+    private void ShowFreqPage()
     {
         if (_frequencyPage.IsLoaded)
         {
@@ -242,7 +264,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
         if (_frequencyPage.Settings != null && Settings != null)
         {
             _frequencyPage.Settings.BandwidthKHz = Settings.BandwidthKHz;
-            _frequencyPage.Settings.FrequencyKHz = from ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
+            _frequencyPage.Settings.FrequencyKHz = _editingFrom ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
             _frequencyPage.NotifyChange();
         }
 

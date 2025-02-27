@@ -49,6 +49,11 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         }
     }
 
+    public void UpdateActualFreq()
+    {
+        _viewModel.UpdateActualFreq();
+    }
+
     private void ChannelFound(object? sender, EventArgs e)
     {
         if (e is ChannelFoundEventArgs che)

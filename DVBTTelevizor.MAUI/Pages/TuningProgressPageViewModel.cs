@@ -402,6 +402,15 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public void UpdateActualFreq()
+        {
+            if (_actualTunningFreqKHz > Settings.FrequencyToKHz || _actualTunningFreqKHz < Settings.FrequencyFromKHz)
+            {
+                _actualTunningFreqKHz = Settings.FrequencyFromKHz;
+                NotifyChange();
+            }
+        }
+
         public Channel? SelectedChannel
         {
             get
