@@ -30,7 +30,66 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
 
         BindingContext = _viewModel = new FrequencyPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
+        KHZEntry.Focused += KHZEntry_Focused;
+        KHZEntry.Unfocused += KHZEntry_Unfocused;
+
+        MHZEntry.Focused += MHZEntry_Focused;
+        MHZEntry.Unfocused += MHZEntry_Unfocused;
+
         BuildFocusableItems();
+    }
+
+    private void MHZEntry_Focused(object? sender, FocusEventArgs e)
+    {
+        _viewModel.NotifyEnabled = false;
+    }
+
+    private void KHZEntry_Focused(object? sender, FocusEventArgs e)
+    {
+        _viewModel.NotifyEnabled = false;
+    }
+
+    private async void MHZEntry_Unfocused(object? sender, FocusEventArgs e)
+    {
+        _viewModel.NotifyEnabled = true;
+
+        float mhz;
+        if (!float.TryParse(MHZEntry.Text, out mhz))
+        {
+            await _dialogService.Information($"Invalid frequency");
+            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            return;
+        }
+
+        if (!_viewModel.ValidFrequencyMHz(mhz))
+        {
+            await _dialogService.Information($"Frequency \"{mhz}\" MHz is out of range {_viewModel.FrequencyMinMHz} MHz - {_viewModel.FrequencyMaxMHz} MHz");
+            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            return;
+        }
+
+        _viewModel.FrequencyKHz = Convert.ToInt64(mhz * 1000);
+    }
+
+    private async void KHZEntry_Unfocused(object? sender, FocusEventArgs e)
+    {
+        _viewModel.NotifyEnabled = true;
+        int khz;
+        if (!int.TryParse(KHZEntry.Text, out khz))
+        {
+            await _dialogService.Information($"Invalid frequency");
+            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            return;
+        }
+
+        if (!_viewModel.ValidFrequencyKHz(khz))
+        {
+            await _dialogService.Information($"Frequency \"{khz}\" KHz is out of range {_viewModel.FrequencyMinKHz} KHz - {_viewModel.FrequencyMaxKHz} KHz");
+            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            return;
+        }
+
+        _viewModel.FrequencyKHz = khz;
     }
 
     public TuningSettings? Settings

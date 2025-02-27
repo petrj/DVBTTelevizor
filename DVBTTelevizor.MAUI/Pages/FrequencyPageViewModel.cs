@@ -20,6 +20,8 @@ namespace DVBTTelevizor.MAUI
     {
         public TuningSettings _tuneSettings { get; set; }
 
+        public bool NotifyEnabled { get; set; } = true;
+
         public FrequencyPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
@@ -45,6 +47,27 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool ValidFrequencyKHz(long freqKHz)
+        {
+
+            if (freqKHz < _tuneSettings.FrequencyMinKHz || freqKHz > _tuneSettings.FrequencyMaxKHz)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool ValidFrequencyKHz(double freqKHz)
+        {
+            return ValidFrequencyKHz(Convert.ToInt64(freqKHz));
+        }
+
+        public bool ValidFrequencyMHz(double freqMHz)
+        {
+            return ValidFrequencyKHz(Convert.ToInt64(freqMHz*1000));
+        }
+
         public long TuneBandWidthKHz
         {
             get
@@ -63,9 +86,16 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug("NotifyChange");
 
+            if (!NotifyEnabled)
+            {
+                _loggingService.Debug("NotifyChange disabled");
+                return;
+            }
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 OnPropertyChanged(nameof(FrequencyKHz));
+                OnPropertyChanged(nameof(FrequencyMHz));
                 OnPropertyChanged(nameof(FrequencyWholePartMHz));
                 OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
 
@@ -106,9 +136,17 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                _loggingService.Debug($"Setting value:{value}");
                 Settings.FrequencyKHz = value;
-
                 NotifyChange();
+            }
+        }
+
+        public string FrequencyMHz
+        {
+            get
+            {
+                return (Settings.FrequencyKHz / 1000.0).ToString("0.###");
             }
         }
 
