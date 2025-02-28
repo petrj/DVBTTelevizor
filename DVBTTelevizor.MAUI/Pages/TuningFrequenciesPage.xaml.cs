@@ -162,15 +162,8 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
             return;
         }
 
-        if (_tuningProgressPage.Settings != null)
-        {
-            _tuningProgressPage.Settings.DVBT = _tuningFrequenciesViewModel.DVBT;
-            _tuningProgressPage.Settings.DVBT2 = _tuningFrequenciesViewModel.DVBT2;
-            _tuningProgressPage.Settings.BandwidthKHz = _tuningFrequenciesViewModel.TuneBandWidthKHz;
-            _tuningProgressPage.Settings.FrequencyFromKHz = _tuningFrequenciesViewModel.FrequencyFromKHz;
-            _tuningProgressPage.Settings.FrequencyToKHz = _tuningFrequenciesViewModel.FrequencyToKHz;
-            _tuningProgressPage.UpdateActualFreq();
-        }
+        _tuningProgressPage.Settings = _tuningFrequenciesViewModel.Settings;
+        _tuningProgressPage.UpdateActualFreq();
 
         await Navigation.PushAsync(_tuningProgressPage);
     }

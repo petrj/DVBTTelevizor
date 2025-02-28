@@ -24,20 +24,12 @@ namespace DVBTTelevizor.MAUI
 
         private int _actualTuningDVBTType = 0; // 0 .. DVBT, 1 .. DVBT2
         private long _actualTunningFreqKHz = 474000;
-        //private long _tuneBandWidthKHz = 8000;
-
-        //private long _frequencyFromKHz = 474000;
-        //private long _frequencyToKHz = 852000;
 
         private double _signalProgress = 0;
-
-        //private bool _DVBTTuning = true;
-        //private bool _DVBT2Tuning = true;
-
-        private bool _signalSynced { get; set; } = false;
-        private bool _signalLocked { get; set; } = false;
-        private bool _signalCarrier { get; set; } = false;
-        private long _signalSNR { get; set; } = 0;
+        private bool _signalSynced = false;
+        private bool _signalLocked = false;
+        private bool _signalCarrier = false;
+        private long _signalSNR = 0;
 
         private long _bitrate { get; set; } = 0;
 
@@ -114,31 +106,6 @@ namespace DVBTTelevizor.MAUI
                     Channels.Clear();
                 });
             }
-
-            /*
-            Channels.Add(new Channel()
-            {
-                Number = "1",
-                Name = "CT1",
-                ProviderName = "Cesta televize",
-                Bandwdith = 8,
-                DVBTType = 1,
-                Frequency = 484000000,
-                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                NonFree = true
-            });
-            Channels.Add(new Channel()
-            {
-                Number = "2",
-                Name = "CT2",
-                ProviderName = "Cesta televize",
-                Bandwdith = 8,
-                DVBTType = 1,
-                Frequency = 484000000,
-                Type = MPEGTS.ServiceTypeEnum.DigitalTelevisionService,
-                NonFree = false
-            });
-            */
 
             _actualTuningDVBTType = 0;
             if (!DVBTTuning)
@@ -394,12 +361,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Settings.BandwidthKHz;
             }
-            set
-            {
-                Settings.BandwidthKHz = value;
-
-                NotifyChange();
-            }
         }
 
         public void UpdateActualFreq()
@@ -407,8 +368,15 @@ namespace DVBTTelevizor.MAUI
             if (_actualTunningFreqKHz > Settings.FrequencyToKHz || _actualTunningFreqKHz < Settings.FrequencyFromKHz)
             {
                 _actualTunningFreqKHz = Settings.FrequencyFromKHz;
-                NotifyChange();
             }
+
+            if (!DVBTTuning && _actualTuningDVBTType == 0)
+            {
+                _actualTuningDVBTType = 1;
+                _actualTunningFreqKHz = Settings.FrequencyFromKHz;
+            }
+
+            NotifyChange();
         }
 
         public Channel? SelectedChannel
@@ -630,12 +598,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Settings.DVBT;
             }
-            set
-            {
-                Settings.DVBT = value;
-
-                NotifyChange();
-            }
         }
 
         public bool SignalCarrier
@@ -708,12 +670,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Settings.DVBT2;
             }
-            set
-            {
-                Settings.DVBT2 = value;
-
-                NotifyChange();
-            }
         }
 
         public long FrequencyFromKHz
@@ -722,11 +678,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Settings.FrequencyFromKHz;
             }
-            set
-            {
-                Settings.FrequencyFromKHz = value;
-                NotifyChange();
-            }
         }
 
         public long FrequencyToKHz
@@ -734,11 +685,6 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.FrequencyToKHz;
-            }
-            set
-            {
-                Settings.FrequencyToKHz = value;
-                NotifyChange();
             }
         }
 
@@ -910,6 +856,8 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _signalStrengthProgress = value;
+
+                NotifyChange();
             }
         }
 

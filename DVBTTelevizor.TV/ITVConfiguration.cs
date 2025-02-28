@@ -20,8 +20,6 @@ namespace DVBTTelevizor
         public DVBTDriverTypeEnum DVBTDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }
 
-        public DVBTBandwidthEnum DVBTBandwidth { get; set; }
-
         public bool Fullscreen { get; set; }
         public bool PlayOnBackground { get; set; }
 
@@ -39,6 +37,11 @@ namespace DVBTTelevizor
 
         public bool TuneDVBTEnabled { get; set; }
         public bool TuneDVBT2Enabled { get; set; }
+
+        public long FrequencyFromKHz { get; set; }
+        public long FrequencyToKHz { get; set; }
+
+        public DVBTBandwidthEnum DVBTBandwidth { get; set; }
 
         void Load();
         void Save();

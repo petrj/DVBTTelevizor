@@ -47,6 +47,10 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         {
             return _viewModel?.Settings;
         }
+        set
+        {
+            _viewModel.Settings = value;
+        }
     }
 
     public void UpdateActualFreq()

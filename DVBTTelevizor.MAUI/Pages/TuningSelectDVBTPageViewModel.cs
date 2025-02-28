@@ -16,6 +16,8 @@ namespace DVBTTelevizor.MAUI
         private string? _selectedBandwidth = null;
         private Dictionary<string, int> _dict = new Dictionary<string, int>();
 
+        public bool Initializing { get; set; } = true;
+
         public ObservableCollection<string> Bandwidths { get; set; } = new ObservableCollection<string>();
 
         public TuningSettings Settings { get; set; }
@@ -119,6 +121,9 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                if (Initializing) // MAUI fires setter with default value while creating view model
+                    return;
+
                 Settings.DVBT = value;
                 OnPropertyChanged(nameof(DVBT));
                 OnPropertyChanged(nameof(NextVisible));
@@ -134,6 +139,9 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                if (Initializing)
+                    return;
+
                 Settings.DVBT2 = value;
                 OnPropertyChanged(nameof(DVBT2));
                 OnPropertyChanged(nameof(NextVisible));

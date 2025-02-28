@@ -514,5 +514,29 @@ namespace DVBTTelevizor
                 _loggingService.Error(ex);
             }
         }
+
+        public long FrequencyFromKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FrequencyFromKHz", 474000);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FrequencyFromKHz", value);
+            }
+        }
+
+        public long FrequencyToKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FrequencyToKHz", 852000);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FrequencyToKHz", value);
+            }
+        }
     }
 }

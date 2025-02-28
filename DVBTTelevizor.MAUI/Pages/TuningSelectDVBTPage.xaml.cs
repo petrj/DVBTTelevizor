@@ -14,8 +14,6 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
-    public TuningSettings Settings { get; set; }
-
     private KeyboardFocusableItemList _focusItems;
 
     private string? _lastSelectedCenterItem = null;
@@ -35,14 +33,25 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        Settings = new TuningSettings();
-
         BindingContext = _tuningSelectDVBTViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _tuningSelectDVBTViewModel.Initializing = false;
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
+    }
+
+    public TuningSettings? Settings
+    {
+        get
+        {
+            return _tuningSelectDVBTViewModel?.Settings;
+        }
+        set
+        {
+            _tuningSelectDVBTViewModel.Settings = value;
+        }
     }
 
     private void BuildFocusableItems()
@@ -229,22 +238,6 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
     {
         switch (Settings.TuningMode)
         {
-            case TuneModeEnum.Automatic:
-                if (_tuningProgressPage.IsLoaded)
-                {
-                    // preventing click when the settings page is just (or yet) loaded
-                    return;
-                }
-
-                if (_tuningProgressPage.Settings != null)
-                {
-                    _tuningProgressPage.Settings.DVBT = _tuningSelectDVBTViewModel.DVBT;
-                    _tuningProgressPage.Settings.DVBT2 = _tuningSelectDVBTViewModel.DVBT2;
-                    _tuningProgressPage.Settings.BandwidthKHz = _tuningSelectDVBTViewModel.SelectedBandwidthKHz;
-                }
-
-                await Navigation.PushAsync(_tuningProgressPage);
-            break;
             case TuneModeEnum.Manual:
                 if (_tuningFrequenciesPage.IsLoaded)
                 {
@@ -252,7 +245,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                     return;
                 }
 
-                _tuningFrequenciesPage.DVBT = _tuningSelectDVBTViewModel.DVBT;
+                _tuningFrequenciesPage.Settings = _tuningSelectDVBTViewModel.Settings;
 
                 await Navigation.PushAsync(_tuningFrequenciesPage);
                 break;

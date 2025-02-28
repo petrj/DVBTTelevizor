@@ -69,14 +69,14 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         if (!float.TryParse(MHZEntry.Text, out mhz))
         {
             await _dialogService.Information($"Invalid frequency");
-            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
             return;
         }
 
         if (!_viewModel.ValidFrequencyMHz(mhz))
         {
             await _dialogService.Information($"Frequency \"{mhz}\" MHz is out of range {_viewModel.FrequencyMinMHz} MHz - {_viewModel.FrequencyMaxMHz} MHz");
-            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
             return;
         }
 
@@ -90,14 +90,14 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         if (!int.TryParse(KHZEntry.Text, out khz))
         {
             await _dialogService.Information($"Invalid frequency");
-            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
             return;
         }
 
         if (!_viewModel.ValidFrequencyKHz(khz))
         {
             await _dialogService.Information($"Frequency \"{khz}\" KHz is out of range {_viewModel.FrequencyMinKHz} KHz - {_viewModel.FrequencyMaxKHz} KHz");
-            _viewModel.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
             return;
         }
 

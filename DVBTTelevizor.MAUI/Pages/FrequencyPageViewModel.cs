@@ -226,7 +226,7 @@ namespace DVBTTelevizor.MAUI
                 return;
 
             // rounding to start freq 474 MHZ
-            var startFreq = Settings.DefaultFrequencyKHz;
+            var startFreq = TuningSettings.DefaultFrequencyKHz;
 
             var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz));
 

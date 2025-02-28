@@ -140,18 +140,15 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         if (page is TuningSelectDVBTPage sPage)
         {
-            sPage.Settings.TuningMode = mode;
-        }
-        if (page is TuningProgressPage pPage)
-        {
-            if (pPage.Settings != null)
+            sPage.Settings = new TuningSettings()
             {
-                pPage.Settings.DVBT = true;
-                pPage.Settings.DVBT2 = true;
-
-                // TODO detect DVBT by region
-                // TODO set default BandBandWidth in config
-            }
+                DVBT = _configuration.TuneDVBTEnabled,
+                DVBT2 = _configuration.TuneDVBT2Enabled,
+                BandwidthKHz = Bandwidth.BandWidthHz.ContainsKey(_configuration.DVBTBandwidth) ? Bandwidth.BandWidthHz[_configuration.DVBTBandwidth] / 1000: TuningSettings.DefaultBandwidthKHz,
+                FrequencyFromKHz = _configuration.FrequencyFromKHz,
+                FrequencyToKHz = _configuration.FrequencyToKHz,
+                TuningMode = mode
+            };
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>
