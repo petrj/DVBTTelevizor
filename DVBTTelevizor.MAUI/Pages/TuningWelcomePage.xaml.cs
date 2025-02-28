@@ -149,6 +149,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                 FrequencyToKHz = _configuration.FrequencyToKHz,
                 TuningMode = mode
             };
+
+            sPage.Update();
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>

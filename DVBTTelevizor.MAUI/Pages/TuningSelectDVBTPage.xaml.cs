@@ -54,6 +54,11 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         }
     }
 
+    public void Update()
+    {
+        _tuningSelectDVBTViewModel?.Update();
+    }
+
     private void BuildFocusableItems()
     {
         _focusItems = new KeyboardFocusableItemList();

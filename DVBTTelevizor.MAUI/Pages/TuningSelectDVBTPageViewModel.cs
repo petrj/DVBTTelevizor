@@ -156,6 +156,13 @@ namespace DVBTTelevizor.MAUI
                 return DVBT || DVBT2;
             }
         }
+
+        public void Update()
+        {
+            DVBT = _configuration.TuneDVBTEnabled;
+            DVBT2 = _configuration.TuneDVBT2Enabled;
+            SelectedBandwidth = Bandwidth.BandWidthTitle[_configuration.DVBTBandwidth];
+        }
     }
 }
 
