@@ -130,6 +130,13 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         ShowPage(_selectDVBTPage, TuneModeEnum.Manual);
     }
 
+    private void TuneButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
+
+        ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
+    }
+
     private void ShowPage(Page page, TuneModeEnum mode)
     {
         if (page.IsLoaded)
@@ -159,10 +166,5 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         });
     }
 
-    private void TuneButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
 
-        ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
-    }
 }

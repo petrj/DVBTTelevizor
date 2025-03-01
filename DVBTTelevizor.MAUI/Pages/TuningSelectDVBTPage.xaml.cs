@@ -22,6 +22,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private TuningProgressPage _tuningProgressPage;
     private TuningFrequenciesPage _tuningFrequenciesPage;
+    private TuningFrequencyPage _tuningFrequencyPage;
 
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -38,6 +39,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -253,6 +255,17 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
                 _tuningFrequenciesPage.Settings = _tuningSelectDVBTViewModel.Settings;
 
                 await Navigation.PushAsync(_tuningFrequenciesPage);
+                break;
+            case TuneModeEnum.Frequency:
+                if (_tuningFrequencyPage.IsLoaded)
+                {
+                    // preventing click when the settings page is just (or yet) loaded
+                    return;
+                }
+
+                _tuningFrequencyPage.Settings = _tuningSelectDVBTViewModel.Settings;
+
+                await Navigation.PushAsync(_tuningFrequencyPage);
                 break;
         }
     }

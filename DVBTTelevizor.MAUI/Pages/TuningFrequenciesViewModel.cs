@@ -31,13 +31,14 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(FrequencyFromKHz));
             OnPropertyChanged(nameof(FrequencyFromKHz));
             OnPropertyChanged(nameof(FrequencyToKHz));
-            OnPropertyChanged(nameof(TuneBandWidthKHz));
-            OnPropertyChanged(nameof(DVBT));
-            OnPropertyChanged(nameof(DVBT2));
+            OnPropertyChanged(nameof(FrequencyKHz));
+
             OnPropertyChanged(nameof(FrequencyFromWholePartMHz));
             OnPropertyChanged(nameof(FrequencyFromDecimalPartMHzCaption));
             OnPropertyChanged(nameof(FrequencyToWholePartMHz));
             OnPropertyChanged(nameof(FrequencyToDecimalPartMHzCaption));
+            OnPropertyChanged(nameof(FrequencyWholePartMHz));
+            OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
         }
 
         public TuningSettings Settings
@@ -67,6 +68,19 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public long FrequencyKHz
+        {
+            get
+            {
+                return _tuneSettings.FrequencyKHz;
+            }
+            set
+            {
+                _tuneSettings.FrequencyKHz = value;
+                NotifyChange();
+            }
+        }
+
         public long FrequencyToKHz
         {
             get
@@ -77,45 +91,6 @@ namespace DVBTTelevizor.MAUI
             {
                 _configuration.FrequencyToKHz = value;
                 _tuneSettings.FrequencyToKHz = value;
-                NotifyChange();
-            }
-        }
-
-        public long TuneBandWidthKHz
-        {
-            get
-            {
-                return _tuneSettings.BandwidthKHz;
-            }
-            set
-            {
-                _tuneSettings.BandwidthKHz = value;
-                NotifyChange();
-            }
-        }
-
-        public bool DVBT
-        {
-            get
-            {
-                return _tuneSettings.DVBT;
-            }
-            set
-            {
-                _tuneSettings.DVBT = value;
-                NotifyChange();
-            }
-        }
-
-        public bool DVBT2
-        {
-            get
-            {
-                return _tuneSettings.DVBT2;
-            }
-            set
-            {
-                _tuneSettings.DVBT2 = value;
                 NotifyChange();
             }
         }
@@ -151,6 +126,24 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 var part = (FrequencyToKHz / 1000.0) - FrequencyToWholePartMHz;
+                var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
+                return $".{part1000}";
+            }
+        }
+
+        public long FrequencyWholePartMHz
+        {
+            get
+            {
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+            }
+        }
+
+        public string FrequencyDecimalPartMHzCaption
+        {
+            get
+            {
+                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000}";
             }
