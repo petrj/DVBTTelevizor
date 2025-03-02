@@ -160,9 +160,12 @@ public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
             return;
         }
 
-        _tuningProgressPage.Settings = _tuningFrequenciesViewModel.Settings;
-        _tuningProgressPage.Settings.FrequencyFromKHz = _tuningFrequenciesViewModel.FrequencyKHz;
-        _tuningProgressPage.Settings.FrequencyToKHz = _tuningFrequenciesViewModel.FrequencyKHz;
+        if (Settings != null)
+        {
+            _configuration.FrequencyKHz = Settings.FrequencyKHz;
+        }
+
+        _tuningProgressPage.Settings = Settings;
         _tuningProgressPage.UpdateActualFreq();
 
         await Navigation.PushAsync(_tuningProgressPage);

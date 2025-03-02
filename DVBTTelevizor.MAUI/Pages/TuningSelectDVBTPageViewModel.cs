@@ -27,7 +27,14 @@ namespace DVBTTelevizor.MAUI
         {
             Settings = new TuningSettings();
 
-            _selectedBandwidth = Bandwidth.BandWidthTitle[tvConfiguration.DVBTBandwidth];
+            if (!Bandwidth.BandWidthHzTitle.ContainsKey(tvConfiguration.DVBTBandwidthKHz * 1000))
+            {
+                _selectedBandwidth = "8 MHz";
+            }
+            else
+            {
+                _selectedBandwidth = Bandwidth.BandWidthHzTitle[tvConfiguration.DVBTBandwidthKHz * 1000];
+            }
 
             WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
             {
@@ -72,13 +79,10 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 _selectedBandwidth = value;
-
-                if (Bandwidth.TitleBandWidth.ContainsKey(value))
-                {
-                    _configuration.DVBTBandwidth = Bandwidth.TitleBandWidth[value];
-                }
+                Settings.BandwidthKHz = SelectedBandwidthKHz;
 
                 OnPropertyChanged(nameof(SelectedBandwidth));
+                OnPropertyChanged(nameof(SelectedBandwidthKHz));
             }
         }
 
@@ -121,13 +125,12 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                if (Initializing) // MAUI fires setter with default value while creating view model
-                    return;
+                //if (Initializing) // MAUI fires setter with default value while creating view model
+                  //  return;
 
                 Settings.DVBT = value;
                 OnPropertyChanged(nameof(DVBT));
                 OnPropertyChanged(nameof(NextVisible));
-                _configuration.TuneDVBTEnabled = value;
             }
         }
 
@@ -145,7 +148,6 @@ namespace DVBTTelevizor.MAUI
                 Settings.DVBT2 = value;
                 OnPropertyChanged(nameof(DVBT2));
                 OnPropertyChanged(nameof(NextVisible));
-                _configuration.TuneDVBT2Enabled = value;
             }
         }
 
@@ -161,7 +163,11 @@ namespace DVBTTelevizor.MAUI
         {
             DVBT = _configuration.TuneDVBTEnabled;
             DVBT2 = _configuration.TuneDVBT2Enabled;
-            SelectedBandwidth = Bandwidth.BandWidthTitle[_configuration.DVBTBandwidth];
+
+            if (Bandwidth.BandWidthHzTitle.ContainsKey(_configuration.DVBTBandwidthKHz * 1000))
+            {
+                SelectedBandwidth = Bandwidth.BandWidthHzTitle[_configuration.DVBTBandwidthKHz * 1000];
+            }
         }
     }
 }

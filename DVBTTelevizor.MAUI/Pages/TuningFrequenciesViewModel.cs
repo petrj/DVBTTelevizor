@@ -62,7 +62,6 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                _configuration.FrequencyFromKHz = value;
                 _tuneSettings.FrequencyFromKHz = value;
                 NotifyChange();
             }
@@ -89,7 +88,6 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                _configuration.FrequencyToKHz = value;
                 _tuneSettings.FrequencyToKHz = value;
                 NotifyChange();
             }

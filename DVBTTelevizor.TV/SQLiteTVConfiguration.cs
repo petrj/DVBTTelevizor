@@ -214,16 +214,15 @@ namespace DVBTTelevizor
             }
         }
 
-        public DVBTBandwidthEnum DVBTBandwidth
+        public long DVBTBandwidthKHz
         {
             get
             {
-                var index = GetPersistingSettingValue<int>("DVBTBandwidth", 0);
-                return (DVBTBandwidthEnum)index;
+                return GetPersistingSettingValue<long>("DVBTBandwidthKHz", 8000);
             }
             set
             {
-                SavePersistingSettingValue<int>("DVBTBandwidth", (int)value);
+                SavePersistingSettingValue<long>("DVBTBandwidthKHz", value);
             }
         }
 
@@ -311,6 +310,19 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("TuneDVBT2Enabled", value);
             }
         }
+
+        public bool TuneDVBTPreferred
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("TuneDVBTPreferred", true);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("TuneDVBTPreferred", value);
+            }
+        }
+
 
         public bool ShowNonFreeChannels
         {
@@ -536,6 +548,18 @@ namespace DVBTTelevizor
             set
             {
                 SavePersistingSettingValue<long>("FrequencyToKHz", value);
+            }
+        }
+
+        public long FrequencyKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FrequencyKHz", 474000);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FrequencyKHz", value);
             }
         }
     }

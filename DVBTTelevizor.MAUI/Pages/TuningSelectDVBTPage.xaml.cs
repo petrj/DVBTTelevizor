@@ -241,31 +241,47 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         });
     }
 
+    private void ShowPage(Page page)
+    {
+        if (page.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
+
+        if (Settings != null)
+        {
+            _configuration.TuneDVBTEnabled = Settings.DVBT;
+            _configuration.TuneDVBT2Enabled = Settings.DVBT2;
+            _configuration.DVBTBandwidthKHz = Settings.BandwidthKHz;
+        }
+
+        if (page is TuningFrequenciesPage fsPage)
+        {
+            fsPage.Settings = _tuningSelectDVBTViewModel.Settings;
+            //fsPage.Update();
+        }
+
+        if (page is TuningFrequencyPage fPage)
+        {
+            fPage.Settings = _tuningSelectDVBTViewModel.Settings;
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Navigation.PushAsync(page);
+        });
+    }
+
     private async void NextButton_Clicked(object sender, EventArgs e)
     {
         switch (Settings.TuningMode)
         {
             case TuneModeEnum.Manual:
-                if (_tuningFrequenciesPage.IsLoaded)
-                {
-                    // preventing click when the settings page is just (or yet) loaded
-                    return;
-                }
-
-                _tuningFrequenciesPage.Settings = _tuningSelectDVBTViewModel.Settings;
-
-                await Navigation.PushAsync(_tuningFrequenciesPage);
+                ShowPage(_tuningFrequenciesPage);
                 break;
             case TuneModeEnum.Frequency:
-                if (_tuningFrequencyPage.IsLoaded)
-                {
-                    // preventing click when the settings page is just (or yet) loaded
-                    return;
-                }
-
-                _tuningFrequencyPage.Settings = _tuningSelectDVBTViewModel.Settings;
-
-                await Navigation.PushAsync(_tuningFrequencyPage);
+                ShowPage(_tuningFrequencyPage);
                 break;
         }
     }

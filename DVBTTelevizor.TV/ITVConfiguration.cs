@@ -37,11 +37,13 @@ namespace DVBTTelevizor
 
         public bool TuneDVBTEnabled { get; set; }
         public bool TuneDVBT2Enabled { get; set; }
+        public bool TuneDVBTPreferred { get; set; }
 
         public long FrequencyFromKHz { get; set; }
         public long FrequencyToKHz { get; set; }
+        public long FrequencyKHz { get; set; }
 
-        public DVBTBandwidthEnum DVBTBandwidth { get; set; }
+        public long DVBTBandwidthKHz { get; set; }
 
         void Load();
         void Save();

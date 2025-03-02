@@ -151,13 +151,32 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             {
                 DVBT = _configuration.TuneDVBTEnabled,
                 DVBT2 = _configuration.TuneDVBT2Enabled,
-                BandwidthKHz = Bandwidth.BandWidthHz.ContainsKey(_configuration.DVBTBandwidth) ? Bandwidth.BandWidthHz[_configuration.DVBTBandwidth] / 1000: TuningSettings.DefaultBandwidthKHz,
+                TuneDVBTPreferred = _configuration.TuneDVBTPreferred,
+                BandwidthKHz = _configuration.DVBTBandwidthKHz,
                 FrequencyFromKHz = _configuration.FrequencyFromKHz,
                 FrequencyToKHz = _configuration.FrequencyToKHz,
+                FrequencyKHz = _configuration.FrequencyKHz,
                 TuningMode = mode
             };
 
             sPage.Update();
+        }
+
+        if (page is TuningProgressPage tPage)
+        {
+            tPage.Settings = new TuningSettings()
+            {
+                DVBT = true,
+                DVBT2 = true,
+                TuneDVBTPreferred = false,
+                BandwidthKHz = TuningSettings.DefaultBandwidthKHz,
+                FrequencyFromKHz = TuningSettings.DefaultFrequencyFromKHz,
+                FrequencyToKHz = TuningSettings.DefaultFrequencyToKHz,
+                FrequencyKHz = TuningSettings.DefaultFrequencyKHz,
+                TuningMode = TuneModeEnum.Automatic
+            };
+
+            tPage.UpdateActualFreq();
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>

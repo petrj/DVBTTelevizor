@@ -12,6 +12,9 @@ namespace DVBTTelevizor
 
         public bool DVBT { get; set; } = true;
         public bool DVBT2 { get; set; } = true;
+
+        public bool TuneDVBTPreferred { get; set; } = false;
+
         public long BandwidthKHz { get; set; } = 8000;
 
         public long FrequencyFromKHz { get; set; } = 474000;
@@ -24,5 +27,8 @@ namespace DVBTTelevizor
 
         public static long DefaultFrequencyKHz { get; set; } = 474000;
         public static long DefaultBandwidthKHz { get; set; } = 8000;
+
+        public static long DefaultFrequencyFromKHz { get; set; } = 474000;
+        public static long DefaultFrequencyToKHz { get; set; } = 852000;
     }
 }

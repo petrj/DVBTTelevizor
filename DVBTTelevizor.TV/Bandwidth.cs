@@ -70,7 +70,7 @@ namespace DVBTTelevizor
                 res.Add("6 MHz", 6000000);
                 res.Add("5 MHz", 5000000);
                 res.Add("10 MHz", 10000000);
-                res.Add("1.7 MHz", 5000000);
+                res.Add("1.7 MHz", 1700000);
 
                 return res;
             }
@@ -87,7 +87,7 @@ namespace DVBTTelevizor
                 res.Add(6000000, "6 MHz");
                 res.Add(5000000, "5 MHz");
                 res.Add(10000000, "10 MHz");
-                res.Add(5000000, "1.7 MHz");
+                res.Add(1700000, "1.7 MHz");
 
                 return res;
             }
