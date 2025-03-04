@@ -125,11 +125,15 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                //if (Initializing) // MAUI fires setter with default value while creating view model
-                  //  return;
-
                 Settings.DVBT = value;
+
+                if (Settings.TuningMode == TuneModeEnum.Frequency && Settings.DVBT == Settings.DVBT2)
+                {
+                    DVBT2 = !Settings.DVBT;
+                }
+
                 OnPropertyChanged(nameof(DVBT));
+                OnPropertyChanged(nameof(DVBT2));
                 OnPropertyChanged(nameof(NextVisible));
             }
         }
@@ -142,10 +146,14 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                if (Initializing)
-                    return;
-
                 Settings.DVBT2 = value;
+
+                if (Settings.TuningMode == TuneModeEnum.Frequency && Settings.DVBT == Settings.DVBT2)
+                {
+                    DVBT = !Settings.DVBT2;
+                }
+
+                OnPropertyChanged(nameof(DVBT));
                 OnPropertyChanged(nameof(DVBT2));
                 OnPropertyChanged(nameof(NextVisible));
             }
@@ -163,6 +171,11 @@ namespace DVBTTelevizor.MAUI
         {
             DVBT = _configuration.TuneDVBTEnabled;
             DVBT2 = _configuration.TuneDVBT2Enabled;
+
+            if (Settings.TuningMode == TuneModeEnum.Frequency)
+            {
+                DVBT = Settings.TuneDVBTPreferred;
+            }
 
             if (Bandwidth.BandWidthHzTitle.ContainsKey(_configuration.DVBTBandwidthKHz * 1000))
             {

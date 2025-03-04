@@ -254,6 +254,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
             _configuration.TuneDVBTEnabled = Settings.DVBT;
             _configuration.TuneDVBT2Enabled = Settings.DVBT2;
             _configuration.DVBTBandwidthKHz = Settings.BandwidthKHz;
+            _configuration.TuneDVBTPreferred = Settings.TuneDVBTPreferred;
         }
 
         if (page is TuningFrequenciesPage fsPage)
