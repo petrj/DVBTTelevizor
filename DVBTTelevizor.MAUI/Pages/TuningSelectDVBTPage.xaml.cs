@@ -1,6 +1,4 @@
 using LoggerService;
-using Microsoft.Maui;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -41,7 +39,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        BuildFocusableItems();
+        _focusItems = BuildFocusableItems();
     }
 
     public TuningSettings? Settings
@@ -61,18 +59,20 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _tuningSelectDVBTViewModel?.Update();
     }
 
-    private void BuildFocusableItems()
+    private KeyboardFocusableItemList BuildFocusableItems()
     {
-        _focusItems = new KeyboardFocusableItemList();
+        var focusItems = new KeyboardFocusableItemList();
 
-        _focusItems
+        focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTBoxView, DVBTSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBT2", new List<View>() { DVBT2BoxView, DVBT2Switch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Bandwidth", new List<View>() { BandwidthBoxView, BandwidthPicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Next", new List<View>() { NextButton }));
 
-        _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+        focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+
+        return focusItems;
     }
 
     private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
