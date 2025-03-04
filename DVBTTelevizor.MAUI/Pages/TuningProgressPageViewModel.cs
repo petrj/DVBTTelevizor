@@ -91,7 +91,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void RestartTune(bool clearChannels = true)
+        public void ResetTune(bool clearChannels = true)
         {
             _loggingService.Info("RestartTune");
 
@@ -129,12 +129,12 @@ namespace DVBTTelevizor.MAUI
         {
             if (State == TuneStateEnum.Inactive)
             {
-                RestartTune();
+                ResetTune();
             }
 
             if (State == TuneStateEnum.Finished)
             {
-                RestartTune(false);
+                ResetTune(false);
             }
 
             await Task.Run( async () => { await Tune(); });
@@ -178,6 +178,9 @@ namespace DVBTTelevizor.MAUI
                         if (FrequencyToKHz != FrequencyFromKHz)
                         {
                             _actualTunningFreqKHz += TuneBandWidthKHz;
+                        } else
+                        {
+                            break;
                         }
 
                         if (State != TuneStateEnum.InProgress)
@@ -727,11 +730,16 @@ namespace DVBTTelevizor.MAUI
                 if (_actualTunningFreqKHz < FrequencyFromKHz)
                     return 0.0;
 
-                if (_actualTunningFreqKHz >= FrequencyToKHz)
+                if (_actualTunningFreqKHz > FrequencyToKHz)
                     return 100.0;
 
                 if (FrequencyFromKHz == FrequencyToKHz)
                 {
+                    if (State == TuneStateEnum.Finished)
+                    {
+                        return 100.0;
+                    }
+
                     return 0.0;
                 }
 

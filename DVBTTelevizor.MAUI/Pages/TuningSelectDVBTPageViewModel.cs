@@ -127,6 +127,8 @@ namespace DVBTTelevizor.MAUI
             {
                 Settings.DVBT = value;
 
+                Settings.TuneDVBTPreferred = Settings.DVBT;
+
                 if (Settings.TuningMode == TuneModeEnum.Frequency && Settings.DVBT == Settings.DVBT2)
                 {
                     DVBT2 = !Settings.DVBT;
@@ -147,6 +149,8 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 Settings.DVBT2 = value;
+
+                Settings.TuneDVBTPreferred = !Settings.DVBT2;
 
                 if (Settings.TuningMode == TuneModeEnum.Frequency && Settings.DVBT == Settings.DVBT2)
                 {

@@ -225,7 +225,7 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
                 "Continue".Translated(),
                 "Start from beginning".Translated()))
             {
-                _viewModel.RestartTune(true);
+                _viewModel.ResetTune(true);
             }
         }
 
@@ -259,6 +259,8 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     private async void FinishButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
+
+        _viewModel.ResetTune(true);
 
         WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
     }
