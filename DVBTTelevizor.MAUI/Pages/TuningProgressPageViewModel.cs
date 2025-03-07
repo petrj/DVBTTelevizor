@@ -78,12 +78,40 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public static string GetNextFreeChannelNumber(ObservableCollection<Channel> channels)
+        {
+            int num;
+            int max = int.MinValue;
+            var maxfound = false;
+            foreach (var channel in channels)
+            {
+                if (int.TryParse(channel.Number, out num))
+                {
+                    if (num>max)
+                    {
+                        maxfound = true;
+                        max = num;
+                    }
+                }
+            }
+
+            if (!maxfound)
+            {
+                return "1";
+            }
+
+            max++;
+
+            return max.ToString();
+        }
+
         private void TuningProgressPageViewModel_ChannelFound(object? sender, EventArgs e)
         {
             if (e is ChannelFoundEventArgs che)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
+                    che.Channel.Number = GetNextFreeChannelNumber(Channels);
                     Channels.Add(che.Channel);
 
                     NotifyChange();
