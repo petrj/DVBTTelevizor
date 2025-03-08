@@ -167,6 +167,7 @@
             </Grid.ColumnDefinitions>
 
             <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="BackButton_Clicked"/>
+            <Button x:Name="DefaultButton" Grid.Column="2" Text="{local:LngXamlExt Input='Default'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="DefaultButton_Clicked"/>
         </Grid>
 
     </AbsoluteLayout>

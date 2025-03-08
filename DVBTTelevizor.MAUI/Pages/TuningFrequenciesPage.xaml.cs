@@ -213,6 +213,7 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
         {
             _frequencyPage.Settings.BandwidthKHz = Settings.BandwidthKHz;
             _frequencyPage.Settings.FrequencyKHz = _editingFrom ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
+            _frequencyPage.TuneFrequencyMode = _editingFrom ? TuneFrequencyModeEnum.From : TuneFrequencyModeEnum.To;
             _frequencyPage.NotifyChange();
         }
 

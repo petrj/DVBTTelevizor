@@ -16,6 +16,8 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
+    public TuneFrequencyModeEnum TuneFrequencyMode { get; set; } = TuneFrequencyModeEnum.Center;
+
     private KeyboardFocusableItemList _focusItems;
 
     public FrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
@@ -130,7 +132,8 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Right", new List<View>() { RightButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("KHz", new List<View>() { KHzEntryBoxView, KHZEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("MHz", new List<View>() { MHzEntryBoxView , MHZEntry}))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Default", new List<View>() { DefaultButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -139,7 +142,18 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
-        Title = "Frequency".Translated();
+        var title = "Frequency".Translated();
+        switch (TuneFrequencyMode)
+        {
+            case TuneFrequencyModeEnum.From:
+                title += " " + "from".Translated();
+                break;
+            case TuneFrequencyModeEnum.To:
+                title += " " + "to".Translated();
+                break;
+        }
+
+        Title = title;
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
@@ -198,10 +212,10 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
                             MHZEntry.Focus();
                             break;
                         case "Back":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                await Navigation.PopAsync();
-                            });
+                            BackButton_Clicked(this, new EventArgs());
+                            break;
+                        case "Default":
+                            DefaultButton_Clicked(this, new EventArgs());
                             break;
                     }
                 });
@@ -214,6 +228,11 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"FrequencyPage OnTextSent {text}");
     }
 
+    private void SliderFrequency_ValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage SliderFrequency_ValueChanged");
+    }
+
     private void BackButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"FrequencyPage BackButton_Clicked");
@@ -222,11 +241,6 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         {
             await Navigation.PopAsync();
         });
-    }
-
-    private void SliderFrequency_ValueChanged(object sender, ValueChangedEventArgs e)
-    {
-        _loggingService.Debug($"FrequencyPage SliderFrequency_ValueChanged");
     }
 
     private void LeftButton_Clicked(object sender, EventArgs e)
@@ -243,5 +257,12 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
 
         _viewModel.IncreaseFreq();
         _viewModel.RoundFrequency();
+    }
+
+    private void DefaultButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage DefaultButton_Clicked");
+
+        _viewModel.SetDefaultFrequency(TuneFrequencyMode);
     }
 }

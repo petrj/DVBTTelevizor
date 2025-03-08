@@ -47,6 +47,22 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public void SetDefaultFrequency(TuneFrequencyModeEnum tuneFrequencyModeEnum)
+        {
+            switch (tuneFrequencyModeEnum)
+            {
+                case TuneFrequencyModeEnum.From:
+                    FrequencyKHz = TuningSettings.DefaultFrequencyFromKHz;
+                    break;
+                case TuneFrequencyModeEnum.To:
+                    FrequencyKHz = TuningSettings.DefaultFrequencyToKHz;
+                    break;
+                case TuneFrequencyModeEnum.Center:
+                    FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+                    break;
+            }
+        }
+
         public bool ValidFrequencyKHz(long freqKHz)
         {
 
