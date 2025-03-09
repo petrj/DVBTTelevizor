@@ -97,7 +97,6 @@ namespace DVBTTelevizor.MAUI
 
             _configuration = tvConfiguration;
             _configuration.ConfigDirectory = PublicDirectory;
-            _configuration.Load();
 
             var language = "cz";
             var languageFileName = Path.Join(PublicDirectory, "lng", $"{language}.lng");

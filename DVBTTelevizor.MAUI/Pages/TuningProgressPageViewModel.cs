@@ -111,8 +111,17 @@ namespace DVBTTelevizor.MAUI
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    che.Channel.Number = GetNextFreeChannelNumber(Channels);
+                    var channels = _configuration.GetChannels();
+
+                    che.Channel.Number = GetNextFreeChannelNumber(channels);
+
                     Channels.Add(che.Channel);
+
+                    channels.Add(che.Channel.Clone());
+
+                    _configuration.SaveChannels(channels);
+
+                    WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
 
                     NotifyChange();
                 });

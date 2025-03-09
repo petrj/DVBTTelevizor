@@ -90,7 +90,9 @@ namespace DVBTTelevizor.MAUI
                 ProgramMapPID = 0
             };
 
-            if (_configuration.Channels.Count == 0)
+            var channels = _configuration.GetChannels();
+
+            if (channels.Count == 0)
             {
                 SelectedChannel = noChannel;
                 return;
@@ -101,7 +103,7 @@ namespace DVBTTelevizor.MAUI
 
             var anythingSelected = false;
 
-            foreach (var ch in _configuration.Channels)
+            foreach (var ch in channels)
             {
                 AutoPlayChannels.Add(ch.Clone());
 

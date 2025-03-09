@@ -13,7 +13,8 @@ namespace DVBTTelevizor
     {
         public string ConfigDirectory { get; set; }
 
-        public ObservableCollection<Channel> Channels { get; set; }
+        public ObservableCollection<Channel> GetChannels();
+        public void SaveChannels(ObservableCollection<Channel> channels);
 
         public string AutoPlayedChannelFrequencyAndMapPID { get; set; }
 
@@ -44,12 +45,5 @@ namespace DVBTTelevizor
         public long FrequencyKHz { get; set; }
 
         public long DVBTBandwidthKHz { get; set; }
-
-        void Load();
-        void Save();
-
-        int ImportChannelsFromJSON(string fileName);
-
-
     }
 }

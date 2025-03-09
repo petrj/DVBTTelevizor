@@ -57,63 +57,80 @@ namespace DVBTTelevizor.MAUI
             {
                 DisconnectDriver();
             });
+
+            WeakReferenceMessenger.Default.Register<ChannelsChangedMessage>(this, (r, m) =>
+            {
+                Task.Run(async () =>
+                {
+                    await RefreshChannels();
+                });
+            });
         }
 
         public async Task RefreshChannels()
         {
-            _loggingService.Debug($"Refreshing EPG");
+            _loggingService.Debug($"Refreshing channels");
 
-            string? selectedChanneFrequencyAndMapPID = null;
-
-            try
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                await _semaphoreSlim.WaitAsync();
+                string? selectedChanneFrequencyAndMapPID = null;
 
-                if (SelectedChannel != null)
+                try
                 {
-                    selectedChanneFrequencyAndMapPID = SelectedChannel.FrequencyAndMapPID;
-                    SelectedChannel = null;
-                }
+                    await _semaphoreSlim.WaitAsync();
 
-                _configuration.Load();
-                NotifyFontSizeChange();
-
-                Channels.Clear();
-                foreach (var channel in _configuration.Channels)
-                {
-                    Channels.Add(channel.Clone());
-                }
-
-                OnPropertyChanged(nameof(Channels));
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex, "Refreshing EPG failed");
-            }
-            finally
-            {
-                _semaphoreSlim.Release();
-
-                //NotifyEPGDetailVisibilityChange();
-
-                if (selectedChanneFrequencyAndMapPID != null)
-                {
-                    var selectedChannel = await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
-                    if (selectedChannel == null)
+                    if (SelectedChannel != null)
                     {
-                        await SelectFirstChannel();
+                        selectedChanneFrequencyAndMapPID = SelectedChannel.FrequencyAndMapPID;
+                        SelectedChannel = null;
                     }
-                }
 
-                OnPropertyChanged(nameof(Channels));
-                OnPropertyChanged(nameof(SelectedChannel));
-                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
-                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
-                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
-                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
-                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
-                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-            }
+                    var channels = _configuration.GetChannels();
+
+                    _loggingService.Debug($"Clearing channels");
+
+                    Channels.Clear();
+
+                    foreach (var channel in channels)
+                    {
+                        Channels.Add(channel.Clone());
+                    }
+
+                    _loggingService.Debug($"about to SelectChannelByFrequencyAndMapPID");
+
+                    if (selectedChanneFrequencyAndMapPID != null)
+                    {
+                        var selectedChannel = await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
+                        if (selectedChannel == null)
+                        {
+                            _loggingService.Debug($"selecting first channel");
+
+                            await SelectFirstChannel();
+                        }
+                    }
+
+                    _loggingService.Debug($"Channels refreshed");
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex, "Refreshing channels failed");
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+
+                    //NotifyEPGDetailVisibilityChange();
+
+                    OnPropertyChanged(nameof(Channels));
+                    OnPropertyChanged(nameof(SelectedChannel));
+                    OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                    OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                    OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                    OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                    OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                    OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                }
+            });
         }
 
         public async Task SelectFirstChannel()
@@ -176,8 +193,20 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
-                var count = _configuration.ImportChannelsFromJSON(File.ReadAllText(filename));
-                _configuration.Save();
+                var count = 0;
+
+                foreach (var ch in
+                    JsonConvert.DeserializeObject<ObservableCollection<Channel>>(File.ReadAllText(filename)))
+                {
+                    if (!ch.ChannelExists(Channels))
+                    {
+                        ch.Number = TuningProgressPageViewModel.GetNextFreeChannelNumber(Channels);
+                        Channels.Add(ch);
+                        count++;
+                    }
+                }
+
+                _configuration.SaveChannels(Channels);
 
                 await RefreshChannels();
 

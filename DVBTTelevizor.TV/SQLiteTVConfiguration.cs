@@ -19,8 +19,6 @@ namespace DVBTTelevizor
         private string _configDBPath = string.Empty;
         private string _configDirectory = string.Empty;
 
-        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
-
         public SQLiteTVConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)
         {
             _loggingService = loggingProvider.GetLoggingService();
@@ -443,32 +441,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public int ImportChannelsFromJSON(string json)
-        {
-            try
-            {
-                var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<Channel>>(json);
-
-                var count = 0;
-                foreach (var ch in importedChannels)
-                {
-                    if (!ch.ChannelExists(Channels))
-                    {
-                        count++;
-                        ch.Number = Channel.GetNextChannelNumber(Channels).ToString();
-                        Channels.Add(ch);
-                    }
-                }
-
-                return count;
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex, "Import failed");
-                return -1;
-            }
-        }
-
         private string ChannelsConfigFileName
         {
             get
@@ -477,10 +449,12 @@ namespace DVBTTelevizor
             }
         }
 
-        public void Load()
+        public ObservableCollection<Channel> GetChannels()
         {
             try
             {
+                _loggingService.Debug("Loading channels");
+
                 var json = GetPersistingSettingValue<string>("ChannelsJson");
                 if (string.IsNullOrEmpty(json) && (File.Exists(ChannelsConfigFileName)))
                 {
@@ -493,12 +467,7 @@ namespace DVBTTelevizor
 
                     if (loadedChannels != null && loadedChannels.Count > 0)
                     {
-                        Channels.Clear();
-
-                        foreach (var channel in loadedChannels)
-                        {
-                            Channels.Add(channel.Clone());
-                        }
+                        return loadedChannels;
                     }
                 }
 
@@ -507,17 +476,19 @@ namespace DVBTTelevizor
             {
                 _loggingService.Error(ex);
             }
+
+            return new ObservableCollection<Channel>();
         }
 
-        public void Save()
+        public void SaveChannels(ObservableCollection<Channel> channels)
         {
             try
             {
                 _loggingService.Info("Saving channels");
 
-                var json = JsonConvert.SerializeObject(Channels);
+                var json = JsonConvert.SerializeObject(channels);
 
-                SavePersistingSettingValue<string>("ChannelsJson", JsonConvert.SerializeObject(Channels));
+                SavePersistingSettingValue<string>("ChannelsJson", json);
 
                 File.WriteAllText(ChannelsConfigFileName, json);
             }

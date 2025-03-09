@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using System.Collections.ObjectModel;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -155,18 +156,21 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     {
         _loggingService.Info("Clearing channels");
 
-        if (_configuration.Channels.Count==0)
+        var channels = _configuration.GetChannels();
+
+        if (channels.Count == 0)
         {
             await _dialogService.Information("No channel found".Translated());
             return;
         }
 
-        if (!await _dialogService.Confirm("Are you sure to delete all channels?".Translated(),"Confirm".Translated(),"Yes".Translated(), "No".Translated()))
+        if (!await _dialogService.Confirm("Are you sure to delete all channels ({0})?".Translated(channels.Count.ToString()),"Confirm".Translated(),"Yes".Translated(), "No".Translated()))
         {
             return;
         }
 
-        _configuration.Channels.Clear();
-        _configuration.Save();
+        _configuration.SaveChannels(new ObservableCollection<Channel>());
+
+        WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
     }
 }
