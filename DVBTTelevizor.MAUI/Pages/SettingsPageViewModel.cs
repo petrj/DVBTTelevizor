@@ -12,6 +12,8 @@ namespace DVBTTelevizor.MAUI
 {
     public class SettingsPageViewModel : BaseViewModel
     {
+        private int? previousDVBTDriverTypeindex = null;
+
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
         public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> FontSizes { get; set; } = new ObservableCollection<string>();
@@ -162,8 +164,16 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _configuration.DVBTDriverType = (DVBTDriverTypeEnum)value;
-
                 OnPropertyChanged(nameof(DVBTDriverTypeIndex));
+
+                if ((previousDVBTDriverTypeindex != null) &&
+                    previousDVBTDriverTypeindex != value)
+                {
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
+                }
+
+                previousDVBTDriverTypeindex = value;
+
             }
         }
 

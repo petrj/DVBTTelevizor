@@ -129,6 +129,7 @@ namespace DVBTTelevizor.MAUI
                     OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
                     OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                     OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                    OnPropertyChanged(nameof(ChannelsListViewVisible));
                 }
             });
         }
@@ -571,6 +572,14 @@ namespace DVBTTelevizor.MAUI
                 _recordingChannel = value;
 
                 OnPropertyChanged(nameof(RecordingLabel));
+            }
+        }
+
+        public bool ChannelsListViewVisible
+        {
+            get
+            {
+                return Channels.Count > 0;
             }
         }
     }

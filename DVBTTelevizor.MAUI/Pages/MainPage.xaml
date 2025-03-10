@@ -62,11 +62,14 @@
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Margin" Value="5,5,5,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="BorderWidth" Value="0"/>
                 <Setter Property="CornerRadius" Value="7"/>
-                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
             <Style x:Key="ImageButtonStyle" TargetType="ImageButton">
@@ -184,7 +187,7 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Button x:Name="TuneChannelsButton" Text="{local:LngXamlExt Input='Tune'}" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.0,0.35,0.5,0.1"  AbsoluteLayout.LayoutFlags="All" BackgroundColor="Yellow"/>
+        <Button x:Name="TuneChannelsButton" Text="{local:LngXamlExt Input='Tune'}" Clicked="TuneButton_Clicked" IsVisible="True" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.2,0.35,0.5,0.1"  AbsoluteLayout.LayoutFlags="All" />
         <Button x:Name="InstallDriverButton" Text="{local:LngXamlExt Input='Install DVB-T Driver'}" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
 
         <Grid
@@ -243,6 +246,7 @@
           IsRefreshing="{Binding IsRefreshing}"
           Style="{StaticResource ListViewStyle}"
           SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
+          IsVisible="{Binding ChannelsListViewVisible}"
           ItemTapped="ChannelsListView_ItemTapped">
 
             <ListView.ItemTemplate>

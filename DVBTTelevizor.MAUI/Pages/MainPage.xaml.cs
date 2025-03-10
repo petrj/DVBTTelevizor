@@ -108,21 +108,7 @@ namespace DVBTTelevizor.MAUI
 
             _dialogService = new DialogService(this);
 
-            switch (_configuration.DVBTDriverType)
-            {
-                case DVBTDriverTypeEnum.AndroidDVBTDriver:
-                    _driver = new DVBTDriverConnector(_loggingService);
-                    break;
-                case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
-                    _driver = new DVBTDriverConnector(_loggingService);
-                    break;
-                case DVBTDriverTypeEnum.TestTuneDriver:
-                    _driver = new TestTuneConnector(_loggingService);
-                    break;
-                default:
-                    _driver = new TestTuneConnector(_loggingService);
-                    break;
-            }
+            InitDVBTDriver();
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
@@ -148,6 +134,11 @@ namespace DVBTTelevizor.MAUI
                 ConnectDriver();
             });
 
+            WeakReferenceMessenger.Default.Register<DVBTDriverChangedMessage>(this, (r, m) =>
+            {
+                InitDVBTDriver();
+            });
+
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
             {
                 _loggingService.Info($"FinishTuning");
@@ -162,6 +153,25 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             };
+        }
+
+        private void InitDVBTDriver()
+        {
+            switch (_configuration.DVBTDriverType)
+            {
+                case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                    _driver = new DVBTDriverConnector(_loggingService);
+                    break;
+                case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
+                    _driver = new DVBTDriverConnector(_loggingService);
+                    break;
+                case DVBTDriverTypeEnum.TestTuneDriver:
+                    _driver = new TestTuneConnector(_loggingService);
+                    break;
+                default:
+                    _driver = new TestTuneConnector(_loggingService);
+                    break;
+            }
         }
 
         private void CloseAllPages()
@@ -271,7 +281,9 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("TuneChannelsButton", new List<View>() { TuneChannelsButton }));
+
 
             //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
         }
@@ -982,7 +994,7 @@ namespace DVBTTelevizor.MAUI
                 case KeyboardNavigationActionEnum.Down:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        _focusItems.FocusNextItem();
+                        _focusItems.FocusNextItem(true);
                     });
                     break;
 
@@ -990,7 +1002,7 @@ namespace DVBTTelevizor.MAUI
                 case KeyboardNavigationActionEnum.Up:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        _focusItems.FocusPreviousItem();
+                        _focusItems.FocusPreviousItem(true);
                     });
                     break;
 
