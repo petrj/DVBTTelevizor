@@ -641,6 +641,68 @@ namespace DVBTTelevizor
             return bytesToSend.ToArray();
         }
 
+        private List<byte> ProcessBuffer(List<byte> buffer, Socket handler)
+        {
+            DVBTDriverRequestTypeEnum? reqType = null;
+            List<byte> payload = new List<byte>();
+
+            var pos = 0;
+
+            if (buffer.Count < 2)
+            {
+                _loggingService.Debug("Buffer too small");
+                return buffer;
+            }
+
+            while (buffer.Count>=2)
+            {
+                payload = new List<byte>();
+
+                // first byte - request type
+                reqType = (DVBTDriverRequestTypeEnum)buffer[0];
+
+                // second byte - payload size
+                var payloadSize = buffer[1];
+
+                _loggingService.Debug($"reqType     : {reqType}");
+                _loggingService.Debug($"payloadSize : {payloadSize}");
+
+                if (payloadSize > 0)
+                {
+                    if (buffer.Count < 2+payloadSize*8)
+                    {
+                        _loggingService.Debug($"Buffer too small  ({payloadSize}>{buffer.Count})");
+                        return buffer;
+                    }
+
+                    payload = buffer.GetRange(0, 2+payloadSize*8);
+                }
+
+                switch (reqType.Value)
+                {
+                    case DVBTDriverRequestTypeEnum.REQ_EXIT:
+                        Disconnect();
+                        break;
+                    case DVBTDriverRequestTypeEnum.REQ_GET_CAPABILITIES:
+                        handler.Send(GetCapabilities());
+                        break;
+                    case DVBTDriverRequestTypeEnum.REQ_TUNE:
+                        handler.Send(Tune(payload.ToArray()));
+                        break;
+                    case DVBTDriverRequestTypeEnum.REQ_SET_PIDS:
+                        handler.Send(SetPIDs(payload.ToArray()));
+                        break;
+                    case DVBTDriverRequestTypeEnum.REQ_GET_STATUS:
+                        handler.Send(GetStatus());
+                        break;
+                }
+
+                buffer.RemoveRange(0, 2+payloadSize*8);
+            }
+
+            return buffer;
+        }
+
         private void _controlWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             try
@@ -677,45 +739,7 @@ namespace DVBTTelevizor
                                         responseBuffer.Add(buffer[i]);
                                     }
 
-                                    if (responseBuffer.Count > 1 && reqType == null)
-                                    {
-                                        // first byte - request type
-                                        reqType = (DVBTDriverRequestTypeEnum)responseBuffer[0];
-
-                                        // second byte - payload size
-                                        var payloadSize = responseBuffer[1];
-
-                                        totalBytesExpected += payloadSize*8; // 1 long = 8 bytes
-                                    }
-                                }
-
-                                if (totalBytesExpected == responseBuffer.Count)
-                                {
-                                    if (reqType.HasValue)
-                                    {
-                                        switch (reqType.Value)
-                                        {
-                                            case DVBTDriverRequestTypeEnum.REQ_EXIT:
-                                                Disconnect();
-                                                break;
-                                            case DVBTDriverRequestTypeEnum.REQ_GET_CAPABILITIES:
-                                                handler.Send(GetCapabilities());
-                                                break;
-                                            case DVBTDriverRequestTypeEnum.REQ_TUNE:
-                                                handler.Send(Tune(responseBuffer.ToArray()));
-                                                break;
-                                            case DVBTDriverRequestTypeEnum.REQ_SET_PIDS:
-                                                handler.Send(SetPIDs(responseBuffer.ToArray()));
-                                                break;
-                                            case DVBTDriverRequestTypeEnum.REQ_GET_STATUS:
-                                                handler.Send(GetStatus());
-                                                break;
-                                        }
-                                    }
-
-                                    responseBuffer.Clear();
-                                    totalBytesExpected = 2;
-                                    reqType = null;
+                                    responseBuffer = ProcessBuffer(responseBuffer, handler);
                                 }
                                 else
                                 {
