@@ -671,7 +671,7 @@ namespace DVBTTelevizor
                 {
                     if (buffer.Count < 2+payloadSize*8)
                     {
-                        _loggingService.Debug($"Buffer too small  ({payloadSize}>{buffer.Count})");
+                        _loggingService.Debug($"Buffer too small  ({payloadSize*8}>{buffer.Count})");
                         return buffer;
                     }
 
@@ -697,6 +697,7 @@ namespace DVBTTelevizor
                         break;
                 }
 
+                _loggingService.Debug($"Clearing buffer: ({2 + payloadSize * 8})");
                 buffer.RemoveRange(0, 2+payloadSize*8);
             }
 

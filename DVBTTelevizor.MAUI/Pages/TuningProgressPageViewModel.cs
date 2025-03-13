@@ -33,7 +33,6 @@ namespace DVBTTelevizor.MAUI
 
         private long _bitrate { get; set; } = 0;
 
-        private BackgroundWorker? _signalStrengthBackgroundWorker = null;
         private double _signalStrengthProgress = 0;
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
@@ -45,19 +44,14 @@ namespace DVBTTelevizor.MAUI
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
 
         public event EventHandler? ChannelFound = null;
-        public event EventHandler? SignalChanged = null;
 
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            _signalStrengthBackgroundWorker = new BackgroundWorker();
-            _signalStrengthBackgroundWorker.WorkerSupportsCancellation = true;
-            _signalStrengthBackgroundWorker.DoWork += SignalStrengthBackgroundWorker_DoWork;
-
             Settings = new TuningSettings();
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
-            SignalChanged += TuningProgressPageViewModel_SignalChanged;
+            _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
 
             WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
             {
@@ -68,6 +62,8 @@ namespace DVBTTelevizor.MAUI
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
         {
+            _loggingService.Info($"TuningProgressPageViewModel: TuningProgressPageViewModel_SignalChanged");
+
             if (e is DVBTDriverStatusChangedEventArgs se)
             {
                 _signalProgress = se.Status.rfStrengthPercentage;
@@ -75,6 +71,8 @@ namespace DVBTTelevizor.MAUI
                 _signalLocked = se.Status.hasLock > 0;
                 _signalSynced = se.Status.hasSync > 0;
                 _signalSNR = se.Status.snr;
+
+                NotifyChange();
             }
         }
 
@@ -187,11 +185,6 @@ namespace DVBTTelevizor.MAUI
 
                 //_savedChannels = await _channelService.LoadChannels();
 
-                if (!_signalStrengthBackgroundWorker.IsBusy)
-                {
-                    _signalStrengthBackgroundWorker.RunWorkerAsync();
-                }
-
                 NotifyChange();
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
@@ -248,7 +241,6 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 _loggingService.Info("Tuning finished");
-                _signalStrengthBackgroundWorker?.CancelAsync();
                 NotifyChange();
             }
         }
@@ -904,56 +896,6 @@ namespace DVBTTelevizor.MAUI
 
                 NotifyChange();
             }
-        }
-
-        private void SignalStrengthBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            _loggingService.Info("Starting SignalStrengthBackgroundWorker_DoWork");
-
-            if (_signalStrengthBackgroundWorker == null)
-                return;
-
-            while (!_signalStrengthBackgroundWorker.CancellationPending)
-            {
-                try
-                {
-                    if (_driver.Connected)
-                    {
-                        Task.Run(async () =>
-                        {
-                            _loggingService.Debug("SignalStrengthBackgroundWorker_DoWork: calling GetStatus");
-
-                            var status = await _driver.GetStatus();
-
-                            if (SignalChanged != null)
-                            {
-                                _bitrate = _driver.Bitrate;
-                                SignalChanged(this, new DVBTDriverStatusChangedEventArgs()
-                                {
-                                    Status = status
-                                });
-                            }
-
-                        }).Wait();
-                    }
-                    else
-                    {
-                        SignalStrengthProgress = 0;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex);
-                }
-                finally
-                {
-
-                }
-
-                System.Threading.Thread.Sleep(1000);
-            }
-
-            _loggingService.Info("SignalStrengthBackgroundWorker_DoWork finished");
         }
     }
 }
