@@ -38,7 +38,7 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
         private Channel? _selectedChannel;
 
-        private Dictionary<string,int> _tunedMultiplexes = new Dictionary<string,int>();
+        private Dictionary<string, int> _tunedMultiplexes = new Dictionary<string, int>();
         private int _tunedNewChannels = 0;
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
@@ -85,7 +85,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (int.TryParse(channel.Number, out num))
                 {
-                    if (num>max)
+                    if (num > max)
                     {
                         maxfound = true;
                         max = num;
@@ -181,7 +181,7 @@ namespace DVBTTelevizor.MAUI
                 ResetTune(false);
             }
 
-            await Task.Run( async () => { await Tune(); });
+            await Task.Run(async () => { await Tune(); });
         }
 
         private async Task Tune()
@@ -202,7 +202,7 @@ namespace DVBTTelevizor.MAUI
                         continue;
                     if (!DVBT2Tuning && dvbtTypeIndex == 1)
                         continue;
-                    if (_actualTuningDVBTType>dvbtTypeIndex)
+                    if (_actualTuningDVBTType > dvbtTypeIndex)
                     {
                         continue;
                     }
@@ -905,6 +905,30 @@ namespace DVBTTelevizor.MAUI
 
                 NotifyChange();
             }
+        }
+
+        public async void SelectChannelsListView(ListView list)
+        {
+            _loggingService.Info($"Selecting ChannelsListView");
+
+            await Task.Run(
+                () =>
+                {
+                    if (Channels.Count == 0)
+                    {
+                        SelectedChannel = null;
+                        return;
+                    }
+
+                    // selecting first channel
+                    foreach (var ch in Channels)
+                    {
+                        SelectedChannel = ch;
+                        return;
+                    }
+
+                    list.Focus();
+                });
         }
     }
 }

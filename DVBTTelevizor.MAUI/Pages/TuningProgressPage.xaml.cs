@@ -74,9 +74,18 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }));
 
-        //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
+        _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent; ;
+    }
+
+    private async void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
+    {
+        if (_args.FocusedItem.Name == "ChannelsList")
+        {
+            await _viewModel.SelectChannelsListView(ChannelsListView);
+        }
     }
 
     protected override void OnSizeAllocated(double width, double height)
