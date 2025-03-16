@@ -38,7 +38,7 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
         private Channel? _selectedChannel;
 
-        private Dictionary<long,string> _tunedMultiplexes = new Dictionary<long,string>();
+        private Dictionary<string,int> _tunedMultiplexes = new Dictionary<string,int>();
         private int _tunedNewChannels = 0;
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
@@ -116,6 +116,15 @@ namespace DVBTTelevizor.MAUI
                     Channels.Add(che.Channel);
 
                     channels.Add(che.Channel.Clone());
+
+                    if (che.Channel.ProviderName != null)
+                    {
+                        if (!_tunedMultiplexes.ContainsKey(che.Channel.ProviderName))
+                        {
+                            _tunedMultiplexes.Add(che.Channel.ProviderName, 0);
+                        }
+                        _tunedMultiplexes[che.Channel.ProviderName]++;
+                    }
 
                     _configuration.SaveChannels(channels);
 
