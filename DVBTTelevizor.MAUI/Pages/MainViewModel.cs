@@ -438,6 +438,7 @@ namespace DVBTTelevizor.MAUI
                 try
                 {
                     _selectedChannel = value;
+                    _selectedChannel.Selected = true;
 
                     NotifyChannelChange();
                 }

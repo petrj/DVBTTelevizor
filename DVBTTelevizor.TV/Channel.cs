@@ -16,6 +16,8 @@ namespace DVBTTelevizor
         [PrimaryKey, Column("Number")]
         public string Number { get; set; } = "0";
 
+        public bool Selected { get; set; } = false;
+
         public long Frequency { get; set; }
         public long ProgramMapPID { get; set; }
         public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
@@ -294,6 +296,14 @@ namespace DVBTTelevizor
                 }
 
                 return null;
+            }
+        }
+
+        public string BackgroundColor
+        {
+            get
+            {
+                return Selected ? "#007cd2" : "Transparent";
             }
         }
 

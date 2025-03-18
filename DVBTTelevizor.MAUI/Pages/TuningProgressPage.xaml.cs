@@ -84,7 +84,7 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
     {
         if (_args.FocusedItem.Name == "ChannelsList")
         {
-            await _viewModel.SelectChannelsListView(ChannelsListView);
+            //await _viewModel.SelectChannelsListView(ChannelsListView);
         }
     }
 
