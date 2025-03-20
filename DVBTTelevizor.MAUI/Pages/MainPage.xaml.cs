@@ -285,7 +285,18 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneChannelsButton", new List<View>() { TuneChannelsButton }));
 
 
-            //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
+            _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+        }
+
+        private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
+        {
+            if (_focusItems.FocusedItemName == "ChannelsListView")
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.SelectFirstChannel();
+                });
+            }
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -537,11 +548,7 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
-
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        await _viewModel.SelectFirstChannel();
-                    });
+                    _viewModel.SelectFirstChannel();
                 });
 
                 //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
@@ -991,11 +998,25 @@ namespace DVBTTelevizor.MAUI
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Right:
-                case KeyboardNavigationActionEnum.Down:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         _focusItems.FocusNextItem(true);
                     });
+                    break;
+
+                case KeyboardNavigationActionEnum.Down:
+
+                    if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton", "SettingsButton" }).Contains(_focusItems.FocusedItemName))
+                    {
+                        _focusItems.FocusItem("ChannelsListView");
+                    } else
+                    if (_focusItems.FocusedItemName == "ChannelsListView")
+                    {
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                _viewModel.SelectNextChannel();
+                            });
+                    }
                     break;
 
                 case KeyboardNavigationActionEnum.Left:

@@ -14,14 +14,18 @@ namespace DVBTTelevizor.MAUI
     {
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
-
-        //public event PropertyChangedEventHandler? PropertyChanged = null;
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
+
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
+
+        public EITManager EIT { get; set; }
+        public PIDManager PID { get; set; }
+
+        private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
+        private ListViewSelector? _listViewSelector = null;
 
         private bool _EPGDetailEnabled = true;
 
@@ -29,14 +33,13 @@ namespace DVBTTelevizor.MAUI
         private Channel _playingChannel;
         private Channel _recordingChannel;
 
-        public EITManager EIT { get; set; }
-        public PIDManager PID { get; set; }
-
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
+
+            _listViewSelector = new ListViewSelector(Channels);
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
             {
@@ -96,8 +99,6 @@ namespace DVBTTelevizor.MAUI
                         Channels.Add(channel.Clone());
                     }
 
-                    _loggingService.Debug($"about to SelectChannelByFrequencyAndMapPID");
-
                     if (selectedChanneFrequencyAndMapPID != null)
                     {
                         var selectedChannel = await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
@@ -105,7 +106,7 @@ namespace DVBTTelevizor.MAUI
                         {
                             _loggingService.Debug($"selecting first channel");
 
-                            await SelectFirstChannel();
+                            SelectFirstChannel();
                         }
                     }
 
@@ -121,38 +122,31 @@ namespace DVBTTelevizor.MAUI
 
                     //NotifyEPGDetailVisibilityChange();
 
-                    OnPropertyChanged(nameof(Channels));
-                    OnPropertyChanged(nameof(SelectedChannel));
-                    OnPropertyChanged(nameof(SelectedChannelEPGTitle));
-                    OnPropertyChanged(nameof(SelectedChannelEPGDescription));
-                    OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
-                    OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
-                    OnPropertyChanged(nameof(SelectedChannelEPGProgress));
-                    OnPropertyChanged(nameof(EPGProgressBackgroundColor));
-                    OnPropertyChanged(nameof(ChannelsListViewVisible));
+                    NotifyChannelChange();
                 }
             });
         }
 
-        public async Task SelectFirstChannel()
+        public void SelectFirstChannel()
         {
             _loggingService.Info($"Selecting first channel");
 
-            await Task.Run(
-                () =>
-                {
-                    if (Channels.Count == 0)
-                    {
-                        SelectedChannel = null;
-                        return;
-                    }
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _listViewSelector?.SelectFirstsChannel();
+                NotifyChannelChange();
+            });
+        }
 
-                    foreach (var ch in Channels)
-                    {
-                        SelectedChannel = ch;
-                        return;
-                    }
-                });
+        public void SelectNextChannel()
+        {
+            _loggingService.Info($"Selecting next channel");
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _listViewSelector?.SelectNextChannel();
+                NotifyChannelChange();
+            });
         }
 
         public async Task<Channel> SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
@@ -314,6 +308,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(SelectedChannelEPGProgress));
             OnPropertyChanged(nameof(EPGProgressBackgroundColor));
             OnPropertyChanged(nameof(RecordingLabel));
+            OnPropertyChanged(nameof(ChannelsListViewVisible));
         }
 
         public async void DisconnectDriver()
@@ -425,7 +420,7 @@ namespace DVBTTelevizor.MAUI
                 _semaphoreSlim.WaitAsync();
                 try
                 {
-                    return _selectedChannel;
+                    return _listViewSelector?.GetSelectedChannel();
                 }
                 finally
                 {
@@ -437,8 +432,7 @@ namespace DVBTTelevizor.MAUI
                 _semaphoreSlim.WaitAsync();
                 try
                 {
-                    _selectedChannel = value;
-                    _selectedChannel.Selected = true;
+                    _listViewSelector?.SetSelectedChannel(value);
 
                     NotifyChannelChange();
                 }
