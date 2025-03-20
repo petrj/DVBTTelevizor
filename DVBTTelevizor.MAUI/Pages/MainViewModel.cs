@@ -299,6 +299,8 @@ namespace DVBTTelevizor.MAUI
 
         public void NotifyChannelChange()
         {
+            _loggingService.Info($"NotifyChannelChange (Current channel: {SelectedChannel}, thread id:{Thread.CurrentThread.ManagedThreadId})");
+
             OnPropertyChanged(nameof(SelectedChannel));
             OnPropertyChanged(nameof(NoVideoTitle));
             OnPropertyChanged(nameof(SelectedChannelEPGTitle));

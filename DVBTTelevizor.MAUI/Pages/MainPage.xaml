@@ -247,6 +247,7 @@
           Style="{StaticResource ListViewStyle}"
           SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
           IsVisible="{Binding ChannelsListViewVisible}"
+          SelectionMode="Single"
           ItemTapped="ChannelsListView_ItemTapped">
 
             <ListView.ItemTemplate>

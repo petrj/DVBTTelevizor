@@ -38,6 +38,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     ch.Selected = false;
                 }
+                ch.NotifyChanges();
             }
         }
 

@@ -277,8 +277,9 @@ namespace DVBTTelevizor
                 NextEventItem = currentEvent.NextEventItem;
         }
 
-        public void NotifyEPGChanges()
+        public void NotifyChanges()
         {
+            OnPropertyChanged(nameof(BackgroundColor));
             OnPropertyChanged(nameof(CurrentEPGEventTitle));
             OnPropertyChanged(nameof(NextEPGEventTitle));
             OnPropertyChanged(nameof(CurrentEPGEventTime));

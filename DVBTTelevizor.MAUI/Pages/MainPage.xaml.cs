@@ -548,7 +548,6 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
-                    _viewModel.SelectFirstChannel();
                 });
 
                 //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
@@ -1012,10 +1011,17 @@ namespace DVBTTelevizor.MAUI
                     } else
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                _viewModel.SelectNextChannel();
-                            });
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            _viewModel.SelectNextChannel();
+
+                            var tmp = ChannelsListView.SelectedItem;
+                            ChannelsListView.SelectedItem = null;  // Reset
+                            ChannelsListView.SelectedItem = tmp;
+
+                            _viewModel.NotifyChannelChange();
+                        });
+
                     }
                     break;
 
