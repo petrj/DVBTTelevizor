@@ -42,6 +42,7 @@ namespace DVBTTelevizor.MAUI
         private int _tunedNewChannels = 0;
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
+        private ListViewSelector? _listViewSelector = null;
 
         public event EventHandler? ChannelFound = null;
 
@@ -52,6 +53,8 @@ namespace DVBTTelevizor.MAUI
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+
+            _listViewSelector = new ListViewSelector(Channels);
 
             WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
             {
@@ -74,6 +77,52 @@ namespace DVBTTelevizor.MAUI
 
                 NotifyChange();
             }
+        }
+
+        public void SelectFirstChannel()
+        {
+            _loggingService.Info($"Selecting first channel");
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _selectedChannel = _listViewSelector?.SelectFirstChannel();
+                NotifyChange();
+            });
+        }
+
+        public void DeselectAll()
+        {
+            _loggingService.Info($"DeselectAll");
+
+            _selectedChannel = null;
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _listViewSelector?.DeselectAll();
+                NotifyChange();
+            });
+        }
+
+        public void SelectNextChannel()
+        {
+            _loggingService.Info($"Selecting next channel");
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _selectedChannel = _listViewSelector?.SelectNextChannel();
+                NotifyChange();
+            });
+        }
+
+        public void SelectPreviousChannel()
+        {
+            _loggingService.Info($"Selecting previous channel");
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _selectedChannel = _listViewSelector?.SelectPreviousChannel();
+                NotifyChange();
+            });
         }
 
         public static string GetNextFreeChannelNumber(ObservableCollection<Channel> channels)

@@ -133,7 +133,7 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _listViewSelector?.SelectFirstsChannel();
+                _listViewSelector?.SelectFirstChannel();
                 NotifyChannelChange();
             });
         }

@@ -27,6 +27,15 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
+        public void DeselectAll()
+        {
+            foreach (var ch in _channels)
+            {
+                ch.Selected = false;
+                ch.NotifyChanges();
+            }
+        }
+
         public void SetSelectedChannel(Channel? channel)
         {
             foreach (var ch in _channels)
@@ -42,19 +51,53 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void SelectFirstsChannel()
+        public Channel? SelectFirstChannel()
         {
             foreach (var ch in _channels)
             {
                 SetSelectedChannel(ch);
-                break;
+                return ch;
             }
+
+            return null;
         }
 
-        public void SelectNextChannel()
+        public Channel? SelectLastChannel()
+        {
+            foreach (var ch in _channels.Reverse())
+            {
+                SetSelectedChannel(ch);
+                return ch;
+            }
+
+            return null;
+        }
+
+        public Channel? SelectPreviousChannel()
         {
             var selFound = false;
-            var selected = false;
+            foreach (var ch in _channels.Reverse())
+            {
+                if (!selFound)
+                {
+                    if (ch.Selected)
+                    {
+                        selFound = true;
+                    }
+                }
+                else
+                {
+                    SetSelectedChannel(ch);
+                    return ch;
+                }
+            }
+
+            return SelectLastChannel();
+        }
+
+        public Channel? SelectNextChannel()
+        {
+            var selFound = false;
             foreach (var ch in _channels)
             {
                 if (!selFound)
@@ -66,15 +109,11 @@ namespace DVBTTelevizor.MAUI
                 } else
                 {
                     SetSelectedChannel(ch);
-                    selected = true;
-                    break;
+                    return ch;
                 }
             }
 
-            if (!selected)
-            {
-                SelectFirstsChannel();
-            }
+            return SelectFirstChannel();
         }
     }
 }

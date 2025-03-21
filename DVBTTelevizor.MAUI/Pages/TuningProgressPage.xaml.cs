@@ -77,7 +77,7 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }));
 
-        _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent; ;
+        _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
     }
 
     private async void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
@@ -85,6 +85,26 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         if (_args.FocusedItem.Name == "ChannelsList")
         {
             //await _viewModel.SelectChannelsListView(ChannelsListView);
+            if (_viewModel.Channels.Count == 0)
+            {
+                _focusItems.FocusNextItem(true);
+            } else
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.SelectFirstChannel();
+                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                });
+            }
+        } else
+        {
+            if (_viewModel.SelectedChannel != null)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.DeselectAll();
+                });
+            }
         }
     }
 
@@ -161,6 +181,57 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
 
+    private void ActionDown()
+    {
+        if (_focusItems.FocusedItemName == "ChannelsList")
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _viewModel.SelectNextChannel();
+            });
+        } else
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _focusItems.FocusNextItem(true);
+            });
+        }
+    }
+
+    private void ActionUp()
+    {
+        if (_focusItems.FocusedItemName == "ChannelsList")
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _viewModel.SelectPreviousChannel();
+            });
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _focusItems.FocusPreviousItem(true);
+            });
+        }
+    }
+
+    private void ActionRight()
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _focusItems.FocusNextItem(true);
+        });
+    }
+
+    private void ActionLeft()
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _focusItems.FocusPreviousItem(true);
+        });
+    }
+
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"TuningProgressPage Page OnKeyDown {key}");
@@ -169,20 +240,20 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
 
         switch (keyAction)
         {
-            case KeyboardNavigationActionEnum.Down:
             case KeyboardNavigationActionEnum.Right:
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _focusItems.FocusNextItem(true);
-                });
+                ActionRight();
+                break;
+
+            case KeyboardNavigationActionEnum.Down:
+                ActionDown();
                 break;
 
             case KeyboardNavigationActionEnum.Up:
+                ActionUp();
+                break;
+
             case KeyboardNavigationActionEnum.Left:
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _focusItems.FocusPreviousItem(true);
-                });
+                ActionLeft();
                 break;
 
             case KeyboardNavigationActionEnum.Back:
