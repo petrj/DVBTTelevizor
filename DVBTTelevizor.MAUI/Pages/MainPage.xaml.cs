@@ -551,8 +551,13 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
 
-                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
-            }
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    vW.MediaPlayer.Play();
+                });
+
+                    //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+                }
         }
 
         private void ConnectDriver()
@@ -609,6 +614,11 @@ namespace DVBTTelevizor.MAUI
                 _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
+
+                var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                var mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
+                mediaPlayer.Media = media;
+                vW.MediaPlayer = mediaPlayer;
             }
         }
 
