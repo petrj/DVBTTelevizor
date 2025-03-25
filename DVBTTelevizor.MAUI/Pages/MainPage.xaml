@@ -190,9 +190,9 @@
         <Button x:Name="InstallDriverButton" Text="{local:LngXamlExt Input='Install DVB-T Driver'}" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
 
         <Grid
-            AbsoluteLayout.LayoutBounds="1.0,1.0,1.0,0.3"
-            AbsoluteLayout.LayoutFlags="All"
             x:Name="EPGDetailGrid"
+            AbsoluteLayout.LayoutBounds="1.0, 0.22, 0.3, 0.62"
+            AbsoluteLayout.LayoutFlags="All"
             BackgroundColor="#262626"
             Margin="0,0,0,0"
             Padding="0,0,0,0"
@@ -236,9 +236,9 @@
         </Grid>
 
         <ListView
-          AbsoluteLayout.LayoutBounds="0,0.1,1,0.3"
-          AbsoluteLayout.LayoutFlags="All"
           x:Name="ChannelsListView"
+          AbsoluteLayout.LayoutBounds="0.0, 0.92, 0.7, 0.92"
+          AbsoluteLayout.LayoutFlags="All"
           ItemsSource="{Binding Channels}"
           CachingStrategy="RecycleElement"
           RefreshCommand="{Binding RefreshCommand}"

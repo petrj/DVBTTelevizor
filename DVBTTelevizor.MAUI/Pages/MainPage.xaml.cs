@@ -332,6 +332,8 @@ namespace DVBTTelevizor.MAUI
 
         public void RefreshGUI()
         {
+            return;
+
             if (!_refreshGUIEnabled)
                 return;
 
@@ -551,10 +553,11 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
 
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    videoView.MediaPlayer.Play();
-                });
+
+                //MainThread.BeginInvokeOnMainThread(async () =>
+                //{
+                //    videoView.MediaPlayer.Play();
+                //});
 
                     //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
                 }
@@ -615,8 +618,8 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
-                var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
-                _mediaPlayer.Media = media;
+                //var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                //_mediaPlayer.Media = media;
             }
         }
 
@@ -675,7 +678,10 @@ namespace DVBTTelevizor.MAUI
             // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
             var task = Task.Run(() =>
             {
-                ThreadPool.QueueUserWorkItem(_ => action());
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    ThreadPool.QueueUserWorkItem(_ => action());
+                });
             });
 
             if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
