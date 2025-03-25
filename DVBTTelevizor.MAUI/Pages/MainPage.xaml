@@ -160,11 +160,10 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="0.0,1,1.0,0.5" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
+        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
-                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1" NumberOfTapsRequired="2" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="SwipeGestureRecognizer_Swiped_1"/>
                 <SwipeGestureRecognizer Direction="Right" Swiped="SwipeGestureRecognizer_Swiped_2"/>
                 <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Swiped_3"/>
@@ -313,6 +312,8 @@
             <ImageButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" Source="{Binding MenuIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="MenuButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
             <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
         </Grid>
+
+        <BoxView AbsoluteLayout.LayoutBounds="0,1,0.7,0.92" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" />
 
     </AbsoluteLayout>
 

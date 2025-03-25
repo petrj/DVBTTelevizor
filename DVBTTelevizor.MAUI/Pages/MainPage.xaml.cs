@@ -45,7 +45,7 @@ namespace DVBTTelevizor.MAUI
         private bool IsPortrait { get; set; } = false;
 
         // EPGDetailGrid
-        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
+        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 0.22, 0.3, 0.62); //new Rect(1.0, 1.0, 0.3, 0.92);
         private Rect LandscapePreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.7);
         private Rect LandscapePlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
 
@@ -483,7 +483,7 @@ namespace DVBTTelevizor.MAUI
                             {
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible); // 0,1,0.7,0.92
                                     AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
                                 }
                                 else
@@ -492,8 +492,8 @@ namespace DVBTTelevizor.MAUI
                                 }
                             }
 
-                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
-
+                            //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(1, 1, 0.3, 0.3));
 
                             break;
                     }
@@ -551,8 +551,13 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
 
-                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
-            }
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    videoView.MediaPlayer.Play();
+                });
+
+                    //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+                }
         }
 
         private void ConnectDriver()
@@ -609,6 +614,9 @@ namespace DVBTTelevizor.MAUI
                 _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
+
+                var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                _mediaPlayer.Media = media;
             }
         }
 
@@ -628,11 +636,6 @@ namespace DVBTTelevizor.MAUI
         }
 
         private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
-        {
-
-        }
-
-        private void TapGestureRecognizer_Tapped_1(object sender, TappedEventArgs e)
         {
 
         }
