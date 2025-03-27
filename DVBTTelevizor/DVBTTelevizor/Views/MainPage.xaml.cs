@@ -115,8 +115,6 @@ namespace DVBTTelevizor
             _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
             videoView.MediaPlayer = _mediaPlayer;
 
-
-
             if (_config.AutoInitAfterStart)
             {
                 Task.Run(() =>
@@ -352,6 +350,13 @@ namespace DVBTTelevizor
 
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
             RestartRemoteAccessService();
+
+            ChannelsListView.ItemTapped += ChannelsListView_ItemTapped;
+        }
+
+        private void ChannelsListView_ItemTapped(object sender, ItemTappedEventArgs e)
+        {
+
         }
 
         private async void _editChannelPage_Disappearing(object sender, EventArgs e)

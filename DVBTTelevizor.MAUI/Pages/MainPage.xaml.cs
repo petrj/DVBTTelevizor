@@ -673,6 +673,59 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
         }
 
+        public async Task ActionStop(bool force)
+        {
+            _loggingService.Debug($"ActionStop (Force: {force}, PlayingState: {PlayingState})");
+
+            if (_media == null || videoView == null || videoView.MediaPlayer == null)
+                return;
+
+            //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+            //_viewModel.EPGDetailEnabled = false;
+
+            if (!force && (PlayingState == PlayingStateEnum.Playing))
+            {
+                if (_viewModel.EPGDetailVisible)
+                {
+                    _viewModel.EPGDetailEnabled = false;
+                }
+                else
+                {
+                    PlayingState = PlayingStateEnum.PlayingInPreview;
+                    _viewModel.EPGDetailEnabled = true;
+                }
+            }
+            else
+            {
+
+                CallWithTimeout(delegate
+                {
+                    videoView.MediaPlayer.Stop();
+
+                    if (_viewModel.RecordingChannel == null)
+                    {
+                        _driver.Stop();
+                    }
+                });
+
+
+                PlayingState = PlayingStateEnum.Stopped;
+
+                _lastActionPlayTime = DateTime.MinValue;
+
+                _viewModel.PlayingChannelSubtitles.Clear();
+                _viewModel.PlayingChannelAudioTracks.Clear();
+                _viewModel.PlayingChannelAspect = new Size(-1, -1);
+                _viewModel.PlayingChannel = null;
+
+                //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
+            }
+
+            //_viewModel.SelectedToolbarItemName = null;
+            //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
+            //_viewModel.NotifyMediaChange();
+        }
+
         private void CallWithTimeout(Action action, int miliseconds = 1000)
         {
             // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
@@ -864,6 +917,10 @@ namespace DVBTTelevizor.MAUI
                         {
                             videoView.MediaPlayer.Play(_media);
                         });
+                    } else
+                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                    {
+                        VLCLauncher.RunInWindows(_driver.StreamUrl);
                     }
 
                     //SetSubtitles(-1);
@@ -1058,6 +1115,10 @@ namespace DVBTTelevizor.MAUI
                     switch (_focusItems.FocusedItemName)
                     {
                         case "ChannelsListView":
+                            Task.Run(async () =>
+                            {
+                                await ActionPlay();
+                            });
                             break;
                         case "SettingsButton":
                             MainThread.BeginInvokeOnMainThread(async () =>
@@ -1095,6 +1156,16 @@ namespace DVBTTelevizor.MAUI
                 navigationPage.BarBackgroundColor = background;
                 navigationPage.BarTextColor = textColor;
             }
+        }
+
+        private void ChannelsListView_ItemTapped(object sender, SelectedItemChangedEventArgs e)
+        {
+
+        }
+
+        private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+
         }
     }
 

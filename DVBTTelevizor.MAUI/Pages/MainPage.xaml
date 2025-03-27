@@ -247,7 +247,8 @@
           SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
           IsVisible="{Binding ChannelsListViewVisible}"
           SelectionMode="Single"
-          ItemTapped="ChannelsListView_ItemTapped">
+          ItemTapped="ChannelsListView_ItemTapped"
+          ItemSelected="ChannelsListView_ItemSelected">
 
             <ListView.ItemTemplate>
                 <DataTemplate>
