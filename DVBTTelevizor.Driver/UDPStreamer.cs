@@ -57,8 +57,9 @@ namespace DVBTTelevizor
 
             if (ip == null)
             {
-                _ip = "127.0.0.1";
+                ip = "127.0.0.1";
             }
+            _ip = ip;
 
             if (port == -1)
             {
@@ -80,14 +81,41 @@ namespace DVBTTelevizor
                     _log.Info($"UDPStreamer: No available port found, binding port 55555");
                     port = 55555;
                 }
-
-                _port = port;
             }
+
+            _port = port;
 
             _log.Info($"UDPStreamer: Binding address {IP}:{Port}");
 
             _UDPClient = new UdpClient();
             _EndPoint = new IPEndPoint(IPAddress.Parse(IP), Port);
+        }
+
+        public void SendStream(Stream stream)
+        {
+            try
+            {
+                if (_UDPClient == null || _EndPoint == null)
+                    return;
+
+                _log.Info($"UDPStreamer: Sending stream to {IP}:{Port}");
+
+                Task.Run( async () =>
+                {
+                    byte[] buffer = new byte[1316]; // Common TS packet size for UDP
+                    int bytesRead;
+
+                    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        await _UDPClient.SendAsync(buffer, bytesRead, _EndPoint);
+                    }
+                });
+
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex);
+            }
         }
 
         public void SendByteArray(byte[] array, int count)

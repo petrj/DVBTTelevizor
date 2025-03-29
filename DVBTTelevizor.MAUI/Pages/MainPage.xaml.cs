@@ -920,7 +920,12 @@ namespace DVBTTelevizor.MAUI
                     } else
                     if (DeviceInfo.Platform == DevicePlatform.WinUI)
                     {
-                        VLCLauncher.RunInWindows(_driver.StreamUrl);
+                        var udpStreamer = new UDPStreamer(_loggingService,"127.0.0.1", 8012);
+                        var url = $"udp://@{udpStreamer.IP}:{udpStreamer.Port}";
+
+                        udpStreamer.SendStream(_driver.VideoStream);
+
+                        VLCLauncher.RunInWindows(url);
                     }
 
                     //SetSubtitles(-1);
