@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using MPEGTS;
 using System;
@@ -30,8 +31,6 @@ namespace DVBTTelevizor.MAUI
         private bool _signalLocked = false;
         private bool _signalCarrier = false;
         private long _signalSNR = 0;
-
-        private long _bitrate { get; set; } = 0;
 
         private double _signalStrengthProgress = 0;
 
@@ -158,28 +157,55 @@ namespace DVBTTelevizor.MAUI
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    var channels = _configuration.GetChannels();
-
-                    che.Channel.Number = GetNextFreeChannelNumber(channels);
-
-                    Channels.Add(che.Channel);
-
-                    channels.Add(che.Channel.Clone());
-
-                    if (che.Channel.ProviderName != null)
+                    try
                     {
-                        if (!_tunedMultiplexes.ContainsKey(che.Channel.ProviderName))
+                        var configChannels = _configuration.GetChannels();
+
+                        // looking for the same channel
+                        var channelAlreadyFound = false;
+                        foreach (var configChannel in configChannels)
                         {
-                            _tunedMultiplexes.Add(che.Channel.ProviderName, 0);
+                            if (
+                                (configChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
+                                (configChannel.Frequency == che.Channel.Frequency)
+                               )
+                            {
+                                channelAlreadyFound = true;
+                                break;
+                            }
                         }
-                        _tunedMultiplexes[che.Channel.ProviderName]++;
+
+                        Channels.Add(che.Channel);
+
+                        if (che.Channel.ProviderName != null)
+                        {
+                            if (!_tunedMultiplexes.ContainsKey(che.Channel.ProviderName))
+                            {
+                                _tunedMultiplexes.Add(che.Channel.ProviderName, 0);
+                            }
+                            _tunedMultiplexes[che.Channel.ProviderName]++;
+                        }
+
+                        if (channelAlreadyFound)
+                        {
+                            _loggingService.Debug($"Found already tuned channel: \"{che.Channel.Name}\"");
+                            return;
+                        }
+
+                        che.Channel.Number = GetNextFreeChannelNumber(configChannels);
+                        _tunedNewChannels++;
+
+                        configChannels.Add(che.Channel.Clone());
+
+                        _configuration.SaveChannels(configChannels);
+
+                        WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+
                     }
-
-                    _configuration.SaveChannels(channels);
-
-                    WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
-
-                    NotifyChange();
+                    finally
+                    {
+                        NotifyChange();
+                    }
                 });
             }
         }
@@ -208,7 +234,6 @@ namespace DVBTTelevizor.MAUI
 
             _actualTunningFreqKHz = FrequencyFromKHz;
 
-            _bitrate = 0;
             _signalSNR = 0;
             _signalCarrier = false;
             _signalLocked = false;
@@ -351,6 +376,8 @@ namespace DVBTTelevizor.MAUI
                 var totalChannelsAddedCount = 0;
 
                 var mapPIDToServiceDescriptor = new Dictionary<long, MPEGTS.ServiceDescriptor>();
+
+                var configChannels = _configuration.GetChannels();
 
                 foreach (var serviceDescriptor in searchMapPIDsResult.ServiceDescriptors)
                 {
@@ -750,7 +777,10 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return DVBTDriverConnector.GetHumanReadableBitRate(_bitrate);
+                if (_driver == null)
+                    return "0";
+
+                return DVBTDriverConnector.GetHumanReadableBitRate(_driver.Bitrate);
             }
         }
 

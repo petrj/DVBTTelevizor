@@ -311,6 +311,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(EPGProgressBackgroundColor));
             OnPropertyChanged(nameof(RecordingLabel));
             OnPropertyChanged(nameof(ChannelsListViewVisible));
+            OnPropertyChanged(nameof(TuneChannelsButtonVisible));
         }
 
         public async void DisconnectDriver()
@@ -577,6 +578,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Channels.Count > 0;
+            }
+        }
+
+        public bool TuneChannelsButtonVisible
+        {
+            get
+            {
+                return Channels.Count == 0;
             }
         }
     }
