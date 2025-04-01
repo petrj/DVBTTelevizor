@@ -282,7 +282,7 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("TuneChannelsButton", new List<View>() { TuneChannelsButton }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("TuneQuickButton", new List<View>() { TuneQuickButton }));
 
 
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
@@ -1026,11 +1026,6 @@ namespace DVBTTelevizor.MAUI
             await Navigation.PushAsync(_settingsPage);
         }
 
-        private void TuneButton_Clicked_1(object sender, EventArgs e)
-        {
-
-        }
-
         private async void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
         {
             if (_aboutPage.IsLoaded)
@@ -1165,13 +1160,14 @@ namespace DVBTTelevizor.MAUI
 
         private void ChannelsListView_ItemTapped(object sender, SelectedItemChangedEventArgs e)
         {
-
+            _loggingService.Debug("ChannelsListView_ItemTapped");
         }
 
         private void ChannelsListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
-
+            _loggingService.Debug("ChannelsListView_ItemSelected");
         }
+
     }
 
 }

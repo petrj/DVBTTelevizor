@@ -186,8 +186,7 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Button x:Name="TuneChannelsButton" Text="{local:LngXamlExt Input='Tune'}" Clicked="TuneButton_Clicked" IsVisible="{Binding TuneChannelsButtonVisible}" Style="{DynamicResource ButtonStyle}" AbsoluteLayout.LayoutBounds="0.2,0.35,0.5,0.1"  AbsoluteLayout.LayoutFlags="All" />
-        <Button x:Name="InstallDriverButton" Text="{local:LngXamlExt Input='Install DVB-T Driver'}" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <Button x:Name="InstallDriverButton" Text="{local:LngXamlExt Input='Install DVB-T Driver'}" IsEnabled="True" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
 
         <Grid
             x:Name="EPGDetailGrid"
@@ -314,7 +313,8 @@
             <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
         </Grid>
 
-        <BoxView AbsoluteLayout.LayoutBounds="0,1,0.7,0.92" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" />
+        <Button x:Name="TuneQuickButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.35,0.5,0.1" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='Tune'}"
+                IsEnabled="True" Clicked="TuneButton_Clicked" Style="{DynamicResource ButtonStyle}" />
 
     </AbsoluteLayout>
 
