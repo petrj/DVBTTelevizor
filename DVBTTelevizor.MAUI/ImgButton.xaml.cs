@@ -4,7 +4,7 @@ using Microsoft.Maui.Controls;
 public partial class ImgButton : ContentView
 {
     private string _title = String.Empty;
-    private string _img = null;
+    private ImageSource _img = "icon.png";
 
     public readonly BindableProperty TitleProperty =
         BindableProperty.Create(
@@ -21,10 +21,11 @@ public partial class ImgButton : ContentView
     public readonly BindableProperty ImgProperty =
         BindableProperty.Create(
             nameof(Img),
-            typeof(string),
+            typeof(ImageSource),
             typeof(ImgButton),
-            default(string),
+            default(ImageSource),
             propertyChanged: OnAnyValueChanged);
+
 
     public ImgButton()
 	{
@@ -44,16 +45,22 @@ public partial class ImgButton : ContentView
         }
     }
 
-    public string Img
+    public ImageSource Img
     {
         get
         {
-            return _img;
+            return _img; // NO image! It works only when "tune.png" used
         }
         set
         {
             _img = value;
-            OnPropertyChanged(nameof(Img));
+
+            _img = "tune.png"; // this works
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(Img));
+            });
         }
     }
 }

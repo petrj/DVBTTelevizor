@@ -317,6 +317,7 @@
                 IsEnabled="True" Clicked="TuneButton_Clicked" Style="{DynamicResource ButtonStyle}" />
 
         <local:ImgButton AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.55,0.5,0.2" BackgroundColor="Transparent" Title="Tune" Img="appicon.png" />
+        <local:ImgButton AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.85,0.5,0.2" BackgroundColor="Transparent" Title="Connect" Img="connect.png" />
 
 
 

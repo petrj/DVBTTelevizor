@@ -10,7 +10,6 @@ namespace DVBTTelevizor.MAUI
     public partial class MainPage : ContentPage, IOnKeyDown
     {
         private MainViewModel _viewModel;
-
         private ILoggingService _loggingService { get; set; }
         private IDriverConnector _driver { get; set; }
         private IDialogService _dialogService;
