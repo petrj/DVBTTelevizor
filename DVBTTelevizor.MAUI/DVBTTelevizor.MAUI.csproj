@@ -181,6 +181,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="ImgButton.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\AboutPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
