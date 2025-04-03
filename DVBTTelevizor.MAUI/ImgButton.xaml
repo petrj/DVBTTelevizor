@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DVBTTelevizor.MAUI.ImgButton">
+             x:Class="DVBTTelevizor.MAUI.ImgButton"
+             x:Name="ImgBtn">
     <Frame
             x:Name="mainFrame"
             BackgroundColor="LightGray"
@@ -9,15 +10,11 @@
             CornerRadius="10"
             HasShadow="True">
         <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
-            <Image Source="{Binding ImageSource}" />
-            <Label Text="{Binding Title}"
+            <Image Source="{Binding Img, Source={x:Reference ImgBtn}}" />
+            <Label Text="{Binding Title, Source={x:Reference ImgBtn}}"
                 FontSize="16"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center"/>
-            <!--Label Text="{Binding Title}"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center"/-->
+                FontAttributes="Bold"
+                HorizontalTextAlignment="Center"/>
         </StackLayout>
     </Frame>
 </ContentView>

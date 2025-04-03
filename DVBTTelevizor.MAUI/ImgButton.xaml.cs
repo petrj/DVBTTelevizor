@@ -4,14 +4,27 @@ using Microsoft.Maui.Controls;
 public partial class ImgButton : ContentView
 {
     private string _title = String.Empty;
-    private string _img = String.Empty;
+    private string _img = null;
 
-    public static readonly BindableProperty TitleProperty =
-          BindableProperty.Create(nameof(Title), typeof(string), typeof(ImgButton), default(string));
+    public readonly BindableProperty TitleProperty =
+        BindableProperty.Create(
+            nameof(Title),
+            typeof(string),
+            typeof(ImgButton),
+            default(string),
+            propertyChanged: OnAnyValueChanged);
 
-    public static readonly BindableProperty ImageSourceProperty =
-        BindableProperty.Create(nameof(ImageSource), typeof(ImageSource), typeof(ImgButton), default(ImageSource));
+    private static void OnAnyValueChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+    }
 
+    public readonly BindableProperty ImgProperty =
+        BindableProperty.Create(
+            nameof(Img),
+            typeof(string),
+            typeof(ImgButton),
+            default(string),
+            propertyChanged: OnAnyValueChanged);
 
     public ImgButton()
 	{
@@ -22,7 +35,7 @@ public partial class ImgButton : ContentView
     {
         get
         {
-            return "_title";
+            return _title;
         }
         set
         {
@@ -31,7 +44,7 @@ public partial class ImgButton : ContentView
         }
     }
 
-    public string ImageSource
+    public string Img
     {
         get
         {
@@ -40,7 +53,7 @@ public partial class ImgButton : ContentView
         set
         {
             _img = value;
-            OnPropertyChanged(nameof(ImageSource));
+            OnPropertyChanged(nameof(Img));
         }
     }
 }

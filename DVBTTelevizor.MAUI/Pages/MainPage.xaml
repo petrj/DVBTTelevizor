@@ -316,7 +316,7 @@
         <Button x:Name="TuneQuickButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.35,0.5,0.1" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='Tune'}"
                 IsEnabled="True" Clicked="TuneButton_Clicked" Style="{DynamicResource ButtonStyle}" />
 
-        <local:ImgButton AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.55,0.5,0.1" BackgroundColor="Transparent" Title="Tune" ImageSource="{Binding TuneIconImage}" />
+        <local:ImgButton AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.55,0.5,0.2" BackgroundColor="Transparent" Title="Tune" Img="appicon.png" />
 
 
 
