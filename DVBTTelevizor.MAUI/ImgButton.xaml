@@ -2,10 +2,11 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DVBTTelevizor.MAUI.ImgButton"
+             xmlns:local="DVBTTelevizor.MAUI"
              x:Name="ImgBtn">
     <Frame
             x:Name="mainFrame"
-            BackgroundColor="LightGray"
+            BackgroundColor="{Binding ButtonColor, Source={x:Reference ImgBtn}}"
             Padding="10"
             CornerRadius="10"
             HasShadow="True">
@@ -16,5 +17,8 @@
                 FontAttributes="Bold"
                 HorizontalTextAlignment="Center"/>
         </StackLayout>
+        <Frame.GestureRecognizers>
+            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
+        </Frame.GestureRecognizers>
     </Frame>
 </ContentView>

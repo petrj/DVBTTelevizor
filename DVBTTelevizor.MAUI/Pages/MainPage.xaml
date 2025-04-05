@@ -313,13 +313,7 @@
             <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
         </Grid>
 
-        <Button x:Name="TuneQuickButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.35,0.5,0.1" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='Tune'}"
-                IsEnabled="True" Clicked="TuneButton_Clicked" Style="{DynamicResource ButtonStyle}" />
-
-        <local:ImgButton AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.55,0.5,0.2" BackgroundColor="Transparent" Title="Tune" ImgName="tune.png" />
-        <local:ImgButton AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.85,0.5,0.2" BackgroundColor="Transparent" Title="Connect" ImgName="connected.png" />
-
-
+        <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.55,0.1,0.2" IsVisible="{Binding TuneChannelsButtonVisible}" Title="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" />
 
     </AbsoluteLayout>
 

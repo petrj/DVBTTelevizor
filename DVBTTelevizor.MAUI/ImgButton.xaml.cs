@@ -1,12 +1,11 @@
 namespace DVBTTelevizor.MAUI;
+
 using Microsoft.Maui.Controls;
+using System.Windows.Input;
 
 public partial class ImgButton : ContentView
 {
-    private string _title = String.Empty;
-    private string _imgName = null;
-
-    public readonly BindableProperty TitleProperty =
+     public readonly BindableProperty TitleProperty =
         BindableProperty.Create(
             nameof(Title),
             typeof(string),
@@ -14,18 +13,20 @@ public partial class ImgButton : ContentView
             default(string),
             propertyChanged: OnAnyValueChanged);
 
-    private static void OnAnyValueChanged(BindableObject bindable, object oldValue, object newValue)
-    {
+    public static readonly BindableProperty TapCommandProperty =
+    BindableProperty.Create(
+        nameof(TapCommand),
+        typeof(ICommand),
+        typeof(ImgButton),
+        null);
 
-    }
-
-    public readonly BindableProperty ImgNameProperty =
-        BindableProperty.Create(
-            nameof(ImgName),
-            typeof(string),
-            typeof(ImgButton),
-            default(string),
-            propertyChanged: OnAnyValueChanged);
+    public static readonly BindableProperty ButtonColorProperty =
+    BindableProperty.Create(
+        nameof(ButtonColor),
+        typeof(Color),
+        typeof(ImgButton),
+        default(Color),
+        propertyChanged: OnAnyValueChanged);
 
     public static readonly BindableProperty ImgProperty =
     BindableProperty.Create(
@@ -35,52 +36,45 @@ public partial class ImgButton : ContentView
         default(ImageSource),
         propertyChanged: OnAnyValueChanged);
 
+    private static void OnAnyValueChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+
+    }
 
     public ImgButton()
 	{
 		InitializeComponent();
+
+        ButtonColor = Colors.Gray;
 	}
+
+    public ICommand TapCommand
+    {
+        get => (ICommand)GetValue(TapCommandProperty);
+        set => SetValue(TapCommandProperty, value);
+    }
 
     public string Title
     {
-        get
-        {
-            return _title;
-        }
-        set
-        {
-            _title = value;
-            OnPropertyChanged(nameof(Title));
-        }
+        get => (string)GetValue(TitleProperty);
+        set => SetValue(TitleProperty, value);
     }
 
     public ImageSource Img
     {
-        get
-        {
-            var val = (ImageSource)GetValue(ImgProperty);
-            return val;
-        }
+        get => (ImageSource)GetValue(ImgProperty);
         set => SetValue(ImgProperty, value);
     }
 
-    public string ImgName
+    private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
     {
-        get
-        {
-            return _imgName;
-        }
-        set
-        {
-            _imgName = value;
-            Img = ImageSource.FromFile(value);
-
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                OnPropertyChanged(nameof(ImgName));
-                OnPropertyChanged(nameof(Img));
-            });
-
-        }
+        TapCommand?.Execute(null);
     }
+
+    public Color ButtonColor
+    {
+        get => (Color)GetValue(ButtonColorProperty);
+        set => SetValue(ButtonColorProperty, value);
+    }
+
 }

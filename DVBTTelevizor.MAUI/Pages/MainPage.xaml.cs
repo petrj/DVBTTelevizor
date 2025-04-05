@@ -3,6 +3,7 @@ using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui.Layouts;
+using System.Windows.Input;
 
 
 namespace DVBTTelevizor.MAUI
@@ -145,6 +146,11 @@ namespace DVBTTelevizor.MAUI
                 CloseAllPages();
             });
 
+            WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>
+            {
+                TuneButton_Clicked(this, null);
+            });
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>
@@ -281,7 +287,7 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("TuneQuickButton", new List<View>() { TuneQuickButton }));
+                .AddItem(KeyboardFocusableItem.CreateFrom("TuneQuickButton", new List<View>() { TuneQuickImgButton }));
 
 
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
@@ -629,6 +635,7 @@ namespace DVBTTelevizor.MAUI
                 // preventing click when the settings page is just (or yet) loaded
                 return;
             }
+
             await Navigation.PushAsync(_tuneWelcomePage);
         }
 
@@ -1082,19 +1089,24 @@ namespace DVBTTelevizor.MAUI
 
                 case KeyboardNavigationActionEnum.Down:
 
-                    if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton", "SettingsButton" }).Contains(_focusItems.FocusedItemName))
+                    MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        _focusItems.FocusItem("ChannelsListView");
-                    } else
+                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton", "SettingsButton" }).Contains(_focusItems.FocusedItemName) &&
+                        _viewModel.ChannelsListViewVisible)
+                        {
+                            _focusItems.FocusItem("ChannelsListView");
+                        }
+                        else
                     if (_focusItems.FocusedItemName == "ChannelsListView")
-                    {
-                        MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             _viewModel.SelectNextChannel();
                             ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
-                        });
-
-                    }
+                        }
+                        else
+                        {
+                            _focusItems.FocusNextItem(true);
+                        }
+                    });
                     break;
 
                 case KeyboardNavigationActionEnum.Left:

@@ -114,6 +114,12 @@ namespace DVBTTelevizor.MAUI
                     //button.TextColor = Colors.White;
                     ibutton.Focus();
                 }
+                if (part is ImgButton ibtn)
+                {
+                    ibtn.ButtonColor = Color.FromHex("#303F9F");
+                    //button.TextColor = Colors.White;
+                    ibtn.Focus();
+                }
                 else
                 if (part is Picker picker)
                 {
@@ -153,7 +159,10 @@ namespace DVBTTelevizor.MAUI
                 if (part is ImageButton ibutton)
                 {
                     ibutton.BackgroundColor = Colors.Gray;
-                    //button.TextColor = Colors.White;
+                }
+                if (part is ImgButton ibtn)
+                {
+                    ibtn.ButtonColor = Colors.Gray;
                 }
                 else
                 if (part is Picker picker)

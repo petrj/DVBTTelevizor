@@ -6,7 +6,9 @@ using LoggerService;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Threading;
+using System.Windows.Input;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -32,6 +34,8 @@ namespace DVBTTelevizor.MAUI
         private Channel? _selectedChannel;
         private Channel _playingChannel;
         private Channel _recordingChannel;
+
+        public ICommand CommandTune { get; set; }
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -67,6 +71,11 @@ namespace DVBTTelevizor.MAUI
                 {
                     await RefreshChannels();
                 });
+            });
+
+            CommandTune = new Command( () =>
+            {
+                WeakReferenceMessenger.Default.Send(new StartTuneMessage(String.Empty));
             });
         }
 
