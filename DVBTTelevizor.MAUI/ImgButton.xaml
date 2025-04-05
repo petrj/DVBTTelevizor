@@ -7,15 +7,21 @@
     <Frame
             x:Name="mainFrame"
             BackgroundColor="{Binding ButtonColor, Source={x:Reference ImgBtn}}"
-            Padding="10"
+            Padding="0"
             CornerRadius="10"
             HasShadow="True">
-        <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
-            <Image x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}"  WidthRequest="50" HeightRequest="50"  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"  />
+        <StackLayout
+            Orientation="Horizontal"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="FillAndExpand"
+            Spacing="10"
+            Margin="5,0,0,5">
+            <Image x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start"  />
             <Label Text="{Binding Title, Source={x:Reference ImgBtn}}"
                 FontSize="16"
                 FontAttributes="Bold"
-                HorizontalTextAlignment="Center"/>
+                HorizontalTextAlignment="Start"
+                VerticalOptions="Center"/>
         </StackLayout>
         <Frame.GestureRecognizers>
             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
