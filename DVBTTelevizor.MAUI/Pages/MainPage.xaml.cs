@@ -1179,6 +1179,11 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Debug("ChannelsListView_ItemSelected");
         }
 
+        private void ShowMenu()
+        {
+            _viewModel.MenuVisible = true;
+        }
+
     }
 
 }

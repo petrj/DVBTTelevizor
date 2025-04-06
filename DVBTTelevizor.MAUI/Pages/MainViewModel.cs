@@ -30,6 +30,7 @@ namespace DVBTTelevizor.MAUI
         private ListViewSelector? _listViewSelector = null;
 
         private bool _EPGDetailEnabled = true;
+        private bool _menuVisible = true;
 
         private Channel? _selectedChannel;
         private Channel _playingChannel;
@@ -595,6 +596,19 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Channels.Count == 0;
+            }
+        }
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+                OnPropertyChanged(nameof(MenuVisible));
             }
         }
     }
