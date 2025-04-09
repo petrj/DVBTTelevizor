@@ -1025,6 +1025,7 @@ namespace DVBTTelevizor.MAUI
 
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
+            _viewModel.MenuVisible = !_viewModel.MenuVisible;
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)

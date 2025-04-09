@@ -30,7 +30,7 @@ namespace DVBTTelevizor.MAUI
         private ListViewSelector? _listViewSelector = null;
 
         private bool _EPGDetailEnabled = true;
-        private bool _menuVisible = true;
+        private bool _menuVisible = false;
 
         private Channel? _selectedChannel;
         private Channel _playingChannel;
