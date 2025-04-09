@@ -37,6 +37,7 @@ namespace DVBTTelevizor.MAUI
         private Channel _recordingChannel;
 
         public ICommand CommandTune { get; set; }
+        public ICommand CommandSettings { get; set; }
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -76,7 +77,12 @@ namespace DVBTTelevizor.MAUI
 
             CommandTune = new Command( () =>
             {
-                WeakReferenceMessenger.Default.Send(new StartTuneMessage(String.Empty));
+                WeakReferenceMessenger.Default.Send(new ShowTuneMessage(String.Empty));
+            });
+
+            CommandSettings = new Command(() =>
+            {
+                WeakReferenceMessenger.Default.Send(new ShowSettingsMessage(String.Empty));
             });
         }
 

@@ -36,6 +36,14 @@ public partial class ImgButton : ContentView
         default(ImageSource),
         propertyChanged: OnAnyValueChanged);
 
+    public static readonly BindableProperty TextFontSizeProperty =
+    BindableProperty.Create(
+        nameof(TextFontSize),
+        typeof(int),
+        typeof(ImgButton),
+        default(int),
+        propertyChanged: OnAnyValueChanged);
+
     private static void OnAnyValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
 
@@ -58,6 +66,12 @@ public partial class ImgButton : ContentView
     {
         get => (string)GetValue(TitleProperty);
         set => SetValue(TitleProperty, value);
+    }
+
+    public int TextFontSize
+    {
+        get => (int)GetValue(TextFontSizeProperty);
+        set => SetValue(TextFontSizeProperty, value);
     }
 
     public ImageSource Img

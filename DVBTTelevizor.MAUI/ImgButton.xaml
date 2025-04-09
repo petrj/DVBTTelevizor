@@ -18,7 +18,7 @@
             Margin="5,0,0,5">
             <Image x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start"  />
             <Label Text="{Binding Title, Source={x:Reference ImgBtn}}"
-                FontSize="16"
+                FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
                 FontAttributes="Bold"
                 HorizontalTextAlignment="Start"
                 VerticalOptions="Center"/>

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    internal class StartTuneMessage : ValueChangedMessage<string>
+    internal class ShowSettingsMessage : ValueChangedMessage<string>
     {
-        public StartTuneMessage(string value) : base(value)
+        public ShowSettingsMessage(string value) : base(value)
         {
 
         }

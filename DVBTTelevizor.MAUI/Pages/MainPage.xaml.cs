@@ -146,9 +146,14 @@ namespace DVBTTelevizor.MAUI
                 CloseAllPages();
             });
 
-            WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<ShowTuneMessage>(this, (r, m) =>
             {
                 TuneButton_Clicked(this, null);
+            });
+
+            WeakReferenceMessenger.Default.Register<ShowSettingsMessage>(this, (r, m) =>
+            {
+                SettingsButton_Clicked(this, null);
             });
 
             _settingsPage.Disappearing += delegate
