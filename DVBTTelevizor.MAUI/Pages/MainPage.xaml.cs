@@ -78,6 +78,16 @@ namespace DVBTTelevizor.MAUI
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
+            PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+
+            var language = "cz";
+            var languageFileName = Path.Join(PublicDirectory, "lng", $"{language}.lng");
+
+            if (File.Exists(languageFileName))
+            {
+                Lng.LoadLanguage(languageFileName);
+            }
+
             InitializeComponent();
 
             _loggingService = loggingProvider.GetLoggingService();
@@ -93,18 +103,8 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(e.Exception);
             };
 
-            PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-
             _configuration = tvConfiguration;
             _configuration.ConfigDirectory = PublicDirectory;
-
-            var language = "cz";
-            var languageFileName = Path.Join(PublicDirectory, "lng", $"{language}.lng");
-
-            if (File.Exists(languageFileName))
-            {
-                Lng.LoadLanguage(languageFileName);
-            }
 
             _dialogService = new DialogService(this);
 
