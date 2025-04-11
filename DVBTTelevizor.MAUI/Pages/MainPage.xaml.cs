@@ -1073,6 +1073,15 @@ namespace DVBTTelevizor.MAUI
 
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
+            if (_viewModel.MenuVisible)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    OnMenuKeyDown(keyAction);
+                });
+                return;
+            }
+
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Right:
@@ -1185,11 +1194,40 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Debug("ChannelsListView_ItemSelected");
         }
 
-        private void ShowMenu()
+        private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
         {
-            _viewModel.MenuVisible = true;
-        }
+            switch (keyAction)
+            {
+                case KeyboardNavigationActionEnum.Right:
+                case KeyboardNavigationActionEnum.Down:
+                    //if (_focusItems.FocusedItemName == "ChannelsListView")
+                    break;
 
+                case KeyboardNavigationActionEnum.Left:
+                case KeyboardNavigationActionEnum.Up:
+                    //    _focusItems.FocusPreviousItem(true);
+                    break;
+
+                case KeyboardNavigationActionEnum.Back:
+                    _viewModel.MenuVisible = false;
+                    break;
+
+                case KeyboardNavigationActionEnum.OK:
+
+                   /* switch (_focusItems.FocusedItemName)
+                    {
+                        case "ChannelsListView":
+                            Task.Run(async () =>
+                            {
+                                await ActionPlay();
+                            });
+                            break;
+
+                    }*/
+
+                    break;
+            }
+        }
     }
 
 }
