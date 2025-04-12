@@ -28,6 +28,7 @@ namespace DVBTTelevizor.MAUI
         private Channel[] _lastPlayedChannels = new Channel[2];
 
         private KeyboardFocusableItemList _focusItems;
+        private KeyboardFocusableItemList _focusMenuItems;
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
@@ -294,8 +295,22 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneQuickButton", new List<View>() { TuneQuickImgButton }));
 
-
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+
+            _focusMenuItems = new KeyboardFocusableItemList();
+
+            _focusMenuItems
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonPlay", new List<View>() { MenuButtonPlay }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonRecord", new List<View>() { MenuButtonRecord }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonShowEPG", new List<View>() { MenuButtonShowEPG }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonSubtitles", new List<View>() { MenuButtonSubtitles }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonTeletext", new List<View>() { MenuButtonTeletext }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonAudio", new List<View>() { MenuButtonAudio }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonAspect", new List<View>() { MenuButtonAspect }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonScanEPG", new List<View>() { MenuButtonScanEPG }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonSettings", new List<View>() { MenuButtonSettings }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonQuit", new List<View>() { MenuButtonQuit }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonClose", new List<View>() { MenuButtonClose }));
         }
 
         private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
@@ -1200,12 +1215,12 @@ namespace DVBTTelevizor.MAUI
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
-                    //if (_focusItems.FocusedItemName == "ChannelsListView")
+                    _focusMenuItems.FocusNextItem();
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
                 case KeyboardNavigationActionEnum.Up:
-                    //    _focusItems.FocusPreviousItem(true);
+                     _focusItems.FocusPreviousItem(true);
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
@@ -1214,16 +1229,15 @@ namespace DVBTTelevizor.MAUI
 
                 case KeyboardNavigationActionEnum.OK:
 
-                   /* switch (_focusItems.FocusedItemName)
+                    switch (_focusMenuItems.FocusedItemName)
                     {
-                        case "ChannelsListView":
-                            Task.Run(async () =>
-                            {
-                                await ActionPlay();
-                            });
+                        case "MenuButtonClose":
+                            _viewModel.MenuVisible = false;
                             break;
-
-                    }*/
+                        case "MenuButtonSettings":
+                            _viewModel.CommandSettings.Execute(null);
+                            break;
+                    }
 
                     break;
             }
