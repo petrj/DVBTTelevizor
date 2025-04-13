@@ -28,6 +28,14 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return Parts[0].IsVisible;
+            } set
+            {
+                if (Parts == null || Parts.Count == 0)
+                {
+                    return;
+                }
+
+                Parts[0].IsVisible = value;
             }
         }
 
@@ -91,6 +99,16 @@ namespace DVBTTelevizor.MAUI
 
             _maxYPos = res;
             return _maxYPos;
+        }
+
+        public ContentView GetFirstView()
+        {
+            foreach (ContentView part in Parts)
+            {
+                return part;
+            }
+
+            return null;
         }
 
         public void Focus()

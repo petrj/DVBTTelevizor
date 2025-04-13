@@ -59,6 +59,17 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
+        public ContentView GetFirstViewByItemName(string name)
+        {
+            var item = GetItemByName(name);
+            if (item == null)
+            {
+                return null;
+            }
+
+            return item.GetFirstView();
+        }
+
         public void FocusNextItem(bool onlyVisible=false)
         {
             if (Items.Count == 0)
@@ -210,6 +221,14 @@ namespace DVBTTelevizor.MAUI
                 // raise event
                 if (OnItemUnFocusedEvent != null)
                     OnItemUnFocusedEvent(new KeyboardFocusableItemEventArgs(item));
+            }
+        }
+
+        public void VisibleAll(bool isVisible)
+        {
+            foreach (var item in Items)
+            {
+                item.IsVisible = isVisible;
             }
         }
     }
