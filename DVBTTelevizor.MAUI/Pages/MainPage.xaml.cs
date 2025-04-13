@@ -157,6 +157,20 @@ namespace DVBTTelevizor.MAUI
                 SettingsButton_Clicked(this, null);
             });
 
+            WeakReferenceMessenger.Default.Register<ShowAboutMessage>(this, (r, m) =>
+            {
+                DVBTTelevizorButton_Clicked(this, null);
+            });
+
+            WeakReferenceMessenger.Default.Register<ShowDriverStateMessage>(this, (r, m) =>
+            {
+                DriverStateButton_Clicked(this, null);
+            });
+            WeakReferenceMessenger.Default.Register<ShowMenuMessage>(this, (r, m) =>
+            {
+                MenuButton_Clicked(this, null);
+            });
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>
@@ -292,7 +306,6 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("SettingsButton", new List<View>() { SettingsButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneQuickButton", new List<View>() { TuneQuickImgButton }));
 
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
@@ -1282,6 +1295,7 @@ namespace DVBTTelevizor.MAUI
             menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonClose"));
 
             var pos = 0.0;
+            var step = 0.1;
 
             _focusMenuItems.VisibleAll(false);
 
@@ -1301,7 +1315,12 @@ namespace DVBTTelevizor.MAUI
                     AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.85, 0.07));
                 }
 
-                pos += 0.1;
+                if (item.Name == "MenuButtonHideEPG" || item.Name == "MenuButtonShowEPG")
+                {
+                    step += 0.02;
+                }
+
+                pos += step;
             }
         }
     }

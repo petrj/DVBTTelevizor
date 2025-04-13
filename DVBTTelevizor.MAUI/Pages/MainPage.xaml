@@ -8,6 +8,10 @@
 <ContentPage.Resources>
         <ResourceDictionary>
 
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
             <Style x:Key="ListViewStyle" TargetType="ListView">
                 <Setter Property="HasUnevenRows" Value="True"/>
                 <Setter Property="IsPullToRefreshEnabled" Value="True"/>
@@ -160,6 +164,9 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+        <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.3,0.1" IsVisible="{Binding TuneChannelsButtonVisible}" Title="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" />
+
         <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
@@ -294,26 +301,25 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.08" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a">
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.08" AbsoluteLayout.LayoutFlags="All"
+              ColumnSpacing="5"
+              BackgroundColor="Black"
+              Margin="5,5,5,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="100*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
                 <ColumnDefinition Width="20*" />
                 <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="10*" />
             </Grid.ColumnDefinitions>
 
-            <ImageButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" Source="dvbttelevizor.png" IsEnabled="True" Margin="5,5,5,5" Clicked="DVBTTelevizorButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
-            <ImageButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" Source="{Binding DriverIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="DriverStateButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
-            <ImageButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" Source="{Binding TuneIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="TuneButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
-            <ImageButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" Source="{Binding MenuIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="MenuButton_Clicked" Style="{DynamicResource ImageButtonStyle}"/>
-            <ImageButton x:Name="SettingsButton" Grid.Column="4" Grid.Row="0" Source="{Binding SettingsIconImage}" IsEnabled="True" Margin="5,5,5,5" Clicked="SettingsButton_Clicked" Style="{DynamicResource ImageButtonStyle}" />
+            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='DVBT Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" />
+            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='USB Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}" />
+            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}" />
+            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" />
         </Grid>
-
-        <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.2,0.55,0.1,0.2" IsVisible="{Binding TuneChannelsButtonVisible}" Title="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" />
 
         <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#444444" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.65,0.75" CornerRadius="100">
             <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
