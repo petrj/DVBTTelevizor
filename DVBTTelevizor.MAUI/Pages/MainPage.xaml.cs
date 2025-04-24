@@ -147,6 +147,14 @@ namespace DVBTTelevizor.MAUI
                 CloseAllPages();
             });
 
+            WeakReferenceMessenger.Default.Register<PlayMessage>(this, (r, m) =>
+            {
+                Task.Run(async () =>
+                {
+                    await ActionPlay(_viewModel.SelectedChannel);
+                });
+            });
+
             WeakReferenceMessenger.Default.Register<ShowTuneMessage>(this, (r, m) =>
             {
                 TuneButton_Clicked(this, null);
@@ -316,6 +324,7 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonPlay", new List<View>() { MenuButtonPlay }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonStop", new List<View>() { MenuButtonStop }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonRecord", new List<View>() { MenuButtonRecord }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonStopRecord", new List<View>() { MenuButtonStopRecord }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonShowEPG", new List<View>() { MenuButtonShowEPG }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonHideEPG", new List<View>() { MenuButtonHideEPG }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonSubtitles", new List<View>() { MenuButtonSubtitles }))
@@ -1234,7 +1243,7 @@ namespace DVBTTelevizor.MAUI
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
-                    _focusMenuItems.FocusNextItem();
+                    _focusMenuItems.FocusNextItem(true);
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
@@ -1266,20 +1275,31 @@ namespace DVBTTelevizor.MAUI
         {
             var menuItems = new KeyboardFocusableItemList();
 
-            if (_viewModel.PlayingState == PlayingStateEnum.Playing)
+            if ((_viewModel.Channels.Count > 0) && (_viewModel.SelectedChannel != null))
             {
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonStop"));
+                if (_viewModel.PlayingState == PlayingStateEnum.Playing)
+                {
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonStop"));
 
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonSubtitles"));
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonAudio"));
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonAspect"));
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonTeletext"));
-            } else
-            {
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonPlay"));
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonSubtitles"));
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonAudio"));
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonAspect"));
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonTeletext"));
+                }
+                else
+                {
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonPlay"));
+                }
+
+                if (_viewModel.RecordingChannel == null)
+                {
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonRecord"));
+                }
+                else
+                {
+                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonStopRecord"));
+                }
             }
-
-            menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonRecord"));
 
             if (_viewModel.EPGDetailVisible)
             {
@@ -1294,10 +1314,12 @@ namespace DVBTTelevizor.MAUI
 
             menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonClose"));
 
-            var pos = 0.0;
-            var step = 0.1;
+            var pos = 0.1;
+            var step = 1.0 / menuItems.Items.Count;
 
             _focusMenuItems.VisibleAll(false);
+
+            AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, 0.65, 0.65));
 
             foreach (var item in menuItems.Items)
             {
@@ -1309,15 +1331,15 @@ namespace DVBTTelevizor.MAUI
 
                 if (item.Name == "MenuButtonClose")
                 {
-                    AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.35, 0.07));
+                    AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.35, step*0.7));
                 } else
                 {
-                    AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.85, 0.07));
+                    AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.85, step * 0.7));
                 }
 
                 if (item.Name == "MenuButtonHideEPG" || item.Name == "MenuButtonShowEPG")
                 {
-                    step += 0.02;
+                    //step += 0.02;
                 }
 
                 pos += step;

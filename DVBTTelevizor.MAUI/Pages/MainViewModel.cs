@@ -36,6 +36,7 @@ namespace DVBTTelevizor.MAUI
         private Channel _playingChannel;
         private Channel _recordingChannel;
 
+        public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
         public ICommand CommandSettings { get; set; }
         public ICommand CommandAbout { get; set; }
@@ -81,11 +82,19 @@ namespace DVBTTelevizor.MAUI
 
             CommandTune = new Command( () =>
             {
+                MenuVisible = false;
                 WeakReferenceMessenger.Default.Send(new ShowTuneMessage(String.Empty));
+            });
+
+            CommandPlay = new Command(() =>
+            {
+                MenuVisible = false;
+                WeakReferenceMessenger.Default.Send(new PlayMessage(String.Empty));
             });
 
             CommandSettings = new Command(() =>
             {
+                MenuVisible = false;
                 WeakReferenceMessenger.Default.Send(new ShowSettingsMessage(String.Empty));
             });
 
