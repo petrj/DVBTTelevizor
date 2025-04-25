@@ -179,6 +179,11 @@ namespace DVBTTelevizor.MAUI
                 MenuButton_Clicked(this, null);
             });
 
+            WeakReferenceMessenger.Default.Register<USBChangedMessage>(this, (r, m) =>
+            {
+                USBConnectorDisconnect();
+            });
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>
@@ -186,6 +191,29 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             };
+        }
+
+        private async void USBConnectorDisconnect()
+        {
+            ////
+            if ((_driver.State == DVBTDriverStateEnum.Unknown) || (_driver.State == DVBTDriverStateEnum.Disconnected))
+            {
+                ConnectDriver();
+            } else
+            {
+                // check driver state
+                try
+                {
+                    var status = await _driver.CheckStatus();
+                    if (!status)
+                    {
+                        // TODO: device disconnected
+                    }
+                } catch (Exception ex)
+                {
+                    _loggingService.Error(ex, "Error while checking driver state");
+                }
+            }
         }
 
         private void InitDVBTDriver()
@@ -381,8 +409,6 @@ namespace DVBTTelevizor.MAUI
 
         public void RefreshGUI()
         {
-            return;
-
             if (!_refreshGUIEnabled)
                 return;
 

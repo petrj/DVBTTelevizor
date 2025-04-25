@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
+using Android.Hardware.Usb;
 using Android.OS;
 using Android.Util;
 using Android.Views;
@@ -9,6 +10,7 @@ using Android.Widget;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
+using Java.Sql;
 using LoggerService;
 using Microsoft.Maui.Controls.Compatibility;
 using NLog;
@@ -46,7 +48,31 @@ namespace DVBTTelevizor.MAUI
 
             var dir = GetAndroidDirectory(null);
 
+            try
+            {
+                UsbManager manager = (UsbManager)GetSystemService(Context.UsbService);
+
+                var usbReciever = new USBBroadcastReceiverSystem();
+                var intentFilter = new IntentFilter(UsbManager.ActionUsbDeviceAttached);
+                var intentFilter2 = new IntentFilter(UsbManager.ActionUsbDeviceDetached);
+                RegisterReceiver(usbReciever, intentFilter);
+                RegisterReceiver(usbReciever, intentFilter2);
+                usbReciever.UsbAttachedOrDetached += UsbAttachedOrDetached;
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while initializing UsbManager");
+            }
+
             base.OnCreate(savedInstanceState);
+        }
+
+        private async void UsbAttachedOrDetached(object sender, EventArgs e)
+        {
+            _loggingService.Info("USB Attached or detached");
+
+            WeakReferenceMessenger.Default.Send(new USBChangedMessage(String.Empty));
         }
 
         private async Task ShowPlayingNotification(PlayStreamInfo playStreamInfo)
