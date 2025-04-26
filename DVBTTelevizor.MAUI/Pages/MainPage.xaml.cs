@@ -222,7 +222,7 @@ namespace DVBTTelevizor.MAUI
                 var status = await _driver.CheckStatus();
                 if (!status)
                 {
-                    // TODO: device disconnected
+                    _viewModel.DisconnectDriver();
                 }
             }
             catch (Exception ex)
@@ -556,7 +556,7 @@ namespace DVBTTelevizor.MAUI
                             //    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
                             //}
 
-                            //VideoStackLayout.IsVisible = false;
+                            VideoStackLayout.IsVisible = false;
                             NoVideoStackLayout.IsVisible = false;
 
                             if (IsPortrait)

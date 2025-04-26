@@ -285,19 +285,19 @@
                 <RowDefinition Height="100*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="40*" />
                 <ColumnDefinition Width="20*" />
                 <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="10*" />
+                <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
 
-            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='DVBT Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" />
-            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='USB Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}" />
+            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" />
+            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}" />
             <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}" />
             <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" />
         </Grid>
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="True" AbsoluteLayout.LayoutBounds="1,1,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
+        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
@@ -321,7 +321,6 @@
             </StackLayout.GestureRecognizers-->
         </StackLayout>
 
-
         <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#444444" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.65,0.75" CornerRadius="100">
             <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
                 <local:ImgButton x:Name="MenuButtonPlay"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Play'}" Img="play.png" TapCommand="{Binding CommandPlay}" />
@@ -340,6 +339,8 @@
                 <local:ImgButton x:Name="MenuButtonClose"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,1.0,0.35,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Close'}" Img="icon.png" TapCommand="{Binding CommandCloseMenu}" />
             </AbsoluteLayout>
         </Frame>
+
+
 
     </AbsoluteLayout>
 

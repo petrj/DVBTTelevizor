@@ -4,27 +4,35 @@
              x:Class="DVBTTelevizor.MAUI.ImgButton"
              xmlns:local="DVBTTelevizor.MAUI"
              x:Name="ImgBtn">
-    <Frame
-            x:Name="mainFrame"
-            BackgroundColor="{Binding ButtonColor, Source={x:Reference ImgBtn}}"
-            Padding="0"
-            CornerRadius="10"
-            HasShadow="True">
-        <StackLayout
-            Orientation="Horizontal"
-            HorizontalOptions="FillAndExpand"
-            VerticalOptions="FillAndExpand"
-            Spacing="10"
-            Margin="5,0,0,5">
-            <Image x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start"  />
-            <Label Text="{Binding Title, Source={x:Reference ImgBtn}}"
-                FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
-                FontAttributes="Bold"
-                HorizontalTextAlignment="Start"
-                VerticalOptions="Center"/>
-        </StackLayout>
-        <Frame.GestureRecognizers>
+
+            <Grid
+                   Margin="0,0,0,0"
+                   Padding="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
+
+                <Image Grid.Row="0" Grid.Column="0" x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start"  />
+
+                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title, Source={x:Reference ImgBtn}}"
+                        FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
+                        FontAttributes="Bold"
+                        HorizontalTextAlignment="Start"
+                        VerticalOptions="Center"/>
+
+                <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Title, Source={x:Reference ImgBtn}}"
+                        FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
+                        FontAttributes="Bold"
+                        HorizontalTextAlignment="Start"
+                        VerticalOptions="Center"/>
+
+        <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
-        </Frame.GestureRecognizers>
-    </Frame>
+        </Grid.GestureRecognizers>
+    </Grid>
 </ContentView>
