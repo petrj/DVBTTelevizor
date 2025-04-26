@@ -181,7 +181,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<USBChangedMessage>(this, (r, m) =>
             {
-                USBConnectorDisconnect();
+                USBConnectOrDisconnect();
             });
 
             _settingsPage.Disappearing += delegate
@@ -193,26 +193,41 @@ namespace DVBTTelevizor.MAUI
             };
         }
 
-        private async void USBConnectorDisconnect()
+        private async void USBConnectOrDisconnect()
         {
-            ////
-            if ((_driver.State == DVBTDriverStateEnum.Unknown) || (_driver.State == DVBTDriverStateEnum.Disconnected))
+            switch (_driver.State)
             {
-                ConnectDriver();
-            } else
-            {
-                // check driver state
-                try
-                {
-                    var status = await _driver.CheckStatus();
-                    if (!status)
+                case DVBTDriverStateEnum.Unknown:
+                case DVBTDriverStateEnum.Disconnected:
                     {
-                        // TODO: device disconnected
+                        ConnectDriver();
+                        break;
                     }
-                } catch (Exception ex)
+                default:
+                    {
+                        // check driver state
+                        Task.Run(async () =>
+                        {
+                            await CheckDriverState();
+                        });
+                        break;
+                    }
+            }
+        }
+
+        private async Task CheckDriverState()
+        {
+            try
+            {
+                var status = await _driver.CheckStatus();
+                if (!status)
                 {
-                    _loggingService.Error(ex, "Error while checking driver state");
+                    // TODO: device disconnected
                 }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while checking driver state");
             }
         }
 
@@ -724,14 +739,20 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void SwipeGestureRecognizer_Swiped_1(object sender, SwipedEventArgs e)
+        private void VideoSwiped_Left(object sender, SwipedEventArgs e)
         {
-
+            Task.Run(async () =>
+            {
+                await ActionStop(true);
+            });
         }
 
-        private void SwipeGestureRecognizer_Swiped_2(object sender, SwipedEventArgs e)
+        private void VideoSwiped_Right(object sender, SwipedEventArgs e)
         {
-
+            Task.Run(async () =>
+            {
+                await ActionStop(false);
+            });
         }
 
         private void SwipeGestureRecognizer_Swiped_3(object sender, SwipedEventArgs e)
@@ -1059,7 +1080,7 @@ namespace DVBTTelevizor.MAUI
             {
                 _refreshGUIEnabled = true;
                 _checkStreamEnabled = true;
-                //RefreshGUI();
+                RefreshGUI();
             }
         }
 
