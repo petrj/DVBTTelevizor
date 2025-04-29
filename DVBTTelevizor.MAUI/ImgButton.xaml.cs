@@ -28,6 +28,14 @@ public partial class ImgButton : ContentView
         default(Color),
         propertyChanged: OnAnyValueChanged);
 
+    public static readonly BindableProperty LeftToRightProperty =
+    BindableProperty.Create(
+        nameof(LeftToRight),
+        typeof(bool),
+        typeof(ImgButton),
+        default(bool),
+        propertyChanged: OnAnyValueChanged);
+
     public static readonly BindableProperty ImgProperty =
     BindableProperty.Create(
         nameof(Img),
@@ -54,7 +62,8 @@ public partial class ImgButton : ContentView
 		InitializeComponent();
 
         ButtonColor = Colors.Gray;
-	}
+        LeftToRight = true;
+    }
 
     public ICommand TapCommand
     {
@@ -78,6 +87,18 @@ public partial class ImgButton : ContentView
     {
         get => (ImageSource)GetValue(ImgProperty);
         set => SetValue(ImgProperty, value);
+    }
+
+    public bool LeftToRight
+    {
+        get => (bool)GetValue(LeftToRightProperty);
+        set
+        {
+            SetValue(LeftToRightProperty, value);
+
+            TopTitle.IsVisible = value;
+            BottomTitle.IsVisible = !value;
+        }
     }
 
     private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)

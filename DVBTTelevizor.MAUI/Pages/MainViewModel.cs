@@ -43,6 +43,7 @@ namespace DVBTTelevizor.MAUI
         public ICommand CommandCloseMenu { get; set; }
         public ICommand CommandDriverState { get; set; }
         public ICommand CommandShowMenu { get; set; }
+        public ICommand CommandInstallDriver { get; set; }
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -105,7 +106,12 @@ namespace DVBTTelevizor.MAUI
 
             CommandShowMenu = new Command(() =>
             {
-                WeakReferenceMessenger.Default.Send(new ShowAboutMessage(String.Empty));
+                WeakReferenceMessenger.Default.Send(new ShowMenuMessage(String.Empty));
+            });
+
+            CommandInstallDriver = new Command(() =>
+            {
+                WeakReferenceMessenger.Default.Send(new InstallDriverMessage(String.Empty));
             });
 
             CommandDriverState = new Command(() =>

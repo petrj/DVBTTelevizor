@@ -184,6 +184,14 @@ namespace DVBTTelevizor.MAUI
                 USBConnectOrDisconnect();
             });
 
+            WeakReferenceMessenger.Default.Register<InstallDriverMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                });
+            });
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>

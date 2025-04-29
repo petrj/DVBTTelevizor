@@ -164,12 +164,9 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+        <!--Label AbsoluteLayout.LayoutBounds="0.5,0.1,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/-->
         <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.3,0.1" IsVisible="{Binding TuneChannelsButtonVisible}" Title="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" />
-
-        <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
-
-        <Button x:Name="InstallDriverButton" Text="{local:LngXamlExt Input='Install DVB-T Driver'}" IsEnabled="True" Clicked="DriverButton_Clicked" IsVisible="{Binding InstallDriverButtonVisible}"  Style="{DynamicResource ButtonStyle}"  AbsoluteLayout.LayoutBounds="0.0,0.31,1.0,0.15"  AbsoluteLayout.LayoutFlags="All"/>
+        <local:ImgButton x:Name="InstallDriverButton"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.45,0.3,0.1" Title="{local:LngXamlExt Input='Install DVB-T Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandInstallDriver}" IsVisible="{Binding InstallDriverButtonVisible}"/>
 
         <Grid
             x:Name="EPGDetailGrid"
@@ -285,16 +282,16 @@
                 <RowDefinition Height="100*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="40*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="34*" />
+                <ColumnDefinition Width="22*" />
+                <ColumnDefinition Width="22*" />
+                <ColumnDefinition Width="22*" />
             </Grid.ColumnDefinitions>
 
-            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" />
-            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}" />
-            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}" />
-            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" />
+            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" LeftToRight="True"/>
+            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}" LeftToRight="True" />
+            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}" LeftToRight="True"/>
+            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" LeftToRight="True"/>
         </Grid>
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
@@ -320,6 +317,8 @@
                 <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Down"/>
             </StackLayout.GestureRecognizers-->
         </StackLayout>
+
+        <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
         <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#444444" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.65,0.75" CornerRadius="100">
             <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
