@@ -6,7 +6,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class FrequencyPage : ContentPage, IOnKeyDown
+public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 {
     private FrequencyPageViewModel _viewModel;
 
@@ -45,6 +45,7 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
 
     private void SliderFrequency_DragCompleted(object? sender, EventArgs e)
     {
+        if (!_viewModel.Rounding)
         _viewModel.RoundFrequency();
     }
 
@@ -71,18 +72,18 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         if (!float.TryParse(MHZEntry.Text, out mhz))
         {
             await _dialogService.Information($"Invalid frequency");
-            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
             return;
         }
 
-        if (!_viewModel.ValidFrequencyMHz(mhz))
+        if (!_viewModel.Settings.ValidFrequency(Convert.ToInt64(mhz*1000.0), true))
         {
             await _dialogService.Information($"Frequency \"{mhz}\" MHz is out of range {_viewModel.FrequencyMinMHz} MHz - {_viewModel.FrequencyMaxMHz} MHz");
-            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
             return;
         }
 
-        _viewModel.FrequencyKHz = Convert.ToInt64(mhz * 1000);
+        _viewModel.Settings.FrequencyKHz = Convert.ToInt64(mhz * 1000);
     }
 
     private async void KHZEntry_Unfocused(object? sender, FocusEventArgs e)
@@ -92,18 +93,18 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         if (!int.TryParse(KHZEntry.Text, out khz))
         {
             await _dialogService.Information($"Invalid frequency");
-            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
             return;
         }
 
-        if (!_viewModel.ValidFrequencyKHz(khz))
+        if (!_viewModel.Settings.ValidFrequency(khz, true))
         {
             await _dialogService.Information($"Frequency \"{khz}\" KHz is out of range {_viewModel.FrequencyMinKHz} KHz - {_viewModel.FrequencyMaxKHz} KHz");
-            _viewModel.FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
             return;
         }
 
-        _viewModel.FrequencyKHz = khz;
+        _viewModel.Settings.FrequencyKHz = khz;
     }
 
     public TuningSettings? Settings
@@ -111,10 +112,6 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         get
         {
             return _viewModel?.Settings;
-        }
-        set
-        {
-            _viewModel.Settings = value;
         }
     }
 
@@ -264,5 +261,10 @@ public partial class FrequencyPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"FrequencyPage DefaultButton_Clicked");
 
         _viewModel.SetDefaultFrequency(TuneFrequencyMode);
+    }
+
+    public void UpdateSettings(TuningSettings tuningSettings)
+    {
+        _viewModel.Settings = tuningSettings;
     }
 }

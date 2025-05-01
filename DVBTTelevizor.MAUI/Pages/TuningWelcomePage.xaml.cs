@@ -160,9 +160,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             _tuningSettings.DVBT2 = _configuration.TuneDVBT2Enabled;
             _tuningSettings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
             _tuningSettings.TuningMode = mode;
-
-            sPage.Settings = _tuningSettings;
-            sPage.Update();
         }
 
         if (page is TuningProgressPage tPage)
@@ -171,9 +168,11 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             _tuningSettings.DVBT2 = true;
             _tuningSettings.TuneDVBTPreferred = false;
             _tuningSettings.TuningMode = TuneModeEnum.Automatic;
+        }
 
-            tPage.Settings = _tuningSettings;
-            tPage.UpdateActualFreq();
+        if (page is ITuningPage tuPage)
+        {
+            tuPage.UpdateSettings( _tuningSettings );
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>

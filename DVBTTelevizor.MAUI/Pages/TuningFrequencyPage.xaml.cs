@@ -3,7 +3,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
+public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 {
     private TuningFrequenciesViewModel _tuningFrequenciesViewModel;
 
@@ -14,8 +14,6 @@ public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
-
-    public TuningSettings _tuneSettings { get; set; }
 
     private FrequencyPage _frequencyPage;
     private TuningProgressPage _tuningProgressPage;
@@ -30,9 +28,9 @@ public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        _tuneSettings = new TuningSettings();
-
         BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+
+        _tuningFrequenciesViewModel.Settings = new TuningSettings();
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
@@ -46,14 +44,6 @@ public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
         get
         {
             return _tuningFrequenciesViewModel?.Settings;
-        }
-        set
-        {
-            if (value == null)
-            {
-                return;
-            }
-            _tuningFrequenciesViewModel.Settings = value;
         }
     }
 
@@ -162,13 +152,18 @@ public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
 
         if (Settings != null)
         {
+            Settings.FrequencyFromKHz = Settings.FrequencyKHz;
+            Settings.FrequencyToKHz = Settings.FrequencyKHz;
+
             _configuration.FrequencyKHz = Settings.FrequencyKHz;
+
+            _tuningProgressPage.UpdateSettings(Settings);
         }
 
-        _tuningProgressPage.Settings = Settings;
-        _tuningProgressPage.Settings.FrequencyFromKHz = Settings.FrequencyKHz;
-        _tuningProgressPage.Settings.FrequencyToKHz = Settings.FrequencyKHz;
-        _tuningProgressPage.UpdateActualFreq();
+        //_tuningProgressPage.Settings = Settings;
+        //_tuningProgressPage.Settings.FrequencyFromKHz = Settings.FrequencyKHz;
+        //_tuningProgressPage.Settings.FrequencyToKHz = Settings.FrequencyKHz;
+        //_tuningProgressPage.UpdateActualFreq();
 
         await Navigation.PushAsync(_tuningProgressPage);
     }
@@ -205,5 +200,10 @@ public partial class TuningFrequencyPage : ContentPage, IOnKeyDown
     private void EditFreqButton_Clicked(object sender, EventArgs e)
     {
         ShowFreqPage();
+    }
+
+    public void UpdateSettings(TuningSettings tuningSettings)
+    {
+        _tuningFrequenciesViewModel.Settings = tuningSettings;
     }
 }

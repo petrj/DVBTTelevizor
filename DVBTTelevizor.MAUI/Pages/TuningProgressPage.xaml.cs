@@ -1,3 +1,4 @@
+using Android.Provider;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
@@ -6,7 +7,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningProgressPage : ContentPage, IOnKeyDown
+public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 {
     private TuningProgressPageViewModel _viewModel;
 
@@ -39,23 +40,6 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
 
         _viewModel.ChannelFound += ChannelFound;
-    }
-
-    public TuningSettings? Settings
-    {
-        get
-        {
-            return _viewModel?.Settings;
-        }
-        set
-        {
-            _viewModel.Settings = value;
-        }
-    }
-
-    public void UpdateActualFreq()
-    {
-        _viewModel.UpdateActualFreq();
     }
 
     private void ChannelFound(object? sender, EventArgs e)
@@ -348,5 +332,11 @@ public partial class TuningProgressPage : ContentPage, IOnKeyDown
         _viewModel.ResetTune(true);
 
         WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
+    }
+
+    public void UpdateSettings(TuningSettings tuningSettings)
+    {
+        _viewModel.Settings = tuningSettings;
+        _viewModel.UpdateActualFreq();
     }
 }

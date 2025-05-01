@@ -3,7 +3,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
+public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDown
 {
     private TuningFrequenciesViewModel _tuningFrequenciesViewModel;
 
@@ -47,14 +47,6 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
         get
         {
             return _tuningFrequenciesViewModel?.Settings;
-        }
-        set
-        {
-            if (value == null)
-            {
-                return;
-            }
-            _tuningFrequenciesViewModel.Settings = value;
         }
     }
 
@@ -166,10 +158,9 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
         {
             _configuration.FrequencyFromKHz = Settings.FrequencyFromKHz;
             _configuration.FrequencyToKHz = Settings.FrequencyToKHz;
-        }
 
-        _tuningProgressPage.Settings = _tuningFrequenciesViewModel.Settings;
-        _tuningProgressPage.UpdateActualFreq();
+            _tuningProgressPage.UpdateSettings(Settings);
+        }
 
         await Navigation.PushAsync(_tuningProgressPage);
     }
@@ -211,15 +202,22 @@ public partial class TuningFrequenciesPage : ContentPage, IOnKeyDown
 
         if (_frequencyPage.Settings != null && Settings != null)
         {
-            _frequencyPage.Settings.BandwidthKHz = Settings.BandwidthKHz;
-            _frequencyPage.Settings.FrequencyKHz = _editingFrom ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
+            var settings = Settings.Clone();
+            settings.FrequencyKHz = _editingFrom ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
+
             _frequencyPage.TuneFrequencyMode = _editingFrom ? TuneFrequencyModeEnum.From : TuneFrequencyModeEnum.To;
-            _frequencyPage.NotifyChange();
+
+            _frequencyPage.UpdateSettings(settings);
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
             await Navigation.PushAsync(_frequencyPage);
         });
+    }
+
+    public void UpdateSettings(TuningSettings tuningSettings)
+    {
+        _tuningFrequenciesViewModel.Settings = tuningSettings;
     }
 }

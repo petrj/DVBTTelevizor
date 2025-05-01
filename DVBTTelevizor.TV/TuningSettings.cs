@@ -26,10 +26,33 @@ namespace DVBTTelevizor
         public long DeviceFrequencyFromKHz { get; set; } = 474000;
         public long DeviceFrequencyToKHz { get; set; } = 852000;
 
-        public static long DefaultBandwidthKHz { get; set; } = 8000;
-        public static long DefaultFrequencyKHz { get; set; } = 474000;
-        public static long FrequencyMinKHz { get; set; } = 174000; // 174.0 MHz - VHF high-band (band III) channel 7
-        public static long FrequencyMaxKHz { get; set; } = 858000; // 858.0 MHz - UHF band channel 69
+        public long DefaultFrequencyKHz { get; set; } = 474000;
+        public long DefaultFrequencyFromKHz { get; set; } = 474000;
+        public long DefaultFrequencyToKHz { get; set; } = 852000;
+
+        public const long DefaultBandwidthKHz = 8000;
+        public const long FrequencyMinKHz = 174000; // 174.0 MHz - VHF high-band (band III) channel 7
+        public const long FrequencyMaxKHz = 858000; // 858.0 MHz - UHF band channel 69
+
+        public TuningSettings Clone()
+        {
+            return new TuningSettings()
+            {
+                 DVBT = DVBT,
+                 DVBT2 = DVBT2,
+                 BandwidthKHz = BandwidthKHz,
+                 FrequencyFromKHz = FrequencyFromKHz,
+                 FrequencyToKHz = FrequencyToKHz,
+                 FrequencyKHz = FrequencyKHz,
+                 TuneDVBTPreferred = TuneDVBTPreferred,
+                 TuningMode = TuningMode,
+                 DefaultFrequencyFromKHz = DefaultFrequencyFromKHz,
+                 DefaultFrequencyToKHz = DefaultFrequencyToKHz,
+                 DefaultFrequencyKHz = DefaultFrequencyKHz,
+                 DeviceFrequencyFromKHz =  DeviceFrequencyFromKHz,
+                 DeviceFrequencyToKHz = DeviceFrequencyToKHz
+            };
+        }
 
         public bool ValidFrequency(long freq, bool device)
         {
@@ -75,10 +98,7 @@ namespace DVBTTelevizor
                             {
                                 DeviceFrequencyToKHz = TuningSettings.FrequencyMaxKHz;
                             }
-                            if (!ValidFrequency(TuningSettings.DefaultFrequencyKHz, false))
-                            {
-                                TuningSettings.DefaultFrequencyKHz = TuningSettings.FrequencyMinKHz;
-                            }
+
                         }
                     }
                     catch (Exception ex)
@@ -87,23 +107,52 @@ namespace DVBTTelevizor
                     }
                 }
 
+                // fix default frequencies
+
+                if (!ValidFrequency(DefaultFrequencyKHz, true))
+                {
+                    DefaultFrequencyKHz = DeviceFrequencyFromKHz;
+                }
+
+                if (!ValidFrequency(DefaultFrequencyFromKHz, true))
+                {
+                    DefaultFrequencyFromKHz = DeviceFrequencyFromKHz;
+                }
+
+                if (!ValidFrequency(DefaultFrequencyToKHz, true))
+                {
+                    DefaultFrequencyToKHz = DeviceFrequencyToKHz;
+                }
+
+                // load configuration values
+
                 FrequencyKHz = configuration.FrequencyKHz;
+                FrequencyFromKHz = configuration.FrequencyFromKHz;
+                FrequencyToKHz = configuration.FrequencyToKHz;
+
+                // fix
+
                 if (!ValidFrequency(FrequencyKHz, true))
                 {
-                    FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+                    FrequencyKHz = DefaultFrequencyKHz;
                 }
 
-                FrequencyFromKHz = configuration.FrequencyFromKHz;
                 if (!ValidFrequency(FrequencyFromKHz, true))
                 {
-                    FrequencyFromKHz = DeviceFrequencyFromKHz;
+                    FrequencyFromKHz = DefaultFrequencyFromKHz;
                 }
 
-                FrequencyToKHz = configuration.FrequencyToKHz;
                 if (!ValidFrequency(FrequencyToKHz, true))
                 {
-                    FrequencyToKHz = DeviceFrequencyToKHz;
+                    FrequencyToKHz = DefaultFrequencyToKHz;
                 }
+
+                // save to config
+
+                configuration.FrequencyKHz = FrequencyKHz;
+                configuration.FrequencyFromKHz = FrequencyFromKHz;
+                configuration.FrequencyToKHz= FrequencyToKHz;
+                configuration.DVBTBandwidthKHz = BandwidthKHz;
             }
             catch (Exception ex)
             {

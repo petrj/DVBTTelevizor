@@ -21,6 +21,7 @@ namespace DVBTTelevizor.MAUI
         public TuningSettings _tuneSettings { get; set; }
 
         public bool NotifyEnabled { get; set; } = true;
+        public bool Rounding { get; set; } = false;
 
         public FrequencyPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -52,25 +53,15 @@ namespace DVBTTelevizor.MAUI
             switch (tuneFrequencyModeEnum)
             {
                 case TuneFrequencyModeEnum.From:
-                    FrequencyKHz = _tuneSettings.DeviceFrequencyFromKHz;
+                    _tuneSettings.FrequencyKHz = _tuneSettings.DeviceFrequencyFromKHz;
                     break;
                 case TuneFrequencyModeEnum.To:
-                    FrequencyKHz = _tuneSettings.DeviceFrequencyToKHz;
+                    _tuneSettings.FrequencyKHz = _tuneSettings.DeviceFrequencyToKHz;
                     break;
                 case TuneFrequencyModeEnum.Center:
-                    FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
+                    _tuneSettings.FrequencyKHz = _tuneSettings.DefaultFrequencyKHz;
                     break;
             }
-        }
-
-        public bool ValidFrequencyKHz(double freqKHz)
-        {
-            return ValidFrequencyKHz(Convert.ToInt64(freqKHz));
-        }
-
-        public bool ValidFrequencyMHz(double freqMHz)
-        {
-            return ValidFrequencyKHz(Convert.ToInt64(freqMHz*1000));
         }
 
         public long TuneBandWidthKHz
@@ -78,12 +69,6 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.BandwidthKHz;
-            }
-            set
-            {
-                Settings.BandwidthKHz = value;
-
-                NotifyChange();
             }
         }
 
@@ -138,12 +123,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Settings.FrequencyKHz;
             }
-            set
-            {
-                _loggingService.Debug($"Setting value:{value}");
-                Settings.FrequencyKHz = value;
-                NotifyChange();
-            }
         }
 
         public string FrequencyMHz
@@ -160,11 +139,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Settings.DeviceFrequencyFromKHz;
             }
-            set
-            {
-                Settings.DeviceFrequencyFromKHz = value;
-                NotifyChange();
-            }
         }
 
         public long FrequencyMaxKHz
@@ -172,11 +146,6 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.DeviceFrequencyToKHz;
-            }
-            set
-            {
-                Settings.DeviceFrequencyToKHz = value;
-                NotifyChange();
             }
         }
 
@@ -199,44 +168,51 @@ namespace DVBTTelevizor.MAUI
         public void IncreaseFreq()
         {
             var freq = FrequencyKHz + TuneBandWidthKHz;
-            if (!ValidFrequencyKHz(freq))
+            if (!_tuneSettings.ValidFrequency(freq, true))
             {
                 freq = FrequencyMaxKHz;
             }
-            FrequencyKHz = freq;
+            Settings.FrequencyKHz = freq;
         }
 
         public void DecreaseFreq()
         {
             var freq = FrequencyKHz - TuneBandWidthKHz;
-            if (!ValidFrequencyKHz(freq))
+            if (!_tuneSettings.ValidFrequency(freq, true))
             {
                 freq = FrequencyMinKHz;
             }
-            FrequencyKHz = freq;
+            Settings.FrequencyKHz = freq;
         }
 
         public void RoundFrequency()
         {
-            if (!ValidFrequencyKHz(FrequencyKHz))
-                return;
-
-            // rounding to start freq 474 MHZ
-            var startFreq = TuningSettings.DefaultFrequencyKHz;
-
-            var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz));
-
-            var freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
-            if (freqRounded > TuningSettings.FrequencyMaxKHz)
+            Rounding = true;
+            try
             {
-                freqRounded = TuningSettings.FrequencyMaxKHz;
-            }
-            if (freqRounded < TuningSettings.FrequencyMinKHz)
-            {
-                freqRounded = TuningSettings.FrequencyMinKHz;
-            }
+                if (!_tuneSettings.ValidFrequency(FrequencyKHz, true))
+                    return;
 
-            FrequencyKHz = freqRounded;
+                // rounding to start freq 474 MHZ
+                var startFreq = _tuneSettings.DefaultFrequencyKHz;
+
+                var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz));
+
+                var freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
+                if (freqRounded > TuningSettings.FrequencyMaxKHz)
+                {
+                    freqRounded = TuningSettings.FrequencyMaxKHz;
+                }
+                if (freqRounded < TuningSettings.FrequencyMinKHz)
+                {
+                    freqRounded = TuningSettings.FrequencyMinKHz;
+                }
+
+                Settings.FrequencyKHz = freqRounded;
+            } finally
+            {
+                Rounding = false;
+            }
         }
     }
 }

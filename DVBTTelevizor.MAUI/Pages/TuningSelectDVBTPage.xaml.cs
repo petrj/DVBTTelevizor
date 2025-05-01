@@ -2,7 +2,7 @@ using LoggerService;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
+public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
 {
     private TuningSelectDVBTPageViewModel _tuningSelectDVBTViewModel;
 
@@ -42,20 +42,9 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
         _focusItems = BuildFocusableItems();
     }
 
-    public TuningSettings? Settings
+    public void UpdateSettings(TuningSettings tuningSettings)
     {
-        get
-        {
-            return _tuningSelectDVBTViewModel?.Settings;
-        }
-        set
-        {
-            _tuningSelectDVBTViewModel.Settings = value;
-        }
-    }
-
-    public void Update()
-    {
+        _tuningSelectDVBTViewModel.Settings = tuningSettings;
         _tuningSelectDVBTViewModel?.Update();
     }
 
@@ -249,23 +238,17 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
             return;
         }
 
-        if (Settings != null)
+        if (_tuningSelectDVBTViewModel.Settings != null)
         {
-            _configuration.TuneDVBTEnabled = Settings.DVBT;
-            _configuration.TuneDVBT2Enabled = Settings.DVBT2;
-            _configuration.DVBTBandwidthKHz = Settings.BandwidthKHz;
-            _configuration.TuneDVBTPreferred = Settings.TuneDVBTPreferred;
+            _configuration.TuneDVBTEnabled = _tuningSelectDVBTViewModel.Settings.DVBT;
+            _configuration.TuneDVBT2Enabled = _tuningSelectDVBTViewModel.Settings.DVBT2;
+            _configuration.DVBTBandwidthKHz = _tuningSelectDVBTViewModel.Settings.BandwidthKHz;
+            _configuration.TuneDVBTPreferred = _tuningSelectDVBTViewModel.Settings.TuneDVBTPreferred;
         }
 
-        if (page is TuningFrequenciesPage fsPage)
+        if (page is ITuningPage tPage)
         {
-            fsPage.Settings = _tuningSelectDVBTViewModel.Settings;
-            //fsPage.Update();
-        }
-
-        if (page is TuningFrequencyPage fPage)
-        {
-            fPage.Settings = _tuningSelectDVBTViewModel.Settings;
+            tPage.UpdateSettings(_tuningSelectDVBTViewModel.Settings);
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>
@@ -276,7 +259,7 @@ public partial class TuningSelectDVBTPage : ContentPage, IOnKeyDown
 
     private async void NextButton_Clicked(object sender, EventArgs e)
     {
-        switch (Settings.TuningMode)
+        switch (_tuningSelectDVBTViewModel.Settings.TuningMode)
         {
             case TuneModeEnum.Manual:
                 ShowPage(_tuningFrequenciesPage);
