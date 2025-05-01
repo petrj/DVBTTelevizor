@@ -34,7 +34,6 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
-        _frequencyPage.Disappearing += _frequencyPage_Disappearing;
 
         BuildFocusableItems();
     }
@@ -168,14 +167,6 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         await Navigation.PushAsync(_tuningProgressPage);
     }
 
-    private void _frequencyPage_Disappearing(object? sender, EventArgs e)
-    {
-        if (Settings == null)
-            return;
-
-        _tuningFrequenciesViewModel.FrequencyKHz = _frequencyPage.Settings.FrequencyKHz;
-    }
-
     private void ShowFreqPage()
     {
         if (_frequencyPage.IsLoaded)
@@ -186,9 +177,7 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         if (_frequencyPage.Settings != null && Settings != null)
         {
-            _frequencyPage.Settings.BandwidthKHz = Settings.BandwidthKHz;
-            _frequencyPage.Settings.FrequencyKHz = Settings.FrequencyKHz;
-            _frequencyPage.NotifyChange();
+            _frequencyPage.UpdateSettings(Settings);
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>
