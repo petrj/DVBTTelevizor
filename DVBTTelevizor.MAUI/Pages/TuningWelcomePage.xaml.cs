@@ -13,6 +13,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
+    private TuningSettings _tuningSettings;
+
     private KeyboardFocusableItemList _focusItems;
 
     private TuningSelectDVBTPage _selectDVBTPage;
@@ -27,6 +29,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _configuration = tvConfiguration;
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+
+        _tuningSettings = new TuningSettings();
 
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
@@ -54,6 +58,11 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+
+        Task.Run(async () =>
+        {
+            await _tuningSettings.SetFrequencies(_configuration, _driver, _loggingService);
+        });
     }
 
     public void OnKeyDown(string key, bool longPress)
@@ -147,35 +156,23 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         if (page is TuningSelectDVBTPage sPage)
         {
-            sPage.Settings = new TuningSettings()
-            {
-                DVBT = _configuration.TuneDVBTEnabled,
-                DVBT2 = _configuration.TuneDVBT2Enabled,
-                TuneDVBTPreferred = _configuration.TuneDVBTPreferred,
-                BandwidthKHz = _configuration.DVBTBandwidthKHz,
-                FrequencyFromKHz = _configuration.FrequencyFromKHz,
-                FrequencyToKHz = _configuration.FrequencyToKHz,
-                FrequencyKHz = _configuration.FrequencyKHz,
-                TuningMode = mode
-            };
+            _tuningSettings.DVBT = _configuration.TuneDVBTEnabled;
+            _tuningSettings.DVBT2 = _configuration.TuneDVBT2Enabled;
+            _tuningSettings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+            _tuningSettings.TuningMode = mode;
 
+            sPage.Settings = _tuningSettings;
             sPage.Update();
         }
 
         if (page is TuningProgressPage tPage)
         {
-            tPage.Settings = new TuningSettings()
-            {
-                DVBT = true,
-                DVBT2 = true,
-                TuneDVBTPreferred = false,
-                BandwidthKHz = TuningSettings.DefaultBandwidthKHz,
-                FrequencyFromKHz = TuningSettings.DefaultFrequencyFromKHz,
-                FrequencyToKHz = TuningSettings.DefaultFrequencyToKHz,
-                FrequencyKHz = TuningSettings.DefaultFrequencyKHz,
-                TuningMode = TuneModeEnum.Automatic
-            };
+            _tuningSettings.DVBT = true;
+            _tuningSettings.DVBT2 = true;
+            _tuningSettings.TuneDVBTPreferred = false;
+            _tuningSettings.TuningMode = TuneModeEnum.Automatic;
 
+            tPage.Settings = _tuningSettings;
             tPage.UpdateActualFreq();
         }
 

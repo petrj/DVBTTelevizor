@@ -52,26 +52,15 @@ namespace DVBTTelevizor.MAUI
             switch (tuneFrequencyModeEnum)
             {
                 case TuneFrequencyModeEnum.From:
-                    FrequencyKHz = TuningSettings.DefaultFrequencyFromKHz;
+                    FrequencyKHz = _tuneSettings.DeviceFrequencyFromKHz;
                     break;
                 case TuneFrequencyModeEnum.To:
-                    FrequencyKHz = TuningSettings.DefaultFrequencyToKHz;
+                    FrequencyKHz = _tuneSettings.DeviceFrequencyToKHz;
                     break;
                 case TuneFrequencyModeEnum.Center:
                     FrequencyKHz = TuningSettings.DefaultFrequencyKHz;
                     break;
             }
-        }
-
-        public bool ValidFrequencyKHz(long freqKHz)
-        {
-
-            if (freqKHz < _tuneSettings.FrequencyMinKHz || freqKHz > _tuneSettings.FrequencyMaxKHz)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         public bool ValidFrequencyKHz(double freqKHz)
@@ -121,7 +110,6 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(FrequencyMaxKHz));
                 OnPropertyChanged(nameof(FrequencyMinMHz));
                 OnPropertyChanged(nameof(FrequencyMaxMHz));
-                OnPropertyChanged(nameof(FrequencyToMHz));
 
             });
         }
@@ -170,11 +158,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.FrequencyMinKHz;
+                return Settings.DeviceFrequencyFromKHz;
             }
             set
             {
-                Settings.FrequencyMinKHz = value;
+                Settings.DeviceFrequencyFromKHz = value;
                 NotifyChange();
             }
         }
@@ -183,11 +171,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.FrequencyMaxKHz;
+                return Settings.DeviceFrequencyToKHz;
             }
             set
             {
-                Settings.FrequencyMaxKHz = value;
+                Settings.DeviceFrequencyToKHz = value;
                 NotifyChange();
             }
         }
@@ -196,7 +184,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.FrequencyMinKHz / 1000;
+                return Settings.DeviceFrequencyFromKHz / 1000;
             }
         }
 
@@ -204,15 +192,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.FrequencyMaxKHz / 1000;
-            }
-        }
-
-        public long FrequencyToMHz
-        {
-            get
-            {
-                return Settings.FrequencyMaxKHz / 1000;
+                return Settings.DeviceFrequencyToKHz / 1000;
             }
         }
 
@@ -247,13 +227,13 @@ namespace DVBTTelevizor.MAUI
             var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz));
 
             var freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
-            if (freqRounded > Settings.FrequencyMaxKHz)
+            if (freqRounded > TuningSettings.FrequencyMaxKHz)
             {
-                freqRounded = Settings.FrequencyMaxKHz;
+                freqRounded = TuningSettings.FrequencyMaxKHz;
             }
-            if (freqRounded < Settings.FrequencyMinKHz)
+            if (freqRounded < TuningSettings.FrequencyMinKHz)
             {
-                freqRounded = Settings.FrequencyMinKHz;
+                freqRounded = TuningSettings.FrequencyMinKHz;
             }
 
             FrequencyKHz = freqRounded;
