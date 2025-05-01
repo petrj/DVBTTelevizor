@@ -62,6 +62,7 @@ namespace DVBTTelevizor.MAUI
                     _tuneSettings.FrequencyKHz = _tuneSettings.DefaultFrequencyKHz;
                     break;
             }
+            NotifyChange();
         }
 
         public long TuneBandWidthKHz
@@ -84,6 +85,8 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
+                OnPropertyChanged(nameof(FrequencyMaxKHz));
+
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyMHz));
                 OnPropertyChanged(nameof(FrequencyWholePartMHz));
@@ -92,7 +95,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
 
                 OnPropertyChanged(nameof(FrequencyMinKHz));
-                OnPropertyChanged(nameof(FrequencyMaxKHz));
+
                 OnPropertyChanged(nameof(FrequencyMinMHz));
                 OnPropertyChanged(nameof(FrequencyMaxMHz));
 
@@ -122,6 +125,11 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.FrequencyKHz;
+            }
+            set
+            {
+                Settings.FrequencyKHz = value;
+                NotifyChange();
             }
         }
 
@@ -173,6 +181,8 @@ namespace DVBTTelevizor.MAUI
                 freq = FrequencyMaxKHz;
             }
             Settings.FrequencyKHz = freq;
+
+            NotifyChange();
         }
 
         public void DecreaseFreq()
@@ -183,6 +193,8 @@ namespace DVBTTelevizor.MAUI
                 freq = FrequencyMinKHz;
             }
             Settings.FrequencyKHz = freq;
+
+            NotifyChange();
         }
 
         public void RoundFrequency()

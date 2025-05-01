@@ -45,8 +45,8 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     private void SliderFrequency_DragCompleted(object? sender, EventArgs e)
     {
-        if (!_viewModel.Rounding)
         _viewModel.RoundFrequency();
+        _viewModel.NotifyChange();
     }
 
     private void SliderFrequency_Unfocused(object? sender, FocusEventArgs e)
@@ -154,6 +154,8 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+
+        NotifyChange();
     }
 
     public void OnKeyDown(string key, bool longPress)
