@@ -25,7 +25,7 @@ namespace DVBTTelevizor.MAUI
         public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            Settings = new TuningSettings();
+            Settings = new TuningSettings(loggingService);
 
             if (!Bandwidth.BandWidthHzTitle.ContainsKey(tvConfiguration.DVBTBandwidthKHz * 1000))
             {

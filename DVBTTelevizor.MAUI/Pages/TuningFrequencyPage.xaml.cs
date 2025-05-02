@@ -30,7 +30,7 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
-        _tuningFrequenciesViewModel.Settings = new TuningSettings();
+        _tuningFrequenciesViewModel.Settings = new TuningSettings(_loggingService);
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);

@@ -17,7 +17,7 @@ namespace DVBTTelevizor.MAUI
         public TuningFrequenciesViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            _tuneSettings = new TuningSettings();
+            _tuneSettings = new TuningSettings(loggingService);
 
             WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
             {

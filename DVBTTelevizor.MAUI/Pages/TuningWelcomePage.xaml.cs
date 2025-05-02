@@ -30,7 +30,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        _tuningSettings = new TuningSettings();
+        _tuningSettings = new TuningSettings(_loggingService);
 
         BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
@@ -61,7 +61,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            await _tuningSettings.SetFrequencies(_configuration, _driver, _loggingService);
+            _tuningSettings.LoadFromConfiguration(_configuration);
+            await _tuningSettings.SetFrequencies(_driver);
+            _tuningSettings.SaveToConfiguration(_configuration);
         });
     }
 

@@ -165,11 +165,11 @@
     <AbsoluteLayout BackgroundColor="Black" Margin="0,0,0,0">
 
         <!--Label AbsoluteLayout.LayoutBounds="0.5,0.1,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/-->
-        <Frame IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.25,0.5,0.14" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
+        <Frame IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.25,0.5,0.25" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
             <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.4,0.1" TopTitleText="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" BackgroundColor="#222222"/>
         </Frame>
 
-        <Frame IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.5,0.14" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
+        <Frame IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.65,0.5,0.25" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
             <local:ImgButton x:Name="InstallDriverButton"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.4,0.14" TopTitleText="{local:LngXamlExt Input='Install Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandInstallDriver}"/>
         </Frame>
 
@@ -293,10 +293,10 @@
                 <ColumnDefinition Width="16*" />
             </Grid.ColumnDefinitions>
 
-            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='DVBT Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/>
-            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
-            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
-            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
+            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/>
+            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
+            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}"  Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
+            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
         </Grid>
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">

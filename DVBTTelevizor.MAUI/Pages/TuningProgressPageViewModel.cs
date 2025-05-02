@@ -48,7 +48,7 @@ namespace DVBTTelevizor.MAUI
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            Settings = new TuningSettings();
+            Settings = new TuningSettings(loggingService);
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;

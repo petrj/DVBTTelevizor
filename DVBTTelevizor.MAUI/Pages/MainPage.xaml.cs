@@ -443,6 +443,31 @@ namespace DVBTTelevizor.MAUI
                 {
                     await _semaphoreSlimForRefreshGUI.WaitAsync();
 
+                    if (IsPortrait)
+                    {
+                        DVBTTelevizorButton.BottomTitleText = "DVBT Televizor".Translated();
+                        DriverStateButton.BottomTitleText = "Driver".Translated();
+                        TuneButton.BottomTitleText = "Tune".Translated();
+                        MenuButton.BottomTitleText = "Menu".Translated();
+
+                        DVBTTelevizorButton.TopTitleText =
+                        DriverStateButton.TopTitleText =
+                        TuneButton.TopTitleText =
+                        MenuButton.TopTitleText = "";
+
+                    } else
+                    {
+                        DVBTTelevizorButton.TopTitleText = "DVBT Televizor".Translated();
+                        DriverStateButton.TopTitleText = "Driver".Translated();
+                        TuneButton.TopTitleText = "Tune".Translated();
+                        MenuButton.TopTitleText = "Menu".Translated();
+
+                        DVBTTelevizorButton.BottomTitleText =
+                        DriverStateButton.BottomTitleText =
+                        TuneButton.BottomTitleText =
+                        MenuButton.BottomTitleText = "";
+                    }
+
                     AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                     AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 

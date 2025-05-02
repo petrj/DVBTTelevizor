@@ -9,6 +9,8 @@ namespace DVBTTelevizor
 {
     public class TuningSettings
     {
+        ILoggingService _loggingService = null;
+
         public TuneModeEnum TuningMode { get; set; } = TuneModeEnum.Automatic;
 
         public bool DVBT { get; set; } = true;
@@ -34,9 +36,14 @@ namespace DVBTTelevizor
         public const long FrequencyMinKHz = 174000; // 174.0 MHz - VHF high-band (band III) channel 7
         public const long FrequencyMaxKHz = 858000; // 858.0 MHz - UHF band channel 69
 
-        public TuningSettings Clone()
+        public TuningSettings(ILoggingService loggingService)
         {
-            return new TuningSettings()
+            _loggingService = loggingService;
+        }
+
+        public TuningSettings Clone(ILoggingService loggingService)
+        {
+            return new TuningSettings(loggingService)
             {
                  DVBT = DVBT,
                  DVBT2 = DVBT2,
@@ -62,14 +69,31 @@ namespace DVBTTelevizor
             return device ? deviceValid && dvbtValid : dvbtValid;
         }
 
-        public async Task SetFrequencies(ITVConfiguration configuration, IDriverConnector driver, ILoggingService loggingService)
+        public void LoadFromConfiguration(ITVConfiguration configuration)
+        {
+            BandwidthKHz = configuration.DVBTBandwidthKHz;
+
+            FrequencyKHz = configuration.FrequencyKHz;
+            FrequencyFromKHz = configuration.FrequencyFromKHz;
+            FrequencyToKHz = configuration.FrequencyToKHz;
+        }
+
+
+        public void SaveToConfiguration(ITVConfiguration configuration)
+        {
+            configuration.FrequencyKHz = FrequencyKHz;
+            configuration.FrequencyFromKHz = FrequencyFromKHz;
+            configuration.FrequencyToKHz = FrequencyToKHz;
+            configuration.DVBTBandwidthKHz = BandwidthKHz;
+        }
+
+        public async Task SetFrequencies(IDriverConnector driver)
         {
             try
             {
-                loggingService.Info("SetFrequencies");
+                _loggingService.Info("SetFrequencies");
 
                 // bandwidth
-                BandwidthKHz = configuration.DVBTBandwidthKHz;
                 if (BandwidthKHz == default)
                 {
                     BandwidthKHz = TuningSettings.DefaultBandwidthKHz;
@@ -103,7 +127,7 @@ namespace DVBTTelevizor
                     }
                     catch (Exception ex)
                     {
-                        loggingService.Error(ex);
+                        _loggingService.Error(ex);
                     }
                 }
 
@@ -124,12 +148,6 @@ namespace DVBTTelevizor
                     DefaultFrequencyToKHz = DeviceFrequencyToKHz;
                 }
 
-                // load configuration values
-
-                FrequencyKHz = configuration.FrequencyKHz;
-                FrequencyFromKHz = configuration.FrequencyFromKHz;
-                FrequencyToKHz = configuration.FrequencyToKHz;
-
                 // fix
 
                 if (!ValidFrequency(FrequencyKHz, true))
@@ -146,17 +164,10 @@ namespace DVBTTelevizor
                 {
                     FrequencyToKHz = DefaultFrequencyToKHz;
                 }
-
-                // save to config
-
-                configuration.FrequencyKHz = FrequencyKHz;
-                configuration.FrequencyFromKHz = FrequencyFromKHz;
-                configuration.FrequencyToKHz= FrequencyToKHz;
-                configuration.DVBTBandwidthKHz = BandwidthKHz;
             }
             catch (Exception ex)
             {
-                loggingService.Error(ex);
+                _loggingService.Error(ex);
             }
             finally
             {

@@ -31,7 +31,7 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
         _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        _tuneSettings = new TuningSettings();
+        _tuneSettings = new TuningSettings(_loggingService);
 
         BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
@@ -202,7 +202,7 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
         if (_frequencyPage.Settings != null && Settings != null)
         {
-            var settings = Settings.Clone();
+            var settings = Settings.Clone(_loggingService);
             settings.FrequencyKHz = _editingFrom ? Settings.FrequencyFromKHz : Settings.FrequencyToKHz;
 
             _frequencyPage.TuneFrequencyMode = _editingFrom ? TuneFrequencyModeEnum.From : TuneFrequencyModeEnum.To;
