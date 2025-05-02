@@ -47,6 +47,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
+        Task.Run(async () =>
+        {
+            await _driverPageViewModel.CheckFrequencyRange();
+         });
+
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }

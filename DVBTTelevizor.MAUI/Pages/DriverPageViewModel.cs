@@ -12,6 +12,8 @@ namespace DVBTTelevizor.MAUI
 {
     public class DriverPageViewModel : BaseViewModel
     {
+        private string _range = string.Empty;
+
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
@@ -19,6 +21,29 @@ namespace DVBTTelevizor.MAUI
             {
                 NotifyChange();
             });
+        }
+
+        public async Task CheckFrequencyRange()
+        {
+            try
+            {
+                _range = string.Empty;
+
+                if (_driver == null || !_driver.Connected)
+                    return;
+
+                var cap = await _driver.GetCapabalities();
+
+                // setting min/max frequencies from device
+                if (cap.SuccessFlag)
+                {
+                    _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")}";
+                }
+            }
+            finally
+            {
+                NotifyChange();
+            }
         }
 
         public void NotifyChange()
@@ -31,6 +56,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
             OnPropertyChanged(nameof(DisconnectButtonVisible));
             OnPropertyChanged(nameof(ConnectButtonVisible));
+            OnPropertyChanged(nameof(ConnectedDeviceRange));
         }
 
         public string ConnectedDevice
@@ -84,6 +110,16 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return (_driver != null) && _driver.DriverInstalled && _driver.Connected;
+            }
+        }
+
+        public string ConnectedDeviceRange
+        {
+            get
+            {
+                return (_driver != null) && _driver.DriverInstalled && _driver.Connected
+                    ? _range
+                    : String.Empty;
             }
         }
 
