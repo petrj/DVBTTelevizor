@@ -19,22 +19,20 @@
 
                 <Image Grid.Row="0" Grid.Column="0" x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start" HeightRequest="30"  />
 
-                <Label x:Name="TopTitle" Grid.Row="0" Grid.Column="1" Text="{Binding Title, Source={x:Reference ImgBtn}}"
+                <Label x:Name="TopTitle" Grid.Row="0" Grid.Column="1" Text="{Binding TopTitleText, Source={x:Reference ImgBtn}}"
                         FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
                         FontAttributes="Bold"
                         HorizontalTextAlignment="Start"
                         VerticalOptions="Center"
                         TextColor="White"
-                        Margin="5,0,0,0"
-                        IsVisible="false"/>
+                        Margin="5,0,0,0"/>
 
-                <Label x:Name="BottomTitle" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Title, Source={x:Reference ImgBtn}}"
+                <Label x:Name="BottomTitle" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding BottomTitleText, Source={x:Reference ImgBtn}}"
                         FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
                         FontAttributes="Bold"
                         HorizontalTextAlignment="Start"
                         VerticalOptions="Center"
-                        TextColor="White"
-                        IsVisible="true"/>
+                        TextColor="White"/>
 
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />

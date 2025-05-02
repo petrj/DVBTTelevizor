@@ -1,17 +1,27 @@
 namespace DVBTTelevizor.MAUI;
 
 using Microsoft.Maui.Controls;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 public partial class ImgButton : ContentView
 {
-     public readonly BindableProperty TitleProperty =
+     public readonly BindableProperty BottomTitleTextProperty =
         BindableProperty.Create(
-            nameof(Title),
+            nameof(BottomTitleText),
             typeof(string),
             typeof(ImgButton),
             default(string),
             propertyChanged: OnAnyValueChanged);
+
+    public readonly BindableProperty TopTitleTextProperty =
+       BindableProperty.Create(
+           nameof(TopTitleText),
+           typeof(string),
+           typeof(ImgButton),
+           default(string),
+           propertyChanged: OnAnyValueChanged);
 
     public static readonly BindableProperty TapCommandProperty =
     BindableProperty.Create(
@@ -26,14 +36,6 @@ public partial class ImgButton : ContentView
         typeof(Color),
         typeof(ImgButton),
         default(Color),
-        propertyChanged: OnAnyValueChanged);
-
-    public static readonly BindableProperty LeftToRightProperty =
-    BindableProperty.Create(
-        nameof(LeftToRight),
-        typeof(bool),
-        typeof(ImgButton),
-        default(bool),
         propertyChanged: OnAnyValueChanged);
 
     public static readonly BindableProperty ImgProperty =
@@ -62,7 +64,6 @@ public partial class ImgButton : ContentView
 		InitializeComponent();
 
         ButtonColor = Colors.Gray;
-        LeftToRight = true;
     }
 
     public ICommand TapCommand
@@ -71,10 +72,16 @@ public partial class ImgButton : ContentView
         set => SetValue(TapCommandProperty, value);
     }
 
-    public string Title
+    public string TopTitleText
     {
-        get => (string)GetValue(TitleProperty);
-        set => SetValue(TitleProperty, value);
+        get => (string)GetValue(TopTitleTextProperty);
+        set => SetValue(TopTitleTextProperty, value);
+    }
+
+    public string BottomTitleText
+    {
+        get => (string)GetValue(BottomTitleTextProperty);
+        set => SetValue(BottomTitleTextProperty, value);
     }
 
     public int TextFontSize
@@ -87,18 +94,6 @@ public partial class ImgButton : ContentView
     {
         get => (ImageSource)GetValue(ImgProperty);
         set => SetValue(ImgProperty, value);
-    }
-
-    public bool LeftToRight
-    {
-        get => (bool)GetValue(LeftToRightProperty);
-        set
-        {
-            SetValue(LeftToRightProperty, value);
-
-            TopTitle.IsVisible = value;
-            BottomTitle.IsVisible = !value;
-        }
     }
 
     private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)

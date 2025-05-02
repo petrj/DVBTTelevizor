@@ -162,11 +162,16 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <AbsoluteLayout BackgroundColor="Black">
+    <AbsoluteLayout BackgroundColor="Black" Margin="0,0,0,0">
 
         <!--Label AbsoluteLayout.LayoutBounds="0.5,0.1,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/-->
-        <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.3,0.1" IsVisible="{Binding TuneChannelsButtonVisible}" Title="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" />
-        <local:ImgButton x:Name="InstallDriverButton"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.45,0.3,0.1" Title="{local:LngXamlExt Input='Install DVB-T Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandInstallDriver}" IsVisible="{Binding InstallDriverButtonVisible}"/>
+        <Frame IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.25,0.5,0.14" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
+            <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.4,0.1" TopTitleText="{local:LngXamlExt Input='Tune'}" Img="tune.png" TapCommand="{Binding CommandTune}" BackgroundColor="#222222"/>
+        </Frame>
+
+        <Frame IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.5,0.14" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
+            <local:ImgButton x:Name="InstallDriverButton"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.4,0.14" TopTitleText="{local:LngXamlExt Input='Install Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandInstallDriver}"/>
+        </Frame>
 
         <Grid
             x:Name="EPGDetailGrid"
@@ -274,24 +279,24 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.11" AbsoluteLayout.LayoutFlags="All"
               ColumnSpacing="5"
-              BackgroundColor="Black"
-              Margin="5,5,5,0">
+              BackgroundColor="#29242a"
+              Margin="0,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="100*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="34*" />
-                <ColumnDefinition Width="22*" />
-                <ColumnDefinition Width="22*" />
-                <ColumnDefinition Width="22*" />
+                <ColumnDefinition Width="52*" />
+                <ColumnDefinition Width="16*" />
+                <ColumnDefinition Width="16*" />
+                <ColumnDefinition Width="16*" />
             </Grid.ColumnDefinitions>
 
-            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" LeftToRight="True"/>
-            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}" LeftToRight="True" />
-            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}" LeftToRight="True"/>
-            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" LeftToRight="True"/>
+            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='DVBT Televizor'}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/>
+            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='Driver'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
+            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='Tune'}" Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
+            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" BottomTitleText="{local:LngXamlExt Input='Menu'}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
         </Grid>
 
         <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
@@ -320,26 +325,24 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#444444" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.65,0.75" CornerRadius="100">
+        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.65,0.75" CornerRadius="25" BackgroundColor="#444444">
             <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
-                <local:ImgButton x:Name="MenuButtonPlay"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Play'}" Img="play.png" TapCommand="{Binding CommandPlay}" />
-                <local:ImgButton x:Name="MenuButtonStop"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Stop'}" Img="stop.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonStopRecord" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Stop'}" Img="stoprecord.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonRecord"    AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.1,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Record'}" Img="record.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonShowEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.2,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Show EPG'}" Img="epg.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonHideEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.2,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Hide EPG'}" Img="epg.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonSubtitles" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.3,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Subtitles'}" Img="subtitles.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonTeletext"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.4,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Teletext'}" Img="teletext.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonAudio"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Audio'}" Img="audio.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonAspect"    AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.6,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Aspect ratio'}" Img="aspect.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonScanEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.7,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Scan EPG'}" Img="zoom.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonSettings"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.8,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Settings'}" Img="settings.png" TapCommand="{Binding CommandSettings}" />
-                <local:ImgButton x:Name="MenuButtonQuit"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.9,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Quit'}" Img="quit.png" TapCommand="{Binding CommandQuit}" />
-                <local:ImgButton x:Name="MenuButtonClose"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,1.0,0.35,0.07" TextFontSize="{Binding FontSizeForLabel}" Title="{local:LngXamlExt Input='Close'}" Img="icon.png" TapCommand="{Binding CommandCloseMenu}" />
+                <local:ImgButton x:Name="MenuButtonPlay"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Play'}" Img="play.png" TapCommand="{Binding CommandPlay}" />
+                <local:ImgButton x:Name="MenuButtonStop"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Stop'}" Img="stop.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonStopRecord" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Stop'}" Img="stoprecord.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonRecord"    AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.1,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Record'}" Img="record.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonShowEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.2,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Show EPG'}" Img="epg.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonHideEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.2,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Hide EPG'}" Img="epg.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonSubtitles" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.3,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Subtitles'}" Img="subtitles.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonTeletext"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.4,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Teletext'}" Img="teletext.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonAudio"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Audio'}" Img="audio.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonAspect"    AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.6,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Aspect ratio'}" Img="aspect.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonScanEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.7,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Scan EPG'}" Img="zoom.png" TapCommand="{Binding CommandTune}" />
+                <local:ImgButton x:Name="MenuButtonSettings"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.8,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Settings'}" Img="settings.png" TapCommand="{Binding CommandSettings}" />
+                <local:ImgButton x:Name="MenuButtonQuit"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.9,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Quit'}" Img="quit.png" TapCommand="{Binding CommandQuit}" />
+                <local:ImgButton x:Name="MenuButtonClose"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,1.0,0.35,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Close'}" Img="icon.png" TapCommand="{Binding CommandCloseMenu}" />
             </AbsoluteLayout>
         </Frame>
-
-
 
     </AbsoluteLayout>
 
