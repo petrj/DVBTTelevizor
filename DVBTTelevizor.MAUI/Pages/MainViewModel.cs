@@ -298,15 +298,14 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return true;
+                //return true;
                 // TODO: remove after debugged!
 
-                /*
                 return
                     EPGDetailEnabled &&
                     SelectedChannel != null &&
                     SelectedChannel.CurrentEventItem != null;
-                */
+
             }
         }
 

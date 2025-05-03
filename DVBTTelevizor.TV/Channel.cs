@@ -65,6 +65,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public string ProviderNameAndFrequencyShortLabel
+        {
+            get
+            {
+                return $"{ProviderName} - {FrequencyShortLabel}";
+            }
+        }
+
         public string FrequencyShortLabel
         {
             get
@@ -284,6 +292,7 @@ namespace DVBTTelevizor
             OnPropertyChanged(nameof(NextEPGEventTitle));
             OnPropertyChanged(nameof(CurrentEPGEventTime));
             OnPropertyChanged(nameof(CurrentEPGEventProgress));
+            OnPropertyChanged(nameof(ProviderNameAndFrequencyShortLabel));
         }
 
         public string Icon
