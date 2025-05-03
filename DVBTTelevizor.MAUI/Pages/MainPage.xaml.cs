@@ -527,17 +527,11 @@ namespace DVBTTelevizor.MAUI
                             break;
                         case PlayingStateEnum.PlayingInPreview:
 
-                            if (!NavigationPage.GetHasNavigationBar(this))
-                            {
-                                NavigationPage.SetHasNavigationBar(this, true);
-                            }
+                            NavigationPage.SetHasNavigationBar(this, false);
 
-                            //ChannelsListView.IsVisible = true;
+                            ChannelsListView.IsVisible = true;
 
-                            //if (!_config.Fullscreen)
-                            //{
-                            //    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
-                            //}
+                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage("Connect"));
 
                             if (IsPortrait)
                             {
@@ -577,17 +571,11 @@ namespace DVBTTelevizor.MAUI
                             break;
                         case PlayingStateEnum.Stopped:
 
-                            //if (!NavigationPage.GetHasNavigationBar(this))
-                            //{
-                            //    NavigationPage.SetHasNavigationBar(this, true);
-                            //}
+                            NavigationPage.SetHasNavigationBar(this, false);
 
-                            //ChannelsListView.IsVisible = true;
+                            ChannelsListView.IsVisible = true;
 
-                            //if (!_config.Fullscreen)
-                            //{
-                            //    MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_DisableFullScreen);
-                            //}
+                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(""));
 
                             VideoStackLayout.IsVisible = false;
                             NoVideoStackLayout.IsVisible = false;
@@ -617,8 +605,7 @@ namespace DVBTTelevizor.MAUI
                                 }
                             }
 
-                            //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
-                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(1, 1, 0.3, 0.3));
+                            AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
 
                             break;
                     }
@@ -665,6 +652,8 @@ namespace DVBTTelevizor.MAUI
 
             if (_firstAppearing)
             {
+                WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(""));
+
                 _firstAppearing = false;
 
                 InitializeVLC();
