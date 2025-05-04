@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Alsa.Net"/>
+    <PackageReference Include="LibVLCSharp"/>
+    <PackageReference Include="NAudio"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RTLSDR.Common\RTLSDR.Common.csproj" />
+  </ItemGroup>
+</Project>

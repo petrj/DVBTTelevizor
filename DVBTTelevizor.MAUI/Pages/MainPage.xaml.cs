@@ -4,7 +4,7 @@ using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui.Layouts;
 using System.Windows.Input;
-
+using DVBTTelevizor.TV;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -251,6 +251,9 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case DVBTDriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
+                    break;
+                case DVBTDriverTypeEnum.RTLSDRFMDriver:
+                    _driver = new RTLSDRTCPIPFMDriverConnector(_loggingService);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
@@ -709,6 +712,14 @@ namespace DVBTTelevizor.MAUI
                         }));
 
                     break;
+
+                case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(new RTLSDR.DriverSettings()
+                    {
+                         SDRSampleRate = 1056000,
+                         Streamport = 1234
+                    }));
+                    break;
             }
         }
 
@@ -785,11 +796,6 @@ namespace DVBTTelevizor.MAUI
         private void SwipeGestureRecognizer_Swiped_4(object sender, SwipedEventArgs e)
         {
 
-        }
-
-        private void ConnectButton_Clicked(object sender, EventArgs e)
-        {
-            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
         }
 
         public async Task ActionStop(bool force)

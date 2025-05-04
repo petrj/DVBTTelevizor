@@ -10,6 +10,8 @@ namespace DVBTTelevizor.MAUI
     {
          AndroidDVBTDriver = 0,
          AndroidTestingDVBTDriver = 1,
-         TestTuneDriver = 2
+         TestTuneDriver = 2,
+         RTLSDRTCPIPFMDriver = 3,
+         RTLSDRFMDriver = 4
     }
 }
