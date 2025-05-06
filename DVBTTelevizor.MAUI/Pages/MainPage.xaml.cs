@@ -252,7 +252,7 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
-                case DVBTDriverTypeEnum.RTLSDRFMDriver:
+                case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
                     _driver = new RTLSDRTCPIPFMDriverConnector(_loggingService);
                     break;
                 default:

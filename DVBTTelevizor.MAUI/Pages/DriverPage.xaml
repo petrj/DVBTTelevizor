@@ -89,7 +89,7 @@
 
         </Grid>
 
-        <Button x:Name="InstallDriverButton" AbsoluteLayout.LayoutBounds="0.5,0.55,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Install'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
+        <Button x:Name="InstallDriverButton" AbsoluteLayout.LayoutBounds="0.5,0.55,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Install DVBT driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.9,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
             <Grid.RowDefinitions>
