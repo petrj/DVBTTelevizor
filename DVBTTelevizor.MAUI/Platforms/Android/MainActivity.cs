@@ -157,7 +157,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (obj.Value is DriverSettings settings)
                 {
-                    InitRTLSDRDriver(settings.Port, settings.SDRSampleRate);
+                     InitRTLSDRDriver(settings.Port, settings.SDRSampleRate);
                     //_streamPort = settings.Streamport;
                 }
             });
@@ -434,6 +434,7 @@ MainThread.BeginInvokeOnMainThread(() =>
 
                 var req = new Intent(Intent.ActionView);
                 req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
+
                 req.PutExtra(Intent.ExtraReturnResult, true);
 
                 StartActivityForResult(req, StartRequestCodeRTLSDR);
@@ -625,9 +626,11 @@ MainThread.BeginInvokeOnMainThread(() =>
                 }
                 else
                 {
-                    _loggingService.Info($"Driver Init failed: {(data == null ? "no description" : data.GetStringExtra("detailed_exception_message"))}");
+                    var errorMsg = (data == null ? "no description" : data.GetStringExtra("detailed_exception_message"));
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(""));/*(""));DVBTDriverConfiguration()
+                    _loggingService.Info($"Driver Init failed: {errorMsg}");
+
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorMsg));/*(""));DVBTDriverConfiguration()
                     {
                         ErrorId = data == null ? -1 : data.GetIntExtra("marto.rtl_tcp_andro.RtlTcpExceptionId", -1),
                         ExceptionCode = data == null ? 0 : data.GetIntExtra("detailed_exception_code", 0),

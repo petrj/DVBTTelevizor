@@ -533,5 +533,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<long>("FrequencyKHz", value);
             }
         }
+
+        public int RTLSDRDriverStreamPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("RTLSDRDriverStreamPort", 5658);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("RTLSDRDriverStreamPort", value);
+            }
+        }
     }
 }

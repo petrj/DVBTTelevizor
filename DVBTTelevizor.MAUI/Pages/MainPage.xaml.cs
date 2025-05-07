@@ -716,8 +716,8 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(new RTLSDR.DriverSettings()
                     {
-                         SDRSampleRate = 1056000,
-                         Streamport = 1234
+                         SDRSampleRate = 1000000,
+                         Streamport = _configuration.RTLSDRDriverStreamPort
                     }));
                     break;
             }

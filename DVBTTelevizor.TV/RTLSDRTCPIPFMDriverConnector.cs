@@ -13,7 +13,7 @@ namespace DVBTTelevizor.TV
     public class RTLSDRTCPIPFMDriverConnector : IDriverConnector
     {
         private ILoggingService _log;
-        private RTLSDRDriver _driver = null;
+        private ISDR _driver = null;
 
         public RTLSDRTCPIPFMDriverConnector(ILoggingService loggingService)
         {
@@ -172,31 +172,81 @@ namespace DVBTTelevizor.TV
 
         public void Connect()
         {
+            _driver.SetFrequency(104 * 1000); // must be set before init due to Test driver
+            _driver.Init(new DriverInitializationResult());
+            _driver.Installed = true;
         }
 
         public Task Disconnect()
         {
-            return Task.Run(() => { return; });
+            return Task.Run(() =>
+            {
+                _driver.Disconnect();
+            });
         }
 
         public Task<bool> DriverSendingData(int readMsTimeout = 500)
         {
-            return Task.Run(() => { return false; });
+            return Task.Run(() => { return _driver.RTLBitrate > 0; });
         }
 
         public Task<DVBTDriverCapabilities> GetCapabalities()
         {
-            return Task.Run(() => { return new DVBTDriverCapabilities(); });
+            return Task.Run(() =>
+            {
+                return new DVBTDriverCapabilities()
+                {
+                    supportedDeliverySystems = 0,
+                    minFrequency = 88000,
+                    maxFrequency = 108000,
+                    frequencyStepSize = 1000
+                };
+            });
         }
 
         public Task<DVBTDriverStatus> GetStatus()
         {
-            return Task.Run(() => { return new DVBTDriverStatus(); });
+            return Task.Run(() =>
+            {
+                var state = new DVBTDriverStatus()
+                {
+                    SuccessFlag = true
+                };
+
+                switch (_driver.State)
+                {
+                    case DriverStateEnum.DisConnected:
+                    case DriverStateEnum.NotInitialized:
+                    case DriverStateEnum.Error:
+                        state.hasCarrier = 0;
+                        state.hasSync = 0;
+                        state.hasSignal = 0;
+                        state.hasLock = 0;
+                        state.rfStrengthPercentage = 0;
+                    break;
+                    case DriverStateEnum.Connected:
+                        state.hasSignal = 1;
+                        state.hasCarrier = 0;
+                        state.hasSync = 0;
+                        state.hasLock = 0;
+                        state.rfStrengthPercentage = 0;
+                        break;
+                }
+
+                return state;
+            });
         }
 
         public Task<DVBTDriverVersion> GetVersion()
         {
-            return Task.Run(() => { return new DVBTDriverVersion(); });
+            return Task.Run(() =>
+            {
+                return new DVBTDriverVersion()
+                {
+                    SuccessFlag = true,
+                    Version = 1
+                };
+            });
         }
 
         public Task<EITScanResult> ScanEPG(int msTimeout = 2000)
@@ -253,7 +303,13 @@ namespace DVBTTelevizor.TV
 
         public Task<DVBTDriverResponse> Tune(long frequency, long bandwidth, int deliverySystem)
         {
-            return Task.Run(() => { return new DVBTDriverResponse(); });
+            return Task.Run(() =>
+            {
+                return new DVBTDriverResponse()
+                {
+                    SuccessFlag = true
+                };
+            });
         }
 
         public Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)

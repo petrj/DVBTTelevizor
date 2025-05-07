@@ -339,6 +339,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public int RTLSDRDriverStreamPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("RTLSDRDriverStreamPort", 5658);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("RTLSDRDriverStreamPort", value);
+            }
+        }
+
         public ObservableCollection<Channel> GetChannels()
         {
             try
@@ -387,7 +399,5 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
-
-
     }
 }
