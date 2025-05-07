@@ -714,11 +714,14 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
-                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(new RTLSDR.DriverSettings()
+
+                    var cfg = new RTLSDR.DriverSettings()
                     {
-                         SDRSampleRate = 1000000,
-                         Streamport = _configuration.RTLSDRDriverStreamPort
-                    }));
+                        Port = _configuration.SDRDriverPort,
+                        Streamport = _configuration.SDRDriverStreamPort
+                    };
+
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(cfg));
                     break;
             }
         }

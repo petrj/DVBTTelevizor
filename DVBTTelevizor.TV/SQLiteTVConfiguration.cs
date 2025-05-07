@@ -534,15 +534,28 @@ namespace DVBTTelevizor
             }
         }
 
-        public int RTLSDRDriverStreamPort
+        public int SDRDriverStreamPort
         {
             get
             {
-                return GetPersistingSettingValue<int>("RTLSDRDriverStreamPort", 5658);
+                return GetPersistingSettingValue<int>("SDRDriverStreamPort", 5658);
             }
             set
             {
-                SavePersistingSettingValue<int>("RTLSDRDriverStreamPort", value);
+                SavePersistingSettingValue<int>("SDRDriverStreamPort", value);
+            }
+        }
+
+
+        public int SDRDriverPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRDriverPort", 5659);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRDriverPort", value);
             }
         }
     }
