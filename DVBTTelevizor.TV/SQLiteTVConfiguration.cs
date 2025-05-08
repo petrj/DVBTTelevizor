@@ -538,7 +538,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetPersistingSettingValue<int>("SDRDriverStreamPort", 5658);
+                return GetPersistingSettingValue<int>("SDRDriverStreamPort", 5659);
             }
             set
             {
@@ -551,7 +551,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetPersistingSettingValue<int>("SDRDriverPort", 5659);
+                return GetPersistingSettingValue<int>("SDRDriverPort", 5658);
             }
             set
             {

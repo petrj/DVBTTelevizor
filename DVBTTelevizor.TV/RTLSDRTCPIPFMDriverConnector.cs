@@ -25,6 +25,12 @@ namespace DVBTTelevizor.TV
             _driverConfiguration = new DVBTDriverConfiguration();
 
             _driver = new RTLSDRDriver(_log);
+            _driver.OnDataReceived += _driver_OnDataReceived;
+        }
+
+        private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
+        {
+
         }
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
@@ -156,7 +162,7 @@ namespace DVBTTelevizor.TV
 
         public long Bitrate { get; set; }
 
-        public long LastTunedFreq { get; set; }
+        public long LastTunedFreq { get; set; } = 104000000;
 
         public event EventHandler StatusChanged;
 
@@ -172,9 +178,22 @@ namespace DVBTTelevizor.TV
 
         public void Connect()
         {
-            _driver.SetFrequency(104 * 1000); // must be set before init due to Test driver
-            _driver.Init(new DriverInitializationResult());
-            _driver.Installed = true;
+            _log.Info($"RTL SDR driver: Connecting");
+
+            try
+            {
+                _driver.Settings.Streamport = _driverConfiguration.TransferPort;
+                _driver.Settings.Port = _driverConfiguration.ControlPort;
+
+                _driver.SetFrequency(Convert.ToInt32(LastTunedFreq)); // must be set before init due to Test driver
+                _driver.Init(new DriverInitializationResult());
+                _driver.Installed = true;
+                State = DVBTDriverStateEnum.Connected;
+            }
+            catch (Exception ex)
+            {
+                State = DVBTDriverStateEnum.Disconnected;
+            }
         }
 
         public Task Disconnect()
@@ -303,11 +322,28 @@ namespace DVBTTelevizor.TV
 
         public Task<DVBTDriverResponse> Tune(long frequency, long bandwidth, int deliverySystem)
         {
+            _log.Info($"RTL SDR driver: Tuning {frequency}");
+
             return Task.Run(() =>
             {
+                var successFlag = false;
+
+                try
+                {
+                    if (_driver.State == DriverStateEnum.Connected)
+                    {
+                        _driver.SetFrequency(Convert.ToInt32(frequency));
+                        successFlag = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex);
+                }
+
                 return new DVBTDriverResponse()
                 {
-                    SuccessFlag = true
+                    SuccessFlag = successFlag
                 };
             });
         }

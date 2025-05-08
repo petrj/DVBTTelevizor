@@ -33,6 +33,9 @@ namespace DVBTTelevizor.MAUI
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
         private NotificationHelper _notificationHelper;
 
+        private int _SDRDriverStreamPort = 0;
+        private int _SDRDriverPort = 0;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             Assembly assembly = typeof(App).GetTypeInfo().Assembly;
@@ -157,7 +160,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (obj.Value is DriverSettings settings)
                 {
-                     InitRTLSDRDriver(settings.Port, settings.SDRSampleRate);
+                     InitRTLSDRDriver(settings.Port, settings.Streamport, settings.SDRSampleRate);
                     //_streamPort = settings.Streamport;
                 }
             });
@@ -426,16 +429,19 @@ MainThread.BeginInvokeOnMainThread(() =>
             });
         }
 
-        private void InitRTLSDRDriver(int port = 1234, int samplerate = 2048000)
+        private void InitRTLSDRDriver(int port, int streamPort, int samplerate = 2048000)
         {
             try
             {
                 _loggingService.Info($"Initializing RTLSDR driver: port:{port}, sampleRate: {samplerate}");
 
                 var req = new Intent(Intent.ActionView);
-                req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
+                //req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
+                req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"5658\" -s \"2048000\""));
 
                 req.PutExtra(Intent.ExtraReturnResult, true);
+                _SDRDriverStreamPort = streamPort;
+                _SDRDriverPort = port;
 
                 StartActivityForResult(req, StartRequestCodeRTLSDR);
             }
@@ -615,11 +621,16 @@ MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (resultCode == Result.Ok)
                 {
+                    var x = data.GetIntExtra("SDRDriverPort", 1234);
+                    var y = data.GetIntExtra("SDRDriverStreamPort", 1235);
+
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
                     {
                         //SupportedTcpCommands = data.GetIntArrayExtra("supportedTcpCommands"),
                         DeviceName = data.GetStringExtra("deviceName"),
-                        //OutputRecordingDirectory = AndroidAppDirectory
+                        ControlPort = _SDRDriverPort,
+                        TransferPort = _SDRDriverStreamPort,
+                        PublicDirectory = GetAndroidDirectory(null)
                     }));
 
                     //+RestartAudio();

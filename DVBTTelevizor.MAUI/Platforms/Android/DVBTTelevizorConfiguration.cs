@@ -339,27 +339,27 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public int SDRDriverStreamPort
-        {
-            get
-            {
-                return GetPersistingSettingValue<int>("SDRDriverStreamPort", 5658);
-            }
-            set
-            {
-                SavePersistingSettingValue<int>("SDRDriverStreamPort", value);
-            }
-        }
-
         public int SDRDriverPort
         {
             get
             {
-                return GetPersistingSettingValue<int>("SDRDriverPort", 5659);
+                return GetPersistingSettingValue<int>("SDRDriverPort", 5658);
             }
             set
             {
                 SavePersistingSettingValue<int>("SDRDriverPort", value);
+            }
+        }
+
+        public int SDRDriverStreamPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRDriverStreamPort", 5659);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRDriverStreamPort", value);
             }
         }
 
