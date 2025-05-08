@@ -2,6 +2,7 @@
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
+using RTLSDR.FM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace DVBTTelevizor.TV
     {
         private ILoggingService _log;
         private ISDR _driver = null;
+        private IDemodulator _demodulator = null;
 
         public RTLSDRTCPIPFMDriverConnector(ILoggingService loggingService)
         {
@@ -26,11 +28,22 @@ namespace DVBTTelevizor.TV
 
             _driver = new RTLSDRDriver(_log);
             _driver.OnDataReceived += _driver_OnDataReceived;
+
+            _demodulator = new FMDemodulator(_log);
+            _demodulator.OnDemodulated += _demodulator_OnDemodulated;
+        }
+
+        private void _demodulator_OnDemodulated(object? sender, EventArgs e)
+        {
+
         }
 
         private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
         {
-
+            if (_demodulator != null)
+            {
+                _demodulator.AddSamples(e.Data, e.Size);
+            }
         }
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
@@ -163,7 +176,16 @@ namespace DVBTTelevizor.TV
 
         public string DataStreamInfo { get; set; }
 
-        public long Bitrate { get; set; }
+        public long Bitrate
+        {
+            get
+            {
+                if (!Connected)
+                    return 0;
+
+                return _driver.RTLBitrate;
+            }
+        }
 
         public long LastTunedFreq { get; set; } = 104000000;
 
