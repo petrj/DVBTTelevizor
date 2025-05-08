@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.Hardware.Usb;
+using Android.Media;
 using Android.OS;
 using Android.Util;
 using Android.Views;
@@ -15,6 +16,9 @@ using LoggerService;
 using Microsoft.Maui.Controls.Compatibility;
 using NLog;
 using RTLSDR;
+using System.ComponentModel;
+using System.Net.Sockets;
+using System.Net;
 using System.Reflection;
 using Environment = System.Environment;
 
@@ -25,6 +29,9 @@ namespace DVBTTelevizor.MAUI
     {
         private const int StartRequestCode = 1000;
         private const int StartRequestCodeRTLSDR = 1001;
+        private int _audioSampleRate = 96000;
+        private int _audioChannels = 1;
+
         private bool _waitingForInit = false;
         private static Android.Widget.Toast _instance;
         private ILoggingService _loggingService = null;
@@ -35,6 +42,7 @@ namespace DVBTTelevizor.MAUI
 
         private int _SDRDriverStreamPort = 0;
         private int _SDRDriverPort = 0;
+        private BackgroundWorker _audioReceiver;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {

@@ -195,7 +195,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
             {
                 // Create Media from TCP stream
-                var media = new Media(_LibVLC, $"tcp://localhost:{_driver.Configuration.TransferPort}", FromType.FromLocation);
+                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
                 media.AddOption(":demux=rawaud");
                 media.AddOption(":rawaud-channels=1");
                 media.AddOption(":rawaud-samplerate=96000");

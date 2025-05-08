@@ -151,7 +151,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return $"udp://@localhost:{(_driver == null ? "1234" : _driver.Settings.Streamport)}";
+                return $"udp://@localhost:{(_driver == null ? "1234" : "8012")}";
             }
         }
 
@@ -232,7 +232,7 @@ namespace DVBTTelevizor.TV
                 DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
 
-                _UDPStreamer = new UDPStreamer(_log, "127.0.0.1", _driver.Settings.Streamport);
+                _UDPStreamer = new UDPStreamer(_log, "127.0.0.1", 8012);
             }
             catch (Exception ex)
             {
