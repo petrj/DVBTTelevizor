@@ -363,6 +363,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public int SDRSampleRate
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRSampleRate", 1024000);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRSampleRate", value);
+            }
+        }
+
         public ObservableCollection<Channel> GetChannels()
         {
             try

@@ -436,8 +436,8 @@ MainThread.BeginInvokeOnMainThread(() =>
                 _loggingService.Info($"Initializing RTLSDR driver: port:{port}, sampleRate: {samplerate}");
 
                 var req = new Intent(Intent.ActionView);
-                //req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
-                req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"5658\" -s \"2048000\""));
+                req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
+                //req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"5658\" -s \"2048000\""));
 
                 req.PutExtra(Intent.ExtraReturnResult, true);
                 _SDRDriverStreamPort = streamPort;

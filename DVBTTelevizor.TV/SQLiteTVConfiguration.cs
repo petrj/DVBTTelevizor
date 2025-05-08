@@ -558,5 +558,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<int>("SDRDriverPort", value);
             }
         }
+
+        public int SDRSampleRate
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRSampleRate", 1024000);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRSampleRate", value);
+            }
+        }
     }
 }

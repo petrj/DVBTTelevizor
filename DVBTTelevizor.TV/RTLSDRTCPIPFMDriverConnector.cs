@@ -94,7 +94,10 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return false;
+                return
+                        _driverInstalled &&
+                        _driver != null &&
+                        _driver.State == DriverStateEnum.Connected;
             }
         }
 
@@ -173,7 +176,17 @@ namespace DVBTTelevizor.TV
 
         public Task<bool> CheckStatus()
         {
-            return Task.Run(() => { return false; });
+            return Task.Run(() =>
+            {
+                if (!_driverInstalled ||
+                   _driver == null ||
+                    _driver.State != DriverStateEnum.Connected)
+                {
+                    return false;
+                }
+
+                return _driver.State == DriverStateEnum.Connected;
+            });
         }
 
         public void Connect()
@@ -188,6 +201,8 @@ namespace DVBTTelevizor.TV
                 _driver.SetFrequency(Convert.ToInt32(LastTunedFreq)); // must be set before init due to Test driver
                 _driver.Init(new DriverInitializationResult());
                 _driver.Installed = true;
+
+                DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
             }
             catch (Exception ex)
@@ -201,12 +216,13 @@ namespace DVBTTelevizor.TV
             return Task.Run(() =>
             {
                 _driver.Disconnect();
+                State = DVBTDriverStateEnum.Disconnected;
             });
         }
 
         public Task<bool> DriverSendingData(int readMsTimeout = 500)
         {
-            return Task.Run(() => { return _driver.RTLBitrate > 0; });
+            return Task.Run(() => { return Connected && _driver.RTLBitrate > 0; });
         }
 
         public Task<DVBTDriverCapabilities> GetCapabalities()

@@ -719,7 +719,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         Port = _configuration.SDRDriverPort,
                         Streamport = _configuration.SDRDriverStreamPort,
-                        SDRSampleRate = 1000000
+                        SDRSampleRate = _configuration.SDRSampleRate
                     };
 
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(cfg));

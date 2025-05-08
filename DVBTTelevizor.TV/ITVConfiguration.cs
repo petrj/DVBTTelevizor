@@ -48,5 +48,6 @@ namespace DVBTTelevizor
 
         public int SDRDriverStreamPort { get; set; }
         public int SDRDriverPort { get; set; }
+        public int SDRSampleRate { get; set; }
     }
 }
