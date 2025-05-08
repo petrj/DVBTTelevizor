@@ -192,6 +192,19 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
+            {
+                // Create Media from TCP stream
+                var media = new Media(_LibVLC, $"tcp://localhost:{_driver.Configuration.TransferPort}", FromType.FromLocation);
+                media.AddOption(":demux=rawaud");
+                media.AddOption(":rawaud-channels=1");
+                media.AddOption(":rawaud-samplerate=96000");
+                media.AddOption(":rawaud-fourcc=s16l");
+
+                _mediaPlayer.Play(media);
+            });
+
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>

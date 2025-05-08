@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
 using Newtonsoft.Json;
@@ -397,6 +398,11 @@ namespace DVBTTelevizor.MAUI
             _driver.Configuration = config;
             _driver.PublicDirectory = _publicDirectory;
             _driver.Connect();
+
+            if (_driver is RTLSDRTCPIPFMDriverConnector)
+            {
+                WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(String.Empty));
+            }
 
             UpdateDriverState();
         }

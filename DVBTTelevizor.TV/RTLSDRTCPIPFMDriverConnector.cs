@@ -17,6 +17,8 @@ namespace DVBTTelevizor.TV
         private ISDR _driver = null;
         private IDemodulator _demodulator = null;
 
+        UDPStreamer _UDPStreamer = null;
+
         public RTLSDRTCPIPFMDriverConnector(ILoggingService loggingService)
         {
             _log = loggingService;
@@ -35,7 +37,10 @@ namespace DVBTTelevizor.TV
 
         private void _demodulator_OnDemodulated(object? sender, EventArgs e)
         {
-
+            if (e is DataDemodulatedEventArgs de)
+            {
+                _UDPStreamer.SendByteArray(de.Data, de.Data.Length);
+            }
         }
 
         private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
@@ -146,7 +151,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return "udp://@localhost:1234";
+                return $"udp://@localhost:{(_driver == null ? "1234" : _driver.Settings.Streamport)}";
             }
         }
 
@@ -226,6 +231,8 @@ namespace DVBTTelevizor.TV
 
                 DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
+
+                _UDPStreamer = new UDPStreamer(_log, "127.0.0.1", _driver.Settings.Streamport);
             }
             catch (Exception ex)
             {
