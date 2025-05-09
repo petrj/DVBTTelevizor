@@ -736,6 +736,9 @@ namespace DVBTTelevizor.MAUI
                     };
 
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(cfg));
+
+                    WeakReferenceMessenger.Default.Send(new NotifyAudioChangeMessage(""));  // starting audio reciever in MainActivity
+
                     break;
             }
         }

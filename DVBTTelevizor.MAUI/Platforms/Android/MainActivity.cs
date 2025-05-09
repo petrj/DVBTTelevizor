@@ -21,6 +21,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Reflection;
 using Environment = System.Environment;
+using RTLSDR.Common;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -31,6 +32,10 @@ namespace DVBTTelevizor.MAUI
         private const int StartRequestCodeRTLSDR = 1001;
         private int _audioSampleRate = 96000;
         private int _audioChannels = 1;
+        private bool _startAudioReceiverThread = false;
+        private int _SDRDriverStreamPort = 0;
+        private int _SDRDriverPort = 0;
+        private int _audioRecieverPort = 8012;
 
         private bool _waitingForInit = false;
         private static Android.Widget.Toast _instance;
@@ -40,8 +45,6 @@ namespace DVBTTelevizor.MAUI
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
         private NotificationHelper _notificationHelper;
 
-        private int _SDRDriverStreamPort = 0;
-        private int _SDRDriverPort = 0;
         private BackgroundWorker _audioReceiver;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -78,8 +81,78 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, "Error while initializing UsbManager");
             }
 
+            _audioReceiver = new BackgroundWorker();
+            _audioReceiver.WorkerSupportsCancellation = true;
+            _audioReceiver.DoWork += _audioReceiver_DoWork;
+            _audioReceiver.RunWorkerCompleted += _audioReceiver_RunWorkerCompleted;
+
             base.OnCreate(savedInstanceState);
         }
+
+        private void RestartAudio()
+        {
+            _loggingService.Info("RestartAudio");
+
+            if (_audioReceiver.IsBusy)
+            {
+                _loggingService.Info("Stopping _audioReceiver");
+
+                _startAudioReceiverThread = true;
+                _audioReceiver.CancelAsync();
+            }
+            else
+            {
+                _audioReceiver.RunWorkerAsync();
+            }
+        }
+
+        private void _audioReceiver_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (_startAudioReceiverThread)
+            {
+                _audioReceiver.RunWorkerAsync();
+                _startAudioReceiverThread = false;
+            }
+        }
+
+        private void _audioReceiver_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _loggingService.Info("Starting _audioReceiver");
+
+            var bufferSize = AudioTrack.GetMinBufferSize(_audioSampleRate, _audioChannels == 1 ? ChannelOut.Mono : ChannelOut.Stereo, Encoding.Pcm16bit);
+            var _audioTrack = new AudioTrack(Android.Media.Stream.Music, _audioSampleRate, _audioChannels == 1 ? ChannelOut.Mono : ChannelOut.Stereo, Encoding.Pcm16bit, bufferSize, AudioTrackMode.Stream);
+
+            _audioTrack.Play();
+
+            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), _audioRecieverPort);
+            using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                client.Bind(remoteEP);
+
+                var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
+
+                while (!_audioReceiver.CancellationPending)
+                {
+                    if (client.Available > 0)
+                    {
+                        var bytesRead = client.Receive(packetBuffer);
+
+                        _audioTrack.Write(packetBuffer, 0, bytesRead);
+                    }
+                    else
+                    {
+                        Thread.Sleep(25);
+                    }
+                }
+
+                client.Close();
+            }
+
+            _audioTrack.Stop();
+
+            _loggingService.Info("_audioReceiver finished");
+        }
+
 
         private async void UsbAttachedOrDetached(object sender, EventArgs e)
         {
@@ -157,6 +230,17 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
             {
                 ShowToastMessage(m.Value);
+            });
+
+
+            WeakReferenceMessenger.Default.Register<NotifyAudioChangeMessage>(this, (sender, obj) =>
+            {
+                //if (obj.Value is AudioDataDescription desc)
+                //{
+                //    _audioSampleRate = desc.SampleRate;
+                //    _audioChannels = desc.Channels;
+                    RestartAudio();
+                //}
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
