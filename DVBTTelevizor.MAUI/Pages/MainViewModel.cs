@@ -401,7 +401,7 @@ namespace DVBTTelevizor.MAUI
 
             if (_driver is RTLSDRTCPIPFMDriverConnector)
             {
-                WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(String.Empty));
+                //WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(String.Empty));
             }
 
             UpdateDriverState();
