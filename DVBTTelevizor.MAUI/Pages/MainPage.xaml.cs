@@ -5,6 +5,7 @@ using LoggerService;
 using Microsoft.Maui.Layouts;
 using System.Windows.Input;
 using DVBTTelevizor.TV;
+using RTLSDR.Common;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -679,6 +680,42 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
+
+                    // load WAVE
+
+                    var bufferSize = 8096; //1024 * 1024;
+                    var IQDataBuffer = new byte[bufferSize];
+                    var lastBufferFillNotify = DateTime.MinValue;
+
+                    var streamer = new UDPStreamer(_loggingService, "127.0.0.1", 8012);
+
+                    var fileName = "/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor.MAUI/rec.wav";
+                    using (var inputFs = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                    {
+                        _loggingService.Info($"Total bytes : {inputFs.Length}");
+                        long totalBytesRead = 0;
+
+                        while (inputFs.Position < inputFs.Length)
+                        {
+                            var bytesRead = inputFs.Read(IQDataBuffer, 0, bufferSize);
+                            totalBytesRead += bytesRead;
+
+                            if ((DateTime.Now - lastBufferFillNotify).TotalMilliseconds > 1000)
+                            {
+                                lastBufferFillNotify = DateTime.Now;
+                                if (inputFs.Length > 0)
+                                {
+                                    var percents = totalBytesRead / (inputFs.Length / 100);
+                                    _loggingService.Debug($" Processing input file:                   {percents} %");
+                                }
+                            }
+
+                            streamer.SendByteArray(IQDataBuffer, bytesRead);
+
+                            System.Threading.Thread.Sleep(30);
+                        }
+                    }
+
                 });
 
 
