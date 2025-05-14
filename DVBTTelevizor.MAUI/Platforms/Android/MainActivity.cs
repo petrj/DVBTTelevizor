@@ -86,8 +86,6 @@ namespace DVBTTelevizor.MAUI
             _audioReceiver.DoWork += _audioReceiver_DoWork;
             _audioReceiver.RunWorkerCompleted += _audioReceiver_RunWorkerCompleted;
 
-            RestartAudio();
-
             base.OnCreate(savedInstanceState);
         }
 

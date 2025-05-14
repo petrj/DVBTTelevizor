@@ -43,11 +43,24 @@ namespace DVBTTelevizor.TV
             }
         }
 
+        private FileStream _recordFileStream = null;
+
         private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
         {
             if (_demodulator != null)
             {
                 _demodulator.AddSamples(e.Data, e.Size);
+
+                if (_recordFileStream == null)
+                {
+                    var fileName = Path.Combine("/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor.MAUI/", $"FM-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                    _log.Info($"Creating FM record: {fileName}");
+
+                    _recordFileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+                }
+
+                _recordFileStream.Write(e.Data, 0, e.Size);
+                _recordFileStream.Flush();
             }
         }
 
@@ -225,9 +238,15 @@ namespace DVBTTelevizor.TV
                 _driver.Settings.Streamport = _driverConfiguration.TransferPort;
                 _driver.Settings.Port = _driverConfiguration.ControlPort;
 
-                _driver.SetFrequency(Convert.ToInt32(LastTunedFreq)); // must be set before init due to Test driver
                 _driver.Init(new DriverInitializationResult());
                 _driver.Installed = true;
+
+                _driver.SetFrequency(Convert.ToInt32(LastTunedFreq)); // must be set before init due to Test driver
+
+                _driver.SetSampleRate(_driver.Settings.SDRSampleRate);
+                _driver.SetDirectSampling(0);
+                _driver.SetFrequencyCorrection(0);
+                _driver.SetGainMode(false);
 
                 DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
@@ -261,8 +280,8 @@ namespace DVBTTelevizor.TV
                 return new DVBTDriverCapabilities()
                 {
                     supportedDeliverySystems = 0,
-                    minFrequency = 88000,
-                    maxFrequency = 108000,
+                    minFrequency = 88000000,
+                    maxFrequency = 108000000,
                     frequencyStepSize = 1000
                 };
             });

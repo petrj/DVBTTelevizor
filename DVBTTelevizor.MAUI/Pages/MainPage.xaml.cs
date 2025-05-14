@@ -680,7 +680,7 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
-
+                    /*
                     // load WAVE
 
                     var bufferSize = 8096; //1024 * 1024;
@@ -714,7 +714,7 @@ namespace DVBTTelevizor.MAUI
 
                             System.Threading.Thread.Sleep(30);
                         }
-                    }
+                    }*/
 
                 });
 
