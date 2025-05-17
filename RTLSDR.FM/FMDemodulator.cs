@@ -105,6 +105,14 @@ namespace RTLSDR.FM
             }
         }
 
+        public void ClearBuffer()
+        {
+            lock (_lock)
+            {
+                _queue.Clear();
+            }
+        }
+
         private void _worker_DoWork(object sender, DoWorkEventArgs e)
         {
             _loggingService.Info($"Starting FM demodulator worker thread`");
@@ -141,6 +149,9 @@ namespace RTLSDR.FM
                 if ((DateTime.Now - _lastQueueSizeNotifyTime).TotalSeconds > 5)
                 {
                     _loggingService.Info($"FM queue size: {(_queue.Count / 1024).ToString("N0")} KB");
+
+                    _loggingService.Info($"FM power: {_powerPercent.ToString("N0")}%");
+
                     _lastQueueSizeNotifyTime = DateTime.Now;
                 }
 
@@ -174,10 +185,9 @@ namespace RTLSDR.FM
                         {
                             var lowPassedDataLength = LowPassWithMove(_buffer, _demodBuffer, processedBytesCount, Samplerate, -127);
 
-                            if ((DateTime.Now - _lastPowerPercentNotifyTime).TotalSeconds > 5)
+                            if ((DateTime.Now - _lastPowerPercentNotifyTime).TotalMilliseconds > 500)
                             {
                                 _powerPercent = _powerCalculator.GetPowerPercent(_demodBuffer, lowPassedDataLength);
-                                _loggingService.Info($"FM power: {_powerPercent.ToString("N0")}%");
                                 _lastPowerPercentNotifyTime = DateTime.Now;
                             }
 

@@ -17,6 +17,8 @@ namespace DVBTTelevizor.TV
         private ISDR _driver = null;
         private IDemodulator _demodulator = null;
 
+        private const int MinFMSignalPower = 60;
+
         UDPStreamer _UDPStreamer = null;
 
         public RTLSDRTCPIPFMDriverConnector(ILoggingService loggingService)
@@ -325,8 +327,38 @@ namespace DVBTTelevizor.TV
 
         public Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            return Task.Run(() => { return new DVBTDriverSearchProgramMapPIDsResult(); });
+            return Task.Run(() =>
+            {
+                if (_demodulator.PercentSignalPower >= MinFMSignalPower)
+                {
+                    var dict = new Dictionary<ServiceDescriptor, long>();
+                    dict.Add(new ServiceDescriptor()
+                    {
+                        Free = true,
+                        Length = 0,
+                        ProgramNumber = _driver.Frequency,
+                        ProviderName = "FM radio " + Convert.ToInt32(_driver.Frequency / 1000).ToString() + " kHz",
+                        ServiceName = "FM radio",
+                        ServisType = 0
+
+                    }, _driver.Frequency);
+
+                    return new DVBTDriverSearchProgramMapPIDsResult()
+                    {
+                        Result = DVBTDriverSearchProgramResultEnum.OK,
+                        ServiceDescriptors = dict
+                    };
+                }
+                else
+                {
+                    return new DVBTDriverSearchProgramMapPIDsResult()
+                    {
+                        Result = DVBTDriverSearchProgramResultEnum.NoSignal
+                    };
+                }
+            });
         }
+
 
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
@@ -400,6 +432,8 @@ namespace DVBTTelevizor.TV
 
         public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
+            _log.Info($"RTLSDRTCPIPFMDriverConnector: TuneEnhanced freq {frequency / 1000} kHz");
+
             var tuneResult = await Tune(frequency, bandWidth, deliverySystem);
             if (!tuneResult.SuccessFlag)
             {
@@ -409,21 +443,45 @@ namespace DVBTTelevizor.TV
                 };
             }
 
-            var res = new DVBTDriverTuneResult()
+            _demodulator.ClearBuffer();
+
+            for (var i = 0; i < 10; i++)
             {
-                Result = DVBTDriverSearchProgramResultEnum.OK,
-                 SignalState = new DVBTDriverStatus()
-                 {
-                    hasCarrier = 1,
-                    hasLock = 1,
-                    hasSync = 1,
-                    hasSignal = 1,
+                _log.Info($"Demodulator signal power: {_demodulator.PercentSignalPower}");
+                await Task.Delay(100);
+
+                if (_demodulator.PercentSignalPower >= MinFMSignalPower)
+                {
+                    return new DVBTDriverTuneResult()
+                    {
+                        Result = DVBTDriverSearchProgramResultEnum.OK,
+                        SignalState = new DVBTDriverStatus()
+                        {
+                            hasCarrier = 1,
+                            hasLock = 1,
+                            hasSync = 1,
+                            hasSignal = 1,
+                            SuccessFlag = true,
+                            rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                        }
+                    };
+                }
+            }
+
+            return new DVBTDriverTuneResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.NoSignal,
+                SignalState = new DVBTDriverStatus()
+                {
+                    hasCarrier = 10,
+                    hasLock = 0,
+                    hasSync = 0,
+                    hasSignal = 0,
                     SuccessFlag = true,
-                    rfStrengthPercentage = 100
-                 }
+                    rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                }
             };
 
-            return res;
         }
 
         public Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)

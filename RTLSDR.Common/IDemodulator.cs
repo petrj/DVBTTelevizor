@@ -13,6 +13,7 @@ namespace RTLSDR.Common
         /// </summary>
         void Finish();
         void Stop();
+        void ClearBuffer();
 
         double PercentSignalPower { get; }
 
