@@ -43,24 +43,11 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        private FileStream _recordFileStream = null;
-
         private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
         {
             if (_demodulator != null)
             {
                 _demodulator.AddSamples(e.Data, e.Size);
-
-                if (_recordFileStream == null)
-                {
-                    var fileName = Path.Combine("/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor.MAUI/", $"FM-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
-                    _log.Info($"Creating FM record: {fileName}");
-
-                    _recordFileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
-                }
-
-                _recordFileStream.Write(e.Data, 0, e.Size);
-                _recordFileStream.Flush();
             }
         }
 
@@ -100,7 +87,6 @@ namespace DVBTTelevizor.TV
                 }
             }
         }
-
 
         public bool DriverStreamDataAvailable
         {
@@ -412,9 +398,32 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
+        public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
-            return Task.Run(() => { return new DVBTDriverTuneResult(); });
+            var tuneResult = await Tune(frequency, bandWidth, deliverySystem);
+            if (!tuneResult.SuccessFlag)
+            {
+                return new DVBTDriverTuneResult()
+                {
+                    Result = DVBTDriverSearchProgramResultEnum.Error
+                };
+            }
+
+            var res = new DVBTDriverTuneResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.OK,
+                 SignalState = new DVBTDriverStatus()
+                 {
+                    hasCarrier = 1,
+                    hasLock = 1,
+                    hasSync = 1,
+                    hasSignal = 1,
+                    SuccessFlag = true,
+                    rfStrengthPercentage = 100
+                 }
+            };
+
+            return res;
         }
 
         public Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
@@ -425,6 +434,26 @@ namespace DVBTTelevizor.TV
         public Task<DVBTDriverTuneResult> WaitForSignal(bool fastTuning)
         {
             return Task.Run( () => { return new DVBTDriverTuneResult();  } );
+        }
+
+        public int FrequencyMinKHz
+        {
+            get { return 88000; }
+        }
+
+        public int FrequencyMaxKHz
+        {
+            get { return 104000; }
+        }
+
+        public int BandwidthMinKHz
+        {
+            get { return 100; }
+        }
+
+        public int BandwidthMaxKHz
+        {
+            get { return 100; }
         }
     }
 }

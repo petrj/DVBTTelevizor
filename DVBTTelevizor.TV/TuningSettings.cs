@@ -25,16 +25,8 @@ namespace DVBTTelevizor
 
         public long FrequencyKHz { get; set; } = 474000;
 
-        public long DeviceFrequencyFromKHz { get; set; } = 474000;
-        public long DeviceFrequencyToKHz { get; set; } = 852000;
-
-        public long DefaultFrequencyKHz { get; set; } = 474000;
-        public long DefaultFrequencyFromKHz { get; set; } = 474000;
-        public long DefaultFrequencyToKHz { get; set; } = 852000;
-
-        public const long DefaultBandwidthKHz = 8000;
-        public const long FrequencyMinKHz = 174000; // 174.0 MHz - VHF high-band (band III) channel 7
-        public const long FrequencyMaxKHz = 858000; // 858.0 MHz - UHF band channel 69
+        public long DeviceFrequencyMinKHz { get; set; } = 474000;
+        public long DeviceFrequencyMaxKHz { get; set; } = 852000;
 
         public TuningSettings(ILoggingService loggingService)
         {
@@ -53,20 +45,21 @@ namespace DVBTTelevizor
                  FrequencyKHz = FrequencyKHz,
                  TuneDVBTPreferred = TuneDVBTPreferred,
                  TuningMode = TuningMode,
-                 DefaultFrequencyFromKHz = DefaultFrequencyFromKHz,
-                 DefaultFrequencyToKHz = DefaultFrequencyToKHz,
-                 DefaultFrequencyKHz = DefaultFrequencyKHz,
-                 DeviceFrequencyFromKHz =  DeviceFrequencyFromKHz,
-                 DeviceFrequencyToKHz = DeviceFrequencyToKHz
+                 DeviceFrequencyMinKHz =  DeviceFrequencyMinKHz,
+                 DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz
             };
         }
 
         public bool ValidFrequency(long freq, bool device)
         {
+            /*
             var dvbtValid = ((freq >= TuningSettings.FrequencyMinKHz) && (freq <= TuningSettings.FrequencyMaxKHz));
             var deviceValid = ((freq >= DeviceFrequencyFromKHz) && (freq <= DeviceFrequencyToKHz));
 
             return device ? deviceValid && dvbtValid : dvbtValid;
+            */
+
+            return (freq >= DeviceFrequencyMinKHz) && (freq <= DeviceFrequencyMaxKHz);
         }
 
         public void LoadFromConfiguration(ITVConfiguration configuration)
@@ -93,14 +86,11 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info("SetFrequencies");
 
-                // bandwidth
-                if (BandwidthKHz == default)
-                {
-                    BandwidthKHz = TuningSettings.DefaultBandwidthKHz;
-                }
+                // TODO: load/save bandwidth/freq (min/max?)
+                BandwidthKHz = driver.BandwidthMinKHz;
 
-                DeviceFrequencyFromKHz = TuningSettings.FrequencyMinKHz;
-                DeviceFrequencyToKHz = TuningSettings.FrequencyMaxKHz;
+                DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
+                DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
 
                 if (driver.Connected)
                 {
@@ -111,16 +101,16 @@ namespace DVBTTelevizor
                         // setting min/max frequencies from device
                         if (cap.SuccessFlag)
                         {
-                            DeviceFrequencyFromKHz = cap.minFrequency / 1000;
-                            DeviceFrequencyToKHz = cap.maxFrequency / 1000;
+                            DeviceFrequencyMinKHz = cap.minFrequency / 1000;
+                            DeviceFrequencyMaxKHz = cap.maxFrequency / 1000;
 
-                            if (!ValidFrequency(DeviceFrequencyFromKHz, false))
+                            if (!ValidFrequency(DeviceFrequencyMinKHz, false))
                             {
-                                DeviceFrequencyFromKHz = TuningSettings.FrequencyMinKHz;
+                                DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
                             }
-                            if (!ValidFrequency(DeviceFrequencyToKHz, false))
+                            if (!ValidFrequency(DeviceFrequencyMaxKHz, false))
                             {
-                                DeviceFrequencyToKHz = TuningSettings.FrequencyMaxKHz;
+                                DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
                             }
 
                         }
@@ -131,38 +121,21 @@ namespace DVBTTelevizor
                     }
                 }
 
-                // fix default frequencies
-
-                if (!ValidFrequency(DefaultFrequencyKHz, true))
-                {
-                    DefaultFrequencyKHz = DeviceFrequencyFromKHz;
-                }
-
-                if (!ValidFrequency(DefaultFrequencyFromKHz, true))
-                {
-                    DefaultFrequencyFromKHz = DeviceFrequencyFromKHz;
-                }
-
-                if (!ValidFrequency(DefaultFrequencyToKHz, true))
-                {
-                    DefaultFrequencyToKHz = DeviceFrequencyToKHz;
-                }
-
                 // fix
 
                 if (!ValidFrequency(FrequencyKHz, true))
                 {
-                    FrequencyKHz = DefaultFrequencyKHz;
+                    FrequencyKHz = DeviceFrequencyMinKHz;
                 }
 
                 if (!ValidFrequency(FrequencyFromKHz, true))
                 {
-                    FrequencyFromKHz = DefaultFrequencyFromKHz;
+                    FrequencyFromKHz = DeviceFrequencyMinKHz;
                 }
 
                 if (!ValidFrequency(FrequencyToKHz, true))
                 {
-                    FrequencyToKHz = DefaultFrequencyToKHz;
+                    FrequencyToKHz = DeviceFrequencyMaxKHz;
                 }
             }
             catch (Exception ex)
