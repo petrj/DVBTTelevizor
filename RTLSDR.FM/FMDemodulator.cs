@@ -185,9 +185,10 @@ namespace RTLSDR.FM
                         {
                             var lowPassedDataLength = LowPassWithMove(_buffer, _demodBuffer, processedBytesCount, Samplerate, -127);
 
-                            if ((DateTime.Now - _lastPowerPercentNotifyTime).TotalMilliseconds > 500)
+                            if ((DateTime.Now - _lastPowerPercentNotifyTime).TotalMilliseconds > 2000)
                             {
                                 _powerPercent = _powerCalculator.GetPowerPercent(_demodBuffer, lowPassedDataLength);
+
                                 _lastPowerPercentNotifyTime = DateTime.Now;
                             }
 

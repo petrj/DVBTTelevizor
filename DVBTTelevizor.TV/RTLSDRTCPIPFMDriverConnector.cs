@@ -47,10 +47,28 @@ namespace DVBTTelevizor.TV
 
         private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
         {
-            if (_demodulator != null)
+            if (_demodulator != null && e.Size>0)
             {
                 _demodulator.AddSamples(e.Data, e.Size);
+
+                // save raw data for analysis
+                //RecordData(e.Data, e.Size);
             }
+        }
+
+        private Stream _recordStream = null;
+
+        private void RecordData(byte[] data, int size)
+        {
+            var fileName = Path.Combine("/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor.MAUI/", $"{(_driver.Frequency / 1000)}_kHz.raw");
+
+            if (!File.Exists(fileName))
+            {
+                _recordStream = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write);
+            }
+
+            _recordStream.Write(data, 0, size);
+            _recordStream.Flush();
         }
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
@@ -445,7 +463,7 @@ namespace DVBTTelevizor.TV
 
             _demodulator.ClearBuffer();
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 50; i++)
             {
                 _log.Info($"Demodulator signal power: {_demodulator.PercentSignalPower}");
                 await Task.Delay(100);
@@ -501,7 +519,7 @@ namespace DVBTTelevizor.TV
 
         public int FrequencyMaxKHz
         {
-            get { return 104000; }
+            get { return 108000; }
         }
 
         public int BandwidthMinKHz
