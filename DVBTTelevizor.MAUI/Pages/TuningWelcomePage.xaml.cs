@@ -135,6 +135,16 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
 
+        switch (_configuration.DVBTDriverType)
+        {
+            case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+            case DVBTDriverTypeEnum.RTLSDRFMDriver:
+                _tuningSettings.FM = true;
+                break;
+            default:
+                break;
+        }
+
         ShowPage(_tuningProgressPage, TuneModeEnum.Automatic);
     }
 
@@ -146,6 +156,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         {
             case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
             case DVBTDriverTypeEnum.RTLSDRFMDriver:
+                _tuningSettings.FM = true;
                 ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
                 break;
             default:
@@ -162,6 +173,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         {
             case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
             case DVBTDriverTypeEnum.RTLSDRFMDriver:
+                _tuningSettings.FM = true;
                 ShowPage(_tuningFrequencyPage, TuneModeEnum.Frequency);
                 break;
             default:

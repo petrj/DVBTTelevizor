@@ -964,6 +964,15 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
+                if (
+                    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
+                    (  _configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+                    )
+                {
+                    shouldMediaStop = false;
+                    shouldMediaPlay = false;
+                }
+
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
                     //await _driver.Stop(); // setting no PID
@@ -1102,7 +1111,16 @@ namespace DVBTTelevizor.MAUI
                     _lastPlayedChannels[1] = channel;
                 }
 
-                PlayingState = PlayingStateEnum.Playing;
+                if (
+    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
+    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+    )
+                {
+                    PlayingState = PlayingStateEnum.PlayingInPreview;
+                } else
+                {
+                    PlayingState = PlayingStateEnum.Playing;
+                }
 
                 _viewModel.NotifyChannelChange();
 

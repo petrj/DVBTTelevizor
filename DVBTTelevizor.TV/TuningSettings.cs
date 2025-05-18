@@ -15,6 +15,7 @@ namespace DVBTTelevizor
 
         public bool DVBT { get; set; } = true;
         public bool DVBT2 { get; set; } = true;
+        public bool FM { get; set; } = false;
 
         public bool TuneDVBTPreferred { get; set; } = false;
 
@@ -39,6 +40,7 @@ namespace DVBTTelevizor
             {
                  DVBT = DVBT,
                  DVBT2 = DVBT2,
+                 FM = FM,
                  BandwidthKHz = BandwidthKHz,
                  FrequencyFromKHz = FrequencyFromKHz,
                  FrequencyToKHz = FrequencyToKHz,

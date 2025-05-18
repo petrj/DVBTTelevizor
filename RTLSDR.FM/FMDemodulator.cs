@@ -64,7 +64,6 @@ namespace RTLSDR.FM
         //public delegate void OnDemodulatedEventHandler(object sender, DataDemodulatedEventArgs e);
         //public delegate void OnFinishedEventHandler(object sender, EventArgs e);
 
-        PowerCalculation _powerCalculator = new PowerCalculation();
         private double _powerPercent = 0;
         private double _audioBitrate = 0;
 
@@ -185,14 +184,9 @@ namespace RTLSDR.FM
                         {
                             var lowPassedDataLength = LowPassWithMove(_buffer, _demodBuffer, processedBytesCount, Samplerate, -127);
 
-                            if ((DateTime.Now - _lastPowerPercentNotifyTime).TotalMilliseconds > 2000)
-                            {
-                                _powerPercent = _powerCalculator.GetPowerPercent(_demodBuffer, lowPassedDataLength);
-
-                                _lastPowerPercentNotifyTime = DateTime.Now;
-                            }
-
                             var demodulatedDataMonoLength = FMDemodulate(_demodBuffer, lowPassedDataLength, false);
+
+                            UpdatePowerSignal(_demodBuffer, demodulatedDataMonoLength);
 
                             arg.Data = GetBytes(_demodBuffer, demodulatedDataMonoLength);
                             arg.AudioDescription = new AudioDataDescription()
@@ -217,6 +211,30 @@ namespace RTLSDR.FM
             }
 
             _loggingService.Info($"FM demodulator worker thread finished`");
+        }
+
+        private void UpdatePowerSignal(short[] buffer, int length)
+        {
+            // calculating Root Mean Square
+
+            double sum = 0;
+            float normalized;
+            for (int i = 0; i < length; i++)
+            {
+                normalized = buffer[i] / 32768f;
+                sum += normalized * normalized;
+            }
+            var rms = (float)Math.Sqrt(sum / length);
+
+            /*
+                0.000 – 0.005   Silence or static (very quiet / unhearable)
+                0.005 – 0.02    Background noise or weak signal
+                0.02  – 0.05    Voice or quiet music(hearable content)
+                0.05  – 0.2     Loud speech or music
+                0.2   – 1.0     Very loud signal(possibly clipped)
+            */
+
+            _powerPercent = (1.0 - rms)*100;
         }
 
         public int LowPassReal(short[] lp, int count, int sampleRateOut = 170000, int sampleRate2 = 32000)

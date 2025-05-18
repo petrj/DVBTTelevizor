@@ -17,7 +17,7 @@ namespace DVBTTelevizor.TV
         private ISDR _driver = null;
         private IDemodulator _demodulator = null;
 
-        private const int MinFMSignalPower = 60;
+        private const int MinFMSignalPower = 80;
 
         UDPStreamer _UDPStreamer = null;
 
@@ -318,8 +318,13 @@ namespace DVBTTelevizor.TV
                         state.hasCarrier = 0;
                         state.hasSync = 0;
                         state.hasLock = 0;
-                        state.rfStrengthPercentage = 0;
+                        state.rfStrengthPercentage = Convert.ToInt64(_demodulator?.PercentSignalPower);
                         break;
+                }
+
+                if (StatusChanged != null)
+                {
+                    StatusChanged(this, new DVBTDriverStatusChangedEventArgs() { Status = state });
                 }
 
                 return state;
@@ -355,8 +360,8 @@ namespace DVBTTelevizor.TV
                         Free = true,
                         Length = 0,
                         ProgramNumber = _driver.Frequency,
-                        ProviderName = "FM radio " + Convert.ToInt32(_driver.Frequency / 1000).ToString() + " kHz",
-                        ServiceName = "FM radio",
+                        ProviderName = "FM radio",
+                        ServiceName = $"{(_driver.Frequency / 1000000.0).ToString("N1")} FM ",
                         ServisType = 0
 
                     }, _driver.Frequency);
@@ -380,22 +385,45 @@ namespace DVBTTelevizor.TV
 
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
-            return Task.Run(() => { return new DVBTDriverSearchPIDsResult(); });
+            return Task.Run(() =>
+            {
+                return new DVBTDriverSearchPIDsResult()
+                {
+                    Result = DVBTDriverSearchProgramResultEnum.OK
+                };
+            });
         }
 
         public Task<DVBTDriverSearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs)
         {
-            return Task.Run(() => { return new DVBTDriverSearchAllPIDsResult(); });
+            return Task.Run(() =>
+            {
+                return new DVBTDriverSearchAllPIDsResult()
+                {
+                    Result = DVBTDriverSearchProgramResultEnum.OK
+                };
+            });
         }
 
         public Task<DVBTDriverResponse> SetPIDs(List<long> PIDs)
         {
-            return Task.Run(() => { return new DVBTDriverResponse(); });
+            return Task.Run(() => {
+                return new DVBTDriverResponse()
+                {
+                    SuccessFlag = true
+                };
+            });
         }
 
         public Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
-            return Task.Run(() => { return new DVBTDriverSearchPIDsResult(); });
+            return Task.Run(() => {
+                return new DVBTDriverSearchPIDsResult()
+                {
+                    PIDs = new List<long>(),
+                    Result = DVBTDriverSearchProgramResultEnum.OK
+                };
+            });
         }
 
         public Task StartRecording()
@@ -409,7 +437,7 @@ namespace DVBTTelevizor.TV
 
         public Task<bool> Stop()
         {
-            return Task.Run(() => { return false; });
+            return Task.Run(() => { return true; });
         }
 
         public void StopRecording()
@@ -452,9 +480,21 @@ namespace DVBTTelevizor.TV
         {
             _log.Info($"RTLSDRTCPIPFMDriverConnector: TuneEnhanced freq {frequency / 1000} kHz");
 
+            var status = await GetStatus();
+
+            if (!status.SuccessFlag)
+            {
+                _log.Debug($"Getting status failed");
+                return new DVBTDriverTuneResult()
+                {
+                    Result = DVBTDriverSearchProgramResultEnum.Error
+                };
+            }
+
             var tuneResult = await Tune(frequency, bandWidth, deliverySystem);
             if (!tuneResult.SuccessFlag)
             {
+                _log.Debug($"Tune failed");
                 return new DVBTDriverTuneResult()
                 {
                     Result = DVBTDriverSearchProgramResultEnum.Error
@@ -463,27 +503,29 @@ namespace DVBTTelevizor.TV
 
             _demodulator.ClearBuffer();
 
-            for (var i = 0; i < 50; i++)
+            for (var i = 0; i < 15; i++)
             {
                 _log.Info($"Demodulator signal power: {_demodulator.PercentSignalPower}");
                 await Task.Delay(100);
+            }
 
-                if (_demodulator.PercentSignalPower >= MinFMSignalPower)
+            if (_demodulator.PercentSignalPower >= MinFMSignalPower)
+            {
+                await Task.Delay(2000);
+
+                return new DVBTDriverTuneResult()
                 {
-                    return new DVBTDriverTuneResult()
+                    Result = DVBTDriverSearchProgramResultEnum.OK,
+                    SignalState = new DVBTDriverStatus()
                     {
-                        Result = DVBTDriverSearchProgramResultEnum.OK,
-                        SignalState = new DVBTDriverStatus()
-                        {
-                            hasCarrier = 1,
-                            hasLock = 1,
-                            hasSync = 1,
-                            hasSignal = 1,
-                            SuccessFlag = true,
-                            rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
-                        }
-                    };
-                }
+                        hasCarrier = 1,
+                        hasLock = 1,
+                        hasSync = 1,
+                        hasSignal = 1,
+                        SuccessFlag = true,
+                        rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                    }
+                };
             }
 
             return new DVBTDriverTuneResult()
