@@ -297,8 +297,8 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="70*" />
                         <ColumnDefinition Width="30*" />
+                        <ColumnDefinition Width="70*" />
                     </Grid.ColumnDefinitions>
 
                     <BoxView x:Name="DriverBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>

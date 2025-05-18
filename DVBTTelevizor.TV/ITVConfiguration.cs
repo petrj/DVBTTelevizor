@@ -45,5 +45,9 @@ namespace DVBTTelevizor
         public long FrequencyKHz { get; set; }
 
         public long DVBTBandwidthKHz { get; set; }
+
+        public int SDRDriverStreamPort { get; set; }
+        public int SDRDriverPort { get; set; }
+        public int SDRSampleRate { get; set; }
     }
 }

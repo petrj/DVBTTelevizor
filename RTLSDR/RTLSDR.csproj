@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LoggerService" Version="1.0.4" />
+    <PackageReference Include="NLog" Version="5.4.0" />
+    <PackageReference Include="System.Memory" />
+    <PackageReference Include="System.Numerics.Vectors" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="NLog">
+      <HintPath>lib\NLog.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="FMDemodulator.cs" />
+    <Compile Remove="IDemodulator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RTLSDR.Common\RTLSDR.Common.csproj" />
+  </ItemGroup>
+</Project>

@@ -68,7 +68,7 @@ namespace DVBTTelevizor.MAUI
 
             if (e is DVBTDriverStatusChangedEventArgs se)
             {
-                _signalProgress = se.Status.rfStrengthPercentage;
+                _signalProgress = se.Status.rfStrengthPercentage/100.0;
                 _signalCarrier = se.Status.hasCarrier > 0;
                 _signalLocked = se.Status.hasLock > 0;
                 _signalSynced = se.Status.hasSync > 0;
@@ -272,13 +272,20 @@ namespace DVBTTelevizor.MAUI
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
-                    if (!DVBTTuning && dvbtTypeIndex == 0)
-                        continue;
-                    if (!DVBT2Tuning && dvbtTypeIndex == 1)
-                        continue;
-                    if (_actualTuningDVBTType > dvbtTypeIndex)
+                    if (FMTuning)
                     {
-                        continue;
+                        if (dvbtTypeIndex > 0)
+                            continue;
+                    } else
+                    {
+                        if (!DVBTTuning && dvbtTypeIndex == 0)
+                            continue;
+                        if (!DVBT2Tuning && dvbtTypeIndex == 1)
+                            continue;
+                        if (_actualTuningDVBTType > dvbtTypeIndex)
+                        {
+                            continue;
+                        }
                     }
                     _actualTuningDVBTType = dvbtTypeIndex;
 
@@ -305,7 +312,7 @@ namespace DVBTTelevizor.MAUI
 
                     } while (_actualTunningFreqKHz <= FrequencyToKHz);
 
-                    if (dvbtTypeIndex == 0)
+                    if (dvbtTypeIndex == 0 && DVBT2Tuning)
                     {
                         // reset position to DVBT2
                         _actualTunningFreqKHz = FrequencyFromKHz;
@@ -549,6 +556,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(DVBTTuning));
                 OnPropertyChanged(nameof(DVBT2Tuning));
+                OnPropertyChanged(nameof(FMTuning));
 
                 OnPropertyChanged(nameof(FrequencyFromKHz));
                 OnPropertyChanged(nameof(FrequencyToKHz));
@@ -717,6 +725,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool FMTuning
+        {
+            get
+            {
+                return Settings.FM;
+            }
+        }
+
         public bool SignalCarrier
         {
             get
@@ -880,7 +896,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (DVBTTuning && DVBT2Tuning)
+                if (DVBTTuning && DVBT2Tuning && !FMTuning)
                 {
                     var perc = FrequencyProgress / 2.0;
                     if (_actualTuningDVBTType == 1)
@@ -923,7 +939,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_signalProgress).ToString("N0") + " %";
+                return (_signalProgress*100.0).ToString("N0") + " %";
             }
         }
 

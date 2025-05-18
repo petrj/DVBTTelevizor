@@ -34,9 +34,20 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
         _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _frequencyPage.Disappearing += _frequencyPage_Disappearing;
 
         BuildFocusableItems();
     }
+
+    private void _frequencyPage_Disappearing(object? sender, EventArgs e)
+    {
+        if (Settings == null)
+            return;
+
+        _tuningFrequenciesViewModel.FrequencyKHz =
+            _frequencyPage.Settings.FrequencyKHz;
+    }
+
 
     public TuningSettings? Settings
     {

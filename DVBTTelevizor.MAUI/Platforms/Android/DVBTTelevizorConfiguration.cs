@@ -339,6 +339,42 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public int SDRDriverPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRDriverPort", 5658);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRDriverPort", value);
+            }
+        }
+
+        public int SDRDriverStreamPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRDriverStreamPort", 5659);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRDriverStreamPort", value);
+            }
+        }
+
+        public int SDRSampleRate
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("SDRSampleRate", 1024000);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("SDRSampleRate", value);
+            }
+        }
+
         public ObservableCollection<Channel> GetChannels()
         {
             try
@@ -387,7 +423,5 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
-
-
     }
 }

@@ -72,14 +72,14 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (!float.TryParse(MHZEntry.Text, out mhz))
         {
             await _dialogService.Information($"Invalid frequency");
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
 
         if (!_viewModel.Settings.ValidFrequency(Convert.ToInt64(mhz*1000.0), true))
         {
             await _dialogService.Information($"Frequency \"{mhz}\" MHz is out of range {_viewModel.FrequencyMinMHz} MHz - {_viewModel.FrequencyMaxMHz} MHz");
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
 
@@ -93,14 +93,14 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (!int.TryParse(KHZEntry.Text, out khz))
         {
             await _dialogService.Information($"Invalid frequency");
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
 
         if (!_viewModel.Settings.ValidFrequency(khz, true))
         {
             await _dialogService.Information($"Frequency \"{khz}\" KHz is out of range {_viewModel.FrequencyMinKHz} KHz - {_viewModel.FrequencyMaxKHz} KHz");
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyKHz;
+            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
 

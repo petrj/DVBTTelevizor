@@ -82,7 +82,7 @@ namespace DVBTTelevizor
                     return (Frequency / 1000000).ToString("N0") + " MHz";
                 }
 
-                return (Frequency / 1000000).ToString("N3") + " MHz";
+                return (Frequency / 1000000.0).ToString("N3") + " MHz";
             }
         }
 

@@ -49,6 +49,8 @@ namespace DVBTTelevizor.MAUI
             DVBTDrivers.Add("Android DVBT driver".Translated());
             DVBTDrivers.Add("Android testing DVBT Driver".Translated());
             DVBTDrivers.Add("Test tune driver".Translated());
+            DVBTDrivers.Add("RTLSDR FM TCPIP driver".Translated());
+            DVBTDrivers.Add("RTLSDR FM driver".Translated());
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {

@@ -4,7 +4,8 @@ using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui.Layouts;
 using System.Windows.Input;
-
+using DVBTTelevizor.TV;
+using RTLSDR.Common;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -192,6 +193,19 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
+            {
+                // Create Media from TCP stream
+                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
+                media.AddOption(":demux=rawaud");
+                media.AddOption(":rawaud-channels=1");
+                media.AddOption(":rawaud-samplerate=96000");
+                media.AddOption(":rawaud-fourcc=s16l");
+
+                _mediaPlayer.Play(media);
+            });
+
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>
@@ -251,6 +265,9 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case DVBTDriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
+                    break;
+                case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+                    _driver = new RTLSDRTCPIPFMDriverConnector(_loggingService);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
@@ -709,6 +726,21 @@ namespace DVBTTelevizor.MAUI
                         }));
 
                     break;
+
+                case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+
+                    var cfg = new RTLSDR.DriverSettings()
+                    {
+                        Port = _configuration.SDRDriverPort,
+                        Streamport = _configuration.SDRDriverStreamPort,
+                        SDRSampleRate = _configuration.SDRSampleRate
+                    };
+
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(cfg));
+
+                    WeakReferenceMessenger.Default.Send(new NotifyAudioChangeMessage(""));  // starting audio reciever in MainActivity
+
+                    break;
             }
         }
 
@@ -785,11 +817,6 @@ namespace DVBTTelevizor.MAUI
         private void SwipeGestureRecognizer_Swiped_4(object sender, SwipedEventArgs e)
         {
 
-        }
-
-        private void ConnectButton_Clicked(object sender, EventArgs e)
-        {
-            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
         }
 
         public async Task ActionStop(bool force)
@@ -937,6 +964,15 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
+                if (
+                    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
+                    (  _configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+                    )
+                {
+                    shouldMediaStop = false;
+                    shouldMediaPlay = false;
+                }
+
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
                     //await _driver.Stop(); // setting no PID
@@ -1075,7 +1111,16 @@ namespace DVBTTelevizor.MAUI
                     _lastPlayedChannels[1] = channel;
                 }
 
-                PlayingState = PlayingStateEnum.Playing;
+                if (
+    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
+    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+    )
+                {
+                    PlayingState = PlayingStateEnum.PlayingInPreview;
+                } else
+                {
+                    PlayingState = PlayingStateEnum.Playing;
+                }
 
                 _viewModel.NotifyChannelChange();
 

@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.Hardware.Usb;
+using Android.Media;
 using Android.OS;
 using Android.Util;
 using Android.Views;
@@ -14,8 +15,13 @@ using Java.Sql;
 using LoggerService;
 using Microsoft.Maui.Controls.Compatibility;
 using NLog;
+using RTLSDR;
+using System.ComponentModel;
+using System.Net.Sockets;
+using System.Net;
 using System.Reflection;
 using Environment = System.Environment;
+using RTLSDR.Common;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -23,6 +29,14 @@ namespace DVBTTelevizor.MAUI
     public class MainActivity : MauiAppCompatActivity
     {
         private const int StartRequestCode = 1000;
+        private const int StartRequestCodeRTLSDR = 1001;
+        private int _audioSampleRate = 96000;
+        private int _audioChannels = 1;
+        private bool _startAudioReceiverThread = false;
+        private int _SDRDriverStreamPort = 0;
+        private int _SDRDriverPort = 0;
+        private int _audioRecieverPort = 8012;
+
         private bool _waitingForInit = false;
         private static Android.Widget.Toast _instance;
         private ILoggingService _loggingService = null;
@@ -30,6 +44,8 @@ namespace DVBTTelevizor.MAUI
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
         private NotificationHelper _notificationHelper;
+
+        private BackgroundWorker _audioReceiver;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -65,8 +81,78 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, "Error while initializing UsbManager");
             }
 
+            _audioReceiver = new BackgroundWorker();
+            _audioReceiver.WorkerSupportsCancellation = true;
+            _audioReceiver.DoWork += _audioReceiver_DoWork;
+            _audioReceiver.RunWorkerCompleted += _audioReceiver_RunWorkerCompleted;
+
             base.OnCreate(savedInstanceState);
         }
+
+        private void RestartAudio()
+        {
+            _loggingService.Info("RestartAudio");
+
+            if (_audioReceiver.IsBusy)
+            {
+                _loggingService.Info("Stopping _audioReceiver");
+
+                _startAudioReceiverThread = true;
+                _audioReceiver.CancelAsync();
+            }
+            else
+            {
+                _audioReceiver.RunWorkerAsync();
+            }
+        }
+
+        private void _audioReceiver_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (_startAudioReceiverThread)
+            {
+                _audioReceiver.RunWorkerAsync();
+                _startAudioReceiverThread = false;
+            }
+        }
+
+        private void _audioReceiver_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _loggingService.Info("Starting _audioReceiver");
+
+            var bufferSize = AudioTrack.GetMinBufferSize(_audioSampleRate, _audioChannels == 1 ? ChannelOut.Mono : ChannelOut.Stereo, Encoding.Pcm16bit);
+            var _audioTrack = new AudioTrack(Android.Media.Stream.Music, _audioSampleRate, _audioChannels == 1 ? ChannelOut.Mono : ChannelOut.Stereo, Encoding.Pcm16bit, bufferSize, AudioTrackMode.Stream);
+
+            _audioTrack.Play();
+
+            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), _audioRecieverPort);
+            using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                client.Bind(remoteEP);
+
+                var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
+
+                while (!_audioReceiver.CancellationPending)
+                {
+                    if (client.Available > 0)
+                    {
+                        var bytesRead = client.Receive(packetBuffer);
+
+                        _audioTrack.Write(packetBuffer, 0, bytesRead);
+                    }
+                    else
+                    {
+                        Thread.Sleep(10);
+                    }
+                }
+
+                client.Close();
+            }
+
+            _audioTrack.Stop();
+
+            _loggingService.Info("_audioReceiver finished");
+        }
+
 
         private async void UsbAttachedOrDetached(object sender, EventArgs e)
         {
@@ -146,9 +232,29 @@ namespace DVBTTelevizor.MAUI
                 ShowToastMessage(m.Value);
             });
 
+
+            WeakReferenceMessenger.Default.Register<NotifyAudioChangeMessage>(this, (sender, obj) =>
+            {
+                //if (obj.Value is AudioDataDescription desc)
+                //{
+                //    _audioSampleRate = desc.SampleRate;
+                //    _audioChannels = desc.Channels;
+                    RestartAudio();
+                //}
+            });
+
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
             {
                 InitDriver();
+            });
+
+            WeakReferenceMessenger.Default.Register<RTLSDRDriverConnectAndroidMessage>(this, (sender, obj) =>
+            {
+                if (obj.Value is DriverSettings settings)
+                {
+                     InitRTLSDRDriver(settings.Port, settings.Streamport, settings.SDRSampleRate);
+                    //_streamPort = settings.Streamport;
+                }
             });
 
             WeakReferenceMessenger.Default.Register<DispatchKeyEventEnabledMessage>(this, (r, m) =>
@@ -210,7 +316,7 @@ MainThread.BeginInvokeOnMainThread(() =>
                 });
             });
 
-            WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
+                        WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
             {
                 SendRemoteKey(m.Value);
             });
@@ -415,6 +521,35 @@ MainThread.BeginInvokeOnMainThread(() =>
             });
         }
 
+        private void InitRTLSDRDriver(int port, int streamPort, int samplerate = 2048000)
+        {
+            try
+            {
+                _loggingService.Info($"Initializing RTLSDR driver: port:{port}, sampleRate: {samplerate}");
+
+                var req = new Intent(Intent.ActionView);
+                req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
+                //req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"5658\" -s \"2048000\""));
+
+                req.PutExtra(Intent.ExtraReturnResult, true);
+                _SDRDriverStreamPort = streamPort;
+                _SDRDriverPort = port;
+
+                StartActivityForResult(req, StartRequestCodeRTLSDR);
+            }
+            catch (ActivityNotFoundException ex)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver not installed"));
+
+                _loggingService.Info("Activity not found");
+                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout"));
+            }
+            catch (Exception ex)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver initializing failed"));
+            }
+        }
+
         public void InitDriver()
         {
             try
@@ -445,7 +580,8 @@ MainThread.BeginInvokeOnMainThread(() =>
 
             } catch (ActivityNotFoundException e)
             {
-                _loggingService.Info("InitDriver");
+                _loggingService.Info("Activity not found");
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver not installed"));
                 WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout"));
             }
             catch (Exception ex)
@@ -507,64 +643,102 @@ MainThread.BeginInvokeOnMainThread(() =>
             }
         }
 
+        private void ProcessDriverConnectResult(Result resultCode, Intent data)
+        {
+            _waitingForInit = false;
+
+            if (resultCode == Result.Canceled)
+            {
+                return;
+            }
+
+            if (resultCode == Result.Ok)
+            {
+                if (data != null)
+                {
+                    var cfg = new DVBTDriverConfiguration();
+
+                    if (data.HasExtra("ControlPort"))
+                        cfg.ControlPort = data.GetIntExtra("ControlPort", 0);
+
+                    if (data.HasExtra("TransferPort"))
+                        cfg.TransferPort = data.GetIntExtra("TransferPort", 0);
+
+                    if (data.HasExtra("DeviceName"))
+                        cfg.DeviceName = data.GetStringExtra("DeviceName");
+
+                    if (data.HasExtra("ProductIds"))
+                        cfg.ProductIds = data.GetIntArrayExtra("ProductIds");
+
+                    if (data.HasExtra("VendorIds"))
+                        cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
+
+                    _loggingService.Info($"Received device configuration: {cfg}");
+
+                    cfg.PublicDirectory = GetAndroidDirectory(null);
+
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
+                }
+                else
+                {
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad activity result"));
+                }
+            }
+            else
+            {
+                var errorCodeString = "Bad activity result";
+
+                if (data != null && data.Extras != null && !data.Extras.IsEmpty)
+                {
+                    if (data.HasExtra("ErrorCode"))
+                        errorCodeString = data.GetStringExtra("ErrorCode");
+
+                    foreach (var key in data.Extras.KeySet())
+                    {
+                        var value = data.Extras.Get(key);
+                        _loggingService.Info($"Key: {key}, Value: {value}");
+                    }
+                }
+                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorCodeString));
+            }
+        }
+
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             if (requestCode == StartRequestCode)
             {
-                _waitingForInit = false;
-
-                if (resultCode == Result.Canceled)
-                {
-                    return;
-                }
-
+                ProcessDriverConnectResult(resultCode,data);
+            }
+            if (requestCode == StartRequestCodeRTLSDR)
+            {
                 if (resultCode == Result.Ok)
                 {
-                    if (data != null)
+                    var x = data.GetIntExtra("SDRDriverPort", 1234);
+                    var y = data.GetIntExtra("SDRDriverStreamPort", 1235);
+
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
                     {
-                        var cfg = new DVBTDriverConfiguration();
+                        //SupportedTcpCommands = data.GetIntArrayExtra("supportedTcpCommands"),
+                        DeviceName = data.GetStringExtra("deviceName"),
+                        ControlPort = _SDRDriverPort,
+                        TransferPort = _SDRDriverStreamPort,
+                        PublicDirectory = GetAndroidDirectory(null)
+                    }));
 
-                        if (data.HasExtra("ControlPort"))
-                            cfg.ControlPort = data.GetIntExtra("ControlPort", 0);
-
-                        if (data.HasExtra("TransferPort"))
-                            cfg.TransferPort = data.GetIntExtra("TransferPort", 0);
-
-                        if (data.HasExtra("DeviceName"))
-                            cfg.DeviceName = data.GetStringExtra("DeviceName");
-
-                        if (data.HasExtra("ProductIds"))
-                            cfg.ProductIds = data.GetIntArrayExtra("ProductIds");
-
-                        if (data.HasExtra("VendorIds"))
-                            cfg.VendorIds = data.GetIntArrayExtra("VendorIds");
-
-                        _loggingService.Info($"Received device configuration: {cfg}");
-
-                        cfg.PublicDirectory = GetAndroidDirectory(null);
-
-                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
-                    }
-                    else
-                    {
-                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad activity result"));
-                    }
-                } else
+                    //+RestartAudio();
+                }
+                else
                 {
-                    var errorCodeString = "Bad activity result";
+                    var errorMsg = (data == null ? "no description" : data.GetStringExtra("detailed_exception_message"));
 
-                    if (data != null && data.Extras != null && !data.Extras.IsEmpty)
+                    _loggingService.Info($"Driver Init failed: {errorMsg}");
+
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorMsg));/*(""));DVBTDriverConfiguration()
                     {
-                        if (data.HasExtra("ErrorCode"))
-                            errorCodeString = data.GetStringExtra("ErrorCode");
-
-                        foreach (var key in data.Extras.KeySet())
-                        {
-                            var value = data.Extras.Get(key);
-                            _loggingService.Info($"Key: {key}, Value: {value}");
-                        }
-                    }
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorCodeString));
+                        ErrorId = data == null ? -1 : data.GetIntExtra("marto.rtl_tcp_andro.RtlTcpExceptionId", -1),
+                        ExceptionCode = data == null ? 0 : data.GetIntExtra("detailed_exception_code", 0),
+                        DetailedDescription = data == null ? "unknown" : data.GetStringExtra("detailed_exception_message")
+                    }));*/
                 }
             }
         }
