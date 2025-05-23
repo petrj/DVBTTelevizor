@@ -6,6 +6,7 @@ using Microsoft.Maui.Layouts;
 using System.Windows.Input;
 using DVBTTelevizor.TV;
 using RTLSDR.Common;
+using System.Collections.ObjectModel;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -1458,6 +1459,8 @@ namespace DVBTTelevizor.MAUI
 
                 pos += step;
             }
+
+            _viewModel.UpdateMenu(menuItems);
         }
     }
 

@@ -159,6 +159,13 @@
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
+            <Style x:Key="ListLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -325,7 +332,7 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.65,0.75" CornerRadius="25" BackgroundColor="#444444">
+        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.1,0.5,0.35,0.75" CornerRadius="25" BackgroundColor="#444444">
             <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
                 <local:ImgButton x:Name="MenuButtonPlay"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Play'}" Img="play.png" TapCommand="{Binding CommandPlay}" />
                 <local:ImgButton x:Name="MenuButtonStop"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Stop'}" Img="stop.png" TapCommand="{Binding CommandTune}" />
@@ -343,6 +350,16 @@
                 <local:ImgButton x:Name="MenuButtonClose"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,1.0,0.35,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Close'}" Img="icon.png" TapCommand="{Binding CommandCloseMenu}" />
             </AbsoluteLayout>
         </Frame>
+
+        <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.35,0.75">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="Transparent" Padding="5">
+                        <Label Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="End"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                    </Frame>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </StackLayout>
 
     </AbsoluteLayout>
 

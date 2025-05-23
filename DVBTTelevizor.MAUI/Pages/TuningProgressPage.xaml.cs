@@ -1,4 +1,3 @@
-using Android.Provider;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;

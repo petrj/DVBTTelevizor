@@ -22,6 +22,8 @@ namespace DVBTTelevizor.MAUI
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
 
+        public ObservableCollection<MenuItem> MenuItems{ get; set; } = new ObservableCollection<MenuItem>();
+
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
 
         public EITManager EIT { get; set; }
@@ -671,6 +673,22 @@ namespace DVBTTelevizor.MAUI
                 _menuVisible = value;
                 OnPropertyChanged(nameof(MenuVisible));
             }
+        }
+
+        public void UpdateMenu(KeyboardFocusableItemList items)
+        {
+            MenuItems.Clear();
+
+            var menuItems = new ObservableCollection<MenuItem>();
+            foreach (var item in items.Items)
+            {
+                MenuItems.Add(new MenuItem()
+                {
+                    Title = item.Name
+                });
+            }
+
+            OnPropertyChanged(nameof(MenuItems));
         }
     }
 }
