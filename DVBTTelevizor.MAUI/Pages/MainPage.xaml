@@ -332,34 +332,45 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.1,0.5,0.35,0.75" CornerRadius="25" BackgroundColor="#444444">
-            <AbsoluteLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
-                <local:ImgButton x:Name="MenuButtonPlay"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Play'}" Img="play.png" TapCommand="{Binding CommandPlay}" />
-                <local:ImgButton x:Name="MenuButtonStop"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Stop'}" Img="stop.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonStopRecord" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.0,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Stop'}" Img="stoprecord.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonRecord"    AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.1,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Record'}" Img="record.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonShowEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.2,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Show EPG'}" Img="epg.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonHideEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,0.2,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Hide EPG'}" Img="epg.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonSubtitles" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.3,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Subtitles'}" Img="subtitles.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonTeletext"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.4,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Teletext'}" Img="teletext.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonAudio"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Audio'}" Img="audio.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonAspect"    AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.6,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Aspect ratio'}" Img="aspect.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonScanEPG"   AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.7,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Scan EPG'}" Img="zoom.png" TapCommand="{Binding CommandTune}" />
-                <local:ImgButton x:Name="MenuButtonSettings"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.8,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Settings'}" Img="settings.png" TapCommand="{Binding CommandSettings}" />
-                <local:ImgButton x:Name="MenuButtonQuit"      AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.9,0.85,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Quit'}" Img="quit.png" TapCommand="{Binding CommandQuit}" />
-                <local:ImgButton x:Name="MenuButtonClose"     AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,1.0,0.35,0.07" TextFontSize="{Binding FontSizeForLabel}" TopTitleText="{local:LngXamlExt Input='Close'}" Img="icon.png" TapCommand="{Binding CommandCloseMenu}" />
-            </AbsoluteLayout>
-        </Frame>
+        <Frame IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.35,0.75" BackgroundColor="#555555" CornerRadius="25">
 
-        <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.35,0.75">
-            <BindableLayout.ItemTemplate>
-                <DataTemplate>
-                    <Frame BackgroundColor="Transparent" Padding="5">
-                        <Label Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="End"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
-                    </Frame>
-                </DataTemplate>
-            </BindableLayout.ItemTemplate>
-        </StackLayout>
+            <StackLayout BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+                <Label Text="{local:LngXamlExt Input='Menu'}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
+
+                <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+
+                            <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="10,10,10,10" Padding="0,0,0,0" BorderColor="White" IsVisible="True">
+
+                                    <Grid RowSpacing="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20*" />
+                                            <ColumnDefinition Width="80*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                                        <Image Grid.Row="0" Grid.Column="0" Source="{Binding ImgSource}" VerticalOptions="Center" HorizontalOptions="Center" HeightRequest="30"  />
+                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="Start"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                                    </Grid>
+
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding Id}" />
+                                </Frame.GestureRecognizers>
+
+                            </Frame>
+
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
 
     </AbsoluteLayout>
 

@@ -675,17 +675,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void UpdateMenu(KeyboardFocusableItemList items)
+        public void UpdateMenu(IEnumerable<MenuItem> items)
         {
             MenuItems.Clear();
 
             var menuItems = new ObservableCollection<MenuItem>();
-            foreach (var item in items.Items)
+            foreach (var item in items)
             {
-                MenuItems.Add(new MenuItem()
-                {
-                    Title = item.Name
-                });
+                MenuItems.Add(item);
             }
 
             OnPropertyChanged(nameof(MenuItems));
