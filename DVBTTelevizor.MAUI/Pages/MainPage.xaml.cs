@@ -6,6 +6,7 @@ using Microsoft.Maui.Layouts;
 using System.Windows.Input;
 using DVBTTelevizor.TV;
 using RTLSDR.Common;
+using System.Collections.ObjectModel;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -29,7 +30,7 @@ namespace DVBTTelevizor.MAUI
         private Channel[] _lastPlayedChannels = new Channel[2];
 
         private KeyboardFocusableItemList _focusItems;
-        private KeyboardFocusableItemList _focusMenuItems;
+        private List<MenuItem> _menuItems = new List<MenuItem>();
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
@@ -385,24 +386,6 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneQuickButton", new List<View>() { TuneQuickImgButton }));
 
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
-
-            _focusMenuItems = new KeyboardFocusableItemList();
-
-            _focusMenuItems
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonPlay", new List<View>() { MenuButtonPlay }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonStop", new List<View>() { MenuButtonStop }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonRecord", new List<View>() { MenuButtonRecord }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonStopRecord", new List<View>() { MenuButtonStopRecord }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonShowEPG", new List<View>() { MenuButtonShowEPG }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonHideEPG", new List<View>() { MenuButtonHideEPG }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonSubtitles", new List<View>() { MenuButtonSubtitles }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonTeletext", new List<View>() { MenuButtonTeletext }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonAudio", new List<View>() { MenuButtonAudio }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonAspect", new List<View>() { MenuButtonAspect }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonScanEPG", new List<View>() { MenuButtonScanEPG }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonSettings", new List<View>() { MenuButtonSettings }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonQuit", new List<View>() { MenuButtonQuit }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("MenuButtonClose", new List<View>() { MenuButtonClose }));
         }
 
         private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
@@ -786,6 +769,30 @@ namespace DVBTTelevizor.MAUI
         private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
         {
 
+        }
+
+        private void Menu_Tapped(object sender, TappedEventArgs e)
+        {
+            if (e.Parameter != null && e.Parameter is string p)
+            {
+                Menu_Tapped(p);
+            }
+        }
+
+        private void Menu_Tapped(string menuId)
+        {
+            switch (menuId)
+            {
+                case "menuSettings":
+                    SettingsButton_Clicked(this, null);
+                    break;
+                case "menuClose":
+                    _viewModel.MenuVisible = false;
+                    break;
+                case "menuQuit":
+                    WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
+                    break;
+            }
         }
 
         private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
@@ -1351,18 +1358,66 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Debug("ChannelsListView_ItemSelected");
         }
 
+        private string GetSelctedMenuId()
+        {
+            foreach (var item in _menuItems)
+            {
+                if (item.Selected)
+                {
+                    return item.Id;
+                }
+            }
+
+            return null;
+        }
+
+        private void SelectNextMenuItem(bool reverse)
+        {
+            var now = false;
+            var selected = false;
+            MenuItem first = null;
+
+            foreach (var item in (reverse ? _menuItems.AsEnumerable().Reverse() : _menuItems))
+            {
+                if (first == null)
+                {
+                    first = item;
+                }
+
+                if (now)
+                {
+                    item.Selected = true;
+                    selected = true;
+                    item.Update();
+                    break;
+                } else
+                if (item.Selected)
+                {
+                    item.Selected = false;
+                    item.Update();
+                    now = true;
+                }
+            }
+
+            if (!selected && first!=null)
+            {
+                first.Selected = true;
+                first.Update();
+            }
+        }
+
         private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
         {
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
-                    _focusMenuItems.FocusNextItem(true);
+                    SelectNextMenuItem(false);
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
                 case KeyboardNavigationActionEnum.Up:
-                     _focusItems.FocusPreviousItem(true);
+                    SelectNextMenuItem(true);
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
@@ -1370,94 +1425,73 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
-
-                    switch (_focusMenuItems.FocusedItemName)
+                    var id = GetSelctedMenuId();
+                    if (id != null)
                     {
-                        case "MenuButtonClose":
-                            _viewModel.MenuVisible = false;
-                            break;
-                        case "MenuButtonSettings":
-                            _viewModel.CommandSettings.Execute(null);
-                            break;
+                        Menu_Tapped(id);
                     }
-
                     break;
             }
         }
 
+        private void AddMenuItem(string id, string title, string img)
+        {
+            var item = new MenuItem()
+            {
+                Id = id,
+                Title = title,
+                ImgSource = img
+            };
+
+            _menuItems.Add(item);
+        }
+
         private void BuildMenu()
         {
-            var menuItems = new KeyboardFocusableItemList();
+            var old_menuItems = new KeyboardFocusableItemList();
+            _menuItems.Clear();
 
             if ((_viewModel.Channels.Count > 0) && (_viewModel.SelectedChannel != null))
             {
                 if (_viewModel.PlayingState == PlayingStateEnum.Playing)
                 {
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonStop"));
+                    AddMenuItem("menuStop", "Stop".Translated(), "stop.png");
 
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonSubtitles"));
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonAudio"));
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonAspect"));
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonTeletext"));
+                    AddMenuItem("menuSubtitles", "Subtitles".Translated(), "subtitles.png");
+                    AddMenuItem("menuAudio", "Audio".Translated(), "audio.png");
+                    AddMenuItem("menuAspect", "Aspect ratio".Translated(), "aspect.png");
+                    AddMenuItem("menuTeletext", "Teletext".Translated(), "teletext.png");
                 }
                 else
                 {
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonPlay"));
+                    AddMenuItem("menuPlay", "Play".Translated(), "play.png");
                 }
 
                 if (_viewModel.RecordingChannel == null)
                 {
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonRecord"));
+                    AddMenuItem("menuRecord", "Record".Translated(), "record.png");
                 }
                 else
                 {
-                    menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonStopRecord"));
+                    AddMenuItem("menuStopRecord", "Stop record".Translated(), "stoprecord.png");
                 }
             }
 
             if (_viewModel.EPGDetailVisible)
             {
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonHideEPG"));
+                //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonHideEPG"));
             } else
             {
-                menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonShowEPG"));
+                //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonShowEPG"));
             }
 
-            menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonSettings"));
-            menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonQuit"));
+            AddMenuItem("menuSettings", "Settings".Translated(), "settings.png");
+            AddMenuItem("menuQuit", "Quit application".Translated(), "quit.png");
+            AddMenuItem("menuClose", "Close menu".Translated(), "icon.png");
 
-            menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonClose"));
+           // _menuItems.First().Selected = true;
 
-            var pos = 0.1;
-            var step = 1.0 / menuItems.Items.Count;
-
-            _focusMenuItems.VisibleAll(false);
-
-            AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, 0.65, 0.65));
-
-            foreach (var item in menuItems.Items)
-            {
-                item.IsVisible = true;
-
-                var view = _focusMenuItems.GetFirstViewByItemName(item.Name);
-
-                AbsoluteLayout.SetLayoutFlags(view, AbsoluteLayoutFlags.All);
-
-                if (item.Name == "MenuButtonClose")
-                {
-                    AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.35, step*0.7));
-                } else
-                {
-                    AbsoluteLayout.SetLayoutBounds(view, new Rect(0.5, pos, 0.85, step * 0.7));
-                }
-
-                if (item.Name == "MenuButtonHideEPG" || item.Name == "MenuButtonShowEPG")
-                {
-                    //step += 0.02;
-                }
-
-                pos += step;
-            }
+          _viewModel.UpdateMenu(_menuItems);
         }
     }
 
