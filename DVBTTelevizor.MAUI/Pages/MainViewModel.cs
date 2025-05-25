@@ -675,17 +675,24 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void UpdateMenu(IEnumerable<MenuItem> items)
+        public void UpdateMenu(IEnumerable<MenuItem> items = null)
         {
-            MenuItems.Clear();
-
-            var menuItems = new ObservableCollection<MenuItem>();
-            foreach (var item in items)
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                MenuItems.Add(item);
-            }
 
-            OnPropertyChanged(nameof(MenuItems));
+                if (items != null)
+                {
+                    MenuItems.Clear();
+
+                    var menuItems = new ObservableCollection<MenuItem>();
+                    foreach (var item in items)
+                    {
+                        MenuItems.Add(item);
+                    }
+                }
+
+                OnPropertyChanged(nameof(MenuItems));
+            });
         }
     }
 }

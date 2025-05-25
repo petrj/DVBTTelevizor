@@ -775,20 +775,24 @@ namespace DVBTTelevizor.MAUI
         {
             if (e.Parameter != null && e.Parameter is string p)
             {
-                switch (p)
-                {
-                    case "menuSettings":
-                        SettingsButton_Clicked(sender, e);
-                        break;
-                    case "menuClose":
-                        _viewModel.MenuVisible = false;
-                        break;
-                    case "menuQuit":
-                        WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
-                        break;
-                }
+                Menu_Tapped(p);
             }
+        }
 
+        private void Menu_Tapped(string menuId)
+        {
+            switch (menuId)
+            {
+                case "menuSettings":
+                    SettingsButton_Clicked(this, null);
+                    break;
+                case "menuClose":
+                    _viewModel.MenuVisible = false;
+                    break;
+                case "menuQuit":
+                    WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
+                    break;
+            }
         }
 
         private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
@@ -1354,19 +1358,66 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Debug("ChannelsListView_ItemSelected");
         }
 
+        private string GetSelctedMenuId()
+        {
+            foreach (var item in _menuItems)
+            {
+                if (item.Selected)
+                {
+                    return item.Id;
+                }
+            }
+
+            return null;
+        }
+
+        private void SelectNextMenuItem(bool reverse)
+        {
+            var now = false;
+            var selected = false;
+            MenuItem first = null;
+
+            foreach (var item in (reverse ? _menuItems.AsEnumerable().Reverse() : _menuItems))
+            {
+                if (first == null)
+                {
+                    first = item;
+                }
+
+                if (now)
+                {
+                    item.Selected = true;
+                    selected = true;
+                    item.Update();
+                    break;
+                } else
+                if (item.Selected)
+                {
+                    item.Selected = false;
+                    item.Update();
+                    now = true;
+                }
+            }
+
+            if (!selected && first!=null)
+            {
+                first.Selected = true;
+                first.Update();
+            }
+        }
+
         private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
         {
-            /*
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
-                    _focusMenuItems.FocusNextItem(true);
+                    SelectNextMenuItem(false);
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
                 case KeyboardNavigationActionEnum.Up:
-                     _focusItems.FocusPreviousItem(true);
+                    SelectNextMenuItem(true);
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
@@ -1374,20 +1425,13 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
-
-                    switch (_focusMenuItems.FocusedItemName)
+                    var id = GetSelctedMenuId();
+                    if (id != null)
                     {
-                        case "MenuButtonClose":
-                            _viewModel.MenuVisible = false;
-                            break;
-                        case "MenuButtonSettings":
-                            _viewModel.CommandSettings.Execute(null);
-                            break;
+                        Menu_Tapped(id);
                     }
-
                     break;
             }
-            */
         }
 
         private void AddMenuItem(string id, string title, string img)
@@ -1445,7 +1489,7 @@ namespace DVBTTelevizor.MAUI
             AddMenuItem("menuQuit", "Quit application".Translated(), "quit.png");
             AddMenuItem("menuClose", "Close menu".Translated(), "icon.png");
 
-            _menuItems.First().Selected = true;
+           // _menuItems.First().Selected = true;
 
           _viewModel.UpdateMenu(_menuItems);
         }

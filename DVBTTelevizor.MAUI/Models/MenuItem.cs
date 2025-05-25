@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI
 {
-    public class MenuItem
+    public class MenuItem : BaseNotifableObject
     {
         public string Id { get; set; }
 
@@ -20,6 +20,15 @@ namespace DVBTTelevizor.MAUI
             {
                 return Selected ? "#007cd2" : "#444444";
             }
+        }
+
+        public void Update()
+        {
+            OnPropertyChanged(nameof(Id));
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(ImgSource));
+            OnPropertyChanged(nameof(Selected));
+            OnPropertyChanged(nameof(BackgroundColor));
         }
     }
 }
