@@ -690,7 +690,6 @@ namespace DVBTTelevizor.MAUI
                         MenuItems.Add(item);
                     }
                 }
-
                 OnPropertyChanged(nameof(MenuItems));
             });
         }

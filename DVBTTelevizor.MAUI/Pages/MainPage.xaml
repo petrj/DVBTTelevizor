@@ -169,7 +169,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <AbsoluteLayout BackgroundColor="Black" Margin="0,0,0,0">
+    <AbsoluteLayout x:Name="MainAbsoluteLayout" BackgroundColor="Black" Margin="0,0,0,0">
 
         <!--Label AbsoluteLayout.LayoutBounds="0.5,0.1,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/-->
         <Frame IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.25,0.5,0.25" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
@@ -286,7 +286,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.11" AbsoluteLayout.LayoutFlags="All"
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.09" AbsoluteLayout.LayoutFlags="All"
               ColumnSpacing="5"
               BackgroundColor="#29242a"
               Margin="0,0,0,0">
@@ -332,18 +332,18 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Frame IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.35,0.75" BackgroundColor="#555555" CornerRadius="25">
+        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.35,0.75" BackgroundColor="#555555" CornerRadius="25">
 
-            <StackLayout BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <StackLayout x:Name="MenuStackLayout" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-                <Label Text="{local:LngXamlExt Input='Menu'}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
+                <Label x:Name="MenuLabel" Text="{local:LngXamlExt Input='Menu'}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
 
                 <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
 
-                            <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="10,10,10,10" Padding="0,0,0,0" BorderColor="White" IsVisible="True">
+                            <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="{Binding Margin}" Padding="0,0,0,0" BorderColor="White" IsVisible="true">
 
                                     <Grid RowSpacing="0">
                                         <Grid.RowDefinitions>

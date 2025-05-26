@@ -1434,16 +1434,47 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void AddMenuItem(string id, string title, string img)
+        private void AddMenuItem(string id, string title, string img, bool delimitterFollows = false)
         {
             var item = new MenuItem()
             {
                 Id = id,
                 Title = title,
-                ImgSource = img
+                ImgSource = img,
+                IsVisible = true
             };
 
+            if (delimitterFollows)
+            {
+                item.Margin = new Thickness(10, 10, 10, 40);
+            }
+
             _menuItems.Add(item);
+        }
+
+        private void FitMenuSize()
+        {
+            // TODO
+
+            /*
+            if (_menuItems == null || _menuItems.Count == 0 || MenuItemsStackLayout == null)
+                return;
+
+            double h = 0;
+            foreach (IView view in MenuItemsStackLayout.Children)
+            {
+                if (view.Height > 0)
+                {
+                    h += view.Height;
+                }
+            }
+
+            double relativeHeight = h / MainAbsoluteLayout.Height;
+
+            // Apply new bounds to the Frame using relative units
+            AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, 0.35, relativeHeight));
+            AbsoluteLayout.SetLayoutFlags(MenuFrame, AbsoluteLayoutFlags.All);
+            */
         }
 
         private void BuildMenu()
@@ -1486,12 +1517,12 @@ namespace DVBTTelevizor.MAUI
             }
 
             AddMenuItem("menuSettings", "Settings".Translated(), "settings.png");
-            AddMenuItem("menuQuit", "Quit application".Translated(), "quit.png");
+            AddMenuItem("menuQuit", "Quit application".Translated(), "quit.png", true);
             AddMenuItem("menuClose", "Close menu".Translated(), "icon.png");
 
-           // _menuItems.First().Selected = true;
+            // _menuItems.First().Selected = true;
 
-          _viewModel.UpdateMenu(_menuItems);
+            _viewModel.UpdateMenu(_menuItems);
         }
     }
 

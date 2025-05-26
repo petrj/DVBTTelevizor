@@ -8,11 +8,16 @@ namespace DVBTTelevizor.MAUI
 {
     public class MenuItem : BaseNotifableObject
     {
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
-        public string Title { get; set; }
-        public string ImgSource { get; set; }
+        public string? Title { get; set; }
+        public string? ImgSource { get; set; }
+
         public bool Selected { get; set; } = false;
+
+        public bool IsVisible { get; set; } = true;
+
+        public Thickness Margin { get; set; } = new Thickness(10,10,10,10);
 
         public string BackgroundColor
         {
