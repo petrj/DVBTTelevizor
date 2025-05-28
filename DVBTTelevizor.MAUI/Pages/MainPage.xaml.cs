@@ -1454,27 +1454,18 @@ namespace DVBTTelevizor.MAUI
 
         private void FitMenuSize()
         {
-            // TODO
+            var h = 200; // menulabel, margin, .....
 
-            /*
-            if (_menuItems == null || _menuItems.Count == 0 || MenuItemsStackLayout == null)
-                return;
+            // FontSizeForLabel ~ 12, Margin 10+10
+            var labelHeight = _viewModel.GetScaledSize(12) + 10 + 10;
 
-            double h = 0;
-            foreach (IView view in MenuItemsStackLayout.Children)
-            {
-                if (view.Height > 0)
-                {
-                    h += view.Height;
-                }
-            }
+            h += labelHeight * _menuItems.Count;
+            h += 30; // delimiter
 
-            double relativeHeight = h / MainAbsoluteLayout.Height;
+            var relativeHeight = h / MainAbsoluteLayout.Height;
 
-            // Apply new bounds to the Frame using relative units
             AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, 0.35, relativeHeight));
             AbsoluteLayout.SetLayoutFlags(MenuFrame, AbsoluteLayoutFlags.All);
-            */
         }
 
         private void BuildMenu()
@@ -1523,6 +1514,8 @@ namespace DVBTTelevizor.MAUI
             // _menuItems.First().Selected = true;
 
             _viewModel.UpdateMenu(_menuItems);
+
+            FitMenuSize();
         }
     }
 
