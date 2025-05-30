@@ -44,6 +44,7 @@ namespace DVBTTelevizor.MAUI
         private TuningWelcomePage _tuneWelcomePage = null;
         private NavigationPage _aboutPage = null;
         private NavigationPage _driverPage = null;
+        private NavigationPage _channelPage = null;
 
         private bool IsPortrait { get; set; } = false;
 
@@ -119,6 +120,9 @@ namespace DVBTTelevizor.MAUI
             _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
             _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _channelPage = new NavigationPage(new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+
+            _channelPage.Disappearing += _channelPage_Disappearing;
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -214,6 +218,11 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             };
+        }
+
+        private void _channelPage_Disappearing(object? sender, EventArgs e)
+        {
+            _viewModel.RefreshChannels();
         }
 
         private async void USBConnectOrDisconnect()
@@ -769,30 +778,6 @@ namespace DVBTTelevizor.MAUI
         private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
         {
 
-        }
-
-        private void Menu_Tapped(object sender, TappedEventArgs e)
-        {
-            if (e.Parameter != null && e.Parameter is string p)
-            {
-                Menu_Tapped(p);
-            }
-        }
-
-        private void Menu_Tapped(string menuId)
-        {
-            switch (menuId)
-            {
-                case "menuSettings":
-                    SettingsButton_Clicked(this, null);
-                    break;
-                case "menuClose":
-                    _viewModel.MenuVisible = false;
-                    break;
-                case "menuQuit":
-                    WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
-                    break;
-            }
         }
 
         private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
@@ -1434,6 +1419,21 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async void EditChannel(Channel channel)
+        {
+            if (_viewModel.SelectedChannel == null || _channelPage.IsLoaded)
+            {
+                return;
+            }
+
+            if (_channelPage.RootPage is ChannelPage p)
+            {
+                p.SelectedChannel = channel;
+            }
+
+            await Navigation.PushAsync(_channelPage);
+        }
+
         private void AddMenuItem(string id, string title, string img, bool delimitterFollows = false)
         {
             var item = new MenuItem()
@@ -1466,6 +1466,33 @@ namespace DVBTTelevizor.MAUI
 
             AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, 0.35, relativeHeight));
             AbsoluteLayout.SetLayoutFlags(MenuFrame, AbsoluteLayoutFlags.All);
+        }
+
+        private void Menu_Tapped(object sender, TappedEventArgs e)
+        {
+            if (e.Parameter != null && e.Parameter is string p)
+            {
+                Menu_Tapped(p);
+            }
+        }
+
+        private void Menu_Tapped(string menuId)
+        {
+            _viewModel.MenuVisible = false;
+            switch (menuId)
+            {
+                case "menuSettings":
+                    SettingsButton_Clicked(this, null);
+                    break;
+                case "menuClose":
+                    break;
+                case "menuQuit":
+                    WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
+                    break;
+                case "menuChannel":
+                    EditChannel(_viewModel.SelectedChannel);
+                    break;
+            }
         }
 
         private void BuildMenu()
@@ -1507,9 +1534,15 @@ namespace DVBTTelevizor.MAUI
                 //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonShowEPG"));
             }
 
+            var selectedChannel = _viewModel.SelectedChannel;
+            if (selectedChannel != null)
+            {
+                AddMenuItem("menuChannel", "Edit channel".Translated(), "edit.png");
+            }
+
             AddMenuItem("menuSettings", "Settings".Translated(), "settings.png");
             AddMenuItem("menuQuit", "Quit application".Translated(), "quit.png", true);
-            AddMenuItem("menuClose", "Close menu".Translated(), "icon.png");
+            AddMenuItem("menuClose", "Close menu".Translated(), "close.png");
 
             // _menuItems.First().Selected = true;
 

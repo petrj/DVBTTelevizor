@@ -146,6 +146,7 @@ namespace DVBTTelevizor.MAUI
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 string? selectedChanneFrequencyAndMapPID = null;
+                Channel? firstChannel = null;
 
                 try
                 {
@@ -165,18 +166,24 @@ namespace DVBTTelevizor.MAUI
 
                     foreach (var channel in channels)
                     {
-                        Channels.Add(channel.Clone());
-                    }
+                        var ch = channel.Clone();
+                        ch.Selected = false;
 
-                    if (selectedChanneFrequencyAndMapPID != null)
-                    {
-                        var selectedChannel = await SelectChannelByFrequencyAndMapPID(selectedChanneFrequencyAndMapPID);
-                        if (selectedChannel == null)
+                        if (firstChannel == null)
                         {
-                            _loggingService.Debug($"selecting first channel");
-
-                            SelectFirstChannel();
+                            firstChannel = ch;
+                            if (selectedChanneFrequencyAndMapPID == null)
+                            {
+                                ch.Selected = true;
+                            }
                         }
+
+                        if (selectedChanneFrequencyAndMapPID == ch.FrequencyAndMapPID)
+                        {
+                            ch.Selected = true;
+                        }
+
+                        Channels.Add(ch);
                     }
 
                     _loggingService.Debug($"Channels refreshed");
