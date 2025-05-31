@@ -4,7 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.ChannelPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Channel detail'}">
+             Title="{local:LngXamlExt Input='Channel'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>

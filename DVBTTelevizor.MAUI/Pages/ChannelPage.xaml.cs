@@ -43,10 +43,16 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         set
         {
             if (_channelPageViewModel == null)
-            {
                 return;
-            }
+
             _channelPageViewModel.Channel = value;
+
+            var title = "Channel".Translated();
+            if (value != null && !String.IsNullOrWhiteSpace(value.Name))
+            {
+                title += $" - {value.Name}";
+            }
+            Title = title;
         }
     }
 
