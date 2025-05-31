@@ -14,14 +14,21 @@
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="30,20,20,20"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
-
-                <Setter Property="Padding" Value="0,0,0,0"/>
-                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+                <Setter Property="Background" Value="#444444"/>
                 <Setter Property="CornerRadius" Value="7"/>
-                <Setter Property="BackgroundColor" Value="Gray"/>
-                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style x:Key="EntryStyle" TargetType="Entry">
+                <Setter Property="TextColor" Value="Yellow"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="PlaceholderColor" Value="Gray"/>
+                <Setter Property="BackgroundColor" Value="#222222"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
             </Style>
 
             <Style x:Key="LabelStyle" TargetType="Label">
@@ -32,21 +39,175 @@
                 <Setter Property="HorizontalOptions" Value="End" />
             </Style>
 
-            <Style x:Key="DonateButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="20,10,20,10"/>
-                <Setter Property="FontAttributes" Value="Bold"/>
-                <Setter Property="Padding" Value="0,0,0,0"/>
-                <Setter Property="BorderWidth" Value="0"/>
-                <Setter Property="CornerRadius" Value="7"/>
+            <Style x:Key="SeparatorBoxViewStyle" TargetType="BoxView">
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="HeightRequest" Value="1"/>
+                <Setter Property="Color" Value="Gray"/>
             </Style>
 
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <AbsoluteLayout BackgroundColor="Black">
+    <ScrollView x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/>
+        <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand" Margin="0,0,0,10">
 
-    </AbsoluteLayout>
+            <Grid RowSpacing="0" Margin="10,10,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="34*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="64*" />
+                </Grid.ColumnDefinitions>
+
+                <BoxView x:Name="NameBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                <Label Grid.Row="0" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                <Entry Grid.Row="0" Grid.Column="2"
+                                   Margin="0,2,0,2"
+                                   x:Name="EntryName"
+                                   Text="{Binding Channel.Name, Mode=TwoWay}"
+                                   Placeholder="Channel name"
+                                   Style="{DynamicResource EntryStyle}"
+                                   FontSize="{Binding FontSizeForEntry}" />
+
+            </Grid>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Grid RowSpacing="0" Margin="10,10,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="34*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="64*" />
+                </Grid.ColumnDefinitions>
+
+                <BoxView x:Name="NumberBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+
+                <Label Grid.Row="0" Grid.Column="0" Text="Number" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Entry Grid.Row="0" Grid.Column="2"
+                                   Margin="0,2,0,2"
+                                   x:Name="EntryNumber"
+                                   Text="{Binding Channel.Number, Mode=TwoWay}"
+                                   Placeholder="Channel number"
+                                   Style="{DynamicResource EntryStyle}"
+                                   Keyboard="Numeric"
+                                   FontSize="{Binding FontSizeForEntry}" />
+
+            </Grid>
+
+            <Grid RowSpacing="0" Margin="10,10,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="ButtonUp" Grid.Row="0" Grid.Column="0" Text="Move up" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}"  Clicked="ButtonUp_Clicked"/>
+                <Button x:Name="ButtonDown" Grid.Row="0" Grid.Column="1" Text="Move down" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDown_Clicked" />
+
+            </Grid>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Provider" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.ProviderName}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.FrequencyLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Free" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.FreeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.BandwdithLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,0,10,0" x:Name="KeyStop01" HeightRequest="0" />
+
+            <Label Margin="10,10,10,0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Service type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.ServiceTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+            <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+            <Label Margin="10,0,10,0" x:Name="KeyStop02" HeightRequest="0" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Signal strength" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
+            <Label Margin="10,0,10,10" Text="{Binding SignalStrength}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}"  IsVisible="{Binding SignalStrengthVisible}"></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Bitrate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamBitRateVisible}" />
+            <Label Margin="10,0,10,10" Text="{Binding Bitrate}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamBitRateVisible}" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamBitRateVisible}" ></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamInfoVisible}" />
+            <Label Margin="10,0,10,10" Text="{Binding StreamVideoSize}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamInfoVisible}" />
+
+            <Label Margin="10,0,10,0" x:Name="KeyStop03" HeightRequest="0" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}"></BoxView>
+
+            <Label Margin="10,10,10,0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding AudioTracksInfoVisible}" />
+            <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding AudioTracks, Mode=OneWay}" IsVisible="{Binding AudioTracksInfoVisible}" x:Name="AudioTracksStackLayout">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="Transparent" Padding="5">
+                            <Label Text="{Binding ValueWithDot, Mode=OneWay}" TextColor="{Binding Colour}" VerticalOptions="Center" HorizontalOptions="End"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference AudioTracksStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </StackLayout>
+            <Button Margin="10,20,10,10" x:Name="ButtonChangeAudio" Text="Change audio track" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}" />
+
+            <Label Margin="10,10,10,0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SubtitlesTracksInfoVisible}" />
+            <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding Subtitles, Mode=OneWay}" IsVisible="{Binding SubtitlesTracksInfoVisible}" x:Name="SubtitlesStackLayout">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="Transparent" Padding="5">
+                            <Label Text="{Binding ValueWithDot, Mode=OneWay}" TextColor="{Binding Colour}" VerticalOptions="Center" HorizontalOptions="End"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference SubtitlesStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </StackLayout>
+            <Button Margin="10,20,10,10" x:Name="ButtonChangeSubtitles" Text="Change subtitles" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}" />
+
+            <Button Margin="10,20,10,0" x:Name="ButtonDeleteChannel" Text="Delete"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
+
+
+        </StackLayout>
+
+    </ScrollView>
 
 </ContentPage>

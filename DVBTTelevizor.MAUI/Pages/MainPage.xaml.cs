@@ -1428,7 +1428,7 @@ namespace DVBTTelevizor.MAUI
 
             if (_channelPage.RootPage is ChannelPage p)
             {
-                p.SelectedChannel = channel;
+                p.Channel = channel;
             }
 
             await Navigation.PushAsync(_channelPage);

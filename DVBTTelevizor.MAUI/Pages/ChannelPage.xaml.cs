@@ -30,7 +30,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
-    public Channel? SelectedChannel
+    public Channel? Channel
     {
         get
         {
@@ -134,5 +134,30 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     public void OnTextSent(string text)
     {
         _loggingService.Debug($"ChannelPage Page OnTextSent {text}");
+    }
+
+    private void ButtonChangeAudio_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ButtonChangeSubtitles_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ButtonDeleteChannel_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ButtonUp_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ButtonDown_Clicked(object sender, EventArgs e)
+    {
+
     }
 }

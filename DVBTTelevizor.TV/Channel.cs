@@ -37,7 +37,14 @@ namespace DVBTTelevizor
         {
             get
             {
-                return (Bandwdith / 1000000).ToString("N3") + " MHz";
+                var mhzN = Bandwdith % 1000000;
+                if  (mhzN == 0)
+                {
+                    return (Bandwdith / 1000000).ToString("N0") + " MHz";
+                } else
+                {
+                    return (Bandwdith / 1000000).ToString("N3") + " MHz";
+                }
             }
         }
 
