@@ -30,8 +30,13 @@ namespace DVBTTelevizor.MAUI
             {
                 _channel = value;
 
-                OnPropertyChanged(nameof(Channel));
+                NotifyChannelChange();
             }
+        }
+
+        public void NotifyChannelChange()
+        {
+            OnPropertyChanged(nameof(Channel));
         }
     }
 }

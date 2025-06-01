@@ -12,6 +12,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
+    private string? _previousName = null;
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -27,18 +28,54 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
         BindingContext = _channelPageViewModel = new ChannelPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
+        EntryName.Focused += delegate
+        {
+            EntryName.CursorPosition = EntryNumber.Text == null ? 0 : EntryName.Text.Length;
+            _previousName = _channelPageViewModel?.Channel?.Name;
+        };
+        EntryName.Unfocused += EntryName_Unfocused;
+
         BuildFocusableItems();
+    }
+
+    private void EntryName_Unfocused(object? sender, FocusEventArgs e)
+    {
+        if (_channelPageViewModel == null || _channelPageViewModel.Channel == null)
+            return;
+
+        if (_channelPageViewModel.Channel.Name == _previousName)
+        {
+            return;
+        }
+
+        Task.Run(async () =>
+        {
+            if (string.IsNullOrEmpty(EntryName.Text))
+            {
+                _channelPageViewModel.Channel.Name = _previousName;
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await _dialogService.Information($"Invalid name".Translated());
+                    _channelPageViewModel.NotifyChannelChange();
+                });
+            }
+
+            //if (_channelPageViewModel.Channel.Name != _previousName)
+            //{
+            //    _channelPageViewModel.Changed = true;
+            //    await _channelPageViewModel.SaveChannels();
+            //}
+
+            _previousName = null;
+        });
     }
 
     public Channel? Channel
     {
         get
         {
-            if (_channelPageViewModel == null)
-            {
-                return null;
-            }
-            return _channelPageViewModel.Channel;
+            return _channelPageViewModel?.Channel;
         }
         set
         {

@@ -1492,6 +1492,12 @@ namespace DVBTTelevizor.MAUI
                 case "menuChannel":
                     EditChannel(_viewModel.SelectedChannel);
                     break;
+                case "menuRefresh":
+                    Task.Run(async () =>
+                    {
+                        await _viewModel.RefreshChannels();
+                    });
+                    break;
             }
         }
 
@@ -1541,6 +1547,7 @@ namespace DVBTTelevizor.MAUI
             }
 
             AddMenuItem("menuSettings", "Settings".Translated(), "settings.png");
+            AddMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png");
             AddMenuItem("menuQuit", "Quit application".Translated(), "quit.png", true);
             AddMenuItem("menuClose", "Close menu".Translated(), "close.png");
 
