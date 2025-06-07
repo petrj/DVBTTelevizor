@@ -15,6 +15,14 @@ foreach ($folder in `
     "DVBTTelevizor.MAUI\obj",
     "LibVLCSharp.MAUI.Windows\bin",
     "LibVLCSharp.MAUI.Windows\obj",
+    "RTLSDR\bin",
+    "RTLSDR\obj",
+    "RTLSDR.Audio\bin",
+    "RTLSDR.Audio\obj",
+    "RTLSDR.Common\bin",
+    "RTLSDR.Common\obj",
+    "RTLSDR.FM\bin",
+    "RTLSDR.FM\obj",
     "packages",
     ".vs"
      ))
@@ -25,8 +33,10 @@ foreach ($folder in `
             $fullPath += "\"
     }
 
+    Write-Host "Removing $fullPath"
+
     if (Test-Path -Path $fullPath)
     {
-	Remove-Item -Path $fullPath -Recurse -Force -Verbose		
+	    Remove-Item -Path $fullPath -Recurse -Force -Verbose		
     }
 }

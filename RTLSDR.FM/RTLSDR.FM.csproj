@@ -4,6 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>RTLSDR.FM</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LoggerService" Version="1.0.4" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\RTLSDR.Common\RTLSDR.Common.csproj" />
   </ItemGroup>

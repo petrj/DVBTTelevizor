@@ -141,10 +141,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Pages\ChannelPage.xaml.cs">
 	    <DependentUpon>ChannelPage.xaml</DependentUpon>
 	  </Compile>

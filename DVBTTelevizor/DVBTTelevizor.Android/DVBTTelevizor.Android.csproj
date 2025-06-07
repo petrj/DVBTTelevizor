@@ -178,12 +178,6 @@
     <Folder Include="Resources\drawable-xxxhdpi\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DVBTTelevizor\DVBTTelevizor.csproj">
-      <Project>{D909A3AA-45B0-4F06-9975-404C7CAA96AB}</Project>
-      <Name>DVBTTelevizor</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -381,6 +375,12 @@
     <AndroidResource Include="Resources\drawable\Empty.png">
       <CustomToolNamespace>MSBuild:UpdateGeneratedFiles</CustomToolNamespace>
     </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DVBTTelevizor\DVBTTelevizor.csproj">
+      <Project>{d7d14254-aec9-49b9-8543-1de3d0e4adda}</Project>
+      <Name>DVBTTelevizor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>

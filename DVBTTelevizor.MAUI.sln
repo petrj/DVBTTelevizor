@@ -1,0 +1,107 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D54974CA-1DE5-430E-812E-133929BDDFE4}"
+	ProjectSection(SolutionItems) = preProject
+		BuildAPK.bat = BuildAPK.bat
+		BuildAPK.ps1 = BuildAPK.ps1
+		Clear.bat = Clear.bat
+		Clear.ps1 = Clear.ps1
+		devices.txt = devices.txt
+		PushTestingDVBTDriverDataToDevice.bat = PushTestingDVBTDriverDataToDevice.bat
+		PushTestingDVBTDriverManagerDataToDevice.bat = PushTestingDVBTDriverManagerDataToDevice.bat
+		ResizeIconImage.ps1 = ResizeIconImage.ps1
+		WifiDebug.bat = WifiDebug.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestingDVBTDriverManagerData", "TestingDVBTDriverManagerData", "{823E48A1-D12F-4F43-BAC3-7158BCDFBE9B}"
+	ProjectSection(SolutionItems) = preProject
+		TestingDVBTDriverManagerData\2300.ts = TestingDVBTDriverManagerData\2300.ts
+		TestingDVBTDriverManagerData\2400.ts = TestingDVBTDriverManagerData\2400.ts
+		TestingDVBTDriverManagerData\310.ts = TestingDVBTDriverManagerData\310.ts
+		TestingDVBTDriverManagerData\7070.ts = TestingDVBTDriverManagerData\7070.ts
+		TestingDVBTDriverManagerData\stream.ts = TestingDVBTDriverManagerData\stream.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestingDVBTDriverData", "TestingDVBTDriverData", "{E0D4A3B9-003B-4BB6-A3A4-905DA75CDB1C}"
+	ProjectSection(SolutionItems) = preProject
+		TestingDVBTDriverData\DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts = TestingDVBTDriverData\DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts
+		TestingDVBTDriverData\DVBTTelevizor.channels.json = TestingDVBTDriverData\DVBTTelevizor.channels.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.MAUI", "DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj", "{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.Driver", "DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj", "{9B023BD9-C561-4342-9C53-FB9FD5112641}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DVBTTelevizor.TV", "DVBTTelevizor.TV\DVBTTelevizor.TV.csproj", "{FED9F232-E440-4504-9627-A7D4DA1258D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibVLCSharp.MAUI.Windows", "LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj", "{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTLSDR", "RTLSDR\RTLSDR.csproj", "{A9D287AB-F5EE-4343-8671-B4315529E90B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTLSDR.Common", "RTLSDR.Common\RTLSDR.Common.csproj", "{F5E33076-2BF1-4768-BFFF-05536C537C5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTLSDR.FM", "RTLSDR.FM\RTLSDR.FM.csproj", "{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AndroidTV|Any CPU = AndroidTV|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.AndroidTV|Any CPU.Deploy.0 = Debug|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37377C8C-F9B6-4C1A-B919-65A3C4E182A6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9B023BD9-C561-4342-9C53-FB9FD5112641}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B023BD9-C561-4342-9C53-FB9FD5112641}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B023BD9-C561-4342-9C53-FB9FD5112641}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED9F232-E440-4504-9627-A7D4DA1258D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841F6027-8FEB-4E22-B3A1-FE03DA292F6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9D287AB-F5EE-4343-8671-B4315529E90B}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9D287AB-F5EE-4343-8671-B4315529E90B}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{A9D287AB-F5EE-4343-8671-B4315529E90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9D287AB-F5EE-4343-8671-B4315529E90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9D287AB-F5EE-4343-8671-B4315529E90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9D287AB-F5EE-4343-8671-B4315529E90B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5E33076-2BF1-4768-BFFF-05536C537C5A}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5E33076-2BF1-4768-BFFF-05536C537C5A}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{F5E33076-2BF1-4768-BFFF-05536C537C5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5E33076-2BF1-4768-BFFF-05536C537C5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5E33076-2BF1-4768-BFFF-05536C537C5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5E33076-2BF1-4768-BFFF-05536C537C5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}.AndroidTV|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}.AndroidTV|Any CPU.Build.0 = Debug|Any CPU
+		{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB4DED0-A861-426D-91C9-7F9511A9EDA3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8467F2DC-71E6-4787-8A43-455DF3FEE29C}
+	EndGlobalSection
+EndGlobal

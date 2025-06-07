@@ -7,13 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LoggerService" Version="1.0.4" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
+    <PackageReference Include="MPEGTS" Version="1.0.26" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj" />
+    <ProjectReference Include="..\RTLSDR.Common\RTLSDR.Common.csproj" />
     <ProjectReference Include="..\RTLSDR.FM\RTLSDR.FM.csproj" />
     <ProjectReference Include="..\RTLSDR\RTLSDR.csproj" />
   </ItemGroup>
