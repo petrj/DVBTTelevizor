@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp" Version="3.9.1" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.93" />
-    <PackageReference Include="SharpHook" Version="5.3.8" />
+    <PackageReference Include="LibVLCSharp" Version="3.9.3" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.70" />
+    <PackageReference Include="SharpHook" Version="6.1.1" />
   </ItemGroup>
 
 </Project>
