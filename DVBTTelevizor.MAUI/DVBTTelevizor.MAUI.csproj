@@ -128,7 +128,10 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\DVBTTelevizor.TV\DVBTTelevizor.TV.csproj" />
-	  <ProjectReference Include="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(TargetFramework.Contains('windows'))">
+		<ProjectReference Include="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
