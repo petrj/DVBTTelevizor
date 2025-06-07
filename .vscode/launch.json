@@ -2,6 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Build MAUI app (Linux only)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build on Linux",
+            "program": "/bin/true",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },        
+        {
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
@@ -36,6 +47,5 @@
             "env": {
               "DOTNET_WORKLOAD_MANIFEST_SKIP_UPDATE": "true"
             }
-          }
-    ]
+        }
 }
