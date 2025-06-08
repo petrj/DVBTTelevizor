@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Build MAUI app (Linux only)",
+            "name": "Linux release build",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Linux - Build",
+            "preLaunchTask": "Linux - release build",
             "program": "/bin/true",
             "args": [],
             "cwd": "${workspaceFolder}",

@@ -2,15 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Linux - Build",
+            "label": "Linux - release build",
             "type": "shell",
             "command": "dotnet",
             "args": [
-              "build",
+              "publish",
               "${workspaceFolder}/DVBTTelevizor.MAUI/DVBTTelevizor.MAUI.csproj",
-              "-c", "Debug",
-              "-f", "net9.0-android35.0",
-              "/p:AndroidSdkDirectory=/home/kirk/Android/Sdk/"
+              "--configuration", "Release",
+              "--framework", "net9.0-android35.0",
+              "/p:AndroidSdkDirectory=/home/kirk/Android/Sdk/",
+              "/p:AndroidPackageFormat=apk"
             ],
             "group": {
               "kind": "build"
