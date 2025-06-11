@@ -59,7 +59,7 @@ namespace DVBTTelevizor.MAUI
 
 
         // VideoStackLayout
-        private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.3, 0.3);
+        private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.3);
         private Rect LandscapeVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 0.7, 1.0);
         private Rect PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
         private Rect PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.5, 0.3);
@@ -210,7 +210,6 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer.Play(media);
             });
 
-
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>
@@ -218,6 +217,9 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             };
+
+            videoView.MediaPlayer = _mediaPlayer;
+
         }
 
         private void _channelPage_Disappearing(object? sender, EventArgs e)
@@ -620,7 +622,8 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     //_loggingService.Info("RefreshGUI completed");
-
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                    VideoStackLayout.IsVisible = true;
                 }
                 catch (Exception ex)
                 {
