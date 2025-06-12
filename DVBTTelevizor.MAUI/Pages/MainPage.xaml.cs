@@ -219,7 +219,6 @@ namespace DVBTTelevizor.MAUI
             };
 
             videoView.MediaPlayer = _mediaPlayer;
-
         }
 
         private void _channelPage_Disappearing(object? sender, EventArgs e)
@@ -677,14 +676,13 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
 
-
                 //MainThread.BeginInvokeOnMainThread(async () =>
                 //{
                 //    videoView.MediaPlayer.Play();
                 //});
 
-                    //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
-                }
+                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+            }
         }
 
         private void ConnectDriver()
@@ -749,16 +747,21 @@ namespace DVBTTelevizor.MAUI
 
         private void InitializeVLC()
         {
-            _loggingService.Info("Initializing LibVLC");
-
-            if (DeviceInfo.Platform == DevicePlatform.Android)
+            try
             {
+                _loggingService.Info("Initializing LibVLC");
+
                 _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
-                //var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
-                //_mediaPlayer.Media = media;
+                var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                _mediaPlayer.Media = media;
+                _mediaPlayer.Play();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while initializing VLC");
             }
         }
 

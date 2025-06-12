@@ -5,6 +5,7 @@ using WinRT.Interop; // <- This is key
 using LibVLCSharp.Shared;
 using Border = Microsoft.UI.Xaml.Controls.Border;
 using Grid = Microsoft.UI.Xaml.Controls.Grid;
+using DVBTTelevizor.MAUI;
 
 namespace LibVLCSharp.MAUI
 {
@@ -25,11 +26,11 @@ namespace LibVLCSharp.MAUI
 
             grid.Loaded += (s, e) =>
             {
-                var hwnd = WindowNative.GetWindowHandle(grid);
+                // Safe HWND access here:
+                var hwnd = WindowNative.GetWindowHandle(Microsoft.UI.Xaml.Window.Current);
+
                 if (VirtualView?.MediaPlayer != null)
-                {
                     VirtualView.MediaPlayer.Hwnd = hwnd;
-                }
             };
 
             return grid;

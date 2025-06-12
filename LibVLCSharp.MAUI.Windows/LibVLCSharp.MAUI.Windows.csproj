@@ -15,12 +15,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="SharpHook" Version="6.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="VideoViewHandler.cs">
-      <ExcludeFromCurrentConfiguration>true</ExcludeFromCurrentConfiguration>
-    </Compile>
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
 </Project>
