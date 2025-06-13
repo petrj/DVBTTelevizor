@@ -1,11 +1,12 @@
 ﻿using Microsoft.Maui.Handlers;
 using Microsoft.UI.Xaml.Controls;
 using System;
-using WinRT.Interop; // <- This is key
+using WinRT.Interop;
 using LibVLCSharp.Shared;
 using Border = Microsoft.UI.Xaml.Controls.Border;
 using Grid = Microsoft.UI.Xaml.Controls.Grid;
 using DVBTTelevizor.MAUI;
+using Microsoft.Maui.Platform;
 
 namespace LibVLCSharp.MAUI
 {
@@ -20,28 +21,30 @@ namespace LibVLCSharp.MAUI
         {
         }
 
+
         protected override Grid CreatePlatformView()
         {
-            var grid = new Grid();
-
-            grid.Loaded += (s, e) =>
-            {
-                // Safe HWND access here:
-                var hwnd = WindowNative.GetWindowHandle(Microsoft.UI.Xaml.Window.Current);
-
-                if (VirtualView?.MediaPlayer != null)
-                    VirtualView.MediaPlayer.Hwnd = hwnd;
-            };
-
-            return grid;
+            return new Grid();
         }
 
         public static void MapMediaPlayer(VideoViewHandler handler, VideoView view)
         {
-            if (handler.PlatformView != null && view.MediaPlayer != null)
+            try
             {
-                var hwnd = WindowNative.GetWindowHandle(handler.PlatformView);
-                view.MediaPlayer.Hwnd = hwnd;
+                if (handler.PlatformView != null && view.MediaPlayer != null)
+                {
+                    var platformWindow = App.Current.Windows.FirstOrDefault()?.Handler?.PlatformView;
+
+                    if (platformWindow is Microsoft.UI.Xaml.Window xamlWindow)
+                    {
+                        var hwnd = WindowNative.GetWindowHandle(xamlWindow);
+                        view.MediaPlayer.Hwnd = hwnd;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("MapMediaPlayer error: " + ex);
             }
         }
     }
