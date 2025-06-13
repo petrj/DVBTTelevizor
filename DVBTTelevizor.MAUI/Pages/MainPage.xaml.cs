@@ -8,6 +8,7 @@ using DVBTTelevizor.TV;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 
+
 namespace DVBTTelevizor.MAUI
 {
     public partial class MainPage : ContentPage, IOnKeyDown
@@ -437,6 +438,8 @@ namespace DVBTTelevizor.MAUI
 
             //_viewModel.NotifyToolBarChange();
 
+            WeakReferenceMessenger.Default.Send(new ChangedSizeMessage(new Size(width, height)));
+
             RefreshGUI();
         }
 
@@ -631,6 +634,36 @@ namespace DVBTTelevizor.MAUI
                 finally
                 {
                     _semaphoreSlimForRefreshGUI.Release();
+
+                    var bounds = AbsoluteLayout.GetLayoutBounds(VideoStackLayout);
+                    // Get layout flags to check if it's using relative or absolute positioning
+                    var flags = AbsoluteLayout.GetLayoutFlags(VideoStackLayout);
+
+                    // Get the size of the container in pixels
+                    double containerWidth = Width;
+                    double containerHeight = Height;
+
+                    // Convert to pixels if relative
+                    double left = bounds.X;
+                    double top = bounds.Y;
+                    double width = bounds.Width;
+                    double height = bounds.Height;
+
+                    if ((flags & AbsoluteLayoutFlags.PositionProportional) != 0)
+                    {
+                        left = bounds.X * containerWidth;
+                        top = bounds.Y * containerHeight;
+                    }
+
+                    if ((flags & AbsoluteLayoutFlags.SizeProportional) != 0)
+                    {
+                        width = bounds.Width * containerWidth;
+                        height = bounds.Height * containerHeight;
+                    }
+
+                    // Now you can create a pixel-based Rect
+                    var pixelRect = new Rect(left, top, width, height);
+                    WeakReferenceMessenger.Default.Send(new ChangedVideoPositionMessage(pixelRect));
                 }
             });
         }

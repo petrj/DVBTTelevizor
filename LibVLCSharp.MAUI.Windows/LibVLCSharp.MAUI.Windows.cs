@@ -14,4 +14,6 @@ namespace LibVLCSharp.MAUI
     {
         public MediaPlayer MediaPlayer { get; set; }
     }
+
+
 }
