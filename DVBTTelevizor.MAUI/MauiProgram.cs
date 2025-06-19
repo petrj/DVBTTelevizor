@@ -28,6 +28,10 @@ namespace DVBTTelevizor.MAUI
             builder.Services.AddSingleton<ITVConfiguration, DVBTTelevizorConfiguration>();
             builder.Services.AddSingleton<ILoggingProvider, LoggerProvider>();
 
+builder.ConfigureMauiHandlers(handlers =>
+{
+    handlers.AddHandler(typeof(VideoView), typeof(VideoViewHandler));
+});
 
 
 #if DEBUG

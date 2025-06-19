@@ -1,4 +1,6 @@
-﻿namespace LibVLCSharp.MAUI
+﻿using LibVLCSharp.Shared;
+
+namespace LibVLCSharp.MAUI
 {
     public static class MauiAppBuilderibVLC
     {
@@ -8,14 +10,10 @@
         }
     }
 
-    public class VideoView : BoxView
+    public class VideoView : View
     {
-        public LibVLCSharp.Shared.MediaPlayer MediaPlayer { get; set; }
-
-        protected override void OnSizeAllocated(double width, double height)
-        {
-            BackgroundColor = Color.FromRgb(0, 0, 255);
-            base.OnSizeAllocated(width, height);
-        }
+        public MediaPlayer MediaPlayer { get; set; }
     }
+
+
 }

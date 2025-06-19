@@ -8,6 +8,7 @@ using DVBTTelevizor.TV;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 
+
 namespace DVBTTelevizor.MAUI
 {
     public partial class MainPage : ContentPage, IOnKeyDown
@@ -59,7 +60,7 @@ namespace DVBTTelevizor.MAUI
 
 
         // VideoStackLayout
-        private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.3, 0.3);
+        private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.3);
         private Rect LandscapeVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 0.7, 1.0);
         private Rect PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
         private Rect PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.5, 0.3);
@@ -210,6 +211,10 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer.Play(media);
             });
 
+            WeakReferenceMessenger.Default.Register<ChangedWindowPositionMessage>(this, (r, m) =>
+            {
+                UpdateVideoWindowPosition();
+            });
 
             _settingsPage.Disappearing += delegate
             {
@@ -218,6 +223,8 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             };
+
+            videoView.MediaPlayer = _mediaPlayer;
         }
 
         private void _channelPage_Disappearing(object? sender, EventArgs e)
@@ -436,6 +443,8 @@ namespace DVBTTelevizor.MAUI
 
             //_viewModel.NotifyToolBarChange();
 
+            WeakReferenceMessenger.Default.Send(new ChangedSizeMessage(new Size(width, height)));
+
             RefreshGUI();
         }
 
@@ -620,7 +629,8 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     //_loggingService.Info("RefreshGUI completed");
-
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                    VideoStackLayout.IsVisible = true;
                 }
                 catch (Exception ex)
                 {
@@ -629,8 +639,30 @@ namespace DVBTTelevizor.MAUI
                 finally
                 {
                     _semaphoreSlimForRefreshGUI.Release();
+
+                    UpdateVideoWindowPosition();
                 }
             });
+        }
+
+        private void UpdateVideoWindowPosition()
+        {
+            switch (_viewModel.PlayingState)
+            {
+                case PlayingStateEnum.Playing:
+                    WeakReferenceMessenger.Default.Send(
+                    new ChangedVideoPositionMessage(
+                        new Rect(0, 0, this.Width, this.Height)));
+                    break;
+
+                //case PlayingStateEnum.PlayingInPreview:
+                default:
+                    WeakReferenceMessenger.Default.Send(
+                    new ChangedVideoPositionMessage(
+                        new Rect((0.70) * Width, (0.78) * Height,
+                                 (0.30) * Width, (0.22) * Height)));
+                    break;
+            }
         }
 
         public PlayingStateEnum PlayingState
@@ -674,14 +706,13 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
 
-
                 //MainThread.BeginInvokeOnMainThread(async () =>
                 //{
                 //    videoView.MediaPlayer.Play();
                 //});
 
-                    //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
-                }
+                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
+            }
         }
 
         private void ConnectDriver()
@@ -746,16 +777,21 @@ namespace DVBTTelevizor.MAUI
 
         private void InitializeVLC()
         {
-            _loggingService.Info("Initializing LibVLC");
-
-            if (DeviceInfo.Platform == DevicePlatform.Android)
+            try
             {
+                _loggingService.Info("Initializing LibVLC");
+
                 _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
-                //var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
-                //_mediaPlayer.Media = media;
+                var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                _mediaPlayer.Media = media;
+                _mediaPlayer.Play();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Error while initializing VLC");
             }
         }
 
