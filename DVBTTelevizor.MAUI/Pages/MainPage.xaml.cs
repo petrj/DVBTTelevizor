@@ -211,6 +211,11 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer.Play(media);
             });
 
+            WeakReferenceMessenger.Default.Register<ChangedWindowPositionMessage>(this, (r, m) =>
+            {
+                UpdateVideoWindowPosition();
+            });
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run( async () =>
@@ -635,24 +640,29 @@ namespace DVBTTelevizor.MAUI
                 {
                     _semaphoreSlimForRefreshGUI.Release();
 
-                    switch (_viewModel.PlayingState)
-                    {
-                        case PlayingStateEnum.Playing:
-                            WeakReferenceMessenger.Default.Send(
-                            new ChangedVideoPositionMessage(
-                                new Rect(0, 0, this.Width, this.Height)));
-                            break;
-
-                        //case PlayingStateEnum.PlayingInPreview:
-                        default:
-                            WeakReferenceMessenger.Default.Send(
-                            new ChangedVideoPositionMessage(
-                                new Rect((0.70)*Width, (0.78) * Height,
-                                         (0.30)*Width, (0.22) * Height)));
-                            break;
-                    }
+                    UpdateVideoWindowPosition();
                 }
             });
+        }
+
+        private void UpdateVideoWindowPosition()
+        {
+            switch (_viewModel.PlayingState)
+            {
+                case PlayingStateEnum.Playing:
+                    WeakReferenceMessenger.Default.Send(
+                    new ChangedVideoPositionMessage(
+                        new Rect(0, 0, this.Width, this.Height)));
+                    break;
+
+                //case PlayingStateEnum.PlayingInPreview:
+                default:
+                    WeakReferenceMessenger.Default.Send(
+                    new ChangedVideoPositionMessage(
+                        new Rect((0.70) * Width, (0.78) * Height,
+                                 (0.30) * Width, (0.22) * Height)));
+                    break;
+            }
         }
 
         public PlayingStateEnum PlayingState
