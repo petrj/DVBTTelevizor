@@ -1096,20 +1096,16 @@ namespace DVBTTelevizor.MAUI
                                 break;
                         }
 
-                        CallWithTimeout(delegate
-                        {
-                            videoView.MediaPlayer.Play(_media);
-                        });
                     } else
                     if (DeviceInfo.Platform == DevicePlatform.WinUI)
                     {
-                        var udpStreamer = new UDPStreamer(_loggingService,"127.0.0.1", 8012);
-                        var url = $"udp://@{udpStreamer.IP}:{udpStreamer.Port}";
-
-                        udpStreamer.SendStream(_driver.VideoStream);
-
-                        VLCLauncher.RunInWindows(url);
+                        _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
                     }
+
+                    CallWithTimeout(delegate
+                    {
+                        videoView.MediaPlayer.Play(_media);
+                    });
 
                     //SetSubtitles(-1);
                     //SetAudioTrack(-100);
