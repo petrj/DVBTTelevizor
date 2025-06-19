@@ -635,35 +635,22 @@ namespace DVBTTelevizor.MAUI
                 {
                     _semaphoreSlimForRefreshGUI.Release();
 
-                    var bounds = AbsoluteLayout.GetLayoutBounds(VideoStackLayout);
-                    // Get layout flags to check if it's using relative or absolute positioning
-                    var flags = AbsoluteLayout.GetLayoutFlags(VideoStackLayout);
-
-                    // Get the size of the container in pixels
-                    double containerWidth = Width;
-                    double containerHeight = Height;
-
-                    // Convert to pixels if relative
-                    double left = bounds.X;
-                    double top = bounds.Y;
-                    double width = bounds.Width;
-                    double height = bounds.Height;
-
-                    if ((flags & AbsoluteLayoutFlags.PositionProportional) != 0)
+                    switch (_viewModel.PlayingState)
                     {
-                        left = bounds.X * containerWidth;
-                        top = bounds.Y * containerHeight;
-                    }
+                        case PlayingStateEnum.Playing:
+                            WeakReferenceMessenger.Default.Send(
+                            new ChangedVideoPositionMessage(
+                                new Rect(0, 0, this.Width, this.Height)));
+                            break;
 
-                    if ((flags & AbsoluteLayoutFlags.SizeProportional) != 0)
-                    {
-                        width = bounds.Width * containerWidth;
-                        height = bounds.Height * containerHeight;
+                        //case PlayingStateEnum.PlayingInPreview:
+                        default:
+                            WeakReferenceMessenger.Default.Send(
+                            new ChangedVideoPositionMessage(
+                                new Rect((2.0 / 3.0)*Width, (2.0 / 3.0) * Height,
+                                         (1.0 / 3.0)*Width, (1.0 / 3.0) * Height)));
+                            break;
                     }
-
-                    // Now you can create a pixel-based Rect
-                    var pixelRect = new Rect(left, top, width, height);
-                    WeakReferenceMessenger.Default.Send(new ChangedVideoPositionMessage(pixelRect));
                 }
             });
         }

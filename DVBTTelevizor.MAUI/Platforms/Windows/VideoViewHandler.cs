@@ -26,14 +26,26 @@ namespace LibVLCSharp.MAUI
         {
             WeakReferenceMessenger.Default.Register<ChangedVideoPositionMessage>(this, (r, m) =>
             {
-                var rect = m.Value;
-                SetWindowPos(hwnd, HWND_TOP,
-                    Convert.ToInt32(rect?.Left),
-                    Convert.ToInt32(rect?.Top),
-                    Convert.ToInt32(rect?.Width),
-                    Convert.ToInt32(rect?.Height),
-                    SWP_NOZORDER | SWP_NOACTIVATE);
+                var platformWindow = App.Current.Windows.FirstOrDefault()?.Handler?.PlatformView;
 
+                if (platformWindow is Microsoft.UI.Xaml.Window xamlWindow)
+                {
+                    //var hwnd = WindowNative.GetWindowHandle(xamlWindow);
+                    var parentHwnd = WindowNative.GetWindowHandle(xamlWindow);
+
+                    int titleBarHeight = GetSystemMetrics(4);  // 4 = SM_CYCAPTION
+
+                    RECT parentWindowRectange;
+                    GetWindowRect(parentHwnd, out parentWindowRectange);
+
+                    var rect = m.Value;
+                    SetWindowPos(hwnd, HWND_TOP,
+                        Convert.ToInt32(parentWindowRectange.Left + rect?.Left),
+                        Convert.ToInt32(parentWindowRectange.Top + titleBarHeight + rect?.Top),
+                        Convert.ToInt32(rect?.Width),
+                        Convert.ToInt32(rect?.Height),
+                        SWP_NOZORDER | SWP_NOACTIVATE);
+                }
             });
         }
 
@@ -82,6 +94,22 @@ namespace LibVLCSharp.MAUI
                 Console.WriteLine("MapMediaPlayer error: " + ex);
             }
         }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [DllImport("user32.dll")]
+        static extern int GetSystemMetrics(int nIndex);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateWindowEx(
