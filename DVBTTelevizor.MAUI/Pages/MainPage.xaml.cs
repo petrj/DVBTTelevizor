@@ -647,8 +647,8 @@ namespace DVBTTelevizor.MAUI
                         default:
                             WeakReferenceMessenger.Default.Send(
                             new ChangedVideoPositionMessage(
-                                new Rect((2.0 / 3.0)*Width, (2.0 / 3.0) * Height,
-                                         (1.0 / 3.0)*Width, (1.0 / 3.0) * Height)));
+                                new Rect((0.70)*Width, (0.78) * Height,
+                                         (0.30)*Width, (0.22) * Height)));
                             break;
                     }
                 }
