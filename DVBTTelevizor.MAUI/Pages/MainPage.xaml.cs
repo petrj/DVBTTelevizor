@@ -785,9 +785,11 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
+                /*
                 var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
                 _mediaPlayer.Media = media;
                 _mediaPlayer.Play();
+                */
             }
             catch (Exception ex)
             {
