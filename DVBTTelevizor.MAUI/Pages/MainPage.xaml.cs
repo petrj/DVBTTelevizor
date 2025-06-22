@@ -785,9 +785,11 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
+                /*  debug video
                 var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
                 _mediaPlayer.Media = media;
                 _mediaPlayer.Play();
+                */
             }
             catch (Exception ex)
             {
@@ -1148,13 +1150,15 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.NotifyChannelChange();
 
-                /*playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
+                /*
+                playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
                 if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
                 {
                     await _viewModel.ScanEPG(channel, true, true, 2000, 3000);
                 }
                 */
+
                 await _viewModel.ShowActualPlayingMessage(playInfo);
 
                 //if (_config.PlayOnBackground)
