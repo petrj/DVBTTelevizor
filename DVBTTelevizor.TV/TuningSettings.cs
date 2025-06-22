@@ -88,8 +88,11 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info("SetFrequencies");
 
-                // TODO: load/save bandwidth/freq (min/max?)
-                BandwidthKHz = driver.BandwidthMinKHz;
+                if (BandwidthKHz < driver.BandwidthMinKHz ||
+                    BandwidthKHz > driver.BandwidthMaxKHz)
+                {
+                    BandwidthKHz = driver.BandwidthMinKHz;
+                }
 
                 DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
                 DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
