@@ -31,6 +31,7 @@ namespace DVBTTelevizor.MAUI
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
         private ListViewSelector? _listViewSelector = null;
+        private bool? _EPGDetailVisibleLastValue = null;
 
         private bool _EPGDetailEnabled = true;
         private bool _menuVisible = false;
@@ -300,7 +301,17 @@ namespace DVBTTelevizor.MAUI
             {
                 _EPGDetailEnabled = value;
                 OnPropertyChanged(nameof(EPGDetailVisible));
-                //NotifyEPGDetailVisibilityChange();
+                NotifyEPGDetailVisibilityChange();
+            }
+        }
+
+        private void NotifyEPGDetailVisibilityChange()
+        {
+            if (!_EPGDetailVisibleLastValue.HasValue || _EPGDetailVisibleLastValue.Value != EPGDetailVisible)
+            {
+                _EPGDetailVisibleLastValue = EPGDetailVisible;
+                //MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EPGDetailVisibilityChange);
+                OnPropertyChanged(nameof(EPGDetailVisible));
             }
         }
 
@@ -308,9 +319,6 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return true;
-                // TODO: remove after debugged!
-
                 return
                     EPGDetailEnabled &&
                     SelectedChannel != null &&

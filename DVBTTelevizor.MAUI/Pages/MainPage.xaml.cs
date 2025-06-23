@@ -629,8 +629,8 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     //_loggingService.Info("RefreshGUI completed");
-                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
-                    VideoStackLayout.IsVisible = true;
+                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
+                    //VideoStackLayout.IsVisible = true;
                 }
                 catch (Exception ex)
                 {
@@ -1318,7 +1318,10 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
-                    //
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await ActionStop(false);
+                    });
                     break;
 
                 case KeyboardNavigationActionEnum.OK:

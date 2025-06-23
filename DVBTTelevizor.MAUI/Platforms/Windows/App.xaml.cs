@@ -40,7 +40,8 @@ namespace DVBTTelevizor.MAUI.WinUI
 
             Task.Run(async () =>
             {
-            //    await hook.RunAsync();
+                // enabling keyboard hooking leads to very slow performance!
+                //await hook.RunAsync();
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
