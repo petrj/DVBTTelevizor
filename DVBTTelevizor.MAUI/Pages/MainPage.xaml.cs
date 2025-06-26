@@ -1150,14 +1150,13 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.NotifyChannelChange();
 
-                /*
+
                 playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
                 if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
                 {
                     await _viewModel.ScanEPG(channel, true, true, 2000, 3000);
                 }
-                */
 
                 await _viewModel.ShowActualPlayingMessage(playInfo);
 
