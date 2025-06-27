@@ -209,86 +209,9 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
-                    if (_scanningEPG)
-                    {
-                        return;
-                    }
-
-                    try
-                    {
-                        _scanningEPG = true;
-
-                        if (!silent)
-                        {
-                            WeakReferenceMessenger.Default.Send(new ToastMessage($"Scanning EPG ....".Translated()));
-                        }
-
-                        await Task.Delay(msRunTimeOut);
-
-                        var justPlaying = ((_playingChannel == channel || _recordingChannel == channel));
-
-                        if (!justPlaying)
-                        {
-                            var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
-
-                            if (tuned.Result != DVBTDriverSearchProgramResultEnum.OK)
-                            {
-                                if (!silent)
-                                {
-                                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Scanning EPG failed".Translated()));
-                                }
-                                return;
-                            }
-                        }
-
-                        var res = await EIT.Scan(msScanTimeOut);
-
-                        if (!justPlaying)
-                        {
-                            await _driver.Stop();
-                        }
-
-                        var msg = String.Empty;
-
-                        if (!res.OK)
-                        {
-                            msg += "EPG scan failed".Translated();
-                        }
-                        else
-                        {
-                            msg += $"EPG scan completed".Translated();
-
-                            await RefreshEPG();
-
-                            if (showIfFound)
-                            {
-                                var ev = await GetChannelEPG(channel);
-                                if (ev != null)
-                                {
-                                    await ShowActualPlayingMessage(new PlayStreamInfo
-                                    {
-                                        Channel = channel,
-                                        CurrentEvent = ev,
-                                        ShortInfoWithoutChannelName = true
-                                    });
-                                }
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(msg))
-                        {
-                            if (!silent)
-                            {
-                                WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        _scanningEPG = false;
-                    }
+                    await ScanEPGInternal(channel, showIfFound, silent, msRunTimeOut, msScanTimeOut);
                 });
             }
             catch (Exception ex)
@@ -299,6 +222,88 @@ namespace DVBTTelevizor.MAUI
                 {
                     WeakReferenceMessenger.Default.Send(new ToastMessage($"EPG scan failed".Translated()));
                 }
+            }
+        }
+
+        private async Task ScanEPGInternal(Channel channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
+        {
+            if (_scanningEPG)
+            {
+                return;
+            }
+
+            try
+            {
+                _scanningEPG = true;
+
+                if (!silent)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Scanning EPG ....".Translated()));
+                }
+
+                await Task.Delay(msRunTimeOut);
+
+                var justPlaying = ((_playingChannel == channel || _recordingChannel == channel));
+
+                if (!justPlaying)
+                {
+                    var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
+
+                    if (tuned.Result != DVBTDriverSearchProgramResultEnum.OK)
+                    {
+                        if (!silent)
+                        {
+                            WeakReferenceMessenger.Default.Send(new ToastMessage($"Scanning EPG failed".Translated()));
+                        }
+                        return;
+                    }
+                }
+
+                var res = await EIT.Scan(msScanTimeOut);
+
+                if (!justPlaying)
+                {
+                    await _driver.Stop();
+                }
+
+                var msg = String.Empty;
+
+                if (!res.OK)
+                {
+                    msg += "EPG scan failed".Translated();
+                }
+                else
+                {
+                    msg += $"EPG scan completed".Translated();
+
+                    await RefreshEPG();
+
+                    if (showIfFound)
+                    {
+                        var ev = await GetChannelEPG(channel);
+                        if (ev != null)
+                        {
+                            await ShowActualPlayingMessage(new PlayStreamInfo
+                            {
+                                Channel = channel,
+                                CurrentEvent = ev,
+                                ShortInfoWithoutChannelName = true
+                            });
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    if (!silent)
+                    {
+                        WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
+                    }
+                }
+            }
+            finally
+            {
+                _scanningEPG = false;
             }
         }
 

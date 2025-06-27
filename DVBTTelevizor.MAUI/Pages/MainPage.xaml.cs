@@ -629,8 +629,7 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     //_loggingService.Info("RefreshGUI completed");
-                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
-                    //VideoStackLayout.IsVisible = true;
+
                 }
                 catch (Exception ex)
                 {
@@ -1137,28 +1136,18 @@ namespace DVBTTelevizor.MAUI
                     _lastPlayedChannels[1] = channel;
                 }
 
-                if (
-    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
-    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
-    )
-                {
-                    PlayingState = PlayingStateEnum.PlayingInPreview;
-                } else
-                {
-                    PlayingState = PlayingStateEnum.Playing;
-                }
-
                 _viewModel.NotifyChannelChange();
 
+                Task.Run(async () => {
+                    playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
-                playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
+                    if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
+                    {
+                        await _viewModel.ScanEPG(channel, true, true, 2000, 3000);
+                    }
 
-                if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
-                {
-                    await _viewModel.ScanEPG(channel, true, true, 2000, 3000);
-                }
-
-                await _viewModel.ShowActualPlayingMessage(playInfo);
+                    await _viewModel.ShowActualPlayingMessage(playInfo);
+                }).RunSynchronously();
 
                 //if (_config.PlayOnBackground)
                 //{
@@ -1172,8 +1161,10 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
-                _refreshGUIEnabled = true;
+                PlayingState = PlayingStateEnum.Playing;
+
                 _checkStreamEnabled = true;
+                _refreshGUIEnabled = true;
                 RefreshGUI();
             }
         }
