@@ -39,6 +39,7 @@ namespace DVBTTelevizor.MAUI
         private Channel? _selectedChannel;
         private Channel _playingChannel;
         private Channel _recordingChannel;
+        private bool _scanningEPG = false;
 
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
@@ -139,6 +140,214 @@ namespace DVBTTelevizor.MAUI
                 MenuVisible = false;
             });
         }
+
+        public async Task<EPGCurrentEvent> GetChannelEPG(Channel channel)
+        {
+            if (channel == null)
+                return null;
+
+            try
+            {
+                if (EIT != null)
+                {
+                    var currEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
+                    if (currEv != null)
+                    {
+                        channel.SetCurrentEvent(currEv);
+                        channel.NotifyChanges();
+                        return currEv;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "GetChannelEPG error");
+
+                return null;
+            }
+        }
+
+        public async Task ScanEPG(Channel channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
+        {
+            if (channel == null)
+            {
+                channel = SelectedChannel;
+                if (channel == null)
+                    return;
+            }
+
+            _loggingService.Debug($"Scanning EPG for channel {channel}");
+
+            if ((_playingChannel != null) && (_playingChannel != channel))
+            {
+                if (!silent)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Cannot scan EPG (playing in progress)".Translated()));
+                }
+                return;
+            }
+
+            if ((_recordingChannel != null) && (_recordingChannel != channel))
+            {
+                if (!silent)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Cannot scan EPG (recording in progress)".Translated()));
+                }
+                return;
+            }
+
+            if (!_driver.Connected)
+            {
+                if (!silent)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Cannot scan EPG (device not connected)".Translated()));
+                }
+                return;
+            }
+
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    await ScanEPGInternal(channel, showIfFound, silent, msRunTimeOut, msScanTimeOut);
+                });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, $"EPG scan failed");
+
+                if (!silent)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"EPG scan failed".Translated()));
+                }
+            }
+        }
+
+        private async Task ScanEPGInternal(Channel channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
+        {
+            if (_scanningEPG)
+            {
+                return;
+            }
+
+            try
+            {
+                _scanningEPG = true;
+
+                if (!silent)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Scanning EPG ....".Translated()));
+                }
+
+                await Task.Delay(msRunTimeOut);
+
+                var justPlaying = ((_playingChannel == channel || _recordingChannel == channel));
+
+                if (!justPlaying)
+                {
+                    var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
+
+                    if (tuned.Result != DVBTDriverSearchProgramResultEnum.OK)
+                    {
+                        if (!silent)
+                        {
+                            WeakReferenceMessenger.Default.Send(new ToastMessage($"Scanning EPG failed".Translated()));
+                        }
+                        return;
+                    }
+                }
+
+                var res = await EIT.Scan(msScanTimeOut);
+
+                if (!justPlaying)
+                {
+                    await _driver.Stop();
+                }
+
+                var msg = String.Empty;
+
+                if (!res.OK)
+                {
+                    msg += "EPG scan failed".Translated();
+                }
+                else
+                {
+                    msg += $"EPG scan completed".Translated();
+
+                    await RefreshEPG();
+
+                    if (showIfFound)
+                    {
+                        var ev = await GetChannelEPG(channel);
+                        if (ev != null)
+                        {
+                            await ShowActualPlayingMessage(new PlayStreamInfo
+                            {
+                                Channel = channel,
+                                CurrentEvent = ev,
+                                ShortInfoWithoutChannelName = true
+                            });
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    if (!silent)
+                    {
+                        WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
+                    }
+                }
+            }
+            finally
+            {
+                _scanningEPG = false;
+            }
+        }
+
+        private async Task RefreshEPG()
+        {
+            //_loggingService.Debug($"Refreshing EPG");
+
+            try
+            {
+                await _semaphoreSlim.WaitAsync();
+
+                foreach (var channel in Channels)
+                {
+                    channel.ClearEPG();
+
+                    var channelEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
+                    if (channelEv != null)
+                    {
+                        channel.SetCurrentEvent(channelEv);
+                    }
+
+                    channel.NotifyChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Refreshing EPG failed");
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+
+                OnPropertyChanged(nameof(Channels));
+                OnPropertyChanged(nameof(SelectedChannel));
+                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
+                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
+                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
+                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
+                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                NotifyEPGDetailVisibilityChange();
+            }
+        }
+
 
         public async Task RefreshChannels()
         {
