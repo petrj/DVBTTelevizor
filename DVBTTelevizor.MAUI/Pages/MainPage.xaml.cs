@@ -1483,7 +1483,7 @@ namespace DVBTTelevizor.MAUI
 
         private void FitMenuSize()
         {
-            var h = 200; // menulabel, margin, .....
+            var h = 300; // menulabel, margin, .....
 
             // FontSizeForLabel ~ 12, Margin 10+10
             var labelHeight = _viewModel.GetScaledSize(12) + 10 + 10;
@@ -1493,7 +1493,9 @@ namespace DVBTTelevizor.MAUI
 
             var relativeHeight = h / MainAbsoluteLayout.Height;
 
-            AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, 0.35, relativeHeight));
+            var width = IsPortrait ? 0.75 : 0.35;
+
+            AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, width, relativeHeight));
             AbsoluteLayout.SetLayoutFlags(MenuFrame, AbsoluteLayoutFlags.All);
         }
 

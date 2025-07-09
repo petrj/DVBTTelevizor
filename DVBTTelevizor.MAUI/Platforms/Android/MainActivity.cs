@@ -410,6 +410,7 @@ MainThread.BeginInvokeOnMainThread(() =>
         [Obsolete]
         private void SetFullScreen()
         {
+            /*
             // https://stackoverflow.com/questions/39248138/how-to-hide-bottom-bar-of-android-back-home-in-xamarin-forms
             var defaultUiOptions = (int)Window.DecorView.SystemUiVisibility;
 
@@ -429,7 +430,7 @@ MainThread.BeginInvokeOnMainThread(() =>
             catch (Exception ex)
             {
                 _loggingService.Error(ex);
-            }
+            }*/
         }
 
         private void ShowToastMessage(string message, int AppFontSize = 0)

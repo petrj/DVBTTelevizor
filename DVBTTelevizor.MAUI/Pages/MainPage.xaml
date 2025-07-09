@@ -286,7 +286,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.09" AbsoluteLayout.LayoutFlags="All"
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.075" AbsoluteLayout.LayoutFlags="All"
               ColumnSpacing="5"
               BackgroundColor="#29242a"
               Margin="0,0,0,0">

@@ -3,14 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DVBTTelevizor.MAUI.ImgButton"
              xmlns:local="DVBTTelevizor.MAUI"
-             x:Name="ImgBtn">
+             x:Name="ImgBtn"
+             Margin="0,0,0,0"
+             Padding="0,0,0,0">
 
             <Grid
                    Margin="0,0,0,0"
                    Padding="0,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="80*" />
-                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="75*" />
+                    <RowDefinition Height="25*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
