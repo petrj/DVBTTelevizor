@@ -570,5 +570,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<int>("SDRSampleRate", value);
             }
         }
+
+        public string Language
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("Language");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("Language", value);
+            }
+        }
     }
 }

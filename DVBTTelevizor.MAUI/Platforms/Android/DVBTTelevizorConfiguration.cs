@@ -423,5 +423,17 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
+
+        public string Language
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("Language");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("Language", value);
+            }
+        }
     }
 }

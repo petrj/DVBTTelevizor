@@ -74,6 +74,27 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
     }
 
+    // bug in MAUI? SelectedLanguage is set, but index = -1
+    private static void FixPickerValue(Picker picker, object selectedValue)
+    {
+        if (
+            (picker.SelectedIndex == -1) &&
+            (picker.SelectedItem != null) &&
+            (!String.IsNullOrEmpty(picker.SelectedItem.ToString()))
+           )
+        {
+            // bug in MAUI? SelectedLanguage is set, but index = -1
+            for (var i = 0; i < picker.Items.Count; i++)
+            {
+                if (picker.Items[i].ToString() == picker.SelectedItem.ToString())
+                {
+                    picker.SelectedIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
@@ -94,6 +115,15 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             {
                 _settingsPageViewModel.FillDVBTDrivers();
             }
+
+            if (_settingsPageViewModel.Languages.Count == 0)
+            {
+                _settingsPageViewModel.FillLanguages();
+            }
+
+            _settingsPageViewModel.NotifyLanguageChange();
+
+            FixPickerValue(LanguagePicker, _settingsPageViewModel.SelectedLanguage);
         }
     }
 

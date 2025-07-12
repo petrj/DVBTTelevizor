@@ -12,17 +12,48 @@ namespace DVBTTelevizor.MAUI
 {
     public class SettingsPageViewModel : BaseViewModel
     {
+        private const string DefaultLanguage = "English (default)";
         private int? previousDVBTDriverTypeindex = null;
 
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
         public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> FontSizes { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<string> Languages { get; set; } = new ObservableCollection<string>();
 
         public Channel _selectedChannel = null;
 
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+
+        }
+
+        public async void NotifyLanguageChange()
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnPropertyChanged(nameof(Languages));
+                OnPropertyChanged(nameof(SelectedLanguage));
+            });
+        }
+
+        public string SelectedLanguage
+        {
+            get
+            {
+                var language = _configuration.Language;
+                if (string.IsNullOrEmpty(language))
+                {
+                    language = DefaultLanguage;
+                }
+                return language;
+            }
+            set
+            {
+                _configuration.Language = value;
+
+                NotifyLanguageChange();
+            }
         }
 
         public Channel SelectedChannel
@@ -56,6 +87,24 @@ namespace DVBTTelevizor.MAUI
             {
                 OnPropertyChanged(nameof(DVBTDrivers));
                 OnPropertyChanged(nameof(DVBTDriverTypeIndex));
+            });
+        }
+
+        public async void FillLanguages()
+        {
+            Languages.Clear();
+
+            Languages.Add(DefaultLanguage);
+
+            foreach (var lng in Lng.Languages)
+            {
+                Languages.Add(lng);
+            }
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(Languages));
+                OnPropertyChanged(nameof(SelectedLanguage));
             });
         }
 
