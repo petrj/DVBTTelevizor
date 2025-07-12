@@ -365,7 +365,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"Refreshing channels");
 
-            MainThread.BeginInvokeOnMainThread(async () =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 string? selectedChanneFrequencyAndMapPID = null;
                 Channel? firstChannel = null;

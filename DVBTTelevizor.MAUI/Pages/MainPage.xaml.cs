@@ -7,6 +7,7 @@ using System.Windows.Input;
 using DVBTTelevizor.TV;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
+using System.Reflection.Metadata;
 
 
 namespace DVBTTelevizor.MAUI
@@ -1482,12 +1483,13 @@ namespace DVBTTelevizor.MAUI
 
             if (delimitterFollows)
             {
-                item.Margin = new Thickness(10, 10, 10, 40);
+                item.Margin = new Thickness(10, 10, 10, 30);
             }
 
             _menuItems.Add(item);
         }
 
+        /*
         private void FitMenuSize()
         {
             var h = 300; // menulabel, margin, .....
@@ -1505,12 +1507,13 @@ namespace DVBTTelevizor.MAUI
             AbsoluteLayout.SetLayoutBounds(MenuFrame, new Rect(0.5, 0.5, width, relativeHeight));
             AbsoluteLayout.SetLayoutFlags(MenuFrame, AbsoluteLayoutFlags.All);
         }
+        */
 
-        private void Menu_Tapped(object sender, TappedEventArgs e)
+        private void Menu_Tapped(object sender, EventArgs e)
         {
-            if (e.Parameter != null && e.Parameter is string p)
+            if (e != null && e is TappedEventArgs tea)
             {
-                Menu_Tapped(p);
+                Menu_Tapped(tea.Parameter.ToString());
             }
         }
 
@@ -1595,7 +1598,7 @@ namespace DVBTTelevizor.MAUI
 
             _viewModel.UpdateMenu(_menuItems);
 
-            FitMenuSize();
+            //FitMenuSize();
         }
     }
 

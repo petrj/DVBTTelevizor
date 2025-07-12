@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.Menu"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             x:Name="appMenu"
+             Margin="0,0,0,0"
+             Padding="0,0,0,0">
+
+    <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#555555" CornerRadius="25">
+
+        <StackLayout x:Name="MenuStackLayout" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+            <Label x:Name="MenuLabel" Text="{local:LngXamlExt Input='Menu'}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
+
+            <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+
+                        <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="{Binding Margin}" Padding="0,0,0,0" BorderColor="White" IsVisible="true">
+
+                            <Grid RowSpacing="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20*" />
+                                    <ColumnDefinition Width="80*" />
+                                </Grid.ColumnDefinitions>
+
+                                <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                                <Image Grid.Row="0" Grid.Column="0" Source="{Binding ImgSource}" VerticalOptions="Center" HorizontalOptions="End" HeightRequest="30"  />
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="Start"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                            </Grid>
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding Id}" />
+                            </Frame.GestureRecognizers>
+
+                        </Frame>
+
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </StackLayout>
+        </StackLayout>
+    </Frame>
+
+
+</ContentView>

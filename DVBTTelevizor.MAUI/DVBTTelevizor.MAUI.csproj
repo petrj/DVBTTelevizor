@@ -143,6 +143,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Menu.xaml.cs">
+	    <DependentUpon>Menu.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\ChannelPage.xaml.cs">
 	    <DependentUpon>ChannelPage.xaml</DependentUpon>
 	  </Compile>
@@ -185,6 +188,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Menu.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="ImgButton.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -164,6 +164,7 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="20,0,0,0"/>
             </Style>
 
         </ResourceDictionary>
@@ -332,45 +333,7 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.35,0.75" BackgroundColor="#555555" CornerRadius="25">
-
-            <StackLayout x:Name="MenuStackLayout" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
-
-                <Label x:Name="MenuLabel" Text="{local:LngXamlExt Input='Menu'}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
-
-                <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
-
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-
-                            <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="{Binding Margin}" Padding="0,0,0,0" BorderColor="White" IsVisible="true">
-
-                                    <Grid RowSpacing="0">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="20*" />
-                                            <ColumnDefinition Width="80*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-                                        <Image Grid.Row="0" Grid.Column="0" Source="{Binding ImgSource}" VerticalOptions="Center" HorizontalOptions="Center" HeightRequest="30"  />
-                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="Start"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
-                                    </Grid>
-
-                                <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding Id}" />
-                                </Frame.GestureRecognizers>
-
-                            </Frame>
-
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </StackLayout>
-            </StackLayout>
-        </Frame>
+        <local:Menu AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" Tapped="Menu_Tapped"  />
 
     </AbsoluteLayout>
 

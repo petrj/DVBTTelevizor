@@ -17,7 +17,7 @@ namespace DVBTTelevizor.MAUI
 
         public bool IsVisible { get; set; } = true;
 
-        public Thickness Margin { get; set; } = new Thickness(10,10,10,10);
+        public Thickness Margin { get; set; } = new Thickness(10,8,10,8);
 
         public string BackgroundColor
         {
