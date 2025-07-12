@@ -18,4 +18,22 @@ public partial class Menu : ContentView
     {
         Tapped?.Invoke(this, e);
     }
+
+    public MenuItem CreateMenuItem(string id, string title, string img, bool delimitterFollows = false)
+    {
+        var item = new MenuItem()
+        {
+            Id = id,
+            Title = title,
+            ImgSource = img,
+            IsVisible = true
+        };
+
+        if (delimitterFollows)
+        {
+            item.Margin = new Thickness(10, 10, 10, 30);
+        }
+
+        return item;
+    }
 }
