@@ -67,6 +67,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessSecurityKey", new List<View>() { RemoteAccessSecurityKeyBoxView, SecurityKeyEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectDriver", new List<View>() { DriverBoxView, DriverPicker }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportLanguage", new List<View>() { ExportLanguageButton }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }));
@@ -174,7 +175,23 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 {
                     await Navigation.PopAsync();
                 });
-        break;
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+
+                if (_focusItems.FocusedItem == null)
+                    return;
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    switch (_focusItems.FocusedItem.Name)
+                    {
+                        case "SelectLanguage":
+                            LanguagePicker.Focus();
+                            break;
+                    }
+                });
+                break;
         }
     }
 

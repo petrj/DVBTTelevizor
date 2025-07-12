@@ -40,6 +40,10 @@ namespace DVBTTelevizor.MAUI.WinUI
 
             Task.Run(async () =>
             {
+                // ****************************************************
+                // ****************  keyboard hooking *****************
+                // ****************************************************
+
                 // enabling keyboard hooking leads to very slow performance!
                 //await hook.RunAsync();
             });
