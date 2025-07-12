@@ -51,6 +51,8 @@ namespace DVBTTelevizor.MAUI
         public ICommand CommandInstallDriver { get; set; }
         public ICommand CommandQuit { get; set; }
 
+        public Command CommandScanEPG { get; set; }
+
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
@@ -139,6 +141,16 @@ namespace DVBTTelevizor.MAUI
             {
                 MenuVisible = false;
             });
+
+            CommandScanEPG = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await RefreshEPG();
+                });
+            });
+
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 2, 10);
         }
 
         public async Task<EPGCurrentEvent> GetChannelEPG(Channel channel)
@@ -169,7 +181,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async Task ScanEPG(Channel channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
+        public async Task ScanEPG(Channel? channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
         {
             if (channel == null)
             {
@@ -309,7 +321,7 @@ namespace DVBTTelevizor.MAUI
 
         private async Task RefreshEPG()
         {
-            //_loggingService.Debug($"Refreshing EPG");
+            _loggingService.Debug($"Refreshing EPG");
 
             try
             {

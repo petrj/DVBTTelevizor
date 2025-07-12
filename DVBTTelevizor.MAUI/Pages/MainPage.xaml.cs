@@ -1455,7 +1455,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async void EditChannel(Channel channel)
+        private async void EditChannel(Channel? channel)
         {
             if (_viewModel.SelectedChannel == null || _channelPage.IsLoaded)
             {
@@ -1514,7 +1514,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void Menu_Tapped(string menuId)
+        private async void Menu_Tapped(string menuId)
         {
             _viewModel.MenuVisible = false;
             switch (menuId)
@@ -1527,14 +1527,14 @@ namespace DVBTTelevizor.MAUI
                 case "menuQuit":
                     WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
                     break;
+                case "menuScanEPG":
+                      await _viewModel.ScanEPG(_viewModel.SelectedChannel, false, false);
+                    break;
                 case "menuChannel":
                     EditChannel(_viewModel.SelectedChannel);
                     break;
                 case "menuRefresh":
-                    Task.Run(async () =>
-                    {
-                        await _viewModel.RefreshChannels();
-                    });
+                     await _viewModel.RefreshChannels();
                     break;
             }
         }
@@ -1559,6 +1559,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     AddMenuItem("menuPlay", "Play".Translated(), "play.png");
                 }
+
+                AddMenuItem("menuScanEPG", "ScanEPG".Translated(), "epg.png");
 
                 if (_viewModel.RecordingChannel == null)
                 {
