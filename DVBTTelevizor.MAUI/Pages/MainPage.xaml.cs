@@ -1205,11 +1205,11 @@ namespace DVBTTelevizor.MAUI
 
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-            if (!_viewModel.MenuVisible)
+            if (!MainMenu.MenuVisible)
             {
                 BuildMenu();
             }
-            _viewModel.MenuVisible = !_viewModel.MenuVisible;
+            MainMenu.MenuVisible = !MainMenu.MenuVisible;
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
@@ -1257,7 +1257,7 @@ namespace DVBTTelevizor.MAUI
 
             var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
-            if (_viewModel.MenuVisible)
+            if (MainMenu.MenuVisible)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
@@ -1444,7 +1444,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
-                    _viewModel.MenuVisible = false;
+                    MainMenu.MenuVisible = false;
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
@@ -1502,7 +1502,7 @@ namespace DVBTTelevizor.MAUI
 
         private async void Menu_Tapped(string menuId)
         {
-            _viewModel.MenuVisible = false;
+            MainMenu.MenuVisible = false;
             switch (menuId)
             {
                 case "menuSettings":
@@ -1578,7 +1578,7 @@ namespace DVBTTelevizor.MAUI
 
             // _menuItems.First().Selected = true;
 
-            _viewModel.UpdateMenu(_menuItems);
+            MainMenu.UpdateMenu(_menuItems);
 
             //FitMenuSize();
         }

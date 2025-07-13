@@ -22,8 +22,6 @@ namespace DVBTTelevizor.MAUI
         public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
 
-        public ObservableCollection<MenuItem> MenuItems{ get; set; } = new ObservableCollection<MenuItem>();
-
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
 
         public EITManager EIT { get; set; }
@@ -34,7 +32,6 @@ namespace DVBTTelevizor.MAUI
         private bool? _EPGDetailVisibleLastValue = null;
 
         private bool _EPGDetailEnabled = true;
-        private bool _menuVisible = false;
 
         private Channel? _selectedChannel;
         private Channel _playingChannel;
@@ -91,21 +88,10 @@ namespace DVBTTelevizor.MAUI
 
             CommandTune = new Command( () =>
             {
-                MenuVisible = false;
+                //MenuVisible = false;
                 WeakReferenceMessenger.Default.Send(new ShowTuneMessage(String.Empty));
             });
 
-            CommandPlay = new Command(() =>
-            {
-                MenuVisible = false;
-                WeakReferenceMessenger.Default.Send(new PlayMessage(String.Empty));
-            });
-
-            CommandSettings = new Command(() =>
-            {
-                MenuVisible = false;
-                WeakReferenceMessenger.Default.Send(new ShowSettingsMessage(String.Empty));
-            });
 
             CommandQuit = new Command(() =>
             {
@@ -135,11 +121,6 @@ namespace DVBTTelevizor.MAUI
             CommandShowMenu = new Command(() =>
             {
                 WeakReferenceMessenger.Default.Send(new ShowMenuMessage(String.Empty));
-            });
-
-            CommandCloseMenu = new Command(() =>
-            {
-                MenuVisible = false;
             });
 
             CommandScanEPG = new Command(() =>
@@ -896,38 +877,6 @@ namespace DVBTTelevizor.MAUI
             {
                 return Channels.Count == 0;
             }
-        }
-
-        public bool MenuVisible
-        {
-            get
-            {
-                return _menuVisible;
-            }
-            set
-            {
-                _menuVisible = value;
-                OnPropertyChanged(nameof(MenuVisible));
-            }
-        }
-
-        public void UpdateMenu(IEnumerable<MenuItem> items = null)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-
-                if (items != null)
-                {
-                    MenuItems.Clear();
-
-                    var menuItems = new ObservableCollection<MenuItem>();
-                    foreach (var item in items)
-                    {
-                        MenuItems.Add(item);
-                    }
-                }
-                OnPropertyChanged(nameof(MenuItems));
-            });
         }
     }
 }

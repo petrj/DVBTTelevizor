@@ -12,12 +12,44 @@ public partial class Menu : ContentView
     public Menu()
 	{
 		InitializeComponent();
+
+        BindingContext = new MenuViewModel();
     }
 
     private void Menu_Tapped(object sender, TappedEventArgs e)
     {
         Tapped?.Invoke(this, e);
     }
+
+    public void UpdateMenu(IEnumerable<MenuItem> items = null)
+    {
+        if (BindingContext is MenuViewModel vm)
+        {
+            vm.UpdateMenu(items);
+        }
+    }
+
+    public bool MenuVisible
+    {
+        get
+        {
+            if (BindingContext is MenuViewModel vm)
+            {
+                return vm.MenuVisible;
+            }
+
+            return false;
+        }
+        set
+        {
+            if (BindingContext is MenuViewModel vm)
+            {
+                vm.MenuVisible = value;
+            }
+            OnPropertyChanged(nameof(MenuVisible));
+        }
+    }
+
 
     public MenuItem CreateMenuItem(string id, string title, string img, bool delimitterFollows = false)
     {
