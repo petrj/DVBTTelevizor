@@ -24,6 +24,9 @@ namespace LibVLCSharp.MAUI
 
         public VideoViewHandler() : base(Mapper)
         {
+            // updating audio/video window position
+
+            /*
             WeakReferenceMessenger.Default.Register<ChangedVideoPositionMessage>(this, (r, m) =>
             {
                 var platformWindow = App.Current.Windows.FirstOrDefault()?.Handler?.PlatformView;
@@ -47,6 +50,7 @@ namespace LibVLCSharp.MAUI
                         SWP_NOZORDER | SWP_NOACTIVATE);
                 }
             });
+            */
         }
 
         protected override Grid CreatePlatformView()
@@ -64,6 +68,64 @@ namespace LibVLCSharp.MAUI
 
                     if (platformWindow is Microsoft.UI.Xaml.Window xamlWindow)
                     {
+                        WndProc wndProcDelegate = (hWnd, msg, wParam, lParam) =>
+                        {
+                            switch (msg)
+                            {
+                                case 0x0010: // WM_CLOSE
+                                             // Your custom logic before window is destroyed
+                                    Console.WriteLine("Video window is closing!");
+                                    // Call DestroyWindow manually if you want to proceed
+                                    //DestroyWindow(hWnd);
+                                break;
+
+                                case 0x0002: // WM_DESTROY
+                                             // Cleanup logic here
+                                    Console.WriteLine("Video window has been closed!");
+                                    //PostQuitMessage(0); // Signals to end the message loop
+                                break;
+                            }
+
+                            return DefWindowProc(hWnd, msg, wParam, lParam);
+                        };
+
+                        WNDCLASSEX windowClass = new WNDCLASSEX()
+                        {
+                            cbSize = (uint)Marshal.SizeOf(typeof(WNDCLASSEX)),
+                            style = 0,
+                            lpfnWndProc = Marshal.GetFunctionPointerForDelegate(wndProcDelegate),
+                            cbClsExtra = 0,
+                            cbWndExtra = 0,
+                            hInstance = GetModuleHandle(null),
+                            hIcon = IntPtr.Zero,
+                            hCursor = IntPtr.Zero,
+                            hbrBackground = IntPtr.Zero,
+                            lpszMenuName = null,
+                            lpszClassName = "MyCustomWindowClass",
+                            hIconSm = IntPtr.Zero
+                        };
+
+                        ushort regResult = RegisterClassEx(ref windowClass);
+
+                        if (regResult == 0)
+                        {
+                            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "Failed to register window class");
+                        }
+
+                        IntPtr hwnd = CreateWindowEx(
+                                WS_EX_APPWINDOW,
+                                "MyCustomWindowClass",
+                                "My Independent Window",
+                                WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                                100, 100, 800, 600,
+                                IntPtr.Zero,
+                                IntPtr.Zero,
+                                GetModuleHandle(null),
+                                IntPtr.Zero
+                            );
+
+
+                        /*
                         //var hwnd = WindowNative.GetWindowHandle(xamlWindow);
                         var parentHwnd = WindowNative.GetWindowHandle(xamlWindow);
 
@@ -72,18 +134,18 @@ namespace LibVLCSharp.MAUI
                         hwnd = CreateWindowEx(
                             0,
                             "STATIC",
-                            "",
-                            0x10000000 | 0x40000000 | 0x80000000, // WS_CHILD | WS_VISIBLE | WS_POPUP
+                            "DVBTTelevizor",
+                            WS_OVERLAPPEDWINDOW | WS_VISIBLE, // dwStyle — standard window with title bar
                             x: 0,
                             y: 0,
                             nWidth: 400,
                             nHeight: 300,
-                            hWndParent: parentHwnd,
+                            hWndParent: IntPtr.Zero, // hWndParent — must be NULL for independent windows,
                             hMenu: IntPtr.Zero,
                             hInstance: GetModuleHandle(null),
                             lpParam: IntPtr.Zero
                         );
-
+                        */
                         // Assign it to VLC
                         view.MediaPlayer.Hwnd = hwnd;
                     }
@@ -110,6 +172,29 @@ namespace LibVLCSharp.MAUI
 
         [DllImport("user32.dll")]
         static extern int GetSystemMetrics(int nIndex);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WNDCLASSEX
+        {
+            public uint cbSize;
+            public uint style;
+            public IntPtr lpfnWndProc;
+            public int cbClsExtra;
+            public int cbWndExtra;
+            public IntPtr hInstance;
+            public IntPtr hIcon;
+            public IntPtr hCursor;
+            public IntPtr hbrBackground;
+            public string lpszMenuName;
+            public string lpszClassName;
+            public IntPtr hIconSm;
+        }
+
+        // Window procedure delegate
+        public delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern ushort RegisterClassEx([In] ref WNDCLASSEX lpwcx);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateWindowEx(
@@ -139,8 +224,22 @@ namespace LibVLCSharp.MAUI
             int cy,
             uint uFlags);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool DestroyWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern void PostQuitMessage(int nExitCode);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr DefWindowProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
         private static readonly IntPtr HWND_TOP = IntPtr.Zero;
         private const uint SWP_NOZORDER = 0x0004;
         private const uint SWP_NOACTIVATE = 0x0010;
+        private const uint WS_OVERLAPPEDWINDOW = 0x00CF0000;
+        private const uint WS_VISIBLE = 0x10000000;
+        //private const uint WS_OVERLAPPEDWINDOW = 0x00CF0000;
+        //private const uint WS_VISIBLE = 0x10000000;
+        private const int WS_EX_APPWINDOW = 0x00040000;
     }
 }
