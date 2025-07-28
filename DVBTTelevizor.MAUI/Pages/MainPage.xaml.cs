@@ -37,7 +37,9 @@ namespace DVBTTelevizor.MAUI
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
+
         private bool _checkStreamEnabled = true;
+        public Command CommandCheckStream { get; set; }
 
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
@@ -234,7 +236,162 @@ namespace DVBTTelevizor.MAUI
             };
 
             videoView.MediaPlayer = _mediaPlayer;
+
+
+            CommandCheckStream = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await CheckStream();
+                });
+            });
+
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
         }
+
+        private async Task CheckStream()
+        {
+            if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
+                return;
+
+            _loggingService.Debug($"Checking stream");
+
+            try
+            {
+
+                // checking stopped stream
+                if (!videoView.MediaPlayer.IsPlaying)
+                {
+                    videoView.MediaPlayer.Play();
+                }
+
+                // checking no video
+                var videoTreackCount = videoView.MediaPlayer.VideoTrackCount;
+
+                if (videoTreackCount <= 0)
+                {
+                    /*
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        NoVideoStackLayout.IsVisible = true;
+                        //VideoStackLayout.IsVisible = false;
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                    });
+                    */
+                }
+                else
+                {
+                    //PreviewVideoBordersFix();
+
+                    /*
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        NoVideoStackLayout.IsVisible = false;
+                        VideoStackLayout.IsVisible = true;
+
+                        if (AbsoluteLayout.GetLayoutBounds(VideoStackLayout) == NoVideoStackLayoutPosition)
+                        {
+                            _loggingService.Debug("CheckStream - VideoStackLayout has invalid bounds");
+                            RefreshGUI();
+                        }
+                    });
+                    */
+                }
+
+
+                // check do data from driver
+
+                if (_lastActionPlayTime != DateTime.MinValue)
+                {
+                    if (!_driver.DriverStreamDataAvailable)
+                    {
+                        var timeFromPlayMSecs = (DateTime.Now - _lastActionPlayTime).TotalMilliseconds;
+                        if (timeFromPlayMSecs > 10000)
+                        {
+                            _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                            /*
+                            MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
+                            MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
+                            */
+                        }
+                        else if (timeFromPlayMSecs > 5000)
+                        {
+                            _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                        }
+                    }
+                }
+
+
+                var actualSubtitleTrack = videoView.MediaPlayer.Spu;
+                var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
+
+                //_loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                //_loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+
+                // setting subtitles
+                foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                {
+                    if (!_viewModel.PlayingChannelSubtitles.ContainsKey(desc.Id))
+                    {
+                        _loggingService.Debug($"CheckStream - Adding subtitle {desc.Name}");
+                        _viewModel.PlayingChannelSubtitles.Add(desc.Id, desc.Name);
+                    }
+                }
+
+                // setting audio tracks
+                foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
+                {
+                    if (!_viewModel.PlayingChannelAudioTracks.ContainsKey(desc.Id))
+                    {
+                        _loggingService.Debug($"CheckStream - Adding audio track {desc.Name}");
+                        _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
+                    }
+                }
+
+                if (_viewModel.PlayingChannelAspect.Width == -1)
+                {
+                    // setting aspect ratio
+                    /*
+                    var videoTrack = GetVideoTrack();
+                    if (videoTrack.HasValue)
+                    {
+                        _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
+                        _loggingService.Debug($"CheckStream - Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
+                    }
+                    */
+                }
+
+                /*
+                if ((!_viewModel.TeletextEnabled) && (actualSubtitleTrack != _viewModel.Subtitles))
+                {
+                    _loggingService.Debug($"CheckStream - invalid subtitles {actualSubtitleTrack}, setting {_viewModel.Subtitles}");
+                    videoView.MediaPlayer.SetSpu(_viewModel.Subtitles);
+                }
+                */
+
+                // check audio track
+                /*
+                if (actualAudioTrack != _viewModel.AudioTrack)
+                {
+                    if ((_viewModel.AudioTrack == -100) && (actualAudioTrack != -1))
+                    {
+                        _loggingService.Debug($"CheckStream - Setting automatic audio track {actualAudioTrack}");
+                        _viewModel.AudioTrack = actualAudioTrack;
+                    }
+                    else
+                    {
+                        _loggingService.Debug($"CheckStream - invalid audio track {actualAudioTrack}, setting {_viewModel.AudioTrack}");
+                        videoView.MediaPlayer.SetAudioTrack(_viewModel.AudioTrack);
+                    }
+                }
+                */
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "CheckStream general error");
+            }
+        }
+
 
         private void _channelPage_Disappearing(object? sender, EventArgs e)
         {

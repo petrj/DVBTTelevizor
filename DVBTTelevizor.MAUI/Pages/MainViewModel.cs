@@ -131,7 +131,7 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 2, 10);
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
         }
 
         public async Task<EPGCurrentEvent> GetChannelEPG(Channel channel)
