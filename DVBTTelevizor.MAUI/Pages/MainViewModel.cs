@@ -38,6 +38,8 @@ namespace DVBTTelevizor.MAUI
         private Channel _recordingChannel;
         private bool _scanningEPG = false;
 
+        private bool _refreshing = false;
+
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
         public ICommand CommandSettings { get; set; }
@@ -47,6 +49,7 @@ namespace DVBTTelevizor.MAUI
         public ICommand CommandShowMenu { get; set; }
         public ICommand CommandInstallDriver { get; set; }
         public ICommand CommandQuit { get; set; }
+        public ICommand RefreshCommand { get; set; }
 
         public Command CommandScanEPG { get; set; }
 
@@ -128,6 +131,14 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await RefreshEPG();
+                });
+            });
+
+            RefreshCommand = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await RefreshChannels();
                 });
             });
 
@@ -306,6 +317,7 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
+                IsRefreshing = true;
                 await _semaphoreSlim.WaitAsync();
 
                 foreach (var channel in Channels)
@@ -338,6 +350,8 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
                 NotifyEPGDetailVisibilityChange();
+
+                IsRefreshing = false;
             }
         }
 
@@ -353,6 +367,8 @@ namespace DVBTTelevizor.MAUI
 
                 try
                 {
+                    IsRefreshing = true;
+
                     await _semaphoreSlim.WaitAsync();
 
                     if (SelectedChannel != null)
@@ -400,6 +416,8 @@ namespace DVBTTelevizor.MAUI
                     _semaphoreSlim.Release();
 
                     //NotifyEPGDetailVisibilityChange();
+
+                    IsRefreshing = false;
 
                     NotifyChannelChange();
                 }
@@ -876,6 +894,19 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Channels.Count == 0;
+            }
+        }
+
+        public bool IsRefreshing
+        {
+            get
+            {
+                return _refreshing;
+            }
+            set
+            {
+                _refreshing = value;
+                OnPropertyChanged(nameof(IsRefreshing));
             }
         }
     }
