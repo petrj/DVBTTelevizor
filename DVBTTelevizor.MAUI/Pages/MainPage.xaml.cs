@@ -1362,11 +1362,12 @@ namespace DVBTTelevizor.MAUI
 
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-            if (!MainMenu.MenuVisible)
+            MainMenu.MenuVisible = !MainMenu.MenuVisible;
+
+            if (MainMenu.IsVisible)
             {
                 BuildMenu();
             }
-            MainMenu.MenuVisible = !MainMenu.MenuVisible;
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
@@ -1736,7 +1737,6 @@ namespace DVBTTelevizor.MAUI
             // _menuItems.First().Selected = true;
 
             MainMenu.UpdateMenu(_menuItems);
-
             //FitMenuSize();
         }
     }
