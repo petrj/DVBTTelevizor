@@ -34,6 +34,9 @@ namespace DVBTTelevizor.MAUI
 
         private KeyboardFocusableItemList _focusItems;
         private List<MenuItem> _menuItems = new List<MenuItem>();
+        private List<MenuItem> _subtitleMenuItems = new List<MenuItem>();
+        private List<MenuItem> _audioMenuItems = new List<MenuItem>();
+        private List<MenuItem> _aspectMenuItems = new List<MenuItem>();
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
@@ -1658,6 +1661,83 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task AudioMenu_Tapped()
+        {
+            try
+            {
+                MainMenu.MenuVisible = true;
+
+                _audioMenuItems.Clear();
+
+                _audioMenuItems.Add(MainMenu.CreateMenuItem("setAudio:cz", "cz", "audio.png", false));
+                _audioMenuItems.Add(MainMenu.CreateMenuItem("setAudio:en", "en", "audio.png", true));
+
+                _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                MainMenu.UpdateMenu(_audioMenuItems);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task SubtitlesMenu_Tapped()
+        {
+            try
+            {
+                MainMenu.MenuVisible = true;
+
+                _subtitleMenuItems.Clear();
+
+                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("setSubtitles:cz", "cz", "subtitles.png", false));
+                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("setSubtitles:en", "en", "subtitles.png", true));
+
+                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                MainMenu.UpdateMenu(_subtitleMenuItems);
+
+            } catch(Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task AspectMenu_Tapped()
+        {
+            try
+            {
+                MainMenu.MenuVisible = true;
+
+                _aspectMenuItems.Clear();
+
+                /*
+                        actions.Add("16:9");
+                        actions.Add("4:3");
+                        actions.Add("Original");
+                        actions.Add("Fill");
+                */
+
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:16:9", "16:9", "aspect.png", false));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:4:3", "4:3", "aspect.png", false));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:Original", "Original".Translated(), "aspect.png", false));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:Fill", "Fill".Translated(), "aspect.png", true));
+
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                MainMenu.UpdateMenu(_aspectMenuItems);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private async void Menu_Tapped(string menuId)
         {
             MainMenu.MenuVisible = false;
@@ -1671,6 +1751,15 @@ namespace DVBTTelevizor.MAUI
                 case "menuQuit":
                     WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
                     break;
+                case "menuSubtitles":
+                    await SubtitlesMenu_Tapped();
+                    break;
+                case "menuAudio":
+                    await AudioMenu_Tapped();
+                    break;
+                case "menuAspect":
+                    await AspectMenu_Tapped();
+                    break;
                 case "menuScanEPG":
                       await _viewModel.ScanEPG(_viewModel.SelectedChannel, false, false);
                     break;
@@ -1679,6 +1768,10 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case "menuRefresh":
                      await _viewModel.RefreshChannels();
+                    break;
+                case "menuBack":
+                    MainMenu.MenuVisible = true;
+                    MainMenu.UpdateMenu(_menuItems);
                     break;
             }
         }
@@ -1689,12 +1782,14 @@ namespace DVBTTelevizor.MAUI
 
             if ((_viewModel.Channels.Count > 0) && (_viewModel.SelectedChannel != null))
             {
+                _menuItems.Add(MainMenu.CreateMenuItem("menuAudio", "Audio".Translated(), "audio.png"));
+
                 if (_viewModel.PlayingState == PlayingStateEnum.Playing)
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuStop", "Stop".Translated(), "stop.png"));
 
                     _menuItems.Add(MainMenu.CreateMenuItem("menuSubtitles", "Subtitles".Translated(), "subtitles.png"));
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuAudio", "Audio".Translated(), "audio.png"));
+                    //_menuItems.Add(MainMenu.CreateMenuItem("menuAudio", "Audio".Translated(), "audio.png"));
                     _menuItems.Add(MainMenu.CreateMenuItem("menuAspect", "Aspect ratio".Translated(), "aspect.png"));
                     _menuItems.Add(MainMenu.CreateMenuItem("menuTeletext", "Teletext".Translated(), "teletext.png"));
                 }
@@ -1726,13 +1821,14 @@ namespace DVBTTelevizor.MAUI
             var selectedChannel = _viewModel.SelectedChannel;
             if (selectedChannel != null)
             {
-                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Edit channel".Translated(), "edit.png"));
+                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
             }
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuSettings", "Settings".Translated(), "settings.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuQuit", "Quit application".Translated(), "quit.png", true));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close menu".Translated(), "close.png"));
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
             // _menuItems.First().Selected = true;
 
