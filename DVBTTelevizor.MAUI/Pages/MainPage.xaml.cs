@@ -249,6 +249,12 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            {
+                var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
+                WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
+            }
+
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
         }
 

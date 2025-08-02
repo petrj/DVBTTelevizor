@@ -232,6 +232,14 @@ namespace DVBTTelevizor.MAUI
                 ShowToastMessage(m.Value);
             });
 
+            WeakReferenceMessenger.Default.Register<SetUDPLoggingIPMessage>(this, (r, m) =>
+            {
+                if (_loggingService != null &&
+                _loggingService is NLogLoggingService nlogService)
+                {
+                    nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address =m.Value;
+                }
+            });
 
             WeakReferenceMessenger.Default.Register<NotifyAudioChangeMessage>(this, (sender, obj) =>
             {
