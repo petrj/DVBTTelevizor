@@ -43,13 +43,12 @@ namespace DVBTTelevizor.MAUI
             switch (tuneFrequencyModeEnum)
             {
                 case TuneFrequencyModeEnum.From:
-                    _tuneSettings.FrequencyKHz = _tuneSettings.DeviceFrequencyMinKHz;
+                case TuneFrequencyModeEnum.Center:
+                default:
+                    _tuneSettings.FrequencyKHz = TuningSettings.DefaultDVBTFrequencyMinKHz;
                     break;
                 case TuneFrequencyModeEnum.To:
-                    _tuneSettings.FrequencyKHz = _tuneSettings.DeviceFrequencyMaxKHz;
-                    break;
-                case TuneFrequencyModeEnum.Center:
-                    _tuneSettings.FrequencyKHz = _tuneSettings.DeviceFrequencyMinKHz;
+                    _tuneSettings.FrequencyKHz = TuningSettings.DefaultDVBTFrequencyMaxKHz;
                     break;
             }
             NotifyChange();
@@ -202,11 +201,18 @@ namespace DVBTTelevizor.MAUI
                     return;
 
                 // rounding to start freq 474 MHZ
-                var startFreq = _tuneSettings.DeviceFrequencyMinKHz;
+                var startFreq = TuningSettings.DefaultDVBTFrequencyMinKHz;
 
-                var stepFreq = Math.Round(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz));
+                var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz)));
 
                 var freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
+
+                // corrected min/max:
+
+                //var minFreqRounded = Convert.ToInt64(_tuneSettings.DeviceFrequencyMinKHz startFreq + stepFreq * Settings.BandwidthKHz);
+
+
+
                 if (freqRounded > _tuneSettings.DeviceFrequencyMaxKHz)
                 {
                     freqRounded = _tuneSettings.DeviceFrequencyMaxKHz;
@@ -214,6 +220,7 @@ namespace DVBTTelevizor.MAUI
                 if (freqRounded < _tuneSettings.DeviceFrequencyMinKHz)
                 {
                     freqRounded = _tuneSettings.DeviceFrequencyMinKHz;
+                    //freqRounded = Convert.ToInt64(TuningSettings.DefaultDVBTFrequencyMinKHz + (stepFreq+1)* Convert.ToDecimal(Settings.BandwidthKHz));
                 }
 
                 Settings.FrequencyKHz = freqRounded;
