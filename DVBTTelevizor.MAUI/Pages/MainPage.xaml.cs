@@ -1363,9 +1363,33 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private void ShowOrHideMenu()
+        {
+            if (MainMenu.MenuVisible)
+            {
+                HideMenu();
+            }
+            else
+            {
+                ShowMenu();
+            }
+        }
+
+        private void ShowMenu()
+        {
+            MainMenu.MenuVisible = true;
+            _viewModel.MenuVisible = true;
+        }
+
+        private void HideMenu()
+        {
+            MainMenu.MenuVisible = false;
+            _viewModel.MenuVisible = false;
+        }
+
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-            MainMenu.MenuVisible = !MainMenu.MenuVisible;
+            ShowOrHideMenu();
 
             if (MainMenu.IsVisible)
             {
@@ -1605,7 +1629,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
-                    MainMenu.MenuVisible = false;
+                    HideMenu();
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
@@ -1665,7 +1689,7 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
-                MainMenu.MenuVisible = true;
+                ShowMenu();
 
                 _audioMenuItems.Clear();
 
@@ -1688,7 +1712,7 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
-                MainMenu.MenuVisible = true;
+                ShowMenu();
 
                 _subtitleMenuItems.Clear();
 
@@ -1710,7 +1734,7 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
-                MainMenu.MenuVisible = true;
+                ShowMenu();
 
                 _aspectMenuItems.Clear();
 
@@ -1740,7 +1764,7 @@ namespace DVBTTelevizor.MAUI
 
         private async void Menu_Tapped(string menuId)
         {
-            MainMenu.MenuVisible = false;
+            HideMenu();
             switch (menuId)
             {
                 case "menuSettings":
@@ -1770,7 +1794,7 @@ namespace DVBTTelevizor.MAUI
                      await _viewModel.RefreshChannels();
                     break;
                 case "menuBack":
-                    MainMenu.MenuVisible = true;
+                    ShowMenu();
                     MainMenu.UpdateMenu(_menuItems);
                     break;
             }

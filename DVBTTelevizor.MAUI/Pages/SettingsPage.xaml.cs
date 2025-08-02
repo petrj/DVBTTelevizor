@@ -70,7 +70,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportLanguage", new List<View>() { ExportLanguageButton }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }));
 
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
     }

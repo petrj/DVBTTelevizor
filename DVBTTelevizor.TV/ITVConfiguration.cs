@@ -36,6 +36,7 @@ namespace DVBTTelevizor
         public string RemoteAccessServiceSecurityKey { get; set; }
 
         public bool EnableLogging { get; set; }
+        public string LoggingUDPIP { get; set; }
 
         public bool TuneDVBTEnabled { get; set; }
         public bool TuneDVBT2Enabled { get; set; }

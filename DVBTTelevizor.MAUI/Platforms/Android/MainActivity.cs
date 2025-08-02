@@ -260,6 +260,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DispatchKeyEventEnabledMessage>(this, (r, m) =>
             {
                 _dispatchKeyEventEnabled = m.Value;
+                _loggingService.Info($"DispatchKeyEventEnabled: {_dispatchKeyEventEnabled}");
                 if (m.Value)
                 {
                     _dispatchKeyEventEnabledAt = DateTime.Now;

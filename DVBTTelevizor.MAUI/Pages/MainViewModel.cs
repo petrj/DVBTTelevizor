@@ -39,6 +39,7 @@ namespace DVBTTelevizor.MAUI
         private bool _scanningEPG = false;
 
         private bool _refreshing = false;
+        private bool _menuVisible = false;
 
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
@@ -52,6 +53,22 @@ namespace DVBTTelevizor.MAUI
         public ICommand RefreshCommand { get; set; }
 
         public Command CommandScanEPG { get; set; }
+
+        public bool MainLayoutVisible { get; set; } = true;
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
+            }
+        }
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -754,7 +771,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public bool MainLayoutVisible { get; set; } = true;
+
 
         public void OnAppearing()
         {

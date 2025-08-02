@@ -50,8 +50,8 @@ namespace DVBTTelevizor.MAUI
 
                 if (part is Entry entry)
                 {
-                    entry.Focused += delegate { WeakReferenceMessenger.Default.Send(new DispatchKeyEventEnabledMessage(false)); };
-                    entry.Unfocused += delegate { WeakReferenceMessenger.Default.Send(new DispatchKeyEventEnabledMessage(true)); };
+                    entry.Focused += delegate { WeakReferenceMessenger.Default.Send(new DispatchKeyEventEnabledMessage(true)); };
+                    entry.Unfocused += delegate { WeakReferenceMessenger.Default.Send(new DispatchKeyEventEnabledMessage(false)); };
                 }
             }
 
