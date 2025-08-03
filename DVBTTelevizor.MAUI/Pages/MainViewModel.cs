@@ -19,9 +19,6 @@ namespace DVBTTelevizor.MAUI
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
-        public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
-        public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
-
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
 
         public EITManager EIT { get; set; }

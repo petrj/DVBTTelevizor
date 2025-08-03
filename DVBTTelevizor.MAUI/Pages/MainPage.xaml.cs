@@ -253,7 +253,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run( async () =>
                 {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found on Android Public directory
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
 
                     _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
                     var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
@@ -339,26 +339,26 @@ namespace DVBTTelevizor.MAUI
                 var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                 var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
 
-                //_loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
-                //_loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+                _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
 
-                // setting subtitles
-                foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                 if (_viewModel.PlayingChannel != null)
                 {
-                    if (!_viewModel.PlayingChannelSubtitles.ContainsKey(desc.Id))
+                    foreach (var desc in videoView.MediaPlayer.SpuDescription)
                     {
-                        _loggingService.Debug($"CheckStream - Adding subtitle {desc.Name}");
-                        _viewModel.PlayingChannelSubtitles.Add(desc.Id, desc.Name);
+                        if (!_viewModel.PlayingChannel.Subtitles.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"CheckStream - Adding subtitle {desc.Name}");
+                            _viewModel.PlayingChannel.Subtitles.Add(desc.Id, desc.Name);
+                        }
                     }
-                }
-
-                // setting audio tracks
-                foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
-                {
-                    if (!_viewModel.PlayingChannelAudioTracks.ContainsKey(desc.Id))
+                    foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
                     {
-                        _loggingService.Debug($"CheckStream - Adding audio track {desc.Name}");
-                        _viewModel.PlayingChannelAudioTracks.Add(desc.Id, desc.Name);
+                        if (!_viewModel.PlayingChannel.AudioTracks.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"CheckStream - Adding audio track {desc.Name}");
+                            _viewModel.PlayingChannel.AudioTracks.Add(desc.Id, desc.Name);
+                        }
                     }
                 }
 
@@ -1068,10 +1068,10 @@ namespace DVBTTelevizor.MAUI
 
                 _lastActionPlayTime = DateTime.MinValue;
 
-                _viewModel.PlayingChannelSubtitles.Clear();
-                _viewModel.PlayingChannelAudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
-                _viewModel.PlayingChannel = null;
+
+                _viewModel.PlayingChannel.Subtitles.Clear();
+                _viewModel.PlayingChannel.AudioTracks.Clear();
 
                 //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
@@ -1305,8 +1305,8 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.SelectedChannel = channel;
                 _viewModel.PlayingChannel = channel;
-                _viewModel.PlayingChannelSubtitles.Clear();
-                _viewModel.PlayingChannelAudioTracks.Clear();
+                _viewModel.PlayingChannel.Subtitles.Clear();
+                _viewModel.PlayingChannel.AudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
                 _viewModel.EPGDetailEnabled = false;
 
