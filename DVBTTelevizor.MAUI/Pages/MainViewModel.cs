@@ -366,6 +366,8 @@ namespace DVBTTelevizor.MAUI
                 NotifyEPGDetailVisibilityChange();
 
                 IsRefreshing = false;
+
+               WeakReferenceMessenger.Default.Send(new RefreshGUIMessage(String.Empty));
             }
         }
 
