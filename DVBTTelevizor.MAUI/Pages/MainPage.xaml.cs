@@ -1304,6 +1304,15 @@ namespace DVBTTelevizor.MAUI
                         videoView.MediaPlayer.Play(_media);
                     });
 
+                    if (!String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
+                    {
+                        int trackId;
+                        if (int.TryParse(channel.SelectedAudioTrack, out trackId))
+                        {
+                            SetAudio($"setAudio:{trackId}");
+                        }
+                    }
+
                     //SetSubtitles(-1);
                     //SetAudioTrack(-100);
                     //_viewModel.TeletextEnabled = false;
@@ -1717,12 +1726,33 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
+                if (_viewModel.SelectedChannel == null ||
+                    _viewModel.SelectedChannel.AudioTracks == null)
+                {
+                    return;
+                }
+
                 ShowMenu();
 
                 _audioMenuItems.Clear();
 
-                _audioMenuItems.Add(MainMenu.CreateMenuItem("setAudio:cz", "cz", "audio.png", false));
-                _audioMenuItems.Add(MainMenu.CreateMenuItem("setAudio:en", "en", "audio.png", true));
+                var actualId = -1;
+                if (videoView != null && videoView.MediaPlayer != null)
+                {
+                    actualId = videoView.MediaPlayer.AudioTrack;
+                }
+
+                int index = 0;
+                foreach (var track in _viewModel.SelectedChannel.AudioTracks)
+                {
+                    index++;
+                    var title = track.Value;
+                    if (track.Key == actualId)
+                    {
+                        title += " *";
+                    }
+                    _audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index> _viewModel.SelectedChannel.AudioTracks.Count-1));
+                }
 
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
@@ -1790,9 +1820,50 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private void SetAudio(string command)
+        {
+            _loggingService.Info($"Setting audio: {command}");
+
+            try
+            {
+                var idAsString = command.Substring(9);
+                var id = Convert.ToInt32(idAsString);
+
+                if (videoView == null || videoView.MediaPlayer == null)
+                    return;
+
+                foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
+                {
+                    if (desc.Id == id)
+                    {
+                        _loggingService.Info($"Changing audio track to: {desc.Id} ({desc.Name})");
+                        videoView.MediaPlayer.SetAudioTrack(desc.Id);
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Changing audio track: ".Translated() + desc.Name));
+
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _viewModel.SelectedChannel.SelectedAudioTrack = desc.Id.ToString();
+                            _viewModel.Config.SaveChannels(_viewModel.Channels);
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private async void Menu_Tapped(string menuId)
         {
             HideMenu();
+
+            if (menuId.StartsWith("setAudio"))
+            {
+                SetAudio(menuId);
+            }
+
             switch (menuId)
             {
                 case "menuSettings":
