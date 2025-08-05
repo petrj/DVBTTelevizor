@@ -59,12 +59,12 @@ namespace DVBTTelevizor.MAUI
         // Menu: 0.0,0,1.0,0.08
 
         // EPGDetailGrid
-        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 0.12, 0.3, 0.62); //new Rect(1.0, 1.0, 0.3, 0.92);
+        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
         private Rect LandscapePreviewEPGDetailGridPosition { get; set; } = new Rect(1, 0.2, 0.3, 0.62);
         private Rect LandscapePlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
 
         private Rect PortraitEPGDetailGridPosition { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
-        private Rect PortraitPreviewEPGDetailGridPosition { get; set; } = new Rect(0.0, 1.0, 0.7, 0.3);
+        private Rect PortraitPreviewEPGDetailGridPosition { get; set; } = new Rect(0.0, 0.75, 1.0, 0.2);
         private Rect PortraitPlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
 
 
@@ -72,7 +72,7 @@ namespace DVBTTelevizor.MAUI
         private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.3);
         private Rect LandscapeVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(1, 1, 0.3, 0.3);
         private Rect LandscapeVideoStackLayoutPositionWhenEPGDetailNotVisible { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
-        private Rect PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(1.0, 1,0.33, 0.3);
+        private Rect PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 1.0, 1.0, 0.2);
         private Rect PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
 
         // VideoStackLayout must be visible when initializing VLC window!
@@ -88,10 +88,11 @@ namespace DVBTTelevizor.MAUI
 
         // ChannelsListView
         private Rect LandscapeChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 1.0, 0.7, 0.92);
-        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
+        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1.0, 1, 0.92);
         private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
         private Rect PortraitChannelsListViewPositionWhenEPGDetailVisibleNOTVisible { get; set; } = new Rect(0.0, 1, 1.0, 0.92);
         private Rect PortraitChannelsListViewPlayingInPreview { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
+        private Rect PortraitChannelsListViewPlayingInPreviewWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.16, 1.0, 0.52);
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
@@ -738,16 +739,18 @@ namespace DVBTTelevizor.MAUI
 
                             if (IsPortrait)
                             {
-                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPlayingInPreview);
+
 
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPreviewEPGDetailGridPosition);
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPreviewEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPlayingInPreviewWhenEPGDetailVisible);
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPlayingInPreview);
                                 }
 
                                 //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);

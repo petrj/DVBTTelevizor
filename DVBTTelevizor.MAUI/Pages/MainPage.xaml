@@ -337,8 +337,10 @@
             <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped"  />
         </ScrollView>
 
-        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,0.08"  Color="Red" Opacity="0.25"/>
-        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,1.0,1,0.92"  Color="Purple"/>
+
+        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,0.16,1.0,0.52"  Color="Purple"/>
+        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,0.75,1.0,0.2"  Color="Yellow"/>
+        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,1.0,1.0,0.2"  Color="Green"/-->
 
     </AbsoluteLayout>
 
