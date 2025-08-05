@@ -1306,11 +1306,16 @@ namespace DVBTTelevizor.MAUI
 
                     if (!String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
                     {
-                        int trackId;
-                        if (int.TryParse(channel.SelectedAudioTrack, out trackId))
+                        _ = Task.Run(async () =>
                         {
-                            SetAudio($"setAudio:{trackId}");
-                        }
+                            await Task.Delay(3500); // wait for CheckStream
+
+                            int trackId;
+                            if (int.TryParse(channel.SelectedAudioTrack, out trackId))
+                            {
+                                SetAudio($"setAudio:{trackId}");
+                            }
+                        });
                     }
 
                     //SetSubtitles(-1);
@@ -1352,7 +1357,7 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     await _viewModel.ShowActualPlayingMessage(playInfo);
-                }).RunSynchronously();
+                });
 
                 //if (_config.PlayOnBackground)
                 //{
