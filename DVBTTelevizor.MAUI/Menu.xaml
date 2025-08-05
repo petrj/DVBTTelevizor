@@ -11,7 +11,7 @@
 
         <StackLayout x:Name="MenuStackLayout" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-            <Label x:Name="MenuLabel" Text="{local:LngXamlExt Input='Menu'}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
+            <Label x:Name="MenuLabel" Text="{Binding Title}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
 
             <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 

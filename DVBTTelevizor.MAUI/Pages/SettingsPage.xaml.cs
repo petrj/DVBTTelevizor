@@ -1,3 +1,4 @@
+using AndroidX.Lifecycle;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
@@ -16,6 +17,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
+    private List<MenuItem> _menuItems = new List<MenuItem>();
 
     public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
 	{
@@ -135,6 +137,76 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         base.OnDisappearing();
     }
 
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null && e is TappedEventArgs tea)
+        {
+            Menu_Tapped(tea.Parameter.ToString());
+        }
+    }
+
+    private void ShowOrHideMenu()
+    {
+        if (MainMenu.MenuVisible)
+        {
+            HideMenu();
+        }
+        else
+        {
+            ShowMenu();
+        }
+    }
+
+    private void ShowMenu()
+    {
+        MainMenu.MenuVisible = true;
+        _settingsPageViewModel.MenuVisible = true;
+    }
+
+    private void HideMenu()
+    {
+        MainMenu.MenuVisible = false;
+        _settingsPageViewModel.MenuVisible = false;
+    }
+
+    private void DeleteChannelsMenu()
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            BuildConfirmDeleteChannelsMenu();
+        }
+    }
+
+    private void BuildConfirmDeleteChannelsMenu()
+    {
+        _menuItems.Clear();
+
+        var channels = _configuration.GetChannels();
+
+        _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Confirm delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
+        _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "confirm.png"));
+
+        MainMenu.UpdateMenu(_menuItems);
+    }
+
+    private async void Menu_Tapped(string menuId)
+    {
+        _loggingService.Info($"Menu tapped: {menuId}");
+
+        HideMenu();
+
+        switch (menuId)
+        {
+            case "menuConfirm":
+                break;
+            case "menuCancel":
+                break;
+
+        }
+    }
+
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
     {
 
@@ -203,6 +275,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private async void ClearChannelsButton_Clicked(object sender, EventArgs e)
     {
+        DeleteChannelsMenu();
+
+        /*
         _loggingService.Info("Clearing channels");
 
         var channels = _configuration.GetChannels();
@@ -221,5 +296,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         _configuration.SaveChannels(new ObservableCollection<Channel>());
 
         WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+        */
     }
 }
