@@ -309,10 +309,11 @@
         <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
-                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
+                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
                 <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
                 <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Swiped_3"/>
+                <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
                 <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Swiped_4"/>
             </StackLayout.GestureRecognizers>
         </StackLayout>
@@ -336,8 +337,9 @@
             <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped"  />
         </ScrollView>
 
-        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,1.0,1.0,0.3"  Color="Yellow"/>
-        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,0.7"  Color="Green"/-->
+
+        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,0.0,0.7,1.0"  Color="Green"/>
+        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,1.0"  Color="Yellow"/-->
 
     </AbsoluteLayout>
 
