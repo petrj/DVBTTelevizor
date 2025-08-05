@@ -1318,6 +1318,20 @@ namespace DVBTTelevizor.MAUI
                         });
                     }
 
+                    if (!String.IsNullOrWhiteSpace(channel.SelectedSubtitle))
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            await Task.Delay(3500); // wait for CheckStream
+
+                            int spuId;
+                            if (int.TryParse(channel.SelectedSubtitle, out spuId))
+                            {
+                                SetSubtitles($"setSubtitles:{spuId}");
+                            }
+                        });
+                    }
+
                     //SetSubtitles(-1);
                     //SetAudioTrack(-100);
                     //_viewModel.TeletextEnabled = false;
@@ -1775,12 +1789,33 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
+                if (_viewModel.SelectedChannel == null ||
+                    _viewModel.SelectedChannel.AudioTracks == null)
+                {
+                    return;
+                }
+
                 ShowMenu();
 
                 _subtitleMenuItems.Clear();
 
-                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("setSubtitles:cz", "cz", "subtitles.png", false));
-                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("setSubtitles:en", "en", "subtitles.png", true));
+                var actualId = -1;
+                if (videoView != null && videoView.MediaPlayer != null)
+                {
+                    actualId = videoView.MediaPlayer.Spu;
+                }
+
+                int index = 0;
+                foreach (var sub in _viewModel.SelectedChannel.Subtitles)
+                {
+                    index++;
+                    var title = sub.Value;
+                    if (sub.Key == actualId)
+                    {
+                        title += " *";
+                    }
+                    _subtitleMenuItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "subtitles.png", index > _viewModel.SelectedChannel.Subtitles.Count - 1));
+                }
 
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
@@ -1818,6 +1853,41 @@ namespace DVBTTelevizor.MAUI
 
                 MainMenu.UpdateMenu(_aspectMenuItems);
 
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void SetSubtitles(string command)
+        {
+            _loggingService.Info($"Setting SetSubtitles: {command}");
+
+            try
+            {
+                var idAsString = command.Substring(13);
+                var id = Convert.ToInt32(idAsString);
+
+                if (videoView == null || videoView.MediaPlayer == null)
+                    return;
+
+                foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                {
+                    if (desc.Id == id)
+                    {
+                        _loggingService.Info($"Changing subtitles to: {desc.Id} ({desc.Name})");
+                        videoView.MediaPlayer.SetSpu(desc.Id);
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Changing subtitle: ".Translated() + desc.Name));
+
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _viewModel.SelectedChannel.SelectedSubtitle = desc.Id.ToString();
+                            _viewModel.Config.SaveChannels(_viewModel.Channels);
+                        }
+                        break;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1867,6 +1937,13 @@ namespace DVBTTelevizor.MAUI
             if (menuId.StartsWith("setAudio"))
             {
                 SetAudio(menuId);
+                return;
+            }
+
+            if (menuId.StartsWith("setSubtitles"))
+            {
+                SetSubtitles(menuId);
+                return;
             }
 
             switch (menuId)
@@ -1908,6 +1985,9 @@ namespace DVBTTelevizor.MAUI
                 case "menuBack":
                     ShowMenu();
                     MainMenu.UpdateMenu(_menuItems);
+                    break;
+                case "menuPlay":
+                    await ActionPlay();
                     break;
             }
         }
