@@ -7,7 +7,19 @@
              Margin="0,0,0,0"
              Padding="0,0,0,0">
 
-    <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#555555" CornerRadius="25">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ListLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="Margin" Value="20,0,0,0"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#555555" CornerRadius="25">
 
         <StackLayout x:Name="MenuStackLayout" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 

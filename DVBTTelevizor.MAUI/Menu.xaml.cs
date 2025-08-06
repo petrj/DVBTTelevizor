@@ -21,11 +21,11 @@ public partial class Menu : ContentView
         Tapped?.Invoke(this, e);
     }
 
-    public void UpdateMenu(IEnumerable<MenuItem> items = null)
+    public void UpdateMenu(string title, IEnumerable<MenuItem> items = null)
     {
         if (BindingContext is MenuViewModel vm)
         {
-            vm.UpdateMenu(items);
+            vm.UpdateMenu(items, title);
         }
     }
 

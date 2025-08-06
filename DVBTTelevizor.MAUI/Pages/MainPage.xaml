@@ -159,14 +159,6 @@
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
-            <Style x:Key="ListLabelStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
-                <Setter Property="HorizontalOptions" Value="End"/>
-                <Setter Property="Margin" Value="20,0,0,0"/>
-            </Style>
-
         </ResourceDictionary>
     </ContentPage.Resources>
 

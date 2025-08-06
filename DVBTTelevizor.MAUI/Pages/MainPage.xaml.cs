@@ -1778,7 +1778,7 @@ namespace DVBTTelevizor.MAUI
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-                MainMenu.UpdateMenu(_audioMenuItems);
+                MainMenu.UpdateMenu("Audio menu".Translated(), _audioMenuItems);
 
             }
             catch (Exception ex)
@@ -1822,7 +1822,7 @@ namespace DVBTTelevizor.MAUI
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-                MainMenu.UpdateMenu(_subtitleMenuItems);
+                MainMenu.UpdateMenu("Subtitles menu".Translated(), _subtitleMenuItems);
 
             }
             catch (Exception ex)
@@ -1854,7 +1854,7 @@ namespace DVBTTelevizor.MAUI
                 _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-                MainMenu.UpdateMenu(_aspectMenuItems);
+                MainMenu.UpdateMenu("Aspect menu".Translated(), _aspectMenuItems);
 
             }
             catch (Exception ex)
@@ -1987,7 +1987,7 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case "menuBack":
                     ShowMenu();
-                    MainMenu.UpdateMenu(_menuItems);
+                    MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
                     break;
                 case "menuPlay":
                     await ActionPlay();
@@ -2069,7 +2069,7 @@ namespace DVBTTelevizor.MAUI
 
             // _menuItems.First().Selected = true;
 
-            MainMenu.UpdateMenu(_menuItems);
+            MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
             //FitMenuSize();
         }
 

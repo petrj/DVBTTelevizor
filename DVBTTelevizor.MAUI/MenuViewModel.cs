@@ -42,8 +42,10 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void UpdateMenu(IEnumerable<MenuItem> items)
+        public void UpdateMenu(IEnumerable<MenuItem> items, string title)
         {
+            Title = title;
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 if (items != null)

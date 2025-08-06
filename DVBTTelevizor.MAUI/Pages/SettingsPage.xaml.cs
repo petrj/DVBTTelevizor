@@ -184,10 +184,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         var channels = _configuration.GetChannels();
 
-        _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Confirm delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
-        _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "confirm.png"));
+        _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
+        _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
 
-        MainMenu.UpdateMenu(_menuItems);
+        MainMenu.UpdateMenu("Confirmatiom".Translated(), _menuItems);
     }
 
     private async void Menu_Tapped(string menuId)
@@ -199,10 +199,12 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuConfirm":
+                _configuration.SaveChannels(new ObservableCollection<Channel>());
+                WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+                WeakReferenceMessenger.Default.Send(new  ToastMessage("All existing channels were deleted".Translated()));
                 break;
             case "menuCancel":
                 break;
-
         }
     }
 
@@ -274,27 +276,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private async void ClearChannelsButton_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Info("ClearChannelsButton_Clicked");
+
         DeleteChannelsMenu();
-
-        /*
-        _loggingService.Info("Clearing channels");
-
-        var channels = _configuration.GetChannels();
-
-        if (channels.Count == 0)
-        {
-            await _dialogService.Information("No channel found".Translated());
-            return;
-        }
-
-        if (!await _dialogService.Confirm("Are you sure to delete all channels ({0})?".Translated(channels.Count.ToString()),"Confirm".Translated(),"Yes".Translated(), "No".Translated()))
-        {
-            return;
-        }
-
-        _configuration.SaveChannels(new ObservableCollection<Channel>());
-
-        WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
-        */
     }
 }
