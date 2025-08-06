@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
-using System.Windows.Input;
-using DVBTTelevizor.TV;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.Reflection.Metadata;
-using Microsoft.Maui.Controls;
+using System.Windows.Input;
 
 
 namespace DVBTTelevizor.MAUI
@@ -34,10 +34,15 @@ namespace DVBTTelevizor.MAUI
 
         private KeyboardFocusableItemList _focusItems;
         private List<MenuItem> _menuItems = new List<MenuItem>();
+        private List<MenuItem> _subtitleMenuItems = new List<MenuItem>();
+        private List<MenuItem> _audioMenuItems = new List<MenuItem>();
+        private List<MenuItem> _aspectMenuItems = new List<MenuItem>();
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
+
         private bool _checkStreamEnabled = true;
+        public Command CommandCheckStream { get; set; }
 
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
@@ -51,21 +56,26 @@ namespace DVBTTelevizor.MAUI
 
         private bool IsPortrait { get; set; } = false;
 
-        // EPGDetailGrid
-        private Rect LandscapeEPGDetailGridPosition { get; set; } = new Rect(1.0, 0.22, 0.3, 0.62); //new Rect(1.0, 1.0, 0.3, 0.92);
-        private Rect LandscapePreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.7);
-        private Rect LandscapePlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
+        // Menu: 0.0,0,1.0,0.08
 
-        private Rect PortraitEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.22);
-        private Rect PortraitPreviewEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
-        private Rect PortraitPlayingEPGDetailGridPosition { get; set; } = new Rect(1.0, 1.0, 1.0, 0.3);
+        // EPGDetailGrid
+        private Rect EPGDetailGridLandscapePosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
+        private Rect EPGDetailGridLandscapePositionForPreview { get; set; } = new Rect(1, 0.2, 0.3, 0.62);
+        private Rect EPGDetailGridLandscapePositionForPlay { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
+
+        private Rect EPGDetailGridPortraitPosition { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
+        private Rect EPGDetailGridPortraitPositionForPreview { get; set; } = new Rect(0.0, 0.75, 1.0, 0.2);
+        private Rect EPGDetailGridPortraitPositionForPlay { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
 
 
         // VideoStackLayout
         private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.3);
-        private Rect LandscapeVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 0.7, 1.0);
-        private Rect PortraitVideoStackLayoutPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
-        private Rect PortraitPreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 0.0, 0.5, 0.3);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(1, 1, 0.3, 0.3);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay { get; set; } = new Rect(0.0, 0.0, 0.7, 1.0);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
+        private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 1.0, 0.2);
+        private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
+        private Rect VideoStackLayoutPortraitPositionForPreview { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
 
         // VideoStackLayout must be visible when initializing VLC window!
         private Rect NoVideoStackLayoutPosition { get; set; } = new Rect(-10, -10, -5, -5);
@@ -79,9 +89,12 @@ namespace DVBTTelevizor.MAUI
         private Rect PortraitPreviewRecordingLabelPosition { get; set; } = new Rect(1.0, 0.25, 0.1, 0.1);
 
         // ChannelsListView
-        private Rect LandscapeChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.92, 0.7, 0.92);
-        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0, 0.92, 1, 0.92);
-        private Rect PortraitChannelsListViewPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.3, 1.0, 0.7);
+        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.92);
+        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1.0, 1, 0.92);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1, 1.0, 0.92);
+        private Rect ChannelsListPortraitPositionForPreview { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 0.16, 1.0, 0.52);
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
@@ -200,6 +213,11 @@ namespace DVBTTelevizor.MAUI
                 USBConnectOrDisconnect();
             });
 
+            WeakReferenceMessenger.Default.Register<RefreshGUIMessage>(this, (r, m) =>
+            {
+                RefreshGUI();
+            });
+
             WeakReferenceMessenger.Default.Register<InstallDriverMessage>(this, (r, m) =>
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
@@ -227,14 +245,180 @@ namespace DVBTTelevizor.MAUI
 
             _settingsPage.Disappearing += delegate
             {
-                Task.Run( async () =>
+                Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
                 });
             };
 
             videoView.MediaPlayer = _mediaPlayer;
+
+
+            CommandCheckStream = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await CheckStream();
+                });
+            });
+
+            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
+
+                    _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
+                    var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
+                    WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
+                });
+            }
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
         }
+
+        private async Task CheckStream()
+        {
+            if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
+                return;
+
+            _loggingService.Debug($"Checking stream");
+
+            try
+            {
+
+                // checking stopped stream
+                if (!videoView.MediaPlayer.IsPlaying)
+                {
+                    videoView.MediaPlayer.Play();
+                }
+
+                // checking no video
+                var videoTreackCount = videoView.MediaPlayer.VideoTrackCount;
+
+                if (videoTreackCount <= 0)
+                {
+                    /*
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        NoVideoStackLayout.IsVisible = true;
+                        //VideoStackLayout.IsVisible = false;
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                    });
+                    */
+                }
+                else
+                {
+                    //PreviewVideoBordersFix();
+
+                    /*
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        NoVideoStackLayout.IsVisible = false;
+                        VideoStackLayout.IsVisible = true;
+
+                        if (AbsoluteLayout.GetLayoutBounds(VideoStackLayout) == NoVideoStackLayoutPosition)
+                        {
+                            _loggingService.Debug("CheckStream - VideoStackLayout has invalid bounds");
+                            RefreshGUI();
+                        }
+                    });
+                    */
+                }
+
+
+                // check do data from driver
+
+                if (_lastActionPlayTime != DateTime.MinValue)
+                {
+                    if (!_driver.DriverStreamDataAvailable)
+                    {
+                        var timeFromPlayMSecs = (DateTime.Now - _lastActionPlayTime).TotalMilliseconds;
+                        if (timeFromPlayMSecs > 10000)
+                        {
+                            _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                            /*
+                            MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
+                            MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
+                            */
+                        }
+                        else if (timeFromPlayMSecs > 5000)
+                        {
+                            _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                        }
+                    }
+                }
+
+
+                var actualSubtitleTrack = videoView.MediaPlayer.Spu;
+                var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
+
+                _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
+                _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
+
+                if (_viewModel.PlayingChannel != null)
+                {
+                    foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                    {
+                        if (!_viewModel.PlayingChannel.Subtitles.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"CheckStream - Adding subtitle {desc.Name}");
+                            _viewModel.PlayingChannel.Subtitles.Add(desc.Id, desc.Name);
+                        }
+                    }
+                    foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
+                    {
+                        if (!_viewModel.PlayingChannel.AudioTracks.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"CheckStream - Adding audio track {desc.Name}");
+                            _viewModel.PlayingChannel.AudioTracks.Add(desc.Id, desc.Name);
+                        }
+                    }
+                }
+
+                if (_viewModel.PlayingChannelAspect.Width == -1)
+                {
+                    // setting aspect ratio
+                    /*
+                    var videoTrack = GetVideoTrack();
+                    if (videoTrack.HasValue)
+                    {
+                        _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
+                        _loggingService.Debug($"CheckStream - Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
+                    }
+                    */
+                }
+
+                /*
+                if ((!_viewModel.TeletextEnabled) && (actualSubtitleTrack != _viewModel.Subtitles))
+                {
+                    _loggingService.Debug($"CheckStream - invalid subtitles {actualSubtitleTrack}, setting {_viewModel.Subtitles}");
+                    videoView.MediaPlayer.SetSpu(_viewModel.Subtitles);
+                }
+                */
+
+                // check audio track
+                /*
+                if (actualAudioTrack != _viewModel.AudioTrack)
+                {
+                    if ((_viewModel.AudioTrack == -100) && (actualAudioTrack != -1))
+                    {
+                        _loggingService.Debug($"CheckStream - Setting automatic audio track {actualAudioTrack}");
+                        _viewModel.AudioTrack = actualAudioTrack;
+                    }
+                    else
+                    {
+                        _loggingService.Debug($"CheckStream - invalid audio track {actualAudioTrack}, setting {_viewModel.AudioTrack}");
+                        videoView.MediaPlayer.SetAudioTrack(_viewModel.AudioTrack);
+                    }
+                }
+                */
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "CheckStream general error");
+            }
+        }
+
 
         private void _channelPage_Disappearing(object? sender, EventArgs e)
         {
@@ -482,7 +666,8 @@ namespace DVBTTelevizor.MAUI
                         TuneButton.TopTitleText =
                         MenuButton.TopTitleText = "";
 
-                    } else
+                    }
+                    else
                     {
                         DVBTTelevizorButton.TopTitleText = "DVBT Televizor".Translated();
                         DriverStateButton.TopTitleText = "Driver".Translated();
@@ -509,17 +694,19 @@ namespace DVBTTelevizor.MAUI
                             // VideoStackLayout must be visible before changing Layout
                             VideoStackLayout.IsVisible = true;
                             NoVideoStackLayout.IsVisible = false;
-                            //ChannelsListView.IsVisible = false;
+
+                            ChannelsListView.IsVisible = false;
 
                             if (IsPortrait)
                             {
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPlayingEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPortraitPositionForPlay);
                                     //MainLayout.RaiseChild(EPGDetailGrid);
 
-                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
-                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay);
+
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay);
                                     AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitRecordingLabelPositionWhenEPGDetailVisible);
                                 }
                                 else
@@ -531,13 +718,15 @@ namespace DVBTTelevizor.MAUI
                             }
                             else
                             {
+                                // landscape
+
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePlayingEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridLandscapePositionForPlay);
                                     //MainLayout.RaiseChild(EPGDetailGrid);
 
-                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
-                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapeVideoStackLayoutPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay);
                                     AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPositionWhenEPGDetailVisible);
                                 }
                                 else
@@ -564,31 +753,33 @@ namespace DVBTTelevizor.MAUI
                             {
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitPreviewEPGDetailGridPosition);
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPortraitPositionForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview);
                                 }
                                 else
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListPortraitPositionForPreview);
                                 }
 
-                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, PortraitPreviewVideoStackLayoutPosition);
+                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
                                 AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitPreviewRecordingLabelPosition);
                             }
                             else
                             {
+                                AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview);
+
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible);
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapePreviewEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridLandscapePositionForPreview);
                                 }
                                 else
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
                                 }
 
-                                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
                                 AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
                                 AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
                             }
@@ -611,20 +802,20 @@ namespace DVBTTelevizor.MAUI
                             {
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, PortraitChannelsListViewPositionWhenEPGDetailVisible);
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPortraitPositionWhenEPGDetailVisible);
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPortraitPosition);
                                 }
                                 else
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPositionWhenEPGDetailNOTVisible);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible);
                                 }
                             }
                             else // landscape
                             {
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, LandscapeChannelsListViewPositionWhenEPGDetailVisible); // 0,1,0.7,0.92
-                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeEPGDetailGridPosition);
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview); // 0,1,0.7,0.92
+                                    AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridLandscapePosition);
                                 }
                                 else
                                 {
@@ -821,11 +1012,6 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
-        {
-
-        }
-
         private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
         {
 
@@ -897,10 +1083,10 @@ namespace DVBTTelevizor.MAUI
 
                 _lastActionPlayTime = DateTime.MinValue;
 
-                _viewModel.PlayingChannelSubtitles.Clear();
-                _viewModel.PlayingChannelAudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
-                _viewModel.PlayingChannel = null;
+
+                _viewModel.PlayingChannel.Subtitles.Clear();
+                _viewModel.PlayingChannel.AudioTracks.Clear();
 
                 //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
@@ -1004,7 +1190,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (
                     (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
-                    (  _configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+                    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
                     )
                 {
                     shouldMediaStop = false;
@@ -1106,7 +1292,8 @@ namespace DVBTTelevizor.MAUI
                                 break;
                         }
 
-                    } else
+                    }
+                    else
                     if (DeviceInfo.Platform == DevicePlatform.WinUI)
                     {
                         _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
@@ -1116,6 +1303,34 @@ namespace DVBTTelevizor.MAUI
                     {
                         videoView.MediaPlayer.Play(_media);
                     });
+
+                    if (!String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            await Task.Delay(3500); // wait for CheckStream
+
+                            int trackId;
+                            if (int.TryParse(channel.SelectedAudioTrack, out trackId))
+                            {
+                                SetAudio($"setAudio:{trackId}");
+                            }
+                        });
+                    }
+
+                    if (!String.IsNullOrWhiteSpace(channel.SelectedSubtitle))
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            await Task.Delay(3500); // wait for CheckStream
+
+                            int spuId;
+                            if (int.TryParse(channel.SelectedSubtitle, out spuId))
+                            {
+                                SetSubtitles($"setSubtitles:{spuId}");
+                            }
+                        });
+                    }
 
                     //SetSubtitles(-1);
                     //SetAudioTrack(-100);
@@ -1134,8 +1349,8 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.SelectedChannel = channel;
                 _viewModel.PlayingChannel = channel;
-                _viewModel.PlayingChannelSubtitles.Clear();
-                _viewModel.PlayingChannelAudioTracks.Clear();
+                _viewModel.PlayingChannel.Subtitles.Clear();
+                _viewModel.PlayingChannel.AudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
                 _viewModel.EPGDetailEnabled = false;
 
@@ -1147,7 +1362,8 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.NotifyChannelChange();
 
-                Task.Run(async () => {
+                Task.Run(async () =>
+                {
                     playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
                     if (playInfo.CurrentEvent == null || playInfo.CurrentEvent.CurrentEventItem == null)
@@ -1156,7 +1372,7 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     await _viewModel.ShowActualPlayingMessage(playInfo);
-                }).RunSynchronously();
+                });
 
                 //if (_config.PlayOnBackground)
                 //{
@@ -1174,6 +1390,7 @@ namespace DVBTTelevizor.MAUI
 
                 _checkStreamEnabled = true;
                 _refreshGUIEnabled = true;
+
                 RefreshGUI();
             }
         }
@@ -1196,20 +1413,45 @@ namespace DVBTTelevizor.MAUI
             if (e.Item is Channel channel)
             {
                 _loggingService.Info($"ChannelsListView_ItemTapped: {channel.Name}");
-                MainThread.BeginInvokeOnMainThread( async () =>
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     await ActionPlay(channel);
                 });
             }
         }
 
+        private void ShowOrHideMenu()
+        {
+            if (MainMenu.MenuVisible)
+            {
+                HideMenu();
+            }
+            else
+            {
+                ShowMenu();
+            }
+        }
+
+        private void ShowMenu()
+        {
+            MainMenu.MenuVisible = true;
+            _viewModel.MenuVisible = true;
+        }
+
+        private void HideMenu()
+        {
+            MainMenu.MenuVisible = false;
+            _viewModel.MenuVisible = false;
+        }
+
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-            if (!MainMenu.MenuVisible)
+            ShowOrHideMenu();
+
+            if (MainMenu.IsVisible)
             {
                 BuildMenu();
             }
-            MainMenu.MenuVisible = !MainMenu.MenuVisible;
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
@@ -1413,7 +1655,8 @@ namespace DVBTTelevizor.MAUI
                     selected = true;
                     item.Update();
                     break;
-                } else
+                }
+                else
                 if (item.Selected)
                 {
                     item.Selected = false;
@@ -1422,7 +1665,7 @@ namespace DVBTTelevizor.MAUI
                 }
             }
 
-            if (!selected && first!=null)
+            if (!selected && first != null)
             {
                 first.Selected = true;
                 first.Update();
@@ -1444,7 +1687,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
-                    MainMenu.MenuVisible = false;
+                    HideMenu();
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
@@ -1500,9 +1743,212 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task AudioMenu_Tapped()
+        {
+            try
+            {
+                if (_viewModel.SelectedChannel == null ||
+                    _viewModel.SelectedChannel.AudioTracks == null)
+                {
+                    return;
+                }
+
+                ShowMenu();
+
+                _audioMenuItems.Clear();
+
+                var actualId = -1;
+                if (videoView != null && videoView.MediaPlayer != null)
+                {
+                    actualId = videoView.MediaPlayer.AudioTrack;
+                }
+
+                int index = 0;
+                foreach (var track in _viewModel.SelectedChannel.AudioTracks)
+                {
+                    index++;
+                    var title = track.Value;
+                    if (track.Key == actualId)
+                    {
+                        title += " *";
+                    }
+                    _audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _viewModel.SelectedChannel.AudioTracks.Count - 1));
+                }
+
+                _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                MainMenu.UpdateMenu("Audio menu".Translated(), _audioMenuItems);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task SubtitlesMenu_Tapped()
+        {
+            try
+            {
+                if (_viewModel.SelectedChannel == null ||
+                    _viewModel.SelectedChannel.AudioTracks == null)
+                {
+                    return;
+                }
+
+                ShowMenu();
+
+                _subtitleMenuItems.Clear();
+
+                var actualId = -1;
+                if (videoView != null && videoView.MediaPlayer != null)
+                {
+                    actualId = videoView.MediaPlayer.Spu;
+                }
+
+                int index = 0;
+                foreach (var sub in _viewModel.SelectedChannel.Subtitles)
+                {
+                    index++;
+                    var title = sub.Value;
+                    if (sub.Key == actualId)
+                    {
+                        title += " *";
+                    }
+                    _subtitleMenuItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "subtitles.png", index > _viewModel.SelectedChannel.Subtitles.Count - 1));
+                }
+
+                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                MainMenu.UpdateMenu("Subtitles menu".Translated(), _subtitleMenuItems);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private async Task AspectMenu_Tapped()
+        {
+            try
+            {
+                ShowMenu();
+
+                _aspectMenuItems.Clear();
+
+                /*
+                        actions.Add("16:9");
+                        actions.Add("4:3");
+                        actions.Add("Original");
+                        actions.Add("Fill");
+                */
+
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:16:9", "16:9", "aspect.png", false));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:4:3", "4:3", "aspect.png", false));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:Original", "Original".Translated(), "aspect.png", false));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("setAspect:Fill", "Fill".Translated(), "aspect.png", true));
+
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                MainMenu.UpdateMenu("Aspect menu".Translated(), _aspectMenuItems);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void SetSubtitles(string command)
+        {
+            _loggingService.Info($"Setting SetSubtitles: {command}");
+
+            try
+            {
+                var idAsString = command.Substring(13);
+                var id = Convert.ToInt32(idAsString);
+
+                if (videoView == null || videoView.MediaPlayer == null)
+                    return;
+
+                foreach (var desc in videoView.MediaPlayer.SpuDescription)
+                {
+                    if (desc.Id == id)
+                    {
+                        _loggingService.Info($"Changing subtitles to: {desc.Id} ({desc.Name})");
+                        videoView.MediaPlayer.SetSpu(desc.Id);
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Changing subtitle: ".Translated() + desc.Name));
+
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _viewModel.SelectedChannel.SelectedSubtitle = desc.Id.ToString();
+                            _viewModel.Config.SaveChannels(_viewModel.Channels);
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void SetAudio(string command)
+        {
+            _loggingService.Info($"Setting audio: {command}");
+
+            try
+            {
+                var idAsString = command.Substring(9);
+                var id = Convert.ToInt32(idAsString);
+
+                if (videoView == null || videoView.MediaPlayer == null)
+                    return;
+
+                foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
+                {
+                    if (desc.Id == id)
+                    {
+                        _loggingService.Info($"Changing audio track to: {desc.Id} ({desc.Name})");
+                        videoView.MediaPlayer.SetAudioTrack(desc.Id);
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Changing audio track: ".Translated() + desc.Name));
+
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _viewModel.SelectedChannel.SelectedAudioTrack = desc.Id.ToString();
+                            _viewModel.Config.SaveChannels(_viewModel.Channels);
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private async void Menu_Tapped(string menuId)
         {
-            MainMenu.MenuVisible = false;
+            HideMenu();
+
+            if (menuId.StartsWith("setAudio"))
+            {
+                SetAudio(menuId);
+                return;
+            }
+
+            if (menuId.StartsWith("setSubtitles"))
+            {
+                SetSubtitles(menuId);
+                return;
+            }
+
             switch (menuId)
             {
                 case "menuSettings":
@@ -1513,14 +1959,38 @@ namespace DVBTTelevizor.MAUI
                 case "menuQuit":
                     WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
                     break;
+                case "menuSubtitles":
+                    await SubtitlesMenu_Tapped();
+                    break;
+                case "menuAudio":
+                    await AudioMenu_Tapped();
+                    break;
+                case "menuAspect":
+                    await AspectMenu_Tapped();
+                    break;
                 case "menuScanEPG":
-                      await _viewModel.ScanEPG(_viewModel.SelectedChannel, false, false);
+                    await _viewModel.ScanEPG(_viewModel.SelectedChannel, false, false);
+                    break;
+                case "menuShowEPG":
+                    _viewModel.EPGDetailEnabled = true;
+                    RefreshGUI();
+                    break;
+                case "menuHideEPG":
+                    _viewModel.EPGDetailEnabled = false;
+                    RefreshGUI();
                     break;
                 case "menuChannel":
                     EditChannel(_viewModel.SelectedChannel);
                     break;
                 case "menuRefresh":
-                     await _viewModel.RefreshChannels();
+                    await _viewModel.RefreshChannels();
+                    break;
+                case "menuBack":
+                    ShowMenu();
+                    MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
+                    break;
+                case "menuPlay":
+                    await ActionPlay();
                     break;
             }
         }
@@ -1531,12 +2001,21 @@ namespace DVBTTelevizor.MAUI
 
             if ((_viewModel.Channels.Count > 0) && (_viewModel.SelectedChannel != null))
             {
-                if (_viewModel.PlayingState == PlayingStateEnum.Playing)
+                if ((_viewModel.PlayingState == PlayingStateEnum.Playing) ||
+                    (_viewModel.PlayingState == PlayingStateEnum.PlayingInPreview))
+
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuStop", "Stop".Translated(), "stop.png"));
 
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuSubtitles", "Subtitles".Translated(), "subtitles.png"));
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuAudio", "Audio".Translated(), "audio.png"));
+                    if (_viewModel.SelectedChannel.AudioTracks.Count > 0)
+                    {
+                        _menuItems.Add(MainMenu.CreateMenuItem("menuAudio", "Audio".Translated(), "audio.png"));
+                    }
+                    if (_viewModel.SelectedChannel.Subtitles.Count > 0)
+                    {
+                        _menuItems.Add(MainMenu.CreateMenuItem("menuSubtitles", "Subtitles".Translated(), "subtitles.png"));
+                    }
+
                     _menuItems.Add(MainMenu.CreateMenuItem("menuAspect", "Aspect ratio".Translated(), "aspect.png"));
                     _menuItems.Add(MainMenu.CreateMenuItem("menuTeletext", "Teletext".Translated(), "teletext.png"));
                 }
@@ -1545,7 +2024,17 @@ namespace DVBTTelevizor.MAUI
                     _menuItems.Add(MainMenu.CreateMenuItem("menuPlay", "Play".Translated(), "play.png"));
                 }
 
-                _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "ScanEPG".Translated(), "epg.png"));
+                _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "Scan EPG".Translated(), "epgscan.png"));
+
+                if (_viewModel.EPGDetailVisible)
+                {
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide EPG".Translated(), "epg.png"));
+                }
+                else
+                {
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show EPG".Translated(), "epg.png"));
+                }
+
 
                 if (_viewModel.RecordingChannel == null)
                 {
@@ -1560,7 +2049,8 @@ namespace DVBTTelevizor.MAUI
             if (_viewModel.EPGDetailVisible)
             {
                 //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonHideEPG"));
-            } else
+            }
+            else
             {
                 //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonShowEPG"));
             }
@@ -1568,19 +2058,50 @@ namespace DVBTTelevizor.MAUI
             var selectedChannel = _viewModel.SelectedChannel;
             if (selectedChannel != null)
             {
-                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Edit channel".Translated(), "edit.png"));
+                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
             }
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuSettings", "Settings".Translated(), "settings.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuQuit", "Quit application".Translated(), "quit.png", true));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close menu".Translated(), "close.png"));
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
             // _menuItems.First().Selected = true;
 
-            MainMenu.UpdateMenu(_menuItems);
-
+            MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
             //FitMenuSize();
+        }
+
+        private void EPGDetailGrid_SwipeRight(object sender, SwipedEventArgs e)
+        {
+            _viewModel.EPGDetailEnabled = false;
+            RefreshGUI();
+        }
+
+        private void VideoStackLayout_DoubleTapped(object sender, TappedEventArgs e)
+        {
+            if (_viewModel.PlayingState == PlayingStateEnum.Playing)
+            {
+                _viewModel.PlayingState = PlayingStateEnum.PlayingInPreview;
+            }
+            else
+            if (_viewModel.PlayingState == PlayingStateEnum.PlayingInPreview)
+            {
+                _viewModel.PlayingState = PlayingStateEnum.Playing;
+            }
+
+            RefreshGUI();
+        }
+
+        private void VideoStackLayout_Tapped(object sender, TappedEventArgs e)
+        {
+            if (_viewModel.PlayingState == PlayingStateEnum.Playing ||
+                _viewModel.PlayingState == PlayingStateEnum.PlayingInPreview)
+            {
+                _viewModel.EPGDetailEnabled = !_viewModel.EPGDetailEnabled;
+                RefreshGUI();
+            }
         }
     }
 

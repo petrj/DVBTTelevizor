@@ -582,5 +582,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<string>("Language", value);
             }
         }
+
+        public string LoggingUDPIP
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("LoggingUDPIP", "10.0.0.2");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("LoggingUDPIP", value);
+            }
+        }
     }
 }

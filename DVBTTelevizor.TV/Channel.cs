@@ -31,6 +31,12 @@ namespace DVBTTelevizor
         public string? ProviderName { get; set; } = null;
         public bool NonFree { get; set; } = false; // backward compatibility!!!
 
+        public Dictionary<int, string> Subtitles { get; set; } = new Dictionary<int, string>();
+        public Dictionary<int, string> AudioTracks { get; set; } = new Dictionary<int, string>();
+
+        public string? SelectedSubtitle { get; set; } = null;
+        public string? SelectedAudioTrack { get; set; } = null;
+
         private bool _recording = false;
 
         public string BandwdithLabel
@@ -340,6 +346,19 @@ namespace DVBTTelevizor
             channel.Number = Number;
             channel.NonFree = NonFree;
 
+            channel.AudioTracks = new Dictionary<int, string>();
+            foreach (var track in AudioTracks)
+            {
+                channel.AudioTracks.Add(track.Key, track.Value);
+            }
+            channel.Subtitles = new Dictionary<int, string>();
+            foreach (var sub in Subtitles)
+            {
+                channel.Subtitles.Add(sub.Key, sub.Value);
+            }
+            channel.SelectedAudioTrack = SelectedAudioTrack;
+            channel.SelectedSubtitle = SelectedSubtitle;
+
             return channel;
         }
 
@@ -363,7 +382,6 @@ namespace DVBTTelevizor
 
             return false;
         }
-
 
         public static int GetNextChannelNumber(ObservableCollection<Channel> channels)
         {

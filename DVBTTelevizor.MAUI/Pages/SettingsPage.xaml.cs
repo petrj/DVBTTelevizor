@@ -16,6 +16,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
+    private List<MenuItem> _menuItems = new List<MenuItem>();
 
     public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
 	{
@@ -70,7 +71,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportLanguage", new List<View>() { ExportLanguageButton }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }));
 
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
     }
@@ -131,6 +134,78 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+    }
+
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null && e is TappedEventArgs tea)
+        {
+            Menu_Tapped(tea.Parameter.ToString());
+        }
+    }
+
+    private void ShowOrHideMenu()
+    {
+        if (MainMenu.MenuVisible)
+        {
+            HideMenu();
+        }
+        else
+        {
+            ShowMenu();
+        }
+    }
+
+    private void ShowMenu()
+    {
+        MainMenu.MenuVisible = true;
+        _settingsPageViewModel.MenuVisible = true;
+    }
+
+    private void HideMenu()
+    {
+        MainMenu.MenuVisible = false;
+        _settingsPageViewModel.MenuVisible = false;
+    }
+
+    private void DeleteChannelsMenu()
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            BuildConfirmDeleteChannelsMenu();
+        }
+    }
+
+    private void BuildConfirmDeleteChannelsMenu()
+    {
+        _menuItems.Clear();
+
+        var channels = _configuration.GetChannels();
+
+        _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
+        _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
+
+        MainMenu.UpdateMenu("Confirmatiom".Translated(), _menuItems);
+    }
+
+    private async void Menu_Tapped(string menuId)
+    {
+        _loggingService.Info($"Menu tapped: {menuId}");
+
+        HideMenu();
+
+        switch (menuId)
+        {
+            case "menuConfirm":
+                _configuration.SaveChannels(new ObservableCollection<Channel>());
+                WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+                WeakReferenceMessenger.Default.Send(new  ToastMessage("All existing channels were deleted".Translated()));
+                break;
+            case "menuCancel":
+                break;
+        }
     }
 
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
@@ -201,23 +276,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private async void ClearChannelsButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Info("Clearing channels");
+        _loggingService.Info("ClearChannelsButton_Clicked");
 
-        var channels = _configuration.GetChannels();
-
-        if (channels.Count == 0)
-        {
-            await _dialogService.Information("No channel found".Translated());
-            return;
-        }
-
-        if (!await _dialogService.Confirm("Are you sure to delete all channels ({0})?".Translated(channels.Count.ToString()),"Confirm".Translated(),"Yes".Translated(), "No".Translated()))
-        {
-            return;
-        }
-
-        _configuration.SaveChannels(new ObservableCollection<Channel>());
-
-        WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+        DeleteChannelsMenu();
     }
 }

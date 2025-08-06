@@ -13,7 +13,21 @@ namespace DVBTTelevizor.MAUI
     public class MenuViewModel : BaseNotifableObject
     {
         private bool _menuVisible = false;
+        private string _title = "Menu".Translated();
         public ObservableCollection<MenuItem> MenuItems { get; set; } = new ObservableCollection<MenuItem>();
+
+        public string Title
+        {
+            get
+            {
+                return _title;
+            }
+            set
+            {
+                _title = value;
+                OnPropertyChanged(nameof(Title));
+            }
+        }
 
         public bool MenuVisible
         {
@@ -28,11 +42,12 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void UpdateMenu(IEnumerable<MenuItem> items = null)
+        public void UpdateMenu(IEnumerable<MenuItem> items, string title)
         {
+            Title = title;
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-
                 if (items != null)
                 {
                     MenuItems.Clear();

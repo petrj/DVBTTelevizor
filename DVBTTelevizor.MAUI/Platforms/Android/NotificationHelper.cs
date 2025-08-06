@@ -88,8 +88,8 @@ namespace DVBTTelevizor.MAUI
                      .SetOngoing(true)
                      .SetSound(null)
                      .SetVibrate(new long[] { 0, 0 })
-                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Stop, "Stop", stopPendingIntent))
-                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Quit, "Quit", quitPendingIntent))
+                     .AddAction(new NotificationCompat.Action(Resource.Drawable.stop, "Stop", stopPendingIntent))
+                     .AddAction(new NotificationCompat.Action(Resource.Drawable.quit, "Quit", quitPendingIntent))
                      .SetVisibility((int)NotificationVisibility.Public)
                      .SetContentIntent(pendingIntent);
 
@@ -122,7 +122,7 @@ namespace DVBTTelevizor.MAUI
                      .SetOngoing(true)
                      .SetSound(null)
                      .SetVibrate(new long[] { 0, 0 })
-                     .AddAction(new NotificationCompat.Action(Resource.Drawable.Stop, "Stop recording", stopPendingIntent))
+                     .AddAction(new NotificationCompat.Action(Resource.Drawable.stop, "Stop recording", stopPendingIntent))
                      .SetVisibility((int)NotificationVisibility.Public)
                      .SetContentIntent(pendingIntent);
 

@@ -1194,8 +1194,16 @@ namespace DVBTTelevizor
 
                     while ((DateTime.Now - startTime).TotalMilliseconds < timeoutForReadingBuffer)
                     {
-                        var allPackets = MPEGTransportStreamPacket.Parse(GetReadBufferData());
-                        if (allPackets.Count > 0)
+                        List<MPEGTransportStreamPacket>? allPackets = null;
+                        try
+                        {
+                            allPackets = MPEGTransportStreamPacket.Parse(GetReadBufferData());
+                        } catch (Exception ex)
+                        {
+                            _log.Error(ex, "Error while parsing packets from read buffer");
+                            allPackets = null;
+                        }
+                        if (allPackets != null && allPackets.Count > 0)
                         {
                             pmtTable = DVBTTable.CreateFromPackets<PMTTable>(allPackets, mapPID);
 

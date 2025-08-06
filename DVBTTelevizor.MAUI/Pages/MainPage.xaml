@@ -159,14 +159,6 @@
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
-            <Style x:Key="ListLabelStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
-                <Setter Property="HorizontalOptions" Value="End"/>
-                <Setter Property="Margin" Value="20,0,0,0"/>
-            </Style>
-
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -220,10 +212,9 @@
                 <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"/>
             </ScrollView>
 
-            <!--Grid.GestureRecognizers >
-                <SwipeGestureRecognizer Direction="Right" Swiped="EPDDetail_SwipedRight"/>
-                <SwipeGestureRecognizer Direction="Down" Swiped="EPDDetail_SwipedDown"/>
-            </Grid.GestureRecognizers-->
+            <Grid.GestureRecognizers >
+                <SwipeGestureRecognizer Direction="Right" Swiped="EPGDetailGrid_SwipeRight"/>
+            </Grid.GestureRecognizers>
 
         </Grid>
 
@@ -287,7 +278,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.075" AbsoluteLayout.LayoutFlags="All"
+        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.08" AbsoluteLayout.LayoutFlags="All"
               ColumnSpacing="5"
               BackgroundColor="#29242a"
               Margin="0,0,0,0">
@@ -301,7 +292,7 @@
                 <ColumnDefinition Width="16*" />
             </Grid.ColumnDefinitions>
 
-            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="dvbttelevizor.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/>
+            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="about.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/>
             <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
             <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}"  Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
             <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
@@ -310,10 +301,11 @@
         <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
-                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" NumberOfTapsRequired="1" />
+                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
                 <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
                 <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Swiped_3"/>
+                <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
                 <SwipeGestureRecognizer Direction="Down" Swiped="SwipeGestureRecognizer_Swiped_4"/>
             </StackLayout.GestureRecognizers>
         </StackLayout>
@@ -333,7 +325,13 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" Tapped="Menu_Tapped"  />
+        <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}">
+            <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped"  />
+        </ScrollView>
+
+
+        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,0.0,0.7,1.0"  Color="Green"/>
+        <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,1.0"  Color="Yellow"/-->
 
     </AbsoluteLayout>
 

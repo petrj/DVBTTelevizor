@@ -1,6 +1,6 @@
 cd $PSScriptRoot
 
-$androidFolder="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor.MAUI/"
+$androidFolder="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/"
 
 foreach ($file in Get-ChildItem -Path "TestingDVBTDriverData")
 {    

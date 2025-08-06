@@ -62,7 +62,7 @@ namespace DVBTTelevizor
 
                 if (typeof(T) == typeof(string))
                 {
-                    val = _sharedPrefs.GetString(key, default(string));
+                    val = _sharedPrefs.GetString(key, Convert.ToString(defaultValue));
                 }
                 else
                 if (typeof(T) == typeof(bool))
@@ -76,7 +76,7 @@ namespace DVBTTelevizor
                 } else
                 if (typeof(T) == typeof(long))
                 {
-                    val = _sharedPrefs.GetLong(key, default(long));
+                    val = _sharedPrefs.GetLong(key, Convert.ToInt32(defaultValue));
                 }
                 else
                 {

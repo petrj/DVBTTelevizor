@@ -21,6 +21,7 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<string> Languages { get; set; } = new ObservableCollection<string>();
 
         public Channel _selectedChannel = null;
+        private bool _menuVisible = false;
 
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -35,6 +36,20 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(Languages));
                 OnPropertyChanged(nameof(SelectedLanguage));
             });
+        }
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
+            }
         }
 
         public string SelectedLanguage

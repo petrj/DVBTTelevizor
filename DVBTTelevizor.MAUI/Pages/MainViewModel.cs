@@ -19,9 +19,6 @@ namespace DVBTTelevizor.MAUI
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
-        public Dictionary<int, string> PlayingChannelSubtitles { get; set; } = new Dictionary<int, string>();
-        public Dictionary<int, string> PlayingChannelAudioTracks { get; set; } = new Dictionary<int, string>();
-
         public Size PlayingChannelAspect { get; set; } = new Size(-1, -1);
 
         public EITManager EIT { get; set; }
@@ -38,6 +35,9 @@ namespace DVBTTelevizor.MAUI
         private Channel _recordingChannel;
         private bool _scanningEPG = false;
 
+        private bool _refreshing = false;
+        private bool _menuVisible = false;
+
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
         public ICommand CommandSettings { get; set; }
@@ -47,8 +47,25 @@ namespace DVBTTelevizor.MAUI
         public ICommand CommandShowMenu { get; set; }
         public ICommand CommandInstallDriver { get; set; }
         public ICommand CommandQuit { get; set; }
+        public ICommand RefreshCommand { get; set; }
 
         public Command CommandScanEPG { get; set; }
+
+        public bool MainLayoutVisible { get; set; } = true;
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
+            }
+        }
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -131,7 +148,15 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 2, 10);
+            RefreshCommand = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await RefreshChannels();
+                });
+            });
+
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
         }
 
         public async Task<EPGCurrentEvent> GetChannelEPG(Channel channel)
@@ -306,6 +331,7 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
+                IsRefreshing = true;
                 await _semaphoreSlim.WaitAsync();
 
                 foreach (var channel in Channels)
@@ -338,6 +364,10 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SelectedChannelEPGProgress));
                 OnPropertyChanged(nameof(EPGProgressBackgroundColor));
                 NotifyEPGDetailVisibilityChange();
+
+                IsRefreshing = false;
+
+               WeakReferenceMessenger.Default.Send(new RefreshGUIMessage(String.Empty));
             }
         }
 
@@ -353,6 +383,8 @@ namespace DVBTTelevizor.MAUI
 
                 try
                 {
+                    IsRefreshing = true;
+
                     await _semaphoreSlim.WaitAsync();
 
                     if (SelectedChannel != null)
@@ -400,6 +432,8 @@ namespace DVBTTelevizor.MAUI
                     _semaphoreSlim.Release();
 
                     //NotifyEPGDetailVisibilityChange();
+
+                    IsRefreshing = false;
 
                     NotifyChannelChange();
                 }
@@ -736,7 +770,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public bool MainLayoutVisible { get; set; } = true;
+
 
         public void OnAppearing()
         {
@@ -876,6 +910,19 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Channels.Count == 0;
+            }
+        }
+
+        public bool IsRefreshing
+        {
+            get
+            {
+                return _refreshing;
+            }
+            set
+            {
+                _refreshing = value;
+                OnPropertyChanged(nameof(IsRefreshing));
             }
         }
     }
