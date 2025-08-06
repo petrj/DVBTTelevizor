@@ -23,7 +23,7 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public async Task CheckFrequencyRange()
+        public async Task CheckDriver()
         {
             try
             {
@@ -57,6 +57,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(DisconnectButtonVisible));
             OnPropertyChanged(nameof(ConnectButtonVisible));
             OnPropertyChanged(nameof(ConnectedDeviceRange));
+            OnPropertyChanged(nameof(DriverPreferencesVisible));
         }
 
         public string ConnectedDevice
@@ -102,6 +103,14 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return "donglered.png";
+            }
+        }
+
+        public bool DriverPreferencesVisible
+        {
+            get
+            {
+                return (_driver != null) && _driver.DriverInstalled;
             }
         }
 

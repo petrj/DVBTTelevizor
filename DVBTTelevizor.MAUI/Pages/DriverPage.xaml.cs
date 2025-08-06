@@ -37,6 +37,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("DisConnect", new List<View>() { DisconnectButton }));
 
@@ -49,7 +50,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            await _driverPageViewModel.CheckFrequencyRange();
+            await _driverPageViewModel.CheckDriver();
          });
 
         _focusItems.DeFocusAll();
@@ -103,6 +104,13 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                             ConnectButton_Clicked(this, new EventArgs());
                         });
                         break;
+                    case "Preferences":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            DriverPreferencesButton_Clicked(this, new EventArgs());
+                        });
+                        break;
+
                     case "DisConnect":
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
@@ -139,5 +147,12 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"DriverPage DisconnectButton_Clicked");
 
         WeakReferenceMessenger.Default.Send(new DisConnectMessage(String.Empty));
+    }
+
+    private void DriverPreferencesButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"DriverPage DriverPreferencesButton_Clicked");
+
+        WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage(String.Empty));
     }
 }

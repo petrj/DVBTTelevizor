@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
@@ -16,12 +17,12 @@ using LoggerService;
 using Microsoft.Maui.Controls.Compatibility;
 using NLog;
 using RTLSDR;
+using RTLSDR.Common;
 using System.ComponentModel;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using Environment = System.Environment;
-using RTLSDR.Common;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -30,6 +31,7 @@ namespace DVBTTelevizor.MAUI
     {
         private const int StartRequestCode = 1000;
         private const int StartRequestCodeRTLSDR = 1001;
+        private const int StartRequestCodeDriverPreferences = 1002;
         private int _audioSampleRate = 96000;
         private int _audioChannels = 1;
         private bool _startAudioReceiverThread = false;
@@ -300,12 +302,12 @@ namespace DVBTTelevizor.MAUI
             });
 
             WeakReferenceMessenger.Default.Register<StopPlayInBackgroundNotificationMessage>(this, (r, m) =>
-{
-MainThread.BeginInvokeOnMainThread(() =>
-{
-    StopNotification(1);
-});
-});
+            {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                StopNotification(1);
+            });
+        });
 
             WeakReferenceMessenger.Default.Register<ShareFileMessage>(this, (r, m) =>
             {
@@ -333,6 +335,11 @@ MainThread.BeginInvokeOnMainThread(() =>
             WeakReferenceMessenger.Default.Register<ShowFullscreenMessage>(this, (r, m) =>
             {
                 SetFullScreen();
+            });
+
+            WeakReferenceMessenger.Default.Register<ShowDriverPrefrencesMessage>(this, (r, m) =>
+            {
+                ShowDriverAppPreferences();
             });
         }
 
@@ -529,6 +536,22 @@ MainThread.BeginInvokeOnMainThread(() =>
 
                 }
             });
+        }
+
+        private void ShowDriverAppPreferences()
+        {
+            try
+            {
+                var req = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
+                req.SetData(Android.Net.Uri.Parse($"package:info.martinmarinov.dvbdriver"));
+
+                StartActivityForResult(req, StartRequestCodeDriverPreferences);
+            }
+            catch (Exception ex)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Failed to show driver preferences".Translated()));
+                _loggingService.Error(ex, "Failed to show driver preferences");
+            }
         }
 
         private void InitRTLSDRDriver(int port, int streamPort, int samplerate = 2048000)
