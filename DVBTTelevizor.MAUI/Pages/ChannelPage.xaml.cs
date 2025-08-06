@@ -181,6 +181,8 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     private void ButtonChangeAudio_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Debug($"ButtonChangeAudio_Clicked");
+
 
     }
 

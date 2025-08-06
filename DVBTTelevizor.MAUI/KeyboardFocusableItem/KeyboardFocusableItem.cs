@@ -172,7 +172,7 @@ namespace DVBTTelevizor.MAUI
                 if (part is Button button)
                 {
                     button.BackgroundColor = Colors.Gray;
-                    button.TextColor = Colors.Black;
+                    button.TextColor = Colors.LightGray;
                 } else
                 if (part is ImageButton ibutton)
                 {

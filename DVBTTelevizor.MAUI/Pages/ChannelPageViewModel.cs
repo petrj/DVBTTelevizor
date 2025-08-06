@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui;
 using System;
@@ -14,6 +15,9 @@ namespace DVBTTelevizor.MAUI
     public class ChannelPageViewModel : BaseViewModel
     {
         private Channel? _channel = null;
+
+        public ObservableCollection<MediaTrack> AudioTracks { get; set; } = new ObservableCollection<MediaTrack>();
+        public ObservableCollection<MediaTrack> Subtitles { get; set; } = new ObservableCollection<MediaTrack>();
 
         public ChannelPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -30,8 +34,51 @@ namespace DVBTTelevizor.MAUI
             {
                 _channel = value;
 
+                SetAudioTracks(_channel.AudioTracks, _channel.SelectedAudioTrack);
+                SetSubtitleTracks(_channel.Subtitles, _channel.SelectedSubtitle);
+
                 NotifyChannelChange();
             }
+        }
+
+        private void SetAudioTracks(Dictionary<int, string> playingChannelAudioTracks, string activeId)
+        {
+            AudioTracks.Clear();
+
+            foreach (var kvp in playingChannelAudioTracks)
+            {
+                if (kvp.Key == -1)
+                    continue;
+
+                AudioTracks.Add(new MediaTrack()
+                {
+                    Key = kvp.Key,
+                    Value = kvp.Value,
+                    Active = kvp.Key.ToString() == activeId
+                });
+            }
+
+            OnPropertyChanged(nameof(AudioTracks));
+        }
+
+        private void SetSubtitleTracks(Dictionary<int, string> playingChannelSubtitles, string activeId)
+        {
+            Subtitles.Clear();
+
+            foreach (var kvp in playingChannelSubtitles)
+            {
+                if (kvp.Key == -1)
+                    continue;
+
+                Subtitles.Add(new MediaTrack()
+                {
+                    Key = kvp.Key,
+                    Value = kvp.Value,
+                    Active = kvp.Key.ToString() == activeId
+                });
+            }
+
+            OnPropertyChanged(nameof(Subtitles));
         }
 
         public void NotifyChannelChange()

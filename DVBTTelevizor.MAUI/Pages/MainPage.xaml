@@ -221,7 +221,7 @@
 
         <ListView
           x:Name="ChannelsListView"
-          AbsoluteLayout.LayoutBounds="0.0, 0.92, 0.7, 0.92"
+          AbsoluteLayout.LayoutBounds="0.0, 1.0, 1.0, 0.92"
           AbsoluteLayout.LayoutFlags="All"
           ItemsSource="{Binding Channels}"
           CachingStrategy="RecycleElement"
@@ -279,7 +279,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Grid x:Name="MainToolBar"  AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.08" AbsoluteLayout.LayoutFlags="All"
               ColumnSpacing="5"
               BackgroundColor="#29242a"
               Margin="0,0,0,0">
@@ -302,7 +302,7 @@
         <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,0.3" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
-                <!--TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" /-->
+                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
                 <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
                 <SwipeGestureRecognizer Direction="Up" Swiped="SwipeGestureRecognizer_Swiped_3"/>
@@ -311,9 +311,7 @@
             </StackLayout.GestureRecognizers>
             <StackLayout.Behaviors>
                 <toolkit:TouchBehavior LongPressDuration="750" LongPressCommand="{Binding LongVideoPressCommand}" />
-
             </StackLayout.Behaviors>
-
         </StackLayout>
 
         <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" >
@@ -331,10 +329,9 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}">
+        <ScrollView x:Name="MainMenuScrollView" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}">
             <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped"  />
         </ScrollView>
-
 
         <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,0.0,0.7,1.0"  Color="Green"/>
         <BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0,1.0,0.3,1.0"  Color="Yellow"/-->
