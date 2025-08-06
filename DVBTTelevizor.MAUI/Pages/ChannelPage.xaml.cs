@@ -1,4 +1,8 @@
+using AndroidX.Lifecycle;
+using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using System.Collections.ObjectModel;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -15,6 +19,9 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private string? _previousName = null;
 
     private KeyboardFocusableItemList _focusItems;
+
+    private List<MenuItem> _subtitleMenuItems = new List<MenuItem>();
+    private List<MenuItem> _audioMenuItems = new List<MenuItem>();
 
     public ChannelPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -37,6 +44,75 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
         BuildFocusableItems();
     }
+
+    private void ShowMenu()
+    {
+        MainMenu.MenuVisible =
+        _channelPageViewModel.MenuVisible = true;
+    }
+
+    private void HideMenu()
+    {
+        MainMenu.MenuVisible =
+        _channelPageViewModel.MenuVisible = false;
+    }
+
+    public void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null && e is TappedEventArgs tea)
+        {
+            Menu_Tapped(tea.Parameter.ToString());
+        }
+    }
+
+    private async void Menu_Tapped(string menuId)
+    {
+        _loggingService.Info($"Menu tapped: {menuId}");
+
+        HideMenu();
+    }
+
+    private async Task AudioMenu()
+    {
+        try
+        {
+            if (_channelPageViewModel == null ||
+                _channelPageViewModel.Channel == null ||
+                _channelPageViewModel.Channel.AudioTracks == null)
+            {
+                return;
+            }
+
+            ShowMenu();
+
+            _audioMenuItems.Clear();
+
+            int index = 0;
+            foreach (var track in _channelPageViewModel.Channel.AudioTracks)
+            {
+                index++;
+                var title = track.Value;
+                if (track.Key.ToString() == _channelPageViewModel.Channel.SelectedAudioTrack)
+                {
+                    title += " *";
+                }
+                _audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count - 1));
+            }
+
+            _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+            _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+            MainMenu.UpdateMenu("Audio menu".Translated(), _audioMenuItems);
+
+            ShowMenu();
+
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
+    }
+
 
     private void EntryName_Unfocused(object? sender, FocusEventArgs e)
     {
@@ -183,7 +259,10 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"ButtonChangeAudio_Clicked");
 
-
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            AudioMenu();
+        });
     }
 
     private void ButtonChangeSubtitles_Clicked(object sender, EventArgs e)
