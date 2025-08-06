@@ -5,6 +5,7 @@ using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
+using NLog.LayoutRenderers.Wrappers;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.Reflection.Metadata;
@@ -43,6 +44,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _checkStreamEnabled = true;
         public Command CommandCheckStream { get; set; }
+        public Command LongVideoPressCommand { get; set; }
 
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
@@ -274,7 +276,18 @@ namespace DVBTTelevizor.MAUI
                 });
             }
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
+
+            LongVideoPressCommand = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    _loggingService.Info($"LongVideoPressCommand");
+
+                    MenuButton_Clicked(this, new EventArgs());
+                });
+            });
         }
+
 
         private async Task CheckStream()
         {
@@ -2102,6 +2115,11 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.EPGDetailEnabled = !_viewModel.EPGDetailEnabled;
                 RefreshGUI();
             }
+        }
+
+        private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
+        {
+
         }
     }
 

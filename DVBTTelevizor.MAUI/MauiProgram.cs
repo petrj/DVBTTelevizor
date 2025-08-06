@@ -1,4 +1,5 @@
-﻿using LibVLCSharp.MAUI;
+﻿using CommunityToolkit.Maui;
+using LibVLCSharp.MAUI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
 
@@ -12,6 +13,7 @@ namespace DVBTTelevizor.MAUI
             builder
                 .UseMauiApp<App>()
                 .UseLibVLCSharp()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
