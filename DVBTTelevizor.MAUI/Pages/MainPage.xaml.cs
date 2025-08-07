@@ -245,6 +245,16 @@ namespace DVBTTelevizor.MAUI
                 UpdateVideoWindowPosition();
             });
 
+            WeakReferenceMessenger.Default.Register<SetAudioTrackMessage>(this, (r, m) =>
+            {
+                SetAudio(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<SetSubtitlesMessage>(this, (r, m) =>
+            {
+                SetSubtitles(m.Value);
+            });
+
             _settingsPage.Disappearing += delegate
             {
                 Task.Run(async () =>
@@ -2004,6 +2014,9 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case "menuPlay":
                     await ActionPlay();
+                    break;
+                case "menuStop":
+                    await ActionStop(true);
                     break;
             }
         }

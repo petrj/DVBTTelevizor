@@ -1,4 +1,3 @@
-using AndroidX.Lifecycle;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
@@ -22,6 +21,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     private List<MenuItem> _subtitleMenuItems = new List<MenuItem>();
     private List<MenuItem> _audioMenuItems = new List<MenuItem>();
+    private List<MenuItem> _subtitleItems = new List<MenuItem>();
 
     public ChannelPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -70,6 +70,68 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         _loggingService.Info($"Menu tapped: {menuId}");
 
         HideMenu();
+
+        var ch = _channelPageViewModel.Channel;
+        if (ch == null)
+        {
+            return;
+        }
+
+        if (menuId.StartsWith("setAudio"))
+        {
+            WeakReferenceMessenger.Default.Send(new SetAudioTrackMessage(menuId));
+
+            ch.SelectedAudioTrack = menuId.Substring(9);
+        } else
+        if (menuId.StartsWith("setSubtitles"))
+        {
+            WeakReferenceMessenger.Default.Send(new SetSubtitlesMessage(menuId));
+            ch.SelectedSubtitle = menuId.Substring(13);
+            return;
+        }
+
+        _channelPageViewModel.UpdateAutioAndSubtitles();
+    }
+
+    private async Task SubtitlesMenu()
+    {
+        try
+        {
+            if (_channelPageViewModel == null ||
+                _channelPageViewModel.Channel == null ||
+                _channelPageViewModel.Channel.Subtitles == null)
+            {
+                return;
+            }
+
+            ShowMenu();
+
+            _subtitleItems.Clear();
+
+            int index = 0;
+            foreach (var sub in _channelPageViewModel.Channel.Subtitles)
+            {
+                var title = sub.Value;
+                if (sub.Key.ToString() == _channelPageViewModel.Channel.SelectedAudioTrack)
+                {
+                    title += " *";
+                }
+                _subtitleItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "audio.png", index > _channelPageViewModel.Subtitles.Count -1));
+                index++;
+            }
+
+            _subtitleItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+            _subtitleItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+            MainMenu.UpdateMenu("Subtitles menu".Translated(), _subtitleItems);
+
+            ShowMenu();
+
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
     private async Task AudioMenu()
@@ -90,13 +152,13 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             int index = 0;
             foreach (var track in _channelPageViewModel.Channel.AudioTracks)
             {
-                index++;
                 var title = track.Value;
                 if (track.Key.ToString() == _channelPageViewModel.Channel.SelectedAudioTrack)
                 {
                     title += " *";
                 }
-                _audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count - 1));
+                _audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count-1));
+                index++;
             }
 
             _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
@@ -267,7 +329,12 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     private void ButtonChangeSubtitles_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Debug($"ButtonChangeSubtitles_Clicked");
 
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            SubtitlesMenu();
+        });
     }
 
     private void ButtonDeleteChannel_Clicked(object sender, EventArgs e)

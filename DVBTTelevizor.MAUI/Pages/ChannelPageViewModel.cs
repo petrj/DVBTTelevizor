@@ -35,11 +35,16 @@ namespace DVBTTelevizor.MAUI
             {
                 _channel = value;
 
-                SetAudioTracks(_channel.AudioTracks, _channel.SelectedAudioTrack);
-                SetSubtitleTracks(_channel.Subtitles, _channel.SelectedSubtitle);
+                UpdateAutioAndSubtitles();
 
                 NotifyChannelChange();
             }
+        }
+
+        public void UpdateAutioAndSubtitles()
+        {
+            SetAudioTracks(_channel.AudioTracks, _channel.SelectedAudioTrack);
+            SetSubtitleTracks(_channel.Subtitles, _channel.SelectedSubtitle);
         }
 
         public bool MenuVisible
