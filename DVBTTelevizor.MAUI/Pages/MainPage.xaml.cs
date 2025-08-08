@@ -263,9 +263,6 @@ namespace DVBTTelevizor.MAUI
                 });
             };
 
-            videoView.MediaPlayer = _mediaPlayer;
-
-
             CommandCheckStream = new Command(() =>
             {
                 Task.Run(async () =>
@@ -935,6 +932,22 @@ namespace DVBTTelevizor.MAUI
 
                 //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
             }
+
+            // reatach video after back from another page (or see only black video)
+            if (_mediaPlayer != null)
+            {
+                _mediaPlayer.Dispose();
+                _mediaPlayer = new MediaPlayer(_LibVLC);
+                videoView.MediaPlayer = _mediaPlayer;
+                videoView.MediaPlayer.Media = _media;
+
+                if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                {
+                    videoView.MediaPlayer.Play(_media);
+                }
+            }
+
+            RefreshGUI();
         }
 
         private void ConnectDriver()
