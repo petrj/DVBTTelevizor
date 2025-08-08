@@ -4,6 +4,6 @@
     <RootNamespace>RTLSDR.Common</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LoggerService" Version="1.0.4" />
+    <PackageReference Include="LoggerService" Version="1.0.5" />
   </ItemGroup>
 </Project>

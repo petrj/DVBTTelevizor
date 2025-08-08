@@ -937,46 +937,43 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug("Resume");
 
-            Task.Run(async () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                //var vis = videoView.IsVisible;
+
+                // reatach video after back from another page (or see only black video)
+                if (_mediaPlayer != null)
                 {
-                    //var vis = videoView.IsVisible;
+                    //videoView.IsVisible = true;
 
-                    // reatach video after back from another page (or see only black video)
-                    if (_mediaPlayer != null)
-                    {
-                        //videoView.IsVisible = true;
-
-                        //VideoStackLayout.Children.Remove(videoView);
-                        //VideoStackLayout.Children.Add(videoView);
+                    //VideoStackLayout.Children.Remove(videoView);
+                    //VideoStackLayout.Children.Add(videoView);
 
 
-                        //_mediaPlayer.Dispose();
-                        //_mediaPlayer = new MediaPlayer(_LibVLC);
+                    //_mediaPlayer.Dispose();
+                    //_mediaPlayer = new MediaPlayer(_LibVLC);
 
-                        //videoView.IsVisible = true;
-                        videoView.MediaPlayer = null;
-                        //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                        //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                        videoView.MediaPlayer = _mediaPlayer;
+                    //videoView.IsVisible = true;
+                    videoView.MediaPlayer = null;
+                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+                    videoView.MediaPlayer = _mediaPlayer;
 
-                        //videoView.IsVisible = false;
-                        //videoView.IsVisible = true;
+                    //MainAbsoluteLayout.InvalidateMeasure();
+                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+                    //ArrangeOverride(Bounds);
 
-                        //videoView.MediaPlayer.Media = _media;
+                    //videoView.IsVisible = false;
+                    //videoView.IsVisible = true;
 
-                        //if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
-                        //{
-                        //    videoView.MediaPlayer.Play(_media);
-                        //}
+                    //if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                    //{
+                    //    videoView.MediaPlayer.Play(_media);
+                    //}
 
-
-                        //videoView.IsVisible = vis; // restore visibility
-                    }
-                });
-
-                RefreshGUI();
+                    //videoView.IsVisible = vis; // restore visibility
+                }
             });
         }
 
