@@ -485,7 +485,8 @@ namespace DVBTTelevizor.MAUI
 
                     var minTextSize = textView.TextSize; // 16
 
-                    textView.SetTextColor(Android.Graphics.Color.White);
+                    //textView.SetTextColor(Android.Graphics.Color.White);
+                    textView.SetTextColor(Android.Graphics.Color.Blue);
 
                     var screenHeightRate = 0;
 

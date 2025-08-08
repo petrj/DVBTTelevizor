@@ -3,6 +3,7 @@ using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
+using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
@@ -391,6 +392,10 @@ namespace DVBTTelevizor.MAUI
                         }
                     }
                 }
+
+                var videoBounds = AbsoluteLayout.GetLayoutBounds(VideoStackLayout);
+
+                _loggingService.Info($"Video bounds: {videoBounds}");
 
                 if (_viewModel.PlayingChannelAspect.Width == -1)
                 {
@@ -924,30 +929,55 @@ namespace DVBTTelevizor.MAUI
                 {
                     await _viewModel.RefreshChannels();
                 });
-
-                //MainThread.BeginInvokeOnMainThread(async () =>
-                //{
-                //    videoView.MediaPlayer.Play();
-                //});
-
-                //_viewModel.Import(Path.Join(PublicDirectory, "DVBTTelevizor.channels.json"));
             }
+            Resume();
+        }
 
-            // reatach video after back from another page (or see only black video)
-            if (_mediaPlayer != null)
+        private void Resume()
+        {
+            _loggingService.Debug("Resume");
+
+            Task.Run(async () =>
             {
-                _mediaPlayer.Dispose();
-                _mediaPlayer = new MediaPlayer(_LibVLC);
-                videoView.MediaPlayer = _mediaPlayer;
-                videoView.MediaPlayer.Media = _media;
-
-                if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    videoView.MediaPlayer.Play(_media);
-                }
-            }
+                    //var vis = videoView.IsVisible;
 
-            RefreshGUI();
+                    // reatach video after back from another page (or see only black video)
+                    if (_mediaPlayer != null)
+                    {
+                        //videoView.IsVisible = true;
+
+                        //VideoStackLayout.Children.Remove(videoView);
+                        //VideoStackLayout.Children.Add(videoView);
+
+
+                        //_mediaPlayer.Dispose();
+                        //_mediaPlayer = new MediaPlayer(_LibVLC);
+
+                        //videoView.IsVisible = true;
+                        videoView.MediaPlayer = null;
+                        //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                        //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+                        videoView.MediaPlayer = _mediaPlayer;
+
+                        //videoView.IsVisible = false;
+                        //videoView.IsVisible = true;
+
+                        //videoView.MediaPlayer.Media = _media;
+
+                        //if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                        //{
+                        //    videoView.MediaPlayer.Play(_media);
+                        //}
+
+
+                        //videoView.IsVisible = vis; // restore visibility
+                    }
+                });
+
+                RefreshGUI();
+            });
         }
 
         private void ConnectDriver()

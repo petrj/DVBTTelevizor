@@ -544,9 +544,7 @@ namespace DVBTTelevizor.MAUI
             if (!_EPGDetailVisibleLastValue.HasValue || _EPGDetailVisibleLastValue.Value != EPGDetailVisible)
             {
                 _EPGDetailVisibleLastValue = EPGDetailVisible;
-                //MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EPGDetailVisibilityChange);
-                //OnPropertyChanged(nameof(EPGDetailVisible));
-
+                OnPropertyChanged(nameof(EPGDetailVisible));
                 WeakReferenceMessenger.Default.Send(new RefreshGUIMessage(String.Empty));
             }
         }
