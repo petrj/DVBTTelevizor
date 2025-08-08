@@ -320,14 +320,11 @@ namespace DVBTTelevizor.MAUI
 
                 if (videoTreackCount <= 0)
                 {
-                    /*
-                    Device.BeginInvokeOnMainThread(() =>
+                    MainThread.BeginInvokeOnMainThread(() =>
                     {
                         NoVideoStackLayout.IsVisible = true;
-                        //VideoStackLayout.IsVisible = false;
-                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                        VideoStackLayout.IsVisible = false;
                     });
-                    */
                 }
                 else
                 {
@@ -777,16 +774,17 @@ namespace DVBTTelevizor.MAUI
                                 if (_viewModel.EPGDetailVisible)
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPortraitPositionForPreview);
                                     AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview);
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
                                     AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListPortraitPositionForPreview);
                                 }
 
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
                                 AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitPreviewRecordingLabelPosition);
                             }
                             else
@@ -796,14 +794,15 @@ namespace DVBTTelevizor.MAUI
                                 if (_viewModel.EPGDetailVisible)
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridLandscapePositionForPreview);
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
                                 }
 
-                                AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LandscapePreviewVideoStackLayoutPosition);
                                 AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
                             }
 
@@ -847,6 +846,7 @@ namespace DVBTTelevizor.MAUI
                             }
 
                             AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                            AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, NoVideoStackLayoutPosition);
 
                             break;
                     }
@@ -1056,21 +1056,12 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        private void SwipeGestureRecognizer_Swiped_3(object sender, SwipedEventArgs e)
-        {
-
-        }
-
-        private void SwipeGestureRecognizer_Swiped_4(object sender, SwipedEventArgs e)
-        {
-
-        }
-
         public async Task ActionStop(bool force)
         {
             _loggingService.Debug($"ActionStop (Force: {force}, PlayingState: {PlayingState})");
 
-            if (_media == null || videoView == null || videoView.MediaPlayer == null)
+            // do not check _media or videoView.MediaPlayer.IsPlaying: in case of no signal is MediaPlayer stopped
+            if (videoView == null || videoView.MediaPlayer == null)
                 return;
 
             //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;

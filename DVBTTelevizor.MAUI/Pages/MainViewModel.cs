@@ -366,8 +366,6 @@ namespace DVBTTelevizor.MAUI
                 NotifyEPGDetailVisibilityChange();
 
                 IsRefreshing = false;
-
-               WeakReferenceMessenger.Default.Send(new RefreshGUIMessage(String.Empty));
             }
         }
 
@@ -547,7 +545,9 @@ namespace DVBTTelevizor.MAUI
             {
                 _EPGDetailVisibleLastValue = EPGDetailVisible;
                 //MessagingCenter.Send(String.Empty, BaseViewModel.MSG_EPGDetailVisibilityChange);
-                OnPropertyChanged(nameof(EPGDetailVisible));
+                //OnPropertyChanged(nameof(EPGDetailVisible));
+
+                WeakReferenceMessenger.Default.Send(new RefreshGUIMessage(String.Empty));
             }
         }
 
