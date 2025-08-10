@@ -334,7 +334,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<ShowFullscreenMessage>(this, (r, m) =>
             {
-                SetFullScreen();
+                //SetFullScreen();
             });
 
             WeakReferenceMessenger.Default.Register<ShowDriverPrefrencesMessage>(this, (r, m) =>
@@ -421,32 +421,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, $"DispatchKeyEvent error:");
                 return true;
             }
-        }
-
-        [Obsolete]
-        private void SetFullScreen()
-        {
-            /*
-            // https://stackoverflow.com/questions/39248138/how-to-hide-bottom-bar-of-android-back-home-in-xamarin-forms
-            var defaultUiOptions = (int)Window.DecorView.SystemUiVisibility;
-
-            var fullscreenUiOptions = defaultUiOptions;
-            fullscreenUiOptions |= (int)SystemUiFlags.LowProfile;
-            fullscreenUiOptions |= (int)SystemUiFlags.Fullscreen;
-            fullscreenUiOptions |= (int)SystemUiFlags.HideNavigation;
-            fullscreenUiOptions |= (int)SystemUiFlags.ImmersiveSticky;
-
-            try
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)fullscreenUiOptions;
-                });
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }*/
         }
 
         private void ShowToastMessage(string message, int AppFontSize = 0)

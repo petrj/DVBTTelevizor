@@ -622,7 +622,7 @@ namespace DVBTTelevizor
                                 status += $"({GetHumanReadableBitRate(_bitrate)})";
                             }
 
-                            _log.Debug($"{status}");
+                            //_log.Debug($"{status}");
 
                             bytesReadFromLastMeasureStartTime = 0;
                             _lastSpeedCalculationSec = currentLastSpeedCalculationSec;

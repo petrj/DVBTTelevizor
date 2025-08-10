@@ -10,6 +10,7 @@ using NLog.LayoutRenderers.Wrappers;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.Reflection.Metadata;
+using System.Runtime.Intrinsics.X86;
 using System.Windows.Input;
 
 
@@ -304,6 +305,8 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Debug($"Checking stream");
 
+            var status = "Check stream result: " + Environment.NewLine;
+
             try
             {
 
@@ -314,14 +317,20 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 // checking no video
-                var videoTreackCount = videoView.MediaPlayer.VideoTrackCount;
+                var videoTracksCount = videoView.MediaPlayer.VideoTrackCount;
 
-                if (videoTreackCount <= 0)
+                status += $"   V: {videoTracksCount} ({videoView.MediaPlayer.VideoTrack})" + Environment.NewLine;
+                status += $"   A: {videoView.MediaPlayer.AudioTrackCount} ({videoView.MediaPlayer.AudioTrack})" + Environment.NewLine;
+                status += $"   S: {videoView.MediaPlayer.SpuCount} ({videoView.MediaPlayer.Spu})" + Environment.NewLine;
+
+                _loggingService.Debug(status);
+
+                if (videoTracksCount <= 0)
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        NoVideoStackLayout.IsVisible = true;
-                        VideoStackLayout.IsVisible = false;
+                        //NoVideoStackLayout.IsVisible = true;
+                        //VideoStackLayout.IsVisible = false;
                     });
                 }
                 else
@@ -343,7 +352,6 @@ namespace DVBTTelevizor.MAUI
                     */
                 }
 
-
                 // check do data from driver
 
                 if (_lastActionPlayTime != DateTime.MinValue)
@@ -353,7 +361,7 @@ namespace DVBTTelevizor.MAUI
                         var timeFromPlayMSecs = (DateTime.Now - _lastActionPlayTime).TotalMilliseconds;
                         if (timeFromPlayMSecs > 10000)
                         {
-                            _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                            _loggingService.Info($"     - No data for {timeFromPlayMSecs} ms");
                             /*
                             MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                             MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
@@ -361,25 +369,29 @@ namespace DVBTTelevizor.MAUI
                         }
                         else if (timeFromPlayMSecs > 5000)
                         {
-                            _loggingService.Info($"CheckStream - No data for {timeFromPlayMSecs} ms");
+                            _loggingService.Info($"     - No data for {timeFromPlayMSecs} ms");
                         }
                     }
                 }
 
-
                 var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                 var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
 
-                _loggingService.Debug($"CheckStream - ActualSubtitleTrack: {actualSubtitleTrack}");
-                _loggingService.Debug($"CheckStream - ActualAudioTrack: {actualAudioTrack}");
-
                 if (_viewModel.PlayingChannel != null)
                 {
+                    foreach (var desc in videoView.MediaPlayer.VideoTrackDescription)
+                    {
+                        if (!_viewModel.PlayingChannel.VideoTracks.ContainsKey(desc.Id))
+                        {
+                            _loggingService.Debug($"     - video found: {desc.Name}");
+                            _viewModel.PlayingChannel.VideoTracks.Add(desc.Id, desc.Name);
+                        }
+                    }
                     foreach (var desc in videoView.MediaPlayer.SpuDescription)
                     {
                         if (!_viewModel.PlayingChannel.Subtitles.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"CheckStream - Adding subtitle {desc.Name}");
+                            _loggingService.Debug($"     - subtitles found: {desc.Name}");
                             _viewModel.PlayingChannel.Subtitles.Add(desc.Id, desc.Name);
                         }
                     }
@@ -387,15 +399,14 @@ namespace DVBTTelevizor.MAUI
                     {
                         if (!_viewModel.PlayingChannel.AudioTracks.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"CheckStream - Adding audio track {desc.Name}");
+                            _loggingService.Debug($"     - audio track found: {desc.Name}");
                             _viewModel.PlayingChannel.AudioTracks.Add(desc.Id, desc.Name);
                         }
                     }
                 }
 
-                var videoBounds = AbsoluteLayout.GetLayoutBounds(VideoStackLayout);
-
-                _loggingService.Info($"Video bounds: {videoBounds}");
+                //var videoBounds = AbsoluteLayout.GetLayoutBounds(VideoStackLayout);
+                //_loggingService.Info($"Video bounds: {videoBounds}");
 
                 if (_viewModel.PlayingChannelAspect.Width == -1)
                 {
@@ -633,7 +644,7 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnSizeAllocated(double width, double height)
         {
-            //System.Diagnostics.Debug.WriteLine($"OnSizeAllocated: {width}/{height}");
+            _loggingService.Debug($"OnSizeAllocated: {width}/{height}");
 
             base.OnSizeAllocated(width, height);
 
@@ -765,11 +776,11 @@ namespace DVBTTelevizor.MAUI
                             break;
                         case PlayingStateEnum.PlayingInPreview:
 
-                            NavigationPage.SetHasNavigationBar(this, false);
+                            //NavigationPage.SetHasNavigationBar(this, false);
 
                             ChannelsListView.IsVisible = true;
 
-                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage("Connect"));
+                            //WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage("Connect"));
 
                             if (IsPortrait)
                             {
@@ -930,34 +941,54 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             }
-            Resume();
+            //Resume();
         }
 
         private void Resume()
         {
             _loggingService.Debug("Resume");
 
+            if (_mediaPlayer == null)
+                return;
+
+            _loggingService.Debug($"{videoView.Width}");
+            _loggingService.Debug($"{videoView.Height}");
+
+            // reatach video after back from another page (or see only black video)
+            videoView.MediaPlayer = null;
+            videoView.MediaPlayer = _mediaPlayer;
+
+            // fix re-attached video view size
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 //var vis = videoView.IsVisible;
 
-                // reatach video after back from another page (or see only black video)
-                if (_mediaPlayer != null)
-                {
-                    //videoView.IsVisible = true;
+                //videoView.IsVisible = true;
 
-                    //VideoStackLayout.Children.Remove(videoView);
-                    //VideoStackLayout.Children.Add(videoView);
+                //VideoStackLayout.Children.Remove(videoView);
+                //VideoStackLayout.Children.Add(videoView);
 
+                //_mediaPlayer.Dispose();
+                //_mediaPlayer = new MediaPlayer(_LibVLC);
 
-                    //_mediaPlayer.Dispose();
-                    //_mediaPlayer = new MediaPlayer(_LibVLC);
+                //videoView.IsVisible = true;
 
-                    //videoView.IsVisible = true;
-                    videoView.MediaPlayer = null;
+                // the only half-working solution:
+
+                //PlayingState = PlayingStateEnum.Playing;
+                //PlayingState = PlayingStateEnum.Stopped;
+
+                //VideoStackLayout.IsVisible = true;
                     //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                     //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                    videoView.MediaPlayer = _mediaPlayer;
+                    //VideoStackLayout.InvalidateMeasure();
+                    //videoView.InvalidateMeasure();
+
+                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0.5, 0.5, 0.75, 0.75));
+
+                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
 
                     //MainAbsoluteLayout.InvalidateMeasure();
                     //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
@@ -973,7 +1004,7 @@ namespace DVBTTelevizor.MAUI
                     //}
 
                     //videoView.IsVisible = vis; // restore visibility
-                }
+
             });
         }
 
@@ -1446,6 +1477,31 @@ namespace DVBTTelevizor.MAUI
                 _refreshGUIEnabled = true;
 
                 RefreshGUI();
+
+                await Task.Run(async () =>
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        videoView.MediaPlayer = null;
+                        videoView.MediaPlayer = _mediaPlayer;
+                    });
+
+                    await Task.Delay(1000);
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                    });
+
+                    await Task.Delay(1000);
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+                    });
+                });
             }
         }
 

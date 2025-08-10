@@ -64,7 +64,7 @@ namespace DVBTTelevizor.MAUI
 
         public void NotifyChange()
         {
-            _loggingService.Debug("NotifyChange");
+            //_loggingService.Debug("NotifyChange");
 
             if (!NotifyEnabled)
             {

@@ -31,6 +31,7 @@ namespace DVBTTelevizor
         public string? ProviderName { get; set; } = null;
         public bool NonFree { get; set; } = false; // backward compatibility!!!
 
+        public Dictionary<int, string> VideoTracks { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> Subtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> AudioTracks { get; set; } = new Dictionary<int, string>();
 
@@ -350,6 +351,11 @@ namespace DVBTTelevizor
             foreach (var track in AudioTracks)
             {
                 channel.AudioTracks.Add(track.Key, track.Value);
+            }
+            channel.VideoTracks = new Dictionary<int, string>();
+            foreach (var track in VideoTracks)
+            {
+                channel.VideoTracks.Add(track.Key, track.Value);
             }
             channel.Subtitles = new Dictionary<int, string>();
             foreach (var sub in Subtitles)
