@@ -299,8 +299,8 @@
             <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
         </Grid>
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Yellow">
-            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="2,2,2,2" />
+        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
+            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>

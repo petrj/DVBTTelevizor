@@ -329,8 +329,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        //NoVideoStackLayout.IsVisible = true;
-                        //VideoStackLayout.IsVisible = false;
+                        NoVideoStackLayout.IsVisible = true;
+                        VideoStackLayout.IsVisible = false;
                     });
                 }
                 else
@@ -941,71 +941,6 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                 });
             }
-            //Resume();
-        }
-
-        private void Resume()
-        {
-            _loggingService.Debug("Resume");
-
-            if (_mediaPlayer == null)
-                return;
-
-            _loggingService.Debug($"{videoView.Width}");
-            _loggingService.Debug($"{videoView.Height}");
-
-            // reatach video after back from another page (or see only black video)
-            videoView.MediaPlayer = null;
-            videoView.MediaPlayer = _mediaPlayer;
-
-            // fix re-attached video view size
-
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                //var vis = videoView.IsVisible;
-
-                //videoView.IsVisible = true;
-
-                //VideoStackLayout.Children.Remove(videoView);
-                //VideoStackLayout.Children.Add(videoView);
-
-                //_mediaPlayer.Dispose();
-                //_mediaPlayer = new MediaPlayer(_LibVLC);
-
-                //videoView.IsVisible = true;
-
-                // the only half-working solution:
-
-                //PlayingState = PlayingStateEnum.Playing;
-                //PlayingState = PlayingStateEnum.Stopped;
-
-                //VideoStackLayout.IsVisible = true;
-                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                    //VideoStackLayout.InvalidateMeasure();
-                    //videoView.InvalidateMeasure();
-
-                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0.5, 0.5, 0.75, 0.75));
-
-                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-
-                    //MainAbsoluteLayout.InvalidateMeasure();
-                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                    //ArrangeOverride(Bounds);
-
-                    //videoView.IsVisible = false;
-                    //videoView.IsVisible = true;
-
-                    //if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
-                    //{
-                    //    videoView.MediaPlayer.Play(_media);
-                    //}
-
-                    //videoView.IsVisible = vis; // restore visibility
-
-            });
         }
 
         private void ConnectDriver()
@@ -1387,7 +1322,14 @@ namespace DVBTTelevizor.MAUI
                     CallWithTimeout(delegate
                     {
                         videoView.MediaPlayer.Play(_media);
-                    });
+
+                        Task.Run(async () =>
+                        {
+                            // When user visits some page and return back, video is only black screen
+                            // calls fix video will re-attach the video and set correct video position
+                            await FixVideo();
+                        });
+                    }, 200);
 
                     if (!String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
                     {
@@ -1477,32 +1419,32 @@ namespace DVBTTelevizor.MAUI
                 _refreshGUIEnabled = true;
 
                 RefreshGUI();
-
-                await Task.Run(async () =>
-                {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        videoView.MediaPlayer = null;
-                        videoView.MediaPlayer = _mediaPlayer;
-                    });
-
-                    await Task.Delay(1000);
-
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
-                    });
-
-                    await Task.Delay(1000);
-
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                        AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                    });
-                });
             }
+        }
+
+        private async Task FixVideo()
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                videoView.MediaPlayer = null;
+                videoView.MediaPlayer = _mediaPlayer;
+            });
+
+            await Task.Delay(100);
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+            });
+
+            await Task.Delay(100);
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
+            });
         }
 
         private async void DriverStateButton_Clicked(object sender, EventArgs e)
