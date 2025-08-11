@@ -631,6 +631,8 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(RecordingLabel));
             OnPropertyChanged(nameof(ChannelsListViewVisible));
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
+            OnPropertyChanged(nameof(ChannelIcon));
+            OnPropertyChanged(nameof(PlayingChannel));
         }
 
         public async void DisconnectDriver()
@@ -882,6 +884,18 @@ namespace DVBTTelevizor.MAUI
                 return "\u25CF";
             }
         }
+
+        public string ChannelIcon
+        {
+            get
+            {
+                if (_playingChannel == null)
+                    return string.Empty;
+
+                return _playingChannel.Icon;
+            }
+        }
+
 
         public Channel RecordingChannel
         {

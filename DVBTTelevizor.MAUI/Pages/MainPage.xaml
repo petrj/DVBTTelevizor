@@ -305,9 +305,28 @@
             </StackLayout.Behaviors>
         </StackLayout>
 
-        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" >
-            <Label Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
-            <Image x:Name="AudioPlayingImage" Source="{Binding AudioIcon}"  IsVisible="True" BackgroundColor="Transparent" HeightRequest="{Binding ImageIconSize}" />
+        <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" HorizontalOptions="Fill" VerticalOptions="FillAndExpand">
+
+            <Grid x:Name="NoVideoGrid"
+              ColumnSpacing="5"
+              BackgroundColor="Transparent"
+              HorizontalOptions="FillAndExpand"
+              VerticalOptions="FillAndExpand"
+              Margin="0,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="20*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
+                <Image Grid.Row="2" x:Name="NoVideoImage" Source="tv.png" IsVisible="True" BackgroundColor="Transparent" />
+            </Grid>
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>

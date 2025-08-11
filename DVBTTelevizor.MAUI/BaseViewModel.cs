@@ -87,6 +87,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public string ImageLargeIconSize
+        {
+            get
+            {
+                return GetScaledSize(30).ToString();
+            }
+        }
+
         public string FontSizeForLargeCaption
         {
             get
