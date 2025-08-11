@@ -295,8 +295,16 @@ namespace DVBTTelevizor.MAUI
                     MenuButton_Clicked(this, new EventArgs());
                 });
             });
-        }
 
+            if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
+                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
+                });
+            }
+        }
 
         private async Task CheckStream()
         {

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using AndroidX.Lifecycle;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using System;
@@ -14,6 +15,7 @@ namespace DVBTTelevizor.MAUI
     {
         private const string DefaultLanguage = "English (default)";
         private int? previousDVBTDriverTypeindex = null;
+        private bool _requestWriteToSDCardDisabled = false;
 
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
         public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
@@ -26,7 +28,38 @@ namespace DVBTTelevizor.MAUI
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
+            WeakReferenceMessenger.Default.Register<ExternalDeviceWriteAccessGranted>(this, (r, m) =>
+            {
+                AllowWriteToSDCard(m.Value.Path, m.Value.PathUri);
+            });
+        }
 
+        public void AllowWriteToSDCard(string path, string pathUri)
+        {
+            _loggingService.Info($"AllowWriteToSDCard: {path}");
+
+            try
+            {
+                _requestWriteToSDCardDisabled = true;
+
+                Config.WriteToExternalDevice = true;
+                Config.ExternalDevicePath = path; // Android 11+ stores path to SD Card folder here
+                Config.ExternalDevicePathUri = pathUri;
+
+                NotifyConfigChange();
+            }
+            finally
+            {
+                _requestWriteToSDCardDisabled = false;
+            }
+        }
+
+        public async void NotifyConfigChange()
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnPropertyChanged(nameof(Config));
+            });
         }
 
         public async void NotifyLanguageChange()
@@ -36,6 +69,20 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(Languages));
                 OnPropertyChanged(nameof(SelectedLanguage));
             });
+        }
+
+        public void RequestWriteToSDCard()
+        {
+            if (_requestWriteToSDCardDisabled)
+                return;
+
+            _loggingService.Info("RequestWriteToSDCard");
+
+            // automatically diable write to sd card until permissions granted
+            Config.WriteToExternalDevice = false;
+
+            // check SD card permissions
+            WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteRequestMessage(String.Empty));
         }
 
         public bool MenuVisible

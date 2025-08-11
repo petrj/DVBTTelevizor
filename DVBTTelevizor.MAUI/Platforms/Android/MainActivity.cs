@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using Android;
+using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
@@ -6,9 +7,12 @@ using Android.Graphics;
 using Android.Hardware.Usb;
 using Android.Media;
 using Android.OS;
+using Android.Provider;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
@@ -32,6 +36,8 @@ namespace DVBTTelevizor.MAUI
         private const int StartRequestCode = 1000;
         private const int StartRequestCodeRTLSDR = 1001;
         private const int StartRequestCodeDriverPreferences = 1002;
+        private const int FolderAccessRequestCode = 1003;
+        private const int StorageAccessRequestCode = 1004;
         private int _audioSampleRate = 96000;
         private int _audioChannels = 1;
         private bool _startAudioReceiverThread = false;
@@ -229,6 +235,11 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<ExternalDeviceWriteRequestMessage>(this, (r, m) =>
+            {
+                RequestStoragePermission();
+            });
+
             WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
             {
                 ShowToastMessage(m.Value);
@@ -239,7 +250,7 @@ namespace DVBTTelevizor.MAUI
                 if (_loggingService != null &&
                 _loggingService is NLogLoggingService nlogService)
                 {
-                    nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address =m.Value;
+                    nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address = m.Value;
                 }
             });
 
@@ -249,7 +260,7 @@ namespace DVBTTelevizor.MAUI
                 //{
                 //    _audioSampleRate = desc.SampleRate;
                 //    _audioChannels = desc.Channels;
-                    RestartAudio();
+                RestartAudio();
                 //}
             });
 
@@ -262,7 +273,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (obj.Value is DriverSettings settings)
                 {
-                     InitRTLSDRDriver(settings.Port, settings.Streamport, settings.SDRSampleRate);
+                    InitRTLSDRDriver(settings.Port, settings.Streamport, settings.SDRSampleRate);
                     //_streamPort = settings.Streamport;
                 }
             });
@@ -303,11 +314,11 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<StopPlayInBackgroundNotificationMessage>(this, (r, m) =>
             {
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                StopNotification(1);
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    StopNotification(1);
+                });
             });
-        });
 
             WeakReferenceMessenger.Default.Register<ShareFileMessage>(this, (r, m) =>
             {
@@ -327,7 +338,7 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-                        WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
             {
                 SendRemoteKey(m.Value);
             });
@@ -341,6 +352,60 @@ namespace DVBTTelevizor.MAUI
             {
                 ShowDriverAppPreferences();
             });
+
+
+            WeakReferenceMessenger.Default.Register<ExternalDeviceWriteAccessRestore>(this, (r, m) =>
+            {
+                RestorePersistedPermission(m.Value);
+            });
+        }
+
+        private void RequestStoragePermission()
+        {
+            _loggingService.Debug("RequestStoragePermission");
+
+            int sdkInt = (int)Build.VERSION.SdkInt;
+
+            if (sdkInt >= 30)
+            {
+                // Android 11+ (API 30+)
+                LaunchFolderPicker();
+            }
+            else
+            {
+                //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageWrite>();
+                //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageRead>();
+
+                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Permission.Granted)
+                {
+                    ActivityCompat.RequestPermissions(this,
+                        new string[]
+                        {
+                            Manifest.Permission.WriteExternalStorage,
+                            Manifest.Permission.ReadExternalStorage
+                        }, StorageAccessRequestCode);
+                }
+                else
+                {
+                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessGranted(null));
+                }
+            }
+        }
+
+        private void LaunchFolderPicker()
+        {
+            try
+            {
+                var intent = new Intent(Intent.ActionOpenDocumentTree);
+                intent.AddFlags(ActivityFlags.GrantPersistableUriPermission);
+                intent.AddFlags(ActivityFlags.GrantReadUriPermission);
+                intent.AddFlags(ActivityFlags.GrantWriteUriPermission);
+                StartActivityForResult(intent, FolderAccessRequestCode);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "LaunchFolderPicker failed");
+            }
         }
 
         private void SendRemoteKey(string code)
@@ -711,6 +776,54 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+
+        /// <summary>
+        /// AI generated code !!!
+        /// </summary>
+        /// <param name="treeUri"></param>
+        /// <returns></returns>
+        private string GetFullPathFromTreeUri(Android.Net.Uri treeUri)
+        {
+            var docId = DocumentsContract.GetTreeDocumentId(treeUri);
+            // "primary:Download" / "XXXX-XXXX:MyFolder"
+
+            string[] split = docId.Split(':');
+            if (split.Length < 2)
+                return null;
+
+            string type = split[0];
+            string relativePath = split[1];
+
+            if (type.Equals("primary", StringComparison.OrdinalIgnoreCase))
+            {
+                return $"{Android.OS.Environment.ExternalStorageDirectory}/{relativePath}";
+            }
+            else
+            {
+                return $"/storage/{type}/{relativePath}";
+            }
+        }
+
+        private void RestorePersistedPermission(string pathUri)
+        {
+            try
+            {
+                if (pathUri == null)
+                    return;
+
+                var uri = Android.Net.Uri.Parse(pathUri);
+
+                ContentResolver.TakePersistableUriPermission(
+                    uri,
+                    ActivityFlags.GrantReadUriPermission | ActivityFlags.GrantWriteUriPermission
+                );
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "RestorePersistedPermission failed");
+            }
+        }
+
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             if (requestCode == StartRequestCode)
@@ -749,6 +862,27 @@ namespace DVBTTelevizor.MAUI
                     }));*/
                 }
             }
+
+            if (requestCode == FolderAccessRequestCode && resultCode == Result.Ok && data != null)
+            {
+                Android.Net.Uri treeUri = data.Data;
+
+                _loggingService.Info($"Setting External directory: {treeUri.ToString()}");
+
+                var takeFlags = data.Flags & (ActivityFlags.GrantReadUriPermission | ActivityFlags.GrantWriteUriPermission);
+                ContentResolver.TakePersistableUriPermission(treeUri, takeFlags);
+
+                var path = GetFullPathFromTreeUri(treeUri);
+
+                _loggingService.Info($"full path directory: {path}");
+
+                WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessGranted(new ExternalDeviceWriteAccessGrantedSettings()
+                {
+                     Path = path,
+                     PathUri = treeUri.ToString()
+                }));
+            }
+
         }
     }
 }

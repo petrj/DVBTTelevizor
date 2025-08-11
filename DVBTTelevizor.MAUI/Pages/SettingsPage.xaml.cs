@@ -1,3 +1,4 @@
+using AndroidX.Lifecycle;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
@@ -32,7 +33,21 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         Unloaded += SettingsPage_Unloaded;
 
+        WriteToExternalDeviceSwitch.Toggled += WriteToExternalDeviceSwitch_Toggled;
+
         BuildFocusableItems();
+    }
+
+    private void WriteToExternalDeviceSwitch_Toggled(object? sender, ToggledEventArgs e)
+    {
+        _loggingService.Info("WriteToSDCardSwitch_Toggled");
+
+        if (e.Value)
+        {
+            _settingsPageViewModel.RequestWriteToSDCard();
+        }
+
+        _settingsPageViewModel.NotifyConfigChange();
     }
 
     private void SettingsPage_Unloaded(object? sender, EventArgs e)
