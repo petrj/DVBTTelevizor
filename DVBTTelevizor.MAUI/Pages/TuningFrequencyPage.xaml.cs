@@ -44,8 +44,11 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (Settings == null)
             return;
 
-        _tuningFrequenciesViewModel.FrequencyKHz =
-            _frequencyPage.Settings.FrequencyKHz;
+        if (_frequencyPage.Confirmed)
+        {
+            _tuningFrequenciesViewModel.FrequencyKHz =
+                _frequencyPage.Settings.FrequencyKHz;
+        }
     }
 
 
@@ -190,6 +193,8 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         {
             _frequencyPage.UpdateSettings(Settings);
         }
+
+        _frequencyPage.Confirmed = false;
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {

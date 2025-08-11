@@ -108,7 +108,7 @@
 
         </Grid>
 
-        <Grid x:Name="SliderGrid" IsVisible="True" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5, 0.25, 0.95, 0.2" AbsoluteLayout.LayoutFlags="All" Margin="0,20,0,0">
+        <Grid x:Name="SliderGrid" IsVisible="True" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5, 0.15, 0.95, 0.25" AbsoluteLayout.LayoutFlags="All" Margin="0,20,0,0">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="50*" />
@@ -135,7 +135,7 @@
         </Grid>
 
 
-        <Grid x:Name="EntryGrid" IsVisible="True" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.9, 0.55, 0.75, 0.25" AbsoluteLayout.LayoutFlags="All" Margin="0,20,0,0">
+        <Grid x:Name="EntryGrid" IsVisible="True" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.9, 0.55, 0.75, 0.35" AbsoluteLayout.LayoutFlags="All" Margin="0,20,0,0">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="50*" />
@@ -167,7 +167,8 @@
             </Grid.ColumnDefinitions>
 
             <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="BackButton_Clicked"/>
-            <Button x:Name="DefaultButton" Grid.Column="2" Text="{local:LngXamlExt Input='Default'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="DefaultButton_Clicked"/>
+            <Button x:Name="DefaultButton" Grid.Column="1" Text="{local:LngXamlExt Input='Default'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="DefaultButton_Clicked"/>
+            <Button x:Name="ConfirmButton" Grid.Column="2" Text="{local:LngXamlExt Input='Confirm'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="ConfirmButton_Clicked"/>
         </Grid>
 
     </AbsoluteLayout>

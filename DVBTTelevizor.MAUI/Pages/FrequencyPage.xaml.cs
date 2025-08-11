@@ -20,6 +20,8 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
+    public bool Confirmed { get; set; } = false;
+
     public FrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
@@ -130,7 +132,8 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("KHz", new List<View>() { KHzEntryBoxView, KHZEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("MHz", new List<View>() { MHzEntryBoxView , MHZEntry}))
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Default", new List<View>() { DefaultButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Default", new List<View>() { DefaultButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Confirm", new List<View>() { ConfirmButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -216,6 +219,9 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
                         case "Default":
                             DefaultButton_Clicked(this, new EventArgs());
                             break;
+                        case "Confirm":
+                            ConfirmButton_Clicked(this, new EventArgs());
+                            break;
                     }
                 });
                 break;
@@ -268,5 +274,17 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     public void UpdateSettings(TuningSettings tuningSettings)
     {
         _viewModel.Settings = tuningSettings;
+    }
+
+    private void ConfirmButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage ConfirmButton_Clicked");
+
+        Confirmed = true;
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Navigation.PopAsync();
+        });
     }
 }
