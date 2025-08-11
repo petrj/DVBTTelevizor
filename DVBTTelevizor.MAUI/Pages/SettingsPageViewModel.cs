@@ -302,6 +302,14 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(Config));
             }
         }
+
+        public string AndroidChannelsListPath
+        {
+            get
+            {
+                return Config.OutputDirectory;
+            }
+        }
     }
 }
 

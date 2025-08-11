@@ -2231,6 +2231,7 @@ namespace DVBTTelevizor.MAUI
 
         private void VideoStackLayout_DoubleTapped(object sender, TappedEventArgs e)
         {
+            /*
             if (_viewModel.PlayingState == PlayingStateEnum.Playing)
             {
                 _viewModel.PlayingState = PlayingStateEnum.PlayingInPreview;
@@ -2242,6 +2243,8 @@ namespace DVBTTelevizor.MAUI
             }
 
             RefreshGUI();
+            */
+            MenuButton_Clicked(this, new EventArgs());
         }
 
         private void VideoStackLayout_Tapped(object sender, TappedEventArgs e)
