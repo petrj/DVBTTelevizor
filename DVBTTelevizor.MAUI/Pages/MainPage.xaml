@@ -325,7 +325,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
-                <Image Grid.Row="2" x:Name="NoVideoImage" Source="tv.png" IsVisible="True" BackgroundColor="Transparent" />
+                <Image Grid.Row="2" x:Name="NoVideoImage" Source="{Binding ChannelIcon}" IsVisible="True" BackgroundColor="Transparent" />
             </Grid>
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />

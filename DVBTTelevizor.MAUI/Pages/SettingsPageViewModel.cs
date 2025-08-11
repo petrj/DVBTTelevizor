@@ -29,7 +29,7 @@ namespace DVBTTelevizor.MAUI
         {
             WeakReferenceMessenger.Default.Register<ExternalDeviceWriteAccessGranted>(this, (r, m) =>
             {
-                AllowWriteToSDCard(m.Value.Path, m.Value.PathUri);
+                AllowWriteToSDCard(m?.Value?.Path, m?.Value?.PathUri);
             });
         }
 

@@ -67,7 +67,7 @@ namespace DVBTTelevizor
                 else
                 if (typeof(T) == typeof(bool))
                 {
-                    val = _sharedPrefs.GetBoolean(key, default(bool));
+                    val = _sharedPrefs.GetBoolean(key, Convert.ToBoolean(defaultValue));
                 }
                 else
                 if (typeof(T) == typeof(int))
