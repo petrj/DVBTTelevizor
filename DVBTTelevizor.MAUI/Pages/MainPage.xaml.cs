@@ -84,14 +84,6 @@ namespace DVBTTelevizor.MAUI
         // VideoStackLayout must be visible when initializing VLC window!
         private Rect NoVideoStackLayoutPosition { get; set; } = new Rect(-10, -10, -5, -5);
 
-        // RecordingLabel
-        private Rect LandscapeRecordingLabelPosition { get; set; } = new Rect(1.0, 1.0, 0.1, 0.1);
-        private Rect LandscapePreviewRecordingLabelPosition { get; set; } = new Rect(1.0, 0.25, 0.1, 0.1);
-        private Rect LandscapeRecordingLabelPositionWhenEPGDetailVisible { get; set; } = new Rect(0.65, 1.0, 0.1, 0.1);
-        private Rect PotraitRecordingLabelPosition { get; set; } = new Rect(1.0, 1.0, 0.1, 0.1);
-        private Rect PortraitRecordingLabelPositionWhenEPGDetailVisible { get; set; } = new Rect(1.0, 0.65, 0.1, 0.1);
-        private Rect PortraitPreviewRecordingLabelPosition { get; set; } = new Rect(1.0, 0.25, 0.1, 0.1);
-
         // ChannelsListView
         private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.92);
         private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1.0, 1, 0.92);
@@ -746,15 +738,12 @@ namespace DVBTTelevizor.MAUI
                                     //MainLayout.RaiseChild(EPGDetailGrid);
 
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay);
-
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay);
-                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitRecordingLabelPositionWhenEPGDetailVisible);
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rect(0, 0, 1, 1));
-                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, PotraitRecordingLabelPosition);
                                 }
                             }
                             else
@@ -768,13 +757,11 @@ namespace DVBTTelevizor.MAUI
 
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay);
-                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPositionWhenEPGDetailVisible);
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rect(0, 0, 1, 1));
-                                    AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapeRecordingLabelPosition);
                                 }
                             }
 
@@ -805,8 +792,6 @@ namespace DVBTTelevizor.MAUI
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
                                     AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListPortraitPositionForPreview);
                                 }
-
-                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, PortraitPreviewRecordingLabelPosition);
                             }
                             else
                             {
@@ -823,8 +808,6 @@ namespace DVBTTelevizor.MAUI
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
                                 }
-
-                                AbsoluteLayout.SetLayoutBounds(RecordingLabel, LandscapePreviewRecordingLabelPosition);
                             }
 
                             //CheckStreamCommand.Execute(null);
@@ -1138,6 +1121,104 @@ namespace DVBTTelevizor.MAUI
             if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
             {
                 _loggingService.Info("Action not completed!");
+            }
+        }
+
+        public async Task ActionRecord(Channel channel = null)
+        {
+            _loggingService.Debug($"ActionRecord");
+
+            try
+            {
+                if (channel == null)
+                    channel = _viewModel.SelectedChannel;
+
+                if (channel == null)
+                    return;
+
+                if (!_driver.Connected)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Record failed - device not connected".Translated()));
+                    return;
+                }
+
+                _loggingService.Debug($"recording channel: {channel.Name} ({channel.Number})");
+
+                if (PlayingState == PlayingStateEnum.Playing)
+                {
+                    if (_viewModel.PlayingChannel != channel)
+                    {
+                        // playing different channel
+                        await ActionStop(true);
+                        await ActionPlay(channel);
+                    }
+                }
+                else
+                {
+                    await ActionPlay(channel);
+                }
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.RecordingChannel = channel;
+                });
+
+                await _driver.StartRecording(_configuration.OutputDirectory);
+
+                var playStreamInfo = new PlayStreamInfo()
+                {
+                    Channel = channel,
+                    CurrentEvent = await _viewModel.GetChannelEPG(channel)
+                };
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Recording started".Translated()));
+                //MessagingCenter.Send<PlayStreamInfo>(playStreamInfo, BaseViewModel.MSG_ShowRecordNotification);
+
+                _viewModel.NotifyChannelChange();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+
+        public async Task ActionStopRecord()
+        {
+            _loggingService.Debug($"ActionStopRecord");
+
+            try
+            {
+                var fName = _driver.RecordFileName;
+
+                if (_driver.Recording)
+                {
+                    _driver.StopRecording();
+                }
+
+                if (PlayingState == PlayingStateEnum.Stopped)
+                {
+                    await _driver.Stop();
+                }
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.RecordingChannel = null;
+                });
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Recording stopped".Translated()));
+
+                _viewModel.NotifyChannelChange();
+
+                await Share.RequestAsync(new ShareFileRequest
+                {
+                    Title = "Share record".Translated(),
+                    File = new ShareFile(fName)
+                });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         }
 
@@ -2054,6 +2135,12 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case "menuStop":
                     await ActionStop(true);
+                    break;
+                case "menuRecord":
+                    await ActionRecord();
+                    break;
+                case "menuStopRecord":
+                    await ActionStopRecord();
                     break;
             }
         }

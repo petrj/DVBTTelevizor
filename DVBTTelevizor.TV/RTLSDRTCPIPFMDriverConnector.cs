@@ -426,7 +426,7 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task StartRecording()
+        public Task StartRecording(string path)
         {
             return Task.Run(() => { return; });
         }

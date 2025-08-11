@@ -1,5 +1,4 @@
-﻿using AndroidX.Lifecycle;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using System;

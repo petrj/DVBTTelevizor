@@ -113,7 +113,7 @@ namespace DVBTTelevizor
             Connected = true;
         }
 
-        public async Task StartRecording()
+        public async Task StartRecording(string path)
         {
             Recording = true;
         }
