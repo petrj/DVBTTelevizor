@@ -327,30 +327,35 @@ namespace DVBTTelevizor.MAUI
 
                 if (videoTracksCount <= 0)
                 {
-                    MainThread.BeginInvokeOnMainThread(() =>
+                    if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
-                        NoVideoStackLayout.IsVisible = true;
-                        VideoStackLayout.IsVisible = false;
-                    });
+                        if (VideoStackLayout.IsVisible)
+                        {
+                            MainThread.BeginInvokeOnMainThread(() =>
+                            {
+                                NoVideoStackLayout.IsVisible = true;
+                                VideoStackLayout.IsVisible = false;
+                            });
+                        }
+                    }
                 }
                 else
                 {
-                    //PreviewVideoBordersFix();
-
-                    /*
-                    Device.BeginInvokeOnMainThread(() =>
+                    if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
-                        NoVideoStackLayout.IsVisible = false;
-                        VideoStackLayout.IsVisible = true;
-
-                        if (AbsoluteLayout.GetLayoutBounds(VideoStackLayout) == NoVideoStackLayoutPosition)
+                        if (NoVideoStackLayout.IsVisible)
                         {
-                            _loggingService.Debug("CheckStream - VideoStackLayout has invalid bounds");
-                            RefreshGUI();
+                            MainThread.BeginInvokeOnMainThread(() =>
+                            {
+                                NoVideoStackLayout.IsVisible = false;
+                                VideoStackLayout.IsVisible = true;
+                            });
                         }
-                    });
-                    */
+                    }
+
+                    //PreviewVideoBordersFix();
                 }
+
 
                 // check do data from driver
 
@@ -1575,8 +1580,11 @@ namespace DVBTTelevizor.MAUI
 
         private void ShowMenu()
         {
-            MainMenu.MenuVisible = true;
-            _viewModel.MenuVisible = true;
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                MainMenu.MenuVisible = true;
+                _viewModel.MenuVisible = true;
+            });
         }
 
         private void HideMenu()
