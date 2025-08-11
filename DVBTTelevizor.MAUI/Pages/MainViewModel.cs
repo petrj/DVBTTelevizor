@@ -36,6 +36,7 @@ namespace DVBTTelevizor.MAUI
         private bool _scanningEPG = false;
 
         private bool _refreshing = false;
+        private bool _refreshed = false;
         private bool _menuVisible = false;
 
         public ICommand CommandPlay { get; set; }
@@ -52,20 +53,6 @@ namespace DVBTTelevizor.MAUI
         public Command CommandScanEPG { get; set; }
 
         public bool MainLayoutVisible { get; set; } = true;
-
-        public bool MenuVisible
-        {
-            get
-            {
-                return _menuVisible;
-            }
-            set
-            {
-                _menuVisible = value;
-
-                OnPropertyChanged(nameof(MenuVisible));
-            }
-        }
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
@@ -157,6 +144,20 @@ namespace DVBTTelevizor.MAUI
             });
 
             BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
+        }
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
+            }
         }
 
         public async Task<EPGCurrentEvent> GetChannelEPG(Channel channel)
@@ -432,6 +433,7 @@ namespace DVBTTelevizor.MAUI
                     //NotifyEPGDetailVisibilityChange();
 
                     IsRefreshing = false;
+                    Refreshed = true;
 
                     NotifyChannelChange();
                 }
@@ -565,7 +567,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _driver == null || !_driver.DriverInstalled;
+                return Refreshed && (_driver == null || !_driver.DriverInstalled);
             }
         }
 
@@ -891,6 +893,16 @@ namespace DVBTTelevizor.MAUI
             {
                 _recordingChannel = value;
 
+                foreach (var ch in Channels)
+                {
+                    ch.Recording = false;
+                }
+
+                if (_recordingChannel != null)
+                {
+                    _recordingChannel.Recording = true;
+                }
+
                 OnPropertyChanged(nameof(RecordingLabel));
             }
         }
@@ -907,7 +919,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Channels.Count == 0;
+                return Channels.Count == 0 && Refreshed;
             }
         }
 
@@ -920,8 +932,39 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _refreshing = value;
-                OnPropertyChanged(nameof(IsRefreshing));
+                NotifyChange();
             }
         }
+
+        private void NotifyChange()
+        {
+            OnPropertyChanged(nameof(IsRefreshing));
+            OnPropertyChanged(nameof(Refreshed));
+            OnPropertyChanged(nameof(NotRefreshed));
+            OnPropertyChanged(nameof(TuneChannelsButtonVisible));
+            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+        }
+
+        public bool Refreshed
+        {
+            get
+            {
+                return _refreshed;
+            }
+            set
+            {
+                _refreshed = value;
+                NotifyChange();
+            }
+        }
+
+        public bool NotRefreshed
+        {
+            get
+            {
+                return !_refreshed;
+            }
+        }
+
     }
 }

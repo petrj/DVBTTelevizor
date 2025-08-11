@@ -57,6 +57,8 @@ namespace DVBTTelevizor
 
         public string PublicDirectory { get; set; } = "";
 
+        private string _recordDirectory = "";
+
         public DVBTDriverConnector(ILoggingService loggingService)
         {
             _log = loggingService;
@@ -304,11 +306,19 @@ namespace DVBTTelevizor
             StopBackgroundReading();
         }
 
-        public async Task StartRecording()
+        public async Task StartRecording(string path)
         {
             lock (_readThreadLock)
             {
-                _log.Debug($"starting recording");
+                _log.Debug($"Starting recording to {path}");
+
+                if (!Directory.Exists(path))
+                {
+                    path = PublicDirectory;
+
+                    _log.Debug($"Path corrected to {path}");
+                }
+                _recordDirectory = path;
 
                 if (!Recording)
                 {
@@ -567,7 +577,7 @@ namespace DVBTTelevizor
                                 if (recordFileStream == null)
                                 {
                                     var fileNameFreq = (_lastTunedFreq / 1000000).ToString() + "MHz";
-                                    _recordingFileName = Path.Combine(PublicDirectory, $"DVBT-MPEGTS-{fileNameFreq}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+                                    _recordingFileName = Path.Combine(_recordDirectory, $"DVBT-MPEGTS-{fileNameFreq}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
 
                                     if (System.IO.File.Exists(_recordingFileName))
                                         System.IO.File.Delete(_recordingFileName);

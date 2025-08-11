@@ -55,7 +55,7 @@ namespace DVBTTelevizor
         void StartStream();
         void StopStream();
 
-        Task StartRecording();
+        Task StartRecording(string path);
         void StopRecording();
 
         Task<bool> Stop();

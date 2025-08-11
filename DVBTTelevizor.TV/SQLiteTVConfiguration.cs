@@ -594,5 +594,50 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<string>("LoggingUDPIP", value);
             }
         }
+
+        public bool WriteToExternalDevice
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("WriteToExternalDevice", false);
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("WriteToExternalDevice", value);
+            }
+        }
+
+        public string ExternalDevicePath
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("ExternalDevicePath");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("ExternalDevicePath", value);
+            }
+        }
+
+        public string ExternalDevicePathUri
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("ExternalDevicePathUri");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("ExternalDevicePathUri", value);
+            }
+        }
+
+        public string OutputDirectory
+        {
+            get
+            {
+                // Windows output directory
+                return ConfigDirectory;
+            }
+        }
     }
 }
