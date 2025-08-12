@@ -16,6 +16,8 @@ namespace DVBTTelevizor.MAUI
             _channels = channels;
         }
 
+        public Action OnChannelChanged { get; set; }
+
         public Channel? GetSelectedChannel()
         {
             foreach (var ch in _channels)
@@ -29,19 +31,22 @@ namespace DVBTTelevizor.MAUI
 
         public void DeselectAll()
         {
-            foreach (var ch in _channels)
-            {
-                ch.Selected = false;
-                ch.NotifyChanges();
-            }
+            SetSelectedChannel(null);
         }
 
         public void SetSelectedChannel(Channel? channel)
         {
+            bool fireOnChanged = false;
+
             foreach (var ch in _channels)
             {
                 if (ch == channel)
                 {
+                    if (!ch.Selected && OnChannelChanged != null)
+                    {
+                        fireOnChanged = true;
+                    }
+
                     ch.Selected = true;
                     ch.Focused = true;
                 } else
@@ -50,6 +55,11 @@ namespace DVBTTelevizor.MAUI
                     ch.Focused = false;
                 }
                 ch.NotifyChanges();
+            }
+
+            if (fireOnChanged)
+            {
+                OnChannelChanged();
             }
         }
 

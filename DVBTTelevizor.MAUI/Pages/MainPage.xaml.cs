@@ -640,6 +640,7 @@ namespace DVBTTelevizor.MAUI
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBTTelevizorButton", new List<View>() { DVBTTelevizorButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsListView", new List<View>() { ChannelsListView }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EPGDetailGrid", new List<View>() { EPGDetailGrid }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
@@ -662,6 +663,8 @@ namespace DVBTTelevizor.MAUI
                     ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
                 });
             }
+
+            _viewModel.EPGDetailFocused = (_focusItems.FocusedItemName == "EPGDetailGrid");
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -1721,7 +1724,13 @@ namespace DVBTTelevizor.MAUI
                         }
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
-                            _focusItems.FocusItem("DriverStateButton");
+                            if (EPGDetailGrid.IsVisible)
+                            {
+                                _focusItems.FocusItem("EPGDetailGrid");
+                            } else
+                            {
+                                _focusItems.FocusItem("DriverStateButton");
+                            }
                         });
                     }
                     else
@@ -1748,6 +1757,13 @@ namespace DVBTTelevizor.MAUI
                             _viewModel.SelectNextChannel();
                             //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
                             ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                        }
+                    if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                        {
+                            // scroll down
+                            SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                                SelectedChannelEPGDescriptionScrollView.ScrollX,
+                                SelectedChannelEPGDescriptionScrollView.ScrollY + 10, true);
                         }
                         else
                         {

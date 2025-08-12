@@ -322,6 +322,7 @@ namespace DVBTTelevizor
         public void NotifyChanges()
         {
             OnPropertyChanged(nameof(BackgroundColor));
+            OnPropertyChanged(nameof(ChannelTextLabelColor));
             OnPropertyChanged(nameof(CurrentEPGEventTitle));
             OnPropertyChanged(nameof(NextEPGEventTitle));
             OnPropertyChanged(nameof(CurrentEPGEventTime));
@@ -350,8 +351,18 @@ namespace DVBTTelevizor
                 return Selected
                     ? Focused
                         ? "#007cd2"
-                        : "#001835"   // unfocused
+                        : "#005794"   // unfocused
                     : "Transparent";  // unselected
+            }
+        }
+
+        public string ChannelTextLabelColor
+        {
+            get
+            {
+                return Selected
+                    ? "#FFFFFF" //"#000099"
+                    : "#41b3ff";
             }
         }
 
