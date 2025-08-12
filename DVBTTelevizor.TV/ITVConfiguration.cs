@@ -16,6 +16,8 @@ namespace DVBTTelevizor
         public ObservableCollection<Channel> GetChannels();
         public void SaveChannels(ObservableCollection<Channel> channels);
 
+        public string LastSelectedChannelUniqueIdentifier { get; set; }
+
         public string AutoPlayedChannelFrequencyAndMapPID { get; set; }
 
         public DVBTDriverTypeEnum DVBTDriverType { get; set; }

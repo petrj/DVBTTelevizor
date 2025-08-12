@@ -639,5 +639,17 @@ namespace DVBTTelevizor
                 return ConfigDirectory;
             }
         }
+
+        public string LastSelectedChannelUniqueIdentifier
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("LastSelectedChannelUniqueIdentifier");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("LastSelectedChannelUniqueIdentifier", value);
+            }
+        }
     }
 }

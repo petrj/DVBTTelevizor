@@ -339,7 +339,7 @@
 
         <!--Label AbsoluteLayout.LayoutBounds="0.5,0.1,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/-->
         <Frame IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.7,0.15" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
-            <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.4,0.1" TopTitleText="{local:LngXamlExt Input='Tune'}" BottomTitleText="{local:LngXamlExt Input='- no channel'}" Img="tune.png" TapCommand="{Binding CommandTune}" BackgroundColor="#222222"/>
+            <local:ImgButton x:Name="TuneQuickImgButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.4,0.1" TopTitleText="{local:LngXamlExt Input='Tune'}" BottomTitleText="{local:LngXamlExt Input='- no channel'}" Img="tune.png" TapCommand="{Binding CommandTune}" BackgroundColor="#222222"/>
         </Frame>
 
         <Frame IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.45,0.7,0.15" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">

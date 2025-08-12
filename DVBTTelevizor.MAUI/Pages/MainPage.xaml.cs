@@ -654,7 +654,7 @@ namespace DVBTTelevizor.MAUI
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _viewModel.SelectFirstChannel();
+                    _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
                     ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
                 });
             }
@@ -948,6 +948,13 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        // select last channel:
+                        _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                    });
                 });
             }
         }
@@ -1676,6 +1683,15 @@ namespace DVBTTelevizor.MAUI
 
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _configuration.LastSelectedChannelUniqueIdentifier = _viewModel.SelectedChannel.UniqueIdentifier;
+
+                            // defocus ChannelsListView
+                            _viewModel.SelectedChannel = null;
+                        }
+                        //
+
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             _focusItems.FocusItem("DVBTTelevizorButton");
@@ -1694,7 +1710,7 @@ namespace DVBTTelevizor.MAUI
 
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton", "SettingsButton" }).Contains(_focusItems.FocusedItemName) &&
+                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton" }).Contains(_focusItems.FocusedItemName) &&
                         _viewModel.ChannelsListViewVisible)
                         {
                             _focusItems.FocusItem("ChannelsListView");
@@ -1703,6 +1719,30 @@ namespace DVBTTelevizor.MAUI
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                         {
                             _viewModel.SelectNextChannel();
+                            //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                        }
+                        else
+                        {
+                            _focusItems.FocusNextItem(true);
+                        }
+                    });
+                    break;
+
+
+                case KeyboardNavigationActionEnum.Up:
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton" }).Contains(_focusItems.FocusedItemName) &&
+                        _viewModel.ChannelsListViewVisible)
+                        {
+                            _focusItems.FocusItem("ChannelsListView");
+                        }
+                        else
+                    if (_focusItems.FocusedItemName == "ChannelsListView")
+                        {
+                            _viewModel.SelectPreiousChannel();
                             ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
                         }
                         else
@@ -1713,7 +1753,6 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
-                case KeyboardNavigationActionEnum.Up:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         _focusItems.FocusPreviousItem(true);
@@ -1753,6 +1792,18 @@ namespace DVBTTelevizor.MAUI
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
                                 DVBTTelevizorButton_Clicked(this, new EventArgs());
+                            });
+                            break;
+                        case "MenuButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                MenuButton_Clicked(this, new EventArgs());
+                            });
+                            break;
+                        case "DriverStateButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                DriverStateButton_Clicked(this, new EventArgs());
                             });
                             break;
                     }

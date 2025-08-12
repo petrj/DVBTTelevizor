@@ -377,7 +377,7 @@ namespace DVBTTelevizor.MAUI
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                string? selectedChanneFrequencyAndMapPID = null;
+                string? uniqueIdentifier = null;
                 Channel? firstChannel = null;
 
                 try
@@ -388,7 +388,7 @@ namespace DVBTTelevizor.MAUI
 
                     if (SelectedChannel != null)
                     {
-                        selectedChanneFrequencyAndMapPID = SelectedChannel.FrequencyAndMapPID;
+                        uniqueIdentifier = SelectedChannel.UniqueIdentifier;
                         SelectedChannel = null;
                     }
 
@@ -406,13 +406,13 @@ namespace DVBTTelevizor.MAUI
                         if (firstChannel == null)
                         {
                             firstChannel = ch;
-                            if (selectedChanneFrequencyAndMapPID == null)
+                            if (uniqueIdentifier == null)
                             {
                                 ch.Selected = true;
                             }
                         }
 
-                        if (selectedChanneFrequencyAndMapPID == ch.FrequencyAndMapPID)
+                        if (uniqueIdentifier == ch.UniqueIdentifier)
                         {
                             ch.Selected = true;
                         }
@@ -462,31 +462,41 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public async Task<Channel> SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
+        public void SelectPreiousChannel()
         {
-            _loggingService.Info($"Selecting channel by frequency and mapPID {frequencyAndMapPID}");
+            _loggingService.Info($"Selecting previous channel");
 
-            return await Task.Run<Channel>(
-                () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _listViewSelector?.SelectPreviousChannel();
+                NotifyChannelChange();
+            });
+        }
+
+        public Channel? GetChannelByUniqueidentifier(string uniqueidentifier)
+        {
+            _loggingService.Info($"Selecting channel by unique identifier {uniqueidentifier}");
+
+            if (String.IsNullOrWhiteSpace(uniqueidentifier))
+            {
+                return null;
+            }
+
+            if (Channels.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (var ch in Channels)
+            {
+
+                if (ch.UniqueIdentifier == uniqueidentifier)
                 {
-                    if (Channels.Count == 0)
-                    {
-                        SelectedChannel = null;
-                        return null;
-                    }
+                    return ch;
+                }
+            }
 
-                    foreach (var ch in Channels)
-                    {
-
-                        if (ch.FrequencyAndMapPID == frequencyAndMapPID)
-                        {
-                            SelectedChannel = ch;
-                            return ch;
-                        }
-                    }
-
-                    return null;
-                });
+            return null;
         }
 
         public async Task Import(string filename)

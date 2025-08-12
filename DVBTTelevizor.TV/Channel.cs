@@ -40,6 +40,25 @@ namespace DVBTTelevizor
 
         private bool _recording = false;
 
+        public string UniqueIdentifier
+        {
+            get
+            {
+                return
+                          Frequency.ToString() +
+                    "[" + ProgramMapPID.ToString() + "] - " +
+                          ProviderName;
+            }
+        }
+
+        public string FrequencyAndMapPID
+        {
+            get
+            {
+                return Frequency.ToString() + "[" + ProgramMapPID.ToString() + "]";
+            }
+        }
+
         public string BandwdithLabel
         {
             get
@@ -366,14 +385,6 @@ namespace DVBTTelevizor
             channel.SelectedSubtitle = SelectedSubtitle;
 
             return channel;
-        }
-
-        public string FrequencyAndMapPID
-        {
-            get
-            {
-                return Frequency.ToString() + "[" + ProgramMapPID.ToString() + "]";
-            }
         }
 
         public bool ChannelExists(ObservableCollection<Channel> channels)
