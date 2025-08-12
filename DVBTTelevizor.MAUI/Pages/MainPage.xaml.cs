@@ -126,7 +126,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(e.Exception);
             };
 
-
             _configuration.ConfigDirectory = PublicDirectory;
 
             _dialogService = new DialogService(this);
@@ -145,15 +144,89 @@ namespace DVBTTelevizor.MAUI
 
             NavigationPage.SetHasNavigationBar(this, false);
 
+            BuildFocusableItems();
+
+            _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
+
+#if DEBUG
+            _configuration.AllowRemoteAccessService = true;
+            _configuration.RemoteAccessServiceIP = _configuration.LoggingUDPIP;
+            _configuration.RemoteAccessServicePort = 49152;
+            _configuration.RemoteAccessServiceSecurityKey = "DVBTTelevizor";
+
+#endif
+
+            RestartRemoteAccessService();
+
+            SubscribeMessages();
+
+            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
+            {
+                // Create Media from TCP stream
+                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
+                media.AddOption(":demux=rawaud");
+                media.AddOption(":rawaud-channels=1");
+                media.AddOption(":rawaud-samplerate=96000");
+                media.AddOption(":rawaud-fourcc=s16l");
+
+                _mediaPlayer.Play(media);
+            });
+
+             _settingsPage.Disappearing += delegate
+            {
+                Task.Run(async () =>
+                {
+                    await _viewModel.RefreshChannels();
+                });
+            };
+
+            CommandCheckStream = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await CheckStream();
+                });
+            });
+
+            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
+
+                    _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
+                    var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
+                    WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
+                });
+            }
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
+
+            LongVideoPressCommand = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    _loggingService.Info($"LongVideoPressCommand");
+
+                    MenuButton_Clicked(this, new EventArgs());
+                });
+            });
+
+            if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
+                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
+                });
+            }
+        }
+
+        private void SubscribeMessages()
+        {
             WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, (r, m) =>
             {
                 OnKeyDown(m.Value, m.Long);
             });
-
-            BuildFocusableItems();
-
-            _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
-            RestartRemoteAccessService();
 
             WeakReferenceMessenger.Default.Register<ConnectMessage>(this, (r, m) =>
             {
@@ -222,18 +295,6 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
-            {
-                // Create Media from TCP stream
-                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
-                media.AddOption(":demux=rawaud");
-                media.AddOption(":rawaud-channels=1");
-                media.AddOption(":rawaud-samplerate=96000");
-                media.AddOption(":rawaud-fourcc=s16l");
-
-                _mediaPlayer.Play(media);
-            });
-
             WeakReferenceMessenger.Default.Register<ChangedWindowPositionMessage>(this, (r, m) =>
             {
                 UpdateVideoWindowPosition();
@@ -248,54 +309,6 @@ namespace DVBTTelevizor.MAUI
             {
                 SetSubtitles(m.Value);
             });
-
-            _settingsPage.Disappearing += delegate
-            {
-                Task.Run(async () =>
-                {
-                    await _viewModel.RefreshChannels();
-                });
-            };
-
-            CommandCheckStream = new Command(() =>
-            {
-                Task.Run(async () =>
-                {
-                    await CheckStream();
-                });
-            });
-
-            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
-
-                    _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
-                    var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
-                    WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
-                });
-            }
-            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
-
-            LongVideoPressCommand = new Command(() =>
-            {
-                Task.Run(async () =>
-                {
-                    _loggingService.Info($"LongVideoPressCommand");
-
-                    MenuButton_Clicked(this, new EventArgs());
-                });
-            });
-
-            if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
-                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
-                });
-            }
         }
 
         private async Task CheckStream()

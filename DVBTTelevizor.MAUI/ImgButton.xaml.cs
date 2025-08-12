@@ -66,6 +66,17 @@ public partial class ImgButton : ContentView
         ButtonColor = Colors.Gray;
     }
 
+    public void FocusItem(bool focus)
+    {
+        if (focus)
+        {
+            BackgroundColor = Color.FromHex("#007cd2");
+        } else
+        {
+            BackgroundColor = Colors.Transparent;
+        }
+    }
+
     public ICommand TapCommand
     {
         get => (ICommand)GetValue(TapCommandProperty);
