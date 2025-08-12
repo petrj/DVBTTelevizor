@@ -1758,12 +1758,13 @@ namespace DVBTTelevizor.MAUI
                             //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
                             ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
                         }
+                        else
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
                         {
                             // scroll down
                             SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                                 SelectedChannelEPGDescriptionScrollView.ScrollX,
-                                SelectedChannelEPGDescriptionScrollView.ScrollY + 10, true);
+                                SelectedChannelEPGDescriptionScrollView.ScrollY + 50, true);
                         }
                         else
                         {
@@ -1787,6 +1788,13 @@ namespace DVBTTelevizor.MAUI
                         {
                             _viewModel.SelectPreiousChannel();
                             ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                        } else
+                    if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                        {
+                            // scroll up
+                            SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                                SelectedChannelEPGDescriptionScrollView.ScrollX,
+                                SelectedChannelEPGDescriptionScrollView.ScrollY - 50, true);
                         }
                         else
                         {

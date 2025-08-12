@@ -328,7 +328,7 @@ function Show-GUI {
     }
 }
 
-Show-GUI -SecurityKey "DVBTTelevizor" -IP 10.0.0.10 -Port 49152
+Show-GUI -SecurityKey "DVBTTelevizor" -IP 10.0.0.2 -Port 49152
 
 #$encryptedMessage = $msg | Encrypt-Message  -Key "DVBTTelevizor"
 #$encryptedMessage | Send-TCPMessage -Port 49152 -IP 10.0.0.2 | Decrypt-Message -Key "DVBTTelevizor"
