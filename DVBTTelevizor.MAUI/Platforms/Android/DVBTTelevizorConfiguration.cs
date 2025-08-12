@@ -584,5 +584,17 @@ namespace DVBTTelevizor.MAUI
                 }
             }
         }
+
+        public string LastSelectedChannelUniqueIdentifier
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("LastSelectedChannelUniqueIdentifier");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("LastSelectedChannelUniqueIdentifier", value);
+            }
+        }
     }
 }
