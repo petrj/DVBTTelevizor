@@ -17,6 +17,7 @@ namespace DVBTTelevizor
         public string Number { get; set; } = "0";
 
         public bool Selected { get; set; } = false;
+        public bool Focused { get; set; } = false;
 
         public long Frequency { get; set; }
         public long ProgramMapPID { get; set; }
@@ -346,7 +347,11 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Selected ? "#007cd2" : "Transparent";
+                return Selected
+                    ? Focused
+                        ? "#007cd2"
+                        : "#001835"   // unfocused
+                    : "Transparent";  // unselected
             }
         }
 

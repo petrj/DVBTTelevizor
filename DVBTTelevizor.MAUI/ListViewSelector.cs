@@ -43,9 +43,11 @@ namespace DVBTTelevizor.MAUI
                 if (ch == channel)
                 {
                     ch.Selected = true;
+                    ch.Focused = true;
                 } else
                 {
                     ch.Selected = false;
+                    ch.Focused = false;
                 }
                 ch.NotifyChanges();
             }
