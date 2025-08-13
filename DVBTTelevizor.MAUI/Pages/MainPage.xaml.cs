@@ -33,6 +33,8 @@ namespace DVBTTelevizor.MAUI
         private DateTime _lastActionPlayTime = DateTime.MinValue;
         private Size _lastAllocatedSize = new Size(-1, -1);
 
+        private DateTime _lastBackPressedTime = DateTime.MinValue;
+
         private Channel[] _lastPlayedChannels = new Channel[2];
 
         private KeyboardFocusableItemList _focusItems;
@@ -660,7 +662,7 @@ namespace DVBTTelevizor.MAUI
                         _viewModel.SelectedChannel.Focused = true;
                         _viewModel.SelectedChannel.NotifyChanges();
                     }
-                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
                 });
             }
 
@@ -1085,6 +1087,37 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public async Task ActionBack()
+        {
+            _loggingService.Debug($"ActionBack");
+
+            switch (PlayingState)
+            {
+                case PlayingStateEnum.Playing:
+                case PlayingStateEnum.PlayingInPreview:
+                    Task.Run( async () => { await ActionStop(false); } );
+                    break;
+                case PlayingStateEnum.Stopped:
+
+                    if ((_lastBackPressedTime == DateTime.MinValue) || ((DateTime.Now - _lastBackPressedTime).TotalSeconds > 3))
+                    {
+                        //if (longPress)
+                        //{
+                        //    MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_StopPlayInternalNotificationAndQuit);
+                        //}
+
+                        WeakReferenceMessenger.Default.Send(new ToastMessage($"Press once again for exit".Translated()));
+                        _lastBackPressedTime = DateTime.Now;
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
+                    }
+
+                    break;
+            }
+        }
+
         public async Task ActionStop(bool force)
         {
             _loggingService.Debug($"ActionStop (Force: {force}, PlayingState: {PlayingState})");
@@ -1140,23 +1173,6 @@ namespace DVBTTelevizor.MAUI
             //_viewModel.SelectedToolbarItemName = null;
             //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
             //_viewModel.NotifyMediaChange();
-        }
-
-        private void CallWithTimeout(Action action, int miliseconds = 1000)
-        {
-            // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
-            var task = Task.Run(() =>
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => action());
-                });
-            });
-
-            if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
-            {
-                _loggingService.Info("Action not completed!");
-            }
         }
 
         public async Task ActionRecord(Channel channel = null)
@@ -1216,7 +1232,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
-
 
         public async Task ActionStopRecord()
         {
@@ -1546,6 +1561,23 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private void CallWithTimeout(Action action, int miliseconds = 1000)
+        {
+            // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
+            var task = Task.Run(() =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    ThreadPool.QueueUserWorkItem(_ => action());
+                });
+            });
+
+            if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
+            {
+                _loggingService.Info("Action not completed!");
+            }
+        }
+
         private async Task FixVideo()
         {
             MainThread.BeginInvokeOnMainThread(async () =>
@@ -1756,7 +1788,7 @@ namespace DVBTTelevizor.MAUI
                         {
                             _viewModel.SelectNextChannel();
                             //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
-                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
                         }
                         else
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -1764,7 +1796,7 @@ namespace DVBTTelevizor.MAUI
                             // scroll down
                             SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                                 SelectedChannelEPGDescriptionScrollView.ScrollX,
-                                SelectedChannelEPGDescriptionScrollView.ScrollY + 50, true);
+                                SelectedChannelEPGDescriptionScrollView.ScrollY + 50, false);
                         }
                         else
                         {
@@ -1787,14 +1819,14 @@ namespace DVBTTelevizor.MAUI
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                         {
                             _viewModel.SelectPreiousChannel();
-                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
                         } else
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
                         {
                             // scroll up
                             SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                                 SelectedChannelEPGDescriptionScrollView.ScrollX,
-                                SelectedChannelEPGDescriptionScrollView.ScrollY - 50, true);
+                                SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
                         }
                         else
                         {
@@ -1806,7 +1838,7 @@ namespace DVBTTelevizor.MAUI
                 case KeyboardNavigationActionEnum.Back:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        // TODO: Action Back
+                        await ActionBack();
                     });
                     break;
 
