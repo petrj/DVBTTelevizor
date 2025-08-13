@@ -1685,26 +1685,35 @@ namespace DVBTTelevizor.MAUI
             await Navigation.PushAsync(_aboutPage);
         }
 
+        public Page GetPageFromStack(IReadOnlyList<Page> stack)
+        {
+            Page result = null;
+
+            if (stack != null && stack.Count > 0)
+            {
+                if (stack[stack.Count - 1].GetType() != typeof(MainPage))
+                {
+                    // different page on navigation top
+
+                    var pageOnTop = stack[stack.Count - 1];
+                    if (pageOnTop is NavigationPage np)
+                    {
+                        result = np.CurrentPage;
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"Main Page OnKeyDown {key}");
 
-            var stack = Navigation.NavigationStack;
-            if (stack[stack.Count - 1].GetType() != typeof(MainPage))
+            var pageOnTop = GetPageFromStack(Navigation.NavigationStack);
+            if ((pageOnTop != null) && (pageOnTop is IOnKeyDown okd))
             {
-                // different page on navigation top
-
-                var pageOnTop = stack[stack.Count - 1];
-                if (pageOnTop is NavigationPage np)
-                {
-                    pageOnTop = np.CurrentPage;
-                }
-
-                if (pageOnTop is IOnKeyDown)
-                {
-                    (pageOnTop as IOnKeyDown).OnKeyDown(key, longPress);
-                }
-
+                okd.OnKeyDown(key, longPress);
                 return;
             }
 
