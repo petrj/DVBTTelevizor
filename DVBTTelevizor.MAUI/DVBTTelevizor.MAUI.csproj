@@ -144,12 +144,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Platforms\Windows\NLog.config">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Menu.xaml.cs">
 	    <DependentUpon>Menu.xaml</DependentUpon>
 	  </Compile>
@@ -231,6 +225,12 @@
 	  <MauiXaml Update="Pages\SettingsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Platforms\Windows\NLog.config">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

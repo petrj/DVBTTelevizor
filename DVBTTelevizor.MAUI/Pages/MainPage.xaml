@@ -28,11 +28,12 @@
             </Style>
 
             <Style x:Key="ChannelNameTextStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="#41b3ff"/>
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
                 <Setter Property="Margin" Value="0,5,5,5"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
             </Style>
 
             <Style x:Key="NoVideoChannelNameTextStyle" TargetType="Label">
@@ -44,7 +45,7 @@
             </Style>
 
             <Style x:Key="ProviderNameTextStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="#41b3ff"/>
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
                 <Setter Property="FontAttributes" Value="Italic"/>
                 <Setter Property="Margin" Value="0,0,5,5"/>
                 <Setter Property="VerticalTextAlignment" Value="End"/>
@@ -116,8 +117,8 @@
                 <Setter Property="VerticalOptions" Value="FillAndExpand"/>
             </Style>
 
-            <Style x:Key="TitleTextStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="#41b3ff"/>
+            <Style x:Key="EPGTitleTextStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="MaxLines" Value="2"/>
@@ -165,6 +166,20 @@
 
     <AbsoluteLayout x:Name="MainAbsoluteLayout" BackgroundColor="Black" Margin="0,0,0,0">
 
+        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
+            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
+            <StackLayout.GestureRecognizers >
+                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
+                <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
+                <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
+            </StackLayout.GestureRecognizers>
+            <StackLayout.Behaviors>
+                <toolkit:TouchBehavior LongPressDuration="750" LongPressCommand="{Binding LongVideoPressCommand}" />
+            </StackLayout.Behaviors>
+        </StackLayout>
+
+
         <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.5,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" />
 
         <Grid
@@ -186,7 +201,7 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource TitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}"  Margin="5,5,5,5"/>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5"/>
 
             <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
             <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
@@ -202,7 +217,7 @@
                 <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
             </Grid>
 
-            <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ScrollViewChannelEPGDescription" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Margin="5,5,5,5">
+            <ScrollView x:Name="SelectedChannelEPGDescriptionScrollView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Margin="5,5,5,5" VerticalScrollBarVisibility="Always" >
                 <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"/>
             </ScrollView>
 
@@ -250,7 +265,7 @@
                                 <BoxView Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Grid.ColumnSpan="5" BackgroundColor="{Binding BackgroundColor}" />
 
                                 <Label Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Text="{Binding Number}" Style="{DynamicResource ChannelNumberTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForChannelNumber}"/>
-                                <Label Grid.Row="0" Grid.Column="2"  Grid.ColumnSpan="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" />
+                                <Label Grid.Row="0" Grid.Column="2"  Grid.ColumnSpan="2" Text="{Binding Name}" Style="{DynamicResource ChannelNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForCaption}" TextColor="{Binding ChannelTextLabelColor}"/>
                                 <Image Grid.Row="0" Grid.Column="1"                   Source="{Binding LockIcon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
 
                                 <Image Grid.Row="0" Grid.Column="4"                   Source="{Binding Icon}" Style="{DynamicResource IconStyle}" HeightRequest="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.ImageIconSize}"  />
@@ -260,7 +275,7 @@
                                 <Label Grid.Row="2" Grid.Column="2"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
                                 <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
-                                <Label Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="3" Text="{Binding ProviderNameAndFrequencyShortLabel}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                <Label Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="3" Text="{Binding ProviderNameAndFrequencyShortLabel}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" TextColor="{Binding ChannelTextLabelColor}"/>
 
                                 <ProgressBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Progress="{Binding CurrentEPGEventProgress}" ProgressColor="#41b3ff" BackgroundColor="White"/>
                             </Grid>
@@ -291,19 +306,6 @@
             <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}"  Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
             <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
         </Grid>
-
-        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
-            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
-            <StackLayout.GestureRecognizers >
-                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
-                <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
-                <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
-                <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
-            </StackLayout.GestureRecognizers>
-            <StackLayout.Behaviors>
-                <toolkit:TouchBehavior LongPressDuration="750" LongPressCommand="{Binding LongVideoPressCommand}" />
-            </StackLayout.Behaviors>
-        </StackLayout>
 
         <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" HorizontalOptions="Fill" VerticalOptions="FillAndExpand">
 
@@ -339,7 +341,7 @@
 
         <!--Label AbsoluteLayout.LayoutBounds="0.5,0.1,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="{Binding TuneChannelsButtonVisible}" Text="{local:LngXamlExt Input='No channel'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/-->
         <Frame IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.7,0.15" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
-            <local:ImgButton x:Name="TuneQuickImgButton" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.4,0.1" TopTitleText="{local:LngXamlExt Input='Tune'}" BottomTitleText="{local:LngXamlExt Input='- no channel'}" Img="tune.png" TapCommand="{Binding CommandTune}" BackgroundColor="#222222"/>
+            <local:ImgButton x:Name="TuneQuickImgButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.4,0.1" TopTitleText="{local:LngXamlExt Input='Tune'}" BottomTitleText="{local:LngXamlExt Input='- no channel'}" Img="tune.png" TapCommand="{Binding CommandTune}" BackgroundColor="#222222"/>
         </Frame>
 
         <Frame IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.45,0.7,0.15" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">

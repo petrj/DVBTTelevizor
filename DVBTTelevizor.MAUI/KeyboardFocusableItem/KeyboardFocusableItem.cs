@@ -136,7 +136,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     ibtn.ButtonColor = Color.FromHex("#303F9F");
                     //button.TextColor = Colors.White;
-                    ibtn.Focus();
+                    ibtn.FocusItem(true); // Focus event did not fired when debugging in Windows
                 }
                 else
                 if (part is Picker picker)
@@ -181,6 +181,7 @@ namespace DVBTTelevizor.MAUI
                 if (part is ImgButton ibtn)
                 {
                     ibtn.ButtonColor = Colors.Gray;
+                    ibtn.FocusItem(false); // Focus event did not fired when debugging in Windows
                 }
                 else
                 if (part is Picker picker)

@@ -29,9 +29,13 @@ namespace DVBTTelevizor.MAUI
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private List<string> _remoteDevicesConnected = new List<string>();
 
+        private IPublicDirectoryProvider _publicDirectoryProvider = null;
+
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
         private Size _lastAllocatedSize = new Size(-1, -1);
+
+        private DateTime _lastBackPressedTime = DateTime.MinValue;
 
         private Channel[] _lastPlayedChannels = new Channel[2];
 
@@ -53,7 +57,7 @@ namespace DVBTTelevizor.MAUI
         private Media _media;
 
         private NavigationPage _settingsPage = null;
-        private TuningWelcomePage _tuneWelcomePage = null;
+        private NavigationPage _tuneWelcomePage = null;
         private NavigationPage _aboutPage = null;
         private NavigationPage _driverPage = null;
         private NavigationPage _channelPage = null;
@@ -94,6 +98,7 @@ namespace DVBTTelevizor.MAUI
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
+            _publicDirectoryProvider = publicDirectoryProvider;
             PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
             _configuration = tvConfiguration;
@@ -126,7 +131,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(e.Exception);
             };
 
-
             _configuration.ConfigDirectory = PublicDirectory;
 
             _dialogService = new DialogService(this);
@@ -136,7 +140,6 @@ namespace DVBTTelevizor.MAUI
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
             _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
-            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
             _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _channelPage = new NavigationPage(new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
@@ -145,15 +148,89 @@ namespace DVBTTelevizor.MAUI
 
             NavigationPage.SetHasNavigationBar(this, false);
 
+            BuildFocusableItems();
+
+            _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
+
+#if DEBUG
+            _configuration.AllowRemoteAccessService = true;
+            _configuration.RemoteAccessServiceIP = _configuration.LoggingUDPIP;
+            _configuration.RemoteAccessServicePort = 49152;
+            _configuration.RemoteAccessServiceSecurityKey = "DVBTTelevizor";
+
+#endif
+
+            RestartRemoteAccessService();
+
+            SubscribeMessages();
+
+            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
+            {
+                // Create Media from TCP stream
+                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
+                media.AddOption(":demux=rawaud");
+                media.AddOption(":rawaud-channels=1");
+                media.AddOption(":rawaud-samplerate=96000");
+                media.AddOption(":rawaud-fourcc=s16l");
+
+                _mediaPlayer.Play(media);
+            });
+
+             _settingsPage.Disappearing += delegate
+            {
+                Task.Run(async () =>
+                {
+                    await _viewModel.RefreshChannels();
+                });
+            };
+
+            CommandCheckStream = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await CheckStream();
+                });
+            });
+
+            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
+
+                    _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
+                    var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
+                    WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
+                });
+            }
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
+
+            LongVideoPressCommand = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    _loggingService.Info($"LongVideoPressCommand");
+
+                    MenuButton_Clicked(this, new EventArgs());
+                });
+            });
+
+            if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
+                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
+                });
+            }
+        }
+
+        private void SubscribeMessages()
+        {
             WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, (r, m) =>
             {
                 OnKeyDown(m.Value, m.Long);
             });
-
-            BuildFocusableItems();
-
-            _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
-            RestartRemoteAccessService();
 
             WeakReferenceMessenger.Default.Register<ConnectMessage>(this, (r, m) =>
             {
@@ -169,7 +246,10 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Info($"FinishTuning");
 
-                CloseAllPages();
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Navigation.PopToRootAsync();
+                });
             });
 
             WeakReferenceMessenger.Default.Register<PlayMessage>(this, (r, m) =>
@@ -222,18 +302,6 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
-            {
-                // Create Media from TCP stream
-                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
-                media.AddOption(":demux=rawaud");
-                media.AddOption(":rawaud-channels=1");
-                media.AddOption(":rawaud-samplerate=96000");
-                media.AddOption(":rawaud-fourcc=s16l");
-
-                _mediaPlayer.Play(media);
-            });
-
             WeakReferenceMessenger.Default.Register<ChangedWindowPositionMessage>(this, (r, m) =>
             {
                 UpdateVideoWindowPosition();
@@ -248,54 +316,6 @@ namespace DVBTTelevizor.MAUI
             {
                 SetSubtitles(m.Value);
             });
-
-            _settingsPage.Disappearing += delegate
-            {
-                Task.Run(async () =>
-                {
-                    await _viewModel.RefreshChannels();
-                });
-            };
-
-            CommandCheckStream = new Command(() =>
-            {
-                Task.Run(async () =>
-                {
-                    await CheckStream();
-                });
-            });
-
-            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
-
-                    _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
-                    var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
-                    WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
-                });
-            }
-            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
-
-            LongVideoPressCommand = new Command(() =>
-            {
-                Task.Run(async () =>
-                {
-                    _loggingService.Info($"LongVideoPressCommand");
-
-                    MenuButton_Clicked(this, new EventArgs());
-                });
-            });
-
-            if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
-                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
-                });
-            }
         }
 
         private async Task CheckStream()
@@ -523,48 +543,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void CloseAllPages()
-        {
-            var max = 5; // max 5 pages
-            var current = 0;
-
-            while (current < max)
-            {
-                var stack = Navigation.NavigationStack;
-                if (stack.Count > 0)
-                {
-                    int i = 0;
-                    _loggingService.Info($"Pages on stack:");
-                    foreach (var p in stack)
-                    {
-                        _loggingService.Info($"{new string(' ', i * 2)}: {p.GetType().Name}");
-                        i++;
-                    }
-
-                    var pageOnTop = stack[stack.Count - 1];
-
-                    if (pageOnTop != this)
-                    {
-                        _loggingService.Info($"Closing page in top: {pageOnTop.GetType().Name}");
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            await Navigation.PopAsync();
-                        });
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    _loggingService.Info($"No page on top");
-                }
-
-                current++;
-            }
-        }
-
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)
         {
             if (message == null)
@@ -625,8 +603,9 @@ namespace DVBTTelevizor.MAUI
             _focusItems = new KeyboardFocusableItemList();
 
             _focusItems
-                .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsListView", new List<View>() { ChannelsListView }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBTTelevizorButton", new List<View>() { DVBTTelevizorButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsListView", new List<View>() { ChannelsListView }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("EPGDetailGrid", new List<View>() { EPGDetailGrid }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }))
@@ -641,10 +620,16 @@ namespace DVBTTelevizor.MAUI
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _viewModel.SelectFirstChannel();
-                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                    if (_viewModel.SelectedChannel != null)
+                    {
+                        _viewModel.SelectedChannel.Focused = true;
+                        _viewModel.SelectedChannel.NotifyChanges();
+                    }
+                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
                 });
             }
+
+            _viewModel.EPGDetailFocused = (_focusItems.FocusedItemName == "EPGDetailGrid");
         }
 
         protected override void OnSizeAllocated(double width, double height)
@@ -935,6 +920,13 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        // select last channel:
+                        _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                        _focusItems.FocusItem("ChannelsListView");
+                    });
                 });
             }
         }
@@ -1023,11 +1015,14 @@ namespace DVBTTelevizor.MAUI
 
         private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-            if (_tuneWelcomePage.IsLoaded)
+            if (_tuneWelcomePage != null &&
+                _tuneWelcomePage.IsLoaded)
             {
                 // preventing click when the settings page is just (or yet) loaded
                 return;
             }
+
+            _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, _publicDirectoryProvider));
 
             await Navigation.PushAsync(_tuneWelcomePage);
         }
@@ -1056,6 +1051,37 @@ namespace DVBTTelevizor.MAUI
             {
                 await ActionStop(false);
             });
+        }
+
+        public async Task ActionBack()
+        {
+            _loggingService.Debug($"ActionBack");
+
+            switch (PlayingState)
+            {
+                case PlayingStateEnum.Playing:
+                case PlayingStateEnum.PlayingInPreview:
+                    Task.Run( async () => { await ActionStop(false); } );
+                    break;
+                case PlayingStateEnum.Stopped:
+
+                    if ((_lastBackPressedTime == DateTime.MinValue) || ((DateTime.Now - _lastBackPressedTime).TotalSeconds > 3))
+                    {
+                        //if (longPress)
+                        //{
+                        //    MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_StopPlayInternalNotificationAndQuit);
+                        //}
+
+                        WeakReferenceMessenger.Default.Send(new ToastMessage($"Press once again for exit".Translated()));
+                        _lastBackPressedTime = DateTime.Now;
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
+                    }
+
+                    break;
+            }
         }
 
         public async Task ActionStop(bool force)
@@ -1101,8 +1127,11 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
 
-                _viewModel.PlayingChannel.Subtitles.Clear();
-                _viewModel.PlayingChannel.AudioTracks.Clear();
+                if (_viewModel.PlayingChannel != null)
+                {
+                    _viewModel.PlayingChannel.Subtitles.Clear();
+                    _viewModel.PlayingChannel.AudioTracks.Clear();
+                }
 
                 //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
@@ -1110,23 +1139,6 @@ namespace DVBTTelevizor.MAUI
             //_viewModel.SelectedToolbarItemName = null;
             //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
             //_viewModel.NotifyMediaChange();
-        }
-
-        private void CallWithTimeout(Action action, int miliseconds = 1000)
-        {
-            // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
-            var task = Task.Run(() =>
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => action());
-                });
-            });
-
-            if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
-            {
-                _loggingService.Info("Action not completed!");
-            }
         }
 
         public async Task ActionRecord(Channel channel = null)
@@ -1186,7 +1198,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
-
 
         public async Task ActionStopRecord()
         {
@@ -1516,6 +1527,23 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private void CallWithTimeout(Action action, int miliseconds = 1000)
+        {
+            // https://github.com/ZeBobo5/Vlc.DotNet/issues/542
+            var task = Task.Run(() =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    ThreadPool.QueueUserWorkItem(_ => action());
+                });
+            });
+
+            if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
+            {
+                _loggingService.Info("Action not completed!");
+            }
+        }
+
         private async Task FixVideo()
         {
             MainThread.BeginInvokeOnMainThread(async () =>
@@ -1623,26 +1651,35 @@ namespace DVBTTelevizor.MAUI
             await Navigation.PushAsync(_aboutPage);
         }
 
+        public Page GetPageFromStack(IReadOnlyList<Page> stack)
+        {
+            Page result = null;
+
+            if (stack != null && stack.Count > 0)
+            {
+                if (stack[stack.Count - 1].GetType() != typeof(MainPage))
+                {
+                    // different page on navigation top
+
+                    var pageOnTop = stack[stack.Count - 1];
+                    if (pageOnTop is NavigationPage np)
+                    {
+                        result = np.CurrentPage;
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"Main Page OnKeyDown {key}");
 
-            var stack = Navigation.NavigationStack;
-            if (stack[stack.Count - 1].GetType() != typeof(MainPage))
+            var pageOnTop = GetPageFromStack(Navigation.NavigationStack);
+            if ((pageOnTop != null) && (pageOnTop is IOnKeyDown okd))
             {
-                // different page on navigation top
-
-                var pageOnTop = stack[stack.Count - 1];
-                if (pageOnTop is NavigationPage np)
-                {
-                    pageOnTop = np.CurrentPage;
-                }
-
-                if (pageOnTop is IOnKeyDown)
-                {
-                    (pageOnTop as IOnKeyDown).OnKeyDown(key, longPress);
-                }
-
+                okd.OnKeyDown(key, longPress);
                 return;
             }
 
@@ -1659,13 +1696,48 @@ namespace DVBTTelevizor.MAUI
 
             switch (keyAction)
             {
+                case KeyboardNavigationActionEnum.Left:
+
+                    if (_focusItems.FocusedItemName == "ChannelsListView")
+                    {
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _viewModel.SelectedChannel.Focused = false;
+                            _viewModel.SelectedChannel.NotifyChanges();
+                        }
+
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            _focusItems.FocusItem("DVBTTelevizorButton");
+                        });
+                    }
+                    else
+                    {
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            _focusItems.FocusPreviousItem(true);
+                        });
+                    }
+
+                    break;
                 case KeyboardNavigationActionEnum.Right:
 
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
+                        if (_viewModel.SelectedChannel != null)
+                        {
+                            _viewModel.SelectedChannel.Focused = false;
+                            _viewModel.SelectedChannel.NotifyChanges();
+                        }
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
-                            _focusItems.FocusItem("DVBTTelevizorButton");
+                            if (EPGDetailGrid.IsVisible)
+                            {
+                                _focusItems.FocusItem("EPGDetailGrid");
+                            } else
+                            {
+                                _focusItems.FocusItem("DriverStateButton");
+                            }
                         });
                     }
                     else
@@ -1681,7 +1753,7 @@ namespace DVBTTelevizor.MAUI
 
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton", "SettingsButton" }).Contains(_focusItems.FocusedItemName) &&
+                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton" }).Contains(_focusItems.FocusedItemName) &&
                         _viewModel.ChannelsListViewVisible)
                         {
                             _focusItems.FocusItem("ChannelsListView");
@@ -1690,7 +1762,16 @@ namespace DVBTTelevizor.MAUI
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                         {
                             _viewModel.SelectNextChannel();
-                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                            //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
+                        }
+                        else
+                    if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                        {
+                            // scroll down
+                            SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                                SelectedChannelEPGDescriptionScrollView.ScrollX,
+                                SelectedChannelEPGDescriptionScrollView.ScrollY + 50, false);
                         }
                         else
                         {
@@ -1699,18 +1780,40 @@ namespace DVBTTelevizor.MAUI
                     });
                     break;
 
-                case KeyboardNavigationActionEnum.Left:
+
                 case KeyboardNavigationActionEnum.Up:
+
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        _focusItems.FocusPreviousItem(true);
+                        if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton" }).Contains(_focusItems.FocusedItemName) &&
+                        _viewModel.ChannelsListViewVisible)
+                        {
+                            _focusItems.FocusItem("ChannelsListView");
+                        }
+                        else
+                    if (_focusItems.FocusedItemName == "ChannelsListView")
+                        {
+                            _viewModel.SelectPreiousChannel();
+                            ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
+                        } else
+                    if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                        {
+                            // scroll up
+                            SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                                SelectedChannelEPGDescriptionScrollView.ScrollX,
+                                SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
+                        }
+                        else
+                        {
+                            _focusItems.FocusNextItem(true);
+                        }
                     });
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        await ActionStop(false);
+                        await ActionBack();
                     });
                     break;
 
@@ -1740,6 +1843,18 @@ namespace DVBTTelevizor.MAUI
                             MainThread.BeginInvokeOnMainThread(async () =>
                             {
                                 DVBTTelevizorButton_Clicked(this, new EventArgs());
+                            });
+                            break;
+                        case "MenuButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                MenuButton_Clicked(this, new EventArgs());
+                            });
+                            break;
+                        case "DriverStateButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                DriverStateButton_Clicked(this, new EventArgs());
                             });
                             break;
                     }

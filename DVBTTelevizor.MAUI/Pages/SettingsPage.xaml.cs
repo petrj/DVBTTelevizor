@@ -82,12 +82,15 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessSecurityKey", new List<View>() { RemoteAccessSecurityKeyBoxView, SecurityKeyEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectDriver", new List<View>() { DriverBoxView, DriverPicker }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("WriteToExternalDevice", new List<View>() { WriteToExternalDeviceSwitchBoxView, WriteToExternalDeviceSwitch }))
+
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportLanguage", new List<View>() { ExportLanguageButton }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }));
 
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
     }
@@ -235,6 +238,21 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         WeakReferenceMessenger.Default.Send(new ToastMessage($"Language exported to {fileName}"));
     }
 
+    public static void ShowPicker(Picker picker)
+    {
+#if ANDROID
+        var spinner = picker.Handler?.PlatformView as Android.Widget.Spinner;
+        spinner?.PerformClick();
+#elif WINDOWS
+    var comboBox = picker.Handler?.PlatformView as Microsoft.UI.Xaml.Controls.ComboBox;
+    if (comboBox != null)
+        comboBox.IsDropDownOpen = true;
+#else
+    // iOS and MacCatalyst do not allow programmatic opening
+    System.Diagnostics.Debug.WriteLine("Programmatic Picker open not supported on this platform.");
+#endif
+    }
+
     public async void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"Settings Page OnKeyDown {key}");
@@ -275,8 +293,95 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
+                        case "ShowTVChannels":
+                            ShowTVSwitch.IsToggled = !ShowTVSwitch.IsToggled;
+                            break;
+
+                        case "ShowRadioChannels":
+                            ShowRadioSwitch.IsToggled = !ShowRadioSwitch.IsToggled;
+                            break;
+
+                        case "ShowNonFreeChannels":
+                            ShowNonFreeSwitch.IsToggled = !ShowNonFreeSwitch.IsToggled;
+                            break;
+
+                        case "ShowOtherChannels":
+                            ShowOtherSwitch.IsToggled = !ShowOtherSwitch.IsToggled;
+                            break;
+
+                        case "ClearChannels":
+                            ClearChannelsButton_Clicked(this, new EventArgs());
+                            break;
+
+                        case "ExportToFile":
+                            ExportToFileButton_Clicked(this, new EventArgs());
+                            break;
+
+                        case "ImportChannels":
+                            ImportChannelsButton_Clicked(this, new EventArgs());
+                            break;
+
+                        case "ShowFullScreen":
+                            FullscreenSwitch.IsToggled = !FullscreenSwitch.IsToggled;
+                            break;
+
+                        case "ShowPlayOnBackground":
+                            PlayOnBackgroundSwitch.IsToggled = !PlayOnBackgroundSwitch.IsToggled;
+                            break;
+
+                        case "FontSize":
+                            ShowPicker(FontSizePicker);
+                            break;
+
+                        case "AutoStart":
+                            ShowPicker(ChannelAutoPlayedAfterStartPicker);
+                            break;
+
+                        case "ClearEPG":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                ClearEPGButton_Clicked(this, new EventArgs());
+                            });
+                            break;
+
+                        case "RemoteAccessEnabled":
+                            RemoteAccessSwitch.IsToggled = !RemoteAccessSwitch.IsToggled;
+                            break;
+
+                        case "RemoteAccessIP":
+                            IPEntry.Focus();
+                            break;
+
+                        case "RemoteAccessPort":
+                            PortEntry.Focus();
+                            break;
+
+                        case "RemoteAccessSecurityKey":
+                            SecurityKeyEntry.Focus();
+                            break;
+
+                        case "SelectDriver":
+                            ShowPicker(DriverPicker);
+                            break;
+
+                        case "WriteToExternalDevice":
+                            WriteToExternalDeviceSwitch.IsToggled = !WriteToExternalDeviceSwitch.IsToggled;
+                            break;
+
                         case "SelectLanguage":
-                            LanguagePicker.Focus();
+                            ShowPicker(LanguagePicker);
+                            break;
+
+                        case "ExportLanguage":
+                            ExportLanguageButton_Clicked(this, new EventArgs());
+                            break;
+
+                        case "EnableLogging":
+                            EnableLoggingSwitch.IsToggled = !EnableLoggingSwitch.IsToggled;
+                            break;
+
+                        case "UDPIPLogging":
+                            UDPIPEntry.Focus();
                             break;
                     }
                 });
@@ -293,5 +398,20 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         _loggingService.Info("ClearChannelsButton_Clicked");
 
         DeleteChannelsMenu();
+    }
+
+    private void ExportToFileButton_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ImportChannelsButton_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void ClearEPGButton_Clicked(object sender, EventArgs e)
+    {
+
     }
 }

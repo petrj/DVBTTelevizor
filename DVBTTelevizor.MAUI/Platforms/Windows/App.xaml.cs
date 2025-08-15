@@ -31,8 +31,7 @@ namespace DVBTTelevizor.MAUI.WinUI
         /// </summary>
         public App()
         {
-            // TODO: add NLOG - app cannot have any argument
-            _loggingService = new BasicLoggingService();
+            _loggingService = new LoggerProvider().GetLoggingService();
             this.InitializeComponent();
 
             var hook = new SharpHook.TaskPoolGlobalHook();
@@ -71,6 +70,15 @@ namespace DVBTTelevizor.MAUI.WinUI
             WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
             {
                 ShowToastMessage(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<SetUDPLoggingIPMessage>(this, (r, m) =>
+            {
+                if (_loggingService != null &&
+                _loggingService is NLogLoggingService nlogService)
+                {
+                    nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address = m.Value;
+                }
             });
 
             UnhandledException += App_UnhandledException;

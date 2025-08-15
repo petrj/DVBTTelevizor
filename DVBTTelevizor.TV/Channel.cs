@@ -17,6 +17,7 @@ namespace DVBTTelevizor
         public string Number { get; set; } = "0";
 
         public bool Selected { get; set; } = false;
+        public bool Focused { get; set; } = false;
 
         public long Frequency { get; set; }
         public long ProgramMapPID { get; set; }
@@ -39,6 +40,25 @@ namespace DVBTTelevizor
         public string? SelectedAudioTrack { get; set; } = null;
 
         private bool _recording = false;
+
+        public string UniqueIdentifier
+        {
+            get
+            {
+                return
+                          Frequency.ToString() +
+                    "[" + ProgramMapPID.ToString() + "] - " +
+                          ProviderName;
+            }
+        }
+
+        public string FrequencyAndMapPID
+        {
+            get
+            {
+                return Frequency.ToString() + "[" + ProgramMapPID.ToString() + "]";
+            }
+        }
 
         public string BandwdithLabel
         {
@@ -302,6 +322,7 @@ namespace DVBTTelevizor
         public void NotifyChanges()
         {
             OnPropertyChanged(nameof(BackgroundColor));
+            OnPropertyChanged(nameof(ChannelTextLabelColor));
             OnPropertyChanged(nameof(CurrentEPGEventTitle));
             OnPropertyChanged(nameof(NextEPGEventTitle));
             OnPropertyChanged(nameof(CurrentEPGEventTime));
@@ -327,7 +348,21 @@ namespace DVBTTelevizor
         {
             get
             {
-                return Selected ? "#007cd2" : "Transparent";
+                return Selected
+                    ? Focused
+                        ? "#007cd2"
+                        : "#005794"   // unfocused
+                    : "Transparent";  // unselected
+            }
+        }
+
+        public string ChannelTextLabelColor
+        {
+            get
+            {
+                return Selected
+                    ? "#FFFFFF" //"#000099"
+                    : "#41b3ff";
             }
         }
 
@@ -366,14 +401,6 @@ namespace DVBTTelevizor
             channel.SelectedSubtitle = SelectedSubtitle;
 
             return channel;
-        }
-
-        public string FrequencyAndMapPID
-        {
-            get
-            {
-                return Frequency.ToString() + "[" + ProgramMapPID.ToString() + "]";
-            }
         }
 
         public bool ChannelExists(ObservableCollection<Channel> channels)

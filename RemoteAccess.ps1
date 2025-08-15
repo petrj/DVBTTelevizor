@@ -328,7 +328,10 @@ function Show-GUI {
     }
 }
 
-Show-GUI -SecurityKey "DVBTTelevizor" -IP 10.0.0.8 -Port 49152
+$IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
+Write-host ("Detected IP:" + $IP)
+
+Show-GUI -SecurityKey "DVBTTelevizor" -IP $IP -Port 49152
 
 #$encryptedMessage = $msg | Encrypt-Message  -Key "DVBTTelevizor"
 #$encryptedMessage | Send-TCPMessage -Port 49152 -IP 10.0.0.2 | Decrypt-Message -Key "DVBTTelevizor"

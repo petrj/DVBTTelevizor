@@ -29,6 +29,7 @@ namespace DVBTTelevizor.MAUI
         private bool? _EPGDetailVisibleLastValue = null;
 
         private bool _EPGDetailEnabled = true;
+        private bool _EPGDetailFocused = false;
 
         private Channel? _selectedChannel;
         private Channel _playingChannel;
@@ -49,7 +50,6 @@ namespace DVBTTelevizor.MAUI
         public ICommand CommandInstallDriver { get; set; }
         public ICommand CommandQuit { get; set; }
         public ICommand RefreshCommand { get; set; }
-
         public Command CommandScanEPG { get; set; }
 
         public bool MainLayoutVisible { get; set; } = true;
@@ -61,41 +61,29 @@ namespace DVBTTelevizor.MAUI
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 
             _listViewSelector = new ListViewSelector(Channels);
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
+            _listViewSelector.OnChannelChanged += delegate
             {
-                ConnectDriver(m.Value);
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
-            {
-                ConnectDriverFailed(m.Value);
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
-            {
-                DriverNotInstalled();
-            });
-
-            WeakReferenceMessenger.Default.Register<DisConnectMessage>(this, (r, m) =>
-            {
-                DisconnectDriver();
-            });
-
-            WeakReferenceMessenger.Default.Register<ChannelsChangedMessage>(this, (r, m) =>
-            {
-                Task.Run(async () =>
+                if (_configuration != null && SelectedChannel != null)
                 {
-                    await RefreshChannels();
-                });
-            });
+                    _configuration.LastSelectedChannelUniqueIdentifier = SelectedChannel.UniqueIdentifier;
+                }
+            };
 
-            CommandTune = new Command( () =>
+            SubscribeMessages();
+
+            InitCommands();
+
+
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
+        }
+
+        private void InitCommands()
+        {
+            CommandTune = new Command(() =>
             {
                 //MenuVisible = false;
                 WeakReferenceMessenger.Default.Send(new ShowTuneMessage(String.Empty));
             });
-
 
             CommandQuit = new Command(() =>
             {
@@ -142,8 +130,38 @@ namespace DVBTTelevizor.MAUI
                     await RefreshChannels();
                 });
             });
+        }
 
-            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
+        private void SubscribeMessages()
+        {
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
+            {
+                ConnectDriver(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
+            {
+                ConnectDriverFailed(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
+            {
+                DriverNotInstalled();
+            });
+
+            WeakReferenceMessenger.Default.Register<DisConnectMessage>(this, (r, m) =>
+            {
+                DisconnectDriver();
+            });
+
+            WeakReferenceMessenger.Default.Register<ChannelsChangedMessage>(this, (r, m) =>
+            {
+                Task.Run(async () =>
+                {
+                    await RefreshChannels();
+                });
+            });
+
         }
 
         public bool MenuVisible
@@ -328,7 +346,7 @@ namespace DVBTTelevizor.MAUI
 
         private async Task RefreshEPG()
         {
-            _loggingService.Debug($"Refreshing EPG");
+            _loggingService.Debug($"RefreshEPG");
 
             try
             {
@@ -377,7 +395,7 @@ namespace DVBTTelevizor.MAUI
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                string? selectedChanneFrequencyAndMapPID = null;
+                string? uniqueIdentifier = null;
                 Channel? firstChannel = null;
 
                 try
@@ -388,7 +406,7 @@ namespace DVBTTelevizor.MAUI
 
                     if (SelectedChannel != null)
                     {
-                        selectedChanneFrequencyAndMapPID = SelectedChannel.FrequencyAndMapPID;
+                        uniqueIdentifier = SelectedChannel.UniqueIdentifier;
                         SelectedChannel = null;
                     }
 
@@ -406,13 +424,13 @@ namespace DVBTTelevizor.MAUI
                         if (firstChannel == null)
                         {
                             firstChannel = ch;
-                            if (selectedChanneFrequencyAndMapPID == null)
+                            if (uniqueIdentifier == null)
                             {
                                 ch.Selected = true;
                             }
                         }
 
-                        if (selectedChanneFrequencyAndMapPID == ch.FrequencyAndMapPID)
+                        if (uniqueIdentifier == ch.UniqueIdentifier)
                         {
                             ch.Selected = true;
                         }
@@ -462,31 +480,41 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public async Task<Channel> SelectChannelByFrequencyAndMapPID(string frequencyAndMapPID)
+        public void SelectPreiousChannel()
         {
-            _loggingService.Info($"Selecting channel by frequency and mapPID {frequencyAndMapPID}");
+            _loggingService.Info($"Selecting previous channel");
 
-            return await Task.Run<Channel>(
-                () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _listViewSelector?.SelectPreviousChannel();
+                NotifyChannelChange();
+            });
+        }
+
+        public Channel? GetChannelByUniqueidentifier(string uniqueidentifier)
+        {
+            _loggingService.Info($"Selecting channel by unique identifier {uniqueidentifier}");
+
+            if (String.IsNullOrWhiteSpace(uniqueidentifier))
+            {
+                return null;
+            }
+
+            if (Channels.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (var ch in Channels)
+            {
+
+                if (ch.UniqueIdentifier == uniqueidentifier)
                 {
-                    if (Channels.Count == 0)
-                    {
-                        SelectedChannel = null;
-                        return null;
-                    }
+                    return ch;
+                }
+            }
 
-                    foreach (var ch in Channels)
-                    {
-
-                        if (ch.FrequencyAndMapPID == frequencyAndMapPID)
-                        {
-                            SelectedChannel = ch;
-                            return ch;
-                        }
-                    }
-
-                    return null;
-                });
+            return null;
         }
 
         public async Task Import(string filename)
@@ -527,6 +555,20 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool EPGDetailFocused
+        {
+            get
+            {
+                return _EPGDetailFocused;
+            }
+            set
+            {
+                _EPGDetailFocused = value;
+
+                NotifyEPGDetailVisibilityChange();
+            }
+        }
+
         public bool EPGDetailEnabled
         {
             get
@@ -536,17 +578,50 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _EPGDetailEnabled = value;
-                OnPropertyChanged(nameof(EPGDetailVisible));
+
                 NotifyEPGDetailVisibilityChange();
+            }
+        }
+
+        public string EPGDetailGridLabelTextColor
+        {
+            get
+            {
+                if (EPGDetailFocused)
+                {
+                    return "White";
+                } else
+                {
+                    return "#41b3ff";
+                }
+            }
+        }
+
+        public string EPGDetailGridLabelBackgroundColor
+        {
+            get
+            {
+                if (EPGDetailFocused)
+                {
+                    return "#007cd2";
+                }
+                else
+                {
+                    return "Transparent";
+                }
             }
         }
 
         private void NotifyEPGDetailVisibilityChange()
         {
+            OnPropertyChanged(nameof(EPGDetailVisible));
+            OnPropertyChanged(nameof(EPGDetailFocused));
+            OnPropertyChanged(nameof(EPGDetailGridLabelTextColor));
+            OnPropertyChanged(nameof(EPGDetailGridLabelBackgroundColor));
+
             if (!_EPGDetailVisibleLastValue.HasValue || _EPGDetailVisibleLastValue.Value != EPGDetailVisible)
             {
                 _EPGDetailVisibleLastValue = EPGDetailVisible;
-                OnPropertyChanged(nameof(EPGDetailVisible));
                 WeakReferenceMessenger.Default.Send(new RefreshGUIMessage(String.Empty));
             }
         }
