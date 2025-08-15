@@ -166,6 +166,20 @@
 
     <AbsoluteLayout x:Name="MainAbsoluteLayout" BackgroundColor="Black" Margin="0,0,0,0">
 
+        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
+            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
+            <StackLayout.GestureRecognizers >
+                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
+                <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
+                <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
+                <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
+            </StackLayout.GestureRecognizers>
+            <StackLayout.Behaviors>
+                <toolkit:TouchBehavior LongPressDuration="750" LongPressCommand="{Binding LongVideoPressCommand}" />
+            </StackLayout.Behaviors>
+        </StackLayout>
+
+
         <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.5,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" />
 
         <Grid
@@ -292,19 +306,6 @@
             <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}"  Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
             <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
         </Grid>
-
-        <StackLayout x:Name="VideoStackLayout" IsVisible="false" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
-            <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
-            <StackLayout.GestureRecognizers >
-                <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
-                <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
-                <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
-                <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
-            </StackLayout.GestureRecognizers>
-            <StackLayout.Behaviors>
-                <toolkit:TouchBehavior LongPressDuration="750" LongPressCommand="{Binding LongVideoPressCommand}" />
-            </StackLayout.Behaviors>
-        </StackLayout>
 
         <StackLayout x:Name="NoVideoStackLayout" IsVisible="False" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Black" HorizontalOptions="Fill" VerticalOptions="FillAndExpand">
 
