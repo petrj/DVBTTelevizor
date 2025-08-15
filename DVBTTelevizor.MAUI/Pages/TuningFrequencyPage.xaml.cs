@@ -65,8 +65,8 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreq", new List<View>() { EditFreqButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreq", new List<View>() { EditFreqButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Next", new List<View>() { NextButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
@@ -117,23 +117,22 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
                 if (_focusItems.FocusedItem == null)
                     return;
 
-                /*
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "Auto":
-                            AutoScanButton_Clicked(this, new EventArgs());
+                        case "Back":
+                            BackButton_Clicked(this, new EventArgs());
                             break;
-                        case "Manual":
-                            ManualScanButton_Clicked(this, new EventArgs());
+                        case "Next":
+                            NextButton_Clicked(this, new EventArgs());
                             break;
-                        case "Tune":
-                            TuneButton_Clicked(this, new EventArgs());
+                        case "EditFreq":
+                            EditFreqButton_Clicked(this, new EventArgs());
                             break;
                     }
                 });
-                */
+
                 break;
         }
     }

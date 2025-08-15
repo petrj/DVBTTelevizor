@@ -108,23 +108,26 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
                 if (_focusItems.FocusedItem == null)
                     return;
 
-                /*
+
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "Auto":
-                            AutoScanButton_Clicked(this, new EventArgs());
+                        case "EditFreqFrom":
+                            EditFreqFromButton_Clicked(this, new EventArgs());
                             break;
-                        case "Manual":
-                            ManualScanButton_Clicked(this, new EventArgs());
+                        case "EditFreqTo":
+                            EditFreqToButton_Clicked(this, new EventArgs());
                             break;
-                        case "Tune":
-                            TuneButton_Clicked(this, new EventArgs());
+                        case "Back":
+                            BackButton_Clicked(this, new EventArgs());
+                            break;
+                        case "Next":
+                            NextButton_Clicked(this, new EventArgs());
                             break;
                     }
                 });
-                */
+
                 break;
         }
     }
