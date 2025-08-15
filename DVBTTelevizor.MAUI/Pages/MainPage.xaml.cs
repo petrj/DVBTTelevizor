@@ -29,6 +29,8 @@ namespace DVBTTelevizor.MAUI
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private List<string> _remoteDevicesConnected = new List<string>();
 
+        private IPublicDirectoryProvider _publicDirectoryProvider = null;
+
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
         private Size _lastAllocatedSize = new Size(-1, -1);
@@ -96,6 +98,7 @@ namespace DVBTTelevizor.MAUI
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
+            _publicDirectoryProvider = publicDirectoryProvider;
             PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
             _configuration = tvConfiguration;
@@ -137,7 +140,6 @@ namespace DVBTTelevizor.MAUI
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
             _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
-            _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _channelPage = new NavigationPage(new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
@@ -244,7 +246,10 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Info($"FinishTuning");
 
-                CloseAllPages();
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Navigation.PopToRootAsync();
+                });
             });
 
             WeakReferenceMessenger.Default.Register<PlayMessage>(this, (r, m) =>
@@ -535,48 +540,6 @@ namespace DVBTTelevizor.MAUI
                 default:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
-            }
-        }
-
-        private void CloseAllPages()
-        {
-            var max = 5; // max 5 pages
-            var current = 0;
-
-            while (current < max)
-            {
-                var stack = Navigation.NavigationStack;
-                if (stack.Count > 0)
-                {
-                    int i = 0;
-                    _loggingService.Info($"Pages on stack:");
-                    foreach (var p in stack)
-                    {
-                        _loggingService.Info($"{new string(' ', i * 2)}: {p.GetType().Name}");
-                        i++;
-                    }
-
-                    var pageOnTop = stack[stack.Count - 1];
-
-                    if (pageOnTop != this)
-                    {
-                        _loggingService.Info($"Closing page in top: {pageOnTop.GetType().Name}");
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            await Navigation.PopAsync();
-                        });
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    _loggingService.Info($"No page on top");
-                }
-
-                current++;
             }
         }
 
@@ -1052,11 +1015,14 @@ namespace DVBTTelevizor.MAUI
 
         private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-            if (_tuneWelcomePage.IsLoaded)
+            if (_tuneWelcomePage != null &&
+                _tuneWelcomePage.IsLoaded)
             {
                 // preventing click when the settings page is just (or yet) loaded
                 return;
             }
+
+            _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, _publicDirectoryProvider));
 
             await Navigation.PushAsync(_tuneWelcomePage);
         }
