@@ -1,12 +1,21 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using Microsoft.Maui.Layouts;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
 namespace DVBTTelevizor.MAUI;
 
 public partial class SettingsPage : ContentPage, IOnKeyDown
 {
+    public enum ImportChannelsEnum
+    {
+        None = 0,
+        Overwrite = 1,
+        Append = 2
+    }
+
     private SettingsPageViewModel _settingsPageViewModel;
 
     private ILoggingService _loggingService;
@@ -207,6 +216,54 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         MainMenu.UpdateMenu("Confirmatiom".Translated(), _menuItems);
     }
 
+    private void BuildConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm)
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+              _menuItems.Clear();
+
+            _menuItems.Add(MainMenu.CreateMenuItem(actionConfirm, titleYes, "confirm.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", titleNo, "cancel.png"));
+
+            MainMenu.UpdateMenu(title, _menuItems);
+        }
+    }
+
+    private void BuildChooseMenu(string title, Dictionary<string,string> items)
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            _menuItems.Clear();
+
+            foreach (var kvp in items)
+            {
+                _menuItems.Add(MainMenu.CreateMenuItem(kvp.Key, kvp.Value, ""));
+            }
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
+
+            MainMenu.UpdateMenu(title, _menuItems);
+        }
+    }
+
+    private void BuildErrorMenu(string title, string titleOK)
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            _menuItems.Clear();
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuOK", titleOK, ""));
+
+            MainMenu.UpdateMenu(title, _menuItems);
+        }
+    }
+
     private async void Menu_Tapped(string menuId)
     {
         _loggingService.Info($"Menu tapped: {menuId}");
@@ -221,6 +278,16 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 WeakReferenceMessenger.Default.Send(new  ToastMessage("All existing channels were deleted".Translated()));
                 break;
             case "menuCancel":
+                break;
+            case "menuConfirmOverwriteChannelsExport":
+                ExportChannels(true);
+                break;
+
+            case "menuOverwriteExistingChannels":
+                ImportChannels(ImportChannelsEnum.Overwrite);
+                break;
+            case "menuAppendExistingChannels":
+                ImportChannels(ImportChannelsEnum.Append);
                 break;
         }
     }
@@ -402,12 +469,110 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void ExportToFileButton_Clicked(object sender, EventArgs e)
     {
+        ExportChannels();
+    }
 
+    private async void ExportChannels(bool overwrite = false)
+    {
+        _loggingService.Info($"ExportChannels: overwrite:{overwrite}");
+
+        try
+        {
+            if (File.Exists(_settingsPageViewModel.AndroidChannelsListPath))
+            {
+                if (!overwrite)
+                {
+                    BuildConfirmMenu("File already exists. Overwrite?".Translated(), "Yes".Translated(), "No".Translated(), "menuConfirmOverwriteChannelsExport");
+                    return;
+                } else
+                {
+                    File.Delete(_settingsPageViewModel.AndroidChannelsListPath);
+                }
+            }
+
+            var channels = _configuration.GetChannels();
+            var json = JsonConvert.SerializeObject(channels);
+
+            File.WriteAllText(_settingsPageViewModel.AndroidChannelsListPath, json);
+        } catch (Exception ex)
+        {
+            _loggingService.Error(ex, "Error exporting channels list");
+        }
+    }
+
+    private async void ImportChannels(ImportChannelsEnum importChannels)
+    {
+        _loggingService.Info($"ImportChannels: importChannelsEnum:{importChannels}");
+
+        try
+        {
+            if (!File.Exists(_settingsPageViewModel.AndroidChannelsListPath))
+            {
+                BuildErrorMenu("File does not exist".Translated(), "OK".Translated());
+                return;
+            }
+
+            var channels = _configuration.GetChannels();
+
+            if ((channels.Count > 0) && (importChannels == ImportChannelsEnum.None))
+            {
+                BuildChooseMenu("Import channels", new Dictionary<string, string>()
+                {
+                    {"menuOverwriteExistingChannels","Overwite existing".Translated()},
+                    {"menuAppendExistingChannels","Append existing".Translated()}
+                });
+                return;
+            }
+
+            if (importChannels == ImportChannelsEnum.Overwrite)
+            {
+                channels.Clear();
+            }
+
+            var channelsJSON = await File.ReadAllTextAsync(_settingsPageViewModel.AndroidChannelsListPath);
+            var importedChannels = JsonConvert.DeserializeObject<ObservableCollection<Channel>>(channelsJSON);
+
+            var importedCount = 0;
+
+            foreach (var channel in importedChannels)
+            {
+                bool exists = false;
+                foreach (var existingChannel in channels)
+                {
+                    if (existingChannel.UniqueIdentifier == channel.UniqueIdentifier)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    importedCount++;
+                    channels.Add(channel.Clone());
+                } else
+                {
+                    _loggingService.Info("Channel already exists");
+                }
+            }
+
+            _configuration.SaveChannels(channels);
+
+            WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+
+            var msg = $"{importedCount} " + "channels imported".Translated();
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex, "Error exporting channels list");
+        }
     }
 
     private void ImportChannelsButton_Clicked(object sender, EventArgs e)
     {
-
+        ImportChannels(ImportChannelsEnum.None);
     }
 
     private void ClearEPGButton_Clicked(object sender, EventArgs e)

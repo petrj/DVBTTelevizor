@@ -307,7 +307,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Config.OutputDirectory;
+                return $"{Config.OutputDirectory}{System.IO.Path.DirectorySeparatorChar}DVBTTelevizor.channels.json";
             }
         }
     }

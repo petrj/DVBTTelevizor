@@ -18,7 +18,7 @@
 
             <Style x:Key="DetailLabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="Margin" Value="20,0,20,0"/>
             </Style>
@@ -129,9 +129,22 @@
 
                     <!--local:ImgButton x:Name="ClearChannelsButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="about.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/-->
 
-                    <Button x:Name="ExportToFileButton" Text="{local:LngXamlExt Input='Export To File'}"  Clicked="ExportToFileButton_Clicked" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Margin="30,30,20,0"/>
-                    <Button x:Name="ImportChannelsButton" Text="{local:LngXamlExt Input='Import from file'}"  Clicked="ImportChannelsButton_Clicked" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                    <Label Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50*" />
+                        <ColumnDefinition Width="50*" />
+                    </Grid.ColumnDefinitions>
+
+                        <Button Grid.Row="0" Grid.Column="0" x:Name="ExportToFileButton" Text="{local:LngXamlExt Input='Export'}"  Clicked="ExportToFileButton_Clicked" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Button Grid.Row="0" Grid.Column="1" x:Name="ImportChannelsButton" Text="{local:LngXamlExt Input='Import'}"  Clicked="ImportChannelsButton_Clicked" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding AndroidChannelsListPath}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalTextAlignment="End" />
+
+                    </Grid>
 
                 </StackLayout>
 
