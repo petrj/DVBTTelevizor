@@ -101,11 +101,14 @@ namespace DVBTTelevizor.MAUI
             return _maxYPos;
         }
 
-        public ContentView GetFirstView()
+        public View GetFirstView()
         {
-            foreach (ContentView part in Parts)
+            foreach (var part in Parts)
             {
-                return part;
+                if (part is View v)
+                {
+                    return v;
+                }
             }
 
             return null;
@@ -147,11 +150,6 @@ namespace DVBTTelevizor.MAUI
                 if (part is Entry entry)
                 {
                     //entry.BackgroundColor = Color.FromHex("#303F9F");
-                }
-                else
-                if (part is Switch sw)
-                {
-                    sw.Focus();
                 }
                 else
                 {

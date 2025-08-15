@@ -1887,7 +1887,7 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Debug("ChannelsListView_ItemSelected");
         }
 
-        private string GetSelctedMenuId()
+        private string GetSelectedMenuId()
         {
             foreach (var item in _menuItems)
             {
@@ -1955,7 +1955,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
-                    var id = GetSelctedMenuId();
+                    var id = GetSelectedMenuId();
                     if (id != null)
                     {
                         Menu_Tapped(id);

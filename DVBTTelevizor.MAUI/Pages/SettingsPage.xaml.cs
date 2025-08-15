@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Layouts;
+using Microsoft.Maui.Platform;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 
@@ -73,9 +74,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowNonFreeChannels", new List<View>() { ShowNonFreeChannelsBoxView, ShowNonFreeSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowOtherChannels", new List<View>() { ShowOtherChannelsBoxView, ShowOtherSwitch }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("ClearChannels", new List<View>() { ClearChannelsButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportToFile", new List<View>() { ExportToFileButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ImportChannels", new List<View>() { ImportChannelsButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("ClearChannels", new List<View>() { ClearChannelsButton }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowFullScreen", new List<View>() { ShowFullScreenBoxView, FullscreenSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowPlayOnBackground", new List<View>() { ShowPlayOnBackgroundBoxView, PlayOnBackgroundSwitch }))
@@ -320,11 +321,118 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 #endif
     }
 
+    private string GetSelectedMenuId()
+    {
+        foreach (var item in _menuItems)
+        {
+            if (item.Selected)
+            {
+                return item.Id;
+            }
+        }
+
+        return null;
+    }
+
+    private void SelectNextMenuItem(bool reverse)
+    {
+        var now = false;
+        var selected = false;
+        MenuItem first = null;
+
+        foreach (var item in (reverse ? _menuItems.AsEnumerable().Reverse() : _menuItems))
+        {
+            if (first == null)
+            {
+                first = item;
+            }
+
+            if (now)
+            {
+                item.Selected = true;
+                selected = true;
+                item.Update();
+                break;
+            }
+            else
+            if (item.Selected)
+            {
+                item.Selected = false;
+                item.Update();
+                now = true;
+            }
+        }
+
+        if (!selected && first != null)
+        {
+            first.Selected = true;
+            first.Update();
+        }
+    }
+
+    private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+            case KeyboardNavigationActionEnum.Down:
+                SelectNextMenuItem(false);
+                break;
+
+            case KeyboardNavigationActionEnum.Left:
+            case KeyboardNavigationActionEnum.Up:
+                SelectNextMenuItem(true);
+                break;
+
+            case KeyboardNavigationActionEnum.Back:
+                HideMenu();
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+                var id = GetSelectedMenuId();
+                if (id != null)
+                {
+                    Menu_Tapped(id);
+                }
+                break;
+        }
+    }
+
+
+    public async void ScrollToFocusedItem()
+    {
+        try
+        {
+
+            var focusedItem = _focusItems.FocusedItem;
+            if (focusedItem != null)
+            {
+                var view = focusedItem.GetFirstView();
+                if (view != null)
+                {
+                    await SettingsScrollView.ScrollToAsync(view, ScrollToPosition.Start, animated: false);
+                }
+            }
+        } catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
+    }
+
     public async void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"Settings Page OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+        if (MainMenu.MenuVisible)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnMenuKeyDown(keyAction);
+            });
+            return;
+        }
 
         switch (keyAction)
         {
@@ -333,6 +441,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusNextItem();
+                    ScrollToFocusedItem();
                 });
                 break;
 
@@ -341,6 +450,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusPreviousItem();
+                    ScrollToFocusedItem();
                 });
                 break;
 

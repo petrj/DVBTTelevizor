@@ -59,7 +59,7 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
-        public ContentView GetFirstViewByItemName(string name)
+        public View GetFirstViewByItemName(string name)
         {
             var item = GetItemByName(name);
             if (item == null)
