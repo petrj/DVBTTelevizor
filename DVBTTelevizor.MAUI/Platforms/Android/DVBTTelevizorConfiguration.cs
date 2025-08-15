@@ -406,7 +406,8 @@ namespace DVBTTelevizor.MAUI
 
                     if (loadedChannels != null && loadedChannels.Count > 0)
                     {
-                        return loadedChannels;
+                        var sortedChannels = loadedChannels.OrderBy(p => p.Number);
+                        return new ObservableCollection<Channel>(sortedChannels);
                     }
                 }
 

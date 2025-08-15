@@ -181,32 +181,14 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         if (_channelPageViewModel == null || _channelPageViewModel.Channel == null)
             return;
 
+
         if (_channelPageViewModel.Channel.Name == _previousName)
         {
             return;
         }
 
-        Task.Run(async () =>
-        {
-            if (string.IsNullOrEmpty(EntryName.Text))
-            {
-                _channelPageViewModel.Channel.Name = _previousName;
-
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await _dialogService.Information($"Invalid name".Translated());
-                    _channelPageViewModel.NotifyChannelChange();
-                });
-            }
-
-            //if (_channelPageViewModel.Channel.Name != _previousName)
-            //{
-            //    _channelPageViewModel.Changed = true;
-            //    await _channelPageViewModel.SaveChannels();
-            //}
-
-            _previousName = null;
-        });
+        // save change
+        _configuration.SaveChannels(_channelPageViewModel?.Channels);
     }
 
     public Channel? Channel
@@ -231,17 +213,19 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         }
     }
 
-    private void BuildFocusableItems()
+    public ObservableCollection<Channel>? Channels
     {
-        _focusItems = new KeyboardFocusableItemList();
+        get
+        {
+            return _channelPageViewModel?.Channels;
+        }
+        set
+        {
+            if (_channelPageViewModel == null)
+                return;
 
-        //_focusItems
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Donate3", new List<View>() { Donate3Button }))
-        //    .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }));
-
-        //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
+            _channelPageViewModel.Channels = value;
+        }
     }
 
     protected override void OnAppearing()
@@ -252,10 +236,46 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
 
+    public async void ScrollToFocusedItem()
+    {
+        try
+        {
+            var focusedItem = _focusItems.FocusedItem;
+            if (focusedItem != null)
+            {
+                var view = focusedItem.GetFirstView();
+                if (view != null)
+                {
+                    await ChannelScrollView.ScrollToAsync(view, ScrollToPosition.Start, animated: false);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
+    }
+
+    private void BuildFocusableItems()
+    {
+        _focusItems = new KeyboardFocusableItemList();
+
+        _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("Name", new List<View>() { NameBoxView, EntryName }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Number", new List<View>() { NumberBoxView, EntryNumber }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Up", new List<View>() { ButtonUp }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Down", new List<View>() { ButtonDown }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("MapPID", new List<View>() { MapPIDBoxView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Audio", new List<View>() { ButtonChangeAudio }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Subtitles", new List<View>() { ButtonChangeSubtitles }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Delete", new List<View>() { ButtonDeleteChannel }));
+
+        //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
+    }
+
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"ChannelPage Page OnKeyDown {key}");
-        /*
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
@@ -266,6 +286,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusNextItem(true);
+                    ScrollToFocusedItem();
                 });
                 break;
 
@@ -274,6 +295,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusPreviousItem(true);
+                    ScrollToFocusedItem();
                 });
                 break;
 
@@ -293,23 +315,32 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "Donate1":
-                            _loggingService.Debug($"AboutPage: Donate1");
+                        case "Name":
+                            EntryName.Focus();
                             break;
-                        case "Donate2":
-                            _loggingService.Debug($"AboutPage: Donate2");
+                        case "Number":
+                            EntryNumber.Focus();
                             break;
-                        case "Donate3":
-                            _loggingService.Debug($"AboutPage: Donate3");
+                        case "Up":
+                            ButtonUp_Clicked(this, new EventArgs());
                             break;
-                        case "Donate4":
-                            _loggingService.Debug($"AboutPage: Donate4");
+                        case "Down":
+                            ButtonDown_Clicked(this, new EventArgs());
+                            break;
+                        case "Audio":
+                            ButtonChangeAudio_Clicked(this, new EventArgs());
+                            break;
+                        case "Subtitles":
+                            ButtonChangeSubtitles_Clicked(this, new EventArgs());
+                            break;
+                        case "Delete":
+                            ButtonDeleteChannel_Clicked(this, new EventArgs());
                             break;
                     }
                 });
                 break;
         }
-        */
+
     }
 
     public void OnTextSent(string text)
@@ -342,9 +373,46 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     }
 
+    private Channel? GetPreviousChannel(Channel channel, ObservableCollection<Channel> channels)
+    {
+        Channel? prev = null;
+        foreach (var ch in channels)
+        {
+            if (ch == channel)
+            {
+                return prev;
+            }
+
+            prev = ch;
+        }
+
+        return null;
+    }
+
     private void ButtonUp_Clicked(object sender, EventArgs e)
     {
+        var prev = GetPreviousChannel(_channelPageViewModel.Channel, _channelPageViewModel.Channels);
+        if (prev != null)
+        {
+            // swap numbers
+            var num = prev.Number;
+            prev.Number = Channel.Number;
+            Channel.Number = num;
 
+            _configuration.SaveChannels(_channelPageViewModel.Channels);
+            _channelPageViewModel.Channels = _configuration.GetChannels();
+
+            foreach (var ch in _channelPageViewModel.Channels)
+            {
+                if (ch.UniqueIdentifier == _channelPageViewModel.Channel.UniqueIdentifier)
+                {
+                    _channelPageViewModel.Channel = ch;
+                    break;
+                }
+            }
+
+            _channelPageViewModel.NotifyChannelChange();
+        }
     }
 
     private void ButtonDown_Clicked(object sender, EventArgs e)

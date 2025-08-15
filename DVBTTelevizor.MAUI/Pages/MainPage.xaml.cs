@@ -1974,6 +1974,7 @@ namespace DVBTTelevizor.MAUI
             if (_channelPage.RootPage is ChannelPage p)
             {
                 p.Channel = channel;
+                p.Channels = _viewModel.Channels;
             }
 
             await Navigation.PushAsync(_channelPage);

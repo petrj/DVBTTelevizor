@@ -450,7 +450,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusPreviousItem();
-                    ScrollToFocusedItem();
+
                 });
                 break;
 

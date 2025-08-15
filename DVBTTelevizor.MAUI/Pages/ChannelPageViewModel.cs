@@ -20,6 +20,8 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<MediaTrack> AudioTracks { get; set; } = new ObservableCollection<MediaTrack>();
         public ObservableCollection<MediaTrack> Subtitles { get; set; } = new ObservableCollection<MediaTrack>();
 
+        public ObservableCollection<Channel>? _channels{ get; set; } = new ObservableCollection<Channel>();
+
         public ChannelPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
@@ -38,6 +40,18 @@ namespace DVBTTelevizor.MAUI
                 UpdateAutioAndSubtitles();
 
                 NotifyChannelChange();
+            }
+        }
+
+        public ObservableCollection<Channel>? Channels
+        {
+            get
+            {
+                return _channels;
+            }
+            set
+            {
+                _channels = value;
             }
         }
 
