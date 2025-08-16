@@ -467,7 +467,7 @@ namespace DVBTTelevizor
 
                     if (loadedChannels != null && loadedChannels.Count > 0)
                     {
-                        var sortedChannels = loadedChannels.OrderBy(p => p.Number);
+                        var sortedChannels = loadedChannels.OrderBy(p => p.Number.ToString().PadLeft(4, '0'));
                         return new ObservableCollection<Channel>(sortedChannels);
                     }
                 }

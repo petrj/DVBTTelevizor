@@ -57,6 +57,23 @@ namespace DVBTTelevizor
             return null;
         }
 
+        public static bool IsNumberUnique(string number, ObservableCollection<Channel>? channels)
+        {
+            if (channels == null)
+                return false;
+
+            int count = 0;
+            foreach (var ch in channels)
+            {
+                if (ch.Number == number)
+                {
+                    count++;
+                }
+            }
+
+            return count == 1;
+        }
+
         public static Channel? GetNextChannel(Channel channel, ObservableCollection<Channel> channels)
         {
             var found = false;

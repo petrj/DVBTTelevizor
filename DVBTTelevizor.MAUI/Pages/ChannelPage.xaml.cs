@@ -17,6 +17,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
     private string? _previousName = null;
+    private string? _previousNumber = null;
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -39,9 +40,16 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         EntryName.Focused += delegate
         {
             EntryName.CursorPosition = EntryNumber.Text == null ? 0 : EntryName.Text.Length;
-            _previousName = _channelPageViewModel?.Channel?.Name;
+            _previousName = Channel?.Name;
         };
+        EntryNumber.Focused += delegate
+        {
+            EntryNumber.CursorPosition = EntryNumber.Text == null ? 0 : EntryNumber.Text.Length;
+            _previousNumber = Channel?.Number;
+        };
+
         EntryName.Unfocused += EntryName_Unfocused;
+        EntryNumber.Unfocused += EntryNumber_Unfocused;
 
         BuildFocusableItems();
     }
@@ -179,18 +187,70 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     private void EntryName_Unfocused(object? sender, FocusEventArgs e)
     {
-        if (_channelPageViewModel == null || _channelPageViewModel.Channel == null)
+        if (Channel == null)
             return;
 
-
-        if (_channelPageViewModel.Channel.Name == _previousName)
+        if (Channel.Name == _previousName)
         {
             return;
         }
 
-        // save change
-        _configuration.SaveChannels(_channelPageViewModel?.Channels);
+        ReloadChannels(Channel?.UniqueIdentifier);
         UpdateTitle();
+    }
+
+    private void EntryNumber_Unfocused(object sender, FocusEventArgs e)
+    {
+        if (Channel == null)
+            return;
+
+        if (Channel?.Number == _previousNumber)
+        {
+            return;
+        }
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                int num;
+                if (!int.TryParse(EntryNumber.Text, out num) || (num < 1) || (num > 32000))
+                {
+                    Channel.Number = _previousNumber;
+
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Invalid number".Translated()));
+                    _channelPageViewModel.NotifyChannelChange();
+
+                    return;
+                }
+
+                if ((num < 1) || (num > 9999))
+                {
+                    Channel.Number = _previousNumber;
+
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Number out of range".Translated()));
+                    _channelPageViewModel.NotifyChannelChange();
+
+                    return;
+                }
+
+                if (!Channel.IsNumberUnique(num.ToString(), Channels))
+                {
+                    Channel.Number = _previousNumber;
+
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Number is already used".Translated()));
+                    _channelPageViewModel.NotifyChannelChange();
+
+                    return;
+                }
+
+                ReloadChannels(Channel?.UniqueIdentifier);
+            }
+            finally
+            {
+                _previousNumber = null;
+            }
+        });
     }
 
     private void UpdateTitle()
@@ -379,7 +439,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     }
 
-    private void ReloadChannels(string uniqueIdentifier)
+    private void ReloadChannels(string? uniqueIdentifier)
     {
         _configuration.SaveChannels(_channelPageViewModel.Channels);
         _channelPageViewModel.Channels = _configuration.GetChannels();
