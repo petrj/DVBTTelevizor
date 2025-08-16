@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -189,6 +190,17 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
         // save change
         _configuration.SaveChannels(_channelPageViewModel?.Channels);
+        UpdateTitle();
+    }
+
+    private void UpdateTitle()
+    {
+        var title = "Channel".Translated();
+        if (_channelPageViewModel.Channel != null && !String.IsNullOrWhiteSpace(_channelPageViewModel.Channel.Name))
+        {
+            title += $" - {_channelPageViewModel.Channel.Name}";
+        }
+        Title = title;
     }
 
     public Channel? Channel
@@ -203,13 +215,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 return;
 
             _channelPageViewModel.Channel = value;
-
-            var title = "Channel".Translated();
-            if (value != null && !String.IsNullOrWhiteSpace(value.Name))
-            {
-                title += $" - {value.Name}";
-            }
-            Title = title;
+            UpdateTitle();
         }
     }
 
@@ -373,25 +379,17 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     }
 
-    private Channel? GetPreviousChannel(Channel channel, ObservableCollection<Channel> channels)
+    private void ReloadChannels(string uniqueIdentifier)
     {
-        Channel? prev = null;
-        foreach (var ch in channels)
-        {
-            if (ch == channel)
-            {
-                return prev;
-            }
-
-            prev = ch;
-        }
-
-        return null;
+        _configuration.SaveChannels(_channelPageViewModel.Channels);
+        _channelPageViewModel.Channels = _configuration.GetChannels();
+        _channelPageViewModel.Channel = Channel.GetChannelByUniqueId(uniqueIdentifier, _channelPageViewModel.Channels);
+        _channelPageViewModel.NotifyChannelChange();
     }
 
     private void ButtonUp_Clicked(object sender, EventArgs e)
     {
-        var prev = GetPreviousChannel(_channelPageViewModel.Channel, _channelPageViewModel.Channels);
+        var prev = Channel.GetPreviousChannel(_channelPageViewModel.Channel, _channelPageViewModel.Channels);
         if (prev != null)
         {
             // swap numbers
@@ -399,24 +397,21 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             prev.Number = Channel.Number;
             Channel.Number = num;
 
-            _configuration.SaveChannels(_channelPageViewModel.Channels);
-            _channelPageViewModel.Channels = _configuration.GetChannels();
-
-            foreach (var ch in _channelPageViewModel.Channels)
-            {
-                if (ch.UniqueIdentifier == _channelPageViewModel.Channel.UniqueIdentifier)
-                {
-                    _channelPageViewModel.Channel = ch;
-                    break;
-                }
-            }
-
-            _channelPageViewModel.NotifyChannelChange();
+            ReloadChannels(Channel.UniqueIdentifier);
         }
     }
 
     private void ButtonDown_Clicked(object sender, EventArgs e)
     {
+        var next = Channel.GetNextChannel(_channelPageViewModel.Channel, _channelPageViewModel.Channels);
+        if (next != null)
+        {
+            // swap numbers
+            var num = next.Number;
+            next.Number = Channel.Number;
+            Channel.Number = num;
 
+            ReloadChannels(Channel.UniqueIdentifier);
+        }
     }
 }

@@ -41,6 +41,54 @@ namespace DVBTTelevizor
 
         private bool _recording = false;
 
+        public static Channel? GetPreviousChannel(Channel channel, ObservableCollection<Channel> channels)
+        {
+            Channel? prev = null;
+            foreach (var ch in channels)
+            {
+                if (ch == channel)
+                {
+                    return prev;
+                }
+
+                prev = ch;
+            }
+
+            return null;
+        }
+
+        public static Channel? GetNextChannel(Channel channel, ObservableCollection<Channel> channels)
+        {
+            var found = false;
+            foreach (var ch in channels)
+            {
+                if (found)
+                {
+                    return ch;
+                }
+
+                if (ch == channel)
+                {
+                    found = true;
+                }
+            }
+
+            return null;
+        }
+
+        public static Channel? GetChannelByUniqueId(string uniqueIdentifier, ObservableCollection<Channel> channels)
+        {
+            foreach (var channel in channels)
+            {
+                if (channel.UniqueIdentifier == uniqueIdentifier)
+                {
+                    return channel;
+                }
+            }
+
+            return null;
+        }
+
         public string UniqueIdentifier
         {
             get
