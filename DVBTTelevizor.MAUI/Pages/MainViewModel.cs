@@ -401,6 +401,7 @@ namespace DVBTTelevizor.MAUI
                 try
                 {
                     IsRefreshing = true;
+                    var anySelected = false;
 
                     await _semaphoreSlim.WaitAsync();
 
@@ -424,18 +425,20 @@ namespace DVBTTelevizor.MAUI
                         if (firstChannel == null)
                         {
                             firstChannel = ch;
-                            if (uniqueIdentifier == null)
-                            {
-                                ch.Selected = true;
-                            }
                         }
 
                         if (uniqueIdentifier == ch.UniqueIdentifier)
                         {
-                            ch.Selected = true;
+                            SelectedChannel = ch;
+                            anySelected = true;
                         }
 
                         Channels.Add(ch);
+                    }
+
+                    if (!anySelected && firstChannel != null)
+                    {
+                        SelectedChannel = firstChannel;
                     }
 
                     _loggingService.Debug($"Channels refreshed");

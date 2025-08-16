@@ -3,6 +3,7 @@ using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
+using Windows.UI.WebUI;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -20,10 +21,6 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private string? _previousNumber = null;
 
     private KeyboardFocusableItemList _focusItems;
-
-    private List<MenuItem> _subtitleMenuItems = new List<MenuItem>();
-    private List<MenuItem> _audioMenuItems = new List<MenuItem>();
-    private List<MenuItem> _subtitleItems = new List<MenuItem>();
 
     public ChannelPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -99,40 +96,61 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             return;
         }
 
+        if (menuId == "menuConfirmDeleteChannel")
+        {
+            await Task.Run(async () => await RemoveChannelAndClose());
+        }
+
         _channelPageViewModel.UpdateAutioAndSubtitles();
+    }
+
+    private async Task RemoveChannelAndClose()
+    {
+        if (Channel != null && Channels != null)
+        {
+            _channelPageViewModel.Channels = new ObservableCollection<Channel>(Channels.Where(x => x.UniqueIdentifier != Channel.UniqueIdentifier).ToList());
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            ReloadChannels(null);
+
+            await Navigation.PopAsync();
+        });
     }
 
     private async Task SubtitlesMenu()
     {
         try
         {
-            if (_channelPageViewModel == null ||
-                _channelPageViewModel.Channel == null ||
-                _channelPageViewModel.Channel.Subtitles == null)
+            if (Channel == null ||
+                Channel.Subtitles == null)
             {
                 return;
             }
 
             ShowMenu();
 
-            _subtitleItems.Clear();
+            var subtitleItems = new List<MenuItem>();
+
+            subtitleItems.Clear();
 
             int index = 0;
-            foreach (var sub in _channelPageViewModel.Channel.Subtitles)
+            foreach (var sub in Channel.Subtitles)
             {
                 var title = sub.Value;
-                if (sub.Key.ToString() == _channelPageViewModel.Channel.SelectedAudioTrack)
+                if (sub.Key.ToString() == Channel.SelectedAudioTrack)
                 {
                     title += " *";
                 }
-                _subtitleItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "audio.png", index > _channelPageViewModel.Subtitles.Count -1));
+                subtitleItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "audio.png", index > _channelPageViewModel.Subtitles.Count -1));
                 index++;
             }
 
-            _subtitleItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
-            _subtitleItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+            subtitleItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+            subtitleItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-            MainMenu.UpdateMenu("Subtitles menu".Translated(), _subtitleItems);
+            MainMenu.UpdateMenu("Subtitles menu".Translated(), subtitleItems);
 
             ShowMenu();
 
@@ -147,33 +165,62 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     {
         try
         {
-            if (_channelPageViewModel == null ||
-                _channelPageViewModel.Channel == null ||
-                _channelPageViewModel.Channel.AudioTracks == null)
+            if (Channel == null ||
+                Channel.AudioTracks == null)
             {
                 return;
             }
 
             ShowMenu();
 
-            _audioMenuItems.Clear();
+            var audioMenuItems = new List<MenuItem>();
+
+            audioMenuItems.Clear();
 
             int index = 0;
-            foreach (var track in _channelPageViewModel.Channel.AudioTracks)
+            foreach (var track in Channel.AudioTracks)
             {
                 var title = track.Value;
-                if (track.Key.ToString() == _channelPageViewModel.Channel.SelectedAudioTrack)
+                if (track.Key.ToString() == Channel.SelectedAudioTrack)
                 {
                     title += " *";
                 }
-                _audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count-1));
+                audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count-1));
                 index++;
             }
 
-            _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
-            _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+            audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+            audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-            MainMenu.UpdateMenu("Audio menu".Translated(), _audioMenuItems);
+            MainMenu.UpdateMenu("Audio menu".Translated(), audioMenuItems);
+
+            ShowMenu();
+
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
+    }
+
+    private async Task DeleteMenu()
+    {
+        try
+        {
+            if (Channel == null)
+            {
+                return;
+            }
+
+            ShowMenu();
+
+            var menuItems = new List<MenuItem>();
+
+
+            menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDeleteChannel", "Yes".Translated(), ""));
+            menuItems.Add(MainMenu.CreateMenuItem("menuNo", "No".Translated(), ""));
+
+            MainMenu.UpdateMenu("Are you sure to delete channel".Translated() + $" {Channel.Name}?", menuItems);
 
             ShowMenu();
 
@@ -420,7 +467,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            AudioMenu();
+            await AudioMenu();
         });
     }
 
@@ -430,25 +477,35 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            SubtitlesMenu();
+            await SubtitlesMenu();
         });
     }
 
     private void ButtonDeleteChannel_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Debug($"ButtonDeleteChannel_Clicked");
 
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await DeleteMenu();
+        });
     }
 
     private void ReloadChannels(string? uniqueIdentifier)
     {
         _configuration.SaveChannels(_channelPageViewModel.Channels);
         _channelPageViewModel.Channels = _configuration.GetChannels();
-        _channelPageViewModel.Channel = Channel.GetChannelByUniqueId(uniqueIdentifier, _channelPageViewModel.Channels);
+        if (uniqueIdentifier != null)
+        {
+            _channelPageViewModel.Channel = Channel.GetChannelByUniqueId(uniqueIdentifier, _channelPageViewModel.Channels);
+        }
         _channelPageViewModel.NotifyChannelChange();
     }
 
     private void ButtonUp_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Debug($"ButtonDeleteChannel_Clicked");
+
         var prev = Channel.GetPreviousChannel(_channelPageViewModel.Channel, _channelPageViewModel.Channels);
         if (prev != null)
         {
@@ -463,6 +520,8 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     private void ButtonDown_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Debug($"ButtonDown_Clicked");
+
         var next = Channel.GetNextChannel(_channelPageViewModel.Channel, _channelPageViewModel.Channels);
         if (next != null)
         {

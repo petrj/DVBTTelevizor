@@ -923,9 +923,14 @@ namespace DVBTTelevizor.MAUI
 
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        // select last channel:
-                        _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                        if (_configuration.LastSelectedChannelUniqueIdentifier != null)
+                        {
+                            // select last channel:{
+                            _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                        }
+
                         _focusItems.FocusItem("ChannelsListView");
+
                     });
                 });
             }
