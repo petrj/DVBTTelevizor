@@ -3,7 +3,6 @@ using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
-using Windows.UI.WebUI;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -217,8 +216,8 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             var menuItems = new List<MenuItem>();
 
 
-            menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDeleteChannel", "Yes".Translated(), ""));
-            menuItems.Add(MainMenu.CreateMenuItem("menuNo", "No".Translated(), ""));
+            menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDeleteChannel", "Yes".Translated(), "confirm.png"));
+            menuItems.Add(MainMenu.CreateMenuItem("menuNo", "No".Translated(), "cancel.png"));
 
             MainMenu.UpdateMenu("Are you sure to delete channel".Translated() + $" {Channel.Name}?", menuItems);
 
