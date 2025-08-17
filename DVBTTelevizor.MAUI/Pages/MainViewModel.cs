@@ -1011,7 +1011,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Channels.Count == 0 && Refreshed;
+                return Channels.Count == 0 && Refreshed && _driver.DriverInstalled;
             }
         }
 

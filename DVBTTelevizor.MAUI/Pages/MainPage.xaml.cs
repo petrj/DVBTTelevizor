@@ -807,7 +807,7 @@ namespace DVBTTelevizor.MAUI
 
                             NavigationPage.SetHasNavigationBar(this, false);
 
-                            ChannelsListView.IsVisible = true;
+                            ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
 
                             WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(""));
 
@@ -2315,15 +2315,6 @@ namespace DVBTTelevizor.MAUI
                 }
             }
 
-            if (_viewModel.EPGDetailVisible)
-            {
-                //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonHideEPG"));
-            }
-            else
-            {
-                //old_menuItems.AddItem(_focusMenuItems.GetItemByName("MenuButtonShowEPG"));
-            }
-
             var selectedChannel = _viewModel.SelectedChannel;
             if (selectedChannel != null)
             {
@@ -2376,19 +2367,19 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
+        private void DriverImageTapped(object sender, TappedEventArgs e)
         {
-
-        }
-
-        private void TapGestureRecognizer_Tapped_1(object sender, TappedEventArgs e)
-        {
-
+            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(String.Empty));
         }
 
         private void TuneImageTapped(object sender, TappedEventArgs e)
         {
             TuneButton_Clicked(this, new EventArgs());
+        }
+
+        private void QuickDriverButton_Clicked(object sender, EventArgs e)
+        {
+            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(String.Empty));
         }
     }
 
