@@ -1708,72 +1708,32 @@ namespace DVBTTelevizor.MAUI
             {
                 case KeyboardNavigationActionEnum.Left:
 
-                    if (_focusItems.FocusedItemName == "ChannelsListView")
+                    if ((_focusItems.FocusedItemName == "ChannelsListView") &&
+                        (_viewModel.SelectedChannel != null))
                     {
-                        if (_viewModel.SelectedChannel != null)
-                        {
-                            _viewModel.SelectedChannel.Focused = false;
-                            _viewModel.SelectedChannel.NotifyChanges();
-                        }
+                        _viewModel.SelectedChannel.Focused = false;
+                        _viewModel.SelectedChannel.NotifyChanges();
+                    }
 
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            _focusItems.FocusItem("DVBTTelevizorButton");
-                        });
-                    }
-                    else
+                    MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            _focusItems.FocusPreviousItem(true);
-                        });
-                    }
+                        _focusItems.FocusPreviousItem(true);
+                    });
+
 
                     break;
                 case KeyboardNavigationActionEnum.Right:
 
-                    if (_focusItems.FocusedItemName == "DVBTTelevizorButton")
+                    if ((_focusItems.FocusedItemName == "ChannelsListView") &&
+                        (_viewModel.SelectedChannel != null))
                     {
-                        if (_viewModel.TuneChannelsButtonVisible)
-                        {
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                _focusItems.FocusItem("QuickTuneButton");
-                            });
-                            } else
-                        {
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                _focusItems.FocusItem("ChannelsListView");
-                            });
-                        }
-                    } else
-                    if (_focusItems.FocusedItemName == "ChannelsListView")
-                    {
-                        if (_viewModel.SelectedChannel != null)
-                        {
-                            _viewModel.SelectedChannel.Focused = false;
-                            _viewModel.SelectedChannel.NotifyChanges();
-                        }
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            if (EPGDetailGrid.IsVisible)
-                            {
-                                _focusItems.FocusItem("EPGDetailGrid");
-                            }
-                            else
-                            {
-                                _focusItems.FocusItem("DriverStateButton");
-                            }
-                        });
+                        _viewModel.SelectedChannel.Focused = false;
+                        _viewModel.SelectedChannel.NotifyChanges();
                     }
-                    else
-                    {
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            _focusItems.FocusNextItem(true);
-                        });
-                    }
+                           MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                _focusItems.FocusNextItem(true);
+                            });
                     break;
 
                 case KeyboardNavigationActionEnum.Down:
