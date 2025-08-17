@@ -339,8 +339,12 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="tunebig.png" />
-        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.3,0.1" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray"/>
+        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="tunebig.png">
+            <Image.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TuneImageTapped" NumberOfTapsRequired="1" />
+            </Image.GestureRecognizers>
+        </Image>
+        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.3,0.1" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
         <Frame IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.45,0.7,0.15" BackgroundColor="#222222" CornerRadius="25" BorderColor="#222222">
             <local:ImgButton x:Name="InstallDriverButton"  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.4,0.14" TopTitleText="{local:LngXamlExt Input='Install Driver'}" BottomTitleText="{local:LngXamlExt Input='- no driver installed'}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandInstallDriver}"/>

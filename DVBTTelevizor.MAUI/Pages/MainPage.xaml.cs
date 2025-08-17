@@ -1884,9 +1884,17 @@ namespace DVBTTelevizor.MAUI
                                 DriverStateButton_Clicked(this, new EventArgs());
                             });
                             break;
+                        case "QuickTuneButton":
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                TuneButton_Clicked(this, new EventArgs());
+                            });
+                            break;
                     }
 
                     break;
+
+
             }
         }
 
@@ -2411,6 +2419,16 @@ namespace DVBTTelevizor.MAUI
         private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
         {
 
+        }
+
+        private void TapGestureRecognizer_Tapped_1(object sender, TappedEventArgs e)
+        {
+
+        }
+
+        private void TuneImageTapped(object sender, TappedEventArgs e)
+        {
+            TuneButton_Clicked(this, new EventArgs());
         }
     }
 
