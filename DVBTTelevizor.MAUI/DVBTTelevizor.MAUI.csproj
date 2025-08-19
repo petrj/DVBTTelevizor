@@ -20,10 +20,10 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>DVBTTelevizor.MAUI</ApplicationTitle>
+		<ApplicationTitle>DVBTTelevizor</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.dvbttelevizor.maui</ApplicationId>
+		<ApplicationId>net.petrjanousek.DVBTTelevizor</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -37,9 +37,9 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
 		<!-- debugging setup, remove it when making release! -->
-		<UseFastDeployment>true</UseFastDeployment>
+		<!--UseFastDeployment>true</UseFastDeployment>
 		<UseSharedRuntime>true</UseSharedRuntime>
-		<MandroidLinkMode>None</MandroidLinkMode>
+		<MandroidLinkMode>None</MandroidLinkMode-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
@@ -64,12 +64,13 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
-	  <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
-	  <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
