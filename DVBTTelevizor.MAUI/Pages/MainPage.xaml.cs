@@ -56,7 +56,7 @@ namespace DVBTTelevizor.MAUI
         private MediaPlayer? _mediaPlayer;
         private Media _media;
 
-        private NavigationPage _settingsPage = null;
+        private SettingsPage _settingsPage = null;
         private NavigationPage _tuneWelcomePage = null;
         private NavigationPage _aboutPage = null;
         private NavigationPage _driverPage = null;
@@ -139,7 +139,7 @@ namespace DVBTTelevizor.MAUI
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
-            _settingsPage = new NavigationPage(new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _settingsPage = new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
             _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
             _channelPage = new NavigationPage(new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
@@ -1675,6 +1675,10 @@ namespace DVBTTelevizor.MAUI
                     if (pageOnTop is NavigationPage np)
                     {
                         result = np.CurrentPage;
+                    } else
+                        if (pageOnTop is SettingsPage sp)
+                    {
+                        result = sp;
                     }
                 }
             }
