@@ -626,7 +626,7 @@ namespace DVBTTelevizor.MAUI
                         _viewModel.SelectedChannel.Focused = true;
                         _viewModel.SelectedChannel.NotifyChanges();
                     }
-                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
+                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, animated: false);
                 });
             }
 

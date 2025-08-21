@@ -397,19 +397,20 @@ namespace DVBTTelevizor.MAUI
             {
                 string? uniqueIdentifier = null;
                 Channel? firstChannel = null;
+                Channel? channelToSelect = null;
 
                 try
                 {
                     IsRefreshing = true;
                     var anySelected = false;
 
-                    await _semaphoreSlim.WaitAsync();
-
                     if (SelectedChannel != null)
                     {
                         uniqueIdentifier = SelectedChannel.UniqueIdentifier;
                         SelectedChannel = null;
                     }
+
+                    await _semaphoreSlim.WaitAsync();
 
                     var channels = _configuration.GetChannels();
 
@@ -429,7 +430,7 @@ namespace DVBTTelevizor.MAUI
 
                         if (uniqueIdentifier == ch.UniqueIdentifier)
                         {
-                            SelectedChannel = ch;
+                            channelToSelect = ch;
                             anySelected = true;
                         }
 
@@ -438,7 +439,7 @@ namespace DVBTTelevizor.MAUI
 
                     if (!anySelected && firstChannel != null)
                     {
-                        SelectedChannel = firstChannel;
+                        channelToSelect = firstChannel;
                     }
 
                     _loggingService.Debug($"Channels refreshed");
@@ -451,7 +452,9 @@ namespace DVBTTelevizor.MAUI
                 {
                     _semaphoreSlim.Release();
 
-                    //NotifyEPGDetailVisibilityChange();
+                    SelectedChannel = channelToSelect;
+
+                    NotifyEPGDetailVisibilityChange();
 
                     IsRefreshing = false;
                     Refreshed = true;
