@@ -57,10 +57,10 @@ namespace DVBTTelevizor.MAUI
         private Media _media;
 
         private SettingsPage _settingsPage = null;
-        private NavigationPage _tuneWelcomePage = null;
-        private NavigationPage _aboutPage = null;
-        private NavigationPage _driverPage = null;
-        private NavigationPage _channelPage = null;
+        private TuningWelcomePage _tuneWelcomePage = null;
+        private AboutPage _aboutPage = null;
+        private DriverPage _driverPage = null;
+        private ChannelPage _channelPage = null;
 
         private bool IsPortrait { get; set; } = false;
 
@@ -140,9 +140,10 @@ namespace DVBTTelevizor.MAUI
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
 
             _settingsPage = new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
-            _aboutPage = new NavigationPage(new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
-            _driverPage = new NavigationPage(new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
-            _channelPage = new NavigationPage(new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider));
+            _aboutPage = new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
+            _driverPage = new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
+            _channelPage = new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
+            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, _publicDirectoryProvider);
 
             _channelPage.Disappearing += _channelPage_Disappearing;
 
@@ -1032,8 +1033,6 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            _tuneWelcomePage = new NavigationPage(new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, _publicDirectoryProvider));
-
             await Navigation.PushAsync(_tuneWelcomePage);
         }
 
@@ -1676,9 +1675,9 @@ namespace DVBTTelevizor.MAUI
                     {
                         result = np.CurrentPage;
                     } else
-                        if (pageOnTop is SettingsPage sp)
+                    if (pageOnTop is Page p)
                     {
-                        result = sp;
+                        result = p;
                     }
                 }
             }
@@ -1970,11 +1969,8 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            if (_channelPage.RootPage is ChannelPage p)
-            {
-                p.Channel = channel;
-                p.Channels = _viewModel.Channels;
-            }
+            _channelPage.Channel = channel;
+            _channelPage.Channels = _viewModel.Channels;
 
             await Navigation.PushAsync(_channelPage);
         }
