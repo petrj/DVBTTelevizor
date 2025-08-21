@@ -22,7 +22,6 @@ namespace DVBTTelevizor
         public long Frequency { get; set; }
         public long ProgramMapPID { get; set; }
         public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
-        public DVBTDriverServiceType ServiceType { get; set; } = DVBTDriverServiceType.Other;
         public EventItem? CurrentEventItem { get; set; } = null;
         public EventItem? NextEventItem { get; set; } = null;
 
@@ -223,26 +222,21 @@ namespace DVBTTelevizor
                     res = "DVBT2";
                 }
 
-                switch (SimplifiedServiceType)
+                switch (ServiceType)
                 {
                     case DVBTDriverServiceType.Radio:
                     case DVBTDriverServiceType.TV:
-                        return $"{res} {SimplifiedServiceType}";
+                        return $"{res} {ServiceType}";
                     default:
                         return $"{res}";
                 }
             }
         }
 
-        public DVBTDriverServiceType SimplifiedServiceType
+        public DVBTDriverServiceType ServiceType
         {
             get
             {
-                if (Type == ServiceTypeEnum.Other)
-                {
-                    return ServiceType;
-                }
-
                 switch (Type)
                 {
                     case ServiceTypeEnum.DigitalRadioSoundService:
@@ -399,7 +393,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                switch (SimplifiedServiceType)
+                switch (ServiceType)
                 {
                     case DVBTDriverServiceType.TV: return "tv.png";
                     case DVBTDriverServiceType.Radio: return "radio.png";
@@ -440,7 +434,6 @@ namespace DVBTTelevizor
             channel.Frequency = Frequency;
             channel.Bandwdith = Bandwdith;
             channel.ProgramMapPID = ProgramMapPID;
-            channel.ServiceType = ServiceType;
             channel.Type = Type;
             channel.Bandwdith = Bandwdith;
             channel.DVBTType = DVBTType;

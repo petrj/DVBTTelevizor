@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Windows.Input;
 
@@ -420,6 +421,19 @@ namespace DVBTTelevizor.MAUI
 
                     foreach (var channel in channels)
                     {
+                        // apply filter:
+                        if (!_configuration.ShowTVChannels && channel.ServiceType == DVBTDriverServiceType.TV)
+                            continue;
+
+                        if (!_configuration.ShowRadioChannels && channel.ServiceType == DVBTDriverServiceType.Radio)
+                            continue;
+
+                        if (!_configuration.ShowOtherChannels && channel.ServiceType == DVBTDriverServiceType.Other)
+                            continue;
+
+                        if (!_configuration.ShowNonFreeChannels && channel.NonFree)
+                            continue;
+
                         var ch = channel.Clone();
                         ch.Selected = false;
 

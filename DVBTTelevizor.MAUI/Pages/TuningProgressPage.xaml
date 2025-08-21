@@ -15,6 +15,7 @@
 
             <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
                 <Setter Property="Color" Value="Blue"/>
+                <Setter Property="IsEnabled" Value="False"/>
             </Style>
 
             <Style x:Key="LabelStyle" TargetType="Label">

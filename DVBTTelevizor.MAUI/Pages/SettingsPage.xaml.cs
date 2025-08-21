@@ -410,7 +410,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 var view = focusedItem.GetFirstView();
                 if (view != null)
                 {
-                    await SettingsScrollView.ScrollToAsync(view, ScrollToPosition.Start, animated: false);
+                    await SettingsScrollView.ScrollToAsync(view, ScrollToPosition.MakeVisible, animated: false);
                 }
             }
         } catch (Exception ex)
@@ -450,6 +450,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _focusItems.FocusPreviousItem();
+                    ScrollToFocusedItem();
 
                 });
                 break;
