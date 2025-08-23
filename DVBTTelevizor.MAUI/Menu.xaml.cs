@@ -46,6 +46,7 @@ public partial class Menu : ContentView
             {
                 vm.MenuVisible = value;
             }
+            MenuScrollView.ScrollToAsync(0, 0, false);
             OnPropertyChanged(nameof(MenuVisible));
         }
     }
@@ -75,4 +76,59 @@ public partial class Menu : ContentView
 
         return item;
     }
+
+    public async Task SelectNextMenuItem(IEnumerable<MenuItem> menuItems, bool reverse)
+    {
+        var now = false;
+        var selected = false;
+        MenuItem first = null;
+        var menuIndex = reverse ? MenuLayout.Children.Count - 1 : 0;
+
+        foreach (var item in (reverse ? menuItems.AsEnumerable().Reverse() : menuItems))
+        {
+            if (first == null)
+            {
+                first = item;
+            }
+
+            if (now)
+            {
+                item.Selected = true;
+                selected = true;
+                item.Update();
+
+                await MenuScrollView.ScrollToAsync(MenuLayout.Children[menuIndex] as Element, ScrollToPosition.MakeVisible, false);
+                break;
+            }
+            else
+            if (item.Selected)
+            {
+                item.Selected = false;
+                item.Update();
+                now = true;
+            }
+
+            if (reverse)
+            {
+                menuIndex--;
+            }
+            else
+            {
+                menuIndex++;
+            }
+        }
+
+        if (!selected && first != null)
+        {
+            first.Selected = true;
+            first.Update();
+
+            var firstItemIndex = reverse ? MenuLayout.Children.Count - 1 : 0;
+            await MenuScrollView.ScrollToAsync(MenuLayout.Children[firstItemIndex] as Element, ScrollToPosition.MakeVisible, false);
+        }
+    }
+
+
+
+
 }

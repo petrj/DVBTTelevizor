@@ -353,9 +353,7 @@
         </Image>
         <Button x:Name="QuickDriverButton" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.3,0.1" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="QuickDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
-        <ScrollView x:Name="MainMenuScrollView" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}">
-            <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped"  />
-        </ScrollView>
+         <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
         <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.5,0.25"  Color="Green"/-->
 

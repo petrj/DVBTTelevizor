@@ -25,37 +25,39 @@
 
             <Label x:Name="MenuLabel" Text="{Binding Title}" TextColor="White" HorizontalOptions="Center" Margin="0,0,0,50"  FontSize="{Binding FontSizeForLabel}"/>
 
-            <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <ScrollView x:Name="MenuScrollView" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" VerticalScrollBarVisibility="Always">
+                <StackLayout x:Name="MenuItemsStackLayout" BindableLayout.ItemsSource="{Binding MenuItems, Mode=OneWay}"  BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
 
-                        <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="{Binding Margin}" Padding="0,0,0,0" BorderColor="White" IsVisible="true">
+                            <Frame CornerRadius="25" BackgroundColor="{Binding BackgroundColor}" Margin="{Binding Margin}" Padding="0,0,0,0" BorderColor="White" IsVisible="true">
 
-                            <Grid RowSpacing="0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20*" />
-                                    <ColumnDefinition Width="80*" />
-                                </Grid.ColumnDefinitions>
+                                <Grid RowSpacing="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20*" />
+                                        <ColumnDefinition Width="80*" />
+                                    </Grid.ColumnDefinitions>
 
-                                <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                                    <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                                <Image Grid.Row="0" Grid.Column="0" Source="{Binding ImgSource}" VerticalOptions="Center" HorizontalOptions="End" HeightRequest="30"  />
-                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="Start"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
-                            </Grid>
+                                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding ImgSource}" VerticalOptions="Center" HorizontalOptions="End" HeightRequest="30"  />
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Title, Mode=OneWay}" VerticalOptions="Center" HorizontalOptions="Start"  Style="{DynamicResource ListLabelStyle}" FontSize="{Binding Source={x:Reference MenuItemsStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                                </Grid>
 
-                            <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding Id}" />
-                            </Frame.GestureRecognizers>
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding Id}" />
+                                </Frame.GestureRecognizers>
 
-                        </Frame>
+                            </Frame>
 
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </StackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </ScrollView>
         </StackLayout>
     </Frame>
 

@@ -334,41 +334,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         return null;
     }
 
-    private void SelectNextMenuItem(bool reverse)
-    {
-        var now = false;
-        var selected = false;
-        MenuItem first = null;
-
-        foreach (var item in (reverse ? _menuItems.AsEnumerable().Reverse() : _menuItems))
-        {
-            if (first == null)
-            {
-                first = item;
-            }
-
-            if (now)
-            {
-                item.Selected = true;
-                selected = true;
-                item.Update();
-                break;
-            }
-            else
-            if (item.Selected)
-            {
-                item.Selected = false;
-                item.Update();
-                now = true;
-            }
-        }
-
-        if (!selected && first != null)
-        {
-            first.Selected = true;
-            first.Update();
-        }
-    }
 
     private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
     {
@@ -376,12 +341,18 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         {
             case KeyboardNavigationActionEnum.Right:
             case KeyboardNavigationActionEnum.Down:
-                SelectNextMenuItem(false);
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(_menuItems, false);
+                });
                 break;
 
             case KeyboardNavigationActionEnum.Left:
             case KeyboardNavigationActionEnum.Up:
-                SelectNextMenuItem(true);
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(_menuItems, true);
+                });
                 break;
 
             case KeyboardNavigationActionEnum.Back:

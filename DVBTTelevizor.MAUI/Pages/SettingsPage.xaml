@@ -445,9 +445,7 @@
 
         </ScrollView>
 
-        <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}">
-            <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped"  />
-        </ScrollView>
+        <local:Menu x:Name="MainMenu"  Tapped="Menu_Tapped" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" />
 
     </AbsoluteLayout>
 
