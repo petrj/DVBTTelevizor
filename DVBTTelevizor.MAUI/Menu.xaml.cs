@@ -50,6 +50,13 @@ public partial class Menu : ContentView
         }
     }
 
+    public StackLayout MenuLayout
+    {
+        get
+        {
+            return MenuItemsStackLayout;
+        }
+    }
 
     public MenuItem CreateMenuItem(string id, string title, string img, bool delimitterFollows = false)
     {

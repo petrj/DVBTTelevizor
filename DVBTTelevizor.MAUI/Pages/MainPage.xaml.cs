@@ -1621,6 +1621,7 @@ namespace DVBTTelevizor.MAUI
             {
                 MainMenu.MenuVisible = true;
                 _viewModel.MenuVisible = true;
+                await MainMenuScrollView.ScrollToAsync(0, 0, false);
             });
         }
 
@@ -1759,7 +1760,7 @@ namespace DVBTTelevizor.MAUI
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
                         {
                             // scroll down
-                            SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                            await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                                 SelectedChannelEPGDescriptionScrollView.ScrollX,
                                 SelectedChannelEPGDescriptionScrollView.ScrollY + 50, false);
                         }
@@ -1789,7 +1790,7 @@ namespace DVBTTelevizor.MAUI
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
                         {
                             // scroll up
-                            SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                            await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                                 SelectedChannelEPGDescriptionScrollView.ScrollX,
                                 SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
                         }
@@ -1898,11 +1899,12 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
-        private void SelectNextMenuItem(bool reverse)
+        private async Task SelectNextMenuItem(bool reverse)
         {
             var now = false;
             var selected = false;
             MenuItem first = null;
+            var menuIndex = reverse ? MainMenu.MenuLayout.Children.Count - 1 : 0;
 
             foreach (var item in (reverse ? _menuItems.AsEnumerable().Reverse() : _menuItems))
             {
@@ -1916,6 +1918,8 @@ namespace DVBTTelevizor.MAUI
                     item.Selected = true;
                     selected = true;
                     item.Update();
+
+                    await MainMenuScrollView.ScrollToAsync(MainMenu.MenuLayout.Children[menuIndex] as Element, ScrollToPosition.MakeVisible, false);
                     break;
                 }
                 else
@@ -1925,12 +1929,24 @@ namespace DVBTTelevizor.MAUI
                     item.Update();
                     now = true;
                 }
+
+                if (reverse)
+                {
+                    menuIndex--;
+                }
+                else
+                {
+                    menuIndex++;
+                }
             }
 
             if (!selected && first != null)
             {
                 first.Selected = true;
                 first.Update();
+
+                var firstItemIndex = reverse ? MainMenu.MenuLayout.Children.Count - 1 : 0;
+                await MainMenuScrollView.ScrollToAsync(MainMenu.MenuLayout.Children[firstItemIndex] as Element, ScrollToPosition.MakeVisible, false);
             }
         }
 
@@ -1940,12 +1956,18 @@ namespace DVBTTelevizor.MAUI
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
-                    SelectNextMenuItem(false);
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await SelectNextMenuItem(false);
+                    });
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
                 case KeyboardNavigationActionEnum.Up:
-                    SelectNextMenuItem(true);
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await SelectNextMenuItem(true);
+                    });
                     break;
 
                 case KeyboardNavigationActionEnum.Back:
