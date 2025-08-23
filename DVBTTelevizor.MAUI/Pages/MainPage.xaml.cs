@@ -1898,8 +1898,6 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
-
-
         private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
         {
             switch (keyAction)

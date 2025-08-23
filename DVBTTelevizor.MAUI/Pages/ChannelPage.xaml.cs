@@ -19,6 +19,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private string? _previousName = null;
     private string? _previousNumber = null;
 
+    private List<MenuItem> _menuItems = new List<MenuItem>();
     private KeyboardFocusableItemList _focusItems;
 
     public ChannelPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
@@ -130,9 +131,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
             ShowMenu();
 
-            var subtitleItems = new List<MenuItem>();
-
-            subtitleItems.Clear();
+           _menuItems = new List<MenuItem>();
 
             int index = 0;
             foreach (var sub in Channel.Subtitles)
@@ -142,14 +141,14 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 {
                     title += " *";
                 }
-                subtitleItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "audio.png", index > _channelPageViewModel.Subtitles.Count -1));
+                _menuItems.Add(MainMenu.CreateMenuItem($"setSubtitles:{sub.Key}", title, "audio.png", index > _channelPageViewModel.Subtitles.Count -1));
                 index++;
             }
 
-            subtitleItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
-            subtitleItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-            MainMenu.UpdateMenu("Subtitles menu".Translated(), subtitleItems);
+            MainMenu.UpdateMenu("Subtitles menu".Translated(), _menuItems);
 
             ShowMenu();
 
@@ -172,9 +171,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
             ShowMenu();
 
-            var audioMenuItems = new List<MenuItem>();
-
-            audioMenuItems.Clear();
+            _menuItems = new List<MenuItem>();
 
             int index = 0;
             foreach (var track in Channel.AudioTracks)
@@ -184,14 +181,14 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 {
                     title += " *";
                 }
-                audioMenuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count-1));
+                _menuItems.Add(MainMenu.CreateMenuItem($"setAudio:{track.Key}", title, "audio.png", index > _channelPageViewModel.AudioTracks.Count-1));
                 index++;
             }
 
-            audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
-            audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-            MainMenu.UpdateMenu("Audio menu".Translated(), audioMenuItems);
+            MainMenu.UpdateMenu("Audio menu".Translated(), _menuItems);
 
             ShowMenu();
 
@@ -213,16 +210,14 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
             ShowMenu();
 
-            var menuItems = new List<MenuItem>();
+            _menuItems = new List<MenuItem>();
 
+            _menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDeleteChannel", "Yes".Translated(), "confirm.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuNo", "No".Translated(), "cancel.png"));
 
-            menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDeleteChannel", "Yes".Translated(), "confirm.png"));
-            menuItems.Add(MainMenu.CreateMenuItem("menuNo", "No".Translated(), "cancel.png"));
-
-            MainMenu.UpdateMenu("Are you sure to delete channel".Translated() + $" {Channel.Name}?", menuItems);
+            MainMenu.UpdateMenu("Are you sure to delete channel".Translated() + $" {Channel.Name}?", _menuItems);
 
             ShowMenu();
-
         }
         catch (Exception ex)
         {
@@ -388,11 +383,67 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
 
+    private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+            case KeyboardNavigationActionEnum.Down:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(_menuItems, false);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Left:
+            case KeyboardNavigationActionEnum.Up:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(_menuItems, true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Back:
+                HideMenu();
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+                var id = GetSelectedMenuId();
+                if (id != null)
+                {
+                    Menu_Tapped(id);
+                }
+                break;
+        }
+    }
+
+    private string GetSelectedMenuId()
+    {
+        foreach (var item in _menuItems)
+        {
+            if (item.Selected)
+            {
+                return item.Id;
+            }
+        }
+
+        return null;
+    }
+
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"ChannelPage Page OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+        if (MainMenu.MenuVisible)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnMenuKeyDown(keyAction);
+            });
+            return;
+        }
 
         switch (keyAction)
         {
