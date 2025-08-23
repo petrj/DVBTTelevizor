@@ -45,6 +45,8 @@ namespace DVBTTelevizor.MAUI
         private List<MenuItem> _audioMenuItems = new List<MenuItem>();
         private List<MenuItem> _aspectMenuItems = new List<MenuItem>();
 
+        private List<MenuItem> _activeMenuItems = null;
+
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
 
@@ -1887,7 +1889,10 @@ namespace DVBTTelevizor.MAUI
 
         private string GetSelectedMenuId()
         {
-            foreach (var item in _menuItems)
+            if (_activeMenuItems == null)
+                return null;
+
+            foreach (var item in _activeMenuItems)
             {
                 if (item.Selected)
                 {
@@ -1904,17 +1909,17 @@ namespace DVBTTelevizor.MAUI
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    Task.Run(async () =>
                     {
-                        await  MainMenu.SelectNextMenuItem(_menuItems, false);
+                        await  MainMenu.SelectNextMenuItem(_activeMenuItems, false);
                     });
                     break;
 
                 case KeyboardNavigationActionEnum.Left:
                 case KeyboardNavigationActionEnum.Up:
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    Task.Run(async () =>
                     {
-                        await MainMenu.SelectNextMenuItem(_menuItems, true);
+                        await MainMenu.SelectNextMenuItem(_activeMenuItems, true);
                     });
                     break;
 
@@ -2008,6 +2013,7 @@ namespace DVBTTelevizor.MAUI
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
+                _activeMenuItems = _audioMenuItems;
                 MainMenu.UpdateMenu("Audio menu".Translated(), _audioMenuItems);
 
             }
@@ -2052,6 +2058,7 @@ namespace DVBTTelevizor.MAUI
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
+                _activeMenuItems = _subtitleMenuItems;
                 MainMenu.UpdateMenu("Subtitles menu".Translated(), _subtitleMenuItems);
 
             }
@@ -2084,6 +2091,7 @@ namespace DVBTTelevizor.MAUI
                 _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
                 _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
+                _activeMenuItems = _aspectMenuItems;
                 MainMenu.UpdateMenu("Aspect menu".Translated(), _aspectMenuItems);
 
             }
@@ -2298,7 +2306,7 @@ namespace DVBTTelevizor.MAUI
             _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
             // _menuItems.First().Selected = true;
-
+            _activeMenuItems = _menuItems;
             MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
             //FitMenuSize();
         }
