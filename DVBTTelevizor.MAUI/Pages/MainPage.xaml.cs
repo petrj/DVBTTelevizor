@@ -9,6 +9,7 @@ using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 using System.Windows.Input;
@@ -104,6 +105,12 @@ namespace DVBTTelevizor.MAUI
             PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
             _configuration = tvConfiguration;
+
+            Task.Run(async () =>
+            {
+                await ExtractAssetFile("Czech.lng");
+                await ExtractAssetFile("Azerbaijani.lng");
+            });
 
             // language
             Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
@@ -235,6 +242,31 @@ namespace DVBTTelevizor.MAUI
                     await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
                     WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
                 });
+            }
+        }
+
+        private async Task ExtractAssetFile(string sourceFileName)
+        {
+            try
+            {
+                string lngFolder = Path.Combine(PublicDirectory, "lng");
+                if (!Directory.Exists(lngFolder))
+                {
+                    Directory.CreateDirectory(lngFolder);
+                }
+
+                string destPath = Path.Combine(lngFolder, sourceFileName);
+
+                if (!File.Exists(destPath)) // only copy if it doesn’t already exist
+                {
+                    using var stream = await FileSystem.OpenAppPackageFileAsync(sourceFileName);
+                    using var destStream = File.Create(destPath);
+                    await stream.CopyToAsync(destStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error extracting asset file: {ex}");
             }
         }
 

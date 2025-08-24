@@ -188,6 +188,11 @@
 	    <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
 	  </Compile>
 	</ItemGroup>
+	
+   <ItemGroup>
+	 <AndroidAsset Include="Resources\Raw\Azerbaijani.lng" />
+	 <AndroidAsset Include="Resources\Raw\Czech.lng" />
+   </ItemGroup>	
 
 	<ItemGroup>
 	  <MauiXaml Update="Menu.xaml">
