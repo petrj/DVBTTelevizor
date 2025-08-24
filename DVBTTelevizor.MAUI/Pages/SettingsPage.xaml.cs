@@ -251,7 +251,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         }
     }
 
-    private void BuildErrorMenu(string title, string titleOK)
+    private void BuildInfoMenu(string title, string titleOK)
     {
         ShowOrHideMenu();
 
@@ -329,6 +329,12 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             {
                 return item.Id;
             }
+        }
+
+        // if menu contains only single OK button, return ""menuOK""
+        if ((_menuItems.Count == 1) && (_menuItems[0].Id == "menuOK"))
+        {
+            return "menuOK";
         }
 
         return null;
@@ -495,6 +501,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
                         case "RemoteAccessEnabled":
                             RemoteAccessSwitch.IsToggled = !RemoteAccessSwitch.IsToggled;
+                            BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
                             break;
 
                         case "RemoteAccessIP":
@@ -527,6 +534,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
                         case "EnableLogging":
                             EnableLoggingSwitch.IsToggled = !EnableLoggingSwitch.IsToggled;
+                            BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
                             break;
 
                         case "UDPIPLogging":
@@ -590,7 +598,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         {
             if (!File.Exists(_settingsPageViewModel.AndroidChannelsListPath))
             {
-                BuildErrorMenu("File does not exist".Translated(), "OK".Translated());
+                BuildInfoMenu("File does not exist".Translated(), "OK".Translated());
                 return;
             }
 

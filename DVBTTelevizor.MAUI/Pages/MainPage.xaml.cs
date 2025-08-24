@@ -120,7 +120,17 @@ namespace DVBTTelevizor.MAUI
 
             InitializeComponent();
 
-            _loggingService = loggingProvider.GetLoggingService();
+#if DEBUG
+            _configuration.EnableLogging = true;
+#endif
+
+            if (_configuration.EnableLogging)
+            {
+                _loggingService = loggingProvider.GetLoggingService();
+            } else
+            {
+                _loggingService = new DummyLoggingService();
+            }
 
             _loggingService.Info("MainPage starting");
 

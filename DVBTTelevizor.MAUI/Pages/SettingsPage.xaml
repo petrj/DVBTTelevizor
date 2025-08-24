@@ -407,6 +407,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
@@ -416,26 +417,16 @@
                         <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding EnableLogging, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding Config.EnableLogging, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
 
-                        <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/DVBTTelevizor.log" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}" IsVisible="{Binding EnableLogging}"/>
 
-                        <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='UDP IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Entry Grid.Row="1" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}"/>
+                        <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='UDP IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="2" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}"/>
 
                     </Grid>
-
-                    <Grid Margin="30,10,0,0" IsVisible="{Binding EnableLogging}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Label  Grid.Row="0" Grid.Column="0" Text="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/DVBTTelevizor.log" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-                    </Grid>
-
 
                 </StackLayout>
 
