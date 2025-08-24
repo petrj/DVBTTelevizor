@@ -22,6 +22,11 @@
                 <Setter Property="CornerRadius" Value="7"/>
             </Style>
 
+            <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="Color" Value="Blue"/>
+                <Setter Property="IsEnabled" Value="False"/>
+            </Style>
+
             <Style x:Key="EntryStyle" TargetType="Entry">
                 <Setter Property="TextColor" Value="Yellow"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
@@ -67,7 +72,7 @@
 
                     <BoxView x:Name="NameBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Name" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Name'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                     <Entry Grid.Row="0" Grid.Column="2"
                                        Margin="0,2,0,2"
                                        x:Name="EntryName"
@@ -92,7 +97,7 @@
 
                     <BoxView x:Name="NumberBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
 
-                    <Label Grid.Row="0" Grid.Column="0" Text="Number" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                    <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Number'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                     <Entry Grid.Row="0" Grid.Column="2"
                                        Margin="0,2,0,2"
                                        x:Name="EntryNumber"
@@ -114,66 +119,66 @@
                         <ColumnDefinition Width="50*" />
                     </Grid.ColumnDefinitions>
 
-                    <Button x:Name="ButtonUp" Grid.Row="0" Grid.Column="0" Text="Move up" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}"  Clicked="ButtonUp_Clicked"/>
-                    <Button x:Name="ButtonDown" Grid.Row="0" Grid.Column="1" Text="Move down" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDown_Clicked" />
+                    <Button x:Name="ButtonUp" Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Move up'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}"  Clicked="ButtonUp_Clicked"/>
+                    <Button x:Name="ButtonDown" Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Move down'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDown_Clicked" />
 
                 </Grid>
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Provider" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Provider'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.ProviderName}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Frequency" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.FrequencyLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Free" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
-                <Label Margin="10,0,10,10" Text="{Binding Channel.FreeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Free'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                <CheckBox HorizontalOptions="End" Style="{DynamicResource CheckBoxStyle}" IsChecked="{Binding Channel.Free}" IsEnabled="False"/>
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Bandwidth" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Bandwidth'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.BandwdithLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="DVBT Type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='DVBT Type'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Service type" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Service type'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.ServiceTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" x:Name="MapPIDBoxView"></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Map PID" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Map PID'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Signal strength" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Signal strength'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SignalStrengthVisible}" />
                 <Label Margin="10,0,10,10" Text="{Binding SignalStrength}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding SignalStrengthVisible}" />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}"  IsVisible="{Binding SignalStrengthVisible}"></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Bitrate" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamBitRateVisible}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Bitrate'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamBitRateVisible}" />
                 <Label Margin="10,0,10,10" Text="{Binding Bitrate}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamBitRateVisible}" />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamBitRateVisible}" ></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Stream video size" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamInfoVisible}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Stream video size'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding StreamInfoVisible}" />
                 <Label Margin="10,0,10,10" Text="{Binding StreamVideoSize}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StreamInfoVisible}" />
 
                 <Label Margin="10,0,10,0" x:Name="KeyStop03" HeightRequest="0" />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}"></BoxView>
 
-                <Label Margin="10,0,10,0" Text="Audio tracks" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding AudioTracksInfoVisible}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Audio tracks'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding AudioTracksInfoVisible}" />
                 <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding AudioTracks, Mode=OneWay}" IsVisible="{Binding AudioTracksInfoVisible}" x:Name="AudioTracksStackLayout">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
@@ -183,11 +188,11 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
-                <Button Margin="60,20,10,10" x:Name="ButtonChangeAudio" Text="Change" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
+                <Button Margin="60,20,10,10" x:Name="ButtonChangeAudio" Text="{local:LngXamlExt Input='Change'}" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeAudio_Clicked" />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}" />
 
-                <Label Margin="10,0,10,0" Text="Subtitles" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SubtitlesTracksInfoVisible}" />
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Subtitles'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" IsVisible="{Binding SubtitlesTracksInfoVisible}" />
                 <StackLayout Margin="10,0,10,0" BindableLayout.ItemsSource="{Binding Subtitles, Mode=OneWay}" IsVisible="{Binding SubtitlesTracksInfoVisible}" x:Name="SubtitlesStackLayout">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
@@ -197,11 +202,11 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
-                <Button Margin="60,20,10,10" x:Name="ButtonChangeSubtitles" Text="Change" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
+                <Button Margin="60,20,10,10" x:Name="ButtonChangeSubtitles" Text="{local:LngXamlExt Input='Change'}" IsVisible="{Binding SubtitlesTracksInfoVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonChangeSubtitles_Clicked" />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}" />
 
-                <Button Margin="60,20,10,0" x:Name="ButtonDeleteChannel" Text="Delete"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
+                <Button Margin="60,20,10,0" x:Name="ButtonDeleteChannel" Text="{local:LngXamlExt Input='Delete'}"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
 
             </StackLayout>
 

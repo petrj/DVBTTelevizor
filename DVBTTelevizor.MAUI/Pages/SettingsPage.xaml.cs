@@ -24,6 +24,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
+    private string _lngBefore = "";
 
     private KeyboardFocusableItemList _focusItems;
     private List<MenuItem> _menuItems = new List<MenuItem>();
@@ -45,6 +46,15 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         WriteToExternalDeviceSwitch.Toggled += WriteToExternalDeviceSwitch_Toggled;
 
         BuildFocusableItems();
+
+        LanguagePicker.Focused += delegate { _lngBefore = _configuration.Language; };
+        LanguagePicker.Unfocused += delegate
+        {
+            if (_lngBefore != _configuration.Language)
+            {
+                BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
+            }
+        };
     }
 
     private void WriteToExternalDeviceSwitch_Toggled(object? sender, ToggledEventArgs e)
@@ -308,6 +318,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     public static void ShowPicker(Picker picker)
     {
+        picker.Focus();
+
 #if ANDROID
         var spinner = picker.Handler?.PlatformView as Android.Widget.Spinner;
         spinner?.PerformClick();

@@ -139,11 +139,11 @@ namespace DVBTTelevizor
             }
         }
 
-        public string FreeLabel
+        public bool Free
         {
             get
             {
-                return NonFree ? "No (CA)" : "Yes";
+                return !NonFree;
             }
         }
 

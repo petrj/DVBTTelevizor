@@ -50,7 +50,7 @@
         <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.4" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
 
         <StackLayout AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.25" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Spacing="10">
-                <Label Text="Free DVBT/DVBT2 TV Player"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
+                <Label Text="{local:LngXamlExt Input='Free DVBT/DVBT2 TV Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
                 <Label Text="https://github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
                 <Label Text="https://www.dvbttelevizor.petrjanousek.net/"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
                 <Label Text="email@petrjanousek.net"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
