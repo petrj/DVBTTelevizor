@@ -110,20 +110,20 @@ namespace DVBTTelevizor.MAUI
             {
                 await ExtractAssetFile("Czech.lng");
                 await ExtractAssetFile("Azerbaijani.lng");
-            });
 
-            // language
-            Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
+                // language
+                Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
 
-            if (!String.IsNullOrEmpty(_configuration.Language))
-            {
-                var languageFileName = Path.Join(PublicDirectory, "lng", $"{_configuration.Language}.lng");
-
-                if (File.Exists(languageFileName))
+                if (!String.IsNullOrEmpty(_configuration.Language))
                 {
-                    Lng.LoadLanguage(languageFileName);
+                    var languageFileName = Path.Join(PublicDirectory, "lng", $"{_configuration.Language}.lng");
+
+                    if (File.Exists(languageFileName))
+                    {
+                        Lng.LoadLanguage(languageFileName);
+                    }
                 }
-            }
+            });
 
             InitializeComponent();
 
