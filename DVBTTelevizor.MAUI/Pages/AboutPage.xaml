@@ -26,10 +26,10 @@
 
             <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
-                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="VerticalOptions" Value="Center" />
-                <Setter Property="HorizontalOptions" Value="End" />
+                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
             </Style>
 
             <Style x:Key="DonateButtonStyle" TargetType="Button">
@@ -49,12 +49,40 @@
 
         <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.4" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
 
-        <StackLayout AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.25" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Spacing="10">
-                <Label Text="{local:LngXamlExt Input='Free DVBT/DVBT2 TV Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label Text="https://github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label Text="https://www.dvbttelevizor.petrjanousek.net/"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
-                <Label Text="email@petrjanousek.net"  Style="{DynamicResource LabelStyle}" HorizontalOptions="Center" VerticalOptions="Start"/>
-        </StackLayout>
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.75,0.8,0.2" AbsoluteLayout.LayoutFlags="All" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='Free DVBT/DVBT2 Android Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+
+            <BoxView Grid.Column="0" Grid.Row="1" x:Name="GithubBoxView" />
+            <Label Grid.Column="0" Grid.Row="1" x:Name="GithubLabel"  Text="https://github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" TextDecorations="Underline">
+                <Label.GestureRecognizers >
+                    <TapGestureRecognizer Tapped="GithubLabel_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <BoxView Grid.Column="0" Grid.Row="2" x:Name="WebBoxView" />
+            <Label Grid.Column="0" Grid.Row="2" x:Name="WebLabel"  Text="https://www.dvbttelevizor.petrjanousek.net/"  Style="{DynamicResource LabelStyle}" TextDecorations="Underline">
+                <Label.GestureRecognizers >
+                    <TapGestureRecognizer Tapped="Web_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <BoxView Grid.Column="0" Grid.Row="3" x:Name="EmailBoxView" />
+            <Label Grid.Column="0" Grid.Row="3" Text="petrjanousek.net@gmail.com"  Style="{DynamicResource LabelStyle}">
+                <Label.GestureRecognizers >
+                    <TapGestureRecognizer Tapped="Email_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
 
         <Grid AbsoluteLayout.LayoutBounds="1,0.95,1,0.1" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>

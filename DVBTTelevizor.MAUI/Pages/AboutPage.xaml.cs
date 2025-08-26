@@ -35,6 +35,9 @@ public partial class AboutPage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("GithubLabel", new List<View>() { GithubBoxView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("WebLabel", new List<View>() { WebBoxView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Email", new List<View>() { EmailBoxView }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Donate3", new List<View>() { Donate3Button }))
@@ -91,6 +94,15 @@ public partial class AboutPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
+                        case "GithubLabel":
+                            GithubLabel_Tapped(this, new TappedEventArgs(null));
+                            break;
+                        case "WebLabel":
+                            Web_Tapped(this, new TappedEventArgs(null));
+                            break;
+                        case "Email":
+                            Email_Tapped(this, new TappedEventArgs(null));
+                            break;
                         case "Donate1":
                             _loggingService.Debug($"AboutPage: Donate1");
                             break;
@@ -112,5 +124,38 @@ public partial class AboutPage : ContentPage, IOnKeyDown
     public void OnTextSent(string text)
     {
         _loggingService.Debug($"AboutPage Page OnTextSent {text}");
+    }
+
+    private void GithubLabel_Tapped(object sender, TappedEventArgs e)
+    {
+        _loggingService.Debug($"GithubLabel_Tapped");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Browser.OpenAsync("https://github.com/petrj/DVBTTelevizor", BrowserLaunchMode.External);
+        });
+    }
+
+    private void Web_Tapped(object sender, TappedEventArgs e)
+    {
+        _loggingService.Debug($"Web_Tapped");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Browser.OpenAsync("https://www.dvbttelevizor.petrjanousek.net/", BrowserLaunchMode.External);
+        });
+    }
+
+    private void Email_Tapped(object sender, TappedEventArgs e)
+    {
+        _loggingService.Debug($"Email_Tapped");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Email.Default.ComposeAsync(new EmailMessage
+            {
+                To = new List<string> { "petrjanousek.net@gmail.com" }
+            });
+        });
     }
 }
