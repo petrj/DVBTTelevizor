@@ -175,7 +175,9 @@
                 <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
             </StackLayout.GestureRecognizers>
             <StackLayout.Behaviors>
-                <toolkit:TouchBehavior LongPressDuration="750" LongPressCommand="{Binding LongVideoPressCommand}" />
+                <toolkit:TouchBehavior
+                    LongPressCompleted="OnLongPress"
+                    LongPressDuration="750" />
             </StackLayout.Behaviors>
         </StackLayout>
 

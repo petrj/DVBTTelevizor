@@ -53,7 +53,6 @@ namespace DVBTTelevizor.MAUI
 
         private bool _checkStreamEnabled = true;
         public Command CommandCheckStream { get; set; }
-        public Command LongVideoPressCommand { get; set; }
 
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
@@ -225,16 +224,6 @@ namespace DVBTTelevizor.MAUI
             }
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
 
-            LongVideoPressCommand = new Command(() =>
-            {
-                Task.Run(async () =>
-                {
-                    _loggingService.Info($"LongVideoPressCommand");
-
-                    MenuButton_Clicked(this, new EventArgs());
-                });
-            });
-
             if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
             {
                 Task.Run(async () =>
@@ -243,6 +232,7 @@ namespace DVBTTelevizor.MAUI
                     WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
                 });
             }
+
         }
 
         private async Task ExtractAssetFile(string sourceFileName)
@@ -1729,6 +1719,13 @@ namespace DVBTTelevizor.MAUI
             return result;
         }
 
+        private void OnLongPress(object sender, EventArgs e)
+        {
+            _loggingService.Debug("OnLongPress");
+
+            MenuButton_Clicked(this, new EventArgs());
+        }
+
         public void OnKeyDown(string key, bool longPress)
         {
             _loggingService.Debug($"Main Page OnKeyDown {key}");
@@ -2361,7 +2358,6 @@ namespace DVBTTelevizor.MAUI
 
         private void VideoStackLayout_DoubleTapped(object sender, TappedEventArgs e)
         {
-            /*
             if (_viewModel.PlayingState == PlayingStateEnum.Playing)
             {
                 _viewModel.PlayingState = PlayingStateEnum.PlayingInPreview;
@@ -2373,8 +2369,6 @@ namespace DVBTTelevizor.MAUI
             }
 
             RefreshGUI();
-            */
-            MenuButton_Clicked(this, new EventArgs());
         }
 
         private void VideoStackLayout_Tapped(object sender, TappedEventArgs e)
