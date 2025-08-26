@@ -1096,7 +1096,70 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public async Task ActionBack()
+        private async Task ActionOK(bool longPress)
+        {
+            _loggingService.Debug($"ActionOK");
+
+            if (longPress)
+            {
+                _viewModel.MenuVisible = !_viewModel.MenuVisible;
+                return;
+            }
+
+            if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+            {
+                VideoStackLayout_Tapped(this, new TappedEventArgs(null));
+                return;
+            }
+
+            switch (_focusItems.FocusedItemName)
+            {
+                case "ChannelsListView":
+                    Task.Run(async () =>
+                    {
+                        await ActionPlay();
+                    });
+                    break;
+                case "SettingsButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        SettingsButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+                case "TuneButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        TuneButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+                case "DVBTTelevizorButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        DVBTTelevizorButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+                case "MenuButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        MenuButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+                case "DriverStateButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        DriverStateButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+                case "QuickTuneButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        TuneButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+            }
+        }
+
+        public async Task ActionBack(bool longPress)
         {
             _loggingService.Debug($"ActionBack");
 
@@ -1110,10 +1173,11 @@ namespace DVBTTelevizor.MAUI
 
                     if ((_lastBackPressedTime == DateTime.MinValue) || ((DateTime.Now - _lastBackPressedTime).TotalSeconds > 3))
                     {
-                        //if (longPress)
-                        //{
-                        //    MessagingCenter.Send<string>(string.Empty, BaseViewModel.MSG_StopPlayInternalNotificationAndQuit);
-                        //}
+                        if (longPress)
+                        {
+                            WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
+                            return;
+                        }
 
                         WeakReferenceMessenger.Default.Send(new ToastMessage($"Press once again for exit".Translated()));
                         _lastBackPressedTime = DateTime.Now;
@@ -1844,57 +1908,16 @@ namespace DVBTTelevizor.MAUI
                 case KeyboardNavigationActionEnum.Back:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        await ActionBack();
+                        await ActionBack(longPress);
                     });
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
 
-                    switch (_focusItems.FocusedItemName)
+                    Task.Run(async () =>
                     {
-                        case "ChannelsListView":
-                            Task.Run(async () =>
-                            {
-                                await ActionPlay();
-                            });
-                            break;
-                        case "SettingsButton":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                SettingsButton_Clicked(this, new EventArgs());
-                            });
-                            break;
-                        case "TuneButton":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                TuneButton_Clicked(this, new EventArgs());
-                            });
-                            break;
-                        case "DVBTTelevizorButton":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                DVBTTelevizorButton_Clicked(this, new EventArgs());
-                            });
-                            break;
-                        case "MenuButton":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                MenuButton_Clicked(this, new EventArgs());
-                            });
-                            break;
-                        case "DriverStateButton":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                DriverStateButton_Clicked(this, new EventArgs());
-                            });
-                            break;
-                        case "QuickTuneButton":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                TuneButton_Clicked(this, new EventArgs());
-                            });
-                            break;
-                    }
+                        await ActionOK(longPress);
+                    });
 
                     break;
 
