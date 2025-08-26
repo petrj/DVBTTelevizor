@@ -337,6 +337,11 @@
                 <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
                 <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
             </StackLayout.GestureRecognizers>
+            <StackLayout.Behaviors>
+                <toolkit:TouchBehavior
+                    LongPressCompleted="OnLongPress"
+                    LongPressDuration="750" />
+            </StackLayout.Behaviors>
         </StackLayout>
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />

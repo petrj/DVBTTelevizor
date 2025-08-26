@@ -359,6 +359,28 @@ namespace DVBTTelevizor.MAUI
             {
                 RestorePersistedPermission(m.Value);
             });
+
+            WeakReferenceMessenger.Default.Register<OpenURLMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    var uri = Android.Net.Uri.Parse(m.Value);
+                    var intent = new Intent(Intent.ActionView, uri);
+                    intent.AddFlags(ActivityFlags.NewTask);
+                    Android.App.Application.Context.StartActivity(intent);
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<OpenMailMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Email.Default.ComposeAsync(new EmailMessage
+                    {
+                        To = new List<string> { "petrjanousek.net@gmail.com" }
+                    });
+                });
+            });
         }
 
         private void RequestStoragePermission()

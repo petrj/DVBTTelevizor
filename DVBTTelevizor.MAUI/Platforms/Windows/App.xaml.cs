@@ -67,6 +67,25 @@ namespace DVBTTelevizor.MAUI.WinUI
                 WeakReferenceMessenger.Default.Send(new KeyDownMessage(m.Value));
             });
 
+            WeakReferenceMessenger.Default.Register<OpenURLMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Browser.OpenAsync(m.Value, BrowserLaunchMode.External);
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<OpenMailMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Email.Default.ComposeAsync(new EmailMessage
+                    {
+                        To = new List<string> { "petrjanousek.net@gmail.com" }
+                    });
+                });
+            });
+
             WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
             {
                 ShowToastMessage(m.Value);

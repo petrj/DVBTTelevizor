@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -37,7 +39,7 @@ public partial class AboutPage : ContentPage, IOnKeyDown
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("GithubLabel", new List<View>() { GithubBoxView }))
             .AddItem(KeyboardFocusableItem.CreateFrom("WebLabel", new List<View>() { WebBoxView }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Email", new List<View>() { EmailBoxView }))
+            //.AddItem(KeyboardFocusableItem.CreateFrom("Email", new List<View>() { EmailBoxView }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Donate3", new List<View>() { Donate3Button }))
@@ -130,32 +132,21 @@ public partial class AboutPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"GithubLabel_Tapped");
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Browser.OpenAsync("https://github.com/petrj/DVBTTelevizor", BrowserLaunchMode.External);
-        });
+        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://github.com/petrj/DVBTTelevizor"));
     }
 
     private void Web_Tapped(object sender, TappedEventArgs e)
     {
         _loggingService.Debug($"Web_Tapped");
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Browser.OpenAsync("https://www.dvbttelevizor.petrjanousek.net/", BrowserLaunchMode.External);
-        });
+        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://www.dvbttelevizor.petrjanousek.net/"));
     }
 
     private void Email_Tapped(object sender, TappedEventArgs e)
     {
         _loggingService.Debug($"Email_Tapped");
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Email.Default.ComposeAsync(new EmailMessage
-            {
-                To = new List<string> { "petrjanousek.net@gmail.com" }
-            });
-        });
+        // not supported in Android!
+        //WeakReferenceMessenger.Default.Send(new OpenMailMessage(null));
     }
 }

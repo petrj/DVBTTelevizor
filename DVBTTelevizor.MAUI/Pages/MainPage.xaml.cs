@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 using System.Windows.Input;
+using static Android.Provider.Telephony.Mms;
 
 
 namespace DVBTTelevizor.MAUI
@@ -331,10 +332,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<InstallDriverMessage>(this, (r, m) =>
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                });
+                WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver"));
             });
 
             WeakReferenceMessenger.Default.Register<ChangedWindowPositionMessage>(this, (r, m) =>
