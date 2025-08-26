@@ -985,7 +985,15 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 if (_playingChannel == null)
-                    return string.Empty;
+                {
+                   if (SelectedChannel != null)
+                   {
+                       return SelectedChannel.Icon;
+                   } else
+                   {
+                       return "tv.png";
+                    }
+                }
 
                 return _playingChannel.Icon;
             }
