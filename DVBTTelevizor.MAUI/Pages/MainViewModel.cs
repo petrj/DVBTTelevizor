@@ -5,6 +5,7 @@ using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
 using Newtonsoft.Json;
+using Plugin.InAppBilling;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
@@ -74,6 +75,10 @@ namespace DVBTTelevizor.MAUI
 
             InitCommands();
 
+            Task.Run(async () =>
+            {
+                await CheckPendingPurchasesAsync();
+            });
 
             BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
         }
@@ -209,6 +214,8 @@ namespace DVBTTelevizor.MAUI
 
         public async Task ScanEPG(Channel? channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
         {
+            _loggingService.Debug($"ScanEPG {channel?.Name}");
+
             if (channel == null)
             {
                 channel = SelectedChannel;
@@ -265,6 +272,8 @@ namespace DVBTTelevizor.MAUI
 
         private async Task ScanEPGInternal(Channel channel, bool showIfFound, bool silent, int msRunTimeOut = 5000, int msScanTimeOut = 5000)
         {
+            _loggingService.Info("ScanEPGInternal");
+
             if (_scanningEPG)
             {
                 return;
@@ -1083,5 +1092,56 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public async Task CheckPendingPurchasesAsync()
+        {
+            _loggingService.Info("CheckPendingPurchasesAsync");
+
+            if (!CrossInAppBilling.IsSupported)
+            {
+                _loggingService.Error("Billing system is not supported on this device");
+                return;
+            }
+
+            var billing = CrossInAppBilling.Current;
+
+            try
+            {
+                var connected = await billing.ConnectAsync();
+                if (!connected)
+                {
+                    _loggingService.Error("Connection to billing failed");
+                    return;
+                }
+
+                var purchases = await billing.GetPurchasesAsync(ItemType.InAppPurchase);
+                if (purchases == null)
+                {
+                    _loggingService.Info("No purchases");
+                    return;
+                }
+
+                foreach (var p in purchases)
+                {
+                    if (p.State == PurchaseState.Purchased)
+                    {
+                        _loggingService.Info("Consuming");
+                        await billing.ConsumePurchaseAsync(p.ProductId, p.PurchaseToken);
+                    }
+                    else if (p.State == PurchaseState.PaymentPending)
+                    {
+                        _loggingService.Info("Donation still pending");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+            finally
+            {
+                await billing.DisconnectAsync();
+            }
+        }
     }
 }
+

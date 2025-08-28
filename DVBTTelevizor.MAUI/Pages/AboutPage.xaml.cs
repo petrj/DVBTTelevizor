@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -40,10 +41,7 @@ public partial class AboutPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("GithubLabel", new List<View>() { GithubBoxView }))
             .AddItem(KeyboardFocusableItem.CreateFrom("WebLabel", new List<View>() { WebBoxView }))
             //.AddItem(KeyboardFocusableItem.CreateFrom("Email", new List<View>() { EmailBoxView }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Donate2", new List<View>() { Donate2Button }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Donate3", new List<View>() { Donate3Button }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Donate5", new List<View>() { Donate5Button }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Donate1", new List<View>() { Donate1Button }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -148,5 +146,13 @@ public partial class AboutPage : ContentPage, IOnKeyDown
 
         // not supported in Android!
         //WeakReferenceMessenger.Default.Send(new OpenMailMessage(null));
+    }
+
+    private void Donate1Button_Clicked(object sender, EventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await _aboutPageViewModel.Donate();
+        });
     }
 }

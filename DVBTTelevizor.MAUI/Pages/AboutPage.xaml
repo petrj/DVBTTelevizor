@@ -47,9 +47,9 @@
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/>
 
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.4" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.2,0.8,0.35" AbsoluteLayout.LayoutFlags="All" Source="bigicon.png" HorizontalOptions="Center" VerticalOptions="Center" />
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.75,0.8,0.2" AbsoluteLayout.LayoutFlags="All" >
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.65,0.8,0.2" AbsoluteLayout.LayoutFlags="All" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
@@ -77,29 +77,28 @@
             </Label>
 
             <BoxView Grid.Column="0" Grid.Row="3" x:Name="EmailBoxView" />
-            <Label Grid.Column="0" Grid.Row="3" Text="petrjanousek.net@gmail.com"  Style="{DynamicResource LabelStyle}">
+            <Label Grid.Column="0" Grid.Row="3" Text="petrjanousek.net@gmail.com"  Style="{DynamicResource LabelStyle}" BackgroundColor="Transparent">
                 <Label.GestureRecognizers >
                     <TapGestureRecognizer Tapped="Email_Tapped" NumberOfTapsRequired="1" />
                 </Label.GestureRecognizers>
             </Label>
+
         </Grid>
 
-        <Grid AbsoluteLayout.LayoutBounds="1,0.95,1,0.1" AbsoluteLayout.LayoutFlags="All">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.8,0.2" AbsoluteLayout.LayoutFlags="All" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
+                <RowDefinition Height="1" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25*" />
-                <ColumnDefinition Width="25*" />
-                <ColumnDefinition Width="25*" />
-                <ColumnDefinition Width="25*" />
+                <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="1$"  Command="{Binding Donate1command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate1Visible}"/>
-            <Button x:Name="Donate2Button" Grid.Row="0" Grid.Column="1" Text="2$"  Command="{Binding Donate2Command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate2Visible}"/>
-            <Button x:Name="Donate3Button" Grid.Row="0" Grid.Column="2" Text="3$"  Command="{Binding Donate3command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate3Visible}"/>
-            <Button x:Name="Donate5Button" Grid.Row="0" Grid.Column="3" Text="5$"  Command="{Binding Donate5command}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding Donate5Visible}"/>
+            <BoxView Grid.Column="0" Grid.Row="4"  BackgroundColor="White"/>
         </Grid>
+
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.85,0.5,0.1" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏" Style="{DynamicResource LabelStyle}" BackgroundColor="Transparent"/>
+
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.95,0.5,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Donate $1'}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="Donate1Button_Clicked" />
 
     </AbsoluteLayout>
 

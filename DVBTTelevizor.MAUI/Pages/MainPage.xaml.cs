@@ -13,7 +13,6 @@ using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 using System.Windows.Input;
-using static Android.Provider.Telephony.Mms;
 
 
 namespace DVBTTelevizor.MAUI
