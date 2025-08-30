@@ -1,7 +1,11 @@
 AndroidTV
  - aab
+ - workinng MAUI-Publish-AndroidTV.ps1
 Android - internal testing
- - multi APK
+ - APK per ABI 
+ - Multi-APK is too big!
+ - APK cannot be signed by jarsigner (You uploaded an APK with an invalid signature (learn more about signing). Error from apksigner: ERROR (Jar signer ANDROIDD.RSA): JAR signature META-INF/ANDROIDD.SF indicates the APK is signed using APK Signature Scheme v2 but no such signature was found. Signature stripped? ERROR (Jar signer ANDROIDD.RSA): JAR signature META-INF/ANDROIDD.SF indicates the APK is signed using APK Signature Scheme v3 but no such signature was found. Signature stripped?)
+ - aab cannot be uploded (Tuto verzi nelze vydat, protože žádným existujícím uživatelům neumožňuje upgradovat na nově přidané balíčky aplikací.)
 Android - production
  - APK per ABI
  
