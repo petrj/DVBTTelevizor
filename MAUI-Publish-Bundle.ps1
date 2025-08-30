@@ -19,7 +19,6 @@ DVBT Televizor script for publishing to Google Play
 Set-Location $PSScriptRoot
 #$env:Path += ";C:\Program Files (x86)\Android\android-sdk\platform-tools\"
 
-
 Write-Host "Enter the password to KeyStore, please:" 
 
 $passwEncrypted = Read-Host -AsSecureString
@@ -90,11 +89,9 @@ Write-Host "Creating universal APK"
 
 & $java -jar $bundleTool build-apks --bundle=$aabName --output=$outputArchive --mode=universal --ks=$keystore --ks-key-alias=$keystoreAlias --ks-pass=pass:$passw 
 
-
 Rename-Item -Path $outputArchive -NewName ($outputArchive + ".zip")
 $outputArchive+=".zip"
 
-$zip = [System.IO.Compression.ZipFile]::OpenRead($outputArchive)
 $apkName =  [System.IO.Path]::GetFileNameWithoutExtension($aabName) + ".apk"
 
 Expand-Archive -Path $outputArchive -DestinationPath . -Verbose
