@@ -1,7 +1,0 @@
-AndroidTV
- - aab
-Android - internal testing
- - multi APK
-Android - production
- - APK per ABI
- 
