@@ -30,7 +30,6 @@
 		<ApplicationVersion>2025001</ApplicationVersion>
 		<VersionCode>2025001</VersionCode>
 		<VersionName>2025001</VersionName>
-		<VersionCodePattern>{versionCode}00{abiIndex}</VersionCodePattern>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
@@ -43,22 +42,6 @@
 		<!--UseFastDeployment>true</UseFastDeployment>
 		<UseSharedRuntime>true</UseSharedRuntime>
 		<MandroidLinkMode>None</MandroidLinkMode-->
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'android-arm'">
-		<ApplicationVersion>69001</ApplicationVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'android-arm64'">
-		<ApplicationVersion>69002</ApplicationVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'android-x86'">
-		<ApplicationVersion>69003</ApplicationVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'android-x64'">
-		<ApplicationVersion>69004</ApplicationVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
