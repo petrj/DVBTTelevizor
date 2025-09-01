@@ -140,6 +140,7 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Info("MainPage starting");
 
+
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
                 _loggingService.Error(e.ExceptionObject as Exception);
@@ -1668,13 +1669,17 @@ namespace DVBTTelevizor.MAUI
                 AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
             });
 
-            await Task.Delay(100);
-
-            MainThread.BeginInvokeOnMainThread(async () =>
+            for (int i=7;i>=0;i--)
             {
-                AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-            });
+                await Task.Delay(200);
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0,0,1 - i / 10.0,1 - i / 10.0));
+                });
+            }
+
         }
 
         private async void DriverStateButton_Clicked(object sender, EventArgs e)
