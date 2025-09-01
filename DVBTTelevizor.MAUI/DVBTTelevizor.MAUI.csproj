@@ -27,12 +27,6 @@
 		<!-- App Identifier -->
 		<ApplicationId>net.petrjanousek.DVBTTelevizor</ApplicationId>
 
-		<!-- Versions -->
-		<ApplicationDisplayVersion>2025003</ApplicationDisplayVersion>
-		<ApplicationVersion>2025003</ApplicationVersion>
-		<VersionCode>2025003</VersionCode>
-		<VersionName>2025003</VersionName>
-
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
@@ -44,6 +38,23 @@
 		<!--UseFastDeployment>true</UseFastDeployment>
 		<UseSharedRuntime>true</UseSharedRuntime>
 		<MandroidLinkMode>None</MandroidLinkMode-->
+	</PropertyGroup>
+
+	<!-- Versions
+		Value 2025003 is too big for Windows
+		-->
+	<PropertyGroup  Condition="$(TargetFramework.Contains('android'))">
+		<ApplicationDisplayVersion>2025004</ApplicationDisplayVersion>
+		<ApplicationVersion>2025004</ApplicationVersion>
+		<VersionCode>2025004</VersionCode>
+		<VersionName>2025004</VersionName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
+		<ApplicationDisplayVersion>2025</ApplicationDisplayVersion>
+		<ApplicationVersion>2025</ApplicationVersion>
+		<VersionCode>2025</VersionCode>
+		<VersionName>2025</VersionName>
 	</PropertyGroup>
 
 

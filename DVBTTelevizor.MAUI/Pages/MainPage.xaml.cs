@@ -751,6 +751,7 @@ namespace DVBTTelevizor.MAUI
                             NoVideoStackLayout.IsVisible = false;
 
                             ChannelsListView.IsVisible = false;
+                            MainToolBar.IsVisible = false;
 
                             if (IsPortrait)
                             {
@@ -796,6 +797,8 @@ namespace DVBTTelevizor.MAUI
                             //NavigationPage.SetHasNavigationBar(this, false);
 
                             ChannelsListView.IsVisible = true;
+                            _viewModel.MainLayoutVisible = true;
+                            MainToolBar.IsVisible = true;
 
                             //WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage("Connect"));
 
@@ -840,6 +843,7 @@ namespace DVBTTelevizor.MAUI
                             NavigationPage.SetHasNavigationBar(this, false);
 
                             ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
+                            MainToolBar.IsVisible = true;
 
                             WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(""));
 
