@@ -1,90 +1,43 @@
-param ([string]$framework,[string]$configuration)
+﻿<#
 
-$frameworks = @("net9.0-windows10.0.22000.0", "net9.0-android35.0")
-$configurations = @("Release", "Debug")
+Script for creating AAB/APK release for publishing to Google Play
 
-#########################################################################################################################
+    Android TV necessary release modifications:
 
-function Get-Value
-{
-    Param
-    (       
-        $Title,
-        $Values
-    )
-    Process
-    {
-        Write-Host $Title
-        $i = 1
-        foreach ($value in $Values)
-        {
-            Write-Host ($i.TosTring() + ") " + $value)
-            $i++
-        }
+     1) DVBTTelevizor.MAUI\Platforms\Android\AndroidManifest.xml
+  
+        <uses-feature android:name="android.software.leanback" android:required="true" />
+ 
+     2) DVBTTelevizor.MAUI\Platforms\Android\MainActivity.cs
+ 
+        [IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
 
-        $v = Read-Host
-        $num = 0
+    Do not include AndroidTV modifications to non-Android TV release!
 
-        if (-not ([int]::TryParse($v, [ref] $num)))
-        {
-            throw "Invalid value"
-        } 
+#>
 
-        if (($num -lt 1) -or ($num -gt $Values.Count))
-        {
-            throw "Invalid value"
-        }
-        
-        return ($Values[$num-1])
-    }
-}
+Set-Location $PSScriptRoot
+Import-Module .\MAUI-BuildModule.psm1 -Force
 
-if ([String]::IsNullOrWhiteSpace($framework))
-{
-    $framework =  $frameworks[0]
-}
-
-if ([String]::IsNullOrWhiteSpace($configuration))
-{
-    $configuration = $configurations[0]
-}
-
-if ($framework -eq "?")
-{
-    $framework = Get-Value -Title "Set framework:" -Values $frameworks
-}
-
-if ($configuration -eq "?")
-{
-    $configuration = Get-Value -Title "Set configuration:" -Values $configurations
-}
-
-if (-not ($configurations.Contains($configuration)))
-{
-    $configuration = $configurations | Where-Object { $_ -like "*$configuration*"} 
-}
-
-if (-not ($configurations.Contains($configuration)))
-{
-    throw "Invalid configuration"
-}
-
-if (-not ($frameworks.Contains($framework)))
-{
-    $framework = $frameworks | Where-Object { $_ -like "*$framework*"}
-}
-
-if (-not ($frameworks.Contains($framework)))
-{
-    throw "Invalid framework"
-}
-
-#########################################################################################################################
-
-Write-Host "Building: $framework, $configuration"
+$passw = Get-Password
 
 .\Clear.ps1
-#Clear-Host
 
-dotnet build .\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj --framework $framework --configuration $configuration
+$signedAABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
+    | Publish-AABPackage `
+        -Configuration Release `
+        -PackageName "net.petrjanousek.DVBTTelevizor" `
+    | Protect-BySignature `
+        -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
+        -Alias "PJsAndroidKeyStore" `
+        -Password $passw `
 
+$signedAPKPackage = $signedAABPackage | ConvertTo-APK `
+        -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
+        -Alias "PJsAndroidKeyStore" `
+        -Password $passw 
+    
+
+$signedAABPackage | Copy-Item -Destination . -Force -Verbose
+$signedAPKPackage | Copy-Item -Destination . -Force -Verbose
+   

@@ -52,7 +52,10 @@ function Publish-AABPackage
 
         # Detect Version + AndroidTV suffix
         [xml]$csproj = Get-Content $InputObject.FullName
-        $version = $csproj.Project.PropertyGroup.VersionCode
+
+        $versionNode = $csproj.Project.PropertyGroup | Where-Object { $_.Condition -like "*android*" } 
+
+        $version = $versionNode.VersionCode
         if ($version -is [System.Array]) { $version = $version[0] }
 
         [xml]$manifest = Get-Content (Join-Path $InputObject.Directory.FullName "Platforms\Android\AndroidManifest.xml")
