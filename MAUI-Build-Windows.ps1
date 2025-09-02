@@ -17,7 +17,7 @@ Script for creating AAB/APK release for publishing to Google Play
 #>
 
 Set-Location $PSScriptRoot
-Import-Module .\MAUI-BuildModule.psm1 -Force
+Import-Module .\MAUI-Build-Module.psm1 -Force
 
 $passw = Get-Password
 

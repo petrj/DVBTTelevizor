@@ -42,13 +42,15 @@ function Publish-AABPackage
         [string]$Configuration = "Release",
 
         [Parameter(Mandatory)]
-        [string]$PackageName
+        [string]$PackageName,
+        
+        [string]$AndroidSDKDirectory = "C:\Program Files (x86)\Android\android-sdk"
     )
     process 
     {
         Write-Host "Publishing project $($InputObject.Name) with configuration $Configuration and framework $Framework"
 
-        dotnet publish $InputObject.FullName -c $Configuration -f $Framework /p:AndroidPackageFormat=aab | Out-Default
+        dotnet publish $InputObject.FullName -c $Configuration -f $Framework /p:AndroidPackageFormat=aab /p:AndroidSdkDirectory=`"$AndroidSDKDirectory`" | Out-Default
 
         # Detect Version + AndroidTV suffix
         [xml]$csproj = Get-Content $InputObject.FullName

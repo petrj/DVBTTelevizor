@@ -1,5 +1,5 @@
 Set-Location $PSScriptRoot
-Import-Module .\MAUI-BuildModule.psm1 -Force
+Import-Module .\MAUI-Build-Module.psm1 -Force
 
 $passw = Get-Password
 
@@ -15,6 +15,7 @@ $signedAABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
     | Publish-AABPackage `
         -Configuration Release `
         -PackageName "net.petrjanousek.DVBTTelevizor" `
+        -AndroidSDKDirectory "$HOME/Android/Sdk/" `
     | Protect-BySignature `
         -JarSigner /usr/lib/jvm/java-17-openjdk-amd64/bin/jarsigner `
         -Keystore ~/PJsAndroidKeyStore/PJsAndroidKeyStore.keystore `
