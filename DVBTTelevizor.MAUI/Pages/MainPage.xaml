@@ -39,7 +39,7 @@
             <Style x:Key="NoVideoChannelNameTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
                 <Setter Property="Margin" Value="5,5,5,5"/>
-                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="Center"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
@@ -125,6 +125,17 @@
                 <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
+
+            <Style x:Key="NoVideoEPGTitleTextStyle" TargetType="Label">
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="MaxLines" Value="2"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
 
             <Style x:Key="TimeFromTextStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="SpringGreen"/>
@@ -319,17 +330,18 @@
               Margin="0,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20*" />
-                    <RowDefinition Height="20*" />
-                    <RowDefinition Height="20*" />
-                    <RowDefinition Height="20*" />
-                    <RowDefinition Height="20*" />
+                    <RowDefinition Height="10*" />
+                    <RowDefinition Height="10*" />
+                    <RowDefinition Height="30*" />
+                    <RowDefinition Height="30*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100*" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
-                <Image Grid.Row="2" x:Name="NoVideoImage" Source="{Binding ChannelIcon}" IsVisible="True" BackgroundColor="Transparent" />
+                <Label Grid.Row="1" Grid.Column="0" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource NoVideoEPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5"/>
+                <Image Grid.Row="3" x:Name="NoVideoImage" Source="{Binding ChannelIcon}" IsVisible="True" BackgroundColor="Transparent" />
             </Grid>
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
