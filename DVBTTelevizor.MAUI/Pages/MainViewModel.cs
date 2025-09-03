@@ -168,6 +168,37 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+            WeakReferenceMessenger.Default.Register<ClearCacheMessage>(this, (r, m) =>
+            {
+                Task.Run(async () =>
+                {
+                    await ClearCache();
+                });
+            });
+
+        }
+
+        public async Task ClearCache()
+        {
+            _loggingService.Debug($"ClearCache");
+
+            try
+            {
+                EIT.Clear();
+                PID.Clear();
+
+                _loggingService.Debug($"Cache cleared");
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage($"EPG and channel cache cleared".Translated()));
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+            finally
+            {
+                await RefreshEPG();
+            }
         }
 
         public bool MenuVisible
@@ -384,14 +415,7 @@ namespace DVBTTelevizor.MAUI
             {
                 _semaphoreSlim.Release();
 
-                OnPropertyChanged(nameof(Channels));
-                OnPropertyChanged(nameof(SelectedChannel));
-                OnPropertyChanged(nameof(SelectedChannelEPGTitle));
-                OnPropertyChanged(nameof(SelectedChannelEPGDescription));
-                OnPropertyChanged(nameof(SelectedChannelEPGTimeStart));
-                OnPropertyChanged(nameof(SelectedChannelEPGTimeFinish));
-                OnPropertyChanged(nameof(SelectedChannelEPGProgress));
-                OnPropertyChanged(nameof(EPGProgressBackgroundColor));
+                NotifyChannelChange();
                 NotifyEPGDetailVisibilityChange();
 
                 IsRefreshing = false;
@@ -737,6 +761,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
             OnPropertyChanged(nameof(ChannelIcon));
             OnPropertyChanged(nameof(PlayingChannel));
+            OnPropertyChanged(nameof(Channels));
         }
 
         public async void DisconnectDriver()

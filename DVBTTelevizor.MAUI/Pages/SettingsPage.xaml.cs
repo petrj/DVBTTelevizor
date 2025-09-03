@@ -300,6 +300,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             case "menuAppendExistingChannels":
                 ImportChannels(ImportChannelsEnum.Append);
                 break;
+            case "menuClearCache":
+                WeakReferenceMessenger.Default.Send(new ClearCacheMessage(String.Empty));
+                break;
         }
     }
 
@@ -618,7 +621,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             if ((channels.Count > 0) && (importChannels == ImportChannelsEnum.None))
             {
-                BuildChooseMenu("Import channels", new Dictionary<string, string>()
+                BuildChooseMenu("Import channels".Translated(), new Dictionary<string, string>()
                 {
                     {"menuOverwriteExistingChannels","Overwite existing".Translated()},
                     {"menuAppendExistingChannels","Append existing".Translated()}
@@ -679,6 +682,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void ClearEPGButton_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Info("ClearEPGButton_Clicked");
 
+        BuildConfirmMenu("Clear cache?".Translated(), "Clear EPG cand channel cache".Translated(), "Cancel".Translated(), "menuClearCache");
     }
 }
