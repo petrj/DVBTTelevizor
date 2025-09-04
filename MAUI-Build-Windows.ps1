@@ -21,7 +21,7 @@ Import-Module .\MAUI-Build-Module.psm1 -Force
 
 $passw = Get-Password
 
-.\Clear.ps1
+#.\Clear.ps1
 
 $aABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
     | Publish-AABPackage `
@@ -46,6 +46,7 @@ if (-not [String]::IsNullOrEmpty($passw))
         $signedAPKPackage | Copy-Item -Destination . -Force -Verbose
 } else
 {
+    
     $aABPackage | Copy-Item -Destination . -Force -Verbose
 }
     
