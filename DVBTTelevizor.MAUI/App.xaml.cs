@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using DVBTTelevizor.MAUI.Messages;
+﻿using DVBTTelevizor.MAUI.Messages;
 
 namespace DVBTTelevizor.MAUI
 {

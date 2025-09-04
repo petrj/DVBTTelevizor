@@ -2,17 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net9.0-android35.0</TargetFrameworks>
-		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
-
-		<!-- Note for MacCatalyst:
-		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
-
-		<!--RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers-->
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DVBTTelevizor.MAUI</RootNamespace>
@@ -27,23 +16,24 @@
 		<!-- App Identifier -->
 		<ApplicationId>net.petrjanousek.DVBTTelevizor</ApplicationId>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</TargetPlatformMinVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
-		<!--debugging setup, remove it when making release! -->
-		<!--UseFastDeployment>true</UseFastDeployment>
+		<!-- debugging setup, remove it when making release! -->
+		<UseFastDeployment>true</UseFastDeployment>
 		<UseSharedRuntime>true</UseSharedRuntime>
-		<MandroidLinkMode>None</MandroidLinkMode-->
+		<MandroidLinkMode>None</MandroidLinkMode>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
+		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<!-- Versions
 		Value 2025003 is too big for Windows
 		-->
-	<PropertyGroup  Condition="$(TargetFramework.Contains('android'))">
+	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationDisplayVersion>2025004</ApplicationDisplayVersion>
 		<ApplicationVersion>2025004</ApplicationVersion>
 		<VersionCode>2025004</VersionCode>
@@ -57,14 +47,13 @@
 		<VersionName>2025</VersionName>
 	</PropertyGroup>
 
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	</PropertyGroup>
@@ -131,18 +120,6 @@
 		<PackageReference Include="System.Drawing.Common" Version="8.0.1" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-	  <PackageReference Include="LibVLCSharp.MAUI">
-	    <Version>3.9.1</Version>
-	  </PackageReference>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-ios'">
-	  <PackageReference Include="LibVLCSharp.MAUI">
-	    <Version>3.9.1</Version>
-	  </PackageReference>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
