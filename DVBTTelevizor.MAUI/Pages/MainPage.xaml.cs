@@ -261,6 +261,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public ITVConfiguration Configuration
+        {
+            get
+            {
+                return _configuration;
+            }
+        }
+
         private void SubscribeMessages()
         {
             WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, (r, m) =>
@@ -349,6 +357,7 @@ namespace DVBTTelevizor.MAUI
             {
                 SetSubtitles(m.Value);
             });
+
         }
 
         private async Task CheckStream()
@@ -509,7 +518,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, "CheckStream general error");
             }
         }
-
 
         private void _channelPage_Disappearing(object? sender, EventArgs e)
         {
@@ -1196,6 +1204,9 @@ namespace DVBTTelevizor.MAUI
         public async Task ActionStop(bool force)
         {
             _loggingService.Debug($"ActionStop (Force: {force}, PlayingState: {PlayingState})");
+
+            if (PlayingState == PlayingStateEnum.Stopped)
+                return;
 
             // do not check _media or videoView.MediaPlayer.IsPlaying: in case of no signal is MediaPlayer stopped
             if (videoView == null || videoView.MediaPlayer == null)

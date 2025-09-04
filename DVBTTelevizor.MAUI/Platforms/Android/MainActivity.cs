@@ -381,6 +381,61 @@ namespace DVBTTelevizor.MAUI
                     });
                 });
             });
+
+            WeakReferenceMessenger.Default.Register<CheckBatterySettingsMessage>(this, (r, m) =>
+            {
+                CheckBatterySettings();
+            });
+
+            WeakReferenceMessenger.Default.Register<OpenBatteryOptimizationSettingsMessage>(this, (r, m) =>
+            {
+                OpenBatterySettings();
+            });
+
+        }
+
+        private void OpenBatterySettings()
+        {
+            _loggingService.Debug("OpenBatterySettings");
+
+            try
+            {
+                    var intent = new Intent();
+                    intent.SetAction(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                    intent.SetFlags(ActivityFlags.NewTask);
+                    Android.App.Application.Context.StartActivity(intent);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void CheckBatterySettings()
+        {
+            _loggingService.Debug("CheckBatterySettings");
+
+            try
+            {
+                var pm = (PowerManager)Android.App.Application.Context.GetSystemService(Context.PowerService);
+                bool ignoring = pm.IsIgnoringBatteryOptimizations("net.petrjanousek.DVBTTelevizor");
+
+                WeakReferenceMessenger.Default.Send(new CheckBatterySettingsReplyMessage(ignoring));
+
+                /*
+                if (!ignoring)
+                {
+                    var intent = new Intent();
+                    intent.SetAction(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                    intent.SetFlags(ActivityFlags.NewTask);
+                    Android.App.Application.Context.StartActivity(intent);
+                }
+                */
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
         private void RequestStoragePermission()

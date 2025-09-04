@@ -176,6 +176,7 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+
         }
 
         public async Task ClearCache()

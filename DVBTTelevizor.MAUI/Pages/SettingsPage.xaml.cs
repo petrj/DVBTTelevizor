@@ -41,9 +41,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
 
+
         Unloaded += SettingsPage_Unloaded;
 
         WriteToExternalDeviceSwitch.Toggled += WriteToExternalDeviceSwitch_Toggled;
+        PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
 
         BuildFocusableItems();
 
@@ -55,6 +57,24 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
             }
         };
+
+        WeakReferenceMessenger.Default.Register<CheckBatterySettingsReplyMessage>(this, (r, m) =>
+        {
+            Task.Run(async () =>
+            {
+                await ProcessCheckBatterySettingsResult(m.Value);
+            });
+        });
+    }
+
+    private void PlayOnBackgroundSwitch_Toggled(object? sender, ToggledEventArgs e)
+    {
+        _loggingService.Info("PlayOnBackgroundSwitch_Toggled");
+
+        if (e.Value)
+        {
+            WeakReferenceMessenger.Default.Send(new CheckBatterySettingsMessage(String.Empty));
+        }
     }
 
     private void WriteToExternalDeviceSwitch_Toggled(object? sender, ToggledEventArgs e)
@@ -303,7 +323,24 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             case "menuClearCache":
                 WeakReferenceMessenger.Default.Send(new ClearCacheMessage(String.Empty));
                 break;
+            case "menuGoToBatteryOptimizationSettings":
+                WeakReferenceMessenger.Default.Send(new OpenBatteryOptimizationSettingsMessage(String.Empty));
+                break;
         }
+    }
+
+    private async Task ProcessCheckBatterySettingsResult(bool ignoring)
+    {
+        _loggingService.Debug($"ProcessCheckBatterySettingsResult");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            if (!ignoring)
+            {
+                // When running in the background, it is necessary to ensure that the app is not terminated due to battery optimization
+                BuildConfirmMenu("When running in the background, it is necessary to ensure that the app is not terminated due to battery optimization".Translated(), "Go to settings...".Translated(), "Close".Translated(), "menuGoToBatteryOptimizationSettings");
+            }
+        });
     }
 
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
