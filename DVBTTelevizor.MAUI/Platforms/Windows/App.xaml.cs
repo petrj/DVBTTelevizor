@@ -6,7 +6,6 @@ using LoggerService;
 using Microsoft.Graphics.Canvas.Printing;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.UI.Xaml;
-using SharpHook;
 using System.Threading;
 using Windows.Data.Xml.Dom;
 using Windows.Networking.Vpn;
@@ -101,18 +100,6 @@ namespace DVBTTelevizor.MAUI.WinUI
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             _loggingService.Error(e.Exception);
-        }
-
-        private void Hook_KeyPressed(object? sender, KeyboardHookEventArgs e)
-        {
-            var code = e.Data.KeyCode.ToString();
-            if (code.StartsWith("Vc"))
-            {
-                code = code.Substring(2);
-            }
-            var keyAction = KeyboardDeterminer.GetKeyAction(code);
-
-            WeakReferenceMessenger.Default.Send(new KeyDownMessage(code));
         }
 
         protected override MauiApp CreateMauiApp()
