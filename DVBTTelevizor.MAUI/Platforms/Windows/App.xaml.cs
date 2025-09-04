@@ -34,19 +34,6 @@ namespace DVBTTelevizor.MAUI.WinUI
             _loggingService = new LoggerProvider().GetLoggingService();
             this.InitializeComponent();
 
-            var hook = new SharpHook.TaskPoolGlobalHook();
-            hook.KeyPressed += Hook_KeyPressed; ;       // EventHandler<KeyboardHookEventArgs>
-
-            Task.Run(async () =>
-            {
-                // ****************************************************
-                // ****************  keyboard hooking *****************
-                // ****************************************************
-
-                // enabling keyboard hooking leads to very slow performance!
-                //await hook.RunAsync();
-            });
-
             WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
             {
                 var testDVBTDriver = new TestDVBTDriver(_loggingService);

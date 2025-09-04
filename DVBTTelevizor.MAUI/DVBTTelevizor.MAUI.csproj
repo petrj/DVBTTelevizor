@@ -9,6 +9,8 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		
+		<AndroidEnable16KBPageSupport>true</AndroidEnable16KBPageSupport>
 
 		<!-- Display name -->
 		<ApplicationTitle>DVBT Televizor</ApplicationTitle>
