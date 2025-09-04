@@ -23,21 +23,32 @@ $passw = Get-Password
 
 .\Clear.ps1
 
-$signedAABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
+$aABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
     | Publish-AABPackage `
         -Configuration Release `
-        -PackageName "net.petrjanousek.DVBTTelevizor" `
-    | Protect-BySignature `
-        -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
-        -Alias "PJsAndroidKeyStore" `
-        -Password $passw `
+        -PackageName "net.petrjanousek.DVBTTelevizor"
 
-$signedAPKPackage = $signedAABPackage | ConvertTo-APK `
-        -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
-        -Alias "PJsAndroidKeyStore" `
-        -Password $passw 
+if (-not [String]::IsNullOrEmpty($passw))
+{
+    $signedAABPackage = $aABPackage `
+        | Protect-BySignature `
+            -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
+            -JarSigner "C:\Program Files (x86)\Android\openjdk\jdk-17.0.14\bin\jarsigner.exe" `
+            -Alias "PJsAndroidKeyStore" `
+            -Password $passw `
+
+    $signedAPKPackage = $signedAABPackage | ConvertTo-APK `
+            -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
+            -Alias "PJsAndroidKeyStore" `
+            -Password $passw 
+
+        $signedAABPackage | Copy-Item -Destination . -Force -Verbose
+        $signedAPKPackage | Copy-Item -Destination . -Force -Verbose
+} else
+{
+    $aABPackage | Copy-Item -Destination . -Force -Verbose
+}
     
 
-$signedAABPackage | Copy-Item -Destination . -Force -Verbose
-$signedAPKPackage | Copy-Item -Destination . -Force -Verbose
+
    

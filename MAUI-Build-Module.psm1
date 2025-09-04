@@ -15,7 +15,7 @@
     return $passw
 }
 
-function Publish-AABPackage 
+function Publish-AABPackage
 {
     <#
     .SYNOPSIS
@@ -58,7 +58,19 @@ function Publish-AABPackage
         $versionNode = $csproj.Project.PropertyGroup | Where-Object { $_.Condition -like "*android*" } 
 
         $version = $versionNode.VersionCode
-        if ($version -is [System.Array]) { $version = $version[0] }
+        if ($version -is [System.Array])
+        {
+            $firstNonEmptyVer = ""
+            foreach ($ver in $version)
+            {
+                if (-not [String]::IsNullOrWhiteSpace($ver))
+                {
+                    $firstNonEmptyVer = $ver
+                }
+            }
+            $version = $firstNonEmptyVer
+        }
+        
 
         [xml]$manifest = Get-Content (Join-Path $InputObject.Directory.FullName "Platforms\Android\AndroidManifest.xml")
         if ($manifest.manifest.'uses-feature'.name -eq "android.software.leanback") 
