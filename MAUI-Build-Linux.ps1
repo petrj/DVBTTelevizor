@@ -1,8 +1,6 @@
 Set-Location $PSScriptRoot
 Import-Module .\MAUI-Build-Module.psm1 -Force
 
-$passw = Get-Password
-
 #./Clear.ps1
 
 $env:JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
@@ -15,27 +13,7 @@ $aABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
     | Publish-AABPackage `
         -Configuration Release `
         -PackageName "net.petrjanousek.DVBTTelevizor" `
-        -AndroidSDKDirectory "$HOME/Android/Sdk/"
+        -AndroidSDKDirectory "$HOME/Android/Sdk/" 
 
-if (-not [String]::IsNullOrEmpty($passw))
-{
-    $signedAABPackage = $aABPackage `
-        | Protect-BySignature `
-            -JarSigner /usr/lib/jvm/java-17-openjdk-amd64/bin/jarsigner `
-            -Keystore ~/PJsAndroidKeyStore/PJsAndroidKeyStore.keystore `
-            -Password $passw `
-            -Alias "PJsAndroidKeyStore" 
+$aABPackage | Copy-Item -Destination . -Force -Verbose
 
-    $signedAPKPackage = $signedAABPackage | ConvertTo-APK `
-            -Java "/usr/lib/jvm/java-17-openjdk-amd64/bin/java" `
-            -BundleTool "/opt/bundletool-all-1.18.1.jar" `
-            -Keystore "~/PJsAndroidKeyStore/PJsAndroidKeyStore.keystore" `
-            -Alias "PJsAndroidKeyStore" `
-            -Password $passw 
-
-    $signedAABPackage | Copy-Item -Destination . -Force -Verbose
-    $signedAPKPackage | Copy-Item -Destination . -Force -Verbose
-} else
-{    
-    $aABPackage | Copy-Item -Destination . -Force -Verbose
-}

@@ -9,7 +9,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		
+
 		<AndroidEnable16KBPageSupport>true</AndroidEnable16KBPageSupport>
 
 		<!-- Display name -->
@@ -22,10 +22,10 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</TargetPlatformMinVersion>
 
-		<!-- debugging setup, remove it when making release! -->
-		<UseFastDeployment>true</UseFastDeployment>
+		<!--debugging setup, remove it when making release! -->
+		<!--UseFastDeployment>true</UseFastDeployment>
 		<UseSharedRuntime>true</UseSharedRuntime>
-		<MandroidLinkMode>None</MandroidLinkMode>
+		<MandroidLinkMode>None</MandroidLinkMode-->
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
@@ -35,7 +35,7 @@
 	<!-- Versions
 		Value 2025003 is too big for Windows
 		-->
-	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
+	<PropertyGroup  Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationDisplayVersion>2025004</ApplicationDisplayVersion>
 		<ApplicationVersion>2025004</ApplicationVersion>
 		<VersionCode>2025004</VersionCode>
@@ -49,17 +49,6 @@
 		<VersionName>2025</VersionName>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
-	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	</PropertyGroup>
-
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.22000.0</TargetFrameworks>
 	</PropertyGroup>
@@ -67,15 +56,17 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
-		<PublishTrimmed>True</PublishTrimmed>
+	  <AndroidPackageFormat>aab</AndroidPackageFormat>
+	  <PublishTrimmed>True</PublishTrimmed>
+	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	</PropertyGroup>
-
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -116,12 +107,13 @@
 		<PackageReference Include="NLog" Version="6.0.3" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.3" />
 		<PackageReference Include="Plugin.InAppBilling" Version="9.1.0" />
-		<PackageReference Include="RemoteAccessService" Version="1.0.4" />		
+		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="System.Drawing.Common" Version="9.0.8" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.1" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
 	</ItemGroup>
+
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
