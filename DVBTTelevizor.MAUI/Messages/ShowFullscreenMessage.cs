@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    internal class ShowFullscreenMessage : ValueChangedMessage<string>
+    internal class ShowFullscreenMessage : ValueChangedMessage<bool>
     {
-        public ShowFullscreenMessage(string value) : base(value)
+        public ShowFullscreenMessage(bool value) : base(value)
         {
 
         }

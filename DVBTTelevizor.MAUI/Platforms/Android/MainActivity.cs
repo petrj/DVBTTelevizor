@@ -18,14 +18,18 @@ using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
 using Java.Sql;
 using LoggerService;
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using NLog;
 using RTLSDR;
 using RTLSDR.Common;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using static AndroidX.ViewPager.Widget.ViewPager;
 using Environment = System.Environment;
 
 namespace DVBTTelevizor.MAUI
@@ -64,7 +68,7 @@ namespace DVBTTelevizor.MAUI
             _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
 
             // prevent sleep:
-            var  win = (this as Activity).Window;
+            var  win = (this as Android.App.Activity).Window;
             win.AddFlags(WindowManagerFlags.KeepScreenOn);
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException; ;
@@ -346,7 +350,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<ShowFullscreenMessage>(this, (r, m) =>
             {
-                //SetFullScreen();
+               // SetFullScreen(m.Value);
             });
 
             WeakReferenceMessenger.Default.Register<ShowDriverPrefrencesMessage>(this, (r, m) =>
@@ -392,6 +396,68 @@ namespace DVBTTelevizor.MAUI
                 OpenBatterySettings();
             });
 
+        }
+
+        public void SetFullScreen(bool enable)
+        {
+            try
+            {
+                if (enable)
+                {
+                    // Draw behind status bar and notch
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
+                    }
+
+
+                    Window.AddFlags(WindowManagerFlags.Fullscreen);
+
+                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(
+                    SystemUiFlags.LayoutStable |
+                    SystemUiFlags.LayoutHideNavigation |
+                    SystemUiFlags.LayoutFullscreen |
+                    SystemUiFlags.HideNavigation |
+                    SystemUiFlags.Fullscreen |
+                    SystemUiFlags.ImmersiveSticky);
+
+                    // Optional: make status bar completely transparent
+                    Window.SetStatusBarColor(Android.Graphics.Color.Transparent);
+                    Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
+                }
+                else
+                {
+                    var decorView = Window.DecorView;
+                    var uiOptions = (int)decorView.SystemUiVisibility;
+
+                    // Remove immersive flags manually
+                    uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
+                    uiOptions &= ~(int)SystemUiFlags.Fullscreen;
+                    uiOptions &= ~(int)SystemUiFlags.HideNavigation;
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
+                    }
+
+                    Window.ClearFlags(WindowManagerFlags.Fullscreen);
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                    {
+                        var insetsController = Window.InsetsController;
+                        if (insetsController != null)
+                        {
+                            insetsController.Show(WindowInsets.Type.StatusBars() | WindowInsets.Type.NavigationBars());
+                            insetsController.SystemBarsBehavior = (int)WindowInsetsControllerBehavior.Default;
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
         private void OpenBatterySettings()

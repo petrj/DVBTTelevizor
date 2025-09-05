@@ -754,6 +754,7 @@ namespace DVBTTelevizor.MAUI
                         case PlayingStateEnum.Playing:
 
                             //MessagingCenter.Send(System.String.Empty, BaseViewModel.MSG_EnableFullScreen);
+                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
 
                             // VideoStackLayout must be visible before changing Layout
                             VideoStackLayout.IsVisible = true;
@@ -809,6 +810,7 @@ namespace DVBTTelevizor.MAUI
                             _viewModel.MainLayoutVisible = true;
                             MainToolBar.IsVisible = true;
 
+                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(false));
                             //WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage("Connect"));
 
                             if (IsPortrait)
@@ -854,7 +856,7 @@ namespace DVBTTelevizor.MAUI
                             ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
                             MainToolBar.IsVisible = true;
 
-                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(""));
+                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(false));
 
                             VideoStackLayout.IsVisible = false;
                             NoVideoStackLayout.IsVisible = false;
@@ -954,7 +956,7 @@ namespace DVBTTelevizor.MAUI
 
             if (_firstAppearing)
             {
-                WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(""));
+                WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
 
                 _firstAppearing = false;
 
