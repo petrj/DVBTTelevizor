@@ -8,6 +8,7 @@ using Android.Hardware.Usb;
 using Android.Media;
 using Android.OS;
 using Android.Provider;
+using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
@@ -350,7 +351,10 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<ShowFullscreenMessage>(this, (r, m) =>
             {
-               // SetFullScreen(m.Value);
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    SetFullScreen(m.Value);
+                });
             });
 
             WeakReferenceMessenger.Default.Register<ShowDriverPrefrencesMessage>(this, (r, m) =>
@@ -398,6 +402,74 @@ namespace DVBTTelevizor.MAUI
 
         }
 
+        /*
+        public void SetFullScreen(bool enable)
+        {
+            _loggingService.Info($"SetFullScreen: {enable}");
+
+            try
+            {
+                if (enable)
+                {
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        // This is key: it tells the system your app can handle the cutout.
+                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
+                    }
+
+                    Window.AddFlags(WindowManagerFlags.Fullscreen); // Hide status bar
+                    //Window.AddFlags(WindowManagerFlags.LayoutInOverscan);
+
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                    {
+                        var insetsController = Window.DecorView.WindowInsetsController;
+                        insetsController?.Hide(WindowInsets.Type.SystemBars());
+                    }
+                    else
+                    {
+                        var uiOptions = (int)Window.DecorView.SystemUiVisibility;
+                        uiOptions |= (int)SystemUiFlags.HideNavigation;
+                        uiOptions |= (int)SystemUiFlags.Fullscreen;
+                        uiOptions |= (int)SystemUiFlags.ImmersiveSticky;
+                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+                    }
+                }
+                else
+                {
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        // This is key: it tells the system your app can handle the cutout.
+                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
+                    }
+
+                    // Clear the flag when exiting full screen
+                    //Window.ClearFlags(WindowManagerFlags.LayoutInOverscan);
+                    Window.ClearFlags(WindowManagerFlags.Fullscreen);
+
+
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                    {
+                        var insetsController = Window.DecorView.WindowInsetsController;
+                        insetsController?.Show(WindowInsets.Type.SystemBars());
+                    }
+                    else
+                    {
+                        var uiOptions = (int)Window.DecorView.SystemUiVisibility;
+                        uiOptions &= ~(int)SystemUiFlags.HideNavigation;
+                        uiOptions &= ~(int)SystemUiFlags.Fullscreen;
+                        uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
+                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }*/
+
+        /*
         public void SetFullScreen(bool enable)
         {
             try
@@ -459,6 +531,118 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
+        */
+
+
+        public void SetFullScreen(bool enable)
+        {
+            try
+            {
+                var window = Window;
+                var decorView = window.DecorView;
+
+                if (enable)
+                {
+                    // --- Entering Full Screen ---
+
+                    // 1. Enable drawing behind system bars and notches/cutouts.
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        // For P (API 28) and above, LayoutInDisplayCutoutMode is essential for notches.
+                        window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
+                    }
+                    // LayoutNoLimits is important to allow content to truly go edge-to-edge.
+                    window.AddFlags(WindowManagerFlags.LayoutNoLimits);
+
+                    // 2. Hide system bars (status bar and navigation bar).
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R) // Android 11+
+                    {
+                        var insetsController = decorView.WindowInsetsController;
+                        if (insetsController != null)
+                        {
+                            insetsController.Hide(WindowInsets.Type.SystemBars()); // Hide all system bars
+                                                                                   // Attempt to set behavior. While direct SetSystemBarsBehavior on MAUI's wrapper is tricky,
+                                                                                   // using the native controller via JavaCast can sometimes work, but we'll rely on other flags for now.
+                                                                                   // The key is that Hide(SystemBars()) is generally effective.
+                        }
+                    }
+                    else // Older versions
+                    {
+                        // This combination is generally effective for older APIs.
+                        var uiOptions = (int)decorView.SystemUiVisibility;
+                        uiOptions |= (int)SystemUiFlags.LayoutStable; // Ensure layout is stable
+                        uiOptions |= (int)SystemUiFlags.LayoutHideNavigation; // Layout behind navigation
+                        uiOptions |= (int)SystemUiFlags.LayoutFullscreen; // Layout behind status bar
+                        uiOptions |= (int)SystemUiFlags.HideNavigation; // Hide navigation bar
+                        uiOptions |= (int)SystemUiFlags.Fullscreen; // Fullscreen mode
+                        uiOptions |= (int)SystemUiFlags.ImmersiveSticky; // Sticky immersive mode
+                        decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+                    }
+
+                    // 3. Make status bar transparent if needed (optional, but good for video).
+                    // This flag often works best with LayoutInOverscan/LayoutNoLimits.
+                    window.SetStatusBarColor(Android.Graphics.Color.Transparent);
+
+                    // Ensure the main flag is set.
+                    window.AddFlags(WindowManagerFlags.Fullscreen);
+                }
+                else
+                {
+                    // --- Exiting Full Screen ---
+
+                    // 1. Clear flags that enable drawing behind system bars.
+                    window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    {
+                        window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
+                    }
+
+                    // 2. Show system bars.
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R) // Android 11+
+                    {
+                        var insetsController = decorView.WindowInsetsController;
+                        if (insetsController != null)
+                        {
+                            insetsController.Show(WindowInsets.Type.SystemBars());
+                            // Resetting behavior. Default is usually what you want.
+                            // Note: JavaCast to Android.Views.WindowInsetsController and setting SystemBarsBehavior
+                            // is still the most direct way for API 30+, but it requires careful casting.
+                            // For simplicity here, we rely on Show() and default behavior.
+                        }
+                    }
+                    else // Older versions
+                    {
+                        // Resetting SystemUiVisibility flags.
+                        var uiOptions = (int)decorView.SystemUiVisibility;
+                        uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
+                        uiOptions &= ~(int)SystemUiFlags.Fullscreen;
+                        uiOptions &= ~(int)SystemUiFlags.HideNavigation;
+                        uiOptions &= ~(int)SystemUiFlags.LayoutHideNavigation;
+                        uiOptions &= ~(int)SystemUiFlags.LayoutFullscreen;
+                        // LayoutStable should probably remain to keep layout stable when bars reappear.
+                        decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+                    }
+
+                    // Clear the main fullscreen flag.
+                    window.ClearFlags(WindowManagerFlags.Fullscreen);
+                    // Also clear LayoutNoLimits if it was set.
+                    window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
+
+                    // 3. Restore the status bar color if you had a specific one before.
+                    // If you didn't set a specific color, the default will likely reappear.
+                    // window.SetStatusBarColor(ContextCompat.GetColor(activity, Resource.Color.your_default_status_bar_color)); // Example
+                    // For simplicity, we'll just let it go back to default, which often works.
+                }
+            }
+            catch (Exception ex)
+            {
+                // Your logging service call
+                _loggingService.Error(ex);
+            }
+        }
+
+
+
 
         private void OpenBatterySettings()
         {

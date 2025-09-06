@@ -46,6 +46,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         WriteToExternalDeviceSwitch.Toggled += WriteToExternalDeviceSwitch_Toggled;
         PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
+        FullscreenSwitch.Toggled += FullscreenSwitch_Toggled;
 
         BuildFocusableItems();
 
@@ -65,6 +66,13 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 await ProcessCheckBatterySettingsResult(m.Value);
             });
         });
+    }
+
+    private void FullscreenSwitch_Toggled(object? sender, ToggledEventArgs e)
+    {
+        _loggingService.Info("FullscreenSwitch_Toggled");
+
+        WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(e.Value));
     }
 
     private void PlayOnBackgroundSwitch_Toggled(object? sender, ToggledEventArgs e)

@@ -233,7 +233,6 @@ namespace DVBTTelevizor.MAUI
                     WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
                 });
             }
-
         }
 
         private async Task ExtractAssetFile(string sourceFileName)
@@ -810,8 +809,10 @@ namespace DVBTTelevizor.MAUI
                             _viewModel.MainLayoutVisible = true;
                             MainToolBar.IsVisible = true;
 
-                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(false));
-                            //WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage("Connect"));
+                            if (!_configuration.Fullscreen)
+                            {
+                                WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(false));
+                            }
 
                             if (IsPortrait)
                             {
@@ -856,7 +857,10 @@ namespace DVBTTelevizor.MAUI
                             ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
                             MainToolBar.IsVisible = true;
 
-                            WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(false));
+                            if (!_configuration.Fullscreen)
+                            {
+                                WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(false));
+                            }
 
                             VideoStackLayout.IsVisible = false;
                             NoVideoStackLayout.IsVisible = false;
@@ -956,7 +960,10 @@ namespace DVBTTelevizor.MAUI
 
             if (_firstAppearing)
             {
-                WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
+                if (_configuration.Fullscreen)
+                {
+                    WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
+                }
 
                 _firstAppearing = false;
 
@@ -1538,6 +1545,8 @@ namespace DVBTTelevizor.MAUI
                                 _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
                                 break;
                         }
+
+                        _media.AddOption(":fullscreen");
 
                     }
                     else
