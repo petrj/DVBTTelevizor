@@ -17,12 +17,6 @@ namespace DVBTTelevizor.MAUI
         {
             _tuneSettings = new TuningSettings(_loggingService);
             _driver = driver;
-
-            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
-            {
-                _loggingService.Info($"TuningProgressPageViewModel: FontSizeChanged");
-                NotifyFontSizeChange();
-            });
         }
 
         public TuningSettings Settings

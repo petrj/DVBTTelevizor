@@ -35,12 +35,6 @@ namespace DVBTTelevizor.MAUI
             {
                 _selectedBandwidth = Bandwidth.BandWidthHzTitle[tvConfiguration.DVBTBandwidthKHz * 1000];
             }
-
-            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
-            {
-                _loggingService.Info($"TuningSelectDVBTPageViewModel: FontSizeChanged");
-                NotifyFontSizeChange();
-            });
         }
 
         public async void FillBandwidths()

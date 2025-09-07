@@ -262,7 +262,6 @@ namespace DVBTTelevizor.MAUI
                 _configuration.AppFontSize = (AppFontSizeEnum)value;
 
                 OnPropertyChanged(nameof(AppFontSizeIndex));
-                NotifyFontSizeChange();
                 WeakReferenceMessenger.Default.Send(new FontSizeChangedMessage(AppFontSizeIndex));
             }
         }

@@ -54,12 +54,6 @@ namespace DVBTTelevizor.MAUI
             _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
 
             _listViewSelector = new ListViewSelector(Channels);
-
-            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
-            {
-                _loggingService.Info($"TuningProgressPageViewModel: FontSizeChanged");
-                NotifyFontSizeChange();
-            });
         }
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)

@@ -15,11 +15,6 @@ namespace DVBTTelevizor.MAUI
         public TuningWelcomePageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
         {
-            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
-            {
-                _loggingService.Info($"TuningWelcomePageViewModel: FontSizeChanged");
-                NotifyFontSizeChange();
-            });
         }
     }
 }

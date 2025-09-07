@@ -1,4 +1,6 @@
-﻿using LoggerService;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +28,12 @@ namespace DVBTTelevizor.MAUI
             _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
             _configuration = tvConfiguration;
             _dialogService = dialogService;
+
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                _loggingService.Info($"BaseViewModel: FontSizeChanged");
+                NotifyFontSizeChange();
+            });
         }
 
         public static string DeviceFriendlyName
