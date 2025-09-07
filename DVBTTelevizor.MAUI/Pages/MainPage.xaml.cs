@@ -68,6 +68,8 @@ namespace DVBTTelevizor.MAUI
 
         // Menu: 0.0,0,1.0,0.08
 
+        private Rect FullScreenVideoPosition { get; set; } = new Rect(0.5, 0.5, 1.0, 1.0);
+
         // EPGDetailGrid
         private Rect EPGDetailGridLandscapePosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
         private Rect EPGDetailGridLandscapePositionForPreview { get; set; } = new Rect(1, 0.2, 0.3, 0.62);
@@ -774,8 +776,8 @@ namespace DVBTTelevizor.MAUI
                                 }
                                 else
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, FullScreenVideoPosition);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, FullScreenVideoPosition);
                                 }
                             }
                             else
@@ -792,8 +794,8 @@ namespace DVBTTelevizor.MAUI
                                 }
                                 else
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0, 0, 1, 1));
-                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, new Rect(0, 0, 1, 1));
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, FullScreenVideoPosition);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, FullScreenVideoPosition);
                                 }
                             }
 
@@ -881,7 +883,7 @@ namespace DVBTTelevizor.MAUI
                             {
                                 if (_viewModel.EPGDetailVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview); // 0,1,0.7,0.92
+                                    AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridLandscapePosition);
                                 }
                                 else
@@ -1573,9 +1575,9 @@ namespace DVBTTelevizor.MAUI
                         {
                             // When user visits some page and return back, video is only black screen
                             // calls fix video will re-attach the video and set correct video position
-                            await FixVideo();
+                            await FixVideo(false);
                         });
-                    }, 200);
+                    }, 350);
 
                     if (!String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
                     {
@@ -1685,10 +1687,37 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async Task FixVideo()
+        /// <summary>
+        /// Fix video position
+        /// - workaround for black screen video/bad position/ when play/resume
+        /// </summary>
+        /// <param name="force">force re-attach videoview (will stop if playing)</param>
+        /// <returns></returns>
+        public async Task FixVideo(bool force)
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
+                if (force)
+                {
+                    if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                    {
+                        if (_mediaPlayer.VideoTrack != -1)
+                        {
+                            videoView.MediaPlayer.Stop();
+
+                            VideoStackLayout.Children.Remove(videoView);
+                            VideoStackLayout.Children.Add(videoView);
+
+                            videoView.MediaPlayer.Play();
+                        }
+                    }
+                    else
+                    {
+                        VideoStackLayout.Children.Remove(videoView);
+                        VideoStackLayout.Children.Add(videoView);
+                    }
+                }
+
                 videoView.MediaPlayer = null;
                 videoView.MediaPlayer = _mediaPlayer;
             });
@@ -1701,17 +1730,16 @@ namespace DVBTTelevizor.MAUI
                 AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
             });
 
-            for (int i=7;i>=0;i--)
+            for (int i=5;i>=0;i--)
             {
-                await Task.Delay(200);
+                await Task.Delay(250);
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0,0,1 - i / 10.0,1 - i / 10.0));
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0.5,0.5,1 - i / 10.0,1 - i / 10.0));
                 });
             }
-
         }
 
         private async void DriverStateButton_Clicked(object sender, EventArgs e)

@@ -329,10 +329,10 @@
               VerticalOptions="FillAndExpand"
               Margin="0,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20*" />
-                    <RowDefinition Height="10*" />
-                    <RowDefinition Height="10*" />
                     <RowDefinition Height="30*" />
+                    <RowDefinition Height="5*" />
+                    <RowDefinition Height="30*" />
+                    <RowDefinition Height="5*" />
                     <RowDefinition Height="30*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -340,8 +340,9 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Text="{Binding NoVideoTitle}" Style="{DynamicResource NoVideoChannelNameTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" />
-                <Label Grid.Row="1" Grid.Column="0" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource NoVideoEPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5"/>
-                <Image Grid.Row="3" x:Name="NoVideoImage" Source="{Binding ChannelIcon}" IsVisible="True" BackgroundColor="Transparent" />
+                <Image Grid.Row="2" x:Name="NoVideoImage" Source="{Binding ChannelIcon}" IsVisible="True" BackgroundColor="Transparent" />
+                <Label Grid.Row="4" Grid.Column="0" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource NoVideoEPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5"/>
+
             </Grid>
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />

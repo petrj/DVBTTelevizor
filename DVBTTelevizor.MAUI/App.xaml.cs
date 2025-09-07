@@ -31,6 +31,13 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnResume()
         {
+            if ((_mp != null) && (_mp.PlayingState != PlayingStateEnum.Stopped))
+            {
+                Task.Run(async () =>
+                {
+                    await _mp.FixVideo(true);
+                });
+            }
         }
     }
 }
