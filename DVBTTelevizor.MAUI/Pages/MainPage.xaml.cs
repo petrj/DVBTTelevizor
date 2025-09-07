@@ -1064,6 +1064,8 @@ namespace DVBTTelevizor.MAUI
                 var options = new string[]
                 {
                     "--avcodec-hw=any",
+                    "--file-caching=1500",     // local files/streams
+                    "--network-caching=2000",  // DVB/UDP/HTTP streams
                     //"--mediacodec",
                     //"--no-mediacodec-dr"
                 };

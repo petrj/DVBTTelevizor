@@ -96,7 +96,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return GetPersistingSettingValue<bool>("HideTVChannels", true);
+                return GetPersistingSettingValue<bool>("HideTVChannels", false);
             }
             set
             {
@@ -156,7 +156,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return GetPersistingSettingValue<bool>("ShowRadioChannels");
+                return GetPersistingSettingValue<bool>("ShowRadioChannels", true);
             }
             set
             {
@@ -168,7 +168,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return GetPersistingSettingValue<bool>("ShowOtherChannels");
+                return GetPersistingSettingValue<bool>("ShowOtherChannels", false);
             }
             set
             {
