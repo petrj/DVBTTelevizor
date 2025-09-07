@@ -14,6 +14,12 @@
   <defs
      id="defs438">
     <rect
+       x="113.13709"
+       y="599.62655"
+       width="721.24892"
+       height="147.07821"
+       id="rect2" />
+    <rect
        x="82.024387"
        y="616.59711"
        width="692.96464"
@@ -89,7 +95,7 @@
      inkscape:window-height="1080"
      inkscape:window-x="479"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg434" />
   <path
      id="path372-4-9"
@@ -300,8 +306,38 @@
      id="text1"
      style="font-weight:bold;font-size:66.6667px;font-family:Consolas;-inkscape-font-specification:'Consolas Bold';white-space:pre;shape-inside:url(#rect1);fill:#959aa0;fill-opacity:0.156863"><tspan
        x="82.023438"
-       y="694.24031"
-       id="tspan3"><tspan
-         style="font-size:85.3333px;font-family:Sans;-inkscape-font-specification:'Sans, Bold';fill:#ffffff;fill-opacity:0.971171"
-         id="tspan2">DVBT Televizor</tspan></tspan></text>
+       y="674.44274"
+       id="tspan1">&#10;</tspan><tspan
+       x="82.023438"
+       y="757.77611"
+       id="tspan5">  &#10;</tspan><tspan
+       x="82.023438"
+       y="813.03327"
+       id="tspan9">	<tspan
+   dx="36.718769"
+   id="tspan6">	</tspan><tspan
+   dx="36.718769 62.293266 55.466606 57.344048 49.408028 22.186684 43.4347 50.431938 26.026695 48.725212 48.55471 26.026695 41.642723 52.821312"
+   style="font-size:85.3333px;font-family:Sans;-inkscape-font-specification:'Sans, Bold';fill:#0000ff;fill-opacity:0.971171"
+   id="tspan7">DVBT Televizor</tspan><tspan
+   dx="38.741356"
+   id="tspan8">&#10;</tspan></tspan><tspan
+       x="82.023438"
+       y="899.90233"
+       id="tspan12">	<tspan
+   dx="36.718769"
+   id="tspan10"> </tspan><tspan
+   dx="36.653667"
+   id="tspan11">&#10;</tspan></tspan><tspan
+       x="82.023438"
+       y="983.23571"
+       id="tspan14"><tspan
+         dx="0 36.653664"
+         id="tspan13">  </tspan></tspan></text>
+  <text
+     xml:space="preserve"
+     id="text2"
+     style="font-weight:bold;font-size:85.3333px;font-family:Sans;-inkscape-font-specification:'Sans, Bold';white-space:pre;shape-inside:url(#rect2);fill:#ffffff"><tspan
+       x="113.13672"
+       y="677.2696"
+       id="tspan15">DVBT Televizor</tspan></text>
 </svg>
