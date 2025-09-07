@@ -479,14 +479,13 @@ namespace DVBTTelevizor.MAUI
                 if (_viewModel.PlayingChannelAspect.Width == -1)
                 {
                     // setting aspect ratio
-                    /*
+
                     var videoTrack = GetVideoTrack();
                     if (videoTrack.HasValue)
                     {
                         _viewModel.PlayingChannelAspect = new Size(videoTrack.Value.Data.Video.Width, videoTrack.Value.Data.Video.Height);
                         _loggingService.Debug($"CheckStream - Video size: {_viewModel.PlayingChannelAspect.Width}:{_viewModel.PlayingChannelAspect.Height}");
                     }
-                    */
                 }
 
                 /*
@@ -517,6 +516,31 @@ namespace DVBTTelevizor.MAUI
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "CheckStream general error");
+            }
+        }
+
+        private LibVLCSharp.Shared.MediaTrack? GetVideoTrack()
+        {
+            if (_media.Tracks != null &&
+                _media.Tracks.Length > 0 &&
+                _mediaPlayer != null &&
+                _mediaPlayer.VideoTrackCount > 0 &&
+                _mediaPlayer.VideoTrack != -1)
+            {
+                foreach (var track in _media.Tracks)
+                {
+                    if (track.Data.Video.Width == 0 ||
+                        track.Data.Video.Height == 0)
+                        continue;
+
+                    return track;
+                }
+
+                return null;
+            }
+            else
+            {
+                return null;
             }
         }
 
@@ -617,26 +641,33 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("RestartRemoteAccessService");
 
-            if (_configuration.AllowRemoteAccessService)
+            try
             {
-                if (_remoteAccessService.IsBusy)
+
+                if (_configuration.AllowRemoteAccessService)
                 {
-                    if (_remoteAccessService.ParamsChanged(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey))
+                    if (_remoteAccessService.IsBusy)
                     {
-                        _remoteAccessService.StopListening();
+                        if (_remoteAccessService.ParamsChanged(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey))
+                        {
+                            _remoteAccessService.StopListening();
+                            _remoteAccessService.SetConnection(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey);
+                            _remoteAccessService.StartListening(OnRemoteMessageReceived, BaseViewModel.DeviceFriendlyName);
+                        }
+                    }
+                    else
+                    {
                         _remoteAccessService.SetConnection(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey);
                         _remoteAccessService.StartListening(OnRemoteMessageReceived, BaseViewModel.DeviceFriendlyName);
                     }
                 }
                 else
                 {
-                    _remoteAccessService.SetConnection(_configuration.RemoteAccessServiceIP, _configuration.RemoteAccessServicePort, _configuration.RemoteAccessServiceSecurityKey);
-                    _remoteAccessService.StartListening(OnRemoteMessageReceived, BaseViewModel.DeviceFriendlyName);
+                    _remoteAccessService.StopListening();
                 }
-            }
-            else
+            } catch (Exception ex)
             {
-                _remoteAccessService.StopListening();
+                _loggingService.Error(ex);
             }
         }
 
@@ -979,12 +1010,6 @@ namespace DVBTTelevizor.MAUI
 
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        //if (_configuration.LastSelectedChannelUniqueIdentifier != null)
-                        //{
-                        //    // select last channel:{
-                        //    _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
-                        //}
-
                         if (_viewModel.Channels.Count > 0)
                         {
                             _focusItems.FocusItem("ChannelsListView");
@@ -2229,6 +2254,48 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private void SetAspect(string command)
+        {
+            _loggingService.Info($"Setting Aspect: {command}");
+
+            try
+            {
+                var valueAsString = command.Substring(10);
+
+                if (videoView == null || videoView.MediaPlayer == null || PlayingState == PlayingStateEnum.Stopped || _viewModel.PlayingChannelAspect.Width == -1)
+                {
+                    return;
+                }
+
+                int width = Convert.ToInt32(_viewModel.PlayingChannelAspect.Width);
+                int height = Convert.ToInt32(_viewModel.PlayingChannelAspect.Height);
+
+                switch (valueAsString)
+                {
+                    case "16:9":
+                        width = Convert.ToInt32(16.0 / 9.0 * _viewModel.PlayingChannelAspect.Height);
+                        break;
+                    case "4:3":
+                        width = Convert.ToInt32(4.0 / 3.0 * _viewModel.PlayingChannelAspect.Height);
+                        break;
+                    case "Fill":
+                        width = Convert.ToInt32(_lastAllocatedSize.Width);
+                        height = Convert.ToInt32(_lastAllocatedSize.Height);
+                        break;
+                }
+
+                CallWithTimeout(delegate
+                {
+                    videoView.MediaPlayer.AspectRatio = $"{width}:{height}";
+                });
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private void SetSubtitles(string command)
         {
             _loggingService.Info($"Setting SetSubtitles: {command}");
@@ -2306,6 +2373,12 @@ namespace DVBTTelevizor.MAUI
             if (menuId.StartsWith("setAudio"))
             {
                 SetAudio(menuId);
+                return;
+            }
+
+            if (menuId.StartsWith("setAspect"))
+            {
+                SetAspect(menuId);
                 return;
             }
 
