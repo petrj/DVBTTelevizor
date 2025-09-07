@@ -402,144 +402,14 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        /*
         public void SetFullScreen(bool enable)
         {
-            _loggingService.Info($"SetFullScreen: {enable}");
+            _loggingService.Debug($"SetFullScreen: {enable}");
+
+            // created (including the comments) with A.I.
 
             try
             {
-                if (enable)
-                {
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
-                    {
-                        // This is key: it tells the system your app can handle the cutout.
-                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
-                    }
-
-                    Window.AddFlags(WindowManagerFlags.Fullscreen); // Hide status bar
-                    //Window.AddFlags(WindowManagerFlags.LayoutInOverscan);
-
-
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
-                    {
-                        var insetsController = Window.DecorView.WindowInsetsController;
-                        insetsController?.Hide(WindowInsets.Type.SystemBars());
-                    }
-                    else
-                    {
-                        var uiOptions = (int)Window.DecorView.SystemUiVisibility;
-                        uiOptions |= (int)SystemUiFlags.HideNavigation;
-                        uiOptions |= (int)SystemUiFlags.Fullscreen;
-                        uiOptions |= (int)SystemUiFlags.ImmersiveSticky;
-                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
-                    }
-                }
-                else
-                {
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
-                    {
-                        // This is key: it tells the system your app can handle the cutout.
-                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
-                    }
-
-                    // Clear the flag when exiting full screen
-                    //Window.ClearFlags(WindowManagerFlags.LayoutInOverscan);
-                    Window.ClearFlags(WindowManagerFlags.Fullscreen);
-
-
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
-                    {
-                        var insetsController = Window.DecorView.WindowInsetsController;
-                        insetsController?.Show(WindowInsets.Type.SystemBars());
-                    }
-                    else
-                    {
-                        var uiOptions = (int)Window.DecorView.SystemUiVisibility;
-                        uiOptions &= ~(int)SystemUiFlags.HideNavigation;
-                        uiOptions &= ~(int)SystemUiFlags.Fullscreen;
-                        uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
-                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
-        }*/
-
-        /*
-        public void SetFullScreen(bool enable)
-        {
-            try
-            {
-                if (enable)
-                {
-                    // Draw behind status bar and notch
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
-                    {
-                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
-                    }
-
-
-                    Window.AddFlags(WindowManagerFlags.Fullscreen);
-
-                    Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(
-                    SystemUiFlags.LayoutStable |
-                    SystemUiFlags.LayoutHideNavigation |
-                    SystemUiFlags.LayoutFullscreen |
-                    SystemUiFlags.HideNavigation |
-                    SystemUiFlags.Fullscreen |
-                    SystemUiFlags.ImmersiveSticky);
-
-                    // Optional: make status bar completely transparent
-                    Window.SetStatusBarColor(Android.Graphics.Color.Transparent);
-                    Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
-                }
-                else
-                {
-                    var decorView = Window.DecorView;
-                    var uiOptions = (int)decorView.SystemUiVisibility;
-
-                    // Remove immersive flags manually
-                    uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
-                    uiOptions &= ~(int)SystemUiFlags.Fullscreen;
-                    uiOptions &= ~(int)SystemUiFlags.HideNavigation;
-
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
-                    {
-                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
-                    }
-
-                    Window.ClearFlags(WindowManagerFlags.Fullscreen);
-
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
-                    {
-                        var insetsController = Window.InsetsController;
-                        if (insetsController != null)
-                        {
-                            insetsController.Show(WindowInsets.Type.StatusBars() | WindowInsets.Type.NavigationBars());
-                            insetsController.SystemBarsBehavior = (int)WindowInsetsControllerBehavior.Default;
-                        }
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
-        }
-        */
-
-
-        public void SetFullScreen(bool enable)
-        {
-
-                var window = Window;
-                var decorView = window.DecorView;
-
                 if (enable)
                 {
                     // --- Entering Fullscreen ---
@@ -547,16 +417,16 @@ namespace DVBTTelevizor.MAUI
                     // Enable drawing behind the display cutout (notch/hole punch)
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
                     {
-                        window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
+                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
                     }
 
                     // Hide system bars and make layout immersive
-                    window.AddFlags(WindowManagerFlags.Fullscreen);
+                    Window.AddFlags(WindowManagerFlags.Fullscreen);
 
                     // For API 30+ use InsetsController
                     if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
                     {
-                        var insetsController = window.InsetsController;
+                        var insetsController = Window.InsetsController;
                         if (insetsController != null)
                         {
                             // Hide all system bars (status bar and navigation bar)
@@ -570,82 +440,85 @@ namespace DVBTTelevizor.MAUI
                     else
                     {
                         // For older Android versions
-                        var uiOptions = (int)decorView.SystemUiVisibility;
+                        var uiOptions = (int)Window.DecorView.SystemUiVisibility;
                         uiOptions |= (int)SystemUiFlags.LayoutStable |
                                      (int)SystemUiFlags.LayoutHideNavigation |
                                      (int)SystemUiFlags.LayoutFullscreen |
                                      (int)SystemUiFlags.HideNavigation |
                                      (int)SystemUiFlags.Fullscreen |
                                      (int)SystemUiFlags.ImmersiveSticky;
-                        decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
                     }
 
                     // Optional: Make status bar transparent if desired, helps with seamless look
-                    window.SetStatusBarColor(Android.Graphics.Color.Transparent);
+                    Window.SetStatusBarColor(Android.Graphics.Color.Transparent);
                     // This flag makes the window fill the entire screen, no overscan areas.
-                    window.AddFlags(WindowManagerFlags.LayoutNoLimits);
+                    Window.AddFlags(WindowManagerFlags.LayoutNoLimits);
                 }
                 else
                 {
-                // --- Exit Full Screen ---
+                    // --- Exit Full Screen ---
 
-                // Clear the flag that enables drawing behind system bars.
-                window.ClearFlags(WindowManagerFlags.LayoutInOverscan);
+                    // Clear the flag that enables drawing behind system bars.
+                    Window.ClearFlags(WindowManagerFlags.LayoutInOverscan);
 
-                // Clear the fullscreen flag.
-                window.ClearFlags(WindowManagerFlags.Fullscreen);
+                    // Clear the fullscreen flag.
+                    Window.ClearFlags(WindowManagerFlags.Fullscreen);
 
-                // Reset display cutout mode to default.
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
-                {
-                    window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
-                }
-
-                // Restore status bar color (or set to a default if transparent was problematic)
-                // You might want to set this to a theme color if not transparent.
-                window.SetStatusBarColor(Android.Graphics.Color.Black); // Or your app's default status bar color
-                window.ClearFlags(WindowManagerFlags.LayoutNoLimits); // Ensure we are not limiting layout
-
-                // Restore system UI visibility flags.
-                var uiOptions = (int)decorView.SystemUiVisibility;
-                uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
-                uiOptions &= ~(int)SystemUiFlags.Fullscreen;
-                uiOptions &= ~(int)SystemUiFlags.HideNavigation;
-                uiOptions &= ~(int)SystemUiFlags.LayoutHideNavigation;
-                uiOptions &= ~(int)SystemUiFlags.LayoutFullscreen;
-                // Ensure LayoutStable is also considered if it was set.
-                // uiOptions &= ~(int)SystemUiFlags.LayoutStable;
-
-                // Reapply the (now cleared) flags to ensure the system picks up the changes.
-                // For older versions, this is essential.
-                if (Build.VERSION.SdkInt < BuildVersionCodes.R)
-                {
-                    decorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
-                }
-
-                // For Android 11+ (API 30+), explicitly show system bars.
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
-                {
-                    var insetsController = decorView.WindowInsetsController;
-                    if (insetsController != null)
+                    // Reset display cutout mode to default.
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
                     {
-                        insetsController.Show(WindowInsets.Type.SystemBars());
-                        // Resetting behavior if it was changed
-                        // Note: Direct behavior setting is still tricky. We rely on showing SystemBars.
+                        Window.Attributes.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.Default;
                     }
+
+                    // Restore status bar color (or set to a default if transparent was problematic)
+                    // You might want to set this to a theme color if not transparent.
+                    Window.SetStatusBarColor(Android.Graphics.Color.Black); // Or your app's default status bar color
+                    Window.ClearFlags(WindowManagerFlags.LayoutNoLimits); // Ensure we are not limiting layout
+
+                    // Restore system UI visibility flags.
+                    var uiOptions = (int)Window.DecorView.SystemUiVisibility;
+                    uiOptions &= ~(int)SystemUiFlags.ImmersiveSticky;
+                    uiOptions &= ~(int)SystemUiFlags.Fullscreen;
+                    uiOptions &= ~(int)SystemUiFlags.HideNavigation;
+                    uiOptions &= ~(int)SystemUiFlags.LayoutHideNavigation;
+                    uiOptions &= ~(int)SystemUiFlags.LayoutFullscreen;
+                    // Ensure LayoutStable is also considered if it was set.
+                    // uiOptions &= ~(int)SystemUiFlags.LayoutStable;
+
+                    // Reapply the (now cleared) flags to ensure the system picks up the changes.
+                    // For older versions, this is essential.
+                    if (Build.VERSION.SdkInt < BuildVersionCodes.R)
+                    {
+                        Window.DecorView.SystemUiVisibility = (StatusBarVisibility)uiOptions;
+                    }
+
+                    // For Android 11+ (API 30+), explicitly show system bars.
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+                    {
+                        var insetsController = Window.DecorView.WindowInsetsController;
+                        if (insetsController != null)
+                        {
+                            insetsController.Show(WindowInsets.Type.SystemBars());
+                            // Resetting behavior if it was changed
+                            // Note: Direct behavior setting is still tricky. We rely on showing SystemBars.
+                        }
+                    }
+
+                    // Reset status bar color to default (or your theme's color)
+                    // If not reset, it might remain transparent, causing the white box.
+                    // You might need to explicitly get the system default or theme color.
+                    // A simple way to force a refresh is often just clearing flags.
+                    // If the white box persists, consider setting a default color explicitly.
+                    // window.SetStatusBarColor(activity.Resources.GetColor(Android.Resource.Color.Transparent, null)); // Example for transparent if needed, or your theme's color
                 }
 
-                // Reset status bar color to default (or your theme's color)
-                // If not reset, it might remain transparent, causing the white box.
-                // You might need to explicitly get the system default or theme color.
-                // A simple way to force a refresh is often just clearing flags.
-                // If the white box persists, consider setting a default color explicitly.
-                // window.SetStatusBarColor(activity.Resources.GetColor(Android.Resource.Color.Transparent, null)); // Example for transparent if needed, or your theme's color
             }
-
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
-
-
 
         private void OpenBatterySettings()
         {

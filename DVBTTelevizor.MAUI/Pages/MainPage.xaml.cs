@@ -1061,7 +1061,15 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Info("Initializing LibVLC");
 
-                _LibVLC = new LibVLC(/*enableDebugLogs: true*/);
+                var options = new string[]
+                {
+                    "--avcodec-hw=any",
+                    //"--mediacodec",
+                    //"--no-mediacodec-dr"
+                };
+
+                _LibVLC = new LibVLC(options);
+
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
