@@ -176,7 +176,11 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                _loggingService.Info($"MainPageViewModel: FontSizeChanged");
+                NotifyFontSizeChange();
+            });
         }
 
         public async Task ClearCache()

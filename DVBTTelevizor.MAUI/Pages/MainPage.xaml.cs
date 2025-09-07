@@ -358,7 +358,6 @@ namespace DVBTTelevizor.MAUI
             {
                 SetSubtitles(m.Value);
             });
-
         }
 
         private async Task CheckStream()
