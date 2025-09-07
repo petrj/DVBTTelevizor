@@ -286,7 +286,7 @@
 
                                 <Label Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding CurrentEPGEventTitle}" Style="{DynamicResource ChannelEPGTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
                                 <Label Grid.Row="2" Grid.Column="2"                   Text="{Binding CurrentEPGEventTime}" Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
-                                <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
+                                <Label Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding NextEPGEventTitle}" Style="{DynamicResource NextTitleTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}"/>
 
                                 <Label Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="3" Text="{Binding ProviderNameAndFrequencyShortLabel}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" TextColor="{Binding ChannelTextLabelColor}"/>
 
