@@ -439,7 +439,11 @@ namespace DVBTTelevizor.MAUI
                     IsRefreshing = true;
                     var anySelected = false;
 
-                    if (SelectedChannel != null)
+                    if (SelectedChannel == null)
+                    {
+                        uniqueIdentifier = _configuration.LastSelectedChannelUniqueIdentifier;
+                    }
+                    else
                     {
                         uniqueIdentifier = SelectedChannel.UniqueIdentifier;
                         SelectedChannel = null;

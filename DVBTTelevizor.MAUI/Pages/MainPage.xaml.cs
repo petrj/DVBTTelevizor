@@ -979,11 +979,11 @@ namespace DVBTTelevizor.MAUI
 
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        if (_configuration.LastSelectedChannelUniqueIdentifier != null)
-                        {
-                            // select last channel:{
-                            _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
-                        }
+                        //if (_configuration.LastSelectedChannelUniqueIdentifier != null)
+                        //{
+                        //    // select last channel:{
+                        //    _viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                        //}
 
                         if (_viewModel.Channels.Count > 0)
                         {
