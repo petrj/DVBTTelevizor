@@ -314,7 +314,7 @@ function Show-GUI {
         { 
             Get-KeyDownMessage -keyCode "back" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
-
+        
         $posx = 350
         $posy = 50
         for ($i=1;$i -le 9;$i++)
@@ -324,7 +324,7 @@ function Show-GUI {
             $numDown.Location = New-Object System.Drawing.Point($posx, $posy)
             $numDown.Add_Click(
             { 
-                Get-KeyDownMessage -keyCode $i.ToString() -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+                Get-KeyDownMessage -keyCode ($this.Text) -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
             })
 
             $form.Controls.Add($numDown)

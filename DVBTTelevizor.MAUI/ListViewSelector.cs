@@ -85,6 +85,22 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
+        public Channel? SelectChannelByNumber(string num)
+        {
+            foreach (var ch in _channels)
+            {
+                if (ch.Number == num)
+                {
+                    SetSelectedChannel(ch);
+                    return ch;
+                }
+            }
+
+            return null;
+        }
+
+
+
         public Channel? SelectPreviousChannel()
         {
             var selFound = false;

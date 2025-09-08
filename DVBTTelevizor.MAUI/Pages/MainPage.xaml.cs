@@ -37,6 +37,8 @@ namespace DVBTTelevizor.MAUI
         private Size _lastAllocatedSize = new Size(-1, -1);
 
         private DateTime _lastBackPressedTime = DateTime.MinValue;
+        private DateTime _lastNumPressedTime = DateTime.MinValue;
+        private string _numberPressed = String.Empty;
 
         private Channel[] _lastPlayedChannels = new Channel[2];
 
@@ -2013,7 +2015,232 @@ namespace DVBTTelevizor.MAUI
 
 
             }
+
+            Task.Run(async () =>
+            {
+                switch (key.ToLower())
+                {
+                    //case "end":
+                    //case "moveend":
+                    //    await ActionFirstOrLast(false);
+                    //    break;
+                    //case "home":
+                    //case "movehome":
+                    //    await ActionFirstOrLast(true);
+                    //    break;
+                    //case "mediafastforward":
+                    //case "mediaforward":
+                    //case "pagedown":
+                    //    await ActionKeyDown(10);
+                    //    break;
+                    //case "mediarewind":
+                    //case "mediafastrewind":
+                    //case "pageup":
+                    //    await ActionKeyUp(10);
+                    //    break;
+                    case "mediaplaypause":
+                    case "mediaplaystop":
+                        if (PlayingState == PlayingStateEnum.Stopped)
+                        {
+                            await ActionPlay();
+                        }
+                        else
+                        {
+                            await ActionStop(true);
+                        }
+                        break;
+                    case "mediastop":
+                    case "mediaclose":
+                        await ActionStop(true);
+                        break;
+                    case "f7":
+                    case "mediapause":
+                    case "forwarddel": // delete
+                    case "delete":
+                    case "altleft":
+                    case "minus":
+                    case "period":
+                    case "apostrophe":
+                    case "buttonselect":
+                    case "break": // pause
+                        await ActionStop(false);
+                        break;
+                    case "buttonl2":
+                    case "info":
+                    case "guide":
+                    case "i":
+                    case "g":
+                    case "numpadadd":
+                    case "buttonthumbl":
+                    case "f1":
+                    case "f8":
+                    case "menu":
+                    case "tab":
+                    case "equals":
+                    case "slash":
+                    case "backslash":
+                    case "insert":
+                    case "tvcontentsmenu":
+                        MenuButton_Clicked(this, new EventArgs());
+                        break;
+                    case "0":
+                    case "num0":
+                    case "number0":
+                        HandleNumKey(0);
+                        break;
+                    case "1":
+                    case "num1":
+                    case "number1":
+                        HandleNumKey(1);
+                        break;
+                    case "2":
+                    case "num2":
+                    case "number2":
+                        HandleNumKey(2);
+                        break;
+                    case "3":
+                    case "num3":
+                    case "number3":
+                        HandleNumKey(3);
+                        break;
+                    case "4":
+                    case "num4":
+                    case "number4":
+                        HandleNumKey(4);
+                        break;
+                    case "5":
+                    case "num5":
+                    case "number5":
+                        HandleNumKey(5);
+                        break;
+                    case "6":
+                    case "num6":
+                    case "number6":
+                        HandleNumKey(6);
+                        break;
+                    case "7":
+                    case "num7":
+                    case "number7":
+                        HandleNumKey(7);
+                        break;
+                    case "8":
+                    case "num8":
+                    case "number8":
+                        HandleNumKey(8);
+                        break;
+                    case "9":
+                    case "num9":
+                    case "number9":
+                        HandleNumKey(9);
+                        break;
+                    //case "f5":
+                    //case "numpad0":
+                    //case "green":
+                    //case "proggreen":
+                    //case "f10":
+                    //    Reset();
+                    //    Refresh();
+                    //    break;
+                    //case "record":
+                    //case "mediarecord":
+                    //case "red":
+                    //case "progred":
+                    //case "f9":
+                    //case "r":
+                    //    Device.BeginInvokeOnMainThread(async () => await _viewModel.RecordChannel(!_viewModel.IsRecording, true));
+                    //    break;
+                    //case "yellow":
+                    //case "progyellow":
+                    //case "f11":
+                    //case "l":
+                    //    _viewModel.ToggleFav();
+                    //    break;
+                    //case "blue":
+                    //case "progblue":
+                    //case "f12":
+                    //case "k":
+                    //case "leftshift":
+                    //case "shiftleft":
+                    //    ToggleAudioStream(null);
+                    //    break;
+                }
+            });
         }
+
+        private void HandleNumKey(int number)
+        {
+            _loggingService.Info($"HandleNumKey {number}");
+
+            if ((DateTime.Now - _lastNumPressedTime).TotalSeconds > 2)
+            {
+                _lastNumPressedTime = DateTime.MinValue;
+                _numberPressed = String.Empty;
+            }
+
+            _lastNumPressedTime = DateTime.Now;
+            _numberPressed += number;
+
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage(_numberPressed));
+
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                var numberPressedBefore = _numberPressed;
+
+                Thread.Sleep(2000);
+
+                if (numberPressedBefore == _numberPressed)
+                {
+                    Task.Run(async () =>
+                    {
+                       /* if (_numberPressed == "0")
+                        {
+                            switch (_viewModel.PlayingState)
+                            {
+                                case PlayingStateEnum.PlayingInternal:
+                                    await ActionKeyLeft();
+                                    break;
+                                case PlayingStateEnum.PlayingInPreview:
+                                    _viewModel.SelectedItem = _viewModel.PlayingChannel;
+                                    ActionPlay(_viewModel.PlayingChannel);
+                                    break;
+                                case PlayingStateEnum.Stopped:
+                                    if (_viewModel.StandingOnEnd)
+                                    {
+                                        await ActionFirstOrLast(true);
+                                        _lastTimeHome = true;
+                                    }
+                                    else
+                                    if (_viewModel.StandingOnStart)
+                                    {
+                                        await ActionFirstOrLast(false);
+                                        _lastTimeHome = false;
+                                    }
+                                    else
+                                    {
+                                        await ActionFirstOrLast(_lastTimeHome);
+                                        _lastTimeHome = !_lastTimeHome;
+                                    }
+                                    break;
+                            }
+                            ;
+
+                            return;
+                        }*/
+
+                        var selectedChannel = await _viewModel.SelectChannelByNumber(_numberPressed);
+                        if ((selectedChannel != null) && (_numberPressed == selectedChannel.Number))
+                        {
+                            await ActionPlay(selectedChannel);
+                        }
+                    });
+                }
+
+            }).Start();
+        }
+
 
         public void OnTextSent(string text)
         {

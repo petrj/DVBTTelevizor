@@ -525,6 +525,18 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public async Task<Channel?> SelectChannelByNumber(string num)
+        {
+            _loggingService.Info($"SelectChannelByNumber {num}");
+
+            return await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                var ch  = _listViewSelector?.SelectChannelByNumber(num);
+                NotifyChannelChange();
+                return ch;
+            });
+        }
+
         public void SelectNextChannel()
         {
             _loggingService.Info($"Selecting next channel");
