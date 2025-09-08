@@ -1157,22 +1157,23 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"ActionOK");
 
-            if (longPress)
-            {
-                _viewModel.MenuVisible = !_viewModel.MenuVisible;
-                return;
-            }
-
-            if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
-            {
-                VideoStackLayout_Tapped(this, new TappedEventArgs(null));
-                return;
-            }
-
             switch (_focusItems.FocusedItemName)
             {
                 case "ChannelsListView":
-                    Task.Run(async () =>
+
+                    if (longPress)
+                    {
+                        _viewModel.MenuVisible = !_viewModel.MenuVisible;
+                        return;
+                    }
+
+                    if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                    {
+                        VideoStackLayout_Tapped(this, new TappedEventArgs(null));
+                        return;
+                    }
+
+                    await Task.Run(async () =>
                     {
                         await ActionPlay();
                     });
@@ -1920,8 +1921,8 @@ namespace DVBTTelevizor.MAUI
                         _focusItems.FocusPreviousItem(true);
                     });
 
+                    return;
 
-                    break;
                 case KeyboardNavigationActionEnum.Right:
 
                     if ((_focusItems.FocusedItemName == "ChannelsListView") &&
@@ -1934,7 +1935,7 @@ namespace DVBTTelevizor.MAUI
                             {
                                 _focusItems.FocusNextItem(true);
                             });
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.Down:
 
@@ -1965,7 +1966,7 @@ namespace DVBTTelevizor.MAUI
                             _focusItems.FocusNextItem(true);
                         }
                     });
-                    break;
+                    return;
 
 
                 case KeyboardNavigationActionEnum.Up:
@@ -1995,14 +1996,14 @@ namespace DVBTTelevizor.MAUI
                             _focusItems.FocusNextItem(true);
                         }
                     });
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.Back:
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         await ActionBack(longPress);
                     });
-                    break;
+                    return;
 
                 case KeyboardNavigationActionEnum.OK:
 
@@ -2011,7 +2012,7 @@ namespace DVBTTelevizor.MAUI
                         await ActionOK(longPress);
                     });
 
-                    break;
+                    return;
 
 
             }
