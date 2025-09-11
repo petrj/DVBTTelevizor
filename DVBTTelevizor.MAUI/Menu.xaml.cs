@@ -1,5 +1,6 @@
 namespace DVBTTelevizor.MAUI;
 
+using Android.Media;
 using Microsoft.Maui.Controls;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -71,7 +72,10 @@ public partial class Menu : ContentView
 
         if (delimitterFollows)
         {
-            item.Margin = new Thickness(10, 10, 10, 30);
+            item.Margin = new Thickness(5, 10, 5, 30);
+        } else
+        {
+            item.Margin = new Thickness(5, 10, 5, 10);
         }
 
         return item;

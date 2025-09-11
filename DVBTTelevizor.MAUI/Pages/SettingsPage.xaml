@@ -16,11 +16,18 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
             </Style>
 
+            <Style x:Key="YellowLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="yellow"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,10,1,0" />
+            </Style>
+
             <Style x:Key="DetailLabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
-                <Setter Property="Margin" Value="20,0,20,0"/>
+                <Setter Property="Margin" Value="20,10,20,0"/>
             </Style>
 
             <Style x:Key="CaptionStyle" TargetType="Label">
@@ -31,10 +38,11 @@
                 <Setter Property="HorizontalOptions" Value="End"/>
                 <Setter Property="VerticalOptions" Value="Center"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="Margin" Value="0,0,20,0"/>
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
-                <Setter Property="Margin" Value="30,20,20,0"/>
+                <Setter Property="Margin" Value="10,10,5,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
@@ -51,8 +59,15 @@
                 <Setter Property="Margin" Value="3,3,3,3"/>
             </Style>
 
+            <Style x:Key="BoxViewStyle" TargetType="BoxView">
+                <Setter Property="CornerRadius" Value="15"/>
+                <Setter Property="BackgroundColor" Value="#333333"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
             <Style x:Key="CommonSwitchTextStyle" TargetType="Switch">
                 <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="Margin" Value="0,0,20,0"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
             </Style>
@@ -108,21 +123,25 @@
                         <BoxView x:Name="ShowTVChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show TV Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}" />
 
                         <BoxView x:Name="ShowRadioChannelsBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Show Radio Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch"  IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
                         <BoxView x:Name="ShowNonFreeChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Show Non Free Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="2" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowNonFreeSwitch"  IsToggled="{Binding Config.ShowNonFreeChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
                         <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Show Other Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="3" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
                     </Grid>
 
@@ -168,11 +187,17 @@
                         <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Full screen'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="FullscreenSwitch"  IsToggled="{Binding Config.Fullscreen, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}"/>
+
+
 
                         <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Play on background'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
@@ -240,12 +265,13 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80*" />
-                            <ColumnDefinition Width="20*" />
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
                         <BoxView x:Name="RemoteAccessEnabledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Enabled'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="RemoteAccessSwitch" IsToggled="{Binding AllowRemoteAccessService, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
                     </Grid>
 
@@ -280,7 +306,7 @@
                             <Grid Grid.Row="6" Grid.Column="0" HorizontalOptions="End">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto" />
-                                    <RowDefinition Height="100" />
+                                    <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto" />
@@ -306,9 +332,9 @@
 
                 </StackLayout>
 
-                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding DebugSettingsVisible}"/>
 
-                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutDriver">
+                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutDriver" IsVisible="{Binding DebugSettingsVisible}">
 
                     <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
                         <Grid.RowDefinitions>
@@ -354,11 +380,12 @@
                         <BoxView x:Name="RecordingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='Recording directory'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Config.OutputDirectory}"  Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" TextColor="Yellow" />
+                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Config.OutputDirectory}"  Style="{StaticResource YellowLabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
 
                         <BoxView x:Name="WriteToExternalDeviceSwitchBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Write to external storage'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <BoxView Grid.Row="2" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="2" Grid.Column="1" x:Name="WriteToExternalDeviceSwitch" IsToggled="{Binding Config.WriteToExternalDevice, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}"/>
                     </Grid>
 
@@ -393,7 +420,7 @@
                         </Picker>
                     </Grid>
 
-                    <Button x:Name="ExportLanguageButton" Text="{local:LngXamlExt Input='Export language'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="ExportLanguageButton_Clicked" />
+                    <Button x:Name="ExportLanguageButton" Text="{local:LngXamlExt Input='Export language'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="ExportLanguageButton_Clicked"  IsVisible="{Binding DebugSettingsVisible}"/>
 
                 </StackLayout>
 
@@ -407,7 +434,6 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70*" />
@@ -417,14 +443,25 @@
                         <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding Config.EnableLogging, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/DVBTTelevizor.log" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}" IsVisible="{Binding EnableLogging}"/>
+                    </Grid>
 
-                        <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                    <Grid Margin="30,10,10,0" IsVisible="{Binding DebugSettingsVisible}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
 
-                        <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='UDP IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Entry Grid.Row="2" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}"/>
+                        <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='UDP IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}"/>
 
                     </Grid>
 

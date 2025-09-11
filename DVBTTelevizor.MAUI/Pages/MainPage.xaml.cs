@@ -1016,7 +1016,7 @@ namespace DVBTTelevizor.MAUI
                             _focusItems.FocusItem("ChannelsListView");
                         } else
                         {
-                            _focusItems.FocusItem("QuickTuneButton"); ;
+                            _focusItems.FocusItem("QuickTuneButton");
                         }
                     });
                 });
@@ -1078,9 +1078,6 @@ namespace DVBTTelevizor.MAUI
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-
-            //_mediaPlayer?.Dispose();
-            //_LibVLC?.Dispose();
         }
 
         private void InitializeVLC()

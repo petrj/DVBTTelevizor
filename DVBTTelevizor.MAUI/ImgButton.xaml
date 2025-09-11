@@ -11,15 +11,15 @@
                    Margin="5,0,5,0"
                    Padding="0,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="75*" />
-                    <RowDefinition Height="25*" />
+                    <RowDefinition Height="50*" />
+                    <RowDefinition Height="50*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
-                <Image Grid.Row="0" Grid.Column="0" x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start" HeightRequest="30"  />
+                <Image Grid.Row="0" Grid.Column="0" x:Name="BtnImage" Source="{Binding Img, Source={x:Reference ImgBtn}}" VerticalOptions="Center" HorizontalOptions="Start" />
 
                 <Label x:Name="TopTitle" Grid.Row="0" Grid.Column="1" Text="{Binding TopTitleText, Source={x:Reference ImgBtn}}"
                         FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
@@ -36,6 +36,7 @@
                         HorizontalTextAlignment="Start"
                         VerticalOptions="Center"
                         TextColor="White"
+                        Margin="5,0,0,0"
                         />
 
         <Grid.GestureRecognizers>

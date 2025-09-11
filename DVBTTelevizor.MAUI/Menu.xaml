@@ -14,12 +14,12 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="HorizontalOptions" Value="End"/>
-                <Setter Property="Margin" Value="20,0,0,0"/>
+                <Setter Property="Margin" Value="10,0,0,0"/>
             </Style>
         </ResourceDictionary>
     </ContentView.Resources>
 
-        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#555555" CornerRadius="25">
+        <Frame x:Name="MenuFrame" IsVisible="{Binding MenuVisible}" BackgroundColor="#555555" CornerRadius="15">
 
         <StackLayout x:Name="MenuStackLayout" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 

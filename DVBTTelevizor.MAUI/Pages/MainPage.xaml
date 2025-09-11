@@ -364,14 +364,14 @@
                 <TapGestureRecognizer Tapped="TuneImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
-        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.3,0.1" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.1" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
         <Image x:Name="DriverImage" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="uninstalled.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="DriverImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
-        <Button x:Name="QuickDriverButton" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.3,0.1" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="QuickDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="QuickDriverButton" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.1" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="QuickDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
          <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
