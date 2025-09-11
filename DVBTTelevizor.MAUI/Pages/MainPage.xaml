@@ -300,7 +300,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <Grid x:Name="MainToolBar"  AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.08" AbsoluteLayout.LayoutFlags="All"
+        <Grid x:Name="MainToolBar"  AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.15" AbsoluteLayout.LayoutFlags="All"
               ColumnSpacing="5"
               BackgroundColor="#29242a"
               Margin="0,0,0,0">
@@ -364,18 +364,18 @@
                 <TapGestureRecognizer Tapped="TuneImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
-        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.1" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
         <Image x:Name="DriverImage" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="uninstalled.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="DriverImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
-        <Button x:Name="QuickDriverButton" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.1" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="QuickDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="QuickDriverButton" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="QuickDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
          <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
-        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.25,0.45,0.5,0.25"  Color="Green"/-->
+        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.0,1.0,0.5,0.85"  Color="Green"/-->
 
     </AbsoluteLayout>
 

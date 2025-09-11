@@ -68,7 +68,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool IsPortrait { get; set; } = false;
 
-        // Menu: 0.0,0,1.0,0.08
+        // Menu: 0.0,0,1.0,0.1
 
         private Rect FullScreenVideoPosition { get; set; } = new Rect(0.5, 0.5, 1.0, 1.0);
 
@@ -95,8 +95,8 @@ namespace DVBTTelevizor.MAUI
         private Rect NoVideoStackLayoutPosition { get; set; } = new Rect(-10, -10, -5, -5);
 
         // ChannelsListView
-        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.92);
-        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1.0, 1, 0.92);
+        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.9);
+        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.5, 1, 1, 0.85);
         private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
         private Rect ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1, 1.0, 0.92);
         private Rect ChannelsListPortraitPositionForPreview { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);

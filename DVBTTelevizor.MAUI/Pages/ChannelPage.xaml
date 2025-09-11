@@ -206,7 +206,7 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}" />
 
-                <Button Margin="60,20,10,0" x:Name="ButtonDeleteChannel" Text="{local:LngXamlExt Input='Delete'}"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
+                <Button Margin="10,20,10,0" x:Name="ButtonDeleteChannel" Text="{local:LngXamlExt Input='Delete'}"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
 
             </StackLayout>
 

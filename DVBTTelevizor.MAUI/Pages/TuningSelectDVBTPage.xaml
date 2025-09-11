@@ -13,6 +13,12 @@
                 <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
 
+            <Style x:Key="BoxViewStyle" TargetType="BoxView">
+                <Setter Property="CornerRadius" Value="15"/>
+                <Setter Property="BackgroundColor" Value="#333333"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
             <Style x:Key="LabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
@@ -38,7 +44,7 @@
                 <Setter Property="ThumbColor" Value="Blue"/>
                 <Setter Property="OnColor" Value="CornflowerBlue"/>
                 <Setter Property="BackgroundColor" Value="Transparent"/>
-                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Margin" Value="0,0,20,0"/>
             </Style>
 
             <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
@@ -58,26 +64,28 @@
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='DVBT standard'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.2" AbsoluteLayout.LayoutFlags="All" IsVisible="True" BackgroundColor="Transparent">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.35" AbsoluteLayout.LayoutFlags="All" IsVisible="True" BackgroundColor="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="70*" />
+                <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
             <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
             <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
             <Switch BackgroundColor="Transparent"  Grid.Row="0" Grid.Column="1" x:Name="DVBTSwitch"  IsToggled="{Binding DVBT, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}">
             </Switch>
 
             <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
             <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT 2'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
             <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2Switch"  IsToggled="{Binding DVBT2, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
             <BoxView x:Name="BandwidthBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" />
