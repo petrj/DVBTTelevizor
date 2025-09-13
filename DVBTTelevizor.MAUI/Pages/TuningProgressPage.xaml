@@ -73,7 +73,9 @@
 
         <!--BoxView x:Name="TestBoxView" AbsoluteLayout.LayoutBounds="0.05, 0.05, 0.45, 0.1" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a" /-->
 
-        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5, 0.01, 0.95, 0.1" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
+        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.0, 0.95, 0.15"  Color="Green"/-->
+
+        <Grid x:Name="FrequencyGrid" AbsoluteLayout.LayoutBounds="0.5, 0.01, 0.95, 0.15" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="70*" />
@@ -99,7 +101,7 @@
 
         <ActivityIndicator x:Name="TuneIndicator" AbsoluteLayout.LayoutBounds="0.5,0.1,0.25,0.1" AbsoluteLayout.LayoutFlags="All"  IsRunning="True" IsEnabled="True" HorizontalOptions="Center" VerticalOptions="Center" Color="#41b3ff" IsVisible="{Binding TuningInProgress}"/>
 
-        <Grid x:Name="ProgressGrid" AbsoluteLayout.LayoutBounds="0.05, 0.25, 0.45, 0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
+        <Grid x:Name="ProgressGrid" AbsoluteLayout.LayoutBounds="0.05, 0.22, 0.45, 0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="50*" />

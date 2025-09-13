@@ -730,7 +730,8 @@ namespace DVBTTelevizor.MAUI
 
                     //textView.SetTextColor(Android.Graphics.Color.Black);
                     //textView.SetTextColor(Android.Graphics.Color.Blue);
-                    textView.SetTextColor(Android.Graphics.Color.Rgb(25,70,100));
+                    //textView.SetTextColor(Android.Graphics.Color.Rgb(25,70,100));
+                    textView.SetTextColor(Android.Graphics.Color.White);
 
                     var screenHeightRate = 0;
 

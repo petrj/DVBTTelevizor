@@ -8,7 +8,7 @@
              Padding="0,0,0,0">
 
             <Grid
-                   Margin="3,3,0,0"
+                   Margin="3,5,0,0"
                    Padding="0,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50*" />

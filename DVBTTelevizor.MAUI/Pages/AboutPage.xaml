@@ -63,7 +63,7 @@
             <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='Free DVBT/DVBT2 Android Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
 
             <BoxView Grid.Column="0" Grid.Row="1" x:Name="GithubBoxView" />
-            <Label Grid.Column="0" Grid.Row="1" x:Name="GithubLabel"  Text="https://github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" TextDecorations="Underline">
+            <Label Grid.Column="0" Grid.Row="1" x:Name="GithubLabel"  Text="github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" TextDecorations="Underline">
                 <Label.GestureRecognizers >
                     <TapGestureRecognizer Tapped="GithubLabel_Tapped" NumberOfTapsRequired="1" />
                 </Label.GestureRecognizers>
@@ -96,9 +96,9 @@
             <BoxView Grid.Column="0" Grid.Row="4"  BackgroundColor="White"/>
         </Grid>
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.85,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  BackgroundColor="Transparent"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.85,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.95,0.5,0.1" AbsoluteLayout.LayoutFlags="All" x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Donate $1'}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="Donate1Button_Clicked" />
+        <Button AbsoluteLayout.LayoutBounds="0.5,0.99,0.5,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Donate $1'}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="Donate1Button_Clicked" />
 
     </AbsoluteLayout>
 
