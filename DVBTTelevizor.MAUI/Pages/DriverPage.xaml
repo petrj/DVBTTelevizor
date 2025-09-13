@@ -90,13 +90,13 @@
 
         <Button x:Name="InstallDriverButton" AbsoluteLayout.LayoutBounds="0.5,0.55,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Install DVBT driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.6,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="40*" />
+                <ColumnDefinition Width="60*" />
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
 
@@ -109,9 +109,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="40*" />
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="40*" />
+                <ColumnDefinition Width="45*" />
+                <ColumnDefinition Width="10*" />
+                <ColumnDefinition Width="45*" />
             </Grid.ColumnDefinitions>
 
             <Button x:Name="ConnectButton" Grid.Column="0" Text="{local:LngXamlExt Input='Connect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectButtonVisible}" Clicked="ConnectButton_Clicked"/>

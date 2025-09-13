@@ -1,6 +1,5 @@
 namespace DVBTTelevizor.MAUI;
 
-using Android.Media;
 using Microsoft.Maui.Controls;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;

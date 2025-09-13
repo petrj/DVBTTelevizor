@@ -73,8 +73,8 @@ namespace DVBTTelevizor.MAUI
         private Rect FullScreenVideoPosition { get; set; } = new Rect(0.5, 0.5, 1.0, 1.0);
 
         // EPGDetailGrid
-        private Rect EPGDetailGridLandscapePosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
-        private Rect EPGDetailGridLandscapePositionForPreview { get; set; } = new Rect(1, 0.2, 0.3, 0.62);
+        private Rect EPGDetailGridLandscapePosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.85);
+        private Rect EPGDetailGridLandscapePositionForPreview { get; set; } = new Rect(1, 0.34, 0.3, 0.56);
         private Rect EPGDetailGridLandscapePositionForPlay { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
 
         private Rect EPGDetailGridPortraitPosition { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
@@ -95,12 +95,12 @@ namespace DVBTTelevizor.MAUI
         private Rect NoVideoStackLayoutPosition { get; set; } = new Rect(-10, -10, -5, -5);
 
         // ChannelsListView
-        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.9);
+        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.85);
         private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.5, 1, 1, 0.85);
-        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
-        private Rect ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.0, 1, 1.0, 0.92);
-        private Rect ChannelsListPortraitPositionForPreview { get; set; } = new Rect(0.0, 0.2, 1.0, 0.62);
-        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 0.16, 1.0, 0.52);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisible { get; set; } = new Rect(0.0, 0.32, 1.0, 0.56);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.5, 1, 1.0, 0.85);
+        private Rect ChannelsListPortraitPositionForPreview { get; set; } = new Rect(0.5,0.25,1.0,0.46);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.5, 0.25, 1.0, 0.46);
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
