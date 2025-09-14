@@ -246,9 +246,9 @@ namespace DVBTTelevizor.MAUI
                 RequestStoragePermission();
             });
 
-            WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<SizedToastMessage>(this, (r, m) =>
             {
-                ShowToastMessage(m.Value);
+                ShowToastMessage(m.Value.Message, (int)m.Value.AppFontSize);
             });
 
             WeakReferenceMessenger.Default.Register<SetUDPLoggingIPMessage>(this, (r, m) =>
@@ -721,17 +721,14 @@ namespace DVBTTelevizor.MAUI
                     {
                         // using Toast
 
-                        tView.Background.SetColorFilter(Android.Graphics.Color.Gray, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
+                        //tView.Background.SetColorFilter(Android.Graphics.Color.Gray, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
                         textView = (TextView)tView.FindViewById(Android.Resource.Id.Message);
-                        textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
                     }
 
                     var minTextSize = textView.TextSize; // 16
 
-                    //textView.SetTextColor(Android.Graphics.Color.Black);
-                    //textView.SetTextColor(Android.Graphics.Color.Blue);
-                    //textView.SetTextColor(Android.Graphics.Color.Rgb(25,70,100));
-                    textView.SetTextColor(Android.Graphics.Color.White);
+                    textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
+                    textView.SetTextColor(Android.Graphics.Color.Black);
 
                     var screenHeightRate = 0;
 

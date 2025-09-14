@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Controls.PlatformConfiguration;
+using System.Linq.Expressions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -152,7 +153,14 @@ public partial class AboutPage : ContentPage, IOnKeyDown
     {
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await _aboutPageViewModel.Donate();
+            try
+            {
+                await _aboutPageViewModel.Donate();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error($"Donate1Button_Clicked error: {ex}");
+            }
         });
     }
 }

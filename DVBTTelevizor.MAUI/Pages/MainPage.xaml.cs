@@ -274,6 +274,16 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new SizedToastMessage(
+                    new SizedToast
+                    {
+                         Message = m.Value,
+                        AppFontSize = _configuration.AppFontSize
+                    }));
+            });
+
             WeakReferenceMessenger.Default.Register<KeyDownMessage>(this, (r, m) =>
             {
                 OnKeyDown(m.Value, m.Long);

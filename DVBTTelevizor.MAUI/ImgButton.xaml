@@ -11,8 +11,8 @@
                    Margin="3,5,0,0"
                    Padding="0,0,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="50*" />
-                    <RowDefinition Height="50*" />
+                    <RowDefinition Height="60*" />
+                    <RowDefinition Height="40*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />

@@ -39,6 +39,8 @@
                 <Setter Property="VerticalOptions" Value="Center"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
                 <Setter Property="Margin" Value="0,0,20,0"/>
+                <Setter Property="ThumbColor" Value="Blue"/>
+                <Setter Property="OnColor" Value="CornflowerBlue"/>
             </Style>
 
             <Style x:Key="ButtonStyle" TargetType="Button">
@@ -70,6 +72,8 @@
                 <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="Margin" Value="0,0,20,0"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="ThumbColor" Value="Blue"/>
+                <Setter Property="OnColor" Value="CornflowerBlue"/>
             </Style>
 
             <Style x:Key="EntryStyle" TargetType="Entry">

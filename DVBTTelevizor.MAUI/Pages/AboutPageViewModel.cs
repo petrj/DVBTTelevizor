@@ -22,16 +22,18 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Donate {productId}");
 
-            if (!CrossInAppBilling.IsSupported)
-            {
-                _loggingService.Error("Billing system is not supported on this device");
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Billing system is not supported on this device".Translated()));
-                return false;
-            }
-
-            var billing = CrossInAppBilling.Current;
+            IInAppBilling billing = null;
             try
             {
+                if (!CrossInAppBilling.IsSupported)
+                {
+                    _loggingService.Error("Billing system is not supported on this device");
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Billing system is not supported on this device".Translated()));
+                    return false;
+                }
+
+                billing = CrossInAppBilling.Current;
+
                 var connected = await billing.ConnectAsync();
                 if (!connected)
                 {
@@ -92,7 +94,10 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
-                await billing.DisconnectAsync();
+                if (billing != null)
+                {
+                    await billing.DisconnectAsync();
+                }
             }
         }
     }
