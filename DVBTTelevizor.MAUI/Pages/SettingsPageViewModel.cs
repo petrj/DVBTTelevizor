@@ -25,7 +25,7 @@ namespace DVBTTelevizor.MAUI
         private bool _menuVisible = false;
 
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
-          : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
+          : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             WeakReferenceMessenger.Default.Register<ExternalDeviceWriteAccessGranted>(this, (r, m) =>
             {

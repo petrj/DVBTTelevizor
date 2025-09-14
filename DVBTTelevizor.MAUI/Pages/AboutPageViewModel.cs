@@ -14,7 +14,7 @@ namespace DVBTTelevizor.MAUI
     public class AboutPageViewModel : BaseViewModel
     {
         public AboutPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
-          : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
+          : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
         }
 

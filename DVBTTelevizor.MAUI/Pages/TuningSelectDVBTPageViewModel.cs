@@ -23,7 +23,7 @@ namespace DVBTTelevizor.MAUI
         public TuningSettings Settings { get; set; }
 
         public TuningSelectDVBTPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
-          : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
+          : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             Settings = new TuningSettings(loggingService);
 

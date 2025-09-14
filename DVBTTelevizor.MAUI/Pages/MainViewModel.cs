@@ -57,7 +57,7 @@ namespace DVBTTelevizor.MAUI
         public bool MainLayoutVisible { get; set; } = true;
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
-            :base(loggingService,driver, tvConfiguration, dialogService, publicDirectoryProvider)
+            :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
@@ -593,7 +593,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (!File.Exists(filename))
                 {
-                    await _dialogService.Information("File {0} not found".Translated(filename));
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("File {0} not found".Translated(filename)));
                     return;
                 }
 
@@ -619,7 +619,7 @@ namespace DVBTTelevizor.MAUI
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "Import failed");
-                await _dialogService.Information("Import failed".Translated());
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Import failed".Translated()));
             }
         }
 

@@ -15,7 +15,7 @@ namespace DVBTTelevizor.MAUI
         private string _range = string.Empty;
 
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
-          : base(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider)
+          : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             WeakReferenceMessenger.Default.Register<DVBTDriverStateChangedMessages>(this, (r, m) =>
             {

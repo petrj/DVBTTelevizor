@@ -15,19 +15,16 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
-        protected IDialogService _dialogService;
 
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
             ITVConfiguration tvConfiguration,
-            IDialogService dialogService,
             IPublicDirectoryProvider publicDirectoryProvider)
         {
             _loggingService = loggingService;
             _driver = driver;
             _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
             _configuration = tvConfiguration;
-            _dialogService = dialogService;
 
             WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
             {
