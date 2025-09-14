@@ -32,6 +32,8 @@ namespace DVBTTelevizor.MAUI
         private bool _signalCarrier = false;
         private long _signalSNR = 0;
 
+        private bool _menuVisible = false;
+
         private double _signalStrengthProgress = 0;
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
@@ -1019,6 +1021,22 @@ namespace DVBTTelevizor.MAUI
                     list.Focus();
                 });
         }
+
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
+            }
+        }
+
     }
 }
 

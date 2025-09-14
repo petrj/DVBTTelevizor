@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Layouts;
+using System.Collections.ObjectModel;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -16,9 +17,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     private bool _isPortrait { get; set; } = false;
     private bool? _isPortraitPreviousValue { get; set; } = null;
 
+    private List<MenuItem> _menuItems = new List<MenuItem>();
+
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
-    private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
@@ -31,7 +33,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new TuningProgressPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
@@ -287,17 +288,16 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped)
         {
-            if (!await _dialogService.Confirm(
-                "Tuning is in progress".Translated(),
-                "Start tuning".Translated(),
-                "Continue".Translated(),
-                "Start from beginning".Translated()))
-            {
-                _viewModel.ResetTune(true);
-            }
+            BuildConfirmMenu(
+            "Tuning is in progress".Translated(),
+            "Start from beginning".Translated(),
+            "Continue".Translated(),
+            "menuFromBeginning",
+            "menuContinue");
+        } else
+        {
+            _viewModel.StartTune();
         }
-
-        _viewModel.StartTune();
     }
 
     private void StopButton_Clicked(object sender, EventArgs e)
@@ -337,5 +337,71 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _viewModel.Settings = tuningSettings;
         _viewModel.UpdateActualFreq();
+    }
+
+    private void ShowOrHideMenu()
+    {
+        if (MainMenu.MenuVisible)
+        {
+            HideMenu();
+        }
+        else
+        {
+            ShowMenu();
+        }
+    }
+
+    private void ShowMenu()
+    {
+        MainMenu.MenuVisible = true;
+        _viewModel.MenuVisible = true;
+    }
+
+    private void HideMenu()
+    {
+        MainMenu.MenuVisible = false;
+        _viewModel.MenuVisible = false;
+    }
+
+    private void BuildConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm, string actionNotConfirm)
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            _menuItems.Clear();
+
+            _menuItems.Add(MainMenu.CreateMenuItem(actionConfirm, titleYes, "confirm.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem(actionNotConfirm, titleNo, "cancel.png"));
+
+            MainMenu.UpdateMenu(title, _menuItems);
+        }
+    }
+
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null && e is TappedEventArgs tea)
+        {
+            Menu_Tapped(tea.Parameter.ToString());
+        }
+    }
+
+    private async void Menu_Tapped(string menuId)
+    {
+        _loggingService.Info($"Menu tapped: {menuId}");
+
+        HideMenu();
+
+        switch (menuId)
+        {
+            case "menuFromBeginning":
+                _viewModel.ResetTune(true);
+                _viewModel.StartTune();
+                break;
+
+            case "menuContinue":
+                _viewModel.StartTune();
+                break;
+        }
     }
 }
