@@ -9,7 +9,6 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
-    private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
@@ -18,22 +17,21 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     private FrequencyPage _frequencyPage;
     private TuningProgressPage _tuningProgressPage;
 
-    public TuningFrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public TuningFrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _tuningFrequenciesViewModel.Settings = new TuningSettings(_loggingService);
 
-        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
-        _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _frequencyPage.Disappearing += _frequencyPage_Disappearing;
 
         BuildFocusableItems();

@@ -9,7 +9,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
-    private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
@@ -22,24 +21,23 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     private TuningFrequencyPage _tuningFrequencyPage;
     private TuningFrequenciesPage _tuningFrequenciesPage;
 
-    public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         _tuningSettings = new TuningSettings(_loggingService);
 
-        BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _driverPageViewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
-        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
-        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
-        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
-        _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
     }

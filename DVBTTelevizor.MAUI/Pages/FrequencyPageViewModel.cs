@@ -12,7 +12,7 @@ namespace DVBTTelevizor.MAUI
         private TuningSettings _tuneSettings { get; set; }
         private bool isReadonly = false;
 
-        public FrequencyPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public FrequencyPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             _tuneSettings = new TuningSettings(_loggingService);

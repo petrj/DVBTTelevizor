@@ -11,23 +11,21 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
-    private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
 
-    public DriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public DriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
     }

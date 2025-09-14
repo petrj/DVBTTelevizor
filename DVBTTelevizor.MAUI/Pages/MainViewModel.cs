@@ -56,7 +56,7 @@ namespace DVBTTelevizor.MAUI
 
         public bool MainLayoutVisible { get; set; } = true;
 
-        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);

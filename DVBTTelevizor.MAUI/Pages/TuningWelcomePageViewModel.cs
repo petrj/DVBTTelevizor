@@ -12,7 +12,7 @@ namespace DVBTTelevizor.MAUI
 {
     public class TuningWelcomePageViewModel : BaseViewModel
     {
-        public TuningWelcomePageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public TuningWelcomePageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
         }

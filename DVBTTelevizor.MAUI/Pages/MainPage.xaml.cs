@@ -23,7 +23,6 @@ namespace DVBTTelevizor.MAUI
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
         private IDriverConnector _driver { get; set; }
-        private IDialogService _dialogService;
         private ITVConfiguration _configuration;
         public string PublicDirectory { get; set; }
 
@@ -158,17 +157,15 @@ namespace DVBTTelevizor.MAUI
 
             _configuration.ConfigDirectory = PublicDirectory;
 
-            _dialogService = new DialogService(this);
-
             InitDVBTDriver();
 
-            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, _dialogService, publicDirectoryProvider);
+            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, publicDirectoryProvider);
 
-            _settingsPage = new SettingsPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
-            _aboutPage = new AboutPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
-            _driverPage = new DriverPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
-            _channelPage = new ChannelPage(_loggingService, _driver, _configuration, _dialogService, publicDirectoryProvider);
-            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _dialogService, _publicDirectoryProvider);
+            _settingsPage = new SettingsPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _aboutPage = new AboutPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
 
             _channelPage.Disappearing += _channelPage_Disappearing;
 

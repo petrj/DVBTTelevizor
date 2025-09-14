@@ -22,7 +22,7 @@ namespace DVBTTelevizor.MAUI
 
         public ObservableCollection<Channel>? _channels{ get; set; } = new ObservableCollection<Channel>();
 
-        public ChannelPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+        public ChannelPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
         }

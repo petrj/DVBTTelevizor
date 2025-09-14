@@ -12,7 +12,6 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
-    private IDialogService _dialogService;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
@@ -22,17 +21,16 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     public bool Confirmed { get; set; } = false;
 
-    public FrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IDialogService dialogService, IPublicDirectoryProvider publicDirectoryProvider)
+    public FrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _dialogService = dialogService;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _viewModel = new FrequencyPageViewModel(loggingService, driver, tvConfiguration, dialogService, publicDirectoryProvider);
+        BindingContext = _viewModel = new FrequencyPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         KHZEntry.Focused += KHZEntry_Focused;
         KHZEntry.Unfocused += KHZEntry_Unfocused;
@@ -73,14 +71,14 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         float mhz;
         if (!float.TryParse(MHZEntry.Text, out mhz))
         {
-            await _dialogService.Information($"Invalid frequency");
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Invalid frequency".Translated()));
             _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
 
         if (!_viewModel.Settings.ValidFrequency(Convert.ToInt64(mhz*1000.0), true))
         {
-            await _dialogService.Information($"Frequency \"{mhz}\" MHz is out of range {_viewModel.FrequencyMinMHz} MHz - {_viewModel.FrequencyMaxMHz} MHz");
+            WeakReferenceMessenger.Default.Send(new ToastMessage($"Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(mhz.ToString(), _viewModel.FrequencyMinMHz.ToString(), _viewModel.FrequencyMaxMHz.ToString())));
             _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
@@ -94,14 +92,14 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         int khz;
         if (!int.TryParse(KHZEntry.Text, out khz))
         {
-            await _dialogService.Information($"Invalid frequency");
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Invalid frequency".Translated()));
             _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
 
         if (!_viewModel.Settings.ValidFrequency(khz, true))
         {
-            await _dialogService.Information($"Frequency \"{khz}\" KHz is out of range {_viewModel.FrequencyMinKHz} KHz - {_viewModel.FrequencyMaxKHz} KHz");
+            WeakReferenceMessenger.Default.Send(new ToastMessage($"Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(khz.ToString(), _viewModel.FrequencyMinKHz.ToString(), _viewModel.FrequencyMaxKHz.ToString())));
             _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
             return;
         }
