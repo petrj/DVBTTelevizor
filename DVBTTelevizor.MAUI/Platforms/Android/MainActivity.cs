@@ -17,12 +17,14 @@ using AndroidX.Core.Content;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
+using Java.Security;
 using Java.Sql;
 using LoggerService;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using NLog;
+using Org.Apache.Commons.Logging;
 using RTLSDR;
 using RTLSDR.Common;
 using System.ComponentModel;
@@ -61,12 +63,18 @@ namespace DVBTTelevizor.MAUI
 
         private BackgroundWorker _audioReceiver;
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        private void EnableNLOGLogging()
         {
             Assembly assembly = typeof(App).GetTypeInfo().Assembly;
             NLog.Config.ISetupBuilder setupBuilder = NLog.LogManager.Setup();
             NLog.Config.ISetupBuilder configuredSetupBuilder = setupBuilder.LoadConfigurationFromAssemblyResource(assembly);
             _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
+
+        }
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            _loggingService = new DummyLoggingService();
 
             // prevent sleep:
             var  win = (this as Android.App.Activity).Window;
@@ -241,6 +249,11 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<EnableLoggingMessage>(this, (r, m) =>
+            {
+                EnableNLOGLogging();
+            });
+
             WeakReferenceMessenger.Default.Register<ExternalDeviceWriteRequestMessage>(this, (r, m) =>
             {
                 RequestStoragePermission();
@@ -580,7 +593,7 @@ namespace DVBTTelevizor.MAUI
                 //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageWrite>();
                 //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageRead>();
 
-                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Permission.Granted)
+                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted)
                 {
                     ActivityCompat.RequestPermissions(this,
                         new string[]

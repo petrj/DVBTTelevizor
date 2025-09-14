@@ -222,7 +222,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run(async () =>
                 {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
+                    await Task.Delay(11000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
 
                     _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
                     var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
@@ -237,6 +237,16 @@ namespace DVBTTelevizor.MAUI
                 {
                     await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
                     WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
+                });
+            }
+
+            if (_configuration.EnableLogging)
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
+
+                    WeakReferenceMessenger.Default.Send(new EnableLoggingMessage(String.Empty));
                 });
             }
         }
