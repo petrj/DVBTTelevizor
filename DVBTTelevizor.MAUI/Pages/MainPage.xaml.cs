@@ -4,6 +4,7 @@ using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui;
+using Microsoft.Maui.Animations;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
@@ -52,6 +53,7 @@ namespace DVBTTelevizor.MAUI
 
         private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
+        private bool _menuShowEnabled = true;
 
         private bool _checkStreamEnabled = true;
         public Command CommandCheckStream { get; set; }
@@ -1830,12 +1832,53 @@ namespace DVBTTelevizor.MAUI
 
         private async void MenuButton_Clicked(object sender, EventArgs e)
         {
-            ShowOrHideMenu();
-
-            if (MainMenu.IsVisible)
+            if (!_menuShowEnabled)
             {
-                BuildMenu();
+                return;
             }
+
+            bool animating = false;
+
+            _menuShowEnabled = false;
+            try
+            {
+                var angle = 0;
+
+                // start rotation
+                var task = Task.Run(async () =>
+                {
+                    animating = true;
+                    while (animating)
+                    {
+                        angle += 36;
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await MenuButton.RotateYTo(angle);
+                        });
+                    }
+                });
+
+                ShowOrHideMenu();
+
+                if (MainMenu.IsVisible)
+                {
+                    BuildMenu();
+                }
+
+
+            } finally
+            {
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    animating = false;
+                    MenuButton.CancelAnimations();
+                    await Task.Delay(500);
+                    MenuButton.RotationY = 0; // reset to default angle
+                });
+
+                _menuShowEnabled = true;
+            }
+
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
