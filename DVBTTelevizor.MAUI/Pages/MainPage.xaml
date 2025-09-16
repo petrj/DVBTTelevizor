@@ -187,7 +187,7 @@
             </StackLayout.GestureRecognizers>
             <StackLayout.Behaviors>
                 <toolkit:TouchBehavior
-                    LongPressCompleted="OnLongPress"
+                    LongPressCompleted="OnVideo_LongPress"
                     LongPressDuration="750" />
             </StackLayout.Behaviors>
         </StackLayout>
@@ -252,7 +252,6 @@
           SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
           IsVisible="{Binding ChannelsListViewVisible}"
           SelectionMode="Single"
-          ItemTapped="ChannelsListView_ItemTapped"
           ItemSelected="ChannelsListView_ItemSelected">
 
             <ListView.ItemTemplate>
@@ -291,6 +290,15 @@
                                 <Label Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="3" Text="{Binding ProviderNameAndFrequencyShortLabel}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" TextColor="{Binding ChannelTextLabelColor}"/>
 
                                 <ProgressBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Progress="{Binding CurrentEPGEventProgress}" ProgressColor="#41b3ff" BackgroundColor="White"/>
+                                <Grid.Behaviors>
+                                    <toolkit:TouchBehavior
+                                        LongPressCompleted="OnChannel_LongTapped"
+                                        LongPressDuration="750" />
+                                </Grid.Behaviors>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnChannel_Tapped" />
+                                </Grid.GestureRecognizers>
+
                             </Grid>
 
                         </ViewCell.View>
@@ -352,7 +360,7 @@
             </StackLayout.GestureRecognizers>
             <StackLayout.Behaviors>
                 <toolkit:TouchBehavior
-                    LongPressCompleted="OnLongPress"
+                    LongPressCompleted="OnVideo_LongPress"
                     LongPressDuration="750" />
             </StackLayout.Behaviors>
         </StackLayout>

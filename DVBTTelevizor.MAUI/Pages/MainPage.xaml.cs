@@ -38,6 +38,7 @@ namespace DVBTTelevizor.MAUI
 
         private DateTime _lastBackPressedTime = DateTime.MinValue;
         private DateTime _lastNumPressedTime = DateTime.MinValue;
+        private DateTime _lastLongTappedTime = DateTime.MinValue;
         private string _numberPressed = String.Empty;
 
         private Channel[] _lastPlayedChannels = new Channel[2];
@@ -1795,21 +1796,6 @@ namespace DVBTTelevizor.MAUI
             await Navigation.PushAsync(_driverPage);
         }
 
-        private async void ChannelsListView_ItemTapped(object sender, ItemTappedEventArgs e)
-        {
-            _loggingService.Info("ChannelsListView_ItemTapped");
-
-            _loggingService.Info($"{e.Item.GetType().FullName}");
-            if (e.Item is Channel channel)
-            {
-                _loggingService.Info($"ChannelsListView_ItemTapped: {channel.Name}");
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await ActionPlay(channel);
-                });
-            }
-        }
-
         private void ShowOrHideMenu()
         {
             if (MainMenu.MenuVisible)
@@ -1933,9 +1919,9 @@ namespace DVBTTelevizor.MAUI
             return result;
         }
 
-        private void OnLongPress(object sender, EventArgs e)
+        private void OnVideo_LongPress(object sender, EventArgs e)
         {
-            _loggingService.Debug("OnLongPress");
+            _loggingService.Debug("OnVideo_LongPress");
 
             MenuButton_Clicked(this, new EventArgs());
         }
@@ -2840,6 +2826,41 @@ namespace DVBTTelevizor.MAUI
         private void QuickDriverButton_Clicked(object sender, EventArgs e)
         {
             WeakReferenceMessenger.Default.Send(new InstallDriverMessage(String.Empty));
+        }
+
+        private void OnChannel_Tapped(object sender, TappedEventArgs e)
+        {
+            _loggingService.Info("OnChannel_Tapped");
+
+            // this event is fired immedietly after LongTappedEvent!
+            if ((DateTime.Now - _lastLongTappedTime).TotalMilliseconds<1000)
+            {
+                return;
+            }
+
+            if (sender is Grid grid && grid.BindingContext is Channel channel)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.SelectedChannel = channel;
+                    await ActionPlay(channel);
+                });
+            }
+        }
+
+        private void OnChannel_LongTapped(object sender, EventArgs e)
+        {
+            _loggingService.Info("OnChannel_LongTapped");
+
+            if (sender is Grid grid && grid.BindingContext is Channel channel)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _viewModel.SelectedChannel = channel;
+                });
+
+                _lastLongTappedTime = DateTime.Now;
+            }
         }
     }
 
