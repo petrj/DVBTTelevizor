@@ -1117,7 +1117,8 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _refreshed;
+                // return _refreshed;
+                return true;
             }
             set
             {

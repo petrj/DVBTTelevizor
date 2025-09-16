@@ -193,8 +193,6 @@
         </StackLayout>
 
 
-        <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.5,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" />
-
         <Grid
             x:Name="EPGDetailGrid"
             AbsoluteLayout.LayoutBounds="1.0, 0.22, 0.3, 0.62"
@@ -383,6 +381,7 @@
 
          <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
+        <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.5,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" />
         <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.2, 1.0, 0.5"  Color="Green"/-->
 
     </AbsoluteLayout>

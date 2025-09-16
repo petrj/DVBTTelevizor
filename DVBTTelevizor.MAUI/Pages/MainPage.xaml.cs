@@ -1429,9 +1429,6 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
-                _refreshGUIEnabled = false;
-                _checkStreamEnabled = false;
-
                 if (channel == null)
                     channel = _viewModel.SelectedChannel;
 
@@ -1506,6 +1503,11 @@ namespace DVBTTelevizor.MAUI
                     shouldMediaStop = false;
                     shouldMediaPlay = false;
                 }
+
+                PlayingState = PlayingStateEnum.Playing;
+
+                _refreshGUIEnabled = false;
+                _checkStreamEnabled = false;
 
                 if (shouldMediaStop && videoView.MediaPlayer.IsPlaying)
                 {
