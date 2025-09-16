@@ -376,8 +376,6 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
-                var totalChannelsAddedCount = 0;
-
                 var mapPIDToServiceDescriptor = new Dictionary<long, MPEGTS.ServiceDescriptor>();
 
                 var configChannels = _configuration.GetChannels();
@@ -402,55 +400,26 @@ namespace DVBTTelevizor.MAUI
                     ch.Frequency = freq;
                     ch.Bandwdith = bandWidth;
                     ch.Number = String.Empty;
-                    ch.DVBTType = dvbtTypeIndex;
-                    ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
-                    //ch.NonFree = !serviceDescriptor.Key.Free;
-
-                    /*
-                    Device.BeginInvokeOnMainThread(() =>
+                    switch (dvbtTypeIndex)
                     {
-                        TunedChannels.Add(ch);
-                        OnPropertyChanged(nameof(TunedChannelsCount));
-                        OnPropertyChanged(nameof(NewTunedChannelsCount));
-                        OnPropertyChanged(nameof(TunedMultiplexesCount));
-                    });
-                    */
+                        case 0: ch.ChannelType = ChannelTypeEnum.DVBT;
+                            break;
+                        case 1:
+                            ch.ChannelType = ChannelTypeEnum.DVBT2;
+                            break;
+                    }
+
+                    ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
+                    ch.NonFree = !serviceDescriptor.Key.Free;
+
                     _loggingService.Debug($"Found channel \"{serviceDescriptor.Key.ServiceName}\"");
 
                     if (ChannelFound != null)
                     {
                         ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
                     }
-
-
-                    /*
-                    // automatically adding new tuned channel if does not exist
-                    if (!ConfigViewModel.ChannelExists(_savedChannels, ch.FrequencyAndMapPID))
-                    {
-                        ch.Number = ConfigViewModel.GetNextChannelNumber(_savedChannels).ToString();
-
-                        _savedChannels.Add(ch);
-
-                        await _channelService.SaveChannels(_savedChannels);
-                        totalChannelsAddedCount++;
-                        _newTunedChannelsCount++;
-                    }
-                    */
                 }
 
-                /*
-                if (totalChannelsAddedCount > 0)
-                {
-                    if (totalChannelsAddedCount > 1)
-                    {
-                        MessagingCenter.Send($"{totalChannelsAddedCount} channels saved", BaseViewModel.MSG_ToastMessage);
-                    }
-                    else
-                    {
-                        MessagingCenter.Send($"Channel saved", BaseViewModel.MSG_ToastMessage);
-                    }
-                }
-                */
             }
             catch (Exception ex)
             {

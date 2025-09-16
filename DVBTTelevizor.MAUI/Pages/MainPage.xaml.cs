@@ -1526,7 +1526,7 @@ namespace DVBTTelevizor.MAUI
                     if (_viewModel.PlayingChannel != null &&
                         _viewModel.PlayingChannel.Frequency == channel.Frequency &&
                         _viewModel.PlayingChannel.Bandwdith == channel.Bandwdith &&
-                        _viewModel.PlayingChannel.DVBTType == channel.DVBTType)
+                        _viewModel.PlayingChannel.ChannelType == channel.ChannelType)
                     {
                         tuneNeeded = false;
                         WeakReferenceMessenger.Default.Send(new LongToastMessage("Tuning ....".Translated()));
@@ -1536,7 +1536,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         WeakReferenceMessenger.Default.Send(new ToastMessage("Tuning {0} ....".Translated(channel.FrequencyShortLabel)));
 
-                        var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
+                        var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             switch (tunedRes.Result)

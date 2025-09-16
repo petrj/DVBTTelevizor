@@ -1,5 +1,6 @@
 ﻿using DVBTTelevizor;
 using MPEGTS;
+using Newtonsoft.Json;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,10 @@ namespace DVBTTelevizor
         public EventItem? NextEventItem { get; set; } = null;
 
         public long Bandwdith { get; set; }
-        public int DVBTType { get; set; }
+
+        [JsonProperty("DVBTType")] // backward compatibility!!!
+        public ChannelTypeEnum ChannelType { get; set; }
+
         public string? Name { get; set; } = null;
         public string? ProviderName { get; set; } = null;
         public bool NonFree { get; set; } = false; // backward compatibility!!!
@@ -208,18 +212,25 @@ namespace DVBTTelevizor
             }
         }
 
-        public string DVBTTypeLabel
+        public string ChannelTypeLabel
         {
             get
             {
                 var res = string.Empty;
-                if (DVBTType == 0)
+                switch (ChannelType)
                 {
-                    res = "DVBT";
-                }
-                if (DVBTType == 1)
-                {
-                    res = "DVBT2";
+                    case ChannelTypeEnum.DVBT:
+                        res = "DVBT";
+                        break;
+                    case ChannelTypeEnum.DVBT2:
+                        res = "DVBT2";
+                        break;
+                    case ChannelTypeEnum.DAB:
+                        res = "DAB";
+                        break;
+                    case ChannelTypeEnum.FM:
+                        res = "FM";
+                        break;
                 }
 
                 switch (ServiceType)
@@ -430,13 +441,13 @@ namespace DVBTTelevizor
             var channel = new Channel();
 
             channel.Name = Name;
+            channel.ChannelType = ChannelType;
             channel.ProviderName = ProviderName;
             channel.Frequency = Frequency;
             channel.Bandwdith = Bandwdith;
             channel.ProgramMapPID = ProgramMapPID;
             channel.Type = Type;
             channel.Bandwdith = Bandwdith;
-            channel.DVBTType = DVBTType;
             channel.Number = Number;
             channel.NonFree = NonFree;
 

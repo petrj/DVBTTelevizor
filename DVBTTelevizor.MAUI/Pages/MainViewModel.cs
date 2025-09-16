@@ -324,7 +324,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (!justPlaying)
                 {
-                    var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, channel.DVBTType, false);
+                    var tuned = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
 
                     if (tuned.Result != DVBTDriverSearchProgramResultEnum.OK)
                     {
@@ -710,7 +710,9 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Refreshed && (_driver == null || !_driver.DriverInstalled);
+                return Refreshed &&
+                    (_driver == null || !_driver.DriverInstalled) &&
+                    (Channels.Count == 0);
             }
         }
 

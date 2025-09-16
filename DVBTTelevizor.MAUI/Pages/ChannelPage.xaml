@@ -126,6 +126,11 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Type'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
+                <Label Margin="10,0,10,10" Text="{Binding Channel.ChannelTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
                 <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Provider'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"  />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.ProviderName}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
@@ -143,11 +148,6 @@
 
                 <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Bandwidth'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.BandwdithLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
-
-                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
-
-                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='DVBT Type'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
-                <Label Margin="10,0,10,10" Text="{Binding Channel.DVBTTypeLabel}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
