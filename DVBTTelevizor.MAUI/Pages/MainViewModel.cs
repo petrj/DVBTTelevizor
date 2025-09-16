@@ -958,7 +958,7 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
-                    return "- no channel -";
+                    return String.Empty;
 
                 return SelectedChannel.CurrentEventItem.EventName;
             }
