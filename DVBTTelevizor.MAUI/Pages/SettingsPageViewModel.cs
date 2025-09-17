@@ -23,6 +23,7 @@ namespace DVBTTelevizor.MAUI
 
         public Channel _selectedChannel = null;
         private bool _menuVisible = false;
+        private bool _showPairedDevice = false;
 
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
@@ -299,6 +300,7 @@ namespace DVBTTelevizor.MAUI
                 Config.AllowRemoteAccessService = value;
 
                 OnPropertyChanged(nameof(Config));
+                OnPropertyChanged(nameof(AllowRemoteAccessService));
             }
         }
 
@@ -307,6 +309,49 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return $"{Config.OutputDirectory}{System.IO.Path.DirectorySeparatorChar}DVBTTelevizor.channels.json";
+            }
+        }
+
+        public bool SledovaniTVEnabled
+        {
+            get
+            {
+                return Config.SledovaniTVEnabled;
+            }
+            set
+            {
+                Config.SledovaniTVEnabled = value;
+
+                OnPropertyChanged(nameof(Config));
+                OnPropertyChanged(nameof(SledovaniTVEnabled));
+            }
+        }
+
+        public bool SledovaniTVShowAdultChannels
+        {
+            get
+            {
+                return Config.SledovaniTVShowAdultChannels;
+            }
+            set
+            {
+                Config.SledovaniTVShowAdultChannels = value;
+
+                OnPropertyChanged(nameof(Config));
+                OnPropertyChanged(nameof(SledovaniTVShowAdultChannels));
+            }
+        }
+
+        public bool SledovaniTVShowPairedDevice
+        {
+            get
+            {
+                return _showPairedDevice;
+            }
+            set
+            {
+                _showPairedDevice = value;
+                OnPropertyChanged(nameof(SledovaniTVShowPairedDevice));
             }
         }
 

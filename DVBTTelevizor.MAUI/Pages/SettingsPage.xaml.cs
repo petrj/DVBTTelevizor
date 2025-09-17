@@ -136,7 +136,20 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVEnabled", new List<View>() { SledovaniTVEnabledBoxView, SledovaniTVSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVUserName", new List<View>() { SledovaniTVUserNameBoxView, SledovaniTVUserNameEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVPasswordEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVDevicePasswordEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPairButton", new List<View>() { SledovaniTVPairButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVUnPairButton", new List<View>() { SledovaniTVUnPairButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVReloadChannelsButton", new List<View>() { SledovaniTVReloadChannelsButton }));
+
 
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
     }
@@ -729,4 +742,18 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         BuildConfirmMenu("Clear cache?".Translated(), "Clear EPG cand channel cache".Translated(), "Cancel".Translated(), "menuClearCache");
     }
-}
+
+    private void SledovaniTVReloadChannelsButton_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
+    {
+    }
+
+    private void SledovaniTVUnpairButton_Clicked(object sender, EventArgs e)
+    {
+    }
+
+ }
