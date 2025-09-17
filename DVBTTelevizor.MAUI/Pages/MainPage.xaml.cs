@@ -542,7 +542,8 @@ namespace DVBTTelevizor.MAUI
 
         private LibVLCSharp.Shared.MediaTrack? GetVideoTrack()
         {
-            if (_media.Tracks != null &&
+            if (_media != null &&
+                _media.Tracks != null &&
                 _media.Tracks.Length > 0 &&
                 _mediaPlayer != null &&
                 _mediaPlayer.VideoTrackCount > 0 &&

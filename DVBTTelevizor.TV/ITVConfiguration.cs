@@ -59,5 +59,13 @@ namespace DVBTTelevizor
         string ExternalDevicePathUri { get; set; }
 
         public string OutputDirectory { get; }
+
+        bool   SledovaniTVEnabled { get; set; }
+        string SledovaniTVUserName { get; set; }
+        string SledovaniTVPassword { get; set; }
+        bool   SledovaniTVShowAdultChannels { get; set; }
+        string SledovaniTVPIN { get; set; }
+        string SledovaniTVDeviceID { get; set; }
+        string SledovaniTVDevicePassword { get; set; }
     }
 }

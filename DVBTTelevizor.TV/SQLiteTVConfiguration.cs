@@ -652,5 +652,89 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<string>("LastSelectedChannelUniqueIdentifier", value);
             }
         }
+
+        public bool SledovaniTVEnabled
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("SledovaniTVEnabled");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("SledovaniTVEnabled", value);
+            }
+        }
+
+        public bool SledovaniTVShowAdultChannels
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("SledovaniTVShowAdultChannels");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("SledovaniTVShowAdultChannels", value);
+            }
+        }
+
+        public string SledovaniTVUserName
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVUserName");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVUserName", value);
+            }
+        }
+
+        public string SledovaniTVPassword
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVPassword");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVPassword", value);
+            }
+        }
+
+        public string SledovaniTVPIN
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVPIN");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVPIN", value);
+            }
+        }
+
+        public string SledovaniTVDeviceID
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVDeviceID");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVDeviceID", value);
+            }
+        }
+
+        public string SledovaniTVDevicePassword
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVDevicePassword");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVDevicePassword", value);
+            }
+        }
     }
 }
