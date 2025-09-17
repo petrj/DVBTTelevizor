@@ -5,6 +5,7 @@ using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using SledovaniTV;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -147,7 +148,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVDevicePasswordEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPairButton", new List<View>() { SledovaniTVPairButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVUnPairButton", new List<View>() { SledovaniTVUnPairButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVReloadChannelsButton", new List<View>() { SledovaniTVReloadChannelsButton }));
 
 
@@ -748,12 +748,15 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     }
 
-    private void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
+    private async void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
     {
-    }
-
-    private void SledovaniTVUnpairButton_Clicked(object sender, EventArgs e)
-    {
+        var iptv = new SledovaniTV.SledovaniTV(_loggingService);
+        iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
+        iptv.SetConnection(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
+        await iptv.Login();
+        _configuration.SledovaniTVDeviceID = iptv.Connection.deviceId;
+        _configuration.SledovaniTVDevicePassword = iptv.Connection.password;
+        //var channels = iptv.GetChannels();
     }
 
  }

@@ -497,7 +497,7 @@
 
                 <StackLayout IsVisible="{Binding Config.SledovaniTVEnabled}">
 
-                    <Grid Margin="30,10,30,0">
+                    <Grid Margin="60,10,30,20">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -518,7 +518,11 @@
 
                     </Grid>
 
-                    <Grid Margin="30,10,10,0">
+                    <Button Margin="60,10,0,0" x:Name="SledovaniTVPairButton" Text="{local:LngXamlExt Input='Pair device'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVPairButton_Clicked"/>
+                    <Button Margin="60,10,0,0" x:Name="SledovaniTVReloadChannelsButton" Text="{local:LngXamlExt Input='Reload channels'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVReloadChannelsButton_Clicked"/>
+
+
+                    <Grid Margin="60,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -533,7 +537,7 @@
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="SledovaniTVShowAdultChannelsSwitch" IsToggled="{Binding SledovaniTVShowAdultChannels, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
                     </Grid>
 
-                    <Grid Margin="30,10,30,0" IsVisible="{Binding SledovaniTVShowAdultChannels}">
+                    <Grid Margin="120,10,30,0" IsVisible="{Binding SledovaniTVShowAdultChannels}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -548,7 +552,7 @@
 
                     </Grid>
 
-                    <Grid Margin="30,10,10,0">
+                    <Grid Margin="60,10,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -563,7 +567,7 @@
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="SledovaniTVShowPairedDeviceSwitch" IsToggled="{Binding SledovaniTVShowPairedDevice, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
                     </Grid>
 
-                    <Grid Margin="30,10,30,0" IsVisible="{Binding SledovaniTVShowPairedDevice}">
+                    <Grid Margin="120,10,30,0" IsVisible="{Binding SledovaniTVShowPairedDevice}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="auto" />
@@ -583,11 +587,6 @@
                         <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVDevicePasswordEntry" Text="{Binding Config.SledovaniTVDevicePassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
 
                     </Grid>
-
-                    <Button x:Name="SledovaniTVPairButton" Text="{local:LngXamlExt Input='Pair device'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVPairButton_Clicked"/>
-                    <Button x:Name="SledovaniTVUnPairButton" Text="{local:LngXamlExt Input='Unpair device'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVUnpairButton_Clicked"/>
-                    <Button x:Name="SledovaniTVReloadChannelsButton" Text="{local:LngXamlExt Input='Reload channels'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVReloadChannelsButton_Clicked"/>
-
 
                 </StackLayout>
 
