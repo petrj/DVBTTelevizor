@@ -514,7 +514,7 @@
 
                         <BoxView x:Name="SledovaniTVPasswordBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
                         <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Password'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVPasswordEntry" Text="{Binding Config.SledovaniTVPassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
+                        <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVPasswordEntry" Text="{Binding Config.SledovaniTVPassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}" />
 
                     </Grid>
 
@@ -553,7 +553,7 @@
 
                         <BoxView x:Name="SledovaniTVDevicePasswordBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
                         <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Device password'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVDevicePasswordEntry" Text="{Binding Config.SledovaniTVDevicePassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
+                        <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVDevicePasswordEntry" Text="{Binding Config.SledovaniTVDevicePassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}"  />
 
                     </Grid>
 

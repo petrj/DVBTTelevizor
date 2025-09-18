@@ -251,6 +251,16 @@ namespace DVBTTelevizor.MAUI
                     WeakReferenceMessenger.Default.Send(new EnableLoggingMessage(String.Empty));
                 });
             }
+
+            if (_configuration.SledovaniTVEnabled)
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(2000);
+
+                    await _iptv.GetChannels(); // just for logging to service
+                });
+            }
         }
 
         private async Task ExtractAssetFile(string sourceFileName)
@@ -1442,7 +1452,10 @@ namespace DVBTTelevizor.MAUI
 
                 _loggingService.Debug($"playing: {channel.Name} ({channel.Number})");
 
-                if (!_driver.Connected)
+                if (
+                    ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
+                    (!_driver.Connected)
+                    )
                 {
                     WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (device not connected)".Translated(channel.Name)));
                     return;
@@ -1500,6 +1513,7 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
+                /*
                 if (
                     (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
                     (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
@@ -1508,6 +1522,7 @@ namespace DVBTTelevizor.MAUI
                     shouldMediaStop = false;
                     shouldMediaPlay = false;
                 }
+                */
 
                 PlayingState = PlayingStateEnum.Playing;
 
@@ -1525,7 +1540,10 @@ namespace DVBTTelevizor.MAUI
                     });
                 }
 
-                if (shouldDriverPlay)
+                if (
+                    ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
+                    (shouldDriverPlay)
+                    )
                 {
                     // tuning only when changing frequency, bandwidth or DVBTType
 
@@ -1597,26 +1615,33 @@ namespace DVBTTelevizor.MAUI
 
                 if (shouldMediaPlay)
                 {
-                    if (DeviceInfo.Platform == DevicePlatform.Android)
+                    if (channel.ChannelType == ChannelTypeEnum.SledovaniTV)
                     {
-                        switch (_driver.DVBTDriverStreamType)
-                        {
-                            case DVBTDriverStreamTypeEnum.UDP:
-                                _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
-                                break;
-                            case DVBTDriverStreamTypeEnum.Stream:
-                                _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
-                                break;
-                        }
-
-                        _media.AddOption(":fullscreen");
-
+                        _media = new Media(_LibVLC, channel.Url, FromType.FromLocation);
                     }
                     else
-                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
                     {
-                        _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                        if (DeviceInfo.Platform == DevicePlatform.Android)
+                        {
+                            switch (_driver.DVBTDriverStreamType)
+                            {
+                                case DVBTDriverStreamTypeEnum.UDP:
+                                    _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
+                                    break;
+                                case DVBTDriverStreamTypeEnum.Stream:
+                                    _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                                    break;
+                            }
+
+                        }
+                        else
+                        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                        {
+                            _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                        }
                     }
+
+                    _media.AddOption(":fullscreen");
 
                     CallWithTimeout(delegate
                     {
@@ -1658,8 +1683,6 @@ namespace DVBTTelevizor.MAUI
                         });
                     }
 
-                    //SetSubtitles(-1);
-                    //SetAudioTrack(-100);
                     //_viewModel.TeletextEnabled = false;
                 }
 

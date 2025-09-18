@@ -446,6 +446,7 @@ namespace DVBTTelevizor.MAUI
                         {
                             Number = num,
                             ChannelId = iptvChannel.ChannelId,
+                            Url = iptvChannel.Url,
                             IconUrl = iptvChannel.IconUrl,
                             Name = iptvChannel.Name,
                             ProviderName = "SledovaniTV",
