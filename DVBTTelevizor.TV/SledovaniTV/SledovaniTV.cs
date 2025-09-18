@@ -44,10 +44,30 @@ namespace SledovaniTV
             };
         }
 
-        public void SetConnection(string deviceId, string password)
+        public void SetDeviceCredential(string deviceId, string password)
         {
             _deviceConnection.deviceId = deviceId;
             _deviceConnection.password = password;
+        }
+
+        public bool Paired
+        {
+            get
+            {
+                return
+                    _deviceConnection != null &&
+                    !_deviceConnection.IsEmpty;
+            }
+        }
+
+        public bool NotPaired
+        {
+            get
+            {
+                return
+                    _deviceConnection == null ||
+                    _deviceConnection.IsEmpty;
+            }
         }
 
         public bool EPGEnabled
@@ -629,15 +649,28 @@ namespace SledovaniTV
                             continue; // TODO: unlock
                         }
 
+                        var channelType = channelJson["type"].ToString();
+                        ServiceTypeEnum serviceType = ServiceTypeEnum.Other;
+                        switch (channelType)
+                        {
+                            case "radio":
+                                serviceType = ServiceTypeEnum.DigitalRadioSoundService;
+                                break;
+                            case "tv":
+                                serviceType = ServiceTypeEnum.DigitalTelevisionService;
+                                break;
+                        }
+
                         var ch = new Channel()
                         {
-                            //ChannelNumber = number.ToString(),
+                            Number = number.ToString(),
 
                             ChannelId = channelJson["id"].ToString(),
                             Name = channelJson["name"].ToString(),
                             Url = channelJson["url"].ToString(),
 
-                            //Type = channelJson["type"].ToString(),
+                            Type = serviceType,
+
                             IconUrl = channelJson["logoUrl"].ToString(),
 
                             //Locked = channelJson["locked"].ToString(),

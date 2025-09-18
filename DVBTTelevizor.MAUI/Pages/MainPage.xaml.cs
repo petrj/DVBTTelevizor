@@ -61,6 +61,7 @@ namespace DVBTTelevizor.MAUI
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
         private Media _media;
+        private SledovaniTV.SledovaniTV _iptv;
 
         private SettingsPage _settingsPage = null;
         private TuningWelcomePage _tuneWelcomePage = null;
@@ -159,10 +160,13 @@ namespace DVBTTelevizor.MAUI
             _configuration.ConfigDirectory = PublicDirectory;
 
             InitDVBTDriver();
+            _iptv = new SledovaniTV.SledovaniTV(_loggingService);
+            _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
+            _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
 
-            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, publicDirectoryProvider);
+            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, _iptv, tvConfiguration, publicDirectoryProvider);
 
-            _settingsPage = new SettingsPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _settingsPage = new SettingsPage(_loggingService, _driver, _iptv, _configuration, publicDirectoryProvider);
             _aboutPage = new AboutPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);

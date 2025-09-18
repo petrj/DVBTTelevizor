@@ -518,41 +518,10 @@
 
                     </Grid>
 
-                    <Button Margin="60,10,0,0" x:Name="SledovaniTVPairButton" Text="{local:LngXamlExt Input='Pair device'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVPairButton_Clicked"/>
-                    <Button Margin="60,10,0,0" x:Name="SledovaniTVReloadChannelsButton" Text="{local:LngXamlExt Input='Reload channels'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVReloadChannelsButton_Clicked"/>
+                    <Button Margin="60,10,0,0" x:Name="SledovaniTVPairButton" IsVisible="{Binding SledovaniTVDeviceNotPaired}" Text="{local:LngXamlExt Input='Pair device'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVPairButton_Clicked"/>
+                    <Button Margin="60,10,0,0" x:Name="SledovaniTVReloadChannelsButton" IsVisible="{Binding SledovaniTVDevicePaired}" Text="{local:LngXamlExt Input='Reload channels'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="SledovaniTVReloadChannelsButton_Clicked"/>
 
-
-                    <Grid Margin="60,10,10,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="70*" />
-                            <ColumnDefinition Width="30*" />
-                        </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="SledovaniTVShowAdultChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-                        <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show adult channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="SledovaniTVShowAdultChannelsSwitch" IsToggled="{Binding SledovaniTVShowAdultChannels, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
-                    </Grid>
-
-                    <Grid Margin="120,10,30,0" IsVisible="{Binding SledovaniTVShowAdultChannels}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100*" />
-                        </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="SledovaniTVPINBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
-                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='PIN'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Entry  Grid.Row="1" Grid.Column="0" x:Name="SledovaniTVPINEntry" Text="{Binding Config.SledovaniTVPIN, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
-
-                    </Grid>
-
-                    <Grid Margin="60,10,10,0">
+                    <Grid Margin="60,10,10,0" IsVisible="{Binding SledovaniTVDevicePaired}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -587,6 +556,38 @@
                         <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVDevicePasswordEntry" Text="{Binding Config.SledovaniTVDevicePassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
 
                     </Grid>
+
+
+                    <Grid Margin="60,10,10,0" IsVisible="{Binding SledovaniTVDevicePaired}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="SledovaniTVShowAdultChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show adult channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="SledovaniTVShowAdultChannelsSwitch" IsToggled="{Binding SledovaniTVShowAdultChannels, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
+                    </Grid>
+
+                    <Grid Margin="120,10,30,0" IsVisible="{Binding SledovaniTVShowAdultChannels}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="SledovaniTVPINBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='PIN'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <Entry  Grid.Row="1" Grid.Column="0" x:Name="SledovaniTVPINEntry" Text="{Binding Config.SledovaniTVPIN, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
+
+                    </Grid>
+
 
                 </StackLayout>
 

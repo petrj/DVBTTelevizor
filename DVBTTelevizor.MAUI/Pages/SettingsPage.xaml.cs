@@ -26,19 +26,22 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private string _publicDirectory = "";
     private string _lngBefore = "";
 
+    private SledovaniTV.SledovaniTV _iptv;
+
     private KeyboardFocusableItemList _focusItems;
     private List<MenuItem> _menuItems = new List<MenuItem>();
 
-    public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+    public SettingsPage(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
 	{
         InitializeComponent();
 
         _loggingService = loggingService;
         _driver = driver;
+        _iptv = iptv;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, iptv, tvConfiguration, publicDirectoryProvider);
 
 
         Unloaded += SettingsPage_Unloaded;
@@ -344,6 +347,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 break;
             case "menuGoToBatteryOptimizationSettings":
                 WeakReferenceMessenger.Default.Send(new OpenBatteryOptimizationSettingsMessage(String.Empty));
+                break;
+            case "menuSledovaniTVReloadChannels":
+                await _settingsPageViewModel.SledovaniTVReloadChannels();
                 break;
         }
     }
@@ -745,18 +751,14 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void SledovaniTVReloadChannelsButton_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Info("SledovaniTVReloadChannelsButton_Clicked");
 
+        BuildConfirmMenu("SledovaniTV - Reloading will reset all channels changes".Translated(), "Reload all channels".Translated(), "Cancel".Translated(), "menuSledovaniTVReloadChannels");
     }
 
     private async void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
     {
-        var iptv = new SledovaniTV.SledovaniTV(_loggingService);
-        iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
-        iptv.SetConnection(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
-        await iptv.Login();
-        _configuration.SledovaniTVDeviceID = iptv.Connection.deviceId;
-        _configuration.SledovaniTVDevicePassword = iptv.Connection.password;
-        //var channels = iptv.GetChannels();
+        await _settingsPageViewModel.SledovaniTVPair();
     }
 
  }

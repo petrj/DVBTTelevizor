@@ -15,6 +15,7 @@ namespace DVBTTelevizor.MAUI
         private const string DefaultLanguage = "English (default)";
         private int? previousDVBTDriverTypeindex = null;
         private bool _requestWriteToSDCardDisabled = false;
+        private SledovaniTV.SledovaniTV _iptv;
 
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
         public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
@@ -25,9 +26,11 @@ namespace DVBTTelevizor.MAUI
         private bool _menuVisible = false;
         private bool _showPairedDevice = false;
 
-        public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+        public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
+            _iptv = iptv;
+
             WeakReferenceMessenger.Default.Register<ExternalDeviceWriteAccessGranted>(this, (r, m) =>
             {
                 AllowWriteToSDCard(m?.Value?.Path, m?.Value?.PathUri);
@@ -322,8 +325,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Config.SledovaniTVEnabled = value;
 
-                OnPropertyChanged(nameof(Config));
-                OnPropertyChanged(nameof(SledovaniTVEnabled));
+                NotifySledovaniTVChange();
             }
         }
 
@@ -337,8 +339,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Config.SledovaniTVShowAdultChannels = value;
 
-                OnPropertyChanged(nameof(Config));
-                OnPropertyChanged(nameof(SledovaniTVShowAdultChannels));
+                NotifySledovaniTVChange();
             }
         }
 
@@ -346,12 +347,127 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _showPairedDevice;
+                return SledovaniTVDevicePaired && _showPairedDevice;
             }
             set
             {
                 _showPairedDevice = value;
-                OnPropertyChanged(nameof(SledovaniTVShowPairedDevice));
+                NotifySledovaniTVChange();
+            }
+        }
+
+        public bool SledovaniTVDevicePaired
+        {
+            get
+            {
+                return _iptv.Paired;
+            }
+        }
+
+        public bool SledovaniTVDeviceNotPaired
+        {
+            get
+            {
+                return _iptv.NotPaired;
+            }
+        }
+
+        public void NotifySledovaniTVChange()
+        {
+
+            OnPropertyChanged(nameof(Config));
+            OnPropertyChanged(nameof(SledovaniTVShowAdultChannels));
+            OnPropertyChanged(nameof(SledovaniTVShowPairedDevice));
+            OnPropertyChanged(nameof(SledovaniTVDevicePaired));
+            OnPropertyChanged(nameof(SledovaniTVDeviceNotPaired));
+            OnPropertyChanged(nameof(SledovaniTVEnabled));
+        }
+
+        public async Task SledovaniTVPair()
+        {
+            _loggingService.Info("SledovaniTVPair");
+
+            try
+            {
+                _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
+                _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
+                await _iptv.Login();
+                _configuration.SledovaniTVDeviceID = _iptv.Connection.deviceId;
+                _configuration.SledovaniTVDevicePassword = _iptv.Connection.password;
+
+                NotifySledovaniTVChange();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        public async Task SledovaniTVReloadChannels()
+        {
+            _loggingService.Info("SledovaniTVReloadChannels");
+
+            try
+            {
+                var iptvChannels = await _iptv.GetChannels();
+                var channels = _configuration.GetChannels();
+
+                var countImported = 0;
+                var countUpdated = 0;
+
+                foreach (var iptvChannel in iptvChannels)
+                {
+                    var found = false;
+
+                    // searching for online channel with the same id
+                    foreach (var channel in channels)
+                    {
+                        if ((channel.ChannelType == ChannelTypeEnum.SledovaniTV) && (channel.ChannelId == iptvChannel.ChannelId))
+                        {
+                            // update
+                            found = true;
+
+                            channel.Url = iptvChannel.Url;
+                            channel.IconUrl = iptvChannel.IconUrl;
+                            channel.Name = iptvChannel.Name;
+                            channel.ProviderName = "SledovaniTV";
+
+                            countUpdated++;
+
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        // create
+                        var num = TuningProgressPageViewModel.GetNextFreeChannelNumber(channels);
+                        var ch = new Channel()
+                        {
+                            Number = num,
+                            ChannelId = iptvChannel.ChannelId,
+                            IconUrl = iptvChannel.IconUrl,
+                            Name = iptvChannel.Name,
+                            ProviderName = "SledovaniTV",
+                            Type = iptvChannel.Type,
+                            ChannelType = ChannelTypeEnum.SledovaniTV
+                        };
+
+                        channels.Add(ch);
+                        countImported++;
+                    }
+                }
+
+                _configuration.SaveChannels(channels);
+
+                WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+                WeakReferenceMessenger.Default.Send(new ToastMessage("{0} channels updated, {1} added".Translated(countUpdated.ToString(), countImported.ToString())));
+
+                NotifySledovaniTVChange();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         }
 

@@ -168,10 +168,15 @@ namespace DVBTTelevizor
             }
         }
 
-        public string ProviderNameAndFrequencyShortLabel
+        public string? ProviderNameAndFrequencyShortLabel
         {
             get
             {
+                if (Frequency == 0)
+                {
+                    return ProviderName;
+                }
+
                 return $"{ProviderName} - {FrequencyShortLabel}";
             }
         }
@@ -405,6 +410,11 @@ namespace DVBTTelevizor
         {
             get
             {
+                if (!string.IsNullOrWhiteSpace(IconUrl))
+                {
+                    return IconUrl;
+                }
+
                 switch (ServiceType)
                 {
                     case DVBTDriverServiceType.TV: return "tv.png";
