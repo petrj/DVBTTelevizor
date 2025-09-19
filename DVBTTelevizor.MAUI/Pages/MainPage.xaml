@@ -372,7 +372,7 @@
         </Image>
         <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
-        <Image x:Name="DriverImage" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="uninstalled.png">
+        <Image x:Name="DriverImage" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="donglered.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="DriverImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>

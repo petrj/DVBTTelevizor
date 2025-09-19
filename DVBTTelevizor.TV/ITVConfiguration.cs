@@ -18,7 +18,7 @@ namespace DVBTTelevizor
 
         public string LastSelectedChannelUniqueIdentifier { get; set; }
 
-        public string AutoPlayedChannelFrequencyAndMapPID { get; set; }
+        public string AutoPlayedChannelUniqueID { get; set; }
 
         public DVBTDriverTypeEnum DVBTDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }

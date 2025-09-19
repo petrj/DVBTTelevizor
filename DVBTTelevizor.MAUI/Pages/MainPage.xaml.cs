@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using Android.Database;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -261,6 +262,7 @@ namespace DVBTTelevizor.MAUI
                     await _iptv.GetChannels(); // just for logging to service
                 });
             }
+
         }
 
         private async Task ExtractAssetFile(string sourceFileName)
@@ -1019,6 +1021,25 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task AutoPlay()
+        {
+            if (String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID))
+            {
+                return;
+            }
+
+            if (_configuration.AutoPlayedChannelUniqueID == "DVBT-0-0-")
+            {
+                // last channel
+                await ActionPlay();
+            } else
+            {
+                var ch = _viewModel.GetChannelByUniqueidentifier(_configuration.AutoPlayedChannelUniqueID);
+                _viewModel.SelectedChannel = ch;
+                await ActionPlay(ch);
+            }
+        }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -1043,6 +1064,8 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _viewModel.RefreshChannels();
+
+                    await AutoPlay();
 
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {

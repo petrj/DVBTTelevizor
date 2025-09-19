@@ -187,7 +187,7 @@ namespace DVBTTelevizor
             }
         }
 
-        public string AutoPlayedChannelFrequencyAndMapPID
+        public string AutoPlayedChannelUniqueID
         {
             get
             {

@@ -869,17 +869,17 @@ namespace DVBTTelevizor.MAUI
             {
                 if (_driver == null ||!_driver.DriverInstalled)
                 {
-                    return "uninstalled.png";
+                    return "donglered.png";
                 }
 
 
                 if (_driver.Connected)
                 {
-                    return "connected.png";
+                    return "donglegreen.png";
 
                 }
 
-                return "disconnected.png";
+                return "dongleyellow.png";
             }
         }
 

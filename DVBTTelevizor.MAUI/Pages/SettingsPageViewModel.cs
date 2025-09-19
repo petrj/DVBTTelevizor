@@ -131,8 +131,10 @@ namespace DVBTTelevizor.MAUI
             {
                 _selectedChannel = value;
 
-                if (value != null)
-                    Config.AutoPlayedChannelFrequencyAndMapPID = value.FrequencyAndMapPID;
+                if ((value != null) && (Config.AutoPlayedChannelUniqueID != value.UniqueIdentifier))
+                {
+                    Config.AutoPlayedChannelUniqueID = value.UniqueIdentifier;
+                }
 
                 OnPropertyChanged(nameof(SelectedChannel));
             }
@@ -223,29 +225,26 @@ namespace DVBTTelevizor.MAUI
 
             foreach (var ch in channels)
             {
-                AutoPlayChannels.Add(ch.Clone());
+                var clonedChannel = ch.Clone();
+                AutoPlayChannels.Add(clonedChannel);
 
-                if (ch.FrequencyAndMapPID == Config.AutoPlayedChannelFrequencyAndMapPID)
+                if (clonedChannel.UniqueIdentifier == Config.AutoPlayedChannelUniqueID)
                 {
                     anythingSelected = true;
-                    SelectedChannel = ch;
+                    SelectedChannel = clonedChannel;
                 }
             }
 
-            if (!anythingSelected && (!string.IsNullOrEmpty(Config.AutoPlayedChannelFrequencyAndMapPID)))
+            if (!anythingSelected && (!string.IsNullOrEmpty(Config.AutoPlayedChannelUniqueID)))
             {
-                if (Config.AutoPlayedChannelFrequencyAndMapPID == noChannel.FrequencyAndMapPID)
+                if (Config.AutoPlayedChannelUniqueID == noChannel.UniqueIdentifier)
                 {
                     SelectedChannel = noChannel;
                 }
-                else
+                else if (Config.AutoPlayedChannelUniqueID == lastChannel.UniqueIdentifier)
                 {
                     SelectedChannel = lastChannel;
                 }
-            }
-            else
-            {
-                SelectedChannel = noChannel;
             }
 
             MainThread.BeginInvokeOnMainThread(async () =>

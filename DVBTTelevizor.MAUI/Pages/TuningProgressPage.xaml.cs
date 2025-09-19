@@ -383,8 +383,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             _menuItems.Clear();
 
-            _menuItems.Add(MainMenu.CreateMenuItem("menuRetryTune", "Retry", ""));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuDriver", "Driver ...", ""));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuRetryTune", "Retry", "refresh.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuDriver", "Driver ...", "driver.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel", "cancel.png"));
 
             MainMenu.UpdateMenu("Tuning failed.Check USB connection".Translated(), _menuItems);

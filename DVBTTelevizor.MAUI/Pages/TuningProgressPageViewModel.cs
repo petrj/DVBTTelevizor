@@ -255,7 +255,7 @@ namespace DVBTTelevizor.MAUI
             {
                 await Tune();
 
-                if (_tuneState == TuneStateEnum.Failed && !_driver.Connected)
+                if (_tuneState == TuneStateEnum.Failed)
                 {
                     WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
                 }

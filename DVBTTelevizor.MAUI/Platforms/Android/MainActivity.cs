@@ -729,6 +729,7 @@ namespace DVBTTelevizor.MAUI
                         snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
 
                         textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
+                        textView.SetTextColor(Android.Graphics.Color.Black);
                     }
                     else
                     {
@@ -736,12 +737,17 @@ namespace DVBTTelevizor.MAUI
 
                         //tView.Background.SetColorFilter(Android.Graphics.Color.Gray, PorterDuff.Mode.SrcIn); //Gets the actual oval background of the Toast then sets the color filter
                         textView = (TextView)tView.FindViewById(Android.Resource.Id.Message);
+                        //textView.SetShadowLayer(0, 0, 0, Android.Graphics.Color.Transparent); // remove shadow
+                        //textView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+
+                        textView.SetTextColor(Android.Graphics.Color.White);
+
                     }
 
                     var minTextSize = textView.TextSize; // 16
 
                     textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
-                    textView.SetTextColor(Android.Graphics.Color.Black);
+                    //textView.SetTextColor(Android.Graphics.Color.Black);
 
                     var screenHeightRate = 0;
 
@@ -754,9 +760,7 @@ namespace DVBTTelevizor.MAUI
                     //VeryBig = 4,
                     //Huge = 5
 
-                    if (DeviceDisplay.MainDisplayInfo.
-
-                    Height < DeviceDisplay.MainDisplayInfo.Width)
+                    if (DeviceDisplay.MainDisplayInfo.Height < DeviceDisplay.MainDisplayInfo.Width)
                     {
                         // Landscape
 

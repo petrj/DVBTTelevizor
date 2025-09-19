@@ -188,15 +188,15 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string AutoPlayedChannelFrequencyAndMapPID
+        public string AutoPlayedChannelUniqueID
         {
             get
             {
-                return GetPersistingSettingValue<string>("ChannelAutoPlayedAfterStart");
+                return GetPersistingSettingValue<string>("AutoPlayedChannelUniqueID");
             }
             set
             {
-                SavePersistingSettingValue<string>("ChannelAutoPlayedAfterStart", value);
+                SavePersistingSettingValue<string>("AutoPlayedChannelUniqueID", value);
             }
         }
 
