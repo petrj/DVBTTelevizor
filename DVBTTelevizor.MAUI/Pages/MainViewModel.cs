@@ -400,15 +400,31 @@ namespace DVBTTelevizor.MAUI
 
                 foreach (var channel in Channels)
                 {
-                    channel.ClearEPG();
-
                     var channelEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
                     if (channelEv != null)
                     {
+                        channel.ClearEPG();
                         channel.SetCurrentEvent(channelEv);
+                        channel.NotifyChanges();
                     }
+                }
 
-                    channel.NotifyChanges();
+                if (_configuration.SledovaniTVEnabled)
+                {
+                    var epg = await _iptv.GetActualEPG();
+
+                    foreach (var channel in Channels)
+                    {
+                        if ((channel.ChannelType == ChannelTypeEnum.SledovaniTV) &&
+                            (channel.ChannelId != null) &&
+                            (epg.ContainsKey(channel.ChannelId))
+                            )
+                        {
+                            channel.ClearEPG();
+                            channel.SetCurrentEvent(epg[channel.ChannelId]);
+                            channel.NotifyChanges();
+                        }
+                    }
                 }
             }
             catch (Exception ex)

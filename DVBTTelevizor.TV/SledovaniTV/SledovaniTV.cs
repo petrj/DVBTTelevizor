@@ -389,14 +389,71 @@ namespace SledovaniTV
             return epgItem.Text;
         }
 
+        public async Task<Dictionary<string, EPGCurrentEvent>> GetActualEPG()
+        {
+            var epg = await GetEPG();
+
+            var result = new Dictionary<string, EPGCurrentEvent>();
+
+            // first step - find current event
+            foreach ( var epgKvp in epg)
+            {
+                foreach (var e in epgKvp.Value)
+                {
+                    if (
+                        (e.StartTime <= DateTime.Now) &&
+                        (e.FinishTime >= DateTime.Now)
+                        )
+                    {
+                        if (!result.ContainsKey(epgKvp.Key))
+                        {
+                            // adding current event item
+                            var ev = new EPGCurrentEvent()
+                            {
+                                CurrentEventItem = e,
+                                NextEventItem = null
+                            };
+                            result.Add(epgKvp.Key, ev);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // second step - find next event
+            foreach (var epgKvp in epg)
+            {
+                foreach (var e in epgKvp.Value)
+                {
+                    if ((result.ContainsKey(epgKvp.Key)) &&
+                    (e.StartTime > DateTime.Now)
+                    )
+                    {
+                        var ev = result[epgKvp.Key];
+
+                        if (ev.NextEventItem == null)
+                        {
+                            ev.NextEventItem = e;
+                        }
+                        else if (e.StartTime < ev.NextEventItem.StartTime)
+                        {
+                            ev.NextEventItem = e;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
-        /// Getting actual EPG
+        /// Getting EPG
         /// </summary>
-        public async Task<List<EventItem>>GetEPG()
+        public async Task<Dictionary<string,List<EventItem>>>GetEPG()
         {
             _log.Info($"Refreshing EPG");
 
-            var result = new List<EventItem>();
+            var result = new Dictionary<string, List<EventItem>>();
 
             await Login();
 
@@ -459,14 +516,18 @@ namespace SledovaniTV
                                 LanguageCode = chId, // Chanel id is int for DVBT, but string for SledovaniTV,
                                                      // using LanguageCode property as workaround
                                                      // TODO: change EventItem.ServiceId to string
-                                EventId = Convert.ToInt32(epgEventId),
+                                // EventId = Convert.ToInt32(epgEventId),
                                 EventName = title,
                                 StartTime = DateTime.ParseExact(times, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
                                 FinishTime = DateTime.ParseExact(timef, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
                                 Text = desc
                             };
 
-                            result.Add(item);
+                            if (!result.ContainsKey(chId))
+                            {
+                                result.Add(chId, new List<EventItem>());
+                            }
+                            result[chId].Add(item);
                         };
                      }
                 }
