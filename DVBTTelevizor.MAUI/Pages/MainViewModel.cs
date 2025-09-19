@@ -85,7 +85,7 @@ namespace DVBTTelevizor.MAUI
                 await CheckPendingPurchasesAsync();
             });
 
-            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 20, 12);
         }
 
         private void InitCommands()

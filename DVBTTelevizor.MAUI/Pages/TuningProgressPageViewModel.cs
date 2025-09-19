@@ -251,7 +251,15 @@ namespace DVBTTelevizor.MAUI
                 ResetTune(false);
             }
 
-            await Task.Run(async () => { await Tune(); });
+            await Task.Run(async () =>
+            {
+                await Tune();
+
+                if (_tuneState == TuneStateEnum.Failed && !_driver.Connected)
+                {
+                    WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
+                }
+            });
         }
 
         private async Task Tune()
@@ -268,6 +276,12 @@ namespace DVBTTelevizor.MAUI
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
+                    if (!_driver.Connected)
+                    {
+                        _tuneState = TuneStateEnum.Failed;
+                        return;
+                    }
+
                     if (FMTuning)
                     {
                         if (dvbtTypeIndex > 0)
