@@ -5,6 +5,7 @@ using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using SledovaniTV;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -25,19 +26,22 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private string _publicDirectory = "";
     private string _lngBefore = "";
 
+    private SledovaniTV.SledovaniTV _iptv;
+
     private KeyboardFocusableItemList _focusItems;
     private List<MenuItem> _menuItems = new List<MenuItem>();
 
-    public SettingsPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+    public SettingsPage(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
 	{
         InitializeComponent();
 
         _loggingService = loggingService;
         _driver = driver;
+        _iptv = iptv;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, iptv, tvConfiguration, publicDirectoryProvider);
 
 
         Unloaded += SettingsPage_Unloaded;
@@ -136,7 +140,19 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVEnabled", new List<View>() { SledovaniTVEnabledBoxView, SledovaniTVSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVUserName", new List<View>() { SledovaniTVUserNameBoxView, SledovaniTVUserNameEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVPasswordEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVDevicePasswordEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPairButton", new List<View>() { SledovaniTVPairButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVReloadChannelsButton", new List<View>() { SledovaniTVReloadChannelsButton }));
+
 
         //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
     }
@@ -331,6 +347,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 break;
             case "menuGoToBatteryOptimizationSettings":
                 WeakReferenceMessenger.Default.Send(new OpenBatteryOptimizationSettingsMessage(String.Empty));
+                break;
+            case "menuSledovaniTVReloadChannels":
+                await _settingsPageViewModel.SledovaniTVReloadChannels();
                 break;
         }
     }
@@ -729,4 +748,17 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         BuildConfirmMenu("Clear cache?".Translated(), "Clear EPG cand channel cache".Translated(), "Cancel".Translated(), "menuClearCache");
     }
-}
+
+    private void SledovaniTVReloadChannelsButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Info("SledovaniTVReloadChannelsButton_Clicked");
+
+        BuildConfirmMenu("SledovaniTV - Reloading will reset all channels changes".Translated(), "Reload all channels".Translated(), "Cancel".Translated(), "menuSledovaniTVReloadChannels");
+    }
+
+    private async void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
+    {
+        await _settingsPageViewModel.SledovaniTVPair();
+    }
+
+ }

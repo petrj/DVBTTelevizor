@@ -26,6 +26,8 @@ namespace DVBTTelevizor.MAUI
         public EITManager EIT { get; set; }
         public PIDManager PID { get; set; }
 
+        private SledovaniTV.SledovaniTV _iptv;
+
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
         private ListViewSelector? _listViewSelector = null;
         private bool? _EPGDetailVisibleLastValue = null;
@@ -42,6 +44,7 @@ namespace DVBTTelevizor.MAUI
         private bool _refreshed = false;
         private bool _menuVisible = false;
 
+
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
         public ICommand CommandSettings { get; set; }
@@ -56,11 +59,13 @@ namespace DVBTTelevizor.MAUI
 
         public bool MainLayoutVisible { get; set; } = true;
 
-        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+        public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
+
+            _iptv = iptv;
 
             _listViewSelector = new ListViewSelector(Channels);
             _listViewSelector.OnChannelChanged += delegate
@@ -80,7 +85,7 @@ namespace DVBTTelevizor.MAUI
                 await CheckPendingPurchasesAsync();
             });
 
-            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 5, 10);
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 20, 12);
         }
 
         private void InitCommands()
@@ -395,15 +400,31 @@ namespace DVBTTelevizor.MAUI
 
                 foreach (var channel in Channels)
                 {
-                    channel.ClearEPG();
-
                     var channelEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
                     if (channelEv != null)
                     {
+                        channel.ClearEPG();
                         channel.SetCurrentEvent(channelEv);
+                        channel.NotifyChanges();
                     }
+                }
 
-                    channel.NotifyChanges();
+                if (_configuration.SledovaniTVEnabled)
+                {
+                    var epg = await _iptv.GetActualEPG();
+
+                    foreach (var channel in Channels)
+                    {
+                        if ((channel.ChannelType == ChannelTypeEnum.SledovaniTV) &&
+                            (channel.ChannelId != null) &&
+                            (epg.ContainsKey(channel.ChannelId))
+                            )
+                        {
+                            channel.ClearEPG();
+                            channel.SetCurrentEvent(epg[channel.ChannelId]);
+                            channel.NotifyChanges();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -848,17 +869,17 @@ namespace DVBTTelevizor.MAUI
             {
                 if (_driver == null ||!_driver.DriverInstalled)
                 {
-                    return "uninstalled.png";
+                    return "donglered.png";
                 }
 
 
                 if (_driver.Connected)
                 {
-                    return "connected.png";
+                    return "donglegreen.png";
 
                 }
 
-                return "disconnected.png";
+                return "dongleyellow.png";
             }
         }
 

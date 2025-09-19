@@ -17,6 +17,10 @@ namespace DVBTTelevizor
         [PrimaryKey, Column("Number")]
         public string Number { get; set; } = "0";
 
+        public string? ChannelId { get; set; }
+        public string? Url { get; set; }
+        public string? IconUrl { get; set; }
+
         public bool Selected { get; set; } = false;
         public bool Focused { get; set; } = false;
 
@@ -43,6 +47,14 @@ namespace DVBTTelevizor
         public string? SelectedAudioTrack { get; set; } = null;
 
         private bool _recording = false;
+
+        public string UniqueIdentifier
+        {
+            get
+            {
+                return $"{ChannelType}-{Frequency}-{ProgramMapPID}-{ProviderName}";
+            }
+        }
 
         public static Channel? GetPreviousChannel(Channel channel, ObservableCollection<Channel> channels)
         {
@@ -109,17 +121,6 @@ namespace DVBTTelevizor
             return null;
         }
 
-        public string UniqueIdentifier
-        {
-            get
-            {
-                return
-                          Frequency.ToString() +
-                    "[" + ProgramMapPID.ToString() + "] - " +
-                          ProviderName;
-            }
-        }
-
         public string FrequencyAndMapPID
         {
             get
@@ -167,10 +168,15 @@ namespace DVBTTelevizor
             }
         }
 
-        public string ProviderNameAndFrequencyShortLabel
+        public string? ProviderNameAndFrequencyShortLabel
         {
             get
             {
+                if (Frequency == 0)
+                {
+                    return ProviderName;
+                }
+
                 return $"{ProviderName} - {FrequencyShortLabel}";
             }
         }
@@ -404,6 +410,11 @@ namespace DVBTTelevizor
         {
             get
             {
+                if (!string.IsNullOrWhiteSpace(IconUrl))
+                {
+                    return IconUrl;
+                }
+
                 switch (ServiceType)
                 {
                     case DVBTDriverServiceType.TV: return "tv.png";
@@ -441,6 +452,9 @@ namespace DVBTTelevizor
             var channel = new Channel();
 
             channel.Name = Name;
+            channel.ChannelId = ChannelId;
+            channel.Url = Url;
+            channel.IconUrl = IconUrl;
             channel.ChannelType = ChannelType;
             channel.ProviderName = ProviderName;
             channel.Frequency = Frequency;

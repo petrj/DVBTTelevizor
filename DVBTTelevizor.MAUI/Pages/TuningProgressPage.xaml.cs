@@ -23,6 +23,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -33,6 +34,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
+        _publicDirectoryProvider = publicDirectoryProvider;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new TuningProgressPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
@@ -40,6 +42,15 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         BuildFocusableItems();
 
         _viewModel.ChannelFound += ChannelFound;
+
+        WeakReferenceMessenger.Default.Register<TuneFailedMessage>(this, (r, m) =>
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                //BuildConfirmMenu("Tuning failed. Check USB connection".Translated(), "Retry".Translated(), "Cancel".Translated(), "menuRetryTune", "menuCancel");
+                BuildRetryTuneMenu();
+            });
+        });
     }
 
     private void ChannelFound(object? sender, EventArgs e)
@@ -363,6 +374,23 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _viewModel.MenuVisible = false;
     }
 
+
+    private void BuildRetryTuneMenu()
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            _menuItems.Clear();
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuRetryTune", "Retry", "refresh.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuDriver", "Driver ...", "driver.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel", "cancel.png"));
+
+            MainMenu.UpdateMenu("Tuning failed.Check USB connection".Translated(), _menuItems);
+        }
+    }
+
     private void BuildConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm, string actionNotConfirm)
     {
         ShowOrHideMenu();
@@ -400,7 +428,13 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 break;
 
             case "menuContinue":
+            case "menuRetryTune":
                 _viewModel.StartTune();
+                break;
+
+            case "menuDriver":
+                var driverPage = new DriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
+                await Navigation.PushAsync(driverPage);
                 break;
         }
     }

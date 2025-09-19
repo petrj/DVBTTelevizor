@@ -92,7 +92,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (_driver == null || !_driver.DriverInstalled)
                 {
-                    return "dongleorange.png";
+                    return "donglered.png";
                 }
 
 
@@ -102,7 +102,7 @@ namespace DVBTTelevizor.MAUI
 
                 }
 
-                return "donglered.png";
+                return "dongleorange.png";
             }
         }
 

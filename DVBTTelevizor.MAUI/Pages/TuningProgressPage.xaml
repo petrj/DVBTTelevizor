@@ -128,7 +128,7 @@
             <!--Label Grid.Row="2" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/-->
         </Grid>
 
-        <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.05, 0.4, 0.45, 0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent" ColumnSpacing="5">
+        <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.05, 0.4, 0.45, 0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent" ColumnSpacing="5">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="33*" />

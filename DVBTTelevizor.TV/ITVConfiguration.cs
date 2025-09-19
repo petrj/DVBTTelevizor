@@ -18,7 +18,7 @@ namespace DVBTTelevizor
 
         public string LastSelectedChannelUniqueIdentifier { get; set; }
 
-        public string AutoPlayedChannelFrequencyAndMapPID { get; set; }
+        public string AutoPlayedChannelUniqueID { get; set; }
 
         public DVBTDriverTypeEnum DVBTDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }
@@ -59,5 +59,13 @@ namespace DVBTTelevizor
         string ExternalDevicePathUri { get; set; }
 
         public string OutputDirectory { get; }
+
+        bool   SledovaniTVEnabled { get; set; }
+        string SledovaniTVUserName { get; set; }
+        string SledovaniTVPassword { get; set; }
+        bool   SledovaniTVShowAdultChannels { get; set; }
+        string SledovaniTVPIN { get; set; }
+        string SledovaniTVDeviceID { get; set; }
+        string SledovaniTVDevicePassword { get; set; }
     }
 }
