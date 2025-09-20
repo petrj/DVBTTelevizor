@@ -371,6 +371,14 @@ namespace DVBTTelevizor
             }
         }
 
+        public string NameWithNumber
+        {
+            get
+            {
+                return $"{Number} - {Name}";
+            }
+        }
+
         public string NextEPGEventTitle
         {
             get

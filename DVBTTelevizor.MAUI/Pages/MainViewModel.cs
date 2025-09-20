@@ -569,22 +569,18 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Selecting next channel");
 
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                _listViewSelector?.SelectNextChannel();
-                NotifyChannelChange();
-            });
+            _listViewSelector?.SelectNextChannel();
+            NotifyChannelChange();
+
+            _loggingService.Info($"... selected");
         }
 
         public void SelectPreiousChannel()
         {
             _loggingService.Info($"Selecting previous channel");
 
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                _listViewSelector?.SelectPreviousChannel();
-                NotifyChannelChange();
-            });
+            _listViewSelector?.SelectPreviousChannel();
+            NotifyChannelChange();
         }
 
         public Channel? GetChannelByUniqueidentifier(string uniqueidentifier)

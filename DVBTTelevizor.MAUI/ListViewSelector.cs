@@ -40,21 +40,36 @@ namespace DVBTTelevizor.MAUI
 
             foreach (var ch in _channels)
             {
+                var fireNotifyChannelChange = false;
+
                 if (ch == channel)
                 {
                     if (!ch.Selected && OnChannelChanged != null)
                     {
                         fireOnChanged = true;
+                        fireNotifyChannelChange = true;
+                        ch.Selected = true;
+                        ch.Focused = true;
                     }
-
-                    ch.Selected = true;
-                    ch.Focused = true;
                 } else
                 {
-                    ch.Selected = false;
-                    ch.Focused = false;
+                    if (ch.Selected)
+                    {
+                        ch.Selected = false;
+                        fireNotifyChannelChange = true;
+                    }
+
+                    if (ch.Focused)
+                    {
+                        ch.Focused = false;
+                        fireNotifyChannelChange = true;
+                    }
                 }
-                ch.NotifyChanges();
+
+                if (fireNotifyChannelChange)
+                {
+                    ch.NotifyChanges();
+                }
             }
 
             if (fireOnChanged)

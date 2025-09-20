@@ -247,7 +247,7 @@
                                 Style="{StaticResource CommonPickerTextStyle}"
                                 SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
                                 ItemsSource="{Binding AutoPlayChannels}"
-                                ItemDisplayBinding="{Binding Name}"/>
+                                ItemDisplayBinding="{Binding NameWithNumber}"/>
                     </Grid>
 
                 </StackLayout>

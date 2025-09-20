@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 using System.Windows.Input;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace DVBTTelevizor.MAUI
@@ -39,7 +40,7 @@ namespace DVBTTelevizor.MAUI
         private DateTime _lastBackPressedTime = DateTime.MinValue;
         private DateTime _lastNumPressedTime = DateTime.MinValue;
         private DateTime _lastLongTappedTime = DateTime.MinValue;
-        private string _numberPressed = String.Empty;
+        private string _numberPressed = System.String.Empty;
 
         private Channel[] _lastPlayedChannels = new Channel[2];
 
@@ -120,7 +121,7 @@ namespace DVBTTelevizor.MAUI
                 // language
                 Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
 
-                if (!String.IsNullOrEmpty(_configuration.Language))
+                if (!System.String.IsNullOrEmpty(_configuration.Language))
                 {
                     var languageFileName = Path.Join(PublicDirectory, "lng", $"{_configuration.Language}.lng");
 
@@ -220,7 +221,7 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            if (!String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            if (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP))
             {
                 Task.Run(async () =>
                 {
@@ -248,7 +249,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
 
-                    WeakReferenceMessenger.Default.Send(new EnableLoggingMessage(String.Empty));
+                    WeakReferenceMessenger.Default.Send(new EnableLoggingMessage(System.String.Empty));
                 });
             }
 
@@ -402,9 +403,8 @@ namespace DVBTTelevizor.MAUI
             if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
                 return;
 
-            _loggingService.Debug($"Checking stream");
-
-            var status = "Check stream result: " + Environment.NewLine;
+            //_loggingService.Debug($"Checking stream");
+            //var status = "Check stream result: " + Environment.NewLine;
 
             try
             {
@@ -418,11 +418,11 @@ namespace DVBTTelevizor.MAUI
                 // checking no video
                 var videoTracksCount = videoView.MediaPlayer.VideoTrackCount;
 
-                status += $"   V: {videoTracksCount} ({videoView.MediaPlayer.VideoTrack})" + Environment.NewLine;
-                status += $"   A: {videoView.MediaPlayer.AudioTrackCount} ({videoView.MediaPlayer.AudioTrack})" + Environment.NewLine;
-                status += $"   S: {videoView.MediaPlayer.SpuCount} ({videoView.MediaPlayer.Spu})" + Environment.NewLine;
+                //status += $"   V: {videoTracksCount} ({videoView.MediaPlayer.VideoTrack})" + Environment.NewLine;
+                //status += $"   A: {videoView.MediaPlayer.AudioTrackCount} ({videoView.MediaPlayer.AudioTrack})" + Environment.NewLine;
+                //status += $"   S: {videoView.MediaPlayer.SpuCount} ({videoView.MediaPlayer.Spu})" + Environment.NewLine;
 
-                _loggingService.Debug(status);
+                //_loggingService.Debug(status);
 
                 if (videoTracksCount <= 0)
                 {
@@ -1022,7 +1022,7 @@ namespace DVBTTelevizor.MAUI
 
         private async Task AutoPlay()
         {
-            if ((String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID)) ||
+            if ((System.String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID)) ||
                 (_configuration.AutoPlayedChannelUniqueID == Channel.GetDefaultUniqueIdentifier("")))
             {
                 return;
@@ -1227,7 +1227,7 @@ namespace DVBTTelevizor.MAUI
                         return;
                     }
 
-                    if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                    if (_viewModel.PlayingState == PlayingStateEnum.Playing)
                     {
                         VideoStackLayout_Tapped(this, new TappedEventArgs(null));
                         return;
@@ -1662,6 +1662,12 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     _media.AddOption(":fullscreen");
+                    _media.AddOption(":avcodec-hw=any");
+
+                    _media.AddOption(new MediaConfiguration()
+                    {
+                        EnableHardwareDecoding = true
+                    });
 
                     CallWithTimeout(delegate
                     {
@@ -1675,7 +1681,7 @@ namespace DVBTTelevizor.MAUI
                         });
                     }, 350);
 
-                    if (!String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
+                    if (!System.String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
                     {
                         _ = Task.Run(async () =>
                         {
@@ -1689,7 +1695,7 @@ namespace DVBTTelevizor.MAUI
                         });
                     }
 
-                    if (!String.IsNullOrWhiteSpace(channel.SelectedSubtitle))
+                    if (!System.String.IsNullOrWhiteSpace(channel.SelectedSubtitle))
                     {
                         _ = Task.Run(async () =>
                         {
@@ -1731,7 +1737,7 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.NotifyChannelChange();
 
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
                     playInfo.CurrentEvent = await _viewModel.GetChannelEPG(channel);
 
@@ -1880,12 +1886,12 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            bool animating = false;
+            //bool animating = false;
 
             _menuShowEnabled = false;
             try
             {
-                var angle = 0;
+                /*var angle = 0;
 
                 // start rotation
                 var task = Task.Run(async () =>
@@ -1900,7 +1906,7 @@ namespace DVBTTelevizor.MAUI
                         });
                     }
                 });
-
+                */
                 ShowOrHideMenu();
 
                 if (MainMenu.IsVisible)
@@ -1911,6 +1917,7 @@ namespace DVBTTelevizor.MAUI
 
             } finally
             {
+                /*
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     animating = false;
@@ -1918,7 +1925,7 @@ namespace DVBTTelevizor.MAUI
                     await Task.Delay(500);
                     MenuButton.RotationY = 0; // reset to default angle
                 });
-
+                */
                 _menuShowEnabled = true;
             }
 
@@ -2045,6 +2052,7 @@ namespace DVBTTelevizor.MAUI
                             _viewModel.SelectNextChannel();
                             //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
                             ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
+                            _loggingService.Info($"... scrolled");
                         }
                         else
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -2268,7 +2276,7 @@ namespace DVBTTelevizor.MAUI
             if ((DateTime.Now - _lastNumPressedTime).TotalSeconds > 2)
             {
                 _lastNumPressedTime = DateTime.MinValue;
-                _numberPressed = String.Empty;
+                _numberPressed = System.String.Empty;
             }
 
             _lastNumPressedTime = DateTime.Now;
@@ -2865,7 +2873,7 @@ namespace DVBTTelevizor.MAUI
 
         private void DriverImageTapped(object sender, TappedEventArgs e)
         {
-            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(String.Empty));
+            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(System.String.Empty));
         }
 
         private void TuneImageTapped(object sender, TappedEventArgs e)
@@ -2875,7 +2883,7 @@ namespace DVBTTelevizor.MAUI
 
         private void QuickDriverButton_Clicked(object sender, EventArgs e)
         {
-            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(String.Empty));
+            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(System.String.Empty));
         }
 
         private void OnChannel_Tapped(object sender, TappedEventArgs e)
