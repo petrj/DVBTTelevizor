@@ -89,6 +89,7 @@
 
 	<ItemGroup>
 	  <None Remove="Platforms\Android\NLog.config" />
+	  <None Remove="Platforms\Android\Resources\values\styles.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
