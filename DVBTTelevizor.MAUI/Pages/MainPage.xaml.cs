@@ -1324,15 +1324,8 @@ namespace DVBTTelevizor.MAUI
 
             if (!force && (PlayingState == PlayingStateEnum.Playing))
             {
-                if (_viewModel.EPGDetailVisible)
-                {
-                    _viewModel.EPGDetailEnabled = false;
-                }
-                else
-                {
-                    PlayingState = PlayingStateEnum.PlayingInPreview;
-                    _viewModel.EPGDetailEnabled = true;
-                }
+                PlayingState = PlayingStateEnum.PlayingInPreview;
+                //_viewModel.EPGDetailEnabled = true;
             }
             else
             {
@@ -1346,7 +1339,6 @@ namespace DVBTTelevizor.MAUI
                         _driver.Stop();
                     }
                 });
-
 
                 PlayingState = PlayingStateEnum.Stopped;
 

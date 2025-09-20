@@ -410,18 +410,20 @@ namespace DVBTTelevizor
         {
             get
             {
+                /* There is some bug in Android (Motorola) and no image is shown when url used
                 if (!string.IsNullOrWhiteSpace(IconUrl))
                 {
                     return IconUrl;
                 }
+                */
 
                 switch (ServiceType)
                 {
                     case DVBTDriverServiceType.TV: return "tv.png";
                     case DVBTDriverServiceType.Radio: return "radio.png";
+                    default:
+                        return "other.png";
                 }
-
-                return null;
             }
         }
 

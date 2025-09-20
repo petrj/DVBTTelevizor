@@ -1063,14 +1063,13 @@ namespace DVBTTelevizor.MAUI
                        return SelectedChannel.Icon;
                    } else
                    {
-                       return "tv.png";
+                       return "other.png";
                     }
                 }
 
                 return _playingChannel.Icon;
             }
         }
-
 
         public Channel RecordingChannel
         {
