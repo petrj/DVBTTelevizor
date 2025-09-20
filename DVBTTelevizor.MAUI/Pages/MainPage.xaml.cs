@@ -581,6 +581,24 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private LibVLCSharp.Shared.MediaTrack? GetTeletextTrack()
+        {
+            if (_media != null &&
+                _media.Tracks != null &&
+                _media.Tracks.Length > 0)
+            {
+                foreach (var track in _media.Tracks)
+                {
+                    if (track.TrackType == TrackType.Text)
+                    {
+                        return track;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private void _channelPage_Disappearing(object? sender, EventArgs e)
         {
             _viewModel.RefreshChannels();
@@ -1729,6 +1747,8 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
                 _viewModel.EPGDetailEnabled = false;
 
+                _mediaPlayer.Teletext = 100;
+
                 if (_lastPlayedChannels[1] != channel)
                 {
                     _lastPlayedChannels[0] = _lastPlayedChannels[1];
@@ -2297,18 +2317,50 @@ namespace DVBTTelevizor.MAUI
                 {
                     Task.Run(async () =>
                     {
-                       /* if (_numberPressed == "0")
+                        if (_numberPressed.StartsWith("0") && _numberPressed.Length>1)
+                        {
+                            // teletext number by 0XXX
+
+                            if (_viewModel.PlayingState == PlayingStateEnum.Stopped)
+                            {
+                                return;
+                            }
+
+                            var teletextNumberAsString = _numberPressed.Substring(1);
+                            int teletextNumber;
+                            if (int.TryParse(teletextNumberAsString, out teletextNumber) && (teletextNumber>=100))
+                            {
+                                _mediaPlayer.Teletext = teletextNumber;
+                                _mediaPlayer.SetMarqueeInt(VideoMarqueeOption.Color, 0);
+
+                                var track = GetTeletextTrack();
+
+                                WeakReferenceMessenger.Default.Send(new ToastMessage("Setting teletext page number: {0}".Translated(teletextNumberAsString)));
+                            } else
+                            {
+                                WeakReferenceMessenger.Default.Send(new ToastMessage("Invalid teletext page number: {0}".Translated(teletextNumberAsString)));
+                            }
+                        }
+
+                        if (_numberPressed == "0")
                         {
                             switch (_viewModel.PlayingState)
                             {
-                                case PlayingStateEnum.PlayingInternal:
-                                    await ActionKeyLeft();
+                                case PlayingStateEnum.Playing:
+                                    // TODO: Play previous channel
                                     break;
                                 case PlayingStateEnum.PlayingInPreview:
-                                    _viewModel.SelectedItem = _viewModel.PlayingChannel;
-                                    ActionPlay(_viewModel.PlayingChannel);
+
+                                    MainThread.BeginInvokeOnMainThread(async () =>
+                                    {
+                                        _viewModel.SelectedChannel = _viewModel.PlayingChannel;
+                                    });
+                                    await ActionPlay(_viewModel.PlayingChannel);
+
                                     break;
+                                    /*
                                 case PlayingStateEnum.Stopped:
+
                                     if (_viewModel.StandingOnEnd)
                                     {
                                         await ActionFirstOrLast(true);
@@ -2326,16 +2378,18 @@ namespace DVBTTelevizor.MAUI
                                         _lastTimeHome = !_lastTimeHome;
                                     }
                                     break;
+                                    */
                             }
                             ;
 
                             return;
-                        }*/
+                        }
 
                         var selectedChannel = await _viewModel.SelectChannelByNumber(_numberPressed);
                         if ((selectedChannel != null) && (_numberPressed == selectedChannel.Number))
                         {
                             await ActionPlay(selectedChannel);
+                            ChannelsListView.ScrollTo(selectedChannel, ScrollToPosition.MakeVisible, animated: false);
                         }
                     });
                 }
