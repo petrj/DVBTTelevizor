@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android35.0</TargetFrameworks>
+		<TargetFrameworks>net9.0-android</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DVBTTelevizor.MAUI</RootNamespace>
@@ -24,14 +24,14 @@
 
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
+	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<!-- Versions
 		Value 2025003 is too big for Windows
 		-->
-	<PropertyGroup  Condition="$(TargetFramework.Contains('android'))">
+	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationDisplayVersion>2025006</ApplicationDisplayVersion>
 		<ApplicationVersion>2025006</ApplicationVersion>
 		<VersionCode>2025006</VersionCode>
@@ -49,7 +49,7 @@
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.22000.0</TargetFrameworks>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
 
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
@@ -62,7 +62,7 @@
 
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
@@ -117,7 +117,7 @@
 	</ItemGroup>
 
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
 	    <Version>3.9.4</Version>
 	  </PackageReference>

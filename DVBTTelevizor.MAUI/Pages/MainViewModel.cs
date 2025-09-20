@@ -879,7 +879,7 @@ namespace DVBTTelevizor.MAUI
 
                 }
 
-                return "dongleyellow.png";
+                return "dongleorange.png";
             }
         }
 

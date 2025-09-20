@@ -146,15 +146,23 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVUserName", new List<View>() { SledovaniTVUserNameBoxView, SledovaniTVUserNameEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVPasswordEntry }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVDevicePasswordEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPairButton", new List<View>() { SledovaniTVPairButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVReloadChannelsButton", new List<View>() { SledovaniTVReloadChannelsButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVReloadChannelsButton", new List<View>() { SledovaniTVReloadChannelsButton }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowDevice", new List<View>() { SledovaniTVShowDeviceBoxView, SledovaniTVShowPairedDeviceSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVDevicePasswordBoxView, SledovaniTVDevicePasswordEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }));
 
 
-        //_focusItems.OnItemFocusedEvent += SettingsPage_OnItemFocusedEvent;
+        _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+    }
+
+    private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
+    {
+        var item = _args.FocusedItem.Name;
     }
 
     // bug in MAUI? SelectedLanguage is set, but index = -1
@@ -494,7 +502,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusNextItem();
+                    _focusItems.FocusNextItem(true);
                     ScrollToFocusedItem();
                 });
                 break;
@@ -503,7 +511,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem();
+                    _focusItems.FocusPreviousItem(true);
                     ScrollToFocusedItem();
 
                 });
@@ -616,6 +624,46 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
                         case "UDPIPLogging":
                             UDPIPEntry.Focus();
+                            break;
+
+                        case "SledovaniTVEnabled":
+                            SledovaniTVSwitch.IsToggled = !SledovaniTVSwitch.IsToggled;
+                            break;
+
+                        case "SledovaniTVUserName":
+                            SledovaniTVUserNameEntry.Focus();
+                            break;
+
+                        case "SledovaniTVPassword":
+                            SledovaniTVDevicePasswordEntry.Focus();
+                            break;
+
+                        case "SledovaniTVPairButton":
+                            SledovaniTVPairButton_Clicked(this, new EventArgs());
+                            break;
+
+                        case "SledovaniTVReloadChannelsButton":
+                            SledovaniTVReloadChannelsButton_Clicked(this, new EventArgs());
+                            break;
+
+                        case "SledovaniTVShowDevice":
+                            SledovaniTVShowPairedDeviceSwitch.IsToggled = !SledovaniTVShowPairedDeviceSwitch.IsToggled;
+                            break;
+
+                        case "SledovaniTVDeviceID":
+                            SledovaniTVDeviceIDEntry.Focus();
+                            break;
+
+                        case "SledovaniTVDevicePassword":
+                            SledovaniTVDevicePasswordEntry.Focus();
+                            break;
+
+                        case "SledovaniTVShowAdultChannels":
+                            SledovaniTVShowAdultChannelsSwitch.IsToggled = !SledovaniTVShowAdultChannelsSwitch.IsToggled;
+                            break;
+
+                        case "SledovaniTVPIN":
+                            SledovaniTVPINEntry.Focus();
                             break;
                     }
                 });
@@ -758,6 +806,12 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private async void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
     {
+        if (String.IsNullOrWhiteSpace(_configuration.SledovaniTVUserName) &&
+            String.IsNullOrWhiteSpace(_configuration.SledovaniTVUserName))
+        {
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Empty credentials".Translated()));
+            return;
+        }
         await _settingsPageViewModel.SledovaniTVPair();
     }
 

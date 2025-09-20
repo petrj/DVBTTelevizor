@@ -1023,7 +1023,8 @@ namespace DVBTTelevizor.MAUI
 
         private async Task AutoPlay()
         {
-            if (String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID))
+            if ((String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID)) ||
+                (_configuration.AutoPlayedChannelUniqueID == "DVBT--1--1-"))
             {
                 return;
             }
@@ -1035,6 +1036,10 @@ namespace DVBTTelevizor.MAUI
             } else
             {
                 var ch = _viewModel.GetChannelByUniqueidentifier(_configuration.AutoPlayedChannelUniqueID);
+                if (ch == null)
+                {
+                    return;
+                }
                 _viewModel.SelectedChannel = ch;
                 await ActionPlay(ch);
             }
