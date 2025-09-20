@@ -52,8 +52,13 @@ namespace DVBTTelevizor
         {
             get
             {
-                return $"{ChannelType}-{Frequency}-{ProgramMapPID}-{ProviderName}";
+                return $"{ChannelType}-{ChannelId}-{Frequency}-{ProgramMapPID}-{ProviderName}";
             }
+        }
+
+        public static string GetDefaultUniqueIdentifier(string channelId)
+        {
+            return $"DVBT-{channelId}-0-0-";
         }
 
         public static Channel? GetPreviousChannel(Channel channel, ObservableCollection<Channel> channels)

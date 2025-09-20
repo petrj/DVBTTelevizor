@@ -200,12 +200,14 @@ namespace DVBTTelevizor.MAUI
             var noChannel = new Channel()
             {
                 Name = "<no channel>".Translated(),
-                Frequency = -1,
-                ProgramMapPID = -1
+                ChannelId = "",
+                Frequency = 0,
+                ProgramMapPID = 0
             };
             var lastChannel = new Channel()
             {
                 Name = "<last channel>".Translated(),
+                ChannelId = "last",
                 Frequency = 0,
                 ProgramMapPID = 0
             };

@@ -1023,12 +1023,13 @@ namespace DVBTTelevizor.MAUI
         private async Task AutoPlay()
         {
             if ((String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID)) ||
-                (_configuration.AutoPlayedChannelUniqueID == "DVBT--1--1-"))
+                (_configuration.AutoPlayedChannelUniqueID == Channel.GetDefaultUniqueIdentifier("")))
             {
                 return;
             }
 
-            if (_configuration.AutoPlayedChannelUniqueID == "DVBT-0-0-")
+            var lastId = Channel.GetDefaultUniqueIdentifier("last");
+            if (_configuration.AutoPlayedChannelUniqueID == Channel.GetDefaultUniqueIdentifier("last"))
             {
                 // last channel
                 await ActionPlay();

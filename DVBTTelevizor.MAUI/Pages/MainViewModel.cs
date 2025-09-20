@@ -451,22 +451,14 @@ namespace DVBTTelevizor.MAUI
             {
                 string? uniqueIdentifier = null;
                 Channel? firstChannel = null;
+                Channel? lastChannel = null;
                 Channel? channelToSelect = null;
 
                 try
                 {
                     IsRefreshing = true;
-                    var anySelected = false;
 
-                    if (SelectedChannel == null)
-                    {
-                        var ch = GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
-                        if (ch != null)
-                        {
-                            uniqueIdentifier = ch.UniqueIdentifier;
-                        }
-                    }
-                    else
+                    if (SelectedChannel != null)
                     {
                         uniqueIdentifier = SelectedChannel.UniqueIdentifier;
                         SelectedChannel = null;
@@ -506,15 +498,26 @@ namespace DVBTTelevizor.MAUI
                         if (uniqueIdentifier == ch.UniqueIdentifier)
                         {
                             channelToSelect = ch;
-                            anySelected = true;
+                        }
+
+                        if (_configuration.LastSelectedChannelUniqueIdentifier == ch.UniqueIdentifier)
+                        {
+                            lastChannel = ch;
                         }
 
                         Channels.Add(ch);
                     }
 
-                    if (!anySelected && firstChannel != null)
+                    if (channelToSelect == null)
                     {
-                        channelToSelect = firstChannel;
+                        if (lastChannel != null)
+                        {
+                            channelToSelect = lastChannel;
+                        } else
+                        if (firstChannel != null)
+                        {
+                            channelToSelect = firstChannel;
+                        }
                     }
 
                     _loggingService.Debug($"Channels refreshed");
