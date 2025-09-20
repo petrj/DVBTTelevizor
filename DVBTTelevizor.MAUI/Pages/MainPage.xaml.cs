@@ -487,7 +487,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         if (!_viewModel.PlayingChannel.VideoTracks.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"     - video found: {desc.Name}");
+                            _loggingService.Debug($"     - video found: {desc.Name} [{desc.Id}]");
                             _viewModel.PlayingChannel.VideoTracks.Add(desc.Id, desc.Name);
                         }
                     }
@@ -495,7 +495,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         if (!_viewModel.PlayingChannel.Subtitles.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"     - subtitles found: {desc.Name}");
+                            _loggingService.Debug($"     - subtitles found: {desc.Name} [{desc.Id}]");
                             _viewModel.PlayingChannel.Subtitles.Add(desc.Id, desc.Name);
                         }
                     }
@@ -503,7 +503,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         if (!_viewModel.PlayingChannel.AudioTracks.ContainsKey(desc.Id))
                         {
-                            _loggingService.Debug($"     - audio track found: {desc.Name}");
+                            _loggingService.Debug($"     - audio track found: {desc.Name} [{desc.Id}]");
                             _viewModel.PlayingChannel.AudioTracks.Add(desc.Id, desc.Name);
                         }
                     }
@@ -2331,9 +2331,8 @@ namespace DVBTTelevizor.MAUI
                             if (int.TryParse(teletextNumberAsString, out teletextNumber) && (teletextNumber>=100))
                             {
                                 _mediaPlayer.Teletext = teletextNumber;
-                                _mediaPlayer.SetMarqueeInt(VideoMarqueeOption.Color, 0);
-
-                                var track = GetTeletextTrack();
+                                //_mediaPlayer.SetMarqueeInt(VideoMarqueeOption.Color, 0);
+                                //var track = GetTeletextTrack();
 
                                 WeakReferenceMessenger.Default.Send(new ToastMessage("Setting teletext page number: {0}".Translated(teletextNumberAsString)));
                             } else
