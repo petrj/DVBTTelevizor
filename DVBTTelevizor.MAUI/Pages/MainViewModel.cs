@@ -460,7 +460,11 @@ namespace DVBTTelevizor.MAUI
 
                     if (SelectedChannel == null)
                     {
-                        uniqueIdentifier = _configuration.LastSelectedChannelUniqueIdentifier;
+                        var ch = GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
+                        if (ch != null)
+                        {
+                            uniqueIdentifier = ch.UniqueIdentifier;
+                        }
                     }
                     else
                     {
@@ -727,13 +731,28 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool TuneChannelsButtonVisible
+        {
+            get
+            {
+                //return false;
+                return
+                    (Channels.Count == 0) &&
+                    Refreshed &&
+                    (_driver!= null) &&
+                    _driver.DriverInstalled;
+            }
+        }
+
         public bool InstallDriverButtonVisible
         {
             get
             {
-                return Refreshed &&
-                    (_driver == null || !_driver.DriverInstalled) &&
-                    (Channels.Count == 0);
+                return
+                    (Channels.Count == 0) &&
+                    Refreshed &&
+                    (_driver != null) &&
+                    !_driver.DriverInstalled;
             }
         }
 
@@ -1103,14 +1122,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public bool TuneChannelsButtonVisible
-        {
-            get
-            {
-                return Channels.Count == 0 && Refreshed && _driver.DriverInstalled;
-            }
-        }
-
         public bool IsRefreshing
         {
             get
@@ -1131,14 +1142,14 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(NotRefreshed));
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
+            OnPropertyChanged(nameof(Channels));
         }
 
         public bool Refreshed
         {
             get
             {
-                // return _refreshed;
-                return true;
+                 return _refreshed;
             }
             set
             {
