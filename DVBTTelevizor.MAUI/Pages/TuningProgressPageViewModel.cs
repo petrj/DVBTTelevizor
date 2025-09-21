@@ -253,7 +253,17 @@ namespace DVBTTelevizor.MAUI
 
             await Task.Run(async () =>
             {
-                await Tune();
+                if (Settings.TuningMode == TuneModeEnum.Frequency)
+                {
+                    do
+                    {
+                        await Tune();
+                    }
+                    while (_tuneState != TuneStateEnum.Stopped);
+                } else
+                {
+                    await Tune();
+                }
 
                 if (_tuneState == TuneStateEnum.Failed)
                 {
@@ -305,17 +315,17 @@ namespace DVBTTelevizor.MAUI
 
                         await Tune(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
 
+                        if (State != TuneStateEnum.InProgress)
+                        {
+                            return;
+                        }
+
                         if (FrequencyToKHz != FrequencyFromKHz)
                         {
                             _actualTunningFreqKHz += TuneBandWidthKHz;
                         } else
                         {
                             break;
-                        }
-
-                        if (State != TuneStateEnum.InProgress)
-                        {
-                            return;
                         }
 
                         NotifyChange();

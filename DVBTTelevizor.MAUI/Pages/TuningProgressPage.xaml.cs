@@ -297,7 +297,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
 
-        if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped)
+        if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
+            _viewModel.Settings.TuningMode != TuneModeEnum.Frequency)
         {
             BuildConfirmMenu(
             "Tuning is in progress".Translated(),
