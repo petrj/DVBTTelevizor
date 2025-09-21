@@ -26,6 +26,7 @@ namespace DVBTTelevizor.MAUI
         private IDriverConnector _driver { get; set; }
         private ITVConfiguration _configuration;
         public string PublicDirectory { get; set; }
+        private string _currentTeletextNum = null;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -49,6 +50,7 @@ namespace DVBTTelevizor.MAUI
         private List<MenuItem> _subtitleMenuItems = new List<MenuItem>();
         private List<MenuItem> _audioMenuItems = new List<MenuItem>();
         private List<MenuItem> _aspectMenuItems = new List<MenuItem>();
+        private List<MenuItem> _teletextMenuItems = new List<MenuItem>();
 
         private List<MenuItem> _activeMenuItems = null;
 
@@ -480,6 +482,10 @@ namespace DVBTTelevizor.MAUI
 
                 var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                 var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
+
+                _loggingService.Debug($"CheckStream - actual subtitle track: {actualSubtitleTrack}");
+                _loggingService.Debug($"CheckStream - actual audio track: {actualAudioTrack}");
+
 
                 if (_viewModel.PlayingChannel != null)
                 {
@@ -2512,6 +2518,65 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task BuildTeletextMenu()
+        {
+            try
+            {
+                ShowMenu();
+
+                _teletextMenuItems.Clear();
+
+                var title = "Teletext menu".Translated();
+
+                if (_currentTeletextNum == null)
+                {
+                    _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuTeletextOn", "On".Translated(), "on.png"));
+                    _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuTeletextOff", "Off".Translated(), "off.png"));
+                    _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuTeletextNum", "Set Number ...".Translated(), "teletextnum.png")); ;
+
+
+                    _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
+                } else
+                {
+                    string dots = "";
+                    switch (_currentTeletextNum.Length)
+                    {
+                        case 0:
+                            title = "Teletext menu - set page number (first digit)".Translated();
+                            dots = "..";
+                            break;
+                        case 1:
+                            title = "Teletext menu - set page number  (second digit)".Translated();
+                            dots = ".";
+                            break;
+                        case 2:
+                            title = "Teletext menu - set page number".Translated();
+                            break;
+                    }
+
+                    for (var i=0;i<=9;i++)
+                    {
+                        if ((_currentTeletextNum.Length==0) && (i==0))
+                        {
+                            continue; // no begin with 0
+                        }
+
+                        _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuTeletextNum" + i.ToString(), _currentTeletextNum + i.ToString() + dots, "")); ;
+
+                    }
+                }
+
+                _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
+
+                _activeMenuItems = _teletextMenuItems;
+                MainMenu.UpdateMenu(title, _teletextMenuItems);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
         private async Task AudioMenu_Tapped()
         {
             try
@@ -2821,7 +2886,61 @@ namespace DVBTTelevizor.MAUI
                 case "menuStopRecord":
                     await ActionStopRecord();
                     break;
+                case "menuTeletext":
+                    await BuildTeletextMenu();
+                    break;
+                case "menuTeletextNum":
+                    _currentTeletextNum = System.String.Empty;
+                    await BuildTeletextMenu();
+                    break;
+                case "menuTeletextOn":
+                    TurnOnTeletext();
+                    break;
+                case "menuTeletextOff":
+                    if (_mediaPlayer != null)
+                    {
+                        _mediaPlayer.SetSpu(-1);
+                    }
+                    break;
             }
+
+            for (var i=0;i<=9;i++)
+            {
+                if (menuId == "menuTeletextNum" + i.ToString())
+                {
+                    _currentTeletextNum += i.ToString();
+
+                    if (_currentTeletextNum.Length == 3)
+                    {
+                        if (_mediaPlayer != null)
+                        {
+                            _mediaPlayer.Teletext = Convert.ToInt32(_currentTeletextNum);
+                            _currentTeletextNum = null;
+                        }
+                    }
+                    else
+                    {
+                        await BuildTeletextMenu();
+                    }
+                }
+            }
+        }
+
+        private void TurnOnTeletext()
+        {
+            if (_mediaPlayer == null)
+                return;
+
+            foreach  (var track in _mediaPlayer.SpuDescription)
+            {
+                if (track.Name.ToLower().Contains("teletext"))
+                {
+                    _mediaPlayer.SetSpu(track.Id);
+                    return;
+                }
+            }
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage("No teletext found".Translated()));
         }
 
         private void BuildMenu()
