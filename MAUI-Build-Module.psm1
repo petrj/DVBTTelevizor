@@ -36,7 +36,7 @@ function Publish-AABPackage
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [System.IO.FileInfo]$InputObject,
 
-        [string]$Framework     = "net9.0-android35.0",
+        [string]$Framework     = "net9.0-android",
 
         [ValidateSet("Debug", "Release")]
         [string]$Configuration = "Release",
