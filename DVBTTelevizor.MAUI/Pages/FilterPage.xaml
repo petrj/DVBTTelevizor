@@ -38,7 +38,7 @@
             <Setter Property="HorizontalOptions" Value="End"/>
             <Setter Property="VerticalOptions" Value="Center"/>
             <Setter Property="FlowDirection" Value="LeftToRight"/>
-            <Setter Property="Margin" Value="0,0,20,0"/>
+            <Setter Property="Margin" Value="10,0,10,0"/>
             <Setter Property="ThumbColor" Value="Blue"/>
             <Setter Property="OnColor" Value="CornflowerBlue"/>
         </Style>

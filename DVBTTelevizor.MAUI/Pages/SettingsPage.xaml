@@ -38,7 +38,7 @@
                 <Setter Property="HorizontalOptions" Value="End"/>
                 <Setter Property="VerticalOptions" Value="Center"/>
                 <Setter Property="FlowDirection" Value="LeftToRight"/>
-                <Setter Property="Margin" Value="0,0,20,0"/>
+                <Setter Property="Margin" Value="10,0,10,0"/>
                 <Setter Property="ThumbColor" Value="Blue"/>
                 <Setter Property="OnColor" Value="CornflowerBlue"/>
             </Style>
@@ -426,7 +426,7 @@
                         <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='UDP IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <Entry Grid.Row="0" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                     </Grid>
 
