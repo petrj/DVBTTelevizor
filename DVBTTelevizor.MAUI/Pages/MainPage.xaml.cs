@@ -71,6 +71,7 @@ namespace DVBTTelevizor.MAUI
         private AboutPage _aboutPage = null;
         private DriverPage _driverPage = null;
         private ChannelPage _channelPage = null;
+        private FilterPage _filterPage = null;
 
         private bool IsPortrait { get; set; } = false;
 
@@ -174,8 +175,10 @@ namespace DVBTTelevizor.MAUI
             _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
+            _filterPage = new FilterPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
             _channelPage.Disappearing += _channelPage_Disappearing;
+            _filterPage.Disappearing += _filterPage_Disappearing;
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -265,6 +268,14 @@ namespace DVBTTelevizor.MAUI
                 });
             }
 
+        }
+
+        private void _filterPage_Disappearing(object? sender, EventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await _viewModel.RefreshChannels();
+            });
         }
 
         private async Task ExtractAssetFile(string sourceFileName)
@@ -2902,6 +2913,9 @@ namespace DVBTTelevizor.MAUI
                         _mediaPlayer.SetSpu(-1);
                     }
                     break;
+                    case "menuFilter":
+                        await Navigation.PushAsync(_filterPage);
+                    break;
             }
 
             for (var i=0;i<=9;i++)
@@ -2992,6 +3006,11 @@ namespace DVBTTelevizor.MAUI
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuStopRecord", "Stop record".Translated(), "stoprecord.png"));
                 }
+            }
+
+            if (_viewModel.PlayingState != PlayingStateEnum.Playing)
+            {
+                _menuItems.Add(MainMenu.CreateMenuItem("menuFilter", "Filter".Translated(), "filter.png"));
             }
 
             var selectedChannel = _viewModel.SelectedChannel;

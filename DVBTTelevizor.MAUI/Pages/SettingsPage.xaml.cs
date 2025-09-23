@@ -109,11 +109,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("ShowTVChannels", new List<View>() { ShowTVChannelsBoxView, ShowTVSwitch }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("ShowRadioChannels", new List<View>() { ShowRadioChannelsBoxView, ShowRadioSwitch }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("ShowNonFreeChannels", new List<View>() { ShowNonFreeChannelsBoxView, ShowNonFreeSwitch }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("ShowOtherChannels", new List<View>() { ShowOtherChannelsBoxView, ShowOtherSwitch }))
-
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportToFile", new List<View>() { ExportToFileButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ImportChannels", new List<View>() { ImportChannelsButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ClearChannels", new List<View>() { ClearChannelsButton }))
@@ -533,22 +528,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "ShowTVChannels":
-                            ShowTVSwitch.IsToggled = !ShowTVSwitch.IsToggled;
-                            break;
-
-                        case "ShowRadioChannels":
-                            ShowRadioSwitch.IsToggled = !ShowRadioSwitch.IsToggled;
-                            break;
-
-                        case "ShowNonFreeChannels":
-                            ShowNonFreeSwitch.IsToggled = !ShowNonFreeSwitch.IsToggled;
-                            break;
-
-                        case "ShowOtherChannels":
-                            ShowOtherSwitch.IsToggled = !ShowOtherSwitch.IsToggled;
-                            break;
-
                         case "ClearChannels":
                             ClearChannelsButton_Clicked(this, new EventArgs());
                             break;
