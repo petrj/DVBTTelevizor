@@ -23,7 +23,8 @@
             </Style>
 
             <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
-                <Setter Property="Color" Value="Blue"/>
+                <Setter Property="Color" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="IsEnabled" Value="False"/>
             </Style>
 
@@ -70,7 +71,7 @@
                         <ColumnDefinition Width="64*" />
                     </Grid.ColumnDefinitions>
 
-                    <BoxView x:Name="NameBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+                    <BoxView x:Name="NameBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                     <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Name'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
                     <Entry Grid.Row="0" Grid.Column="2"
@@ -95,7 +96,7 @@
                         <ColumnDefinition Width="64*" />
                     </Grid.ColumnDefinitions>
 
-                    <BoxView x:Name="NumberBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent"/>
+                    <BoxView x:Name="NumberBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                     <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Number'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                     <Entry Grid.Row="0" Grid.Column="2"
@@ -206,7 +207,7 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" IsVisible="{Binding StreamInfoVisible}" />
 
-                <Button Margin="10,20,10,0" x:Name="ButtonDeleteChannel" Text="{local:LngXamlExt Input='Delete'}"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
+                <Button Margin="10,20,10,30" x:Name="ButtonDeleteChannel" Text="{local:LngXamlExt Input='Delete'}"  IsVisible="{Binding DeleteVisible}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ButtonDeleteChannel_Clicked" />
 
             </StackLayout>
 

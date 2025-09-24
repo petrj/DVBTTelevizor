@@ -140,9 +140,9 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.5, 0.0, 0.95, 0.1));
             AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.5, 0.1, 0.25, 0.05));
-            AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.5, 0.15, 0.95, 0.15));
-            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.9, 0.3, 0.95, 0.1));
-            AbsoluteLayout.SetLayoutBounds(SplitterBoxView, new Rect(0.5, 0.4, 1, 0.005));
+            AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.5, 0.14, 0.95, 0.15));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.9, 0.29, 0.95, 0.15));
+            AbsoluteLayout.SetLayoutBounds(SplitterBoxView, new Rect(0.5, 0.41, 1, 0.005));
             AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.5, 0.46, 0.95, 0.14));
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.98, 0.95, 0.1));
             AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, 0.815, 0.95, 0.325));

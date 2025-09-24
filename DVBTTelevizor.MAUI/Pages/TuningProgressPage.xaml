@@ -14,7 +14,8 @@
             </Style>
 
             <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
-                <Setter Property="Color" Value="Blue"/>
+                <Setter Property="Color" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
                 <Setter Property="IsEnabled" Value="False"/>
             </Style>
 

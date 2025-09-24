@@ -353,7 +353,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        await ChannelScrollView.ScrollToAsync(view, ScrollToPosition.Start, animated: false);
+                        await ChannelScrollView.ScrollToAsync(view, ScrollToPosition.MakeVisible, animated: false);
                     });
                 }
             }

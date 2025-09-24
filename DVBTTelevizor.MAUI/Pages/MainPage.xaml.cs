@@ -167,6 +167,10 @@ namespace DVBTTelevizor.MAUI
             _iptv = new SledovaniTV.SledovaniTV(_loggingService);
             _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
             _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
+            if (_configuration.ShowNonFreeChannels)
+            {
+                Task.Run(async () => { await _iptv.Unlock(); });
+            }
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, _iptv, tvConfiguration, publicDirectoryProvider);
 

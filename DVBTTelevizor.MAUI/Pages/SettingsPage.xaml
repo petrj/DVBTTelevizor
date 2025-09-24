@@ -149,7 +149,7 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ShowFullScreenBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Full screen'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
@@ -158,11 +158,11 @@
 
 
 
-                        <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="ShowPlayOnBackgroundBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Play on background'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                        <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}" />
                         <Switch Grid.Row="1" Grid.Column="1" x:Name="PlayOnBackgroundSwitch"  IsToggled="{Binding Config.PlayOnBackground, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
 
                     </Grid>
@@ -176,7 +176,7 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="FontSizeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="FontSizeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Font size'}" x:Name="FontSizeLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Picker
@@ -198,7 +198,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="AutoStartBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="AutoStartBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Startup auto play'}" x:Name="AutoStartLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Picker
@@ -234,7 +234,7 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="RemoteAccessEnabledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="RemoteAccessEnabledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Enabled'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="RemoteAccessSwitch" IsToggled="{Binding AllowRemoteAccessService, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
@@ -256,15 +256,15 @@
                                 <ColumnDefinition Width="100*" />
                             </Grid.ColumnDefinitions>
 
-                            <BoxView x:Name="RemoteAccessIPBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                            <BoxView x:Name="RemoteAccessIPBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
                             <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='IP'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                             <Entry  Grid.Row="1" Grid.Column="0" x:Name="IPEntry" Text="{Binding Config.RemoteAccessServiceIP, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
 
-                            <BoxView x:Name="RemoteAccessPortBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                            <BoxView x:Name="RemoteAccessPortBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
                             <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Port'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                             <Entry  Grid.Row="3" Grid.Column="0" x:Name="PortEntry" Text="{Binding Config.RemoteAccessServicePort, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Numeric" />
 
-                            <BoxView x:Name="RemoteAccessSecurityKeyBoxView" Grid.Row="4" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+                            <BoxView x:Name="RemoteAccessSecurityKeyBoxView" Grid.Row="4" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
                             <Label  Grid.Row="4" Grid.Column="0" Text="{local:LngXamlExt Input='Security key'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                             <Entry Grid.Row="5" Grid.Column="0"  x:Name="SecurityKeyEntry" Text="{Binding Config.RemoteAccessServiceSecurityKey, Mode=TwoWay}" Style="{StaticResource EntryStyle}" />
 
@@ -310,7 +310,7 @@
                             <ColumnDefinition Width="70*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="DriverBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="DriverBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver'}" x:Name="DriverLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Picker
@@ -342,12 +342,12 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="RecordingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="RecordingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='Recording directory'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Config.OutputDirectory}"  Style="{StaticResource YellowLabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" />
+                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Config.OutputDirectory}"  Style="{StaticResource YellowLabelStyle}" FontSize="{Binding FontSizeForLabel}" HorizontalOptions="End" Margin="0,5,0,5" />
 
-                        <BoxView x:Name="WriteToExternalDeviceSwitchBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="WriteToExternalDeviceSwitchBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Write to external storage'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <BoxView Grid.Row="2" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
@@ -363,7 +363,7 @@
 
                     <Label Text="{local:LngXamlExt Input='Language'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
-                    <Grid Margin="30,0,10,0" BackgroundColor="Transparent">
+                    <Grid Margin="30,5,10,0" BackgroundColor="Transparent">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -372,7 +372,7 @@
                             <ColumnDefinition Width="70*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="LanguageBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="LanguageBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Application language'}" x:Name="LanguageLabel" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Picker
@@ -405,7 +405,7 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="EnableLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="Enable logging" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
@@ -423,7 +423,7 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                        <BoxView x:Name="UDPIPLoggingBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='UDP IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <Entry Grid.Row="0" Grid.Column="1" x:Name="UDPIPEntry"  Text="{Binding Config.LoggingUDPIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}"/>
@@ -450,7 +450,7 @@
                         <ColumnDefinition Width="30*" />
                     </Grid.ColumnDefinitions>
 
-                    <BoxView x:Name="SledovaniTVEnabledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+                    <BoxView x:Name="SledovaniTVEnabledBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
                     <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Enabled'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                     <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                     <Switch Grid.Row="0" Grid.Column="1" x:Name="SledovaniTVSwitch" IsToggled="{Binding SledovaniTVEnabled, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
@@ -469,11 +469,11 @@
                             <ColumnDefinition Width="100*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="SledovaniTVUserNameBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" IsVisible="{Binding Config.SledovaniTVEnabled}"/>
+                        <BoxView x:Name="SledovaniTVUserNameBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" IsVisible="{Binding Config.SledovaniTVEnabled}" Margin="-5,-5,-5,-5" />
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Username'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Entry  Grid.Row="1" Grid.Column="0" x:Name="SledovaniTVUserNameEntry" Text="{Binding Config.SledovaniTVUserName, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
 
-                        <BoxView x:Name="SledovaniTVPasswordBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" IsVisible="{Binding Config.SledovaniTVEnabled}"/>
+                        <BoxView x:Name="SledovaniTVPasswordBoxView" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" IsVisible="{Binding Config.SledovaniTVEnabled}" Margin="-5,-5,-5,-5"/>
                         <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Password'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Entry  Grid.Row="3" Grid.Column="0" x:Name="SledovaniTVPasswordEntry" Text="{Binding Config.SledovaniTVPassword, Mode=TwoWay}" Style="{StaticResource EntryStyle}" />
 
@@ -528,7 +528,7 @@
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="SledovaniTVShowAdultChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" IsVisible="{Binding SledovaniTVDevicePaired}"/>
+                        <BoxView x:Name="SledovaniTVShowAdultChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" IsVisible="{Binding SledovaniTVDevicePaired}" Margin="-5,-5,-5,-5"/>
                         <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show adult channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
                         <Switch Grid.Row="0" Grid.Column="1" x:Name="SledovaniTVShowAdultChannelsSwitch" IsToggled="{Binding SledovaniTVShowAdultChannels, Mode=TwoWay}" Style="{StaticResource CommonSwitchTextStyle}" />
@@ -543,7 +543,7 @@
                             <ColumnDefinition Width="100*" />
                         </Grid.ColumnDefinitions>
 
-                        <BoxView x:Name="SledovaniTVPINBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" IsVisible="{Binding SledovaniTVShowAdultChannels}"/>
+                        <BoxView x:Name="SledovaniTVPINBoxView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="Transparent" IsVisible="{Binding SledovaniTVShowAdultChannels}" Margin="-5,-5,-5,-5"/>
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='PIN'}" Style="{StaticResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
                         <Entry  Grid.Row="1" Grid.Column="0" x:Name="SledovaniTVPINEntry" Text="{Binding Config.SledovaniTVPIN, Mode=TwoWay}" Style="{StaticResource EntryStyle}" Keyboard="Url" />
 
