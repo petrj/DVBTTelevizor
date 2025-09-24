@@ -11,6 +11,8 @@
 
             <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
             </Style>
 
             <Style x:Key="ListViewStyle" TargetType="ListView">
@@ -365,6 +367,9 @@
         </StackLayout>
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
+
+        <Label Text="{local:LngXamlExt Input='No channel'}" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.15,0.75,0.15" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+
 
         <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="tunebig.png">
             <Image.GestureRecognizers>
