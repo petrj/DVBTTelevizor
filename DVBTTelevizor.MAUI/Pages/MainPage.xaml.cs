@@ -2873,7 +2873,11 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.ScanEPG(_viewModel.SelectedChannel, false, false);
                     break;
                 case "menuShowEPG":
-                    _viewModel.EPGDetailEnabled = true;
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        _viewModel.EPGDetailEnabled = true;
+
+                    });
                     RefreshGUI();
                     break;
                 case "menuHideEPG":
@@ -2970,7 +2974,6 @@ namespace DVBTTelevizor.MAUI
             {
                 if ((_viewModel.PlayingState == PlayingStateEnum.Playing) ||
                     (_viewModel.PlayingState == PlayingStateEnum.PlayingInPreview))
-
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuStop", "Stop".Translated(), "stop.png"));
 
@@ -2989,19 +2992,19 @@ namespace DVBTTelevizor.MAUI
                 else
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuPlay", "Play".Translated(), "play.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
                 }
-
-                _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "Scan EPG".Translated(), "epgscan.png"));
 
                 if (_viewModel.EPGDetailVisible)
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide EPG".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide description box".Translated(), "epg.png"));
                 }
                 else
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show EPG".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show description box".Translated(), "epg.png"));
                 }
 
+                _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "Scan EPG".Translated(), "epgscan.png"));
 
                 if (_viewModel.RecordingChannel == null)
                 {
@@ -3018,11 +3021,6 @@ namespace DVBTTelevizor.MAUI
                 _menuItems.Add(MainMenu.CreateMenuItem("menuFilter", "Filter".Translated(), "filter.png"));
             }
 
-            var selectedChannel = _viewModel.SelectedChannel;
-            if (selectedChannel != null)
-            {
-                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
-            }
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuSettings", "Settings".Translated(), "settings.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png"));
@@ -3059,11 +3057,18 @@ namespace DVBTTelevizor.MAUI
 
         private void VideoStackLayout_Tapped(object sender, TappedEventArgs e)
         {
+            /*
             if (_viewModel.PlayingState == PlayingStateEnum.Playing ||
                 _viewModel.PlayingState == PlayingStateEnum.PlayingInPreview)
             {
                 _viewModel.EPGDetailEnabled = !_viewModel.EPGDetailEnabled;
                 RefreshGUI();
+            }
+            */
+
+            if (_viewModel.PlayingState == PlayingStateEnum.Playing)
+            {
+                MenuButton_Clicked(this, new EventArgs());
             }
         }
 
