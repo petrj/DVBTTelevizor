@@ -241,7 +241,6 @@ namespace DVBTTelevizor.MAUI
                     WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
                 });
             }
-            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
 
             if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
             {
@@ -272,6 +271,7 @@ namespace DVBTTelevizor.MAUI
                 });
             }
 
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
         }
 
         private void _filterPage_Disappearing(object? sender, EventArgs e)
