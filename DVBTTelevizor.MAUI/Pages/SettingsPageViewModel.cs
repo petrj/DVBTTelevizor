@@ -517,6 +517,9 @@ namespace DVBTTelevizor.MAUI
 
                 cfg.UpdateConfig(_configuration);
 
+                NotifyConfigChange();
+                NotifyLanguageChange();
+
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Settings imported".Translated()));
 
             }

@@ -1377,7 +1377,11 @@ namespace DVBTTelevizor.MAUI
 
                     if (_viewModel.RecordingChannel == null)
                     {
-                        _driver.Stop();
+                        if (_viewModel.PlayingChannel != null &&
+                        _viewModel.PlayingChannel.ChannelType != ChannelTypeEnum.SledovaniTV)
+                        {
+                            _driver.Stop();
+                        }
                     }
                 });
 
