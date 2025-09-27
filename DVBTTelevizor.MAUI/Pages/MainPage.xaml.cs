@@ -2497,7 +2497,14 @@ namespace DVBTTelevizor.MAUI
 
         public void OnTextSent(string text)
         {
+            _loggingService.Debug($"Main Page OnTextSent: {text}");
 
+            var pageOnTop = GetPageFromStack(Navigation.NavigationStack);
+            if ((pageOnTop != null) && (pageOnTop is IOnKeyDown okd))
+            {
+                okd.OnTextSent(text);
+                return;
+            }
         }
 
         public static void SetToolBarColors(NavigationPage navigationPage, Color textColor, Color background)

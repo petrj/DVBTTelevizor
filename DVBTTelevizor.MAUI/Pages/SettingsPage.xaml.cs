@@ -361,6 +361,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             case "menuConfirmOverwriteSettingsExport":
                 await _settingsPageViewModel.ExportSettings();
                 break;
+
+            case "menuConfirmImportSettingsExport":
+                await _settingsPageViewModel.ImportSettings();
+                break;
         }
     }
 
@@ -665,6 +669,65 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     public void OnTextSent(string text)
     {
+        if (_focusItems.FocusedItem == null)
+            return;
+
+        switch (_focusItems.FocusedItem.Name)
+        {
+            case "RemoteAccessIP":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    IPEntry.Text = text;
+                });
+                break;
+            case "RemoteAccessPort":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    PortEntry.Text = text;
+                });
+                break;
+            case "RemoteAccessSecurityKey":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    SecurityKeyEntry.Text = text;
+                });
+                break;
+
+            case "SledovaniTVUserName":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    SledovaniTVUserNameEntry.Text = text;
+                });
+                break;
+
+            case "SledovaniTVPassword":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    SledovaniTVPasswordEntry.Text = text;
+                });
+                break;
+
+            case "SledovaniTVDeviceID":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    SledovaniTVDeviceIDEntry.Text = text;
+                });
+                break;
+
+            case "SledovaniTVDevicePassword":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    SledovaniTVDevicePasswordEntry.Text = text;
+                });
+                break;
+
+            case "SledovaniTVPIN":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    SledovaniTVPINEntry.Text = text;
+                });
+                break;
+        }
     }
 
     private async void ClearChannelsButton_Clicked(object sender, EventArgs e)
@@ -840,8 +903,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 return;
             }
 
-            Task.Run(async ()=> await _settingsPageViewModel.ImportSettings());
-
+            BuildConfirmMenu("Import configration? All settings will be overwritten!".Translated(), "Yes".Translated(), "No".Translated(), "menuConfirmImportSettingsExport");
         }
         catch (Exception ex)
         {

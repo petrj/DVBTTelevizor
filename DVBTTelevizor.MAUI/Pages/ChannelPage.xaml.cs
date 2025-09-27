@@ -507,9 +507,27 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     }
 
+
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"ChannelPage Page OnTextSent {text}");
+        if (_focusItems.FocusedItem == null)
+            return;
+
+        switch (_focusItems.FocusedItem.Name)
+        {
+            case "Name":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    EntryName.Text = text;
+                });
+                break;
+            case "Number":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    EntryNumber.Text = text;
+                });
+                break;
+        }
     }
 
     private void ButtonChangeAudio_Clicked(object sender, EventArgs e)
