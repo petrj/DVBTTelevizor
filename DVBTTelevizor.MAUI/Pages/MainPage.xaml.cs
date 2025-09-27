@@ -61,6 +61,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _checkStreamEnabled = true;
         public Command CommandCheckStream { get; set; }
+        public Command CommandUpdateDriverState { get; set; }
 
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
@@ -233,6 +234,14 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+            CommandUpdateDriverState = new Command(() =>
+            {
+                Task.Run(async () =>
+                {
+                    await UpdateDriverState();
+                });
+            });
+
             if (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP))
             {
                 Task.Run(async () =>
@@ -275,6 +284,7 @@ namespace DVBTTelevizor.MAUI
             }
 
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
+            BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
         }
 
         private void _filterPage_Disappearing(object? sender, EventArgs e)
@@ -418,6 +428,38 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        private async Task UpdateDriverState()
+        {
+            _loggingService.Debug($"Updating bitrate");
+
+            try
+            {
+                long bitrate = 0;
+                DVBTDriverStatus state = new DVBTDriverStatus()
+                {
+                    rfStrengthPercentage = 0
+                };
+
+                if (_driver != null)
+                {
+                    bitrate = _driver.Bitrate;
+                    state = await _driver.GetStatus();
+                }
+
+                WeakReferenceMessenger.Default.Send(new DriverUpdateStateMessage(
+                    new DriverState()
+                    {
+                        BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
+                        Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq),
+                        Signal = $"{state.rfStrengthPercentage}%"
+                    }
+                    ));
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private async Task CheckStream()
         {
             if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
@@ -469,6 +511,17 @@ namespace DVBTTelevizor.MAUI
                                 NoVideoStackLayout.IsVisible = false;
                                 VideoStackLayout.IsVisible = true;
                             });
+                        }
+                    }
+
+                    if (_viewModel.PlayingChannel != null)
+                    {
+                        foreach (var track in _mediaPlayer.Media.Tracks)
+                        {
+                            if (track.TrackType == TrackType.Video)
+                            {
+                                _viewModel.PlayingChannel.VideoSize = $"{track.Data.Video.Width}x{track.Data.Video.Height}";
+                            }
                         }
                     }
 

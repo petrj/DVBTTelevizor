@@ -654,6 +654,26 @@ namespace DVBTTelevizor
             DataStreamInfo = "Reading data finished";
         }
 
+        public static string GetHumanReadableFrequency(long? herz)
+        {
+            if (herz == null)
+            {
+                return "--";
+            } else
+            if (herz > 1000000)
+            {
+                return $" {(herz.Value / 1000000.0).ToString("N1")} MHz";
+            }
+            else if (herz > 1000)
+            {
+                return $" {(herz.Value / 1000.0).ToString("N1")} KHz";
+            }
+            else
+            {
+                return $" {herz} Hz";
+            }
+        }
+
         public static string GetHumanReadableBitRate(long bitrate)
         {
             if (bitrate > 1000000)

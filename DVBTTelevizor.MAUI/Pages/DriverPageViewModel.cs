@@ -14,11 +14,19 @@ namespace DVBTTelevizor.MAUI
     {
         private string _range = string.Empty;
 
+        private DriverState? _driverState = null;
+
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             WeakReferenceMessenger.Default.Register<DVBTDriverStateChangedMessages>(this, (r, m) =>
             {
+                NotifyChange();
+            });
+
+            WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
+            {
+                _driverState = m.Value;
                 NotifyChange();
             });
         }
@@ -51,6 +59,8 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(ConnectedDevice));
             OnPropertyChanged(nameof(DriverIconImage));
             OnPropertyChanged(nameof(Bitrate));
+            OnPropertyChanged(nameof(LastTuneFrequency));
+            OnPropertyChanged(nameof(SignalStrength));
             OnPropertyChanged(nameof(ConnectedDeviceVisible));
             OnPropertyChanged(nameof(DriverStateStatus));
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
@@ -73,16 +83,42 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string Bitrate
+        public string SignalStrength
         {
             get
             {
-                if (_driver == null || _driver.Configuration == null)
+                if (_driverState == null)
                 {
                     return String.Empty;
                 }
 
-                return DVBTDriverConnector.GetHumanReadableBitRate(_driver.Bitrate);
+                return _driverState.Signal;
+            }
+        }
+
+        public string Bitrate
+        {
+            get
+            {
+                if (_driverState == null)
+                {
+                    return String.Empty;
+                }
+
+                return _driverState.BitRate;
+            }
+        }
+
+        public string LastTuneFrequency
+        {
+            get
+            {
+                if (_driverState == null)
+                {
+                    return String.Empty;
+                }
+
+                return _driverState.Frequency;
             }
         }
 

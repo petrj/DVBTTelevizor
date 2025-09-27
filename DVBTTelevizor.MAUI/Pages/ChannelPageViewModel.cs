@@ -55,6 +55,17 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public string? StreamVideoSize
+        {
+            get
+            {
+                if (_channel == null)
+                    return String.Empty;
+
+                return _channel.VideoSize;
+            }
+        }
+
         public void UpdateAutioAndSubtitles()
         {
             SetAudioTracks(_channel.AudioTracks, _channel.SelectedAudioTrack);
@@ -118,6 +129,31 @@ namespace DVBTTelevizor.MAUI
         public void NotifyChannelChange()
         {
             OnPropertyChanged(nameof(Channel));
+
+            OnPropertyChanged(nameof(AudioTracksButtonVisible));
+            OnPropertyChanged(nameof(SubtitlesTracksButtonVisible));
+        }
+
+        public bool AudioTracksButtonVisible
+        {
+            get
+            {
+                return
+                    _channel != null &&
+                    _channel.AudioTracks != null &&
+                    _channel.AudioTracks.Count > 0;
+            }
+        }
+
+        public bool SubtitlesTracksButtonVisible
+        {
+            get
+            {
+                return
+                    _channel != null &&
+                    _channel.Subtitles != null &&
+                    _channel.Subtitles.Count > 0;
+            }
         }
     }
 }

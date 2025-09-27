@@ -42,6 +42,7 @@ namespace DVBTTelevizor
         public Dictionary<int, string> VideoTracks { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> Subtitles { get; set; } = new Dictionary<int, string>();
         public Dictionary<int, string> AudioTracks { get; set; } = new Dictionary<int, string>();
+        public string? VideoSize { get; set; }
 
         public string? SelectedSubtitle { get; set; } = null;
         public string? SelectedAudioTrack { get; set; } = null;
