@@ -36,6 +36,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
+        private bool _lastDataAnimation = false;
         private Size _lastAllocatedSize = new Size(-1, -1);
 
         private DateTime _lastBackPressedTime = DateTime.MinValue;
@@ -163,7 +164,9 @@ namespace DVBTTelevizor.MAUI
 
             _configuration.ConfigDirectory = PublicDirectory;
 
+
             InitDVBTDriver();
+
             _iptv = new SledovaniTV.SledovaniTV(_loggingService);
             _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
             _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
@@ -271,7 +274,7 @@ namespace DVBTTelevizor.MAUI
                 });
             }
 
-            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 5);
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
         }
 
         private void _filterPage_Disappearing(object? sender, EventArgs e)
@@ -420,7 +423,7 @@ namespace DVBTTelevizor.MAUI
             if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
                 return;
 
-            //_loggingService.Debug($"Checking stream");
+            _loggingService.Debug($"Checking stream");
             //var status = "Check stream result: " + Environment.NewLine;
 
             try
@@ -477,7 +480,15 @@ namespace DVBTTelevizor.MAUI
 
                 if (_lastActionPlayTime != DateTime.MinValue)
                 {
-                    if (!_driver.DriverStreamDataAvailable)
+                    var dataAvailable = true;
+
+                    if (_viewModel.PlayingChannel != null &&
+                        _viewModel.PlayingChannel.ChannelType != ChannelTypeEnum.SledovaniTV)
+                    {
+                        dataAvailable = _driver.DriverStreamDataAvailable;
+                    }
+
+                    if (!dataAvailable)
                     {
                         var timeFromPlayMSecs = (DateTime.Now - _lastActionPlayTime).TotalMilliseconds;
                         if (timeFromPlayMSecs > 10000)
@@ -492,6 +503,10 @@ namespace DVBTTelevizor.MAUI
                         {
                             _loggingService.Info($"     - No data for {timeFromPlayMSecs} ms");
                         }
+                    } else
+                    {
+                        _lastDataAnimation = !_lastDataAnimation;
+                        await NoVideoImage.ScaleTo(_lastDataAnimation ? 1.2 : 0.8, 3000);
                     }
                 }
 
@@ -1006,7 +1021,7 @@ namespace DVBTTelevizor.MAUI
                             break;
                     }
 
-                    //_loggingService.Info("RefreshGUI completed");
+                    _loggingService.Info("RefreshGUI completed");
 
                 }
                 catch (Exception ex)
@@ -1062,6 +1077,8 @@ namespace DVBTTelevizor.MAUI
 
         private async Task AutoPlay()
         {
+            _loggingService.Debug("AutoPlay");
+
             if ((System.String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID)) ||
                 (_configuration.AutoPlayedChannelUniqueID == Channel.GetDefaultUniqueIdentifier("")))
             {
@@ -1772,6 +1789,8 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.PlayingChannel.AudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
                 _viewModel.EPGDetailEnabled = false;
+
+                _lastActionPlayTime = DateTime.Now;
 
                 _mediaPlayer.Teletext = 100;
 
