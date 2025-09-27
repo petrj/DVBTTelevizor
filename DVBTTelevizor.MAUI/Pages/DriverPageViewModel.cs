@@ -60,7 +60,6 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(DriverIconImage));
             OnPropertyChanged(nameof(Bitrate));
             OnPropertyChanged(nameof(LastTuneFrequency));
-            OnPropertyChanged(nameof(SignalStrength));
             OnPropertyChanged(nameof(ConnectedDeviceVisible));
             OnPropertyChanged(nameof(DriverStateStatus));
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
@@ -80,19 +79,6 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return _driver.Configuration.DeviceName;
-            }
-        }
-
-        public string SignalStrength
-        {
-            get
-            {
-                if (_driverState == null)
-                {
-                    return String.Empty;
-                }
-
-                return _driverState.Signal;
             }
         }
 

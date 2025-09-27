@@ -443,15 +443,13 @@ namespace DVBTTelevizor.MAUI
                 if (_driver != null)
                 {
                     bitrate = _driver.Bitrate;
-                    state = await _driver.GetStatus();
                 }
 
                 WeakReferenceMessenger.Default.Send(new DriverUpdateStateMessage(
                     new DriverState()
                     {
                         BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
-                        Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq),
-                        Signal = $"{state.rfStrengthPercentage}%"
+                        Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
                     }
                     ));
             } catch (Exception ex)
@@ -1074,7 +1072,7 @@ namespace DVBTTelevizor.MAUI
                             break;
                     }
 
-                    _loggingService.Info("RefreshGUI completed");
+                    //_loggingService.Info("RefreshGUI completed");
 
                 }
                 catch (Exception ex)

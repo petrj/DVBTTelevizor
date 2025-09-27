@@ -10,7 +10,6 @@ namespace DVBTTelevizor.MAUI.Messages
     public class DriverState
     {
         public string BitRate { get; set; }
-        public string Signal { get; set; }
         public string Frequency { get; set; }
     }
 

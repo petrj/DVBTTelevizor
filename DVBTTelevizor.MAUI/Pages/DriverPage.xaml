@@ -57,8 +57,6 @@
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
             </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40*" />
@@ -75,15 +73,10 @@
             <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Label  Grid.Row="1" Grid.Column="1" Text="{Binding LastTuneFrequency}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
-            <BoxView x:Name="SignalStrengthBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="FrequencyRangeBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Signal strength'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <Label  Grid.Row="2" Grid.Column="1" Text="{Binding SignalStrength}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-
-            <BoxView x:Name="FrequencyRangeBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
-
-            <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <Label  Grid.Row="3" Grid.Column="1" Text="{Binding ConnectedDeviceRange}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="2" Grid.Column="1" Text="{Binding ConnectedDeviceRange}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
 
         </Grid>
