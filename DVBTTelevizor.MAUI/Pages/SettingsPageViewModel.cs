@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -316,6 +318,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public string AndroidSettingsListPath
+        {
+            get
+            {
+                return $"{Config.OutputDirectory}{System.IO.Path.DirectorySeparatorChar}DVBTTelevizor.configuration.json";
+            }
+        }
+
         public bool SledovaniTVEnabled
         {
             get
@@ -473,6 +483,53 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public async Task ExportSettings()
+        {
+            _loggingService.Info("ExportSettings");
+
+            try
+            {
+                var settingsJSON = Newtonsoft.Json.JsonConvert.SerializeObject(_configuration, Newtonsoft.Json.Formatting.Indented);
+
+                if (File.Exists(AndroidSettingsListPath))
+                {
+                    File.Delete(AndroidChannelsListPath);
+                }
+                System.IO.File.WriteAllText(AndroidSettingsListPath, settingsJSON);
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Settings exported".Translated()));
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        public async Task ImportSettings()
+        {
+            _loggingService.Info("ImportSettings");
+
+            try
+            {
+                var json = File.ReadAllText(AndroidSettingsListPath);
+                var cfg = JsonConvert.DeserializeObject<DummyConfiguration>(json);
+
+                cfg.UpdateConfig(_configuration);
+
+                NotifyConfigChange();
+                NotifyLanguageChange();
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Settings imported".Translated()));
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Settings import error".Translated()));
+            }
+        }
+
         public bool DebugSettingsVisible
         {
             get
@@ -484,6 +541,8 @@ namespace DVBTTelevizor.MAUI
 #endif
             }
         }
+
+
     }
 }
 

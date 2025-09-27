@@ -4,8 +4,8 @@ using LoggerService;
 using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 using SledovaniTV;
+using System.Collections.ObjectModel;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -149,7 +149,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVDevicePasswordBoxView, SledovaniTVDevicePasswordEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("ExportSettingsToFile", new List<View>() { ExportSettingsToFileButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("ImportSettingsFromFile", new List<View>() { ImportSettingsFromFileButton }));
+        ;
 
 
         _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
@@ -353,6 +357,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 break;
             case "menuSledovaniTVReloadChannels":
                 await _settingsPageViewModel.SledovaniTVReloadChannels();
+                break;
+            case "menuConfirmOverwriteSettingsExport":
+                await _settingsPageViewModel.ExportSettings();
                 break;
         }
     }
@@ -644,6 +651,12 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                         case "SledovaniTVPIN":
                             SledovaniTVPINEntry.Focus();
                             break;
+                        case "ExportSettingsToFile":
+                            ExportSettingsToFileButton_Clicked(this, new EventArgs());
+                            break;
+                        case "ImportSettingsFromFil":
+                            ImportSettingsFromFileButton_Clicked(this, new EventArgs());
+                            break;
                     }
                 });
                 break;
@@ -688,7 +701,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             var json = JsonConvert.SerializeObject(channels);
 
             File.WriteAllText(_settingsPageViewModel.AndroidChannelsListPath, json);
-        } catch (Exception ex)
+
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Channels exported".Translated()));
+
+        }
+        catch (Exception ex)
         {
             _loggingService.Error(ex, "Error exporting channels list");
         }
@@ -794,4 +811,41 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         await _settingsPageViewModel.SledovaniTVPair();
     }
 
- }
+    private void ExportSettingsToFileButton_Clicked(object sender, EventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (File.Exists(_settingsPageViewModel.AndroidSettingsListPath))
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    BuildConfirmMenu("File already exists. Overwrite?".Translated(), "Yes".Translated(), "No".Translated(), "menuConfirmOverwriteSettingsExport");
+                });
+                return;
+            }
+
+            await _settingsPageViewModel.ExportSettings();
+        });
+    }
+
+    private void ImportSettingsFromFileButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Info($"ImportSettingsFromFileButton_Clicked");
+
+        try
+        {
+            if (!File.Exists(_settingsPageViewModel.AndroidSettingsListPath))
+            {
+                BuildInfoMenu("File does not exist".Translated(), "OK".Translated());
+                return;
+            }
+
+            Task.Run(async ()=> await _settingsPageViewModel.ImportSettings());
+
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex, "Error importing settings");
+        }
+    }
+}

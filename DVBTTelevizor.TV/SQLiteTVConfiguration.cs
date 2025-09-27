@@ -277,7 +277,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetPersistingSettingValue<bool>("HideTVChannels", true);
+                return GetPersistingSettingValue<bool>("HideTVChannels", false);
             }
             set
             {
@@ -338,7 +338,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetPersistingSettingValue<bool>("ShowRadioChannels");
+                return GetPersistingSettingValue<bool>("ShowRadioChannels", true);
             }
             set
             {
@@ -456,10 +456,10 @@ namespace DVBTTelevizor
                 _loggingService.Debug("Loading channels");
 
                 var json = GetPersistingSettingValue<string>("ChannelsJson");
-                if (string.IsNullOrEmpty(json) && (File.Exists(ChannelsConfigFileName)))
-                {
-                    json = File.ReadAllText(ChannelsConfigFileName);
-                }
+                //if (string.IsNullOrEmpty(json) && (File.Exists(ChannelsConfigFileName)))
+                //{
+                //    json = File.ReadAllText(ChannelsConfigFileName);
+                //}
 
                 if (!string.IsNullOrEmpty(json))
                 {
