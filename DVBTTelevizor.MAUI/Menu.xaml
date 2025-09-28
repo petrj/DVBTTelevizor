@@ -14,7 +14,7 @@
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="HorizontalOptions" Value="End"/>
-                <Setter Property="Margin" Value="10,0,0,0"/>
+                <Setter Property="Margin" Value="10,0,15,0"/>
             </Style>
         </ResourceDictionary>
     </ContentView.Resources>

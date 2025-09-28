@@ -26,6 +26,7 @@ public partial class Menu : ContentView
         if (BindingContext is MenuViewModel vm)
         {
             vm.UpdateMenu(items, title);
+            this.Focus();
         }
     }
 

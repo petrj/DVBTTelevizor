@@ -194,14 +194,6 @@ namespace DVBTTelevizor.MAUI
 
             _remoteAccessService = new RemoteAccessService.RemoteAccessService(_loggingService);
 
-#if DEBUG
-            _configuration.AllowRemoteAccessService = true;
-            _configuration.RemoteAccessServiceIP = _configuration.LoggingUDPIP;
-            _configuration.RemoteAccessServicePort = 49152;
-            _configuration.RemoteAccessServiceSecurityKey = "DVBTTelevizor";
-
-#endif
-
             RestartRemoteAccessService();
 
             SubscribeMessages();
@@ -2956,8 +2948,14 @@ namespace DVBTTelevizor.MAUI
                 case "menuShowEPG":
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        _viewModel.EPGDetailEnabled = true;
-
+                        if (_viewModel.SelectedChannel == null ||
+                        _viewModel.SelectedChannel.CurrentEventItem == null)
+                        {
+                            WeakReferenceMessenger.Default.Send(new ToastMessage("No program info found".Translated()));
+                        } else
+                        {
+                            _viewModel.EPGDetailEnabled = true;
+                        }
                     });
                     RefreshGUI();
                     break;
@@ -3078,11 +3076,11 @@ namespace DVBTTelevizor.MAUI
 
                 if (_viewModel.EPGDetailVisible)
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide play info".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide program info".Translated(), "epg.png"));
                 }
                 else
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show play info".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show program info".Translated(), "epg.png"));
                 }
 
                 _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "Scan EPG".Translated(), "epgscan.png"));

@@ -632,7 +632,14 @@ namespace DVBTTelevizor.MAUI
             Android.Views.Keycode keyCode;
             if (Enum.TryParse<Android.Views.Keycode>(code, out keyCode))
             {
-                new Instrumentation().SendKeyDownUpSync(keyCode);
+                try
+                {
+                    new Instrumentation().SendKeyDownUpSync(keyCode);
+                }
+                catch (Exception ex)
+                {
+                    DispatchKeyEvent(new KeyEvent(KeyEventActions.Down, keyCode));
+                }
             }
             else
             {
@@ -771,7 +778,7 @@ namespace DVBTTelevizor.MAUI
                     //Biger = 3,
                     //VeryBig = 4,
                     //Huge = 5
-                    AppFontSize = 5;
+
                     if (DeviceDisplay.MainDisplayInfo.Height < DeviceDisplay.MainDisplayInfo.Width)
                     {
                         // Landscape
