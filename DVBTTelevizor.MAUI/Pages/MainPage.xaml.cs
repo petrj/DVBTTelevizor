@@ -3078,11 +3078,11 @@ namespace DVBTTelevizor.MAUI
 
                 if (_viewModel.EPGDetailVisible)
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide description box".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide play info".Translated(), "epg.png"));
                 }
                 else
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show description box".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show play info".Translated(), "epg.png"));
                 }
 
                 _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "Scan EPG".Translated(), "epgscan.png"));

@@ -718,6 +718,9 @@ namespace DVBTTelevizor.MAUI
                     TextView textView;
                     Snackbar snackBar = null;
 
+                    var bgColour = Android.Graphics.Color.DarkGray;
+                    var txtColour = Android.Graphics.Color.White;
+
                     var tView = _instance.View;
                     if (tView == null)
                     {
@@ -728,8 +731,10 @@ namespace DVBTTelevizor.MAUI
 
                         snackBar = Snackbar.Make(view, message, Snackbar.LengthLong);
 
+                        snackBar.View.SetBackgroundColor(bgColour);
+
                         textView = snackBar.View.FindViewById<TextView>(Resource.Id.snackbar_text);
-                        textView.SetTextColor(Android.Graphics.Color.Black);
+                        textView.SetTextColor(txtColour);
                     }
                     else
                     {
@@ -740,13 +745,20 @@ namespace DVBTTelevizor.MAUI
                         //textView.SetShadowLayer(0, 0, 0, Android.Graphics.Color.Transparent); // remove shadow
                         //textView.SetBackgroundColor(Android.Graphics.Color.Transparent);
 
-                        textView.SetTextColor(Android.Graphics.Color.White);
+                        var parent = textView.Parent;
+                        if (parent is LinearLayout ll)
+                        {
+                            ll.SetBackgroundColor(bgColour);
+                            ll.SetPadding(15,5,15,5);
+                        }
+                        textView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+                        textView.SetTextColor(txtColour);
 
                     }
 
                     var minTextSize = textView.TextSize; // 16
 
-                    textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
+                    //textView.SetTypeface(Typeface.DefaultBold, TypefaceStyle.Bold);
                     //textView.SetTextColor(Android.Graphics.Color.Black);
 
                     var screenHeightRate = 0;
@@ -759,7 +771,7 @@ namespace DVBTTelevizor.MAUI
                     //Biger = 3,
                     //VeryBig = 4,
                     //Huge = 5
-
+                    AppFontSize = 5;
                     if (DeviceDisplay.MainDisplayInfo.Height < DeviceDisplay.MainDisplayInfo.Width)
                     {
                         // Landscape
