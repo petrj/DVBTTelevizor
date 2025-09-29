@@ -27,6 +27,7 @@ namespace DVBTTelevizor.MAUI
         private ITVConfiguration _configuration;
         public string PublicDirectory { get; set; }
         private string _currentTeletextNum = null;
+        private bool _fixVideoNeeded = false;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -968,6 +969,12 @@ namespace DVBTTelevizor.MAUI
                             //MainLayout.RaiseChild(VideoStackLayout);
                             //CheckStreamCommand.Execute(null);
 
+                            if (_fixVideoNeeded)
+                            {
+                                _fixVideoNeeded = false;
+                                await FixVideo(true);
+                            }
+
                             break;
                         case PlayingStateEnum.PlayingInPreview:
 
@@ -1016,6 +1023,9 @@ namespace DVBTTelevizor.MAUI
                             }
 
                             //CheckStreamCommand.Execute(null);
+
+                            // todo : only if needed
+                            //Task.Run(async () => await FixVideo(false));
 
                             break;
                         case PlayingStateEnum.Stopped:
@@ -1147,6 +1157,10 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnAppearing()
         {
+            _loggingService.Debug("OnAppearing");
+
+            _fixVideoNeeded = true;
+
             base.OnAppearing();
 
             _focusItems.DeFocusAll();
@@ -1777,12 +1791,15 @@ namespace DVBTTelevizor.MAUI
                     {
                         videoView.MediaPlayer.Play(_media);
 
+                        /* Video is fixed in RefreshGUI
                         Task.Run(async () =>
                         {
                             // When user visits some page and return back, video is only black screen
                             // calls fix video will re-attach the video and set correct video position
                             await FixVideo(false);
                         });
+                        */
+
                     }, 350);
 
                     if (!System.String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
