@@ -9,8 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.9.4" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.110" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.205">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
