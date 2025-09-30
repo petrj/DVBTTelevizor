@@ -485,28 +485,30 @@ namespace DVBTTelevizor.MAUI
                 {
                     if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
-                        if (VideoStackLayout.IsVisible)
-                        {
+
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                NoVideoStackLayout.IsVisible = true;
-                                VideoStackLayout.IsVisible = false;
+                                if (VideoStackLayout.IsVisible)
+                                {
+                                    NoVideoStackLayout.IsVisible = true;
+                                    VideoStackLayout.IsVisible = false;
+                                }
                             });
-                        }
+
                     }
                 }
                 else
                 {
                     if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
-                        if (NoVideoStackLayout.IsVisible)
-                        {
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                NoVideoStackLayout.IsVisible = false;
-                                VideoStackLayout.IsVisible = true;
+                                if (NoVideoStackLayout.IsVisible)
+                                {
+                                    NoVideoStackLayout.IsVisible = false;
+                                    VideoStackLayout.IsVisible = true;
+                                }
                             });
-                        }
                     }
 
                     if (_viewModel.PlayingChannel != null)
@@ -929,8 +931,8 @@ namespace DVBTTelevizor.MAUI
                             WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
 
                             // VideoStackLayout must be visible before changing Layout
-                            VideoStackLayout.IsVisible = true;
-                            NoVideoStackLayout.IsVisible = false;
+                            //VideoStackLayout.IsVisible = true;
+                            //NoVideoStackLayout.IsVisible = false;
 
                             ChannelsListView.IsVisible = false;
                             MainToolBar.IsVisible = false;
@@ -1790,6 +1792,9 @@ namespace DVBTTelevizor.MAUI
                 */
 
                 _viewModel.EPGDetailEnabled = false;
+
+                VideoStackLayout.IsVisible = false;
+                NoVideoStackLayout.IsVisible = true;
 
                 PlayingState = PlayingStateEnum.Playing;
 
@@ -3078,6 +3083,7 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.RefreshChannels();
                     break;
                 case "menuBack":
+                    _activeMenuItems = _menuItems;
                     ShowMenu();
                     MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
                     break;

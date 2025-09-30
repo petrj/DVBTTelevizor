@@ -517,8 +517,12 @@ namespace DVBTTelevizor.MAUI
 
                 cfg.UpdateConfig(_configuration);
 
+                _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
+                _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
+
                 NotifyConfigChange();
                 NotifyLanguageChange();
+                NotifySledovaniTVChange();
 
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Settings imported".Translated()));
 
