@@ -7,6 +7,6 @@
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-feature android:name="android.software.leanback" android:required="true" />
+	<!--uses-feature android:name="android.software.leanback" android:required="true" /-->
 	<meta-data android:name="com.google.android.play.billingclient.version" android:value="9.1.0" />
 </manifest>
