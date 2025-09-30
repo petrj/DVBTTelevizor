@@ -80,37 +80,39 @@ namespace DVBTTelevizor.MAUI
 
         // Menu: 0.0,0,1.0,0.1
 
-        private Rect FullScreenVideoPosition { get; set; } = new Rect(0.5, 0.5, 1.0, 1.0);
+        private Rect FullScreenVideoPosition { get; } = new Rect(0.5, 0.5, 1.0, 1.0);
 
         // EPGDetailGrid
-        private Rect EPGDetailGridLandscapePosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.9);
-        private Rect EPGDetailGridLandscapePositionForPreview { get; set; } = new Rect(1.0, 0.24, 0.3, 0.6);
-        private Rect EPGDetailGridLandscapePositionForPlay { get; set; } = new Rect(1.0, 1.0, 0.3, 1.0);
+        private Rect EPGDetailGridLandscapePosition { get; } = new Rect(1.0, 1.0, 0.3, 0.9);
+        private Rect EPGDetailGridLandscapePositionForPreview { get; } = new Rect(1.0, 0.24, 0.3, 0.6);
+        private Rect EPGDetailGridLandscapePositionForPlay { get; } = new Rect(1.0, 1.0, 0.3, 1.0);
 
-        private Rect EPGDetailGridPortraitPosition { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
-        private Rect EPGDetailGridPortraitPositionForPreview { get; set; } = new Rect(0.0, 0.75, 1.0, 0.2);
-        private Rect EPGDetailGridPortraitPositionForPlay { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
+        private Rect EPGDetailGridPortraitPosition { get; } = new Rect(0.0, 1.0, 1.0, 0.3);
+        private Rect EPGDetailGridPortraitPositionForPreview { get; } = new Rect(0.0, 0.75, 1.0, 0.2);
+        private Rect EPGDetailGridPortraitPositionForPlay { get; } = new Rect(0.0, 1.0, 1.0, 0.3);
 
 
         // VideoStackLayout
-        private Rect LandscapePreviewVideoStackLayoutPosition { get; set; } = new Rect(1.0, 1.0, 0.3, 0.3);
-        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(1, 1, 0.3, 0.3);
-        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay { get; set; } = new Rect(0.0, 0.0, 0.7, 1.0);
-        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview { get; set; } = new Rect(1.0, 1.0, 0.3, 0.92);
-        private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 1.0, 0.2);
-        private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay { get; set; } = new Rect(0.0, 0.0, 1.0, 0.7);
-        private Rect VideoStackLayoutPortraitPositionForPreview { get; set; } = new Rect(0.0, 1.0, 1.0, 0.3);
+        private Rect LandscapePreviewVideoStackLayoutPosition { get; } = new Rect(1.0, 1.0, 0.3, 0.3);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview { get; } = new Rect(1, 1, 0.3, 0.3);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay { get; } = new Rect(0.0, 0.0, 0.7, 1.0);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview { get; } = new Rect(1.0, 1.0, 0.3, 0.92);
+        private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview { get; } = new Rect(0.0, 1.0, 1.0, 0.2);
+        private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay { get; } = new Rect(0.0, 0.0, 1.0, 0.7);
+        private Rect VideoStackLayoutPortraitPositionForPreview { get; } = new Rect(0.0, 1.0, 1.0, 0.3);
 
         // VideoStackLayout must be visible when initializing VLC window!
         private Rect NoVideoStackLayoutPosition { get; set; } = new Rect(-10, -10, -5, -5);
 
         // ChannelsListView
-        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.0, 1.0, 0.7, 0.9);
-        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.5, 1, 1, 0.9);
-        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisible { get; set; } = new Rect(0.5, 0.24, 1.0, 0.6);
-        private Rect ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible { get; set; } = new Rect(0.5, 1, 1.0, 0.9);
-        private Rect ChannelsListPortraitPositionForPreview { get; set; } = new Rect(0.5,0.25,1.0,0.46);
-        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview { get; set; } = new Rect(0.5, 0.2, 1.0, 0.5);
+        private Rect ChannelsListViewLandscapePositionWhenEPGDetailVisibleForPreview { get; } = new Rect(0.0, 1.0, 0.7, 0.9);
+        private Rect ChannelsListViewPositionWhenEPGDetailNOTVisible { get; } = new Rect(0.5, 1, 1, 0.9);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisible { get; } = new Rect(0.5, 0.24, 1.0, 0.6);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailNOTVisible { get; } = new Rect(0.5, 1, 1.0, 0.9);
+        private Rect ChannelsListPortraitPositionForPreview { get; } = new Rect(0.5,0.25,1.0,0.46);
+        private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview { get; } = new Rect(0.5, 0.2, 1.0, 0.5);
+
+        private Rect? LastVideoStackLayoutPosition { get; set; }
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
         {
@@ -940,11 +942,15 @@ namespace DVBTTelevizor.MAUI
 
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay);
+
+                                    LastVideoStackLayoutPosition = VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay;
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, FullScreenVideoPosition);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, FullScreenVideoPosition);
+
+                                    LastVideoStackLayoutPosition = FullScreenVideoPosition;
                                 }
                             }
                             else
@@ -958,22 +964,20 @@ namespace DVBTTelevizor.MAUI
 
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay);
+
+                                    LastVideoStackLayoutPosition = VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay;
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, FullScreenVideoPosition);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, FullScreenVideoPosition);
+
+                                    LastVideoStackLayoutPosition = FullScreenVideoPosition;
                                 }
                             }
 
                             //MainLayout.RaiseChild(VideoStackLayout);
                             //CheckStreamCommand.Execute(null);
-
-                            if (_fixVideoNeeded)
-                            {
-                                _fixVideoNeeded = false;
-                                await FixVideo(true);
-                            }
 
                             break;
                         case PlayingStateEnum.PlayingInPreview:
@@ -997,12 +1001,16 @@ namespace DVBTTelevizor.MAUI
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridPortraitPositionForPreview);
                                     AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview);
+
+                                    LastVideoStackLayoutPosition = VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview;
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutPortraitPositionForPreview);
                                     AbsoluteLayout.SetLayoutBounds(ChannelsListView, ChannelsListPortraitPositionForPreview);
+
+                                    LastVideoStackLayoutPosition = VideoStackLayoutPortraitPositionForPreview;
                                 }
                             }
                             else
@@ -1014,18 +1022,19 @@ namespace DVBTTelevizor.MAUI
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, EPGDetailGridLandscapePositionForPreview);
+
+                                    LastVideoStackLayoutPosition = VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview;
                                 }
                                 else
                                 {
                                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
                                     AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview);
+
+                                    LastVideoStackLayoutPosition = VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview;
                                 }
                             }
 
                             //CheckStreamCommand.Execute(null);
-
-                            // todo : only if needed
-                            //Task.Run(async () => await FixVideo(false));
 
                             break;
                         case PlayingStateEnum.Stopped:
@@ -1071,7 +1080,15 @@ namespace DVBTTelevizor.MAUI
                             AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
                             AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, NoVideoStackLayoutPosition);
 
+                            LastVideoStackLayoutPosition = NoVideoStackLayoutPosition;
+
                             break;
+                    }
+
+                    if (_fixVideoNeeded)
+                    {
+                        _fixVideoNeeded = false;
+                        await FixVideo(true);
                     }
 
                     //_loggingService.Info("RefreshGUI completed");
@@ -1662,6 +1679,8 @@ namespace DVBTTelevizor.MAUI
                 }
                 */
 
+                _viewModel.EPGDetailEnabled = false;
+
                 PlayingState = PlayingStateEnum.Playing;
 
                 _refreshGUIEnabled = false;
@@ -1848,7 +1867,6 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.PlayingChannel.Subtitles.Clear();
                 _viewModel.PlayingChannel.AudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
-                _viewModel.EPGDetailEnabled = false;
 
                 _lastActionPlayTime = DateTime.Now;
 
@@ -1955,14 +1973,30 @@ namespace DVBTTelevizor.MAUI
                 AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
             });
 
+            if (LastVideoStackLayoutPosition == null)
+            {
+                LastVideoStackLayoutPosition = FullScreenVideoPosition;
+            }
+
             for (int i=5;i>=0;i--)
             {
                 await Task.Delay(250);
 
+                _loggingService.Info(LastVideoStackLayoutPosition.ToString());
+
+
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
+
+                    /*
                     AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(0.5,0.5,1 - i / 10.0,1 - i / 10.0));
+                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, new Rect(
+                        LastVideoStackLayoutPosition.Value.Left,
+                        LastVideoStackLayoutPosition.Value.Top,
+                        LastVideoStackLayoutPosition.Value.Bottom - i / 10.0,
+                        LastVideoStackLayoutPosition.Value.Right - i / 10.0));
+                    */
                 });
             }
         }
@@ -2034,11 +2068,13 @@ namespace DVBTTelevizor.MAUI
                 */
                 ShowOrHideMenu();
 
-                if (MainMenu.IsVisible)
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    BuildMenu();
-                }
-
+                   if (MainMenu.IsVisible)
+                   {
+                        BuildMenu();
+                    }
+                });
 
             } finally
             {
