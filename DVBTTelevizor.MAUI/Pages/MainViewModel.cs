@@ -542,13 +542,24 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public void SelectFirstChannel()
+        public async Task SelectFirstChannel()
         {
             _loggingService.Info($"Selecting first channel");
 
-            MainThread.BeginInvokeOnMainThread(async () =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 _listViewSelector?.SelectFirstChannel();
+                NotifyChannelChange();
+            });
+        }
+
+        public async Task SelectLastChannel()
+        {
+            _loggingService.Info($"Selecting last channel");
+
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                _listViewSelector?.SelectLastChannel();
                 NotifyChannelChange();
             });
         }
@@ -1213,6 +1224,68 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 await billing.DisconnectAsync();
+            }
+        }
+
+        public bool StandingOnStart
+        {
+            get
+            {
+                try
+                {
+                    _semaphoreSlim.WaitAsync();
+
+                    if (SelectedChannel == null)
+                        return true;
+
+                    foreach (var ch in Channels)
+                    {
+                        if (ch == SelectedChannel)
+                            return true;
+
+                        return false;
+                    }
+
+                    return true;
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                }
+                ;
+            }
+        }
+
+        public bool StandingOnEnd
+        {
+            get
+            {
+                try
+                {
+                    _semaphoreSlim.WaitAsync();
+
+                    var item = SelectedChannel;
+
+                    if (item == null)
+                        return true;
+
+                    Channel lastChannel = null;
+                    foreach (var ch in Channels)
+                    {
+                        lastChannel = ch;
+                    }
+
+                    if (lastChannel == item)
+                        return true;
+
+                    return false;
+
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                }
+                ;
             }
         }
     }

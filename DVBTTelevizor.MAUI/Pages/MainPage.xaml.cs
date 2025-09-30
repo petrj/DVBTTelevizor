@@ -29,6 +29,7 @@ namespace DVBTTelevizor.MAUI
         public string PublicDirectory { get; set; }
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
+        private bool _lastTimeHome = false;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -1459,7 +1460,12 @@ namespace DVBTTelevizor.MAUI
                 });
             } else
             {
-                // TODO: playing previous channel
+                if (_lastPlayedChannels != null &&
+                    _lastPlayedChannels[0] != _viewModel.SelectedChannel)
+                {
+                    _viewModel.SelectedChannel = _lastPlayedChannels[0];
+                    await ActionPlay();
+                }
             }
         }
 
@@ -2539,27 +2545,35 @@ namespace DVBTTelevizor.MAUI
 
                                     break;
 
-                                    /*
                                 case PlayingStateEnum.Stopped:
 
-                                    if (_viewModel.StandingOnEnd)
+                                    if (_focusItems.FocusedItemName == "ChannelsListView")
                                     {
-                                        await ActionFirstOrLast(true);
-                                        _lastTimeHome = true;
-                                    }
-                                    else
-                                    if (_viewModel.StandingOnStart)
-                                    {
-                                        await ActionFirstOrLast(false);
-                                        _lastTimeHome = false;
-                                    }
-                                    else
-                                    {
-                                        await ActionFirstOrLast(_lastTimeHome);
-                                        _lastTimeHome = !_lastTimeHome;
+                                        if (_viewModel.StandingOnEnd)
+                                        {
+                                            await _viewModel.SelectFirstChannel();
+                                            _lastTimeHome = true;
+                                        }
+                                        else
+                                        if (_viewModel.StandingOnStart)
+                                        {
+                                            await _viewModel.SelectLastChannel();
+                                            _lastTimeHome = false;
+                                        }
+                                        else
+                                        {
+                                            if (_lastTimeHome)
+                                            {
+                                                await _viewModel.SelectLastChannel();
+                                            }
+                                            else
+                                            {
+                                                await _viewModel.SelectFirstChannel();
+                                            }
+                                            _lastTimeHome = !_lastTimeHome;
+                                        }
                                     }
                                     break;
-                                    */
                             }
                             ;
 
