@@ -10,6 +10,7 @@ using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
@@ -169,7 +170,6 @@ namespace DVBTTelevizor.MAUI
             };
 
             _configuration.ConfigDirectory = PublicDirectory;
-
 
             InitDVBTDriver();
 
@@ -1620,7 +1620,7 @@ namespace DVBTTelevizor.MAUI
                 if (channel == null)
                     return;
 
-                if (!_driver.Connected)
+                if (channel.ChannelType != ChannelTypeEnum.SledovaniTV && !_driver.Connected)
                 {
                     WeakReferenceMessenger.Default.Send(new ToastMessage($"Record failed - device not connected".Translated()));
                     return;
@@ -1647,7 +1647,13 @@ namespace DVBTTelevizor.MAUI
                     _viewModel.RecordingChannel = channel;
                 });
 
-                await _driver.StartRecording(_configuration.OutputDirectory);
+                if (_viewModel.RecordingChannel.ChannelType != ChannelTypeEnum.SledovaniTV)
+                {
+                    await _driver.StartRecording(_configuration.OutputDirectory);
+                } else
+                {
+                    _viewModel.SledovaniTVStartRecording();
+                }
 
                 var playStreamInfo = new PlayStreamInfo()
                 {
@@ -1670,18 +1676,26 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"ActionStopRecord");
 
+            if (_viewModel.RecordingChannel == null)
+                return;
+
             try
             {
-                var fName = _driver.RecordFileName;
+                string? fName = null;
 
-                if (_driver.Recording)
+                if (_viewModel.RecordingChannel.ChannelType != ChannelTypeEnum.SledovaniTV)
                 {
-                    _driver.StopRecording();
-                }
+                    fName = _driver.RecordFileName;
 
-                if (PlayingState == PlayingStateEnum.Stopped)
-                {
-                    await _driver.Stop();
+                    if (_driver.Recording)
+                    {
+                        _driver.StopRecording();
+                    }
+
+                    if (PlayingState == PlayingStateEnum.Stopped)
+                    {
+                        await _driver.Stop();
+                    }
                 }
 
                 MainThread.BeginInvokeOnMainThread(async () =>
@@ -1693,11 +1707,14 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.NotifyChannelChange();
 
-                await Share.RequestAsync(new ShareFileRequest
+                if (fName != null)
                 {
-                    Title = "Share record".Translated(),
-                    File = new ShareFile(fName)
-                });
+                    await Share.RequestAsync(new ShareFileRequest
+                    {
+                        Title = "Share record".Translated(),
+                        File = new ShareFile(fName)
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -3323,6 +3340,16 @@ namespace DVBTTelevizor.MAUI
         private async void VideoSwiped_Down(object sender, SwipedEventArgs e)
         {
             await ActionDown();
+        }
+
+        private void OnChannel_LongTapped(object sender, CommunityToolkit.Maui.Core.LongPressCompletedEventArgs e)
+        {
+
+        }
+
+        private void OnVideo_LongPress(object sender, CommunityToolkit.Maui.Core.LongPressCompletedEventArgs e)
+        {
+
         }
     }
 

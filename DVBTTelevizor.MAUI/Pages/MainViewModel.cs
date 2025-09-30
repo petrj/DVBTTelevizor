@@ -26,6 +26,8 @@ namespace DVBTTelevizor.MAUI
         public EITManager EIT { get; set; }
         public PIDManager PID { get; set; }
 
+        public bool IsRecording { get; set; } = false;
+
         private SledovaniTV.SledovaniTV _iptv;
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
@@ -44,6 +46,7 @@ namespace DVBTTelevizor.MAUI
         private bool _refreshed = false;
         private bool _menuVisible = false;
 
+        private BackgroundWorker _recordingBackgroundWorker = new BackgroundWorker();
 
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }
@@ -84,6 +87,8 @@ namespace DVBTTelevizor.MAUI
             {
                 await CheckPendingPurchasesAsync();
             });
+
+            _recordingBackgroundWorker.DoWork += _recordingBackgroundWorker_DoWork;
 
             BackgroundCommandWorker.RunInBackground(CommandScanEPG, 20, 12);
         }
@@ -1286,6 +1291,53 @@ namespace DVBTTelevizor.MAUI
                     _semaphoreSlim.Release();
                 }
                 ;
+            }
+        }
+
+        public void SledovaniTVStartRecording()
+        {
+            _recordingBackgroundWorker.RunWorkerAsync();
+        }
+
+        private void _recordingBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _loggingService.Info($"_recordingBackgroundWorker_DoWork started");
+
+            if (_recordingChannel == null)
+                return;
+
+            var outputFileName = Path.Combine(Config.OutputDirectory, $"{_recordingChannel.Name} {DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss")}.ts");
+
+            if (!Directory.Exists(Config.OutputDirectory))
+            {
+                System.IO.Directory.CreateDirectory(Config.OutputDirectory);
+            }
+
+            using (var libvlc = new LibVLC())
+            using (var mediaPlayer = new MediaPlayer(libvlc))
+            {
+                var media = new Media(libvlc, _recordingChannel.Url, FromType.FromLocation);
+
+                media.AddOption(":sout=#file{dst=" + outputFileName + "}");
+                media.AddOption(":sout-keep");
+
+                // Start recording
+                mediaPlayer.Play(media);
+
+                do
+                {
+                    System.Threading.Thread.Sleep(500);
+
+                    //var freespaceGB = Convert.ToInt64(Config.UsableSpace / 1000000000);
+
+                    //if (freespaceGB < 1)
+                    //{
+                    //    throw new Exception("Nedosatatek volného místa");
+                    //}
+
+                } while (_recordingChannel != null);
+
+                mediaPlayer.Stop();
             }
         }
     }
