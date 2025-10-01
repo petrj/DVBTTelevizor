@@ -31,7 +31,15 @@ namespace DVBTTelevizor.MAUI
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
-        private bool? noVideoActive = null;
+
+        private enum NoVideoActiveEnum
+        {
+            Unknown,
+            Disabled,
+            Enabled
+        }
+
+        private NoVideoActiveEnum noVideoActive = NoVideoActiveEnum.Unknown;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -486,13 +494,17 @@ namespace DVBTTelevizor.MAUI
                 {
                     if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
-
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                if (VideoStackLayout.IsVisible)
+                                if (noVideoActive != NoVideoActiveEnum.Enabled)
                                 {
-                                    NoVideoStackLayout.IsVisible = true;
-                                    VideoStackLayout.IsVisible = false;
+                                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                                    AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LastVideoStackLayoutPosition.Value);
+
+                                    noVideoActive = NoVideoActiveEnum.Enabled;
                                 }
                             });
 
@@ -502,14 +514,20 @@ namespace DVBTTelevizor.MAUI
                 {
                     if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
+                        if (noVideoActive != NoVideoActiveEnum.Disabled)
+                        {
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                if (NoVideoStackLayout.IsVisible)
-                                {
-                                    NoVideoStackLayout.IsVisible = false;
-                                    VideoStackLayout.IsVisible = true;
-                                }
+                                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                                    AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+
+                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, NoVideoStackLayoutPosition);
+                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
+
+                                    noVideoActive = NoVideoActiveEnum.Disabled;
                             });
+                            //await FixVideo(false);
+                        }
                     }
 
                     if (_viewModel.PlayingChannel != null)
@@ -983,7 +1001,7 @@ namespace DVBTTelevizor.MAUI
 
                             //MainLayout.RaiseChild(VideoStackLayout);
                             //CheckStreamCommand.Execute(null);
-                            VideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = false;
 
                             break;
                         case PlayingStateEnum.PlayingInPreview:
@@ -1042,8 +1060,7 @@ namespace DVBTTelevizor.MAUI
                                 }
                             }
 
-                            VideoStackLayout.IsVisible = true;
-
+                            NoVideoStackLayout.IsVisible = false;
                             //CheckStreamCommand.Execute(null);
 
                             break;
@@ -2007,7 +2024,7 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
 
                 _lastActionPlayTime = DateTime.Now;
-                noVideoActive = null;
+                noVideoActive = NoVideoActiveEnum.Unknown;
 
                 _mediaPlayer.Teletext = 100;
 
