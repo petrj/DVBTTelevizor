@@ -31,6 +31,7 @@ namespace DVBTTelevizor.MAUI
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
+        private bool? noVideoActive = null;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -931,8 +932,8 @@ namespace DVBTTelevizor.MAUI
                             WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
 
                             // VideoStackLayout must be visible before changing Layout
-                            //VideoStackLayout.IsVisible = true;
-                            //NoVideoStackLayout.IsVisible = false;
+                            VideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = true;
 
                             ChannelsListView.IsVisible = false;
                             MainToolBar.IsVisible = false;
@@ -982,11 +983,14 @@ namespace DVBTTelevizor.MAUI
 
                             //MainLayout.RaiseChild(VideoStackLayout);
                             //CheckStreamCommand.Execute(null);
+                            VideoStackLayout.IsVisible = true;
 
                             break;
                         case PlayingStateEnum.PlayingInPreview:
 
                             //NavigationPage.SetHasNavigationBar(this, false);
+                            VideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = true;
 
                             ChannelsListView.IsVisible = true;
                             _viewModel.MainLayoutVisible = true;
@@ -1037,6 +1041,8 @@ namespace DVBTTelevizor.MAUI
                                     LastVideoStackLayoutPosition = VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview;
                                 }
                             }
+
+                            VideoStackLayout.IsVisible = true;
 
                             //CheckStreamCommand.Execute(null);
 
@@ -2001,6 +2007,7 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
 
                 _lastActionPlayTime = DateTime.Now;
+                noVideoActive = null;
 
                 _mediaPlayer.Teletext = 100;
 
