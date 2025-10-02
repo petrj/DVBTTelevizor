@@ -359,6 +359,8 @@
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
                 <SwipeGestureRecognizer Direction="Left" Swiped="VideoSwiped_Left"/>
                 <SwipeGestureRecognizer Direction="Right" Swiped="VideoSwiped_Right"/>
+                <SwipeGestureRecognizer Direction="Up" Swiped="VideoSwiped_Up"/>
+                <SwipeGestureRecognizer Direction="Down" Swiped="VideoSwiped_Down"/>
                 <TapGestureRecognizer Tapped="VideoStackLayout_DoubleTapped" NumberOfTapsRequired="2"/>
             </StackLayout.GestureRecognizers>
             <StackLayout.Behaviors>
@@ -389,7 +391,7 @@
 
          <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
-        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5, 0.2, 1.0, 0.5"  Color="Green"/-->
+        <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0, 1.0, 0.3, 0.9"  Color="Green"/-->
 
     </AbsoluteLayout>
 

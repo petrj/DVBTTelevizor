@@ -108,7 +108,7 @@ namespace DVBTTelevizor.MAUI
         private Rect LandscapePreviewVideoStackLayoutPosition { get; } = new Rect(1.0, 1.0, 0.3, 0.3);
         private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPreview { get; } = new Rect(1, 1, 0.3, 0.3);
         private Rect VideoStackLayoutLandscapePositionWhenEPGDetailVisibleForPlay { get; } = new Rect(0.0, 0.0, 0.7, 1.0);
-        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview { get; } = new Rect(1.0, 1.0, 0.3, 0.92);
+        private Rect VideoStackLayoutLandscapePositionWhenEPGDetailNotVisibleForPreview { get; } = new Rect(1.0, 1.0, 0.3, 0.9);
         private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPreview { get; } = new Rect(0.0, 1.0, 1.0, 0.2);
         private Rect VideoStackLayoutPortraitPositionWhenEPGDetailVisibleForPlay { get; } = new Rect(0.0, 0.0, 1.0, 0.7);
         private Rect VideoStackLayoutPortraitPositionForPreview { get; } = new Rect(0.0, 1.0, 1.0, 0.3);
@@ -496,13 +496,16 @@ namespace DVBTTelevizor.MAUI
                     {
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                if (noVideoActive != NoVideoActiveEnum.Enabled)
+                                if (noVideoActive != NoVideoActiveEnum.Enabled || VideoStackLayout.IsVisible || !NoVideoStackLayout.IsVisible)
                                 {
-                                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                                    AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+                                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                                    //AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 
-                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
-                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LastVideoStackLayoutPosition.Value);
+                                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
+                                    //AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LastVideoStackLayoutPosition.Value);
+
+                                    VideoStackLayout.IsVisible = false;
+                                    NoVideoStackLayout.IsVisible = true;
 
                                     noVideoActive = NoVideoActiveEnum.Enabled;
                                 }
@@ -514,17 +517,20 @@ namespace DVBTTelevizor.MAUI
                 {
                     if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
                     {
-                        if (noVideoActive != NoVideoActiveEnum.Disabled)
+                        if (noVideoActive != NoVideoActiveEnum.Disabled || !VideoStackLayout.IsVisible || NoVideoStackLayout.IsVisible)
                         {
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                    AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                                    AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
+                                //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
+                                //AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
 
-                                    AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, NoVideoStackLayoutPosition);
-                                    AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
+                                //AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, NoVideoStackLayoutPosition);
+                                //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
 
-                                    noVideoActive = NoVideoActiveEnum.Disabled;
+                                VideoStackLayout.IsVisible = true;
+                                NoVideoStackLayout.IsVisible = false;
+
+                                noVideoActive = NoVideoActiveEnum.Disabled;
                             });
                             //await FixVideo(false);
                         }
@@ -951,7 +957,7 @@ namespace DVBTTelevizor.MAUI
 
                             // VideoStackLayout must be visible before changing Layout
                             VideoStackLayout.IsVisible = true;
-                            NoVideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = false;
 
                             ChannelsListView.IsVisible = false;
                             MainToolBar.IsVisible = false;
@@ -1001,14 +1007,14 @@ namespace DVBTTelevizor.MAUI
 
                             //MainLayout.RaiseChild(VideoStackLayout);
                             //CheckStreamCommand.Execute(null);
-                            NoVideoStackLayout.IsVisible = false;
+                            //NoVideoStackLayout.IsVisible = false;
 
                             break;
                         case PlayingStateEnum.PlayingInPreview:
 
                             //NavigationPage.SetHasNavigationBar(this, false);
                             VideoStackLayout.IsVisible = true;
-                            NoVideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = false;
 
                             ChannelsListView.IsVisible = true;
                             _viewModel.MainLayoutVisible = true;
@@ -1060,7 +1066,7 @@ namespace DVBTTelevizor.MAUI
                                 }
                             }
 
-                            NoVideoStackLayout.IsVisible = false;
+                            //NoVideoStackLayout.IsVisible = false;
                             //CheckStreamCommand.Execute(null);
 
                             break;

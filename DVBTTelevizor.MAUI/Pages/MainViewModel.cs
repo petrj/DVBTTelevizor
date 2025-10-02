@@ -820,6 +820,11 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"NotifyChannelChange (Current channel: {SelectedChannel}, thread id:{Thread.CurrentThread.ManagedThreadId})");
 
+            if (SelectedChannel?.CurrentEventItem != null && _playingState != PlayingStateEnum.Playing)
+            {
+                EPGDetailEnabled = true;
+            }
+
             OnPropertyChanged(nameof(SelectedChannel));
             OnPropertyChanged(nameof(NoVideoTitle));
             OnPropertyChanged(nameof(SelectedChannelEPGTitle));
