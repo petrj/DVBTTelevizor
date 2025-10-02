@@ -32,15 +32,6 @@ namespace DVBTTelevizor.MAUI
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
 
-        private enum NoVideoActiveEnum
-        {
-            Unknown,
-            Disabled,
-            Enabled
-        }
-
-        private NoVideoActiveEnum noVideoActive = NoVideoActiveEnum.Unknown;
-
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private List<string> _remoteDevicesConnected = new List<string>();
@@ -492,48 +483,26 @@ namespace DVBTTelevizor.MAUI
 
                 if (videoTracksCount <= 0)
                 {
-                    if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
+                    if (_viewModel.VideoStackLayoutVisible)
                     {
-                            MainThread.BeginInvokeOnMainThread(() =>
-                            {
-                                if (noVideoActive != NoVideoActiveEnum.Enabled || VideoStackLayout.IsVisible || !NoVideoStackLayout.IsVisible)
-                                {
-                                    //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                                    //AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
-
-                                    //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
-                                    //AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, LastVideoStackLayoutPosition.Value);
-
-                                    VideoStackLayout.IsVisible = false;
-                                    NoVideoStackLayout.IsVisible = true;
-
-                                    noVideoActive = NoVideoActiveEnum.Enabled;
-                                }
-                            });
-
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            _viewModel.SetVideoStackLayoutvisible(false);
+                            VideoStackLayout.IsVisible = false;
+                            NoVideoStackLayout.IsVisible = true;
+                        });
                     }
                 }
                 else
                 {
-                    if ((VideoStackLayout != null) && (NoVideoStackLayout != null))
+                    if (_viewModel.NoVideoStackLayoutVisible)
                     {
-                        if (noVideoActive != NoVideoActiveEnum.Disabled || !VideoStackLayout.IsVisible || NoVideoStackLayout.IsVisible)
+                        MainThread.BeginInvokeOnMainThread(async () =>
                         {
-                            MainThread.BeginInvokeOnMainThread(() =>
-                            {
-                                //AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
-                                //AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
-
-                                //AbsoluteLayout.SetLayoutBounds(NoVideoStackLayout, NoVideoStackLayoutPosition);
-                                //AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
-
-                                VideoStackLayout.IsVisible = true;
-                                NoVideoStackLayout.IsVisible = false;
-
-                                noVideoActive = NoVideoActiveEnum.Disabled;
-                            });
-                            //await FixVideo(false);
-                        }
+                            _viewModel.SetVideoStackLayoutvisible(true);
+                            VideoStackLayout.IsVisible = true;
+                            NoVideoStackLayout.IsVisible = false;
+                        });
                     }
 
                     if (_viewModel.PlayingChannel != null)
@@ -956,6 +925,10 @@ namespace DVBTTelevizor.MAUI
                             WeakReferenceMessenger.Default.Send(new ShowFullscreenMessage(true));
 
                             // VideoStackLayout must be visible before changing Layout
+                            //VideoStackLayout.IsVisible = true;
+                            //NoVideoStackLayout.IsVisible = false;
+
+                            _viewModel.SetVideoStackLayoutvisible(true);
                             VideoStackLayout.IsVisible = true;
                             NoVideoStackLayout.IsVisible = false;
 
@@ -1013,6 +986,10 @@ namespace DVBTTelevizor.MAUI
                         case PlayingStateEnum.PlayingInPreview:
 
                             //NavigationPage.SetHasNavigationBar(this, false);
+                            //VideoStackLayout.IsVisible = true;
+                            //NoVideoStackLayout.IsVisible = false;
+
+                            _viewModel.SetVideoStackLayoutvisible(true);
                             VideoStackLayout.IsVisible = true;
                             NoVideoStackLayout.IsVisible = false;
 
@@ -1074,8 +1051,12 @@ namespace DVBTTelevizor.MAUI
 
                             NavigationPage.SetHasNavigationBar(this, false);
 
-                            ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
+                            //ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
                             MainToolBar.IsVisible = true;
+
+                            _viewModel.SetVideoStackLayoutvisible(null);
+                            VideoStackLayout.IsVisible = false;
+                            NoVideoStackLayout.IsVisible = false;
 
                             if (!_configuration.Fullscreen)
                             {
@@ -1839,8 +1820,8 @@ namespace DVBTTelevizor.MAUI
 
                 _viewModel.EPGDetailEnabled = false;
 
-                VideoStackLayout.IsVisible = false;
-                NoVideoStackLayout.IsVisible = true;
+                //VideoStackLayout.IsVisible = false;
+                //NoVideoStackLayout.IsVisible = true;
 
                 PlayingState = PlayingStateEnum.Playing;
 
@@ -2030,7 +2011,6 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
 
                 _lastActionPlayTime = DateTime.Now;
-                noVideoActive = NoVideoActiveEnum.Unknown;
 
                 _mediaPlayer.Teletext = 100;
 

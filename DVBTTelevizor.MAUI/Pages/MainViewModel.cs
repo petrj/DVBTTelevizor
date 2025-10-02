@@ -46,6 +46,8 @@ namespace DVBTTelevizor.MAUI
         private bool _refreshed = false;
         private bool _menuVisible = false;
 
+        private bool? _videoStackLayoutvisible = null;
+
         private BackgroundWorker _recordingBackgroundWorker = new BackgroundWorker();
 
         public ICommand CommandPlay { get; set; }
@@ -90,7 +92,7 @@ namespace DVBTTelevizor.MAUI
 
             _recordingBackgroundWorker.DoWork += _recordingBackgroundWorker_DoWork;
 
-            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 20, 12);
+            BackgroundCommandWorker.RunInBackground(CommandScanEPG, 10, 6);
         }
 
         private void InitCommands()
@@ -814,6 +816,30 @@ namespace DVBTTelevizor.MAUI
             }
 
             WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
+        }
+
+        public void SetVideoStackLayoutvisible(bool? value)
+        {
+            _videoStackLayoutvisible = value;
+
+            OnPropertyChanged(nameof(VideoStackLayoutVisible));
+            OnPropertyChanged(nameof(NoVideoStackLayoutVisible));
+        }
+
+        public bool VideoStackLayoutVisible
+        {
+            get
+            {
+                return !_videoStackLayoutvisible.HasValue ? false : _videoStackLayoutvisible.Value;
+            }
+        }
+
+        public bool NoVideoStackLayoutVisible
+        {
+            get
+            {
+                return !_videoStackLayoutvisible.HasValue ? false : !_videoStackLayoutvisible.Value;
+            }
         }
 
         public void NotifyChannelChange()
