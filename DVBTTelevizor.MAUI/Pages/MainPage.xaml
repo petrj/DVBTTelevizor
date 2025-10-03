@@ -255,6 +255,7 @@
           SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
           IsVisible="{Binding ChannelsListViewVisible}"
           SelectionMode="Single"
+          HasUnevenRows="True"
           ItemSelected="ChannelsListView_ItemSelected">
 
             <ListView.ItemTemplate>

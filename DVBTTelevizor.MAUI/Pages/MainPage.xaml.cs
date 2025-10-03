@@ -834,7 +834,7 @@ namespace DVBTTelevizor.MAUI
                         _viewModel.SelectedChannel.Focused = true;
                         _viewModel.SelectedChannel.NotifyChanges();
                     }
-                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, animated: false);
+                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, false);
                 });
             }
 
@@ -1052,6 +1052,7 @@ namespace DVBTTelevizor.MAUI
                             NavigationPage.SetHasNavigationBar(this, false);
 
                             //ChannelsListView.IsVisible = _viewModel.ChannelsListViewVisible;
+                            ChannelsListView.IsVisible = true;
                             MainToolBar.IsVisible = true;
 
                             _viewModel.SetVideoStackLayoutvisible(null);
@@ -1429,8 +1430,19 @@ namespace DVBTTelevizor.MAUI
             switch (PlayingState)
             {
                 case PlayingStateEnum.Playing:
+
+                    if (_viewModel.EPGDetailEnabled)
+                    {
+                        _viewModel.EPGDetailEnabled = false;
+                    }
+                    else
+                    {
+                        await ActionStop(false);
+                    }
+                    break;
+
                 case PlayingStateEnum.PlayingInPreview:
-                    Task.Run( async () => { await ActionStop(false); } );
+                    await ActionStop(false);
                     break;
                 case PlayingStateEnum.Stopped:
 
@@ -1451,6 +1463,43 @@ namespace DVBTTelevizor.MAUI
                     }
 
                     break;
+            }
+        }
+
+
+        public async Task ActionRight()
+        {
+            _loggingService.Debug($"ActionRight");
+
+            if (_viewModel.PlayingState != PlayingStateEnum.Playing)
+            {
+                if ((_focusItems.FocusedItemName == "ChannelsListView") &&
+                    (_viewModel.SelectedChannel != null))
+                {
+                    _viewModel.SelectedChannel.Focused = false;
+                    _viewModel.SelectedChannel.NotifyChanges();
+                }
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _focusItems.FocusNextItem(true);
+                });
+            } else
+            {
+                // right when playing:
+
+                if (!_viewModel.EPGDetailEnabled)
+                {
+                    _viewModel.EPGDetailEnabled = true;
+                } else
+                {
+                    if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                    {
+                        _focusItems.DeFocusAll();
+                    } else
+                    {
+                        _focusItems.FocusItem("EPGDetailGrid");
+                    }
+                }
             }
         }
 
@@ -1499,7 +1548,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         _viewModel.SelectNextChannel();
                         //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
-                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
+                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, false);
                         _loggingService.Info($"... scrolled");
                     }
                     else
@@ -1518,8 +1567,18 @@ namespace DVBTTelevizor.MAUI
             }
             else
             {
-                _viewModel.SelectNextChannel();
-                await ActionPlay();
+                if (_viewModel.EPGDetailEnabled && _focusItems.FocusedItemName == "EPGDetailGrid")
+                {
+                    // scroll down
+                    await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                        SelectedChannelEPGDescriptionScrollView.ScrollX,
+                        SelectedChannelEPGDescriptionScrollView.ScrollY + 50, false);
+                }
+                else
+                {
+                    _viewModel.SelectNextChannel();
+                    await ActionPlay();
+                }
             }
         }
 
@@ -1540,7 +1599,7 @@ namespace DVBTTelevizor.MAUI
                 if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
                         _viewModel.SelectPreiousChannel();
-                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: false);
+                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, false);
                     }
                     else
                 if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -1557,8 +1616,18 @@ namespace DVBTTelevizor.MAUI
                 });
             } else
             {
-                _viewModel.SelectPreiousChannel();
-                await ActionPlay();
+                if (_viewModel.EPGDetailEnabled && _focusItems.FocusedItemName == "EPGDetailGrid")
+                {
+                    // scroll up
+                    await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                        SelectedChannelEPGDescriptionScrollView.ScrollX,
+                        SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
+                }
+                else
+                {
+                    _viewModel.SelectPreiousChannel();
+                    await ActionPlay();
+                }
             }
         }
 
@@ -1611,6 +1680,14 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
+            }
+
+            _focusItems.DeFocusAll();
+            _viewModel.NotifyChannelChange();
+
+            if (_viewModel.SelectedChannel != null)
+            {
+                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
             }
 
             //_viewModel.SelectedToolbarItemName = null;
@@ -2318,16 +2395,8 @@ namespace DVBTTelevizor.MAUI
 
                 case KeyboardNavigationActionEnum.Right:
 
-                    if ((_focusItems.FocusedItemName == "ChannelsListView") &&
-                        (_viewModel.SelectedChannel != null))
-                    {
-                        _viewModel.SelectedChannel.Focused = false;
-                        _viewModel.SelectedChannel.NotifyChanges();
-                    }
-                           MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                _focusItems.FocusNextItem(true);
-                            });
+                    await ActionRight();
+
                     return;
 
                 case KeyboardNavigationActionEnum.Down:
@@ -2616,7 +2685,11 @@ namespace DVBTTelevizor.MAUI
                         if ((selectedChannel != null) && (_numberPressed == selectedChannel.Number))
                         {
                             await ActionPlay(selectedChannel);
-                            ChannelsListView.ScrollTo(selectedChannel, ScrollToPosition.MakeVisible, animated: false);
+                            _viewModel.NotifyChannelChange();
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                ChannelsListView.ScrollTo(selectedChannel, ScrollToPosition.MakeVisible, false);
+                            });
                         }
                     });
                 }

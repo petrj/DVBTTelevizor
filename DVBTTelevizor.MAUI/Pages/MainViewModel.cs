@@ -4,6 +4,7 @@ using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
+using MPEGTS;
 using Newtonsoft.Json;
 using Plugin.InAppBilling;
 using System.Collections.ObjectModel;
@@ -799,13 +800,23 @@ namespace DVBTTelevizor.MAUI
 
             var msg = playStreamInfo.ShortInfoWithoutChannelName ? "" : " \u25B6 " + playStreamInfo.Channel.Name;
 
+            EventItem ev = null;
             if (playStreamInfo.CurrentEvent != null && playStreamInfo.CurrentEvent.CurrentEventItem != null)
+            {
+                ev = playStreamInfo.CurrentEvent.CurrentEventItem;
+            }
+            if (ev == null && (SelectedChannel != null))
+            {
+                ev = SelectedChannel.CurrentEventItem;
+            }
+
+            if (ev != null)
             {
                 if (msg != "")
                 {
                     msg += " - ";
                 }
-                msg += $"{playStreamInfo.CurrentEvent.CurrentEventItem.EventName}";
+                msg += $"{ev.EventName}";
             }
 
             // showing signal percents only for the first time
