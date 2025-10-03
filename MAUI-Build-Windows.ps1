@@ -32,13 +32,13 @@ if (-not [String]::IsNullOrEmpty($passw))
 {
     $signedAABPackage = $aABPackage `
         | Protect-BySignature `
-            -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
+            -Keystore "$HOME\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
             -JarSigner "C:\Program Files (x86)\Android\openjdk\jdk-17.0.14\bin\jarsigner.exe" `
             -Alias "PJsAndroidKeyStore" `
             -Password $passw `
 
     $signedAPKPackage = $signedAABPackage | ConvertTo-APK `
-            -Keystore "C:\Users\petrj\AppData\Local\Xamarin\Mono for Android\KeyStore\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
+            -Keystore "$HOME\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
             -Alias "PJsAndroidKeyStore" `
             -Password $passw 
 
