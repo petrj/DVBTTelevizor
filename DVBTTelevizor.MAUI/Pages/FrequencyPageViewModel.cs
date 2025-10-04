@@ -63,7 +63,7 @@ namespace DVBTTelevizor.MAUI
             if (!NotifyEnabled)
             {
                 _loggingService.Debug("NotifyChange disabled");
-                return;
+                //return; On some android is KHzEntry focused after Appearing and it disables notify change!
             }
 
             MainThread.BeginInvokeOnMainThread(async () =>
