@@ -126,8 +126,19 @@ namespace DVBTTelevizor.MAUI
 
             Task.Run(async () =>
             {
+                await ExtractAssetFile("Arabic_AI.lng");
+                await ExtractAssetFile("Azerbaijani_AI.lng");
+                await ExtractAssetFile("Bengali_AI.lng");
                 await ExtractAssetFile("Czech.lng");
-                await ExtractAssetFile("Azerbaijani.lng");
+                await ExtractAssetFile("French_AI.lng");
+                await ExtractAssetFile("German_AI.lng");
+                await ExtractAssetFile("Hindi_AI.lng");
+                await ExtractAssetFile("Indonesian_AI.lng");
+                await ExtractAssetFile("MandarinChinese_AI.lng");
+                await ExtractAssetFile("Portuguese_AI.lng");
+                await ExtractAssetFile("Spanish_AI.lng");
+                await ExtractAssetFile("Ukrainian_AI.lng");
+                await ExtractAssetFile("Urdu_AI.lng");
 
                 // language
                 Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
@@ -465,6 +476,8 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
+                if (videoView.MediaPlayer == null)
+                    return;
 
                 // checking stopped stream
                 if (!videoView.MediaPlayer.IsPlaying)
@@ -542,7 +555,7 @@ namespace DVBTTelevizor.MAUI
                             MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                             MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
                             */
-                        }
+            }
                         else if (timeFromPlayMSecs > 5000)
                         {
                             _loggingService.Info($"     - No data for {timeFromPlayMSecs} ms");
@@ -2157,6 +2170,9 @@ namespace DVBTTelevizor.MAUI
         /// <returns></returns>
         public async Task FixVideo(bool force)
         {
+            if (_mediaPlayer == null)
+                return;
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 if (force)

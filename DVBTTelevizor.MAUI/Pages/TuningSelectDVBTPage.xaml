@@ -53,6 +53,7 @@
                 <Setter Property="BackgroundColor" Value="#111111"/>
                 <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <!--Setter Property="FlowDirection" Value="RightToLeft"/-->
             </Style>
 

@@ -75,7 +75,7 @@
 
             <BoxView x:Name="FrequencyRangeBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency range'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Label  Grid.Row="2" Grid.Column="1" Text="{Binding ConnectedDeviceRange}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
 

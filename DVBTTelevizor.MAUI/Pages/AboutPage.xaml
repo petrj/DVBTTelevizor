@@ -96,7 +96,7 @@
             <BoxView Grid.Column="0" Grid.Row="4"  BackgroundColor="White"/>
         </Grid>
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.84,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.84,0.9,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  BackgroundColor="Transparent" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
 
         <Button AbsoluteLayout.LayoutBounds="0.5,0.99,0.5,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="Donate1Button" Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Donate $1'}" Style="{DynamicResource DonateButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="Donate1Button_Clicked" />
 
