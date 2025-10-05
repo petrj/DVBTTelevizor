@@ -61,6 +61,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             }
         };
 
+        EnableLoggingSwitch.Toggled += delegate
+        {
+            BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
+        };
+
         WeakReferenceMessenger.Default.Register<CheckBatterySettingsReplyMessage>(this, (r, m) =>
         {
             Task.Run(async () =>

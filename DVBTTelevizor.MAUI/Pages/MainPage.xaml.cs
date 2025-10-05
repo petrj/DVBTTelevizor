@@ -162,7 +162,7 @@ namespace DVBTTelevizor.MAUI
             InitializeComponent();
 
 #if DEBUG
-            _configuration.EnableLogging = true;
+            //_configuration.EnableLogging = true;
 #endif
 
             if (_configuration.EnableLogging)
