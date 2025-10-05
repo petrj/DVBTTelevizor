@@ -10,6 +10,7 @@ function Get-TranslatedText
         [string]$Line
     )
 
+ 
   if ($Line -match '"((?:[^"\\]|\\.)+)"\s*\.Translated\s*\(') {
         # Unescape \" -> "
         return ($matches[1] -replace '\\\"', '"')
@@ -25,11 +26,22 @@ function Get-XamlTranslatedText {
     )
 
     process {
-       if ([String]::IsNullOrWhiteSpace($Line))
-       {
+      
+
+      $pos = $Line.IndexOf("{local:LngXamlExt Input='")
+
+      if ($pos -lt 0)
+      {
         return $null
-       }
-       
+      }
+
+      $t = $Line.Substring($pos+25);
+
+      $pos = $t.IndexOf("'")
+      #if ($Line.IndexOf("
+      $t = $t.Substring(0,$pos)
+
+      return $t
     }
 }
 
@@ -50,21 +62,44 @@ foreach ($f in $files)
                     }
 
                     $txt = $l | Get-TranslatedText
+
+                    if ([String]::IsNullOrWhiteSpace($txt))
+                    {
+                        continue
+                    }
+
                     if (-not $dict.Contains($txt))
                     {
                         $dict+= $txt
                     }
-                }            
+                }           
 
         }
 
 
         # searching Text="{local:LngXamlExt Input='No channel'}"
-        if ($line.Contains("LngXamlExt"))
+        if ($line.Contains("{local:LngXamlExt"))
         {
-            foreach ($l in $line.Split(" "))
+             foreach ($l in $line.Split("`""))
             {
-                $l | Get-XamlTranslatedText
+                if ([String]::IsNullOrWhiteSpace($l))
+                {
+                    continue
+                }
+             
+               # Write-Host $l -ForegroundColor Yellow
+ 
+                $txt = $l | Get-XamlTranslatedText
+
+                if ([String]::IsNullOrWhiteSpace($txt))
+                {
+                    continue
+                }
+
+                if (-not $dict.Contains($txt))
+                {
+                    $dict+= $txt
+                }
             }
         }
 
@@ -72,5 +107,7 @@ foreach ($f in $files)
 }
 
 
-
-#$dict | Out-GridView
+foreach($word in $dict)
+{
+    Write-Host ($word + "=")
+}

@@ -132,6 +132,8 @@ namespace DVBTTelevizor.MAUI
                 await ExtractAssetFile("Czech.lng");
                 await ExtractAssetFile("French_AI.lng");
                 await ExtractAssetFile("German_AI.lng");
+                await ExtractAssetFile("Polish_AI.lng");
+                await ExtractAssetFile("Italian_AI.lng");
                 await ExtractAssetFile("Hindi_AI.lng");
                 await ExtractAssetFile("Indonesian_AI.lng");
                 await ExtractAssetFile("MandarinChinese_AI.lng");

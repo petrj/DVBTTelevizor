@@ -131,7 +131,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("WriteToExternalDevice", new List<View>() { WriteToExternalDeviceSwitchBoxView, WriteToExternalDeviceSwitch }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("ExportLanguage", new List<View>() { ExportLanguageButton }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
 
@@ -385,14 +384,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
     {
 
-    }
-
-    private void ExportLanguageButton_Clicked(object sender, EventArgs e)
-    {
-        var fileName = Path.Join(_publicDirectory, "en.lng");
-        Lng.SaveToFile(fileName);
-
-        WeakReferenceMessenger.Default.Send(new ToastMessage($"Language exported to {fileName}"));
     }
 
     public static void ShowPicker(Picker picker)

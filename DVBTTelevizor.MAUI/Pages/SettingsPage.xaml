@@ -385,8 +385,6 @@
                         </Picker>
                     </Grid>
 
-                    <Button x:Name="ExportLanguageButton" Text="{local:LngXamlExt Input='Export language'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="ExportLanguageButton_Clicked"  IsVisible="{Binding DebugSettingsVisible}"/>
-
                 </StackLayout>
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
