@@ -141,6 +141,9 @@ namespace DVBTTelevizor.MAUI
                 await ExtractAssetFile("Spanish_AI.lng");
                 await ExtractAssetFile("Ukrainian_AI.lng");
                 await ExtractAssetFile("Urdu_AI.lng");
+                await ExtractAssetFile("Japanese_AI.lng");
+                await ExtractAssetFile("Vietnamese_AI.lng");
+                await ExtractAssetFile("Greek_AI.lng");
 
                 // language
                 Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
