@@ -163,17 +163,17 @@ namespace SledovaniTV
                 request.Timeout = 10 * 1000; // 10 sec timeout per one request
 
                 _log.Debug($"Sending {method} request to url: {request.RequestUri}");
-                _log.Debug($"ContentType: {request.ContentType}");
-                _log.Debug($"Method: {request.Method}");
-                _log.Debug($"RequestUri: {request.RequestUri}");
-                _log.Debug($"Timeout: {request.Timeout}");
-                _log.Debug($"ContentType: {request.ContentType}");
-                _log.Debug($"ContentLength: {request.ContentLength}");
+                //_log.Debug($"ContentType: {request.ContentType}");
+                //_log.Debug($"Method: {request.Method}");
+                //_log.Debug($"RequestUri: {request.RequestUri}");
+                //_log.Debug($"Timeout: {request.Timeout}");
+                //_log.Debug($"ContentType: {request.ContentType}");
+                //_log.Debug($"ContentLength: {request.ContentLength}");
 
-                foreach (var header in request.Headers)
-                {
-                    _log.Debug($"Header: {header.ToString()}");
-                }
+                //foreach (var header in request.Headers)
+                //{
+                //    _log.Debug($"Header: {header.ToString()}");
+                //}
 
                 using (var response = await request.GetResponseAsync() as HttpWebResponse)
                 {
@@ -183,13 +183,13 @@ namespace SledovaniTV
                         responseString = sr.ReadToEnd();
                     }
 
-                    _log.Debug($"Response: {responseString}");
-                    _log.Debug($"StatusCode: {response.StatusCode}");
-                    _log.Debug($"StatusDescription: {response.StatusDescription}");
+                    //_log.Debug($"Response: {responseString}");
+                    //_log.Debug($"StatusCode: {response.StatusCode}");
+                    //_log.Debug($"StatusDescription: {response.StatusDescription}");
 
-                    _log.Debug($"ContentLength: {response.ContentLength}");
-                    _log.Debug($"ContentType: {response.ContentType}");
-                    _log.Debug($"ContentEncoding: {response.ContentEncoding}");
+                    //_log.Debug($"ContentLength: {response.ContentLength}");
+                    //_log.Debug($"ContentType: {response.ContentType}");
+                    //_log.Debug($"ContentEncoding: {response.ContentEncoding}");
 
                     return responseString;
                 }

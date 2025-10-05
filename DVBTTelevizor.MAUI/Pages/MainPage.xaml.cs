@@ -438,7 +438,7 @@ namespace DVBTTelevizor.MAUI
 
         private async Task UpdateDriverState()
         {
-            _loggingService.Debug($"Updating bitrate");
+            //_loggingService.Debug($"Updating bitrate");
 
             try
             {
@@ -471,8 +471,7 @@ namespace DVBTTelevizor.MAUI
             if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
                 return;
 
-            _loggingService.Debug($"Checking stream");
-            //var status = "Check stream result: " + Environment.NewLine;
+            _loggingService.Debug($"CheckStream");
 
             try
             {
@@ -482,6 +481,8 @@ namespace DVBTTelevizor.MAUI
                 // checking stopped stream
                 if (!videoView.MediaPlayer.IsPlaying)
                 {
+                    _loggingService.Debug($"CheckStream - stopped media detected");
+                    videoView.MediaPlayer.Stop();
                     videoView.MediaPlayer.Play();
                 }
 
@@ -498,6 +499,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     if (_viewModel.VideoStackLayoutVisible)
                     {
+                        _loggingService.Debug($"CheckStream - no video detected");
+
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             _viewModel.SetVideoStackLayoutvisible(false);
@@ -512,6 +515,8 @@ namespace DVBTTelevizor.MAUI
                     {
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
+                            _loggingService.Debug($"CheckStream - video detected");
+
                             _viewModel.SetVideoStackLayoutvisible(true);
                             VideoStackLayout.IsVisible = true;
                             NoVideoStackLayout.IsVisible = false;
@@ -550,7 +555,7 @@ namespace DVBTTelevizor.MAUI
                         var timeFromPlayMSecs = (DateTime.Now - _lastActionPlayTime).TotalMilliseconds;
                         if (timeFromPlayMSecs > 10000)
                         {
-                            _loggingService.Info($"     - No data for {timeFromPlayMSecs} ms");
+                            _loggingService.Info($"CheckStream - no data for {timeFromPlayMSecs} ms");
                             /*
                             MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                             MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
@@ -558,7 +563,7 @@ namespace DVBTTelevizor.MAUI
             }
                         else if (timeFromPlayMSecs > 5000)
                         {
-                            _loggingService.Info($"     - No data for {timeFromPlayMSecs} ms");
+                            _loggingService.Info($"CheckStream - no data for {timeFromPlayMSecs} ms");
                         }
                     } else
                     {
@@ -570,12 +575,12 @@ namespace DVBTTelevizor.MAUI
                 var actualSubtitleTrack = videoView.MediaPlayer.Spu;
                 var actualAudioTrack = videoView.MediaPlayer.AudioTrack;
 
-                _loggingService.Debug($"CheckStream - actual subtitle track: {actualSubtitleTrack}");
-                _loggingService.Debug($"CheckStream - actual audio track: {actualAudioTrack}");
-
+                //_loggingService.Debug($"CheckStream - actual subtitle track: {actualSubtitleTrack}");
+                //_loggingService.Debug($"CheckStream - actual audio track: {actualAudioTrack}");
 
                 if (_viewModel.PlayingChannel != null)
                 {
+                    int firstAudioTrackId = -1;
                     foreach (var desc in videoView.MediaPlayer.VideoTrackDescription)
                     {
                         if (!_viewModel.PlayingChannel.VideoTracks.ContainsKey(desc.Id))
@@ -594,11 +599,29 @@ namespace DVBTTelevizor.MAUI
                     }
                     foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
                     {
+                        firstAudioTrackId = desc.Id;
                         if (!_viewModel.PlayingChannel.AudioTracks.ContainsKey(desc.Id))
                         {
                             _loggingService.Debug($"     - audio track found: {desc.Name} [{desc.Id}]");
                             _viewModel.PlayingChannel.AudioTracks.Add(desc.Id, desc.Name);
                         }
+                    }
+
+                    // check audio track
+
+                    if (actualAudioTrack == -1 &&
+                        firstAudioTrackId != -1 &&
+                        _viewModel.PlayingChannel.SelectedAudioTrack != "-1") // when user set NO audio
+                    {
+                        _loggingService.Debug($"CheckStream - invalid current audio track");
+
+                        int trackId;
+                        if (!int.TryParse(_viewModel.PlayingChannel.SelectedAudioTrack, out trackId))
+                        {
+                            trackId = firstAudioTrackId;
+                        }
+
+                        videoView.MediaPlayer.SetAudioTrack(trackId);
                     }
                 }
 
@@ -625,22 +648,6 @@ namespace DVBTTelevizor.MAUI
                 }
                 */
 
-                // check audio track
-                /*
-                if (actualAudioTrack != _viewModel.AudioTrack)
-                {
-                    if ((_viewModel.AudioTrack == -100) && (actualAudioTrack != -1))
-                    {
-                        _loggingService.Debug($"CheckStream - Setting automatic audio track {actualAudioTrack}");
-                        _viewModel.AudioTrack = actualAudioTrack;
-                    }
-                    else
-                    {
-                        _loggingService.Debug($"CheckStream - invalid audio track {actualAudioTrack}, setting {_viewModel.AudioTrack}");
-                        videoView.MediaPlayer.SetAudioTrack(_viewModel.AudioTrack);
-                    }
-                }
-                */
             }
             catch (Exception ex)
             {
