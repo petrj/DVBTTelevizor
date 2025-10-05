@@ -14,6 +14,7 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
+    private long _oldFreq = 0;
 
     public TuneFrequencyModeEnum TuneFrequencyMode { get; set; } = TuneFrequencyModeEnum.Center;
 
@@ -57,11 +58,13 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     private void MHZEntry_Focused(object? sender, FocusEventArgs e)
     {
         _viewModel.NotifyEnabled = false;
+        _oldFreq = _viewModel.FrequencyKHz;
     }
 
     private void KHZEntry_Focused(object? sender, FocusEventArgs e)
     {
         _viewModel.NotifyEnabled = false;
+        _oldFreq = _viewModel.FrequencyKHz;
     }
 
     private async void MHZEntry_Unfocused(object? sender, FocusEventArgs e)
@@ -72,18 +75,18 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (!float.TryParse(MHZEntry.Text, out mhz))
         {
             WeakReferenceMessenger.Default.Send(new ToastMessage("Invalid frequency".Translated()));
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
+            _viewModel.FrequencyKHz = _oldFreq;
             return;
         }
 
         if (!_viewModel.Settings.ValidFrequency(Convert.ToInt64(mhz*1000.0), true))
         {
-            WeakReferenceMessenger.Default.Send(new ToastMessage($"Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(mhz.ToString(), _viewModel.FrequencyMinMHz.ToString(), _viewModel.FrequencyMaxMHz.ToString())));
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(mhz.ToString(), _viewModel.Settings.DeviceFrequencyMinKHz.ToString(), _viewModel.Settings.DeviceFrequencyMaxKHz.ToString())));
+            _viewModel.FrequencyKHz = _oldFreq;
             return;
         }
 
-        _viewModel.Settings.FrequencyKHz = Convert.ToInt64(mhz * 1000);
+        _viewModel.FrequencyKHz = Convert.ToInt64(mhz * 1000);
     }
 
     private async void KHZEntry_Unfocused(object? sender, FocusEventArgs e)
@@ -93,18 +96,18 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (!int.TryParse(KHZEntry.Text, out khz))
         {
             WeakReferenceMessenger.Default.Send(new ToastMessage("Invalid frequency".Translated()));
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
+            _viewModel.FrequencyKHz = _oldFreq;
             return;
         }
 
         if (!_viewModel.Settings.ValidFrequency(khz, true))
         {
-            WeakReferenceMessenger.Default.Send(new ToastMessage($"Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(khz.ToString(), _viewModel.FrequencyMinKHz.ToString(), _viewModel.FrequencyMaxKHz.ToString())));
-            _viewModel.Settings.FrequencyKHz = _viewModel.Settings.DeviceFrequencyMinKHz;
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(khz.ToString(), _viewModel.FrequencyMinKHz.ToString(), _viewModel.FrequencyMaxKHz.ToString())));
+            _viewModel.FrequencyKHz = _oldFreq;
             return;
         }
 
-        _viewModel.Settings.FrequencyKHz = khz;
+        _viewModel.FrequencyKHz = khz;
     }
 
     public TuningSettings? Settings
@@ -276,6 +279,9 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     private void ConfirmButton_Clicked(object sender, EventArgs e)
     {
+        KHZEntry.Unfocus();
+        MHZEntry.Unfocus();
+
         _loggingService.Debug($"FrequencyPage ConfirmButton_Clicked");
 
         Confirmed = true;
