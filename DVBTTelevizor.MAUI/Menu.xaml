@@ -12,7 +12,7 @@
             <Style x:Key="ListLabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="HorizontalOptions" Value="End"/>
                 <Setter Property="Margin" Value="10,0,15,0"/>
             </Style>
