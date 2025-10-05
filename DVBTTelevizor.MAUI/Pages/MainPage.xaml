@@ -248,7 +248,7 @@
           AbsoluteLayout.LayoutBounds="0.0, 0.0, 1.0, 1.0"
           AbsoluteLayout.LayoutFlags="All"
           ItemsSource="{Binding Channels}"
-          CachingStrategy="RecycleElement"
+          CachingStrategy="RetainElement"
           RefreshCommand="{Binding RefreshCommand}"
           IsRefreshing="{Binding IsRefreshing}"
           Style="{StaticResource ListViewStyle}"

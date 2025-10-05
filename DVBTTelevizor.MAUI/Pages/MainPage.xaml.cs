@@ -161,11 +161,13 @@ namespace DVBTTelevizor.MAUI
 
             InitializeComponent();
 
+            var forceLoggingWhenDebug = false;
+
 #if DEBUG
-            //_configuration.EnableLogging = true;
+            forceLoggingWhenDebug = true;
 #endif
 
-            if (_configuration.EnableLogging)
+            if (forceLoggingWhenDebug || _configuration.EnableLogging)
             {
                 _loggingService = loggingProvider.GetLoggingService();
             } else
@@ -174,7 +176,6 @@ namespace DVBTTelevizor.MAUI
             }
 
             _loggingService.Info("MainPage starting");
-
 
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
             {
