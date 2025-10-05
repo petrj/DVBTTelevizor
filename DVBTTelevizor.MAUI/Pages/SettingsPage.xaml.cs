@@ -594,10 +594,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                             ShowPicker(LanguagePicker);
                             break;
 
-                        case "ExportLanguage":
-                            ExportLanguageButton_Clicked(this, new EventArgs());
-                            break;
-
                         case "EnableLogging":
                             EnableLoggingSwitch.IsToggled = !EnableLoggingSwitch.IsToggled;
                             BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
