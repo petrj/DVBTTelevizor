@@ -51,6 +51,13 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 BuildRetryTuneMenu();
             });
         });
+
+        Disappearing += TuningProgressPage_Disappearing;
+    }
+
+    private void TuningProgressPage_Disappearing(object? sender, EventArgs e)
+    {
+        _viewModel.State = TuningProgressPageViewModel.TuneStateEnum.Stopped;
     }
 
     private void ChannelFound(object? sender, EventArgs e)
