@@ -368,6 +368,11 @@ namespace DVBTTelevizor.MAUI
 
                 var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, false);
 
+                if (State != TuneStateEnum.InProgress)
+                {
+                    return;
+                }
+
                 switch (tuneResult.Result)
                 {
                     case DVBTDriverSearchProgramResultEnum.Error:
@@ -411,6 +416,11 @@ namespace DVBTTelevizor.MAUI
 
                 foreach (var serviceDescriptor in searchMapPIDsResult.ServiceDescriptors)
                 {
+                    if (State != TuneStateEnum.InProgress)
+                    {
+                        return;
+                    }
+
                     // ProgramMapPID must be unique!
                     if (!(mapPIDToServiceDescriptor.ContainsKey(serviceDescriptor.Value)))
                     {
@@ -429,6 +439,7 @@ namespace DVBTTelevizor.MAUI
                     ch.Frequency = freq;
                     ch.Bandwdith = bandWidth;
                     ch.Number = String.Empty;
+
                     switch (dvbtTypeIndex)
                     {
                         case 0: ch.ChannelType = ChannelTypeEnum.DVBT;
