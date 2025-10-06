@@ -228,3 +228,7 @@ Automatic scan=স্বয়ংক্রিয় স্ক্যান
 Manual scan=ম্যানুয়াল স্ক্যান
 Tune frequency=টিউন ফ্রিকোয়েন্সি
 Failed to show driver preferences=ড্রাইভারের পছন্দগুলি দেখাতে ব্যর্থ হয়েছে
+Driver is not installed=ড্রাইভার ইনস্টল করা নেই
+Device response timeout=ডিভাইস সাড়া দেওয়ার সময়সীমা শেষ
+Driver initializing failed=ড্রাইভার ইনিশিয়ালাইজেশন ব্যর্থ হয়েছে
+Bad result=খারাপ ফলাফল

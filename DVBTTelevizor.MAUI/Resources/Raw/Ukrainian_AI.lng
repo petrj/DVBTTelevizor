@@ -228,3 +228,7 @@ Automatic scan=Автоматичне сканування
 Manual scan=Ручне сканування
 Tune frequency=Частота налаштування
 Failed to show driver preferences=Не вдалося показати налаштування драйвера
+Driver is not installed=Драйвер не встановлено
+Device response timeout=Час очікування відповіді пристрою вичерпано
+Driver initializing failed=Не вдалося ініціалізувати драйвер
+Bad result=Поганий результат

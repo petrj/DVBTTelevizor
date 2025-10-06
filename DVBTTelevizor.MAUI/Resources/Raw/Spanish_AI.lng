@@ -228,3 +228,7 @@ Automatic scan=Escaneo automático
 Manual scan=Escaneo manual
 Tune frequency=Frecuencia de sintonización
 Failed to show driver preferences=Falló al mostrar las preferencias del controlador
+Driver is not installed=El controlador no está instalado
+Device response timeout=Tiempo de espera de respuesta del dispositivo
+Driver initializing failed=Falló la inicialización del controlador
+Bad result=Mal resultado

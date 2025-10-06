@@ -228,3 +228,7 @@ Automatic scan=Pindai Otomatis
 Manual scan=Pindai Manual
 Tune frequency=Frekuensi penyetelan
 Failed to show driver preferences=Gagal menampilkan preferensi driver
+Driver is not installed=Driver belum terinstal
+Device response timeout=Waktu respons perangkat habis
+Driver initializing failed=Inisialisasi driver gagal
+Bad result=Hasil yang buruk

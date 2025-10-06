@@ -851,14 +851,14 @@ namespace DVBTTelevizor.MAUI
             }
             catch (ActivityNotFoundException ex)
             {
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver not installed"));
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
                 _loggingService.Info("Activity not found");
-                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout"));
+                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout".Translated()));
             }
             catch (Exception ex)
             {
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver initializing failed"));
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver initializing failed".Translated()));
             }
         }
 
@@ -882,7 +882,7 @@ namespace DVBTTelevizor.MAUI
                         _waitingForInit = false;
 
                         _loggingService.Info("Device response timeout");
-                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Device response timeout"));
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Device response timeout".Translated()));
                     }
 
                 });
@@ -893,8 +893,8 @@ namespace DVBTTelevizor.MAUI
             } catch (ActivityNotFoundException e)
             {
                 _loggingService.Info("Activity not found");
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver not installed"));
-                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout"));
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
+                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout".Translated()));
             }
             catch (Exception ex)
             {
@@ -993,7 +993,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 else
                 {
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad activity result"));
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Bad result".Translated()));
                 }
             }
             else

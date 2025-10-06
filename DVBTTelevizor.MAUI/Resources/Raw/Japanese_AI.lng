@@ -228,3 +228,7 @@ Automatic scan=自動スキャン
 Manual scan=手動スキャン
 Tune frequency=チューニング周波数
 Failed to show driver preferences=ドライバ設定の表示に失敗しました
+Driver is not installed=ドライバーがインストールされていません
+Device response timeout=デバイス応答のタイムアウト
+Driver initializing failed=ドライバーの初期化に失敗しました
+Bad result=不良な結果

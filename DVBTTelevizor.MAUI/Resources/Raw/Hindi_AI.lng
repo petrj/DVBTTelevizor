@@ -228,3 +228,7 @@ Automatic scan=स्वचालित स्कैन
 Manual scan=मैनुअल स्कैन
 Tune frequency=ट्यून आवृत्ति
 Failed to show driver preferences=ड्राइवर प्राथमिकताएँ दिखाने में विफल
+Driver is not installed=ड्राइवर इंस्टॉल नहीं है
+Device response timeout=डिवाइस प्रतिक्रिया का समय समाप्त
+Driver initializing failed=ड्राइवर इनिशियलाइज़ेशन विफल रहा
+Bad result=खराब परिणाम

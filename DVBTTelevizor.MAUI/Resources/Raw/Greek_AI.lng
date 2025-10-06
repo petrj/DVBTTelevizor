@@ -228,3 +228,7 @@ Automatic scan=Αυτόματη σάρωση
 Manual scan=Χειροκίνητη σάρωση
 Tune frequency=Συντονισμός συχνότητας
 Failed to show driver preferences=Αποτυχία εμφάνισης προτιμήσεων οδηγού
+Driver is not installed=Ο οδηγός δεν είναι εγκατεστημένος
+Device response timeout=Χρονικό όριο απόκρισης συσκευής
+Driver initializing failed=Η εκκίνηση του οδηγού απέτυχε
+Bad result=Κακό αποτέλεσμα

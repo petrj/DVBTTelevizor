@@ -228,3 +228,7 @@ Automatic scan=Quét tự động
 Manual scan=Quét thủ công
 Tune frequency=Tần số dò đài
 Failed to show driver preferences=Không thể hiển thị tùy chọn driver
+Driver is not installed=Driver chưa được cài đặt
+Device response timeout=Hết thời gian phản hồi của thiết bị
+Driver initializing failed=Khởi tạo driver thất bại
+Bad result=Kết quả xấu

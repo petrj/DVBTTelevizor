@@ -228,3 +228,7 @@ Automatic scan=自动扫描
 Manual scan=手动扫描
 Tune frequency=调谐频率
 Failed to show driver preferences=无法显示驱动程序首选项
+Driver is not installed=驱动程序未安装
+Device response timeout=设备响应超时
+Driver initializing failed=驱动程序初始化失败
+Bad result=结果不良

@@ -776,8 +776,7 @@ namespace DVBTTelevizor.MAUI
 
         public void UpdateDriverState()
         {
-            OnPropertyChanged(nameof(DriverIconImage));
-            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+            NotifyChange();
 
             WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(String.Empty));
         }
@@ -1200,6 +1199,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
             OnPropertyChanged(nameof(Channels));
+            OnPropertyChanged(nameof(DriverIconImage));
         }
 
         public bool Refreshed

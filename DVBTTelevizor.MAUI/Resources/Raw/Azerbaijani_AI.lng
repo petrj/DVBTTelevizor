@@ -228,3 +228,7 @@ Automatic scan=Avtomatik skan
 Manual scan=Əl ilə skan
 Tune frequency=Ayarlama tezliyi
 Failed to show driver preferences=Drayver üstünlüklərini göstərmək uğursuz oldu
+Driver is not installed=Sürücü quraşdırılmayıb
+Device response timeout=Cihaz cavab vaxtı bitdi
+Driver initializing failed=Sürücünün ilkin yüklənməsi uğursuz oldu
+Bad result=Pis nəticə

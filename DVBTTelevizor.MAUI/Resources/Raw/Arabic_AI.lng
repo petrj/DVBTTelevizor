@@ -228,3 +228,7 @@ Automatic scan=مسح تلقائي
 Manual scan=مسح يدوي
 Tune frequency=تردد الضبط
 Failed to show driver preferences=فشل إظهار تفضيلات برنامج التشغيل
+Driver is not installed=المشغل غير مثبت
+Device response timeout=انقضاء مهلة استجابة الجهاز
+Driver initializing failed=فشل تهيئة المشغل
+Bad result=نتيجة سيئة

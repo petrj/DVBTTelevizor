@@ -228,3 +228,7 @@ Automatic scan=خودکار سکین
 Manual scan=دستی سکین
 Tune frequency=ٹیون فریکوئنسی
 Failed to show driver preferences=ڈرائیور کی ترجیحات دکھانے میں ناکامی
+Driver is not installed=ڈرائیور انسٹال نہیں ہے
+Device response timeout=ڈیوائس کا جواب دینے کا وقت ختم
+Driver initializing failed=ڈرائیور کی شروعات ناکام ہو گئی
+Bad result=برا نتیجہ

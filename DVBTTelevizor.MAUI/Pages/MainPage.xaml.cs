@@ -1255,6 +1255,13 @@ namespace DVBTTelevizor.MAUI
                         }
                     });
                 });
+            } else
+            {
+                if (!_driver.DriverInstalled)
+                {
+                    // test if driver has been installed
+                    ConnectDriver();
+                }
             }
         }
 
