@@ -36,6 +36,7 @@ namespace DVBTTelevizor.MAUI
                 Task.Run(async () =>
                 {
                     await _mp.FixVideo(true);
+                    _mp.CheckDriverInstallationChange();
                 });
             }
         }

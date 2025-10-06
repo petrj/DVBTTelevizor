@@ -1255,13 +1255,6 @@ namespace DVBTTelevizor.MAUI
                         }
                     });
                 });
-            } else
-            {
-                if (!_driver.DriverInstalled)
-                {
-                    // test if driver has been installed
-                    ConnectDriver();
-                }
             }
         }
 
@@ -2179,6 +2172,13 @@ namespace DVBTTelevizor.MAUI
             if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
             {
                 _loggingService.Info("Action not completed!");
+            }
+        }
+        public void CheckDriverInstallationChange()
+        {
+            if (!_driver.DriverInstalled)
+            {
+                ConnectDriver();
             }
         }
 
