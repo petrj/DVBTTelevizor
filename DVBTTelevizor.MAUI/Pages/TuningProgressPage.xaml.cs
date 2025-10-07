@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Layouts;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -57,7 +58,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private void TuningProgressPage_Disappearing(object? sender, EventArgs e)
     {
-        _viewModel.State = TuningProgressPageViewModel.TuneStateEnum.Stopped;
+        _viewModel.State = TuningProgressPageViewModel.TuneStateEnum.Inactive;
     }
 
     private void ChannelFound(object? sender, EventArgs e)
