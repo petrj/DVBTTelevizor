@@ -2240,7 +2240,7 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info(LastVideoStackLayoutPosition.ToString());
 
 
-                await MainThread.InvokeOnMainThreadAsyncBeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
 
