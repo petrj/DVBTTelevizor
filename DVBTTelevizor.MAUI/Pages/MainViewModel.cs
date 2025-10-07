@@ -480,6 +480,8 @@ namespace DVBTTelevizor.MAUI
 
                     _loggingService.Debug($"Clearing channels");
 
+                    var channelsToAdd = new ObservableCollection<Channel>();
+
                     Channels.Clear();
 
                     foreach (var channel in channels)
@@ -515,8 +517,13 @@ namespace DVBTTelevizor.MAUI
                             lastChannel = ch;
                         }
 
-                        Channels.Add(ch);
+                        _loggingService.Debug($"Adding channel {ch.Name}");
+
+                        channelsToAdd.Add(channel);
                     }
+
+                    Channels = channelsToAdd;
+                    _listViewSelector?.SetChannels(Channels);
 
                     if (channelToSelect == null)
                     {

@@ -13,6 +13,11 @@ namespace DVBTTelevizor.MAUI
 
         public ListViewSelector(ObservableCollection<Channel> channels)
         {
+            SetChannels(channels);
+        }
+
+        public void SetChannels(ObservableCollection<Channel> channels)
+        {
             _channels = channels;
         }
 
@@ -42,7 +47,7 @@ namespace DVBTTelevizor.MAUI
             {
                 var fireNotifyChannelChange = false;
 
-                if (ch == channel)
+                if (ch.UniqueIdentifier == channel.UniqueIdentifier)
                 {
                     if (!ch.Selected && OnChannelChanged != null)
                     {

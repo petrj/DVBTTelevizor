@@ -1708,7 +1708,8 @@ namespace DVBTTelevizor.MAUI
                 //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
 
-            _focusItems.DeFocusAll();
+            //_focusItems.DeFocusAll();
+            _focusItems.FocusItem("ChannelsListView");
             _viewModel.NotifyChannelChange();
 
             if (_viewModel.SelectedChannel != null)
