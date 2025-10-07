@@ -263,6 +263,7 @@ namespace DVBTTelevizor.MAUI
                         {
                             break;
                         }
+
                     }
                     while (_tuneState != TuneStateEnum.Stopped);
                 } else

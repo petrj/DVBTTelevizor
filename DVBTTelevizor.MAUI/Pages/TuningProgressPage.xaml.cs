@@ -77,6 +77,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         if (e is ChannelFoundEventArgs che)
         {
             _loggingService.Info($"Adding new channel: {che.Channel.Name}");
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                ChannelsListView.ScrollTo(che.Channel, ScrollToPosition.MakeVisible, false);
+            });
         }
     }
 

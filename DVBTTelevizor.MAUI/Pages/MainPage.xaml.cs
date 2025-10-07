@@ -3195,6 +3195,7 @@ namespace DVBTTelevizor.MAUI
                     await _viewModel.ScanEPG(_viewModel.SelectedChannel, false, false);
                     break;
                 case "menuShowEPG":
+                    _viewModel.DoNotAutomaticallyShowEPGDetail = false;
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         if (_viewModel.SelectedChannel == null ||
@@ -3210,6 +3211,7 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case "menuHideEPG":
                     _viewModel.EPGDetailEnabled = false;
+                    _viewModel.DoNotAutomaticallyShowEPGDetail = true;
                     RefreshGUI();
                     break;
                 case "menuChannel":

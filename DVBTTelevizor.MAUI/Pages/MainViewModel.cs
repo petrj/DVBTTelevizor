@@ -47,6 +47,8 @@ namespace DVBTTelevizor.MAUI
         private bool _refreshed = false;
         private bool _menuVisible = false;
 
+        private bool _doNotAutomaticallyShowEPGDetail = false;
+
         private bool? _videoStackLayoutvisible = null;
 
         private BackgroundWorker _recordingBackgroundWorker = new BackgroundWorker();
@@ -856,7 +858,9 @@ namespace DVBTTelevizor.MAUI
         {
             //_loggingService.Info($"NotifyChannelChange (Current channel: {SelectedChannel.UniqueIdentifier}, thread id:{Thread.CurrentThread.ManagedThreadId})");
 
-            if (SelectedChannel?.CurrentEventItem != null && _playingState != PlayingStateEnum.Playing)
+            if (SelectedChannel?.CurrentEventItem != null &&
+                _playingState != PlayingStateEnum.Playing &&
+                !_doNotAutomaticallyShowEPGDetail)
             {
                 EPGDetailEnabled = true;
             }
@@ -1334,6 +1338,12 @@ namespace DVBTTelevizor.MAUI
                 }
                 ;
             }
+        }
+
+        public bool DoNotAutomaticallyShowEPGDetail
+        {
+            get => _doNotAutomaticallyShowEPGDetail;
+            set => _doNotAutomaticallyShowEPGDetail = value;
         }
 
         public void SledovaniTVStartRecording()
