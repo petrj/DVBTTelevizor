@@ -13,8 +13,60 @@ namespace DVBTTelevizor.MAUI
     public class MenuViewModel : BaseNotifableObject
     {
         private bool _menuVisible = false;
+        private int _fontSizeIndex = 0;
         private string _title = "Menu".Translated();
         public ObservableCollection<MenuItem> MenuItems { get; set; } = new ObservableCollection<MenuItem>();
+
+        public MenuViewModel()
+        {
+            WeakReferenceMessenger.Default.Register<FontSizeChangedMessage>(this, (r, m) =>
+            {
+                SetFontSizeByIndex(m.Value);
+            });
+        }
+
+        private int GetScaledSize(int index, int normalSize = 12)
+        {
+            switch (index)
+            {
+                case 1:
+                    return Convert.ToInt32(Math.Round(normalSize * 1.12));
+                case 2:
+                    return Convert.ToInt32(Math.Round(normalSize * 1.25));
+                case 3:
+                    return Convert.ToInt32(Math.Round(normalSize * 1.5));
+                case 4:
+                    return Convert.ToInt32(Math.Round(normalSize * 1.75));
+                case 5:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.0));
+                default: return normalSize;
+            }
+        }
+
+        public void SetFontSizeByIndex(int index = 0)
+        {
+            _fontSizeIndex = index;
+            UpdateFontSize(GetScaledSize(index));
+        }
+
+        private void UpdateFontSize(int size)
+        {
+            foreach (MenuItem item in MenuItems)
+            {
+                item.FontSize = size;
+                item.Update();
+            }
+            OnPropertyChanged(nameof(MenuItems));
+            OnPropertyChanged(nameof(FontSize));
+        }
+
+        public int FontSize
+        {
+            get
+            {
+                return GetScaledSize(_fontSizeIndex);
+            }
+        }
 
         public string Title
         {

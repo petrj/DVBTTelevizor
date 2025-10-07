@@ -277,7 +277,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
         _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
 
-        MainMenu.UpdateMenu("Confirmatiom".Translated(), _menuItems);
+        MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Confirmatiom".Translated(), _menuItems);
     }
 
     private void BuildConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm)
@@ -291,7 +291,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             _menuItems.Add(MainMenu.CreateMenuItem(actionConfirm, titleYes, "confirm.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", titleNo, "cancel.png"));
 
-            MainMenu.UpdateMenu(title, _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, title, _menuItems);
         }
     }
 
@@ -310,7 +310,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
 
-            MainMenu.UpdateMenu(title, _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, title, _menuItems);
         }
     }
 
@@ -324,7 +324,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuOK", titleOK, ""));
 
-            MainMenu.UpdateMenu(title, _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, title, _menuItems);
         }
     }
 

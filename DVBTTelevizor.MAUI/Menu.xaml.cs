@@ -21,11 +21,12 @@ public partial class Menu : ContentView
         Tapped?.Invoke(this, e);
     }
 
-    public void UpdateMenu(string title, IEnumerable<MenuItem> items = null)
+    public void UpdateMenu(int fontSizeIndex, string title, IEnumerable<MenuItem> items = null)
     {
         if (BindingContext is MenuViewModel vm)
         {
             vm.UpdateMenu(items, title);
+            vm.SetFontSizeByIndex(fontSizeIndex);
             this.Focus();
         }
     }

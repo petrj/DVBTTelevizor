@@ -28,6 +28,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
+    private Command _commandUpdateBitrate;
+
     public TuningProgressPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
@@ -53,7 +55,16 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             });
         });
 
+        _commandUpdateBitrate = new Command(() =>
+        {
+            Task.Run(async () =>
+            {
+                await _viewModel.NotifyBitrateChange();
+            });
+        });
+
         Disappearing += TuningProgressPage_Disappearing;
+        BackgroundCommandWorker.RunInBackground(_commandUpdateBitrate, 5);
     }
 
     private void TuningProgressPage_Disappearing(object? sender, EventArgs e)
@@ -396,7 +407,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             _menuItems.Add(MainMenu.CreateMenuItem("menuDriver", "Driver ...", "driver.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel", "cancel.png"));
 
-            MainMenu.UpdateMenu("Tuning failed.Check USB connection".Translated(), _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Tuning failed.Check USB connection".Translated(), _menuItems);
         }
     }
 
@@ -411,7 +422,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             _menuItems.Add(MainMenu.CreateMenuItem(actionConfirm, titleYes, "confirm.png"));
             _menuItems.Add(MainMenu.CreateMenuItem(actionNotConfirm, titleNo, "cancel.png"));
 
-            MainMenu.UpdateMenu(title, _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, title, _menuItems);
         }
     }
 

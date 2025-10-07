@@ -596,6 +596,14 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public async Task NotifyBitrateChange()
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnPropertyChanged(nameof(Bitrate));
+            });
+        }
+
         public TuneStateEnum State
         {
             get

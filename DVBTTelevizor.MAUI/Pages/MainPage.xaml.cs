@@ -2907,7 +2907,7 @@ namespace DVBTTelevizor.MAUI
                 _teletextMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
                 _activeMenuItems = _teletextMenuItems;
-                MainMenu.UpdateMenu(title, _teletextMenuItems);
+                MainMenu.UpdateMenu((int)_configuration.AppFontSize, title, _teletextMenuItems);
 
             }
             catch (Exception ex)
@@ -2951,7 +2951,7 @@ namespace DVBTTelevizor.MAUI
                 _audioMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
                 _activeMenuItems = _audioMenuItems;
-                MainMenu.UpdateMenu("Audio menu".Translated(), _audioMenuItems);
+                MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Audio menu".Translated(), _audioMenuItems);
 
             }
             catch (Exception ex)
@@ -2996,7 +2996,7 @@ namespace DVBTTelevizor.MAUI
                 _subtitleMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
                 _activeMenuItems = _subtitleMenuItems;
-                MainMenu.UpdateMenu("Subtitles menu".Translated(), _subtitleMenuItems);
+                MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Subtitles menu".Translated(), _subtitleMenuItems);
 
             }
             catch (Exception ex)
@@ -3029,7 +3029,7 @@ namespace DVBTTelevizor.MAUI
                 _aspectMenuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
                 _activeMenuItems = _aspectMenuItems;
-                MainMenu.UpdateMenu("Aspect menu".Translated(), _aspectMenuItems);
+                MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Aspect menu".Translated(), _aspectMenuItems);
 
             }
             catch (Exception ex)
@@ -3221,7 +3221,7 @@ namespace DVBTTelevizor.MAUI
                 case "menuBack":
                     _activeMenuItems = _menuItems;
                     ShowMenu();
-                    MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
+                    MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Menu".Translated(), _menuItems);
                     break;
                 case "menuPlay":
                     await ActionPlay();
@@ -3359,7 +3359,7 @@ namespace DVBTTelevizor.MAUI
 
             // _menuItems.First().Selected = true;
             _activeMenuItems = _menuItems;
-            MainMenu.UpdateMenu("Menu".Translated(), _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize,"Menu".Translated(), _menuItems);
             //FitMenuSize();
         }
 

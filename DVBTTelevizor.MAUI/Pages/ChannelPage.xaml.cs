@@ -146,7 +146,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             _menuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-            MainMenu.UpdateMenu("Subtitles menu".Translated(), _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize,"Subtitles menu".Translated(), _menuItems);
 
             ShowMenu();
 
@@ -186,7 +186,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             _menuItems.Add(MainMenu.CreateMenuItem("menuBack", "Back".Translated(), "back.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuClose", "Close".Translated(), "close.png"));
 
-            MainMenu.UpdateMenu("Audio menu".Translated(), _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Audio menu".Translated(), _menuItems);
 
             ShowMenu();
 
@@ -213,7 +213,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             _menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDeleteChannel", "Yes".Translated(), "confirm.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuNo", "No".Translated(), "cancel.png"));
 
-            MainMenu.UpdateMenu("Are you sure to delete channel".Translated() + $" {Channel.Name}?", _menuItems);
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Are you sure to delete channel".Translated() + $" {Channel.Name}?", _menuItems);
 
             ShowMenu();
         }

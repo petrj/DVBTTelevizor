@@ -14,6 +14,7 @@ namespace DVBTTelevizor.MAUI
         public string? ImgSource { get; set; }
 
         public bool Selected { get; set; } = false;
+        public int FontSize { get; set; } = 16;
 
         public bool IsVisible { get; set; } = true;
 
@@ -34,6 +35,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(ImgSource));
             OnPropertyChanged(nameof(Selected));
             OnPropertyChanged(nameof(BackgroundColor));
+            OnPropertyChanged(nameof(FontSize));
         }
     }
 }
