@@ -507,7 +507,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         _loggingService.Debug($"CheckStream - no video detected");
 
-                        MainThread.BeginInvokeOnMainThread(async () =>
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
                         {
                             _viewModel.SetVideoStackLayoutvisible(false);
                             VideoStackLayout.IsVisible = false;
@@ -519,7 +519,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     if (_viewModel.NoVideoStackLayoutVisible)
                     {
-                        MainThread.BeginInvokeOnMainThread(async () =>
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
                         {
                             _loggingService.Debug($"CheckStream - video detected");
 
@@ -1244,7 +1244,7 @@ namespace DVBTTelevizor.MAUI
 
                     await AutoPlay();
 
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         if (_viewModel.Channels.Count > 0)
                         {
@@ -1411,37 +1411,37 @@ namespace DVBTTelevizor.MAUI
                     });
                     break;
                 case "SettingsButton":
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         SettingsButton_Clicked(this, new EventArgs());
                     });
                     break;
                 case "TuneButton":
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         TuneButton_Clicked(this, new EventArgs());
                     });
                     break;
                 case "DVBTTelevizorButton":
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         DVBTTelevizorButton_Clicked(this, new EventArgs());
                     });
                     break;
                 case "MenuButton":
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         MenuButton_Clicked(this, new EventArgs());
                     });
                     break;
                 case "DriverStateButton":
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         DriverStateButton_Clicked(this, new EventArgs());
                     });
                     break;
                 case "QuickTuneButton":
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         TuneButton_Clicked(this, new EventArgs());
                     });
@@ -1505,7 +1505,7 @@ namespace DVBTTelevizor.MAUI
                     _viewModel.SelectedChannel.Focused = false;
                     _viewModel.SelectedChannel.NotifyChanges();
                 }
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     _focusItems.FocusNextItem(true);
                 });
@@ -1541,7 +1541,7 @@ namespace DVBTTelevizor.MAUI
                     _viewModel.SelectedChannel.NotifyChanges();
                 }
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     _focusItems.FocusPreviousItem(true);
                 });
@@ -1562,7 +1562,7 @@ namespace DVBTTelevizor.MAUI
 
             if (_viewModel.PlayingState != PlayingStateEnum.Playing)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton" }).Contains(_focusItems.FocusedItemName) &&
                     _viewModel.ChannelsListViewVisible)
@@ -1614,7 +1614,7 @@ namespace DVBTTelevizor.MAUI
 
             if (_viewModel.PlayingState != PlayingStateEnum.Playing)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     if ((new List<string>() { null, "DVBTTelevizorButton", "DriverStateButton", "TuneButton", "MenuButton" }).Contains(_focusItems.FocusedItemName) &&
                     _viewModel.ChannelsListViewVisible)
@@ -1755,7 +1755,7 @@ namespace DVBTTelevizor.MAUI
                     await ActionPlay(channel);
                 }
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     _viewModel.RecordingChannel = channel;
                 });
@@ -1811,7 +1811,7 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     _viewModel.RecordingChannel = null;
                 });
@@ -2193,7 +2193,7 @@ namespace DVBTTelevizor.MAUI
             if (_mediaPlayer == null)
                 return;
 
-            MainThread.BeginInvokeOnMainThread(async () =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 if (force)
                 {
@@ -2222,7 +2222,7 @@ namespace DVBTTelevizor.MAUI
 
             await Task.Delay(100);
 
-            MainThread.BeginInvokeOnMainThread(async () =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                 AbsoluteLayout.SetLayoutBounds(VideoStackLayout, NoVideoStackLayoutPosition);
@@ -2240,7 +2240,7 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info(LastVideoStackLayoutPosition.ToString());
 
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsyncBeginInvokeOnMainThread(async () =>
                 {
                     AbsoluteLayout.SetLayoutBounds(VideoStackLayout, LastVideoStackLayoutPosition.Value);
 
@@ -2414,7 +2414,7 @@ namespace DVBTTelevizor.MAUI
 
             if (MainMenu.MenuVisible)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     OnMenuKeyDown(keyAction);
                 });
@@ -2449,7 +2449,7 @@ namespace DVBTTelevizor.MAUI
                     return;
 
                 case KeyboardNavigationActionEnum.Back:
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         await ActionBack(longPress);
                     });
@@ -2674,7 +2674,7 @@ namespace DVBTTelevizor.MAUI
                                     break;
                                 case PlayingStateEnum.PlayingInPreview:
 
-                                    MainThread.BeginInvokeOnMainThread(async () =>
+                                    await MainThread.InvokeOnMainThreadAsync(async () =>
                                     {
                                         _viewModel.SelectedChannel = _viewModel.PlayingChannel;
                                     });
@@ -2722,7 +2722,7 @@ namespace DVBTTelevizor.MAUI
                         {
                             await ActionPlay(selectedChannel);
                             _viewModel.NotifyChannelChange();
-                            MainThread.BeginInvokeOnMainThread(async () =>
+                            await MainThread.InvokeOnMainThreadAsync(async () =>
                             {
                                 ChannelsListView.ScrollTo(selectedChannel, ScrollToPosition.MakeVisible, false);
                             });
@@ -3196,7 +3196,7 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case "menuShowEPG":
                     _viewModel.DoNotAutomaticallyShowEPGDetail = false;
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         if (_viewModel.SelectedChannel == null ||
                         _viewModel.SelectedChannel.CurrentEventItem == null)
