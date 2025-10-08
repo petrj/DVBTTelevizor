@@ -457,95 +457,84 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"Refreshing channels");
 
-            await MainThread.InvokeOnMainThreadAsync(async () =>
+            string? uniqueIdentifier = null;
+            Channel? firstChannel = null;
+            Channel? lastChannel = null;
+            Channel? channelToSelect = null;
+
+            try
             {
-                string? uniqueIdentifier = null;
-                Channel? firstChannel = null;
-                Channel? lastChannel = null;
-                Channel? channelToSelect = null;
+                IsRefreshing = true;
 
-                try
+                if (SelectedChannel != null)
                 {
-                    IsRefreshing = true;
+                    uniqueIdentifier = SelectedChannel.UniqueIdentifier;
+                    SelectedChannel = null;
+                }
 
-                    if (SelectedChannel != null)
+                await _semaphoreSlim.WaitAsync();
+
+                var channels = _configuration.GetChannels();
+
+                _loggingService.Debug($"Clearing channels");
+
+                var channelsToAdd = new ObservableCollection<Channel>();
+
+                foreach (var channel in channels)
+                {
+                    // apply filter:
+                    if (!_configuration.ShowTVChannels && channel.ServiceType == DVBTDriverServiceType.TV)
+                        continue;
+
+                    if (!_configuration.ShowRadioChannels && channel.ServiceType == DVBTDriverServiceType.Radio)
+                        continue;
+
+                    if (!_configuration.ShowOtherChannels && channel.ServiceType == DVBTDriverServiceType.Other)
+                        continue;
+
+                    if (!_configuration.ShowNonFreeChannels && channel.NonFree)
+                        continue;
+
+                    var ch = channel.Clone();
+                    ch.Selected = false;
+
+                    if (firstChannel == null)
                     {
-                        uniqueIdentifier = SelectedChannel.UniqueIdentifier;
-                        SelectedChannel = null;
+                        firstChannel = ch;
                     }
 
-                    await _semaphoreSlim.WaitAsync();
-
-                    var channels = _configuration.GetChannels();
-
-                    _loggingService.Debug($"Clearing channels");
-
-                    var channelsToAdd = new ObservableCollection<Channel>();
-
-                    Channels.Clear();
-
-                    foreach (var channel in channels)
+                    if (uniqueIdentifier == ch.UniqueIdentifier)
                     {
-                        // apply filter:
-                        if (!_configuration.ShowTVChannels && channel.ServiceType == DVBTDriverServiceType.TV)
-                            continue;
-
-                        if (!_configuration.ShowRadioChannels && channel.ServiceType == DVBTDriverServiceType.Radio)
-                            continue;
-
-                        if (!_configuration.ShowOtherChannels && channel.ServiceType == DVBTDriverServiceType.Other)
-                            continue;
-
-                        if (!_configuration.ShowNonFreeChannels && channel.NonFree)
-                            continue;
-
-                        var ch = channel.Clone();
-                        ch.Selected = false;
-
-                        if (firstChannel == null)
-                        {
-                            firstChannel = ch;
-                        }
-
-                        if (uniqueIdentifier == ch.UniqueIdentifier)
-                        {
-                            channelToSelect = ch;
-                        }
-
-                        if (_configuration.LastSelectedChannelUniqueIdentifier == ch.UniqueIdentifier)
-                        {
-                            lastChannel = ch;
-                        }
-
-                        _loggingService.Debug($"Adding channel {ch.Name}");
-
-                        channelsToAdd.Add(ch);
+                        channelToSelect = ch;
                     }
 
+                    if (_configuration.LastSelectedChannelUniqueIdentifier == ch.UniqueIdentifier)
+                    {
+                        lastChannel = ch;
+                    }
+
+                    _loggingService.Debug($"Adding channel {ch.Name}");
+
+                    channelsToAdd.Add(ch);
+                }
+
+                if (channelToSelect == null)
+                {
+                    if (lastChannel != null)
+                    {
+                        channelToSelect = lastChannel;
+                    } else
+                    if (firstChannel != null)
+                    {
+                        channelToSelect = firstChannel;
+                    }
+                }
+
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    //Channels.Clear();
                     Channels = channelsToAdd;
                     _listViewSelector?.SetChannels(Channels);
-
-                    if (channelToSelect == null)
-                    {
-                        if (lastChannel != null)
-                        {
-                            channelToSelect = lastChannel;
-                        } else
-                        if (firstChannel != null)
-                        {
-                            channelToSelect = firstChannel;
-                        }
-                    }
-
-                    _loggingService.Debug($"Channels refreshed");
-                }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex, "Refreshing channels failed");
-                }
-                finally
-                {
-                    _semaphoreSlim.Release();
 
                     SelectedChannel = channelToSelect;
 
@@ -555,8 +544,18 @@ namespace DVBTTelevizor.MAUI
                     Refreshed = true;
 
                     NotifyChannelChange();
-                }
-            });
+                });
+
+                _loggingService.Debug($"Channels refreshed");
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex, "Refreshing channels failed");
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
+            }
         }
 
         public async Task SelectFirstChannel()
