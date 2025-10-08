@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI
@@ -47,7 +48,7 @@ namespace DVBTTelevizor.MAUI
             {
                 var fireNotifyChannelChange = false;
 
-                if (ch.UniqueIdentifier == channel.UniqueIdentifier)
+                if (channel != null && ch.UniqueIdentifier == channel.UniqueIdentifier)
                 {
                     if (!ch.Selected && OnChannelChanged != null)
                     {
@@ -79,7 +80,10 @@ namespace DVBTTelevizor.MAUI
 
             if (fireOnChanged)
             {
-                OnChannelChanged();
+                if (OnChannelChanged != null)
+                {
+                    OnChannelChanged();
+                }
             }
         }
 

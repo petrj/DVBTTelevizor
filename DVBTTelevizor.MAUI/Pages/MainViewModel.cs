@@ -519,7 +519,7 @@ namespace DVBTTelevizor.MAUI
 
                         _loggingService.Debug($"Adding channel {ch.Name}");
 
-                        channelsToAdd.Add(channel);
+                        channelsToAdd.Add(ch);
                     }
 
                     Channels = channelsToAdd;

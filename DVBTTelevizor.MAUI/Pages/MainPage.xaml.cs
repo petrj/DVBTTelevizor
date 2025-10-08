@@ -209,6 +209,7 @@ namespace DVBTTelevizor.MAUI
 
             _channelPage.Disappearing += _channelPage_Disappearing;
             _filterPage.Disappearing += _filterPage_Disappearing;
+            _tuneWelcomePage.Disappearing += _tuneWelcomePage_Disappearing;
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -299,6 +300,14 @@ namespace DVBTTelevizor.MAUI
 
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
+        }
+
+        private void _tuneWelcomePage_Disappearing(object? sender, EventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                await _viewModel.RefreshChannels();
+            });
         }
 
         private void _filterPage_Disappearing(object? sender, EventArgs e)
