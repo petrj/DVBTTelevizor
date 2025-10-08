@@ -171,7 +171,19 @@ namespace DVBTTelevizor.MAUI
                             }
                         }
 
-                        Channels.Add(che.Channel);
+                        // looking for the same channel in already tuned channels
+                        var channelAlreadyTuned = false;
+                        foreach (var tunedChannel in Channels)
+                        {
+                            if (
+                                (tunedChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
+                                (tunedChannel.Frequency == che.Channel.Frequency)
+                               )
+                            {
+                                channelAlreadyTuned = true;
+                                break;
+                            }
+                        }
 
                         if (che.Channel.ProviderName != null)
                         {
@@ -182,9 +194,14 @@ namespace DVBTTelevizor.MAUI
                             _tunedMultiplexes[che.Channel.ProviderName]++;
                         }
 
-                        if (channelAlreadyFound)
+                        if (!channelAlreadyTuned)
                         {
-                            _loggingService.Debug($"Found already tuned channel: \"{che.Channel.Name}\"");
+                            Channels.Add(che.Channel);
+                        }
+
+                        if (channelAlreadyFound || channelAlreadyTuned)
+                        {
+                            _loggingService.Debug($"Found already saved channel: \"{che.Channel.Name}\"");
                             return;
                         }
 
@@ -196,7 +213,6 @@ namespace DVBTTelevizor.MAUI
                         _configuration.SaveChannels(configChannels);
 
                         WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
-
                     }
                     finally
                     {
