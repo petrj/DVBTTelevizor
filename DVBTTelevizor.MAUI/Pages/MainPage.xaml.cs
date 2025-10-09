@@ -396,6 +396,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     await Navigation.PopToRootAsync();
                 });
+
+                Task.Run(async () => await _viewModel.RefreshChannels());
             });
 
             WeakReferenceMessenger.Default.Register<PlayMessage>(this, (r, m) =>
