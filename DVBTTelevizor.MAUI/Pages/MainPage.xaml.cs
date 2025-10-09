@@ -2242,7 +2242,7 @@ namespace DVBTTelevizor.MAUI
                 LastVideoStackLayoutPosition = FullScreenVideoPosition;
             }
 
-            for (int i=5;i>=0;i--)
+            for (int i=8;i>=0;i--)
             {
                 await Task.Delay(250);
 
