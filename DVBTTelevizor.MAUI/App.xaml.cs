@@ -35,7 +35,15 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run(async () =>
                 {
-                    await _mp.FixVideo(true);
+                    if (_mp.PlayingState != PlayingStateEnum.Stopped)
+                    {
+                        await _mp.FixVideo(true);
+                    }
+                    else
+                    {
+                        _mp.SetFixVideNeeded();
+                    }
+
                     await _mp.CheckDriverInstallationChange();
                     await _mp.FocusSelectedChannel();
                 });

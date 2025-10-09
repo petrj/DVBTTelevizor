@@ -302,6 +302,11 @@ namespace DVBTTelevizor.MAUI
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
         }
 
+        public void SetFixVideNeeded()
+        {
+            _fixVideoNeeded = true;
+        }
+
         private void _tuneWelcomePage_Disappearing(object? sender, EventArgs e)
         {
             Task.Run(async () =>
@@ -667,6 +672,11 @@ namespace DVBTTelevizor.MAUI
                     videoView.MediaPlayer.SetSpu(_viewModel.Subtitles);
                 }
                 */
+
+                // check video position
+
+                var pos = videoView.Bounds;
+                _loggingService.Debug($"VideoStackLayout.Bounds: {VideoStackLayout.Bounds}");
 
             }
             catch (Exception ex)
@@ -1151,7 +1161,7 @@ namespace DVBTTelevizor.MAUI
                             break;
                     }
 
-                    if (_fixVideoNeeded)
+                    if (_fixVideoNeeded && PlayingState != PlayingStateEnum.Stopped)
                     {
                         _fixVideoNeeded = false;
                         await FixVideo(true);
@@ -1242,7 +1252,14 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug("OnAppearing");
 
-            _fixVideoNeeded = true;
+            if (PlayingState != PlayingStateEnum.Stopped)
+            {
+                Task.Run(async ()=> await FixVideo(true));
+            }
+            else
+            {
+                SetFixVideNeeded();
+            }
 
             base.OnAppearing();
 
@@ -2158,12 +2175,12 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
-                PlayingState = PlayingStateEnum.Playing;
-
+                //_fixVideoNeeded = true;
                 _checkStreamEnabled = true;
                 _refreshGUIEnabled = true;
 
-                RefreshGUI();
+                PlayingState = PlayingStateEnum.Playing;
+                //RefreshGUI();
             }
         }
 
@@ -2199,6 +2216,8 @@ namespace DVBTTelevizor.MAUI
         /// <returns></returns>
         public async Task FixVideo(bool force)
         {
+            _loggingService.Info($"FixVideo: {force}");
+
             if (_mediaPlayer == null)
                 return;
 
