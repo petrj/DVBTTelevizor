@@ -555,6 +555,9 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 _semaphoreSlim.Release();
+
+                WeakReferenceMessenger.Default.Send(new SelectedChannelChangedMessage(channelToSelect));
+
             }
         }
 
@@ -1023,14 +1026,6 @@ namespace DVBTTelevizor.MAUI
                 };
             }
         }
-
-
-
-        public void OnAppearing()
-        {
-            _loggingService.Info("OnAppearing");
-        }
-
 
         public Channel PlayingChannel
         {

@@ -353,6 +353,11 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<SelectedChannelChangedMessage>(this, (r, m) =>
+            {
+                Task.Run(async () => await FocusSelectedChannel());
+            });
+
             WeakReferenceMessenger.Default.Register<ToastMessage>(this, (r, m) =>
             {
                 WeakReferenceMessenger.Default.Send(new SizedToastMessage(
@@ -858,19 +863,30 @@ namespace DVBTTelevizor.MAUI
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
         }
 
+        public async Task FocusSelectedChannel()
+        {
+            _viewModel.NotifyChannelChange();
+
+
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                if (_viewModel.SelectedChannel == null)
+                {
+                    return;
+                }
+
+                _viewModel.SelectedChannel.Focused = true;
+                _viewModel.SelectedChannel.NotifyChanges();
+
+                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+            });
+        }
+
         private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
         {
             if (_focusItems.FocusedItemName == "ChannelsListView")
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    if (_viewModel.SelectedChannel != null)
-                    {
-                        _viewModel.SelectedChannel.Focused = true;
-                        _viewModel.SelectedChannel.NotifyChanges();
-                    }
-                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, false);
-                });
+                Task.Run(async () => await FocusSelectedChannel());
             }
 
             _viewModel.EPGDetailFocused = (_focusItems.FocusedItemName == "EPGDetailGrid");
@@ -1230,10 +1246,6 @@ namespace DVBTTelevizor.MAUI
 
             base.OnAppearing();
 
-            _focusItems.DeFocusAll();
-
-            _viewModel.OnAppearing();
-
             if (_firstAppearing)
             {
                 if (_configuration.Fullscreen)
@@ -1265,6 +1277,8 @@ namespace DVBTTelevizor.MAUI
                     });
                 });
             }
+            _focusItems.DeFocusAll();
+
         }
 
         private void ConnectDriver()
@@ -1582,9 +1596,7 @@ namespace DVBTTelevizor.MAUI
                     if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
                         _viewModel.SelectNextChannel();
-                        //_viewModel.SelectedChannel = _viewModel.GetChannelByUniqueidentifier(_configuration.LastSelectedChannelUniqueIdentifier);
-                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, false);
-                        _loggingService.Info($"... scrolled");
+                        await FocusSelectedChannel();
                     }
                     else
                     if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -1634,7 +1646,7 @@ namespace DVBTTelevizor.MAUI
                 if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
                         _viewModel.SelectPreiousChannel();
-                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.MakeVisible, false);
+                        await FocusSelectedChannel();
                     }
                     else
                 if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -1677,9 +1689,6 @@ namespace DVBTTelevizor.MAUI
             if (videoView == null || videoView.MediaPlayer == null)
                 return;
 
-            //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
-            //_viewModel.EPGDetailEnabled = false;
-
             if (!force && (PlayingState == PlayingStateEnum.Playing))
             {
                 PlayingState = PlayingStateEnum.PlayingInPreview;
@@ -1714,22 +1723,12 @@ namespace DVBTTelevizor.MAUI
                     _viewModel.PlayingChannel.AudioTracks.Clear();
                 }
 
-                //MessagingCenter.Send("", BaseViewModel.MSG_StopPlayInBackgroundNotification);
             }
 
             //_focusItems.DeFocusAll();
             _focusItems.FocusItem("ChannelsListView");
-            _viewModel.NotifyChannelChange();
-
-            if (_viewModel.SelectedChannel != null)
-            {
-                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
-            }
-
-            //_viewModel.SelectedToolbarItemName = null;
-            //_viewModel.SelectedPart = SelectedPartEnum.ChannelsListOrVideo;
-            //_viewModel.NotifyMediaChange();
-        }
+            await FocusSelectedChannel();
+       }
 
         public async Task ActionRecord(Channel channel = null)
         {
@@ -2184,7 +2183,7 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info("Action not completed!");
             }
         }
-        public void CheckDriverInstallationChange()
+        public async Task CheckDriverInstallationChange()
         {
             if (!_driver.DriverInstalled)
             {
@@ -2731,11 +2730,7 @@ namespace DVBTTelevizor.MAUI
                         if ((selectedChannel != null) && (_numberPressed == selectedChannel.Number))
                         {
                             await ActionPlay(selectedChannel);
-                            _viewModel.NotifyChannelChange();
-                            await MainThread.InvokeOnMainThreadAsync(async () =>
-                            {
-                                ChannelsListView.ScrollTo(selectedChannel, ScrollToPosition.MakeVisible, false);
-                            });
+                            await FocusSelectedChannel();
                         }
                     });
                 }
