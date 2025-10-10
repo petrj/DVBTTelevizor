@@ -6,11 +6,14 @@ Script for creating AAB/APK release for publishing to Google Play
 
      1) DVBTTelevizor.MAUI\Platforms\Android\AndroidManifest.xml
   
-        <uses-feature android:name="android.software.leanback" android:required="true" />
+			<uses-feature android:name="android.software.leanback" android:required="true" />
+			<uses-feature android:name="android.hardware.faketouch" android:required="false" />
+			<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
  
      2) DVBTTelevizor.MAUI\Platforms\Android\MainActivity.cs
  
         [IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
+
 
     Do not include AndroidTV modifications to non-Android TV release!
 
