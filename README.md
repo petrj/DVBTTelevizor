@@ -10,7 +10,7 @@ Využívá ovladač "DVB-T Driver": https://play.google.com/store/apps/details?i
 - zdarma a bez reklam
 - podpora DVBT a DVBT2
 - podpora klávesnic a dálkových ovladačů připojených jako klávesnice (usb, bluetooth)
-- nahrávání vysílání do interního úložiště
+- nahrávání vysílání (interní i externí úložiště)
 - automatické i ruční ladění
 - možnost importovat/exportovat naladěné kanály
 - EPG pro právě probíhající/následující program (bez podpory čínských znaků)
@@ -30,7 +30,7 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - free with no ads
 - DVBT and DVBT2 support
 - supporting external keyboards and remote controls connected as keyboard (usb, bluetooth)
-- recording to internal storage
+- recording 
 - automatic and manual tuning
 - possibility to export/import tuned channels
 - EPG for current/next program (chinese characters are not supported)
@@ -49,3 +49,4 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot5.png" width="400" alt="Screenshot5"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot6.png" width="400" alt="Screenshot6"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/Screenshot7.png" width="400" alt="Screenshot7"/>
+
