@@ -88,6 +88,7 @@
 
 	<ItemGroup>
 	  <None Remove="Platforms\Android\NLog.config" />
+	  <None Remove="Platforms\Android\Resources\mipmap-xxhdpi\banner.png" />
 	  <None Remove="Platforms\Android\Resources\values\styles.xml" />
 	</ItemGroup>
 
