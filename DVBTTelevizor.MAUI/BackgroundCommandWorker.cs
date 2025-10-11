@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
@@ -15,29 +16,40 @@ namespace DVBTTelevizor
         /// <param name="delaySeconds">start delay</param>
         public static void RunInBackground(Command command, int repeatIntervalSeconds = 5, int delaySeconds = 0)
         {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-
-                Thread.Sleep(delaySeconds * 1000);
-
-                do
+                new Thread(() =>
                 {
-                    MainThread.BeginInvokeOnMainThread(async () =>
+                    try
                     {
-                        command.Execute(null);
-                    });
 
-                    if (repeatIntervalSeconds <= 0)
-                    {
-                        break;
+
+                        Thread.CurrentThread.IsBackground = true;
+
+                        Thread.Sleep(delaySeconds * 1000);
+
+                        do
+                        {
+                            MainThread.BeginInvokeOnMainThread(async () =>
+                            {
+                                command.Execute(null);
+                            });
+
+                            if (repeatIntervalSeconds <= 0)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Thread.Sleep(repeatIntervalSeconds * 1000);
+                            }
+                        } while (true);
+
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Thread.Sleep(repeatIntervalSeconds * 1000);
+                        Debug.WriteLine(ex);
                     }
-                } while (true);
-            }).Start();
+
+                }).Start();
         }
     }
 }

@@ -34,7 +34,7 @@
                         FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
                         FontAttributes="Bold"
                         HorizontalTextAlignment="Start"
-                        VerticalOptions="Center"
+                        VerticalOptions="Start"
                         TextColor="White"
                         Margin="0,0,0,0"
                         />
