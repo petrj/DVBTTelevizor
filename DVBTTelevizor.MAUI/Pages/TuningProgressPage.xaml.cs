@@ -331,7 +331,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             "menuContinue");
         } else
         {
-            _viewModel.StartTune();
+            await _viewModel.StartTune();
         }
     }
 
@@ -346,7 +346,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage ContinueButton_Clicked");
 
-        _viewModel.StartTune();
+        Task.Run(async () =>
+        {
+            await _viewModel.StartTune();
+        });
     }
 
     private void BackButton_Clicked(object sender, EventArgs e)
@@ -448,12 +451,12 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             case "menuFromBeginning":
                 _viewModel.ResetTune(true);
-                _viewModel.StartTune();
+                await _viewModel.StartTune();
                 break;
 
             case "menuContinue":
             case "menuRetryTune":
-                _viewModel.StartTune();
+                await _viewModel.StartTune();
                 break;
 
             case "menuDriver":

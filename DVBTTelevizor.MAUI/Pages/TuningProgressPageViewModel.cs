@@ -255,7 +255,7 @@ namespace DVBTTelevizor.MAUI
             NotifyChange();
         }
 
-        public async void StartTune()
+        public async Task StartTune()
         {
             if (State == TuneStateEnum.Inactive)
             {
@@ -375,6 +375,7 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info("Tuning finished");
                 NotifyChange();
             }
+
         }
 
         private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
@@ -555,11 +556,11 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void NotifyChange()
+        public async void NotifyChange()
         {
             //_loggingService.Debug("NotifyChange");
 
-            MainThread.BeginInvokeOnMainThread(async () =>
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 OnPropertyChanged(nameof(FrequencyKHz));
                 OnPropertyChanged(nameof(FrequencyWholePartMHz));
