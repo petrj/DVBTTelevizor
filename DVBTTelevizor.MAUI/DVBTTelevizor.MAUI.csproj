@@ -31,10 +31,10 @@
 		Value 2025003 is too big for Windows
 		-->
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationDisplayVersion>2025027</ApplicationDisplayVersion>
-		<ApplicationVersion>2025027</ApplicationVersion>
-		<VersionCode>2025027</VersionCode>
-		<VersionName>2025027</VersionName>
+		<ApplicationDisplayVersion>2025028</ApplicationDisplayVersion>
+		<ApplicationVersion>2025028</ApplicationVersion>
+		<VersionCode>2025028</VersionCode>
+		<VersionName>2025028</VersionName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
