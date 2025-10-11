@@ -1745,8 +1745,12 @@ namespace DVBTTelevizor.MAUI
             }
 
             //_focusItems.DeFocusAll();
+
+            var doNotAutomaticallyShowEPGDetail = _viewModel.DoNotAutomaticallyShowEPGDetail;
+            _viewModel.DoNotAutomaticallyShowEPGDetail = true;
             _focusItems.FocusItem("ChannelsListView");
             await FocusSelectedChannel();
+            _viewModel.DoNotAutomaticallyShowEPGDetail = doNotAutomaticallyShowEPGDetail;
        }
 
         public async Task ActionRecord(Channel channel = null)

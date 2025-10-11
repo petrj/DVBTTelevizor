@@ -252,9 +252,8 @@
           RefreshCommand="{Binding RefreshCommand}"
           IsRefreshing="{Binding IsRefreshing}"
           Style="{StaticResource ListViewStyle}"
-          SelectedItem="{Binding SelectedChannel, Mode=TwoWay}"
           IsVisible="{Binding ChannelsListViewVisible}"
-          SelectionMode="Single"
+          SelectionMode="None"
           HasUnevenRows="True"
           ItemSelected="ChannelsListView_ItemSelected">
 
