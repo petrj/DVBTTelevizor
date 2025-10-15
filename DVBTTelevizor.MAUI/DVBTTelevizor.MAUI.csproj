@@ -176,10 +176,6 @@
 	  </Compile>
 	</ItemGroup>
 
-   <ItemGroup>
-	 <AndroidAsset Include="Resources\Raw\Czech.lng" />
-   </ItemGroup>
-
 	<ItemGroup>
 	  <MauiXaml Update="Menu.xaml">
 	    <Generator>MSBuild:Compile</Generator>
