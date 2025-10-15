@@ -80,6 +80,10 @@ namespace DVBTTelevizor.MAUI
                     return Convert.ToInt32(Math.Round(normalSize * 1.75));
                 case AppFontSizeEnum.Huge:
                     return Convert.ToInt32(Math.Round(normalSize * 2.0));
+                case AppFontSizeEnum.HugePlus:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.20));
+                case AppFontSizeEnum.HugeTriplePLus:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.50));
                 default: return normalSize;
             }
         }

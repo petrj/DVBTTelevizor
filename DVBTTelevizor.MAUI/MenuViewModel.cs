@@ -39,6 +39,10 @@ namespace DVBTTelevizor.MAUI
                     return Convert.ToInt32(Math.Round(normalSize * 1.75));
                 case 5:
                     return Convert.ToInt32(Math.Round(normalSize * 2.0));
+                case 6:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.25));
+                case 7:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.5));
                 default: return normalSize;
             }
         }

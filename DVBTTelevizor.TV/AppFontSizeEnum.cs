@@ -11,6 +11,9 @@ namespace DVBTTelevizor
         Big = 2,
         Bigger = 3,
         VeryBig = 4,
-        Huge = 5
+        Huge = 5,
+        HugePlus = 6,
+        HugeTriplePLus = 7
+
     }
 }
