@@ -3354,8 +3354,8 @@ namespace DVBTTelevizor.MAUI
                 else
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuPlay", "Play".Translated(), "play.png"));
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
                 }
+                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
 
                 if (_viewModel.EPGDetailVisible)
                 {
