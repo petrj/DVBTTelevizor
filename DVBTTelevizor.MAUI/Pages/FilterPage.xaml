@@ -104,46 +104,77 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
+        <ScrollView AbsoluteLayout.LayoutBounds="0.0, 0.0, 1.0, 1.0" AbsoluteLayout.LayoutFlags="All" x:Name="SettingsScrollView" Margin="10,10,10,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-        <Grid Margin="30,10,10,0" AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.75, 0.75" AbsoluteLayout.LayoutFlags="All">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70*" />
-                <ColumnDefinition Width="30*" />
-            </Grid.ColumnDefinitions>
+            <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
 
-            <BoxView x:Name="ShowTVChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+                <StackLayout Margin="0,0,0,10">
 
-            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show TV Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-            <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}" />
+                    <Grid Margin="30,10,10,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
 
-            <BoxView x:Name="ShowRadioChannelsBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+                        <BoxView x:Name="ShowTVChannelsBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
-            <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Show Radio Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-            <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch"  IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Show TV Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="ShowTVSwitch"  IsToggled="{Binding Config.ShowTVChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}" />
 
-            <BoxView x:Name="ShowNonFreeChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+                        <BoxView x:Name="ShowRadioChannelsBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
-            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Show Non Free Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <BoxView Grid.Row="2" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-            <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowNonFreeSwitch"  IsToggled="{Binding Config.ShowNonFreeChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+                        <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Show Radio Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="1" Grid.Column="1" x:Name="ShowRadioSwitch"  IsToggled="{Binding Config.ShowRadioChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
-            <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+                        <BoxView x:Name="ShowNonFreeChannelsBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
-            <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Show Other Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <BoxView Grid.Row="3" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-            <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
-        </Grid>
+                        <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Show Non Free Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="2" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="2" Grid.Column="1" x:Name="ShowNonFreeSwitch"  IsToggled="{Binding Config.ShowNonFreeChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+
+                        <BoxView x:Name="ShowOtherChannelsBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                        <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Show Other Channels'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="3" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="3" Grid.Column="1" x:Name="ShowOtherSwitch"  IsToggled="{Binding Config.ShowOtherChannels, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
+                    </Grid>
+
+                    <Label Margin="10,20,10,10" Text="{local:LngXamlExt Input='Multiplexes'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+
+                    <StackLayout Margin="10,10,10,0" BindableLayout.ItemsSource="{Binding Multiplexes, Mode=OneWay}" x:Name="MultiplexesStackLayout" BackgroundColor="Transparent">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="30,10,10,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70*" />
+                                        <ColumnDefinition Width="30*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="{Binding BackgroundColor}" Margin="-5,-5,-5,-5"/>
+
+                                    <Label  Grid.Row="0" Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Style="{DynamicResource LabelStyle}" FontSize="{Binding Source={x:Reference MultiplexesStackLayout}, Path=BindingContext.FontSizeForLabel}" />
+                                    <Switch Grid.Row="0" Grid.Column="1" IsToggled="{Binding IsEnabled, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}" />
+                                </Grid>
+
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
 
 
-
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
     </AbsoluteLayout>
 
 </ContentPage>
