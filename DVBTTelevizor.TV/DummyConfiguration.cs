@@ -41,6 +41,7 @@ namespace DVBTTelevizor.TV
         public bool WriteToExternalDevice { get; set; } = false;
         public string ExternalDevicePath { get; set; } = String.Empty;
         public string ExternalDevicePathUri { get; set; } = String.Empty;
+        public string FilteredMultiplexes { get; set; } = String.Empty;
 
         public string OutputDirectory { get; } = String.Empty;
 

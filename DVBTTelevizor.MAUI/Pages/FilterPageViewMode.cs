@@ -23,9 +23,45 @@ namespace DVBTTelevizor.MAUI
             _loggingService = loggingService;
         }
 
+        public void UpdateFilter()
+        {
+            _loggingService.Debug("UpdateFilter");
+
+            try
+            {
+                var filters = new List<string>();
+                foreach (var m in Multiplexes)
+                {
+                    if (!m.IsEnabled)
+                    {
+                        filters.Add(m.Name.Replace(";", ":"));
+                    }
+                }
+
+                var filter = string.Join(";", filters);
+
+                _loggingService.Debug($"Setting filter: {filter}");
+
+                _configuration.FilteredMultiplexes = filter;
+            }
+            catch (Exception ex)
+            {
+              _loggingService.Error(ex);
+            }
+        }
+
         public void FillMultiplexes()
         {
             _loggingService.Debug("FilterPageViewModel FillMultiplexes");
+
+            List<string> filteredChannels = new List<string>();
+            if (!string.IsNullOrWhiteSpace(_configuration.FilteredMultiplexes))
+            {
+                foreach (var f in _configuration.FilteredMultiplexes.Split(";"))
+                {
+                    filteredChannels.Add(f);
+                }
+            }
 
             try
             {
@@ -39,6 +75,7 @@ namespace DVBTTelevizor.MAUI
                     if (!nameToInfo.ContainsKey(ch.ProviderName))
                     {
                         var info = new MultiplexInfo(ch.ProviderName);
+                        info.IsEnabled = !filteredChannels.Contains(ch.ProviderName.Replace(";",":"));
 
                         nameToInfo.Add(ch.ProviderName, info);
                         Multiplexes.Add(info);
@@ -63,6 +100,31 @@ namespace DVBTTelevizor.MAUI
                 if (notify)
                     mux.NotifyChanges();
             }
+        }
+
+        public MultiplexInfo GetSelectedMultiplex()
+        {
+            foreach (var mi in Multiplexes)
+            {
+                if (mi.Selected)
+                    return mi;
+            }
+
+            return null;
+        }
+
+        public bool SelectedFirst()
+        {
+            foreach (var mux in Multiplexes)
+            {
+                if (mux.Selected)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
         }
 
         public bool SelectedLast()

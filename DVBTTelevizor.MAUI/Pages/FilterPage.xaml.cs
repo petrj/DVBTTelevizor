@@ -54,13 +54,26 @@ public partial class FilterPage : ContentPage, IOnKeyDown
         {
             if (_focusItems.FocusedItemName == "Multiplexes")
             {
-                _filterPageViewModel.SelectNext();
+                if (_focusItems.LastFocusDirection == KeyboardFocusDirection.Previous)
+                {
+                    _filterPageViewModel.SelectNext(true);
+                } else
+                {
+                    _filterPageViewModel.SelectNext();
+                }
             }
             else
             {
                 _filterPageViewModel.DeSelectAll(true);
             }
         });
+    }
+
+    protected override void OnDisappearing()
+    {
+        _filterPageViewModel.UpdateFilter();
+
+        base.OnDisappearing();
     }
 
     protected override void OnAppearing()
@@ -109,7 +122,20 @@ public partial class FilterPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem(true);
+                    if (_focusItems.FocusedItemName == "Multiplexes")
+                    {
+                        if (_filterPageViewModel.SelectedFirst())
+                        {
+                            _focusItems.FocusPreviousItem(true);
+                        }
+                        else
+                        {
+                            _filterPageViewModel.SelectNext(true);
+                        }
+                    } else
+                    {
+                        _focusItems.FocusPreviousItem(true);
+                    }
                 });
                 break;
 
@@ -144,6 +170,10 @@ public partial class FilterPage : ContentPage, IOnKeyDown
                         case "ShowOtherChannels":
                             ShowOtherSwitch.IsToggled = !ShowOtherSwitch.IsToggled;
                             break;
+
+                        case "Multiplexes":
+                            OnKeyBoardMultiplexToggled();
+                            break;
                     }
                 });
                 break;
@@ -177,5 +207,13 @@ public partial class FilterPage : ContentPage, IOnKeyDown
         //WeakReferenceMessenger.Default.Send(new OpenMailMessage(null));
     }
 
+    private void Switch_Toggled(object sender, ToggledEventArgs e)
+    {
+        _filterPageViewModel.UpdateFilter();
+    }
 
+    public void OnKeyBoardMultiplexToggled()
+    {
+        _filterPageViewModel.UpdateFilter();
+    }
 }

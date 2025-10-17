@@ -736,5 +736,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<string>("SledovaniTVDevicePassword", value);
             }
         }
+
+        public string FilteredMultiplexes
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("FilteredMultiplexes");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("FilteredMultiplexes", value);
+            }
+        }
     }
 }

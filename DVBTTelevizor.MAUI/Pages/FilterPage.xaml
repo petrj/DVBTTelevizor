@@ -164,7 +164,7 @@
                                     <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="{Binding BackgroundColor}" Margin="-5,-5,-5,-5"/>
 
                                     <Label  Grid.Row="0" Grid.Column="0" Text="{Binding Name, Mode=OneWay}" Style="{DynamicResource LabelStyle}" FontSize="{Binding Source={x:Reference MultiplexesStackLayout}, Path=BindingContext.FontSizeForLabel}" />
-                                    <Switch Grid.Row="0" Grid.Column="1" IsToggled="{Binding IsEnabled, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}" />
+                                    <Switch Grid.Row="0" Grid.Column="1" IsToggled="{Binding IsEnabled, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}" Toggled="Switch_Toggled" />
                                 </Grid>
 
                             </DataTemplate>

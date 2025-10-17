@@ -480,6 +480,15 @@ namespace DVBTTelevizor.MAUI
 
                 var channelsToAdd = new ObservableCollection<Channel>();
 
+                List<string> filteredChannels = new List<string>();
+                if (!string.IsNullOrWhiteSpace(_configuration.FilteredMultiplexes))
+                {
+                    foreach (var f in _configuration.FilteredMultiplexes.Split(";"))
+                    {
+                        filteredChannels.Add(f);
+                    }
+                }
+
                 foreach (var channel in channels)
                 {
                     // apply filter:
@@ -494,6 +503,12 @@ namespace DVBTTelevizor.MAUI
 
                     if (!_configuration.ShowNonFreeChannels && channel.NonFree)
                         continue;
+
+                    if (channel.ProviderName != null)
+                    {
+                        if (filteredChannels.Contains(channel.ProviderName.Replace(";", ":")))
+                            continue;
+                    }
 
                     var ch = channel.Clone();
                     ch.Selected = false;
