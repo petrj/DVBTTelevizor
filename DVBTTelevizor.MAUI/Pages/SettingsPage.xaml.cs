@@ -131,6 +131,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessPort", new List<View>() { RemoteAccessPortBoxView, PortEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessSecurityKey", new List<View>() { RemoteAccessSecurityKeyBoxView, SecurityKeyEntry }))
 
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessAppLink", new List<View>() { RemoteAccessAppLinkBoxView }))
+
+
+
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectDriver", new List<View>() { DriverBoxView, DriverPicker }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("WriteToExternalDevice", new List<View>() { WriteToExternalDeviceSwitchBoxView, WriteToExternalDeviceSwitch }))
@@ -388,7 +392,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void OnRemoteTelevizorLabelTapped(object sender, TappedEventArgs e)
     {
-
+        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://play.google.com/store/apps/details?id=net.petrjanousek.RemoteTelevizor"));
     }
 
     public static void ShowPicker(Picker picker)
@@ -585,6 +589,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
                         case "RemoteAccessSecurityKey":
                             SecurityKeyEntry.Focus();
+                            break;
+
+                        case "RemoteAccessAppLink":
+                            OnRemoteTelevizorLabelTapped(this, null);
                             break;
 
                         case "SelectDriver":

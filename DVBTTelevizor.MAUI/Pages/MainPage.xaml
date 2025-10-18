@@ -174,6 +174,12 @@
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
             </Style>
 
+            <Style x:Key="ProgressStyle" TargetType="ProgressBar">
+                <Setter Property="BackgroundColor" Value="#222222"/>
+                <Setter Property="ProgressColor" Value="White"/>
+            </Style>
+
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -230,7 +236,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" BackgroundColor="{Binding EPGProgressBackgroundColor}" />
+                <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" Style="{DynamicResource ProgressStyle}" />
             </Grid>
 
             <ScrollView x:Name="SelectedChannelEPGDescriptionScrollView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Margin="5,5,5,5" VerticalScrollBarVisibility="Always" >
@@ -292,7 +298,7 @@
 
                                 <Label Grid.Row="3" Grid.Column="2"  Grid.ColumnSpan="3" Text="{Binding ProviderNameAndFrequencyShortLabel}" Style="{DynamicResource ProviderNameTextStyle}" FontSize="{Binding Source={x:Reference ChannelsListView}, Path=BindingContext.FontSizeForDetailNote}" TextColor="{Binding ChannelTextLabelColor}"/>
 
-                                <ProgressBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Progress="{Binding CurrentEPGEventProgress}" ProgressColor="#41b3ff" BackgroundColor="White"/>
+                                <ProgressBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Style="{DynamicResource ProgressStyle}" Progress="{Binding CurrentEPGEventProgress}" />
                                 <Grid.Behaviors>
                                     <toolkit:TouchBehavior
                                         LongPressCompleted="OnChannel_LongTapped"

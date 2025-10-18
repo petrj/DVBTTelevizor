@@ -88,7 +88,7 @@
 
             <Style x:Key="LinkStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
-                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
             </Style>
 
@@ -284,6 +284,8 @@
                                     </Image.GestureRecognizers>
                                 </Image>
                                 <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='For remote access use application:'}" Style="{StaticResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+
+                                <BoxView x:Name="RemoteAccessAppLinkBoxView" Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
                                 <Label Grid.Row="0" Grid.Column="1" Text="Remote Televizor" Style="{StaticResource LinkStyle}" FontSize="{Binding FontSizeForDetailNote}" >
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnRemoteTelevizorLabelTapped" NumberOfTapsRequired="1" />

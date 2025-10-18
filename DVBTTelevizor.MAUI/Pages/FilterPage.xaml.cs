@@ -9,7 +9,7 @@ namespace DVBTTelevizor.MAUI;
 
 public partial class FilterPage : ContentPage, IOnKeyDown
 {
-    private FilterPageViewModel _aboutPageViewModel;
+    private FilterPageViewModel _filterPageViewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -27,7 +27,7 @@ public partial class FilterPage : ContentPage, IOnKeyDown
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        BindingContext = _aboutPageViewModel = new FilterPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _filterPageViewModel = new FilterPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -41,15 +41,49 @@ public partial class FilterPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowRadioChannels", new List<View>() { ShowRadioChannelsBoxView, ShowRadioSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowNonFreeChannels", new List<View>() { ShowNonFreeChannelsBoxView, ShowNonFreeSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ShowOtherChannels", new List<View>() { ShowOtherChannelsBoxView, ShowOtherSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Multiplexes", new List<View>() { MultiplexesStackLayout }))
+
             ;
 
-        //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
+        _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
+    }
+
+    private void _focusItems_OnItemFocusedEvent(KeyboardFocusableItemEventArgs _args)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            if (_focusItems.FocusedItemName == "Multiplexes")
+            {
+                if (_focusItems.LastFocusDirection == KeyboardFocusDirection.Previous)
+                {
+                    _filterPageViewModel.SelectNext(true);
+                } else
+                {
+                    _filterPageViewModel.SelectNext();
+                }
+            }
+            else
+            {
+                _filterPageViewModel.DeSelectAll(true);
+            }
+        });
+    }
+
+    protected override void OnDisappearing()
+    {
+        _filterPageViewModel.UpdateFilter();
+
+        base.OnDisappearing();
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _filterPageViewModel.FillMultiplexes();
+        });
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
@@ -66,7 +100,21 @@ public partial class FilterPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusNextItem(true);
+                    if (_focusItems.FocusedItemName == "Multiplexes")
+                    {
+                        if (_filterPageViewModel.SelectedLast())
+                        {
+                            _focusItems.FocusNextItem(true);
+                        }
+                        else
+                        {
+                            _filterPageViewModel.SelectNext();
+                        }
+                    }
+                    else
+                    {
+                        _focusItems.FocusNextItem(true);
+                    }
                 });
                 break;
 
@@ -74,7 +122,20 @@ public partial class FilterPage : ContentPage, IOnKeyDown
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem(true);
+                    if (_focusItems.FocusedItemName == "Multiplexes")
+                    {
+                        if (_filterPageViewModel.SelectedFirst())
+                        {
+                            _focusItems.FocusPreviousItem(true);
+                        }
+                        else
+                        {
+                            _filterPageViewModel.SelectNext(true);
+                        }
+                    } else
+                    {
+                        _focusItems.FocusPreviousItem(true);
+                    }
                 });
                 break;
 
@@ -109,6 +170,10 @@ public partial class FilterPage : ContentPage, IOnKeyDown
                         case "ShowOtherChannels":
                             ShowOtherSwitch.IsToggled = !ShowOtherSwitch.IsToggled;
                             break;
+
+                        case "Multiplexes":
+                            OnKeyBoardMultiplexToggled();
+                            break;
                     }
                 });
                 break;
@@ -142,5 +207,13 @@ public partial class FilterPage : ContentPage, IOnKeyDown
         //WeakReferenceMessenger.Default.Send(new OpenMailMessage(null));
     }
 
+    private void Switch_Toggled(object sender, ToggledEventArgs e)
+    {
+        _filterPageViewModel.UpdateFilter();
+    }
 
+    public void OnKeyBoardMultiplexToggled()
+    {
+        _filterPageViewModel.UpdateFilter();
+    }
 }

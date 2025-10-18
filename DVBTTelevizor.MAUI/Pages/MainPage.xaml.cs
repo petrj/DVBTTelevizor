@@ -144,6 +144,7 @@ namespace DVBTTelevizor.MAUI
                 await ExtractAssetFile("Japanese_AI.lng");
                 await ExtractAssetFile("Vietnamese_AI.lng");
                 await ExtractAssetFile("Greek_AI.lng");
+                await ExtractAssetFile("Thai_AI.lng");
 
                 // language
                 Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
@@ -3353,8 +3354,8 @@ namespace DVBTTelevizor.MAUI
                 else
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuPlay", "Play".Translated(), "play.png"));
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
                 }
+                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
 
                 if (_viewModel.EPGDetailVisible)
                 {
