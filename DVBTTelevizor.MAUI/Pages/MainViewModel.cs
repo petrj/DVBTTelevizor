@@ -453,6 +453,50 @@ namespace DVBTTelevizor.MAUI
         }
 
 
+        public async Task SledovaniTVUpdateChannelUrls(ObservableCollection<Channel> channels)
+        {
+            _loggingService.Info("SledovaniTVUpdateChannelUrls");
+
+            if (!_configuration.SledovaniTVEnabled)
+                return;
+
+            try
+            {
+                var iptvChannels = await _iptv.GetChannels();
+
+                var updated = false;
+
+                foreach (var iptvChannel in iptvChannels)
+                {
+                    // searching for online channel with the same id
+                    foreach (var channel in channels)
+                    {
+                        if ((channel.ChannelType == ChannelTypeEnum.SledovaniTV) && (channel.ChannelId == iptvChannel.ChannelId))
+                        {
+                            // update
+
+                            if (iptvChannel.Url != null)
+                            {
+                                updated = true;
+                                channel.Url = iptvChannel.Url;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (updated)
+                {
+                    _loggingService.Info("SledovaniTVUpdateChannelUrls: saving channels");
+                    _configuration.SaveChannels(channels);
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         public async Task RefreshChannels()
         {
             _loggingService.Debug($"Refreshing channels");
@@ -544,6 +588,8 @@ namespace DVBTTelevizor.MAUI
                         channelToSelect = firstChannel;
                     }
                 }
+
+                await SledovaniTVUpdateChannelUrls(channels);
 
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
