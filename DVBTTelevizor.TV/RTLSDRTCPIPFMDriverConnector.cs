@@ -501,7 +501,7 @@ namespace DVBTTelevizor.TV
                 };
             }
 
-            _demodulator.ClearBuffer();
+            //_demodulator.ClearBuffer();
 
             for (var i = 0; i < 15; i++)
             {

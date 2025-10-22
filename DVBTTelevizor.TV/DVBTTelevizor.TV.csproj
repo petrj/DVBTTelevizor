@@ -11,14 +11,14 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
     <PackageReference Include="MPEGTS" Version="1.0.26" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="RTLSDR" Version="1.0.1" />
+    <PackageReference Include="RTLSDR.Common" Version="1.0.1" />
+    <PackageReference Include="RTLSDR.FM" Version="1.0.1" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DVBTTelevizor.Driver\DVBTTelevizor.Driver.csproj" />
-    <ProjectReference Include="..\RTLSDR.Common\RTLSDR.Common.csproj" />
-    <ProjectReference Include="..\RTLSDR.FM\RTLSDR.FM.csproj" />
-    <ProjectReference Include="..\RTLSDR\RTLSDR.csproj" />
   </ItemGroup>
 
 </Project>
