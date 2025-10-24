@@ -49,7 +49,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("ManualFM", new List<View>() { AutoFMScanButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("TuneFM", new List<View>() { TuneFMButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -117,6 +120,12 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                             break;
                         case "Tune":
                             TuneButton_Clicked(this, new EventArgs());
+                            break;
+                        case "ManualFM":
+                            AutoFMScanButton_Clicked(this, new EventArgs());
+                            break;
+                        case "TuneFM":
+                            TuneFMButton_Clicked(this, new EventArgs());
                             break;
                     }
                 });
@@ -215,5 +224,13 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         });
     }
 
+    private void AutoFMScanButton_Clicked(object sender, EventArgs e)
+    {
 
+    }
+
+    private void TuneFMButton_Clicked(object sender, EventArgs e)
+    {
+
+    }
 }
