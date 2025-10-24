@@ -29,8 +29,8 @@ namespace DVBTTelevizor
         public long DeviceFrequencyMinKHz { get; set; } = 474000;
         public long DeviceFrequencyMaxKHz { get; set; } = 852000;
 
-        public static long DefaultDVBTFrequencyMinKHz { get; set; } = 474000;
-        public static long DefaultDVBTFrequencyMaxKHz { get; set; } = 852000;
+        public static long DefaultFrequencyMinKHz { get; set; } = 474000;
+        public static long DefaultFrequencyMaxKHz { get; set; } = 852000;
 
         public TuningSettings(ILoggingService loggingService)
         {

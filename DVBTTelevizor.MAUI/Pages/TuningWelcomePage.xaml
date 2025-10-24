@@ -29,25 +29,38 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='DVBT'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.20,0.8,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.40,0.8,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.60,0.8,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
-
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
-
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.8,0.15" AbsoluteLayout.LayoutFlags="All">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.9" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+
+                <RowDefinition Height="*" />
+
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Grid.Row="0" x:Name="AutoFMScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoFMScanButton_Clicked" />
-            <Button Grid.Column="1" Grid.Row="0" x:Name="TuneFMButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneFMButton_Clicked" />
+
+            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='DVBT'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+
+            <Button Grid.Column="0" Grid.Row="1" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
+            <Button Grid.Column="0" Grid.Row="2" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
+            <Button Grid.Column="0" Grid.Row="3" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
+
+            <Label Grid.Column="0" Grid.Row="4" Text="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+
+            <Button Grid.Column="0" Grid.Row="5" x:Name="ManualFMScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoFMScanButton_Clicked" />
+            <Button Grid.Column="0" Grid.Row="6" x:Name="TuneFMButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneFMButton_Clicked" />
+
+
 
         </Grid>
 

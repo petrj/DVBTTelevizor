@@ -39,10 +39,10 @@ namespace DVBTTelevizor.MAUI
                 case TuneFrequencyModeEnum.From:
                 case TuneFrequencyModeEnum.Center:
                 default:
-                    _tuneSettings.FrequencyKHz = TuningSettings.DefaultDVBTFrequencyMinKHz;
+                    _tuneSettings.FrequencyKHz = TuningSettings.DefaultFrequencyMinKHz;
                     break;
                 case TuneFrequencyModeEnum.To:
-                    _tuneSettings.FrequencyKHz = TuningSettings.DefaultDVBTFrequencyMaxKHz;
+                    _tuneSettings.FrequencyKHz = TuningSettings.DefaultFrequencyMaxKHz;
                     break;
             }
             NotifyChange();
@@ -195,7 +195,7 @@ namespace DVBTTelevizor.MAUI
                     return;
 
                 // rounding to start freq 474 MHZ
-                var startFreq = TuningSettings.DefaultDVBTFrequencyMinKHz;
+                var startFreq = TuningSettings.DefaultFrequencyMinKHz;
 
                 var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz)));
 

@@ -686,15 +686,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (Settings.FM)
+                {
+                    return "      FM";
+                }
+
                 var res = "";
                 res += DeliverySystem == 0 ? "     DVBT" : "     DVBT2";
-                /*
-                if (FrequencyFromKHz != FrequencyToKHz)
-                {
-                    res += $" ({FrequencyFromMHz}-{FrequencyToMHz})";
-                }
-                res += " MHz";
-                */
 
                 return res;
             }
