@@ -51,7 +51,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("ManualFM", new List<View>() { AutoFMScanButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("ManualFM", new List<View>() { ManualFMScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("TuneFM", new List<View>() { TuneFMButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
@@ -142,16 +142,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
 
-        switch (_configuration.DVBTDriverType)
-        {
-            case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
-            case DVBTDriverTypeEnum.RTLSDRFMDriver:
-                _tuningSettings.FM = true;
-                break;
-            default:
-                break;
-        }
-
         ShowPage(_tuningProgressPage, TuneModeEnum.Automatic);
     }
 
@@ -159,34 +149,15 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
 
-        switch (_configuration.DVBTDriverType)
-        {
-            case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
-            case DVBTDriverTypeEnum.RTLSDRFMDriver:
-                _tuningSettings.FM = true;
-                ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
-                break;
-            default:
-                ShowPage(_selectDVBTPage, TuneModeEnum.Manual);
-                break;
-        }
+        ShowPage(_selectDVBTPage, TuneModeEnum.Manual);
+
     }
 
     private void TuneButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
 
-        switch (_configuration.DVBTDriverType)
-        {
-            case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
-            case DVBTDriverTypeEnum.RTLSDRFMDriver:
-                _tuningSettings.FM = true;
-                ShowPage(_tuningFrequencyPage, TuneModeEnum.Frequency);
-                break;
-            default:
-                ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
-                break;
-        }
+        ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
     }
 
     private void ShowPage(Page page, TuneModeEnum mode)
@@ -224,13 +195,33 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         });
     }
 
+    private void SetFMSettings()
+    {
+        _tuningSettings.FM = true;
+        _tuningSettings.FrequencyKHz = 88000;
+        _tuningSettings.FrequencyFromKHz = 88000;
+        _tuningSettings.FrequencyToKHz = 108000;
+        _tuningSettings.DeviceFrequencyMinKHz = 88000;
+        _tuningSettings.DeviceFrequencyMaxKHz = 108000;
+        _tuningSettings.DeviceFrequencyMinKHz = 88000;
+        _tuningSettings.DeviceFrequencyMaxKHz = 108000;
+        _tuningSettings.BandwidthKHz = 200;
+
+    }
+
     private void AutoFMScanButton_Clicked(object sender, EventArgs e)
     {
+        _loggingService.Debug($"TuningWelcomePage: AutoFMScanButton_Clicked");
+
+        SetFMSettings();
+        ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
 
     }
 
     private void TuneFMButton_Clicked(object sender, EventArgs e)
     {
+        SetFMSettings();
+        ShowPage(_tuningFrequencyPage, TuneModeEnum.Frequency);
 
     }
 }
