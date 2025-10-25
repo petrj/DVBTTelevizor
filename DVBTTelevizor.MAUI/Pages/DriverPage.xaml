@@ -25,6 +25,15 @@
                 <Setter Property="HorizontalOptions" Value="End" />
             </Style>
 
+            <Style x:Key="DriverLabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
+
             <Style x:Key="CommonSwitchStyle" TargetType="Switch">
                 <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="VerticalOptions" Value="Center" />
@@ -42,6 +51,15 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
+            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -49,7 +67,30 @@
     <AbsoluteLayout BackgroundColor="Black">
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding DriverStateStatus}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.35" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.125,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <BoxView x:Name="DriverTypeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver'}" Style="{DynamicResource DriverLabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Picker
+                Grid.Row="0" Grid.Column="1"
+                x:Name="DriverPicker"
+                FontSize="{Binding FontSizeForPicker}"
+                Style="{StaticResource CommonPickerTextStyle}"
+                ItemsSource="{Binding Drivers}"
+                SelectedIndex="{Binding DriverTypeIndex, Mode=TwoWay}"/>
+
+        </Grid>
+
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.3,0.8,0.30" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
         <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">

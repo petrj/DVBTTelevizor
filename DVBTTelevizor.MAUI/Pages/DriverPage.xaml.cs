@@ -1,6 +1,9 @@
+using Android.Graphics.Drawables;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
+using Microsoft.Maui.Handlers;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -12,6 +15,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
+
     private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
@@ -20,14 +24,45 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         InitializeComponent();
 
+#if ANDROID
+        DriverPicker.Loaded += (s, e) =>
+        {
+            var handler = (PickerHandler)DriverPicker.Handler;
+            handler.PlatformView.Background = new ColorDrawable(Android.Graphics.Color.Transparent);
+        };
+#endif
+
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
+        DriverPicker.SelectedIndexChanged += DriverPicker_SelectedIndexChanged;
+
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
+    }
+
+    private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        if (_driverPageViewModel.DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
+        {
+            // switch driver to DVBTDriverConnector
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
+            //WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+        }
+
+        if (_driverPageViewModel.DriverTypeIndex == 1 && (!(_driver is RTLSDRTCPIPFMDriverConnector)))
+        {
+            // switch driver RTLSDRTCPIPFMDriverConnector
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
+            //WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+        }
+
+        Task.Run(async () => await _driverPageViewModel.CheckDriver());
     }
 
     private void BuildFocusableItems()
@@ -48,6 +83,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
+            await _driverPageViewModel.FillDrivers();
             await _driverPageViewModel.CheckDriver();
          });
 

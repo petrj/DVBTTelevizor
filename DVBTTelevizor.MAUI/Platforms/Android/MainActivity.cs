@@ -47,7 +47,7 @@ namespace DVBTTelevizor.MAUI
         private const int FolderAccessRequestCode = 1003;
         private const int StorageAccessRequestCode = 1004;
         private int _audioSampleRate = 96000;
-        private int _audioChannels = 1;
+        private int _audioChannels = 2;
         private bool _startAudioReceiverThread = false;
         private int _SDRDriverStreamPort = 0;
         private int _SDRDriverPort = 0;

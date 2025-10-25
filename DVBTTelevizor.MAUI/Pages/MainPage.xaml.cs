@@ -189,7 +189,7 @@ namespace DVBTTelevizor.MAUI
 
             _configuration.ConfigDirectory = PublicDirectory;
 
-            InitDVBTDriver();
+            InitDriver();
 
             _iptv = new SledovaniTV.SledovaniTV(_loggingService);
             _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
@@ -386,7 +386,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DVBTDriverChangedMessage>(this, (r, m) =>
             {
-                InitDVBTDriver();
+                InitDriver();
             });
 
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
@@ -775,7 +775,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void InitDVBTDriver()
+        private void InitDriver()
         {
             switch (_configuration.DVBTDriverType)
             {
@@ -1303,6 +1303,9 @@ namespace DVBTTelevizor.MAUI
 
         private void ConnectDriver()
         {
+            _driver.Stop();
+            _driver.Disconnect();
+
             switch (_configuration.DVBTDriverType)
             {
                 case DVBTDriverTypeEnum.AndroidDVBTDriver:
