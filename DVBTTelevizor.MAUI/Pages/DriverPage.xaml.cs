@@ -1,4 +1,3 @@
-using Android.Graphics.Drawables;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -69,6 +68,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
         _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverTypeBoxView, DriverPicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
@@ -149,6 +149,13 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
                             DisconnectButton_Clicked(this, new EventArgs());
+                        });
+                        break;
+
+                    case "Driver":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            DriverPicker.Focus();
                         });
                         break;
                 }
