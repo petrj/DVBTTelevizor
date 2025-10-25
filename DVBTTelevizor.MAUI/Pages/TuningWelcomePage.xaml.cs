@@ -205,7 +205,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _tuningSettings.DeviceFrequencyMaxKHz = 108000;
         _tuningSettings.DeviceFrequencyMinKHz = 88000;
         _tuningSettings.DeviceFrequencyMaxKHz = 108000;
-        _tuningSettings.BandwidthKHz = 200;
+        _tuningSettings.BandwidthKHz = 100;
 
     }
 
