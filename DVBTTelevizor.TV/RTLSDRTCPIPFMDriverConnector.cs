@@ -362,7 +362,7 @@ namespace DVBTTelevizor.TV
                         ProgramNumber = _driver.Frequency,
                         ProviderName = "FM radio",
                         ServiceName = $"{(_driver.Frequency / 1000000.0).ToString("N1")} FM ",
-                        ServisType = 0
+                        ServisType = (byte)DVBTDriverServiceType.Radio
 
                     }, _driver.Frequency);
 
