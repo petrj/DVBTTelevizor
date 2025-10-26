@@ -1303,8 +1303,14 @@ namespace DVBTTelevizor.MAUI
 
         private void ConnectDriver()
         {
-            _driver.Stop();
-            _driver.Disconnect();
+            if (_driver != null)
+            {
+                if (_driver.Connected)
+                {
+                    _driver.Stop();
+                    _driver.Disconnect();
+                }
+            }
 
             switch (_configuration.DVBTDriverType)
             {

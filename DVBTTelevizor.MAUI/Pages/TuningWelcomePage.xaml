@@ -24,22 +24,55 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
+            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
+            <Style x:Key="DriverLabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <AbsoluteLayout BackgroundColor="Black">
 
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tuning'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.9" AbsoluteLayout.LayoutFlags="All">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.125,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
 
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+            <BoxView x:Name="DriverTypeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-                <RowDefinition Height="*" />
+            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver:'}" Style="{DynamicResource DriverLabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Picker
+                Grid.Row="0" Grid.Column="1"
+                x:Name="DriverPicker"
+                FontSize="{Binding FontSizeForPicker}"
+                Style="{StaticResource CommonPickerTextStyle}"
+                ItemsSource="{Binding Drivers}"
+                SelectedIndex="{Binding DriverTypeIndex, Mode=TwoWay}"/>
+        </Grid>
 
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.5,0.8,0.5" AbsoluteLayout.LayoutFlags="All">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
 
@@ -48,17 +81,9 @@
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-
-            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='DVBT'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
-
-            <Button Grid.Column="0" Grid.Row="1" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
-            <Button Grid.Column="0" Grid.Row="2" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
-            <Button Grid.Column="0" Grid.Row="3" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
-
-            <Label Grid.Column="0" Grid.Row="4" Text="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
-
-            <Button Grid.Column="0" Grid.Row="5" x:Name="ManualFMScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoFMScanButton_Clicked" />
-            <Button Grid.Column="0" Grid.Row="6" x:Name="TuneFMButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneFMButton_Clicked" />
+            <Button Grid.Column="0" Grid.Row="0" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
+            <Button Grid.Column="0" Grid.Row="1" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
+            <Button Grid.Column="0" Grid.Row="2" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
 
 
 

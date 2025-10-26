@@ -79,7 +79,7 @@
 
             <BoxView x:Name="DriverTypeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
-            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver'}" Style="{DynamicResource DriverLabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver:'}" Style="{DynamicResource DriverLabelStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Picker
                 Grid.Row="0" Grid.Column="1"
                 x:Name="DriverPicker"
@@ -87,7 +87,6 @@
                 Style="{StaticResource CommonPickerTextStyle}"
                 ItemsSource="{Binding Drivers}"
                 SelectedIndex="{Binding DriverTypeIndex, Mode=TwoWay}"/>
-
         </Grid>
 
         <Image AbsoluteLayout.LayoutBounds="0.5,0.3,0.8,0.30" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />

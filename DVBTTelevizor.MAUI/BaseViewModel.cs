@@ -3,6 +3,7 @@ using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
+
+        public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
 
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
@@ -31,6 +34,71 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
+        }
+
+        public virtual async Task FillDrivers()
+        {
+            Drivers.Clear();
+
+            Drivers.Add("DVBT".Translated());
+            Drivers.Add("FM".Translated());
+
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnPropertyChanged(nameof(Drivers));
+                OnPropertyChanged(nameof(DriverTypeIndex));
+            });
+        }
+
+        public DVBTDriverTypeEnum SelectedDriverType
+        {
+            get
+            {
+                switch (DriverTypeIndex)
+                {
+                    case 1:
+                        return DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver;
+                    case 0:
+                    default:
+                        return DVBTDriverTypeEnum.AndroidDVBTDriver;
+                }
+            }
+        }
+
+        public int DriverTypeIndex
+        {
+            get
+            {
+                // DVBTDriverTypeEnum
+                //   *  AndroidDVBTDriver = 0,            => 0
+                //      AndroidTestingDVBTDriver = 1,
+                //      TestTuneDriver = 2,
+                //   *  RTLSDRTCPIPFMDriver = 3,          => 1
+                //      RTLSDRFMDriver = 4
+
+                switch (_configuration.DVBTDriverType)
+                {
+                    case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                        return 0;
+                    case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+                        return 1;
+                    default:
+                        return 0;
+                }
+            }
+            set
+            {
+                switch (value)
+                {
+                    case 0:
+                        _configuration.DVBTDriverType = DVBTDriverTypeEnum.AndroidDVBTDriver;
+                        break;
+                    case 1:
+                        _configuration.DVBTDriverType = DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver;
+                        break;
+                }
+                OnPropertyChanged(nameof(DriverTypeIndex));
+            }
         }
 
         public static string DeviceFriendlyName
