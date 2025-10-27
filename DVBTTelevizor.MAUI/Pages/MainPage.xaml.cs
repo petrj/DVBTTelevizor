@@ -13,6 +13,8 @@ using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 using System.Threading.Tasks;
@@ -33,6 +35,7 @@ namespace DVBTTelevizor.MAUI
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
+        private bool _audioThreadRunning = false;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -227,14 +230,55 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
             {
-                // Create Media from TCP stream
-                var media = new Media(_LibVLC, $"udp://localhost:8012", FromType.FromLocation);
+                /*
+                var media = new Media(_LibVLC, $"udp://@:8012", FromType.FromLocation);
                 media.AddOption(":demux=rawaud");
-                media.AddOption(":rawaud-channels=1");
+                media.AddOption(":rawaud-channels=2");
                 media.AddOption(":rawaud-samplerate=96000");
                 media.AddOption(":rawaud-fourcc=s16l");
 
                 _mediaPlayer.Play(media);
+                */
+
+                Task.Run(() =>
+                {
+                    var remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8012);
+                    using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+                    {
+                        client.Bind(remoteEP);
+
+                        var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
+
+                        _audioThreadRunning = true;
+
+                        while (_audioThreadRunning)
+                        {
+                            if (client.Available > 0)
+                            {
+                                var bytesRead = client.Receive(packetBuffer);
+
+                                if (bytesRead == UDPStreamer.MaxPacketSize)
+                                {
+                                    //_audioPlayer.AddPCM(packetBuffer);
+                                }
+                                else if (bytesRead > 0)
+                                {
+                                    var buf = new byte[bytesRead];
+                                    Buffer.BlockCopy(packetBuffer, 0, buf, 0, bytesRead);
+                                    //_audioPlayer.AddPCM(buf);
+                                }
+                            }
+                            else
+                            {
+                                Thread.Sleep(18);
+                            }
+                        }
+
+                        //_audioPlayer.Stop();
+                        //_audioPlayer = null;
+                        client.Close();
+                    }
+                });
             });
 
              _settingsPage.Disappearing += delegate

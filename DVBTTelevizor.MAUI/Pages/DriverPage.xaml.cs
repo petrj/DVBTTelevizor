@@ -23,13 +23,13 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         InitializeComponent();
 
-#if ANDROID
-        DriverPicker.Loaded += (s, e) =>
-        {
-            var handler = (PickerHandler)DriverPicker.Handler;
-            handler.PlatformView.Background = new ColorDrawable(Android.Graphics.Color.Transparent);
-        };
-#endif
+//#if ANDROID
+//        DriverPicker.Loaded += (s, e) =>
+//        {
+//            var handler = (PickerHandler)DriverPicker.Handler;
+//            handler.PlatformView.Background = new ColorDrawable(Android.Graphics.Color.Transparent);
+//        };
+//#endif
 
         _loggingService = loggingService;
         _driver = driver;

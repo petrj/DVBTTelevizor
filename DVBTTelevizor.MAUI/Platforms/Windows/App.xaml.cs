@@ -7,6 +7,13 @@ using Microsoft.Graphics.Canvas.Printing;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.UI.Xaml;
 using RTLSDR;
+using RTLSDR.Common;
+using SharpDX.Direct3D11;
+using SharpDX.Multimedia;
+using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
+using System.Speech.AudioFormat;
 using System.Threading;
 using Windows.Data.Xml.Dom;
 using Windows.Networking.Vpn;
@@ -99,6 +106,8 @@ namespace DVBTTelevizor.MAUI.WinUI
                         TransferPort = 1235,
                         PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                     }));
+
+                    WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(System.String.Empty));
                 }
             });
 
