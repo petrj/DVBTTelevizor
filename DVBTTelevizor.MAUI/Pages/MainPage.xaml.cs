@@ -240,6 +240,19 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer.Play(media);
                 */
 
+                var stream = new MemoryStream();
+                var input = new StreamMediaInput(stream);
+
+                // Create media from stream
+                var media = new Media(_LibVLC, input);
+                media.AddOption(":demux=rawaud");
+                media.AddOption(":rawaud-channels=2");
+                media.AddOption(":rawaud-samplerate=96000");
+                media.AddOption(":rawaud-fourcc=s16l");
+
+                _mediaPlayer = new MediaPlayer(media);
+                _mediaPlayer.Play();
+
                 Task.Run(() =>
                 {
                     var remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8012);
@@ -256,17 +269,7 @@ namespace DVBTTelevizor.MAUI
                             if (client.Available > 0)
                             {
                                 var bytesRead = client.Receive(packetBuffer);
-
-                                if (bytesRead == UDPStreamer.MaxPacketSize)
-                                {
-                                    //_audioPlayer.AddPCM(packetBuffer);
-                                }
-                                else if (bytesRead > 0)
-                                {
-                                    var buf = new byte[bytesRead];
-                                    Buffer.BlockCopy(packetBuffer, 0, buf, 0, bytesRead);
-                                    //_audioPlayer.AddPCM(buf);
-                                }
+                                stream.Write(packetBuffer, 0, bytesRead);
                             }
                             else
                             {
@@ -278,6 +281,9 @@ namespace DVBTTelevizor.MAUI
                         //_audioPlayer = null;
                         client.Close();
                     }
+
+                    stream.Close();
+                    stream.Dispose();
                 });
             });
 
