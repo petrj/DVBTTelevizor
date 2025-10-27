@@ -35,7 +35,7 @@ namespace DVBTTelevizor.MAUI
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
-        private bool _audioThreadRunning = false;
+
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -240,51 +240,7 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer.Play(media);
                 */
 
-                var stream = new MemoryStream();
-                var input = new StreamMediaInput(stream);
 
-                // Create media from stream
-                var media = new Media(_LibVLC, input);
-                media.AddOption(":demux=rawaud");
-                media.AddOption(":rawaud-channels=2");
-                media.AddOption(":rawaud-samplerate=96000");
-                media.AddOption(":rawaud-fourcc=s16l");
-
-                _mediaPlayer = new MediaPlayer(media);
-                _mediaPlayer.Play();
-
-                Task.Run(() =>
-                {
-                    var remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8012);
-                    using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-                    {
-                        client.Bind(remoteEP);
-
-                        var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
-
-                        _audioThreadRunning = true;
-
-                        while (_audioThreadRunning)
-                        {
-                            if (client.Available > 0)
-                            {
-                                var bytesRead = client.Receive(packetBuffer);
-                                stream.Write(packetBuffer, 0, bytesRead);
-                            }
-                            else
-                            {
-                                Thread.Sleep(18);
-                            }
-                        }
-
-                        //_audioPlayer.Stop();
-                        //_audioPlayer = null;
-                        client.Close();
-                    }
-
-                    stream.Close();
-                    stream.Dispose();
-                });
             });
 
              _settingsPage.Disappearing += delegate

@@ -6,10 +6,9 @@ using LoggerService;
 using Microsoft.Graphics.Canvas.Printing;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.UI.Xaml;
+using NAudio.Wave;
 using RTLSDR;
 using RTLSDR.Common;
-using SharpDX.Direct3D11;
-using SharpDX.Multimedia;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
@@ -19,7 +18,6 @@ using Windows.Data.Xml.Dom;
 using Windows.Networking.Vpn;
 using Windows.UI.Core;
 using Windows.UI.Notifications;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,6 +30,7 @@ namespace DVBTTelevizor.MAUI.WinUI
     public partial class App : MauiWinUIApplication
     {
         private ILoggingService _loggingService;
+        private bool _audioThreadRunning = false;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -108,10 +107,66 @@ namespace DVBTTelevizor.MAUI.WinUI
                     }));
 
                     WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(System.String.Empty));
+                    PlayRawAudio();
                 }
             });
 
             UnhandledException += App_UnhandledException;
+        }
+
+        private void PlayRawAudio()
+        {
+            var audioDescription = new AudioDataDescription()
+            {
+                BitsPerSample = 16,
+                Channels = 2,
+                SampleRate = 96000
+            };
+
+            var outputDevice = new WaveOutEvent();
+            var waveFormat = new WaveFormat(audioDescription.SampleRate, audioDescription.BitsPerSample, audioDescription.Channels);
+            var bufferedWaveProvider = new BufferedWaveProvider(waveFormat);
+            //_bufferedWaveProvider.BufferDuration = new TimeSpan(0,0,10);
+            //_bufferedWaveProvider.BufferLength = 10 * (audioDescription.SampleRate * audioDescription.Channels * audioDescription.BitsPerSample / 8);
+
+            outputDevice.Init(bufferedWaveProvider);
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    var remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8012);
+                    using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+                    {
+                        client.Bind(remoteEP);
+
+                        var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
+
+                        _audioThreadRunning = true;
+
+                        while (_audioThreadRunning)
+                        {
+                            if (client.Available > 0)
+                            {
+                                var bytesRead = client.Receive(packetBuffer);
+                                bufferedWaveProvider.AddSamples(packetBuffer, 0, bytesRead);
+                            }
+                            else
+                            {
+                                Thread.Sleep(18);
+                            }
+                        }
+
+                        //_audioPlayer.Stop();
+                        //_audioPlayer = null;
+                        client.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+            });
         }
 
         private void ShowToastMessage(string msg)
