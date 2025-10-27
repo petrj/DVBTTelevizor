@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Maui;
+using DVBTTelevizor.MAUI.Platforms.Windows;
+using DVBTTelevizor.TV;
 using LibVLCSharp.MAUI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
@@ -25,12 +27,14 @@ namespace DVBTTelevizor.MAUI
             builder.Services.AddSingleton<LoggerProvider>();
             builder.Services.AddSingleton<PublicDirectoryProvider>();
             builder.Services.AddSingleton<DVBTTelevizorConfiguration>();
+            builder.Services.AddSingleton<RTLSDRDriverPlatformImplementation>();
 
             builder.Services.AddSingleton<IPublicDirectoryProvider, PublicDirectoryProvider>();
             builder.Services.AddSingleton<ITVConfiguration, DVBTTelevizorConfiguration>();
             builder.Services.AddSingleton<ILoggingProvider, LoggerProvider>();
+            builder.Services.AddSingleton<IRTLSDRDriverPlatformImplementation, RTLSDRDriverPlatformImplementation>();
 
-builder.ConfigureMauiHandlers(handlers =>
+            builder.ConfigureMauiHandlers(handlers =>
 {
     handlers.AddHandler(typeof(VideoView), typeof(VideoViewHandler));
 });

@@ -6,11 +6,13 @@ using LoggerService;
 using Microsoft.Graphics.Canvas.Printing;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.UI.Xaml;
+using RTLSDR;
 using System.Threading;
 using Windows.Data.Xml.Dom;
 using Windows.Networking.Vpn;
 using Windows.UI.Core;
 using Windows.UI.Notifications;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -83,6 +85,20 @@ namespace DVBTTelevizor.MAUI.WinUI
                 _loggingService is NLogLoggingService nlogService)
                 {
                     nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address = m.Value;
+                }
+            });
+
+            WeakReferenceMessenger.Default.Register<RTLSDRDriverConnectMessage>(this, (sender, obj) =>
+            {
+                if (obj.Value is DriverSettings settings)
+                {
+                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
+                    {
+                        DeviceName = "rtl_sdr bin",
+                        ControlPort = 1234,
+                        TransferPort = 1235,
+                        PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                    }));
                 }
             });
 

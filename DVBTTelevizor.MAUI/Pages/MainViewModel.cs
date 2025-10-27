@@ -970,7 +970,7 @@ namespace DVBTTelevizor.MAUI
             _driver.PublicDirectory = _publicDirectory;
             _driver.Connect();
 
-            if (_driver is RTLSDRTCPIPFMDriverConnector)
+            if (_driver is RTLSDRDriverConnector)
             {
                 //WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(String.Empty));
             }

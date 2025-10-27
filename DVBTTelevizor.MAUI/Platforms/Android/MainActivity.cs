@@ -288,7 +288,7 @@ namespace DVBTTelevizor.MAUI
                 InitDriver();
             });
 
-            WeakReferenceMessenger.Default.Register<RTLSDRDriverConnectAndroidMessage>(this, (sender, obj) =>
+            WeakReferenceMessenger.Default.Register<RTLSDRDriverConnectMessage>(this, (sender, obj) =>
             {
                 if (obj.Value is DriverSettings settings)
                 {

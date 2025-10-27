@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.TV
 {
-    public class RTLSDRTCPIPFMDriverConnector : IDriverConnector
+    public class RTLSDRDriverConnector : IDriverConnector
     {
         private ILoggingService _log;
         private ISDR _driver = null;
@@ -21,7 +21,7 @@ namespace DVBTTelevizor.TV
 
         UDPStreamer _UDPStreamer = null;
 
-        public RTLSDRTCPIPFMDriverConnector(ILoggingService loggingService)
+        public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver)
         {
             _log = loggingService;
 
@@ -30,7 +30,7 @@ namespace DVBTTelevizor.TV
             //_UDPStreamer = new UDPStreamer(_log);
             _driverConfiguration = new DVBTDriverConfiguration();
 
-            _driver = new RTLSDRDriver(_log);
+            _driver = driver;
             _driver.OnDataReceived += _driver_OnDataReceived;
 
             _demodulator = new FMDemodulator(_log);

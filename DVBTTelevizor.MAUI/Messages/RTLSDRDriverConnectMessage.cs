@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class RTLSDRDriverConnectAndroidMessage : ValueChangedMessage<DriverSettings>
+    public class RTLSDRDriverConnectMessage : ValueChangedMessage<DriverSettings>
     {
-        public RTLSDRDriverConnectAndroidMessage(DriverSettings value) : base(value)
+        public RTLSDRDriverConnectMessage(DriverSettings value) : base(value)
         {
 
         }

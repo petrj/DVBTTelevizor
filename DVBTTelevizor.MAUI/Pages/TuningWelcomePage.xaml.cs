@@ -141,7 +141,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
 
-        if (_viewModel.SelectedDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+        if (_viewModel.SelectedDriverType == DVBTDriverTypeEnum.RTLSDRDriver)
         {
             SetFMSettings();
         }
@@ -153,7 +153,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
 
-        if (_viewModel.SelectedDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+        if (_viewModel.SelectedDriverType == DVBTDriverTypeEnum.RTLSDRDriver)
         {
             SetFMSettings();
             ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
@@ -167,7 +167,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
 
-        if (_viewModel.SelectedDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
+        if (_viewModel.SelectedDriverType == DVBTDriverTypeEnum.RTLSDRDriver)
         {
             SetFMSettings();
             ShowPage(_tuningFrequencyPage, TuneModeEnum.Manual);

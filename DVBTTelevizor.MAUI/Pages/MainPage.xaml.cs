@@ -8,6 +8,7 @@ using Microsoft.Maui.Animations;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
+using RTLSDR;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,6 +28,7 @@ namespace DVBTTelevizor.MAUI
         private ILoggingService _loggingService { get; set; }
         private IDriverConnector _driver { get; set; }
         private ITVConfiguration _configuration;
+        private IRTLSDRDriverPlatformImplementation _sdrDriverPlatformImplementation;
         public string PublicDirectory { get; set; }
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
@@ -64,8 +66,8 @@ namespace DVBTTelevizor.MAUI
         private bool _menuShowEnabled = true;
 
         private bool _checkStreamEnabled = true;
-        public Command CommandCheckStream { get; set; }
-        public Command CommandUpdateDriverState { get; set; }
+        public Microsoft.Maui.Controls.Command CommandCheckStream { get; set; }
+        public Microsoft.Maui.Controls.Command CommandUpdateDriverState { get; set; }
 
         private LibVLC? _LibVLC;
         private MediaPlayer? _mediaPlayer;
@@ -117,9 +119,10 @@ namespace DVBTTelevizor.MAUI
 
         private Rect? LastVideoStackLayoutPosition { get; set; }
 
-        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration)
+        public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration, IRTLSDRDriverPlatformImplementation sdrDriverPlatformImplementation)
         {
             _publicDirectoryProvider = publicDirectoryProvider;
+            _sdrDriverPlatformImplementation = sdrDriverPlatformImplementation;
             PublicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
             _configuration = tvConfiguration;
@@ -242,7 +245,7 @@ namespace DVBTTelevizor.MAUI
                 });
             };
 
-            CommandCheckStream = new Command(() =>
+            CommandCheckStream = new Microsoft.Maui.Controls.Command(() =>
             {
                 Task.Run(async () =>
                 {
@@ -250,7 +253,7 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            CommandUpdateDriverState = new Command(() =>
+            CommandUpdateDriverState = new Microsoft.Maui.Controls.Command(() =>
             {
                 Task.Run(async () =>
                 {
@@ -788,8 +791,8 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
-                case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
-                    _driver = new RTLSDRTCPIPFMDriverConnector(_loggingService);
+                case DVBTDriverTypeEnum.RTLSDRDriver:
+                    _driver = new RTLSDRDriverConnector(_loggingService, _sdrDriverPlatformImplementation.GetRTLSDRDriver());
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
@@ -1345,7 +1348,7 @@ namespace DVBTTelevizor.MAUI
 
                     break;
 
-                case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+                case DVBTDriverTypeEnum.RTLSDRDriver:
 
                     var cfg = new RTLSDR.DriverSettings()
                     {
@@ -1354,7 +1357,7 @@ namespace DVBTTelevizor.MAUI
                         SDRSampleRate = _configuration.SDRSampleRate
                     };
 
-                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectAndroidMessage(cfg));
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
 
                     WeakReferenceMessenger.Default.Send(new NotifyAudioChangeMessage(""));  // starting audio reciever in MainActivity
 

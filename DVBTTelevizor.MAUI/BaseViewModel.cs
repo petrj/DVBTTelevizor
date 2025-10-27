@@ -57,7 +57,7 @@ namespace DVBTTelevizor.MAUI
                 switch (DriverTypeIndex)
                 {
                     case 1:
-                        return DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver;
+                        return DVBTDriverTypeEnum.RTLSDRDriver;
                     case 0:
                     default:
                         return DVBTDriverTypeEnum.AndroidDVBTDriver;
@@ -80,7 +80,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     case DVBTDriverTypeEnum.AndroidDVBTDriver:
                         return 0;
-                    case DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver:
+                    case DVBTDriverTypeEnum.RTLSDRDriver:
                         return 1;
                     default:
                         return 0;
@@ -94,7 +94,7 @@ namespace DVBTTelevizor.MAUI
                         _configuration.DVBTDriverType = DVBTDriverTypeEnum.AndroidDVBTDriver;
                         break;
                     case 1:
-                        _configuration.DVBTDriverType = DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver;
+                        _configuration.DVBTDriverType = DVBTDriverTypeEnum.RTLSDRDriver;
                         break;
                 }
                 OnPropertyChanged(nameof(DriverTypeIndex));

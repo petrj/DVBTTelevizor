@@ -53,7 +53,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             //WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
         }
 
-        if (_driverPageViewModel.DriverTypeIndex == 1 && (!(_driver is RTLSDRTCPIPFMDriverConnector)))
+        if (_driverPageViewModel.DriverTypeIndex == 1 && (!(_driver is RTLSDRDriverConnector)))
         {
             // switch driver RTLSDRTCPIPFMDriverConnector
 
