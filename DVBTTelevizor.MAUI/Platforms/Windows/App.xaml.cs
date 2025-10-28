@@ -8,6 +8,7 @@ using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.UI.Xaml;
 using NAudio.Wave;
 using RTLSDR;
+using RTLSDR.Audio;
 using RTLSDR.Common;
 using System.ComponentModel;
 using System.Net;
@@ -123,13 +124,10 @@ namespace DVBTTelevizor.MAUI.WinUI
                 SampleRate = 96000
             };
 
-            var outputDevice = new WaveOutEvent();
-            var waveFormat = new WaveFormat(audioDescription.SampleRate, audioDescription.BitsPerSample, audioDescription.Channels);
-            var bufferedWaveProvider = new BufferedWaveProvider(waveFormat);
-            //_bufferedWaveProvider.BufferDuration = new TimeSpan(0,0,10);
-            //_bufferedWaveProvider.BufferLength = 10 * (audioDescription.SampleRate * audioDescription.Channels * audioDescription.BitsPerSample / 8);
+            var audioPlayer = new NAudioRawAudioPlayer(_loggingService);
+            audioPlayer.Init(audioDescription, _loggingService);
 
-            outputDevice.Init(bufferedWaveProvider);
+            audioPlayer.Play();
 
             Task.Run(() =>
             {
@@ -149,7 +147,17 @@ namespace DVBTTelevizor.MAUI.WinUI
                             if (client.Available > 0)
                             {
                                 var bytesRead = client.Receive(packetBuffer);
-                                bufferedWaveProvider.AddSamples(packetBuffer, 0, bytesRead);
+
+                                if (bytesRead == UDPStreamer.MaxPacketSize)
+                                {
+                                    audioPlayer.AddPCM(packetBuffer);
+                                }
+                                else if (bytesRead > 0)
+                                {
+                                    var buf = new byte[bytesRead];
+                                    Buffer.BlockCopy(packetBuffer, 0, buf, 0, bytesRead);
+                                    audioPlayer.AddPCM(buf);
+                                }
                             }
                             else
                             {
