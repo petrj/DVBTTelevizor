@@ -19,7 +19,7 @@ namespace DVBTTelevizor.TV
 
         private const int MinFMSignalPower = 80;
 
-        UDPStreamer _UDPStreamer = null;
+        public event DemodulatedEventHandler OnRawAudioDemodulated;
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver)
         {
@@ -39,9 +39,18 @@ namespace DVBTTelevizor.TV
 
         private void _demodulator_OnDemodulated(object? sender, EventArgs e)
         {
-            if (e is DataDemodulatedEventArgs de)
+            if ((e is DataDemodulatedEventArgs de) &&
+                OnRawAudioDemodulated != null)
             {
-                _UDPStreamer.SendByteArray(de.Data, de.Data.Length);
+                OnRawAudioDemodulated(this, new DemodulatedEventArgs(de.Data)
+                {
+                     Description = new AudioDataDescription()
+                     {
+                          BitsPerSample = 16,
+                          Channels = 2,
+                          SampleRate = _demodulator.Samplerate
+                     }
+                });
             }
         }
 
@@ -256,8 +265,6 @@ namespace DVBTTelevizor.TV
 
                 DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
-
-                _UDPStreamer = new UDPStreamer(_log, "127.0.0.1", 8012);
             }
             catch (Exception ex)
             {

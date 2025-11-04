@@ -107,75 +107,14 @@ namespace DVBTTelevizor.MAUI.WinUI
                         PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                     }));
 
-                    WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(System.String.Empty));
-                    PlayRawAudio();
+                    //WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(System.String.Empty));
+                    //PlayRawAudio();
                 }
             });
 
             UnhandledException += App_UnhandledException;
         }
 
-        private void PlayRawAudio()
-        {
-            var audioDescription = new AudioDataDescription()
-            {
-                BitsPerSample = 16,
-                Channels = 2,
-                SampleRate = 96000
-            };
-
-            var audioPlayer = new NAudioRawAudioPlayer(_loggingService);
-            audioPlayer.Init(audioDescription, _loggingService);
-
-            audioPlayer.Play();
-
-            Task.Run(() =>
-            {
-                try
-                {
-                    var remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8012);
-                    using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-                    {
-                        client.Bind(remoteEP);
-
-                        var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
-
-                        _audioThreadRunning = true;
-
-                        while (_audioThreadRunning)
-                        {
-                            if (client.Available > 0)
-                            {
-                                var bytesRead = client.Receive(packetBuffer);
-
-                                if (bytesRead == UDPStreamer.MaxPacketSize)
-                                {
-                                    audioPlayer.AddPCM(packetBuffer);
-                                }
-                                else if (bytesRead > 0)
-                                {
-                                    var buf = new byte[bytesRead];
-                                    Buffer.BlockCopy(packetBuffer, 0, buf, 0, bytesRead);
-                                    audioPlayer.AddPCM(buf);
-                                }
-                            }
-                            else
-                            {
-                                Thread.Sleep(18);
-                            }
-                        }
-
-                        //_audioPlayer.Stop();
-                        //_audioPlayer = null;
-                        client.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex);
-                }
-            });
-        }
 
         private void ShowToastMessage(string msg)
         {

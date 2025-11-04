@@ -9,6 +9,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
 using RTLSDR;
+using RTLSDR.Audio;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -36,6 +37,7 @@ namespace DVBTTelevizor.MAUI
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
 
+        private PcmPointerInput _pcmInput = null;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -228,20 +230,10 @@ namespace DVBTTelevizor.MAUI
 
             SubscribeMessages();
 
-            WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
-            {
-                /*
-                var media = new Media(_LibVLC, $"udp://@:8012", FromType.FromLocation);
-                media.AddOption(":demux=rawaud");
-                media.AddOption(":rawaud-channels=2");
-                media.AddOption(":rawaud-samplerate=96000");
-                media.AddOption(":rawaud-fourcc=s16l");
-
-                _mediaPlayer.Play(media);
-                */
-
-
-            });
+            //WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
+            //{
+            //    PlayRawAudio();
+            //});
 
              _settingsPage.Disappearing += delegate
             {
@@ -310,6 +302,38 @@ namespace DVBTTelevizor.MAUI
 
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
+        }
+
+        private void PlayRawAudio()
+        {
+            _loggingService.Info("PlayRawAudio");
+
+            /*
+            var mediaOptions = new[] {
+                ":demux=rawaud",
+                $":rawaud-channels={audioDescription.Channels}",
+                $":rawaud-samplerate={audioDescription.SampleRate}",
+                ":live-caching=50",
+                ":file-caching=50",
+                ":clock-jitter=0",
+                ":clock-synchro=0",
+                ":rawaud-fourcc=s16l"
+            };
+            _pcmInput = new PcmPointerInput();
+
+            _media = new Media(_libVLC, _pcmInput, mediaOptions);
+
+            _mediaPlayer = new MediaPlayer(_media);
+            */
+            /*
+            var media = new Media(_LibVLC, $"udp://@:8012", FromType.FromLocation);
+            media.AddOption(":demux=rawaud");
+            media.AddOption(":rawaud-channels=2");
+            media.AddOption(":rawaud-samplerate=96000");
+            media.AddOption(":rawaud-fourcc=s16l");
+
+            _mediaPlayer.Play(media);
+            */
         }
 
         public void SetFixVideNeeded()
@@ -804,6 +828,37 @@ namespace DVBTTelevizor.MAUI
                     _driver = new TestTuneConnector(_loggingService);
                     break;
             }
+
+            _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
+        }
+
+        private void _driver_OnRawAudioDemodulated(object sender, DemodulatedEventArgs e)
+        {
+            if (_LibVLC == null)
+                return;
+
+            if (_pcmInput == null)
+            {
+                _pcmInput = new PcmPointerInput();
+
+                var mediaOptions = new[] {
+                    ":demux=rawaud",
+                    $":rawaud-channels={e.Description.Channels}",
+                    $":rawaud-samplerate={e.Description.SampleRate}",
+                    ":live-caching=50",
+                    ":file-caching=50",
+                    ":clock-jitter=0",
+                    ":clock-synchro=0",
+                    $":rawaud-fourcc=s{e.Description.BitsPerSample}l"
+                };
+                _pcmInput = new PcmPointerInput();
+
+                _media = new Media(_LibVLC, _pcmInput, mediaOptions);
+
+                _mediaPlayer.Play(_media);
+            }
+
+            _pcmInput.PushData(e.DemodulatedData);
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)

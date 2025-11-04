@@ -28,6 +28,8 @@ namespace DVBTTelevizor
         Stream VideoStream { get; }
         string StreamUrl { get; }
 
+        public event DemodulatedEventHandler OnRawAudioDemodulated;
+
         int FrequencyMinKHz { get; }
         int FrequencyMaxKHz { get; }
 

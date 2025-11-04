@@ -12,6 +12,8 @@ namespace DVBTTelevizor
     {
         public DVBTDriverStateEnum State { get; private set; }
 
+        public event DemodulatedEventHandler OnRawAudioDemodulated;
+
         private long _lastFreq { get; set; }
         private long _lastPID { get; set; }
 

@@ -20,6 +20,8 @@ namespace DVBTTelevizor
     {
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
+        public event DemodulatedEventHandler OnRawAudioDemodulated; // not used, DVBT uses VideoStream
+
         private ILoggingService _log;
         private DVBTDriverConfiguration _driverConfiguration;
         private TcpClient? _controlClient = null;
