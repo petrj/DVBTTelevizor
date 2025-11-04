@@ -230,11 +230,6 @@ namespace DVBTTelevizor.MAUI
 
             SubscribeMessages();
 
-            //WeakReferenceMessenger.Default.Register<PlayRawAdioMessage>(this, (r, m) =>
-            //{
-            //    PlayRawAudio();
-            //});
-
              _settingsPage.Disappearing += delegate
             {
                 Task.Run(async () =>
@@ -302,38 +297,6 @@ namespace DVBTTelevizor.MAUI
 
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
-        }
-
-        private void PlayRawAudio()
-        {
-            _loggingService.Info("PlayRawAudio");
-
-            /*
-            var mediaOptions = new[] {
-                ":demux=rawaud",
-                $":rawaud-channels={audioDescription.Channels}",
-                $":rawaud-samplerate={audioDescription.SampleRate}",
-                ":live-caching=50",
-                ":file-caching=50",
-                ":clock-jitter=0",
-                ":clock-synchro=0",
-                ":rawaud-fourcc=s16l"
-            };
-            _pcmInput = new PcmPointerInput();
-
-            _media = new Media(_libVLC, _pcmInput, mediaOptions);
-
-            _mediaPlayer = new MediaPlayer(_media);
-            */
-            /*
-            var media = new Media(_LibVLC, $"udp://@:8012", FromType.FromLocation);
-            media.AddOption(":demux=rawaud");
-            media.AddOption(":rawaud-channels=2");
-            media.AddOption(":rawaud-samplerate=96000");
-            media.AddOption(":rawaud-fourcc=s16l");
-
-            _mediaPlayer.Play(media);
-            */
         }
 
         public void SetFixVideNeeded()
@@ -1419,8 +1382,6 @@ namespace DVBTTelevizor.MAUI
                     };
 
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
-
-                    WeakReferenceMessenger.Default.Send(new NotifyAudioChangeMessage(""));  // starting audio reciever in MainActivity
 
                     break;
             }

@@ -1,15 +1,10 @@
 ﻿using Android;
 using Android.App;
-using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
-using Android.Graphics;
 using Android.Hardware.Usb;
-using Android.Media;
 using Android.OS;
 using Android.Provider;
-using Android.Runtime;
-using Android.Util;
 using Android.Views;
 using Android.Widget;
 using AndroidX.Core.App;
@@ -17,22 +12,11 @@ using AndroidX.Core.Content;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
-using Java.Security;
-using Java.Sql;
 using LoggerService;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Compatibility;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using NLog;
-using Org.Apache.Commons.Logging;
 using RTLSDR;
-using RTLSDR.Common;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
-using static AndroidX.ViewPager.Widget.ViewPager;
 using Environment = System.Environment;
 
 namespace DVBTTelevizor.MAUI
@@ -60,8 +44,6 @@ namespace DVBTTelevizor.MAUI
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
         private NotificationHelper _notificationHelper;
-
-        private BackgroundWorker _audioReceiver;
 
         private void EnableNLOGLogging()
         {
@@ -103,78 +85,8 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, "Error while initializing UsbManager");
             }
 
-            _audioReceiver = new BackgroundWorker();
-            _audioReceiver.WorkerSupportsCancellation = true;
-            _audioReceiver.DoWork += _audioReceiver_DoWork;
-            _audioReceiver.RunWorkerCompleted += _audioReceiver_RunWorkerCompleted;
-
             base.OnCreate(savedInstanceState);
         }
-
-        private void RestartAudio()
-        {
-            _loggingService.Info("RestartAudio");
-
-            if (_audioReceiver.IsBusy)
-            {
-                _loggingService.Info("Stopping _audioReceiver");
-
-                _startAudioReceiverThread = true;
-                _audioReceiver.CancelAsync();
-            }
-            else
-            {
-                _audioReceiver.RunWorkerAsync();
-            }
-        }
-
-        private void _audioReceiver_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (_startAudioReceiverThread)
-            {
-                _audioReceiver.RunWorkerAsync();
-                _startAudioReceiverThread = false;
-            }
-        }
-
-        private void _audioReceiver_DoWork(object sender, DoWorkEventArgs e)
-        {
-            _loggingService.Info("Starting _audioReceiver");
-
-            var bufferSize = AudioTrack.GetMinBufferSize(_audioSampleRate, _audioChannels == 1 ? ChannelOut.Mono : ChannelOut.Stereo, Encoding.Pcm16bit);
-            var _audioTrack = new AudioTrack(Android.Media.Stream.Music, _audioSampleRate, _audioChannels == 1 ? ChannelOut.Mono : ChannelOut.Stereo, Encoding.Pcm16bit, bufferSize, AudioTrackMode.Stream);
-
-            _audioTrack.Play();
-
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), _audioRecieverPort);
-            using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-            {
-                client.Bind(remoteEP);
-
-                var packetBuffer = new byte[UDPStreamer.MaxPacketSize];
-
-                while (!_audioReceiver.CancellationPending)
-                {
-                    if (client.Available > 0)
-                    {
-                        var bytesRead = client.Receive(packetBuffer);
-
-                        _audioTrack.Write(packetBuffer, 0, bytesRead);
-                    }
-                    else
-                    {
-                        Thread.Sleep(10);
-                    }
-                }
-
-                client.Close();
-            }
-
-            _audioTrack.Stop();
-
-            _loggingService.Info("_audioReceiver finished");
-        }
-
 
         private async void UsbAttachedOrDetached(object sender, EventArgs e)
         {
@@ -271,16 +183,6 @@ namespace DVBTTelevizor.MAUI
                 {
                     nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address = m.Value;
                 }
-            });
-
-            WeakReferenceMessenger.Default.Register<NotifyAudioChangeMessage>(this, (sender, obj) =>
-            {
-                //if (obj.Value is AudioDataDescription desc)
-                //{
-                //    _audioSampleRate = desc.SampleRate;
-                //    _audioChannels = desc.Channels;
-                RestartAudio();
-                //}
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
@@ -1014,7 +916,6 @@ namespace DVBTTelevizor.MAUI
                 WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorCodeString));
             }
         }
-
 
         /// <summary>
         /// AI generated code !!!

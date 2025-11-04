@@ -1,24 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI.Notifications;
 using DVBTTelevizor.MAUI.Messages;
-using LibVLCSharp.Shared;
 using LoggerService;
-using Microsoft.Graphics.Canvas.Printing;
-using Microsoft.Maui.Controls.PlatformConfiguration;
-using Microsoft.UI.Xaml;
-using NAudio.Wave;
 using RTLSDR;
-using RTLSDR.Audio;
-using RTLSDR.Common;
-using System.ComponentModel;
-using System.Net;
-using System.Net.Sockets;
-using System.Speech.AudioFormat;
-using System.Threading;
-using Windows.Data.Xml.Dom;
-using Windows.Networking.Vpn;
-using Windows.UI.Core;
-using Windows.UI.Notifications;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,7 +15,6 @@ namespace DVBTTelevizor.MAUI.WinUI
     public partial class App : MauiWinUIApplication
     {
         private ILoggingService _loggingService;
-        private bool _audioThreadRunning = false;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -106,9 +89,6 @@ namespace DVBTTelevizor.MAUI.WinUI
                         TransferPort = 1235,
                         PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                     }));
-
-                    //WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(System.String.Empty));
-                    //PlayRawAudio();
                 }
             });
 
