@@ -14,10 +14,12 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
+    private bool _menuEnabled = true;
 
-    private string _publicDirectory = "";
+    private string _publicDirectory;
 
     private KeyboardFocusableItemList _focusItems;
+    private List<MenuItem> _menuItems = new List<MenuItem>();
 
     public DriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -43,8 +45,32 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
+    private void BuildChaneDriverMenu()
+    {
+        ShowOrHideMenu();
+
+        if (MainMenu.IsVisible)
+        {
+            _menuItems.Clear();
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuChangeDriver", "Change driver".Translated(), "refresh.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel", "cancel.png"));
+
+            MainMenu.UpdateMenu((int)_configuration.AppFontSize,
+                "Switch driver confirmation".Translated(), _menuItems);
+        }
+    }
+
+
     private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
     {
+        if (!_menuEnabled)
+            return;
+
+        BuildChaneDriverMenu();
+
+        return;
+
         if (_driverPageViewModel.DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
         {
             // switch driver to DVBTDriverConnector
@@ -83,9 +109,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
+            _menuEnabled = false;
             await _driverPageViewModel.FillDrivers();
             await _driverPageViewModel.CheckDriver();
-         });
+            _menuEnabled = true;
+        });
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
@@ -195,5 +223,67 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"DriverPage DriverPreferencesButton_Clicked");
 
         WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage(String.Empty));
+    }
+
+
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null && e is TappedEventArgs tea)
+        {
+            Menu_Tapped(tea.Parameter.ToString());
+        }
+    }
+
+
+    private void ShowOrHideMenu()
+    {
+        if (MainMenu.MenuVisible)
+        {
+            HideMenu();
+        }
+        else
+        {
+            ShowMenu();
+        }
+    }
+
+    private void ShowMenu()
+    {
+        MainMenu.MenuVisible = true;
+        _driverPageViewModel.MenuVisible = true;
+    }
+
+    private void HideMenu()
+    {
+        MainMenu.MenuVisible = false;
+        _driverPageViewModel.MenuVisible = false;
+    }
+
+
+    private async void Menu_Tapped(string menuId)
+    {
+        _loggingService.Info($"Menu tapped: {menuId}");
+
+        HideMenu();
+
+        switch (menuId)
+        {
+            /*
+            case "menuFromBeginning":
+                _viewModel.ResetTune(true);
+                await _viewModel.StartTune();
+                break;
+
+            case "menuContinue":
+            case "menuRetryTune":
+                await _viewModel.StartTune();
+                break;
+
+            case "menuDriver":
+                var driverPage = new DriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
+                await Navigation.PushAsync(driverPage);
+                break;
+            */
+        }
     }
 }

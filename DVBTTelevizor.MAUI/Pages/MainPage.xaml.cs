@@ -37,7 +37,7 @@ namespace DVBTTelevizor.MAUI
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
 
-        private PcmPointerInput _pcmInput = null;
+        private VLCMediaInput _pcmInput = null;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -802,7 +802,7 @@ namespace DVBTTelevizor.MAUI
 
             if (_pcmInput == null)
             {
-                _pcmInput = new PcmPointerInput();
+                _pcmInput = new VLCMediaInput();
 
                 var mediaOptions = new[] {
                     ":demux=rawaud",
@@ -814,8 +814,6 @@ namespace DVBTTelevizor.MAUI
                     ":clock-synchro=0",
                     $":rawaud-fourcc=s{e.Description.BitsPerSample}l"
                 };
-                _pcmInput = new PcmPointerInput();
-
                 _media = new Media(_LibVLC, _pcmInput, mediaOptions);
 
                 _mediaPlayer.Play(_media);

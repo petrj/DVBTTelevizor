@@ -15,6 +15,7 @@ namespace DVBTTelevizor.MAUI
     {
         private string _range = string.Empty;
         private DriverState? _driverState = null;
+        private bool _menuVisible = false;
 
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
@@ -203,6 +204,21 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return (_driver != null && !_driver.Connected);
+            }
+        }
+
+
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
             }
         }
     }

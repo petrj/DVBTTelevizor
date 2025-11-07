@@ -152,6 +152,8 @@
 
         </Grid>
 
+        <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
+
     </AbsoluteLayout>
 
 </ContentPage>
