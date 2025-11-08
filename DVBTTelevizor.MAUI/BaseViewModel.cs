@@ -16,6 +16,7 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
+        protected int? _previousSelectedDriverTypeIndex = null;
 
         public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
 
@@ -65,6 +66,45 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public int PreviousSelectedDriverTypeIndex
+        {
+            get
+            {
+                return _previousSelectedDriverTypeIndex.HasValue ? _previousSelectedDriverTypeIndex.Value : 0;
+            }
+            set
+            {
+                _previousSelectedDriverTypeIndex = value;
+            }
+        }
+
+        public static string GetDVBTDriverTypeName(int driverType)
+        {
+            // DVBTDriverTypeEnum
+            //   *  AndroidDVBTDriver = 0,            => 0
+            //      AndroidTestingDVBTDriver = 1,
+            //      TestTuneDriver = 2,
+            //   *  RTLSDRTCPIPFMDriver = 3,          => 1
+            //      RTLSDRFMDriver = 4
+            switch (driverType)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    return "DVBT";
+                case 3:
+                case 4:
+                    return "FM";
+                default:
+                    return "";
+            }
+        }
+
+        public static string GetDVBTDriverTypeName(DVBTDriverTypeEnum driverType)
+        {
+            return GetDVBTDriverTypeName((int)driverType);
+        }
+
         public int DriverTypeIndex
         {
             get
@@ -88,6 +128,8 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                PreviousSelectedDriverTypeIndex = DriverTypeIndex;
+
                 switch (value)
                 {
                     case 0:

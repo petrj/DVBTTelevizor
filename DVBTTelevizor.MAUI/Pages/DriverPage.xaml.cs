@@ -14,7 +14,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private bool _menuEnabled = true;
+    private int? _ignoreDriverChangeEvent = null;
+    private int? _changeToDriverIndex = null;
 
     private string _publicDirectory;
 
@@ -45,32 +46,35 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
-    private void BuildChaneDriverMenu()
+    private void BuildChangeDriverMenu()
     {
+        if (_driver == null || !_driver.Connected)
+        {
+            return;
+        }
+
         ShowOrHideMenu();
 
         if (MainMenu.IsVisible)
         {
             _menuItems.Clear();
 
-            _menuItems.Add(MainMenu.CreateMenuItem("menuChangeDriver", "Change driver".Translated(), "refresh.png"));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel", "cancel.png"));
+            var currentDriverName = _driver.Configuration.DeviceName;
+            var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
+            var previousDriverType = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.PreviousSelectedDriverTypeIndex);
+
+            _menuItems.Add(MainMenu.CreateMenuItem("menuChangeDriver", "Disconnect {0} ({1}) and connect {2}?"
+                .Translated(currentDriverType, currentDriverName, previousDriverType), "refresh.png"));
+            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverType), "close.png"));
 
             MainMenu.UpdateMenu((int)_configuration.AppFontSize,
-                "Switch driver confirmation".Translated(), _menuItems);
+                "Please confirm change of driver:".Translated(), _menuItems);
         }
     }
 
 
-    private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
+    private void ConnectDriver()
     {
-        if (!_menuEnabled)
-            return;
-
-        BuildChaneDriverMenu();
-
-        return;
-
         if (_driverPageViewModel.DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
         {
             // switch driver to DVBTDriverConnector
@@ -88,6 +92,41 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         }
 
         Task.Run(async () => await _driverPageViewModel.CheckDriver());
+    }
+
+    private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+
+        if (_ignoreDriverChangeEvent.HasValue && _driverPageViewModel.DriverTypeIndex == _ignoreDriverChangeEvent)
+        {
+            _ignoreDriverChangeEvent = null;
+            return;
+        }
+
+        try
+        {
+            if (_driver != null && _driver.Connected)
+            {
+                // reverse the change and show menu
+                _changeToDriverIndex = _driverPageViewModel.DriverTypeIndex;
+                _driverPageViewModel.DriverTypeIndex = _driverPageViewModel.PreviousSelectedDriverTypeIndex;
+
+                // next driver change to DriverTypeIndex must be ignored now!
+                _ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    BuildChangeDriverMenu();
+                });
+            }
+            else
+            {
+                ConnectDriver();
+            }
+        } finally
+        {
+
+        }
     }
 
     private void BuildFocusableItems()
@@ -109,10 +148,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            _menuEnabled = false;
+            _ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
             await _driverPageViewModel.FillDrivers();
             await _driverPageViewModel.CheckDriver();
-            _menuEnabled = true;
         });
 
         _focusItems.DeFocusAll();
@@ -259,6 +297,20 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _driverPageViewModel.MenuVisible = false;
     }
 
+    private void ChangeDriver()
+    {
+        _loggingService.Info($"ChangeDriver");
+
+        if (!_changeToDriverIndex.HasValue)
+            return;
+
+        _ignoreDriverChangeEvent = _changeToDriverIndex.Value;
+        _driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
+
+        _changeToDriverIndex = null;
+
+        ConnectDriver();
+    }
 
     private async void Menu_Tapped(string menuId)
     {
@@ -268,22 +320,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         switch (menuId)
         {
-            /*
-            case "menuFromBeginning":
-                _viewModel.ResetTune(true);
-                await _viewModel.StartTune();
+            case "menuChangeDriver":
+                ChangeDriver();
                 break;
-
-            case "menuContinue":
-            case "menuRetryTune":
-                await _viewModel.StartTune();
-                break;
-
-            case "menuDriver":
-                var driverPage = new DriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
-                await Navigation.PushAsync(driverPage);
-                break;
-            */
         }
     }
 }
