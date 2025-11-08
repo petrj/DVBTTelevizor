@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,25 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(Drivers));
                 OnPropertyChanged(nameof(DriverTypeIndex));
             });
+        }
+
+        public virtual async Task ReConnectDriver()
+        {
+
+            if (DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
+            {
+                // switch driver to DVBTDriverConnector
+                WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
+            }
+
+            if (DriverTypeIndex == 1 && (!(_driver is RTLSDRDriverConnector)))
+            {
+                // switch driver RTLSDRTCPIPFMDriverConnector
+                WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
+            }
+
+            await Task.Delay(1000);
+            WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
         }
 
         public DVBTDriverTypeEnum SelectedDriverType

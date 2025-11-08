@@ -73,27 +73,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     }
 
 
-    private void ConnectDriver()
-    {
-        if (_driverPageViewModel.DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
-        {
-            // switch driver to DVBTDriverConnector
-
-            WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
-            //WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-        }
-
-        if (_driverPageViewModel.DriverTypeIndex == 1 && (!(_driver is RTLSDRDriverConnector)))
-        {
-            // switch driver RTLSDRTCPIPFMDriverConnector
-
-            WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
-            //WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-        }
-
-        Task.Run(async () => await _driverPageViewModel.CheckDriver());
-    }
-
     private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
     {
 
@@ -121,7 +100,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             }
             else
             {
-                ConnectDriver();
+                Task.Run(async () =>
+                {
+                    await _driverPageViewModel.ReConnectDriver();
+                });
             }
         } finally
         {
@@ -309,7 +291,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         _changeToDriverIndex = null;
 
-        ConnectDriver();
+        Task.Run(async () => await _driverPageViewModel.ReConnectDriver());
     }
 
     private async void Menu_Tapped(string menuId)

@@ -1,6 +1,12 @@
 $scriptPath = $PSScriptRoot
 cd $PSScriptRoot
 
+dotnet nuget locals all --clear
+
+dotnet clean C:\DVBTTelevizor\DVBTTelevizor.MAUI\
+
+
+
 foreach ($folder in `
     @(
     "DVBTTelevizor\DVBTTelevizor\bin",
@@ -40,3 +46,10 @@ foreach ($folder in `
 	    Remove-Item -Path $fullPath -Recurse -Force -Verbose		
     }
 }
+
+
+Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force -Verbose
+
+dotnet restore .\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj --force
+
+
