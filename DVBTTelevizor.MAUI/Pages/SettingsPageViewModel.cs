@@ -288,11 +288,11 @@ namespace DVBTTelevizor.MAUI
                 _configuration.DVBTDriverType = (DVBTDriverTypeEnum)value;
                 OnPropertyChanged(nameof(DVBTDriverTypeIndex));
 
-                if ((previousDVBTDriverTypeindex != null) &&
-                    previousDVBTDriverTypeindex != value)
-                {
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
-                }
+                //if ((previousDVBTDriverTypeindex != null) &&
+                //    previousDVBTDriverTypeindex != value)
+                //{
+                //    WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
+                //}
 
                 previousDVBTDriverTypeindex = value;
 

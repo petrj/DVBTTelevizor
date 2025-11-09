@@ -155,7 +155,7 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<ConnectDriverMessage>(this, (r, m) =>
             {
                 ConnectDriver(m.Value);
             });
@@ -961,6 +961,9 @@ namespace DVBTTelevizor.MAUI
         private void ConnectDriver(DVBTDriverConfiguration config)
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
+
+            if (_driver.Connected)
+                return;
 
             _driver.DriverInstalled = true;
 

@@ -380,7 +380,7 @@ namespace DVBTTelevizor.MAUI
                 ConnectDriver();
             });
 
-            WeakReferenceMessenger.Default.Register<DVBTDriverChangedMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<InitDriverMessage>(this, (r, m) =>
             {
                 InitDriver();
             });
@@ -1328,14 +1328,8 @@ namespace DVBTTelevizor.MAUI
 
         private void ConnectDriver()
         {
-            if (_driver != null)
-            {
-                if (_driver.Connected)
-                {
-                    _driver.Stop();
-                    _driver.Disconnect();
-                }
-            }
+            if (_driver.Connected)
+                return;
 
             switch (_configuration.DVBTDriverType)
             {
@@ -1351,7 +1345,7 @@ namespace DVBTTelevizor.MAUI
                     _testDVBTDriver.PublicDirectory = PublicDirectory;
                     _testDVBTDriver.Connect();
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
                         new DVBTDriverConfiguration()
                         {
                             DeviceName = "Testing DVBT driver",
@@ -1362,7 +1356,7 @@ namespace DVBTTelevizor.MAUI
 
                 case DVBTDriverTypeEnum.TestTuneDriver:
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
                         new DVBTDriverConfiguration()
                         {
                             DeviceName = "Test tune driver"
@@ -1383,6 +1377,8 @@ namespace DVBTTelevizor.MAUI
 
                     break;
             }
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 
         protected override void OnDisappearing()

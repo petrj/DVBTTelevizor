@@ -54,21 +54,20 @@ namespace DVBTTelevizor.MAUI
 
         public virtual async Task ReConnectDriver()
         {
-
-            if (DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
+            if (
+                (DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
+                 ||
+                 (DriverTypeIndex == 1 && (!(_driver is RTLSDRDriverConnector)))
+                )
             {
-                // switch driver to DVBTDriverConnector
-                WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
-            }
-
-            if (DriverTypeIndex == 1 && (!(_driver is RTLSDRDriverConnector)))
-            {
-                // switch driver RTLSDRTCPIPFMDriverConnector
-                WeakReferenceMessenger.Default.Send(new DVBTDriverChangedMessage(String.Empty));
+                // switch driver
+                WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
             }
 
             await Task.Delay(1000);
             WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+
+            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 
         public DVBTDriverTypeEnum SelectedDriverType

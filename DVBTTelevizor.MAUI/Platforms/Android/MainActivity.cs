@@ -891,7 +891,7 @@ namespace DVBTTelevizor.MAUI
 
                     cfg.PublicDirectory = GetAndroidDirectory(null);
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(cfg));
+                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(cfg));
                 }
                 else
                 {
@@ -977,7 +977,7 @@ namespace DVBTTelevizor.MAUI
                     var x = data.GetIntExtra("SDRDriverPort", 1234);
                     var y = data.GetIntExtra("SDRDriverStreamPort", 1235);
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(new DVBTDriverConfiguration()
+                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(new DVBTDriverConfiguration()
                     {
                         //SupportedTcpCommands = data.GetIntArrayExtra("supportedTcpCommands"),
                         DeviceName = data.GetStringExtra("deviceName"),

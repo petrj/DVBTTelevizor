@@ -279,19 +279,28 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _driverPageViewModel.MenuVisible = false;
     }
 
-    private void ChangeDriver()
+    private async Task ChangeDriver()
     {
         _loggingService.Info($"ChangeDriver");
 
         if (!_changeToDriverIndex.HasValue)
             return;
 
+        if (_driver != null)
+        {
+            if (_driver.Connected)
+            {
+                await _driver.Stop();
+                await _driver.Disconnect();
+            }
+        }
+
         _ignoreDriverChangeEvent = _changeToDriverIndex.Value;
         _driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
 
         _changeToDriverIndex = null;
 
-        Task.Run(async () => await _driverPageViewModel.ReConnectDriver());
+        await _driverPageViewModel.ReConnectDriver();
     }
 
     private async void Menu_Tapped(string menuId)
@@ -303,7 +312,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuChangeDriver":
-                ChangeDriver();
+                await ChangeDriver();
                 break;
         }
     }
