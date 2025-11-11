@@ -590,43 +590,21 @@ namespace DVBTTelevizor.TV
                 };
             }
 
-            //_demodulator.ClearBuffer();
+            await Task.Delay(2000);
 
-            //await Task.Delay(300);
-
-            await Task.Delay(3500);
-
-            //if (_stationOnFrequency.ContainsKey(_driver.Frequency) && _stationOnFrequency[_driver.Frequency])
-            //{
-                return new DVBTDriverTuneResult()
+            return new DVBTDriverTuneResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.OK,
+                SignalState = new DVBTDriverStatus()
                 {
-                    Result = DVBTDriverSearchProgramResultEnum.OK,
-                    SignalState = new DVBTDriverStatus()
-                    {
-                        hasCarrier = 1,
-                        hasLock = 1,
-                        hasSync = 1,
-                        hasSignal = 1,
-                        SuccessFlag = true,
-                        rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
-                    }
-                };
-            //}
-
-            //return new DVBTDriverTuneResult()
-            //{
-            //    Result = DVBTDriverSearchProgramResultEnum.NoSignal,
-            //    SignalState = new DVBTDriverStatus()
-            //    {
-            //        hasCarrier = 10,
-            //        hasLock = 0,
-            //        hasSync = 0,
-            //        hasSignal = 0,
-            //        SuccessFlag = true,
-            //        rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
-            //    }
-            //};
-
+                    hasCarrier = 1,
+                    hasLock = 1,
+                    hasSync = 1,
+                    hasSignal = 1,
+                    SuccessFlag = true,
+                    rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                }
+            };
         }
 
         public Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
