@@ -40,67 +40,69 @@ namespace DVBTTelevizor.TV
 
         public static bool IsStationPresent(byte[] interleavedPcm16)
         {
-            try
-            {
-                if (interleavedPcm16 == null || interleavedPcm16.Length < 4000)
-                    return false;
-
-                int sampleCount = interleavedPcm16.Length / 4; // stereo 16-bit → 4 bytes/frame
-                float prev = 0f;
-                int zeroCrossings = 0;
-                double sumRms = 0, sumRms2 = 0;
-                int window = 960; // ~10 ms @ 96 kHz
-                int rmsSamples = 0;
-
-                double[] rmsBuffer = new double[sampleCount / window + 1];
-                int rmsIndex = 0;
-
-                for (int i = 0; i < sampleCount; i++)
-                {
-                    short left = BitConverter.ToInt16(interleavedPcm16, i * 4);
-                    short right = BitConverter.ToInt16(interleavedPcm16, i * 4 + 2);
-                    float mono = (left + right) * 0.5f / short.MaxValue;
-
-                    // zero-crossing
-                    if ((mono > 0 && prev <= 0) || (mono < 0 && prev >= 0))
-                        zeroCrossings++;
-                    prev = mono;
-
-                    // RMS accumulation
-                    sumRms += mono * mono;
-                    rmsSamples++;
-
-                    if (rmsSamples >= window)
-                    {
-                        double rms = Math.Sqrt(sumRms / rmsSamples);
-                        rmsBuffer[rmsIndex++] = rms;
-                        sumRms = 0;
-                        rmsSamples = 0;
-                    }
-                }
-
-                // compute variance of RMS across time windows
-                double mean = 0, var = 0;
-                int n = rmsIndex;
-                if (n < 2) return false;
-                for (int i = 0; i < n; i++) mean += rmsBuffer[i];
-                mean /= n;
-                for (int i = 0; i < n; i++) var += (rmsBuffer[i] - mean) * (rmsBuffer[i] - mean);
-                var /= n;
-
-                // compute normalized zero-crossing rate
-                double zcr = (double)zeroCrossings / sampleCount;
-
-                // heuristic thresholds — tune by experiment
-                bool hasDynamics = var > 1e-5;   // station: dynamic loudness
-                bool notTooNoisy = zcr < 0.15;   // noise: ~0.25–0.5
-
-                return hasDynamics && notTooNoisy;
-            }
-            catch (Exception e)
-            {
+            if (interleavedPcm16 == null || interleavedPcm16.Length < 4000)
                 return false;
+
+            int sampleCount = interleavedPcm16.Length / 4; // stereo 16-bit = 4 bytes/frame
+            float prev = 0f;
+            int zeroCrossings = 0;
+
+            double sumRms = 0, sumRms2 = 0;
+            double totalPower = 0;
+            int window = 960; // ~10 ms @ 96 kHz
+            int rmsSamples = 0;
+
+            double[] rmsBuffer = new double[sampleCount / window + 1];
+            int rmsIndex = 0;
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                short left = BitConverter.ToInt16(interleavedPcm16, i * 4);
+                short right = BitConverter.ToInt16(interleavedPcm16, i * 4 + 2);
+                float mono = (left + right) * 0.5f / short.MaxValue;
+
+                // Zero crossing count
+                if ((mono > 0 && prev <= 0) || (mono < 0 && prev >= 0))
+                    zeroCrossings++;
+                prev = mono;
+
+                // Power accumulation
+                double sq = mono * mono;
+                sumRms += sq;
+                rmsSamples++;
+                totalPower += sq;
+
+                if (rmsSamples >= window)
+                {
+                    double rms = Math.Sqrt(sumRms / rmsSamples);
+                    rmsBuffer[rmsIndex++] = rms;
+                    sumRms = 0;
+                    rmsSamples = 0;
+                }
             }
+
+            // Compute variance of RMS values (dynamics)
+            int n = rmsIndex;
+            if (n < 2) return false;
+
+            double mean = 0, var = 0;
+            for (int i = 0; i < n; i++) mean += rmsBuffer[i];
+            mean /= n;
+            for (int i = 0; i < n; i++) var += (rmsBuffer[i] - mean) * (rmsBuffer[i] - mean);
+            var /= n;
+
+            // Average power of the signal
+            double avgPower = totalPower / sampleCount;
+
+            // Normalized zero-crossing rate
+            double zcr = (double)zeroCrossings / sampleCount;
+
+            // --- Heuristic thresholds (tune as needed) ---
+            bool hasDynamics = var > 1e-5;     // real audio has changing RMS
+            bool notTooNoisy = zcr < 0.15;     // noise crosses zero very often
+            bool strongSignal = avgPower > 0.001; // reject weak stations or static
+
+            return hasDynamics && notTooNoisy && strongSignal;
         }
 
         private void _demodulator_OnDemodulated(object? sender, EventArgs e)
