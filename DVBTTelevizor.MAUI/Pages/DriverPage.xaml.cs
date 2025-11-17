@@ -20,7 +20,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private string _publicDirectory;
 
     private KeyboardFocusableItemList _focusItems;
-    private List<MenuItem> _menuItems = new List<MenuItem>();
+
+    private AppMenu _appMenu = null;
 
     public DriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -39,6 +40,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
+        _appMenu = new AppMenu(MainMenu);
+        _appMenu.FontSize = _configuration.AppFontSize;
+        _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged;
+
         DriverPicker.SelectedIndexChanged += DriverPicker_SelectedIndexChanged;
 
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
@@ -46,32 +51,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
-    private void BuildChangeDriverMenu()
+    private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
     {
-        if (_driver == null || !_driver.Connected)
-        {
-            return;
-        }
-
-        ShowOrHideMenu();
-
-        if (MainMenu.IsVisible)
-        {
-            _menuItems.Clear();
-
-            var currentDriverName = _driver.Configuration.DeviceName;
-            var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
-            var previousDriverType = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.PreviousSelectedDriverTypeIndex);
-
-            _menuItems.Add(MainMenu.CreateMenuItem("menuChangeDriver", "Disconnect {0} ({1}) and connect {2}?"
-                .Translated(currentDriverType, currentDriverName, previousDriverType), "refresh.png"));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverType), "close.png"));
-
-            MainMenu.UpdateMenu((int)_configuration.AppFontSize,
-                "Please confirm change of driver:".Translated(), _menuItems);
-        }
+        _driverPageViewModel.MenuVisible = e.IsVisible;
     }
-
 
     private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
     {
@@ -95,7 +78,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    BuildChangeDriverMenu();
+                    _appMenu.BuildChangeDriverMenu(_driver, _driverPageViewModel.SelectedDriverType, _driverPageViewModel.PreviousSelectedDriverTypeIndex);
                 });
             }
             else
@@ -254,31 +237,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         }
     }
 
-
-    private void ShowOrHideMenu()
-    {
-        if (MainMenu.MenuVisible)
-        {
-            HideMenu();
-        }
-        else
-        {
-            ShowMenu();
-        }
-    }
-
-    private void ShowMenu()
-    {
-        MainMenu.MenuVisible = true;
-        _driverPageViewModel.MenuVisible = true;
-    }
-
-    private void HideMenu()
-    {
-        MainMenu.MenuVisible = false;
-        _driverPageViewModel.MenuVisible = false;
-    }
-
     private async Task ChangeDriver()
     {
         _loggingService.Info($"ChangeDriver");
@@ -307,7 +265,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Info($"Menu tapped: {menuId}");
 
-        HideMenu();
+        _appMenu.HideMenu();
 
         switch (menuId)
         {
