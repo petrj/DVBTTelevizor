@@ -30,6 +30,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private Command _commandUpdateBitrate;
 
+    private AppMenu _appMenu = null;
+
     public TuningProgressPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
@@ -42,6 +44,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         BindingContext = _viewModel = new TuningProgressPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
+        _appMenu = new AppMenu(MainMenu);
+        _appMenu.FontSize = _configuration.AppFontSize;
+        _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged;
+
         BuildFocusableItems();
 
         _viewModel.ChannelFound += ChannelFound;
@@ -51,7 +57,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 //BuildConfirmMenu("Tuning failed. Check USB connection".Translated(), "Retry".Translated(), "Cancel".Translated(), "menuRetryTune", "menuCancel");
-                BuildRetryTuneMenu();
+                //BuildRetryTuneMenu();
+                _appMenu.ShowRetryTuneMenu();
             });
         });
 
@@ -65,6 +72,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         Disappearing += TuningProgressPage_Disappearing;
         BackgroundCommandWorker.RunInBackground(_commandUpdateBitrate, 5);
+    }
+
+    private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
+    {
+        _viewModel.MenuVisible = e.IsVisible;
     }
 
     private void TuningProgressPage_Disappearing(object? sender, EventArgs e)
@@ -323,7 +335,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
             _viewModel.Settings.TuningMode != TuneModeEnum.Frequency)
         {
-            BuildConfirmMenu(
+            _appMenu.ShowConfirmMenu(
             "Tuning is in progress".Translated(),
             "Start from beginning".Translated(),
             "Continue".Translated(),
@@ -377,62 +389,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _viewModel.UpdateActualFreq();
     }
 
-    private void ShowOrHideMenu()
-    {
-        if (MainMenu.MenuVisible)
-        {
-            HideMenu();
-        }
-        else
-        {
-            ShowMenu();
-        }
-    }
-
-    private void ShowMenu()
-    {
-        MainMenu.MenuVisible = true;
-        _viewModel.MenuVisible = true;
-    }
-
-    private void HideMenu()
-    {
-        MainMenu.MenuVisible = false;
-        _viewModel.MenuVisible = false;
-    }
-
-
-    private void BuildRetryTuneMenu()
-    {
-        ShowOrHideMenu();
-
-        if (MainMenu.IsVisible)
-        {
-            _menuItems.Clear();
-
-            _menuItems.Add(MainMenu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
-            _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
-
-            MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Tuning failed.Check USB connection".Translated(), _menuItems);
-        }
-    }
-
-    private void BuildConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm, string actionNotConfirm)
-    {
-        ShowOrHideMenu();
-
-        if (MainMenu.IsVisible)
-        {
-            _menuItems.Clear();
-
-            _menuItems.Add(MainMenu.CreateMenuItem(actionConfirm, titleYes, "confirm.png"));
-            _menuItems.Add(MainMenu.CreateMenuItem(actionNotConfirm, titleNo, "cancel.png"));
-
-            MainMenu.UpdateMenu((int)_configuration.AppFontSize, title, _menuItems);
-        }
-    }
-
     private void Menu_Tapped(object sender, EventArgs e)
     {
         if (e != null && e is TappedEventArgs tea)
@@ -445,7 +401,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Info($"Menu tapped: {menuId}");
 
-        HideMenu();
+        _appMenu.HideMenu();
 
         switch (menuId)
         {

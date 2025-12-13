@@ -78,7 +78,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _appMenu.BuildChangeDriverMenu(_driver, _driverPageViewModel.SelectedDriverType, _driverPageViewModel.PreviousSelectedDriverTypeIndex);
+                    _appMenu.ShowChangeDriverMenu(_driver, _driverPageViewModel.SelectedDriverType, _driverPageViewModel.PreviousSelectedDriverTypeIndex);
                 });
             }
             else

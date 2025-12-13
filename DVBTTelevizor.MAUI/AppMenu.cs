@@ -36,9 +36,10 @@ namespace DVBTTelevizor.MAUI
             _menuItems.Clear();
         }
 
-        public void AddItem(MenuItem item)
+        public MenuItem AddItem(MenuItem item)
         {
             _menuItems.Add(item);
+            return item;
         }
 
         public void Finish(string title)
@@ -71,7 +72,7 @@ namespace DVBTTelevizor.MAUI
         }
 
 
-        public void BuildChangeDriverMenu(IDriverConnector _driver, DVBTDriverTypeEnum selectedDriverType, int previousSelectedDriverTypeIndex)
+        public void ShowChangeDriverMenu(IDriverConnector _driver, DVBTDriverTypeEnum selectedDriverType, int previousSelectedDriverTypeIndex)
         {
             if (_driver == null || !_driver.Connected)
             {
@@ -93,6 +94,55 @@ namespace DVBTTelevizor.MAUI
                 AddItem(_menu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverType), "close.png"));
 
                 Finish("Please confirm change of driver:".Translated());
+            }
+        }
+
+        public void ShowRetryTuneMenu()
+        {
+            ShowOrHideMenu();
+
+            if (_menu.IsVisible)
+            {
+                Clear();
+
+                AddItem(_menu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
+                AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
+                AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
+
+                Finish("Tuning failed. Check USB connection".Translated());
+            }
+        }
+
+        public void ShowRetryPlayMenu(string channelId)
+        {
+            ShowOrHideMenu();
+
+            if (_menu.IsVisible)
+            {
+                Clear();
+
+                var playItem = AddItem(_menu.CreateMenuItem("menuRetryPlay", "Retry".Translated(), "refresh.png"));
+                playItem.ChannelId = channelId;
+
+                AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
+                AddItem(_menu.CreateMenuItem("menuCancelPlay", "Cancel".Translated(), "cancel.png"));
+
+                Finish("Playing failed. Check USB connection".Translated());
+            }
+        }
+
+        public void ShowConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm, string actionNotConfirm)
+        {
+            ShowOrHideMenu();
+
+            if (_menu.IsVisible)
+            {
+                Clear();
+
+                AddItem(_menu.CreateMenuItem(actionConfirm, titleYes, "confirm.png"));
+                AddItem(_menu.CreateMenuItem(actionNotConfirm, titleNo, "cancel.png"));
+
+                Finish(title);
             }
         }
     }

@@ -86,6 +86,8 @@ namespace DVBTTelevizor.MAUI
         private ChannelPage _channelPage = null;
         private FilterPage _filterPage = null;
 
+        private AppMenu _appMenu = null;
+
         private bool IsPortrait { get; set; } = false;
 
         // Menu: 0.0,0,1.0,0.1
@@ -169,6 +171,10 @@ namespace DVBTTelevizor.MAUI
             });
 
             InitializeComponent();
+
+            _appMenu = new AppMenu(MainMenu);
+            _appMenu.FontSize = _configuration.AppFontSize;
+            _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged;
 
             var forceLoggingWhenDebug = false;
 
@@ -297,6 +303,11 @@ namespace DVBTTelevizor.MAUI
 
             BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
+        }
+
+        private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
+        {
+            //_viewModel.MenuVisible = e.IsVisible;
         }
 
         public void SetFixVideNeeded()
@@ -1916,6 +1927,10 @@ namespace DVBTTelevizor.MAUI
                     )
                 {
                     WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (device not connected)".Translated(channel.Name)));
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        _appMenu.ShowRetryPlayMenu(channel.ChannelId);
+                    });
                     return;
                 }
 
@@ -3314,6 +3329,13 @@ namespace DVBTTelevizor.MAUI
                     break;
                     case "menuFilter":
                         await Navigation.PushAsync(_filterPage);
+                    break;
+                case "menuCancelPlay":
+                    await ActionStop(true);
+                    break;
+
+                case "menuDriver":
+                    DriverStateButton_Clicked(this, null);
                     break;
             }
 
