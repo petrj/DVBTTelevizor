@@ -782,6 +782,27 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private DVBTDriverTypeEnum GetDriverType()
+        {
+            if ((_driver == null) ||
+                (_driver is DVBTDriverConnector))
+            {
+                return DVBTDriverTypeEnum.AndroidDVBTDriver;
+            }
+
+            if (_driver is TestTuneConnector)
+            {
+                return DVBTDriverTypeEnum.TestTuneDriver;
+            }
+
+            if (_driver is RTLSDRDriverConnector)
+            {
+                return DVBTDriverTypeEnum.RTLSDRDriver;
+            }
+
+            return DVBTDriverTypeEnum.AndroidDVBTDriver;
+        }
+
         private void InitDriver()
         {
             switch (_configuration.DVBTDriverType)
@@ -1929,7 +1950,37 @@ namespace DVBTTelevizor.MAUI
                     WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (device not connected)".Translated(channel.Name)));
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        _appMenu.ShowRetryPlayMenu(channel.ChannelId);
+                        _appMenu.ShowRetryPlayMenu(channel.UniqueIdentifier);
+                    });
+                    return;
+                }
+
+                if (
+                    ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
+                    (_driver.Connected) &&
+                    (!(_driver is DVBTDriverConnector))
+                    )
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
+                        var previousDriverType = BaseViewModel.GetDVBTDriverTypeName(DVBTDriverTypeEnum.AndroidDVBTDriver);
+                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, previousDriverType);
+                    });
+                    return;
+                }
+
+                if (
+                    (channel.ChannelType == ChannelTypeEnum.FM) &&
+                    (_driver.Connected) &&
+                    (!(_driver is RTLSDRDriverConnector))
+                    )
+                {
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
+                        var previousDriverType = BaseViewModel.GetDVBTDriverTypeName(DVBTDriverTypeEnum.RTLSDRDriver);
+                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, previousDriverType);
                     });
                     return;
                 }
@@ -3246,6 +3297,14 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
+            if (menuId.StartsWith("menuRetryPlay"))
+            {
+                var channelId = menuId.Substring(14);
+                var ch = _viewModel.GetChannelByUniqueidentifier(channelId);
+                await ActionPlay(ch);
+                return;
+            }
+
             switch (menuId)
             {
                 case "menuSettings":
@@ -3337,6 +3396,10 @@ namespace DVBTTelevizor.MAUI
                 case "menuDriver":
                     DriverStateButton_Clicked(this, null);
                     break;
+
+                case "menuChangeDriver":
+                    await ChangeDriver();
+                    break;
             }
 
             for (var i=0;i<=9;i++)
@@ -3359,6 +3422,21 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
             }
+        }
+
+        private async Task ChangeDriver()
+        {
+            _loggingService.Info($"ChangeDriver");
+
+            if ((_driver != null) && (_driver.Connected))
+            {
+                await _driver.Stop();
+                await _driver.Disconnect();
+            }
+
+            // TODO: change the driver
+
+            await _viewModel.ReConnectDriver();
         }
 
         private void TurnOnTeletext()

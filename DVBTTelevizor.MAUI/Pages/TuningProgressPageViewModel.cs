@@ -458,13 +458,21 @@ namespace DVBTTelevizor.MAUI
                     ch.Bandwdith = bandWidth;
                     ch.Number = String.Empty;
 
-                    switch (dvbtTypeIndex)
+                    if (FMTuning)
                     {
-                        case 0: ch.ChannelType = ChannelTypeEnum.DVBT;
-                            break;
-                        case 1:
-                            ch.ChannelType = ChannelTypeEnum.DVBT2;
-                            break;
+                        ch.ChannelType = ChannelTypeEnum.FM;
+                    }
+                    else
+                    {
+                        switch (dvbtTypeIndex)
+                        {
+                            case 0:
+                                ch.ChannelType = ChannelTypeEnum.DVBT;
+                                break;
+                            case 1:
+                                ch.ChannelType = ChannelTypeEnum.DVBT2;
+                                break;
+                        }
                     }
 
                     ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;

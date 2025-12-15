@@ -78,7 +78,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _appMenu.ShowChangeDriverMenu(_driver, _driverPageViewModel.SelectedDriverType, _driverPageViewModel.PreviousSelectedDriverTypeIndex);
+                    var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
+                    var newDriverName = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.PreviousSelectedDriverTypeIndex);
+                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverName, newDriverName);
                 });
             }
             else
@@ -244,13 +246,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         if (!_changeToDriverIndex.HasValue)
             return;
 
-        if (_driver != null)
+        if ((_driver != null) && (_driver.Connected))
         {
-            if (_driver.Connected)
-            {
-                await _driver.Stop();
-                await _driver.Disconnect();
-            }
+            await _driver.Stop();
+            await _driver.Disconnect();
         }
 
         _ignoreDriverChangeEvent = _changeToDriverIndex.Value;
