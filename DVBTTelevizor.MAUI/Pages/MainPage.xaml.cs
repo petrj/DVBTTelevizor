@@ -1964,8 +1964,7 @@ namespace DVBTTelevizor.MAUI
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                        var previousDriverType = BaseViewModel.GetDVBTDriverTypeName(DVBTDriverTypeEnum.AndroidDVBTDriver);
-                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, previousDriverType);
+                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.AndroidDVBTDriver);
                     });
                     return;
                 }
@@ -1979,8 +1978,7 @@ namespace DVBTTelevizor.MAUI
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                        var previousDriverType = BaseViewModel.GetDVBTDriverTypeName(DVBTDriverTypeEnum.RTLSDRDriver);
-                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, previousDriverType);
+                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.RTLSDRDriver);
                     });
                     return;
                 }
