@@ -119,6 +119,9 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                if (value == null)
+                    return;
+
                 _configuration.Language = value;
 
                 NotifyLanguageChange();

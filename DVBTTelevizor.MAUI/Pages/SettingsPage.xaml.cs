@@ -232,9 +232,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void Menu_Tapped(object sender, EventArgs e)
     {
-        if (e != null && e is TappedEventArgs tea)
+        if (e != null &&
+            e is TappedEventArgs tea &&
+            tea.Parameter is MenuItem item)
         {
-            Menu_Tapped(tea.Parameter.ToString());
+            Menu_Tapped(item);
         }
     }
 
@@ -332,8 +334,9 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         }
     }
 
-    private async void Menu_Tapped(string menuId)
+    private async void Menu_Tapped(MenuItem item)
     {
+        var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
 
         HideMenu();
@@ -412,20 +415,20 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 #endif
     }
 
-    private string GetSelectedMenuId()
+    private MenuItem? GetSelectedMenuItem()
     {
         foreach (var item in _menuItems)
         {
             if (item.Selected)
             {
-                return item.Id;
+                return item;
             }
         }
 
         // if menu contains only single OK button, return ""menuOK""
         if ((_menuItems.Count == 1) && (_menuItems[0].Id == "menuOK"))
         {
-            return "menuOK";
+            return _menuItems[0];
         }
 
         return null;
@@ -457,10 +460,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 break;
 
             case KeyboardNavigationActionEnum.OK:
-                var id = GetSelectedMenuId();
-                if (id != null)
+                var menu = GetSelectedMenuItem();
+                if (menu != null)
                 {
-                    Menu_Tapped(id);
+                    Menu_Tapped(menu);
                 }
                 break;
         }

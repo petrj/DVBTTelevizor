@@ -63,14 +63,17 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
 
     public void Menu_Tapped(object sender, EventArgs e)
     {
-        if (e != null && e is TappedEventArgs tea)
+        if (e != null &&
+            e is TappedEventArgs tea &&
+            tea.Parameter is MenuItem item)
         {
-            Menu_Tapped(tea.Parameter.ToString());
+            Menu_Tapped(item);
         }
     }
 
-    private async void Menu_Tapped(string menuId)
+    private async void Menu_Tapped(MenuItem item)
     {
+        var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
 
         HideMenu();
@@ -406,22 +409,22 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 break;
 
             case KeyboardNavigationActionEnum.OK:
-                var id = GetSelectedMenuId();
-                if (id != null)
+                var menuItem = GetSelectedMenu();
+                if (menuItem != null)
                 {
-                    Menu_Tapped(id);
+                    Menu_Tapped(menuItem);
                 }
                 break;
         }
     }
 
-    private string GetSelectedMenuId()
+    private MenuItem? GetSelectedMenu()
     {
         foreach (var item in _menuItems)
         {
             if (item.Selected)
             {
-                return item.Id;
+                return item;
             }
         }
 

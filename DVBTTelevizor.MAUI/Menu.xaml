@@ -49,7 +49,7 @@
                                 </Grid>
 
                                 <Frame.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding Id}" />
+                                    <TapGestureRecognizer Tapped="Menu_Tapped" NumberOfTapsRequired="1" CommandParameter="{Binding .}" />
                                 </Frame.GestureRecognizers>
 
                             </Frame>

@@ -232,9 +232,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private void Menu_Tapped(object sender, EventArgs e)
     {
-        if (e != null && e is TappedEventArgs tea)
+        if (e != null &&
+            e is TappedEventArgs tea &&
+            tea.Parameter is MenuItem item)
         {
-            Menu_Tapped(tea.Parameter.ToString());
+            Menu_Tapped(item);
         }
     }
 
@@ -259,8 +261,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         await _driverPageViewModel.ReConnectDriver();
     }
 
-    private async void Menu_Tapped(string menuId)
+    private async void Menu_Tapped(MenuItem item)
     {
+        var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
 
         _appMenu.HideMenu();

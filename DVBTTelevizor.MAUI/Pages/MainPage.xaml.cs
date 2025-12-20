@@ -2898,7 +2898,7 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Debug("ChannelsListView_ItemSelected");
         }
 
-        private string GetSelectedMenuId()
+        private MenuItem? GetSelectedMenuItem()
         {
             if (_activeMenuItems == null)
                 return null;
@@ -2907,7 +2907,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (item.Selected)
                 {
-                    return item.Id;
+                    return item;
                 }
             }
 
@@ -2939,10 +2939,10 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case KeyboardNavigationActionEnum.OK:
-                    var id = GetSelectedMenuId();
-                    if (id != null)
+                    var item = GetSelectedMenuItem();
+                    if (item != null)
                     {
-                        Menu_Tapped(id);
+                        Menu_Tapped(item);
                     }
                     break;
             }
@@ -2983,9 +2983,11 @@ namespace DVBTTelevizor.MAUI
 
         private void Menu_Tapped(object sender, EventArgs e)
         {
-            if (e != null && e is TappedEventArgs tea)
+            if (e != null &&
+                e is TappedEventArgs tea &&
+                tea.Parameter is MenuItem item)
             {
-                Menu_Tapped(tea.Parameter.ToString());
+                Menu_Tapped(item);
             }
         }
 
@@ -3283,8 +3285,9 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async void Menu_Tapped(string menuId)
+        private async void Menu_Tapped(MenuItem menuItem)
         {
+            var menuId = menuItem.Id;
             HideMenu();
 
             if (menuId.StartsWith("setAudio"))
