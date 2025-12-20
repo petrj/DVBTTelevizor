@@ -122,7 +122,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Clear();
 
-                var playItem = AddItem(_menu.CreateMenuItem($"menuRetryPlay-{channelId}", "Retry".Translated(), "refresh.png"));
+                var playItem = AddItem(_menu.CreateMenuItem($"menuRetryPlay", "Retry".Translated(), "refresh.png"));
                 playItem.ChannelId = channelId;
 
                 AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));

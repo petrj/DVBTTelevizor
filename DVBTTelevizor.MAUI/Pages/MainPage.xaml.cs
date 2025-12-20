@@ -1928,7 +1928,65 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async Task ActionPlay(Channel channel = null)
+        private bool CanPlay(Channel? channel = null)
+        {
+            if (
+                    //((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
+                    (!_driver.Connected)
+                    )
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (device not connected)".Translated(channel.Name)));
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _appMenu.ShowRetryPlayMenu(channel.UniqueIdentifier);
+                });
+                return false;
+            }
+
+            if (
+                ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
+                (_driver.Connected) &&
+                (!(_driver is DVBTDriverConnector))
+                )
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
+                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.AndroidDVBTDriver);
+                });
+                return false;
+            }
+
+            if (
+                (channel.ChannelType == ChannelTypeEnum.FM) &&
+                (_driver.Connected) &&
+                (!(_driver is RTLSDRDriverConnector))
+                )
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
+                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.RTLSDRDriver);
+                });
+                return false;
+            }
+
+            if (_viewModel.RecordingChannel != null && _viewModel.RecordingChannel != channel)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (recording in progress)".Translated(channel.Name)));
+                return false;
+            }
+
+            if (channel.NonFree)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (non free channel)".Translated(channel.Name)));
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task ActionPlay(Channel? channel = null)
         {
             _loggingService.Debug($"ActionPlay");
 
@@ -1942,56 +2000,8 @@ namespace DVBTTelevizor.MAUI
 
                 _loggingService.Debug($"playing: {channel.Name} ({channel.Number})");
 
-                if (
-                    ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
-                    (!_driver.Connected)
-                    )
+                if (!CanPlay(channel))
                 {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (device not connected)".Translated(channel.Name)));
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        _appMenu.ShowRetryPlayMenu(channel.UniqueIdentifier);
-                    });
-                    return;
-                }
-
-                if (
-                    ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2)) &&
-                    (_driver.Connected) &&
-                    (!(_driver is DVBTDriverConnector))
-                    )
-                {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.AndroidDVBTDriver);
-                    });
-                    return;
-                }
-
-                if (
-                    (channel.ChannelType == ChannelTypeEnum.FM) &&
-                    (_driver.Connected) &&
-                    (!(_driver is RTLSDRDriverConnector))
-                    )
-                {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                        _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.RTLSDRDriver);
-                    });
-                    return;
-                }
-
-                if (_viewModel.RecordingChannel != null && _viewModel.RecordingChannel != channel)
-                {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (recording in progress)".Translated(channel.Name)));
-                    return;
-                }
-
-                if (channel.NonFree)
-                {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing {0} failed (non free channel)".Translated(channel.Name)));
                     return;
                 }
 
