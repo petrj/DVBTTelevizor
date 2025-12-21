@@ -72,7 +72,7 @@ namespace DVBTTelevizor.MAUI
         }
 
 
-        public void ShowChangeDriverMenu(IDriverConnector _driver, string currentDriverName, int newDriverTypeIndex)
+        public void ShowChangeDriverMenu(IDriverConnector _driver, string currentDriverName, DriverTypeEnum driverType)
         {
             if (_driver == null || !_driver.Connected)
             {
@@ -86,11 +86,11 @@ namespace DVBTTelevizor.MAUI
                 Clear();
 
                 var configDriverName = _driver.Configuration.DeviceName;
-                var newDriverName = BaseViewModel.GetDVBTDriverTypeName(newDriverTypeIndex);
+                var newDriverName = BaseViewModel.GetDVBTDriverTypeName(driverType);
 
                 var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", "Disconnect {0} ({1}) and connect {2}?"
                     .Translated(configDriverName, currentDriverName, newDriverName), "refresh.png"));
-                menuItem.DriverTypeIndex = newDriverTypeIndex;
+                menuItem.DriverType = driverType;
 
                 AddItem(_menu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverName), "close.png"));
 

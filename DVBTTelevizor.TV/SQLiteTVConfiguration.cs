@@ -199,12 +199,12 @@ namespace DVBTTelevizor
             }
         }
 
-        public DVBTDriverTypeEnum DVBTDriverType
+        public DriverTypeEnum DVBTDriverType
         {
             get
             {
                 var index = GetPersistingSettingValue<int>("DVBTDriverType");
-                return (DVBTDriverTypeEnum)index;
+                return (DriverTypeEnum)index;
             }
             set
             {

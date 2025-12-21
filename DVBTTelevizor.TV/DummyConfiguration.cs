@@ -13,7 +13,7 @@ namespace DVBTTelevizor.TV
         public string ConfigDirectory { get; set; } = String.Empty;
         public string LastSelectedChannelUniqueIdentifier { get; set; } = String.Empty;
         public string AutoPlayedChannelUniqueID { get; set; } = String.Empty;
-        public DVBTDriverTypeEnum DVBTDriverType { get; set; } = DVBTDriverTypeEnum.AndroidDVBTDriver;
+        public DriverTypeEnum DVBTDriverType { get; set; } = DriverTypeEnum.AndroidDVBTDriver;
         public AppFontSizeEnum AppFontSize { get; set; } = AppFontSizeEnum.Normal;
         public string Language { get; set; } = String.Empty;
         public bool Fullscreen { get; set; } = false;

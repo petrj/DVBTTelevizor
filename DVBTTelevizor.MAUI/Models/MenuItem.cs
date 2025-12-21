@@ -22,7 +22,7 @@ namespace DVBTTelevizor.MAUI
 
         public Thickness Margin { get; set; } = new Thickness(10,8,10,8);
 
-        public int? DriverTypeIndex { get; set; } = null;
+        public DriverTypeEnum DriverType { get; set; } = DriverTypeEnum.AndroidDVBTDriver;
 
         public string BackgroundColor
         {

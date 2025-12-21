@@ -70,17 +70,17 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 
-        public DVBTDriverTypeEnum SelectedDriverType
+        public DriverTypeEnum SelectedDriverType
         {
             get
             {
                 switch (DriverTypeIndex)
                 {
                     case 1:
-                        return DVBTDriverTypeEnum.RTLSDRDriver;
+                        return DriverTypeEnum.RTLSDRDriver;
                     case 0:
                     default:
-                        return DVBTDriverTypeEnum.AndroidDVBTDriver;
+                        return DriverTypeEnum.AndroidDVBTDriver;
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public static string GetDVBTDriverTypeName(DVBTDriverTypeEnum driverType)
+        public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
         {
             return GetDVBTDriverTypeName((int)driverType);
         }
@@ -137,9 +137,9 @@ namespace DVBTTelevizor.MAUI
 
                 switch (_configuration.DVBTDriverType)
                 {
-                    case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                    case DriverTypeEnum.AndroidDVBTDriver:
                         return 0;
-                    case DVBTDriverTypeEnum.RTLSDRDriver:
+                    case DriverTypeEnum.RTLSDRDriver:
                         return 1;
                     default:
                         return 0;
@@ -152,10 +152,10 @@ namespace DVBTTelevizor.MAUI
                 switch (value)
                 {
                     case 0:
-                        _configuration.DVBTDriverType = DVBTDriverTypeEnum.AndroidDVBTDriver;
+                        _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
                         break;
                     case 1:
-                        _configuration.DVBTDriverType = DVBTDriverTypeEnum.RTLSDRDriver;
+                        _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
                         break;
                 }
                 OnPropertyChanged(nameof(DriverTypeIndex));

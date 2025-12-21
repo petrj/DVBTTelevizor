@@ -79,7 +79,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
-                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverName, _driverPageViewModel.PreviousSelectedDriverTypeIndex);
+                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverName, (DriverTypeEnum)_driverPageViewModel.PreviousSelectedDriverTypeIndex);
                 });
             }
             else

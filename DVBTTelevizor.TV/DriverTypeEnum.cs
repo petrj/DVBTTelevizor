@@ -8,7 +8,9 @@ namespace DVBTTelevizor.MAUI
 {
     public enum DriverTypeEnum
     {
-        DVBT = 0,
-        FM = 1
+         AndroidDVBTDriver = 0,
+         AndroidTestingDVBTDriver = 1,
+         TestTuneDriver = 2,
+         RTLSDRDriver = 3
     }
 }

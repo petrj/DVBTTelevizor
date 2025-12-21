@@ -288,7 +288,7 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
-                _configuration.DVBTDriverType = (DVBTDriverTypeEnum)value;
+                _configuration.DVBTDriverType = (DriverTypeEnum)value;
                 OnPropertyChanged(nameof(DVBTDriverTypeIndex));
 
                 //if ((previousDVBTDriverTypeindex != null) &&

@@ -782,41 +782,41 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private DVBTDriverTypeEnum GetDriverType()
+        private DriverTypeEnum GetDriverType()
         {
             if ((_driver == null) ||
                 (_driver is DVBTDriverConnector))
             {
-                return DVBTDriverTypeEnum.AndroidDVBTDriver;
+                return DriverTypeEnum.AndroidDVBTDriver;
             }
 
             if (_driver is TestTuneConnector)
             {
-                return DVBTDriverTypeEnum.TestTuneDriver;
+                return DriverTypeEnum.TestTuneDriver;
             }
 
             if (_driver is RTLSDRDriverConnector)
             {
-                return DVBTDriverTypeEnum.RTLSDRDriver;
+                return DriverTypeEnum.RTLSDRDriver;
             }
 
-            return DVBTDriverTypeEnum.AndroidDVBTDriver;
+            return DriverTypeEnum.AndroidDVBTDriver;
         }
 
         private void InitDriver()
         {
             switch (_configuration.DVBTDriverType)
             {
-                case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                case DriverTypeEnum.AndroidDVBTDriver:
                     _driver = new DVBTDriverConnector(_loggingService);
                     break;
-                case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
+                case DriverTypeEnum.AndroidTestingDVBTDriver:
                     _driver = new DVBTDriverConnector(_loggingService);
                     break;
-                case DVBTDriverTypeEnum.TestTuneDriver:
+                case DriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
-                case DVBTDriverTypeEnum.RTLSDRDriver:
+                case DriverTypeEnum.RTLSDRDriver:
                     _driver = new RTLSDRDriverConnector(_loggingService, _sdrDriverPlatformImplementation.GetRTLSDRDriver());
                     break;
                 default:
@@ -1365,13 +1365,13 @@ namespace DVBTTelevizor.MAUI
 
             switch (_configuration.DVBTDriverType)
             {
-                case DVBTDriverTypeEnum.AndroidDVBTDriver:
+                case DriverTypeEnum.AndroidDVBTDriver:
 
                     _loggingService.Info("Sending connect message");
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
                     break;
 
-                case DVBTDriverTypeEnum.AndroidTestingDVBTDriver:
+                case DriverTypeEnum.AndroidTestingDVBTDriver:
 
                     _testDVBTDriver = new TestDVBTDriver(_loggingService);
                     _testDVBTDriver.PublicDirectory = PublicDirectory;
@@ -1386,7 +1386,7 @@ namespace DVBTTelevizor.MAUI
                         }));
                     break;
 
-                case DVBTDriverTypeEnum.TestTuneDriver:
+                case DriverTypeEnum.TestTuneDriver:
 
                     WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
                         new DVBTDriverConfiguration()
@@ -1396,7 +1396,7 @@ namespace DVBTTelevizor.MAUI
 
                     break;
 
-                case DVBTDriverTypeEnum.RTLSDRDriver:
+                case DriverTypeEnum.RTLSDRDriver:
 
                     var cfg = new RTLSDR.DriverSettings()
                     {
@@ -1952,7 +1952,7 @@ namespace DVBTTelevizor.MAUI
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.AndroidDVBTDriver);
+                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, DriverTypeEnum.AndroidDVBTDriver);
                 });
                 return false;
             }
@@ -1966,7 +1966,7 @@ namespace DVBTTelevizor.MAUI
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, (int)DVBTDriverTypeEnum.RTLSDRDriver);
+                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, DriverTypeEnum.RTLSDRDriver);
                 });
                 return false;
             }
@@ -3409,7 +3409,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case "menuChangeDriver":
-                    await ChangeDriver();
+                    await ChangeDriver(menuItem.DriverType);
                     break;
             }
 
@@ -3435,7 +3435,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async Task ChangeDriver()
+        private async Task ChangeDriver(DriverTypeEnum driverType)
         {
             _loggingService.Info($"ChangeDriver");
 
@@ -3445,7 +3445,7 @@ namespace DVBTTelevizor.MAUI
                 await _driver.Disconnect();
             }
 
-            // TODO: change the driver
+            _configuration.DVBTDriverType = driverType;
 
             await _viewModel.ReConnectDriver();
         }
