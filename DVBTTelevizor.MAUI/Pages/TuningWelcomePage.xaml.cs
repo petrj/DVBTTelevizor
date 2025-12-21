@@ -216,7 +216,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     private void SetFMSettings()
     {
         _tuningSettings.FM = true;
-        _tuningSettings.FrequencyKHz = 88000;
+        //_tuningSettings.FrequencyKHz = 88000;
         _tuningSettings.FrequencyFromKHz = 88000;
         _tuningSettings.FrequencyToKHz = 108000;
         _tuningSettings.DeviceFrequencyMinKHz = 88000;
