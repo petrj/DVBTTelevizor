@@ -51,13 +51,13 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
-            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="BackgroundColor" Value="Black"/>
-                <Setter Property="HorizontalTextAlignment" Value="Start"/>
-                <Setter Property="VerticalTextAlignment" Value="Center"/>
-                <Setter Property="VerticalOptions" Value="Center"/>
-                <Setter Property="Margin" Value="3,3,3,3"/>
+            <Style x:Key="RadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="BackgroundColor" Value="#808080"/>
+                <Setter Property="BorderColor" Value="#808080"/>
+                <Setter Property="Margin" Value="15,5,5,5" />
+                <Setter Property="BorderWidth" Value="0" />
             </Style>
 
         </ResourceDictionary>
@@ -68,7 +68,10 @@
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding DriverStateStatus}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.125,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" >
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.3,0.8,0.30" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.13,0.5,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="#808080" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -77,20 +80,13 @@
                 <ColumnDefinition Width="50*" />
             </Grid.ColumnDefinitions>
 
-            <BoxView x:Name="DriverTypeBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
+            <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
 
-            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Driver:'}" Style="{DynamicResource DriverLabelStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <Picker
-                Grid.Row="0" Grid.Column="1"
-                x:Name="DriverPicker"
-                FontSize="{Binding FontSizeForPicker}"
-                Style="{StaticResource CommonPickerTextStyle}"
-                ItemsSource="{Binding Drivers}"
-                SelectedIndex="{Binding DriverTypeIndex, Mode=TwoWay}"/>
+            <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
+            <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
         </Grid>
 
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.3,0.8,0.30" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
                 <Grid.RowDefinitions>

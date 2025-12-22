@@ -17,7 +17,6 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
-        protected int? _previousSelectedDriverTypeIndex = null;
 
         public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
 
@@ -36,6 +35,11 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
+
+            //WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
+            //{
+            //    NotifyDriverChange();
+            //});
         }
 
         public virtual async Task FillDrivers()
@@ -48,16 +52,17 @@ namespace DVBTTelevizor.MAUI
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 OnPropertyChanged(nameof(Drivers));
-                OnPropertyChanged(nameof(DriverTypeIndex));
             });
+
+            NotifyDriverChange();
         }
 
         public virtual async Task ReConnectDriver()
         {
             if (
-                (DriverTypeIndex == 0 && (!(_driver is DVBTDriverConnector)))
+                 (DVBTDriverActive && (!(_driver is DVBTDriverConnector)))
                  ||
-                 (DriverTypeIndex == 1 && (!(_driver is RTLSDRDriverConnector)))
+                 (FMDriverActive && (!(_driver is RTLSDRDriverConnector)))
                 )
             {
                 // switch driver
@@ -70,34 +75,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 
-        public DriverTypeEnum SelectedDriverType
-        {
-            get
-            {
-                switch (DriverTypeIndex)
-                {
-                    case 1:
-                        return DriverTypeEnum.RTLSDRDriver;
-                    case 0:
-                    default:
-                        return DriverTypeEnum.AndroidDVBTDriver;
-                }
-            }
-        }
-
-        public int PreviousSelectedDriverTypeIndex
-        {
-            get
-            {
-                return _previousSelectedDriverTypeIndex.HasValue ? _previousSelectedDriverTypeIndex.Value : 0;
-            }
-            set
-            {
-                _previousSelectedDriverTypeIndex = value;
-            }
-        }
-
-        public static string GetDVBTDriverTypeName(int driverType)
+        public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
         {
             // DVBTDriverTypeEnum
             //   *  AndroidDVBTDriver = 0,            => 0
@@ -105,7 +83,7 @@ namespace DVBTTelevizor.MAUI
             //      TestTuneDriver = 2,
             //   *  RTLSDRTCPIPFMDriver = 3,          => 1
             //      RTLSDRFMDriver = 4
-            switch (driverType)
+            switch ((int)driverType)
             {
                 case 0:
                 case 1:
@@ -113,52 +91,63 @@ namespace DVBTTelevizor.MAUI
                     return "DVBT";
                 case 3:
                 case 4:
-                    return "FM";
+                    return "RTLSDR - FM";
                 default:
                     return "";
             }
         }
 
-        public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
-        {
-            return GetDVBTDriverTypeName((int)driverType);
-        }
-
-        public int DriverTypeIndex
+        public bool DVBTDriverActive
         {
             get
             {
-                // DVBTDriverTypeEnum
-                //   *  AndroidDVBTDriver = 0,            => 0
-                //      AndroidTestingDVBTDriver = 1,
-                //      TestTuneDriver = 2,
-                //   *  RTLSDRTCPIPFMDriver = 3,          => 1
-                //      RTLSDRFMDriver = 4
-
                 switch (_configuration.DVBTDriverType)
                 {
-                    case DriverTypeEnum.AndroidDVBTDriver:
-                        return 0;
                     case DriverTypeEnum.RTLSDRDriver:
-                        return 1;
+                        return false;
                     default:
-                        return 0;
+                        return true;
                 }
             }
             set
             {
-                PreviousSelectedDriverTypeIndex = DriverTypeIndex;
-
-                switch (value)
+                if (value)
                 {
-                    case 0:
-                        _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                        break;
-                    case 1:
-                        _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                        break;
+                    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
                 }
-                OnPropertyChanged(nameof(DriverTypeIndex));
+                else
+                {
+                    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
+                }
+
+                NotifyDriverChange();
+            }
+        }
+
+        public bool FMDriverActive
+        {
+            get
+            {
+                switch (_configuration.DVBTDriverType)
+                {
+                    case DriverTypeEnum.RTLSDRDriver:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            set
+            {
+                if (value)
+                {
+                    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
+                }
+                else
+                {
+                    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
+                }
+
+                NotifyDriverChange();
             }
         }
 
@@ -192,6 +181,18 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(ImageIconSize));
                 OnPropertyChanged(nameof(FontSizeForDescription));
                 OnPropertyChanged(nameof(FontSizeForLargeCaption));
+            });
+        }
+
+        public void NotifyDriverChange()
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(FMDriverActive));
+                OnPropertyChanged(nameof(DVBTDriverActive));
+
+                OnPropertyChanged(nameof(ConnectedDevice));
+                OnPropertyChanged(nameof(DriverStateStatus));
             });
         }
 
@@ -304,5 +305,39 @@ namespace DVBTTelevizor.MAUI
                 return GetScaledSize(9).ToString();
             }
         }
+
+        public string ConnectedDevice
+        {
+            get
+            {
+                if (_driver == null ||
+                    _driver.Configuration == null ||
+                    String.IsNullOrWhiteSpace(_driver.Configuration.DeviceName))
+                {
+                    return "No compatible device".Translated();
+                }
+
+                return _driver.Configuration.DeviceName;
+            }
+        }
+
+        public string DriverStateStatus
+        {
+            get
+            {
+                if (_driver == null || !_driver.DriverInstalled)
+                {
+                    return "Driver not installed!".Translated();
+                }
+
+                if (_driver.Connected)
+                {
+                    return "Connected".Translated();
+                }
+
+                return "Disconnected".Translated();
+            }
+        }
+
     }
 }

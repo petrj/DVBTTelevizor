@@ -47,7 +47,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverTypeBoxView, DriverPicker }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverBoxView, DVBTDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverBoxView, FMDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
@@ -120,11 +121,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                         case "Tune":
                             TuneButton_Clicked(this, new EventArgs());
                             break;
-                        case "Driver":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                DriverPicker.Focus();
-                            });
+                        case "DVBTDriver":
+                            break;
+                        case "FMDriver":
                             break;
                     }
                 });
@@ -153,7 +152,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
 
-        if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
+        if (_viewModel.FMDriverActive)
         {
             //_tuningSettings.SetFMSettings();
             ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
@@ -167,7 +166,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
 
-        if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
+        if (_viewModel.FMDriverActive)
         {
             //_tuningSettings.SetFMSettings();
             ShowPage(_tuningFrequencyPage, TuneModeEnum.Manual);

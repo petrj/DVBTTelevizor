@@ -27,14 +27,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         InitializeComponent();
 
-//#if ANDROID
-//        DriverPicker.Loaded += (s, e) =>
-//        {
-//            var handler = (PickerHandler)DriverPicker.Handler;
-//            handler.PlatformView.Background = new ColorDrawable(Android.Graphics.Color.Transparent);
-//        };
-//#endif
-
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
@@ -44,11 +36,17 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _appMenu.FontSize = _configuration.AppFontSize;
         _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged;
 
-        DriverPicker.SelectedIndexChanged += DriverPicker_SelectedIndexChanged;
+        FMDriverRadioButton.CheckedChanged += DriverRadioButton_CheckedChanged;
+        DVBTDriverRadioButton.CheckedChanged += DriverRadioButton_CheckedChanged;
 
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
+    }
+
+    private void DriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        // TODO: Handle driver change
     }
 
     private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
@@ -56,50 +54,51 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _driverPageViewModel.MenuVisible = e.IsVisible;
     }
 
-    private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
-    {
+    //private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
+    //{
 
-        if (_ignoreDriverChangeEvent.HasValue && _driverPageViewModel.DriverTypeIndex == _ignoreDriverChangeEvent)
-        {
-            _ignoreDriverChangeEvent = null;
-            return;
-        }
+    //    if (_ignoreDriverChangeEvent.HasValue && _driverPageViewModel.DriverTypeIndex == _ignoreDriverChangeEvent)
+    //    {
+    //        _ignoreDriverChangeEvent = null;
+    //        return;
+    //    }
 
-        try
-        {
-            if (_driver != null && _driver.Connected)
-            {
-                // reverse the change and show menu
-                _changeToDriverIndex = _driverPageViewModel.DriverTypeIndex;
-                _driverPageViewModel.DriverTypeIndex = _driverPageViewModel.PreviousSelectedDriverTypeIndex;
+    //    try
+    //    {
+    //        if (_driver != null && _driver.Connected)
+    //        {
+    //            // reverse the change and show menu
+    //            _changeToDriverIndex = _driverPageViewModel.DriverTypeIndex;
+    //            _driverPageViewModel.DriverTypeIndex = _driverPageViewModel.PreviousSelectedDriverTypeIndex;
 
-                // next driver change to DriverTypeIndex must be ignored now!
-                _ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
+    //            // next driver change to DriverTypeIndex must be ignored now!
+    //            _ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
 
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
-                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverName, (DriverTypeEnum)_driverPageViewModel.PreviousSelectedDriverTypeIndex);
-                });
-            }
-            else
-            {
-                Task.Run(async () =>
-                {
-                    await _driverPageViewModel.ReConnectDriver();
-                });
-            }
-        } finally
-        {
+    //            MainThread.BeginInvokeOnMainThread(async () =>
+    //            {
+    //                var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
+    //                _appMenu.ShowChangeDriverMenu(_driver, currentDriverName, (DriverTypeEnum)_driverPageViewModel.PreviousSelectedDriverTypeIndex);
+    //            });
+    //        }
+    //        else
+    //        {
+    //            Task.Run(async () =>
+    //            {
+    //                await _driverPageViewModel.ReConnectDriver();
+    //            });
+    //        }
+    //    } finally
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
     private void BuildFocusableItems()
     {
         _focusItems = new KeyboardFocusableItemList();
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverTypeBoxView, DriverPicker }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverBoxView, DVBTDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverBoxView, FMDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
@@ -114,7 +113,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            _ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
+            //_ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
             await _driverPageViewModel.FillDrivers();
             await _driverPageViewModel.CheckDriver();
         });
@@ -187,7 +186,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                     case "Driver":
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
-                            DriverPicker.Focus();
+                            //DriverPicker.Focus();
                         });
                         break;
                 }
@@ -254,7 +253,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         }
 
         _ignoreDriverChangeEvent = _changeToDriverIndex.Value;
-        _driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
+        //_driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
 
         _changeToDriverIndex = null;
 

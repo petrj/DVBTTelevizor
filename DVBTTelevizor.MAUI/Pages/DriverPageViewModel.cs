@@ -67,9 +67,7 @@ namespace DVBTTelevizor.MAUI
 
         public void NotifyChange()
         {
-            OnPropertyChanged(nameof(ConnectedDevice));
             OnPropertyChanged(nameof(DriverIconImage));
-            OnPropertyChanged(nameof(Bitrate));
             OnPropertyChanged(nameof(LastTuneFrequency));
             OnPropertyChanged(nameof(ConnectedDeviceVisible));
             OnPropertyChanged(nameof(DriverStateStatus));
@@ -78,33 +76,9 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(ConnectButtonVisible));
             OnPropertyChanged(nameof(ConnectedDeviceRange));
             OnPropertyChanged(nameof(DriverPreferencesVisible));
+            OnPropertyChanged(nameof(Bitrate));
         }
 
-        public string ConnectedDevice
-        {
-            get
-            {
-                if (_driver == null || _driver.Configuration == null  || String.IsNullOrWhiteSpace(_driver.Configuration.DeviceName))
-                {
-                    return "Plug in compatible device".Translated();
-                }
-
-                return _driver.Configuration.DeviceName;
-            }
-        }
-
-        public string Bitrate
-        {
-            get
-            {
-                if (_driverState == null)
-                {
-                    return String.Empty;
-                }
-
-                return _driverState.BitRate;
-            }
-        }
 
         public string LastTuneFrequency
         {
@@ -165,23 +139,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string DriverStateStatus
-        {
-            get
-            {
-                if (_driver == null || !_driver.DriverInstalled)
-                {
-                    return "Driver not installed!".Translated();
-                }
 
-                if (_driver.Connected)
-                {
-                    return "Connected".Translated();
-                }
-
-                return "Disconnected".Translated();
-            }
-        }
 
         public bool InstallDriverButtonVisible
         {
@@ -207,7 +165,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-
         public bool MenuVisible
         {
             get
@@ -219,6 +176,19 @@ namespace DVBTTelevizor.MAUI
                 _menuVisible = value;
 
                 OnPropertyChanged(nameof(MenuVisible));
+            }
+        }
+
+        public string Bitrate
+        {
+            get
+            {
+                if (_driverState == null)
+                {
+                    return String.Empty;
+                }
+
+                return _driverState.BitRate;
             }
         }
     }
