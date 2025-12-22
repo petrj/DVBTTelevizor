@@ -27,13 +27,22 @@
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup>
+	<!-- Versions
+		Value 2025003 is too big for Windows
+		-->
+	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationDisplayVersion>2025031</ApplicationDisplayVersion>
 		<ApplicationVersion>2025031</ApplicationVersion>
 		<VersionCode>2025031</VersionCode>
 		<VersionName>2025031</VersionName>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
+		<ApplicationDisplayVersion>2025</ApplicationDisplayVersion>
+		<ApplicationVersion>2025</ApplicationVersion>
+		<VersionCode>2025</VersionCode>
+		<VersionName>2025</VersionName>
+	</PropertyGroup>
 
 	<!-- Versions
 		Value 2025003 is too big for Windows
@@ -67,6 +76,7 @@
 	  <UseFastDeployment>true</UseFastDeployment>
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
 
 	</PropertyGroup>
 
@@ -76,6 +86,15 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.22000.0|AnyCPU'">
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.22000.0|AnyCPU'">
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

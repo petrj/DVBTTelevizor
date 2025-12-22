@@ -43,7 +43,7 @@ namespace DVBTTelevizor.MAUI
             Drivers.Clear();
 
             Drivers.Add("DVBT".Translated());
-            Drivers.Add("FM".Translated());
+            Drivers.Add("RTLSDR - FM".Translated());
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {

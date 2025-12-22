@@ -67,7 +67,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             await _viewModel.FillDrivers();
             _tuningSettings.LoadFromConfiguration(_configuration);
             await _tuningSettings.SetFrequencies(_driver);
-            _tuningSettings.SaveToConfiguration(_configuration);
+            //_tuningSettings.SaveToConfiguration(_configuration);
         });
     }
 
@@ -141,10 +141,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
 
-        if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
-        {
-            SetFMSettings();
-        }
+        //if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
+        //{
+        //    _tuningSettings.SetFMSettings();
+        //}
 
         ShowPage(_tuningProgressPage, TuneModeEnum.Automatic);
     }
@@ -155,7 +155,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
         {
-            SetFMSettings();
+            //_tuningSettings.SetFMSettings();
             ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
         } else
         {
@@ -169,7 +169,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
         {
-            SetFMSettings();
+            //_tuningSettings.SetFMSettings();
             ShowPage(_tuningFrequencyPage, TuneModeEnum.Manual);
         }
         else
@@ -186,21 +186,36 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
             return;
         }
 
-        if (page is TuningSelectDVBTPage sPage)
+        // update settings according to selected driver
+        _tuningSettings.LoadFromConfiguration(_configuration);
+        // update frequencies according to driver
+        _tuningSettings.SetFrequencies(_driver);
+        _tuningSettings.TuningMode = mode;
+
+        _tuningSettings.FM = false;
+        _tuningSettings.DVBT = false;
+        _tuningSettings.DVBT2 = false;
+
+        switch (_configuration.DVBTDriverType)
         {
-            _tuningSettings.DVBT = _configuration.TuneDVBTEnabled;
-            _tuningSettings.DVBT2 = _configuration.TuneDVBT2Enabled;
-            _tuningSettings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
-            _tuningSettings.TuningMode = mode;
+            case MAUI.DriverTypeEnum.RTLSDRDriver:
+                _tuningSettings.FM = true;
+                break;
+            default:
+                if (mode == TuneModeEnum.Automatic)
+                {
+                    _tuningSettings.DVBT = true;
+                    _tuningSettings.DVBT2 = true;
+                    _tuningSettings.TuneDVBTPreferred = false;
+                } else
+                {
+                    _tuningSettings.DVBT = _configuration.TuneDVBTEnabled;
+                    _tuningSettings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                    _tuningSettings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+                }
+                break;
         }
 
-        if (page is TuningProgressPage tPage)
-        {
-            _tuningSettings.DVBT = true;
-            _tuningSettings.DVBT2 = true;
-            _tuningSettings.TuneDVBTPreferred = false;
-            _tuningSettings.TuningMode = TuneModeEnum.Automatic;
-        }
 
         if (page is ITuningPage tuPage)
         {
@@ -211,19 +226,5 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         {
             await Navigation.PushAsync(page);
         });
-    }
-
-    private void SetFMSettings()
-    {
-        _tuningSettings.FM = true;
-        //_tuningSettings.FrequencyKHz = 88000;
-        _tuningSettings.FrequencyFromKHz = 88000;
-        _tuningSettings.FrequencyToKHz = 108000;
-        _tuningSettings.DeviceFrequencyMinKHz = 88000;
-        _tuningSettings.DeviceFrequencyMaxKHz = 108000;
-        _tuningSettings.DeviceFrequencyMinKHz = 88000;
-        _tuningSettings.DeviceFrequencyMaxKHz = 108000;
-        _tuningSettings.BandwidthKHz = 100;
-
     }
 }
