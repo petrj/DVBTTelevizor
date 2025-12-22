@@ -577,25 +577,25 @@ namespace DVBTTelevizor
             }
         }
 
-        public int FrequencyMinKHz
-        {
-            get { return 174000; } // 174.0 MHz - VHF high-band (band III) channel 7 }
-        }
+        //public int FrequencyMinKHz
+        //{
+        //    get { return 174000; } // 174.0 MHz - VHF high-band (band III) channel 7 }
+        //}
 
-        public int FrequencyMaxKHz
-        {
-            get { return 858000; } // 858.0 MHz - UHF band channel 69
-        }
+        //public int FrequencyMaxKHz
+        //{
+        //    get { return 858000; } // 858.0 MHz - UHF band channel 69
+        //}
 
-        public int BandwidthMinKHz
-        {
-            get { return 1700; }
-        }
+        //public int BandwidthMinKHz
+        //{
+        //    get { return 1700; }
+        //}
 
-        public int BandwidthMaxKHz
-        {
-            get { return 10000; }
-        }
+        //public int BandwidthMaxKHz
+        //{
+        //    get { return 10000; }
+        //}
 
     }
 }

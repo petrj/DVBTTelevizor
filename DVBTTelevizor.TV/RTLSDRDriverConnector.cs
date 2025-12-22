@@ -617,24 +617,24 @@ namespace DVBTTelevizor.TV
             return Task.Run( () => { return new DVBTDriverTuneResult();  } );
         }
 
-        public int FrequencyMinKHz
-        {
-            get { return 88000; }
-        }
+        //public int FrequencyMinKHz
+        //{
+        //    get { return 88000; }
+        //}
 
-        public int FrequencyMaxKHz
-        {
-            get { return 108000; }
-        }
+        //public int FrequencyMaxKHz
+        //{
+        //    get { return 108000; }
+        //}
 
-        public int BandwidthMinKHz
-        {
-            get { return 100; }
-        }
+        //public int BandwidthMinKHz
+        //{
+        //    get { return 100; }
+        //}
 
-        public int BandwidthMaxKHz
-        {
-            get { return 100; }
-        }
+        //public int BandwidthMaxKHz
+        //{
+        //    get { return 100; }
+        //}
     }
 }

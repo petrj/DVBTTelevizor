@@ -28,6 +28,10 @@ namespace DVBTTelevizor
         public long DeviceFrequencyMinKHz { get; set; } = 474000;
         public long DeviceFrequencyMaxKHz { get; set; } = 852000;
 
+        public long DeviceBandWidthMinKHz { get; set; } = 1700;
+        public long DeviceBandWidthMaxKHz { get; set; } = 10000;
+
+
         public static long DefaultFrequencyMinKHz { get; set; } = 474000;
         public static long DefaultFrequencyMaxKHz { get; set; } = 852000;
 
@@ -158,14 +162,14 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info("SetFrequencies");
 
-                if (BandwidthKHz < driver.BandwidthMinKHz ||
-                    BandwidthKHz > driver.BandwidthMaxKHz)
+                if (BandwidthKHz < DeviceBandWidthMinKHz ||
+                    BandwidthKHz > DeviceBandWidthMaxKHz)
                 {
-                    BandwidthKHz = driver.BandwidthMinKHz;
+                    BandwidthKHz = DefaultBandwidthKHz;
                 }
 
-                DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
-                DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
+                //DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
+                //DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
 
                 if (driver.Connected)
                 {
@@ -181,13 +185,12 @@ namespace DVBTTelevizor
 
                             if (!ValidFrequency(DeviceFrequencyMinKHz, false))
                             {
-                                DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
+                                DeviceFrequencyMinKHz = DeviceFrequencyMinKHz;
                             }
                             if (!ValidFrequency(DeviceFrequencyMaxKHz, false))
                             {
-                                DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
+                                DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz;
                             }
-
                         }
                     }
                     catch (Exception ex)

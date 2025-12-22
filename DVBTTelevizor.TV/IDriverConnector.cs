@@ -30,12 +30,6 @@ namespace DVBTTelevizor
 
         public event DemodulatedEventHandler OnRawAudioDemodulated;
 
-        int FrequencyMinKHz { get; }
-        int FrequencyMaxKHz { get; }
-
-        int BandwidthMinKHz { get; }
-        int BandwidthMaxKHz { get; }
-
         bool Recording { get; }
         bool ReadingStream { get; }
         bool Streaming { get; }
