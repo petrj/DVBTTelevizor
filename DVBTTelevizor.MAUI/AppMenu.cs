@@ -89,7 +89,7 @@ namespace DVBTTelevizor.MAUI
                 .Translated(newDriverName), "refresh.png"));
             menuItem.DriverType = newDriverType;
 
-            AddItem(_menu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverName), "close.png"));
+            AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Stay connected to {0}".Translated(currentDriverName), "close.png"));
 
             Finish("Please confirm change of driver:".Translated());
 

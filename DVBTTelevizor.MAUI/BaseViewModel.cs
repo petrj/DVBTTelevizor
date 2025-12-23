@@ -18,6 +18,12 @@ namespace DVBTTelevizor.MAUI
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
         private DriverTypeEnum _prevActiveDriverType = DriverTypeEnum.AndroidDVBTDriver;
+        private DriverTypeEnum? _ignoreDriver = null;
+
+        private bool _DVBTDriverActive = false;
+        private bool _FMDriverActive = false;
+
+        public static SemaphoreSlim IgnoreChangeEventSemaphore { get; set; } = new SemaphoreSlim(1, 1);
 
         public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
 
@@ -41,6 +47,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
             {
+                UpdateActiveDriverType();
                 NotifyDriverChange();
             });
         }
@@ -57,7 +64,34 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(Drivers));
             });
 
-            NotifyDriverChange();
+            UpdateActiveDriverType();
+        }
+
+        public void UpdateActiveDriverType()
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        if (_configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriver)
+                        {
+                            IgnoreDriver = DriverTypeEnum.RTLSDRDriver;
+                        } else
+                        {
+                           IgnoreDriver = DriverTypeEnum.AndroidDVBTDriver;
+                        }
+
+                        FMDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriver;
+                        DVBTDriverActive = !FMDriverActive;
+                    });
+                }
+                finally
+                {
+
+                }
+            });
         }
 
         public virtual async Task ReConnectDriver()
@@ -104,29 +138,30 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                switch (_configuration.DVBTDriverType)
-                {
-                    case DriverTypeEnum.RTLSDRDriver:
-                        return false;
-                    default:
-                        return true;
-                }
+                return _DVBTDriverActive;
+                //switch (_configuration.DVBTDriverType)
+                //{
+                //    case DriverTypeEnum.RTLSDRDriver:
+                //        return false;
+                //    default:
+                //        return true;
+                //}
             }
             set
             {
-
-                if (value)
-                {
-                    if (_prevActiveDriverType != _configuration.DVBTDriverType)
-                    {
-                        _prevActiveDriverType = _configuration.DVBTDriverType;
-                    }
-                    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                }
-                else
-                {
-                    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                }
+                _DVBTDriverActive = value;
+                //if (value)
+                //{
+                //    if (_prevActiveDriverType != _configuration.DVBTDriverType)
+                //    {
+                //        _prevActiveDriverType = _configuration.DVBTDriverType;
+                //    }
+                //    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
+                //}
+                //else
+                //{
+                //    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
+                //}
 
                 NotifyDriverChange();
             }
@@ -136,28 +171,30 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                switch (_configuration.DVBTDriverType)
-                {
-                    case DriverTypeEnum.RTLSDRDriver:
-                        return true;
-                    default:
-                        return false;
-                }
+                return _FMDriverActive;
+                //switch (_configuration.DVBTDriverType)
+                //{
+                //    case DriverTypeEnum.RTLSDRDriver:
+                //        return true;
+                //    default:
+                //        return false;
+                //}
             }
             set
             {
-                if (value)
-                {
-                    if (_prevActiveDriverType != _configuration.DVBTDriverType)
-                    {
-                        _prevActiveDriverType = _configuration.DVBTDriverType;
-                    }
-                    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                }
-                else
-                {
-                    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                }
+                _FMDriverActive = value;
+                //if (value)
+                //{
+                //    if (_prevActiveDriverType != _configuration.DVBTDriverType)
+                //    {
+                //        _prevActiveDriverType = _configuration.DVBTDriverType;
+                //    }
+                //    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
+                //}
+                //else
+                //{
+                //    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
+                //}
 
                 NotifyDriverChange();
             }
@@ -229,6 +266,18 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(ConnectedDevice));
                 OnPropertyChanged(nameof(DriverStateStatus));
             });
+        }
+
+        public DriverTypeEnum? IgnoreDriver
+        {
+            get
+            {
+                return _ignoreDriver;
+            }
+            set
+            {
+                _ignoreDriver = value;
+            }
         }
 
         public int GetScaledSize(int normalSize)

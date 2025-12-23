@@ -2313,7 +2313,7 @@ namespace DVBTTelevizor.MAUI
         {
             if (!_driver.DriverInstalled)
             {
-                ConnectDriver();
+               // ConnectDriver();
             }
         }
 
