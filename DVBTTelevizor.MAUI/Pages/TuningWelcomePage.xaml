@@ -150,6 +150,8 @@
             <Button Grid.Column="0" Grid.Row="2" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
         </Grid>
 
+        <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
+
     </AbsoluteLayout>
 
 </ContentPage>

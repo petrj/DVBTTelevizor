@@ -71,13 +71,35 @@ namespace DVBTTelevizor.MAUI
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(false));
         }
 
+        public void ShowConfirmChangeDriverMenu(DriverTypeEnum currentDriverType, DriverTypeEnum newDriverType)
+        {
+            //if (_driver == null || !_driver.Connected)
+            //{
+            //    return;
+            //}
 
+            ShowMenu();
+
+            Clear();
+
+            var newDriverName = BaseViewModel.GetDVBTDriverTypeName(newDriverType);
+            var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(currentDriverType);
+
+            var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", "Change driver to {0}"
+                .Translated(newDriverName), "refresh.png"));
+            menuItem.DriverType = newDriverType;
+
+            AddItem(_menu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverName), "close.png"));
+
+            Finish("Please confirm change of driver:".Translated());
+
+        }
         public void ShowChangeDriverMenu(IDriverConnector _driver, string currentDriverName, DriverTypeEnum driverType)
         {
-            if (_driver == null || !_driver.Connected)
-            {
-                return;
-            }
+            //if (_driver == null || !_driver.Connected)
+            //{
+            //    return;
+            //}
 
             ShowOrHideMenu();
 

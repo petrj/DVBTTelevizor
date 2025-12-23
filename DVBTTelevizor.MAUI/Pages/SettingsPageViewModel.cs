@@ -147,23 +147,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async void FillDVBTDrivers()
-        {
-            DVBTDrivers.Clear();
-
-            DVBTDrivers.Add("DVBT - Android".Translated());
-            DVBTDrivers.Add("DVBT - Android - Test".Translated());
-            DVBTDrivers.Add("DVBT - Test".Translated());
-            DVBTDrivers.Add("FM - Android".Translated());
-            DVBTDrivers.Add("FM".Translated());
-
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                OnPropertyChanged(nameof(DVBTDrivers));
-                OnPropertyChanged(nameof(DVBTDriverTypeIndex));
-            });
-        }
-
         public async void FillLanguages()
         {
             Languages.Clear();
@@ -277,28 +260,6 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(AppFontSizeIndex));
                 WeakReferenceMessenger.Default.Send(new FontSizeChangedMessage(AppFontSizeIndex));
-            }
-        }
-
-        public int DVBTDriverTypeIndex
-        {
-            get
-            {
-                return (int)_configuration.DVBTDriverType;
-            }
-            set
-            {
-                _configuration.DVBTDriverType = (DriverTypeEnum)value;
-                OnPropertyChanged(nameof(DVBTDriverTypeIndex));
-
-                //if ((previousDVBTDriverTypeindex != null) &&
-                //    previousDVBTDriverTypeindex != value)
-                //{
-                //    WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
-                //}
-
-                previousDVBTDriverTypeindex = value;
-
             }
         }
 

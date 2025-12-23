@@ -17,6 +17,7 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
+        private DriverTypeEnum _prevActiveDriverType = DriverTypeEnum.AndroidDVBTDriver;
 
         public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
 
@@ -35,6 +36,8 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
+
+            _prevActiveDriverType = _configuration.DVBTDriverType;
 
             //WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
             //{
@@ -111,8 +114,13 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+
                 if (value)
                 {
+                    if (_prevActiveDriverType != _configuration.DVBTDriverType)
+                    {
+                        _prevActiveDriverType = _configuration.DVBTDriverType;
+                    }
                     _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
                 }
                 else
@@ -140,6 +148,10 @@ namespace DVBTTelevizor.MAUI
             {
                 if (value)
                 {
+                    if (_prevActiveDriverType != _configuration.DVBTDriverType)
+                    {
+                        _prevActiveDriverType = _configuration.DVBTDriverType;
+                    }
                     _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
                 }
                 else
@@ -148,6 +160,29 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 NotifyDriverChange();
+            }
+        }
+
+        public async Task ChangeDriver(DriverTypeEnum driver)
+        {
+            _loggingService.Info($"ChangeDriver");
+
+            if ((_driver != null) && (_driver.Connected))
+            {
+                await _driver.Stop();
+                await _driver.Disconnect();
+            }
+
+            _configuration.DVBTDriverType = driver;
+
+            await ReConnectDriver();
+        }
+
+        public DriverTypeEnum PrevActiveDriverType
+        {
+            get
+            {
+                return _prevActiveDriverType;
             }
         }
 

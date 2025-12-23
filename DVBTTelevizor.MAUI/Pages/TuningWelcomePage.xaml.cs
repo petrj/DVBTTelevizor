@@ -1,3 +1,4 @@
+
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -16,10 +17,14 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
 
+    private AppMenu _appMenu = null;
+
     private TuningSelectDVBTPage _selectDVBTPage;
     private TuningProgressPage _tuningProgressPage;
     private TuningFrequencyPage _tuningFrequencyPage;
     private TuningFrequenciesPage _tuningFrequenciesPage;
+
+    private DriverTypeEnum? _prevDriverType;
 
     public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -32,6 +37,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         _tuningSettings = new TuningSettings(_loggingService);
 
+        _appMenu = new AppMenu(MainMenu);
+        _appMenu.FontSize = _configuration.AppFontSize;
+        _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged; ;
+
         BindingContext = _viewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
@@ -39,7 +48,77 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
+
+        FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
+        DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
+
         BuildFocusableItems();
+    }
+
+
+
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null &&
+            e is TappedEventArgs tea &&
+            tea.Parameter is MenuItem item)
+        {
+            Menu_Tapped(item);
+        }
+    }
+
+    private async void Menu_Tapped(MenuItem item)
+    {
+        var menuId = item.Id;
+        _loggingService.Info($"Menu tapped: {menuId}");
+
+        _appMenu.HideMenu();
+
+        switch (menuId)
+        {
+            case "menuChangeDriver":
+                await _viewModel.ChangeDriver(item.DriverType);
+                break;
+        }
+    }
+
+    private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
+    {
+        _viewModel.MenuVisible = e.IsVisible;
+    }
+
+    private void DVBTDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            if (e.Value)
+            {
+                // unchecked => checked => Activated DVBT
+
+                // revert change
+                var prevDriver = _viewModel.PrevActiveDriverType;
+                _configuration.DVBTDriverType = _viewModel.PrevActiveDriverType;
+                _viewModel.NotifyDriverChange();
+                _appMenu.ShowConfirmChangeDriverMenu(prevDriver, DriverTypeEnum.AndroidDVBTDriver);
+            }
+        });
+    }
+
+    private void FMDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            if (e.Value)
+            {
+                // unchecked => checked => Activated FM
+
+                // revert change
+                var prevDriver = _viewModel.PrevActiveDriverType;
+                _configuration.DVBTDriverType = _viewModel.PrevActiveDriverType;
+                _viewModel.NotifyDriverChange();
+                _appMenu.ShowConfirmChangeDriverMenu(prevDriver, DriverTypeEnum.RTLSDRDriver);
+            }
+        });
     }
 
     private void BuildFocusableItems()

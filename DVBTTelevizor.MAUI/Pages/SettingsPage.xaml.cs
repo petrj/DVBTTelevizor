@@ -209,11 +209,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 _settingsPageViewModel.FillFontSizes();
             }
 
-            if (_settingsPageViewModel.DVBTDrivers.Count == 0)
-            {
-                _settingsPageViewModel.FillDVBTDrivers();
-            }
-
             if (_settingsPageViewModel.Languages.Count == 0)
             {
                 _settingsPageViewModel.FillLanguages();
