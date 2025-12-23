@@ -12,6 +12,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
+    private bool _ignoreDriverChangeEvent = false;
 
     private TuningSettings _tuningSettings;
 
@@ -77,7 +78,15 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuChangeDriver":
-                await _viewModel.ChangeDriver(item.DriverType);
+                try
+                {
+                    _ignoreDriverChangeEvent = true;
+                    await _viewModel.ChangeDriver(item.DriverType);
+                } finally
+                {
+                    _ignoreDriverChangeEvent = false;
+                }
+
                 break;
         }
     }
@@ -87,38 +96,36 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _viewModel.MenuVisible = e.IsVisible;
     }
 
-    private void DVBTDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    private void DriverRadioButtonCheckedChanged(bool value, DriverTypeEnum driver)
     {
+
+
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            if (e.Value)
+            if (value)
             {
+                if (_ignoreDriverChangeEvent)
+                    return;
+
                 // unchecked => checked => Activated DVBT
 
                 // revert change
                 var prevDriver = _viewModel.PrevActiveDriverType;
                 _configuration.DVBTDriverType = _viewModel.PrevActiveDriverType;
                 _viewModel.NotifyDriverChange();
-                _appMenu.ShowConfirmChangeDriverMenu(prevDriver, DriverTypeEnum.AndroidDVBTDriver);
+                _appMenu.ShowConfirmChangeDriverMenu(prevDriver, driver);
             }
         });
     }
 
+    private void DVBTDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.AndroidDVBTDriver);
+    }
+
     private void FMDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
     {
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            if (e.Value)
-            {
-                // unchecked => checked => Activated FM
-
-                // revert change
-                var prevDriver = _viewModel.PrevActiveDriverType;
-                _configuration.DVBTDriverType = _viewModel.PrevActiveDriverType;
-                _viewModel.NotifyDriverChange();
-                _appMenu.ShowConfirmChangeDriverMenu(prevDriver, DriverTypeEnum.RTLSDRDriver);
-            }
-        });
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriver);
     }
 
     private void BuildFocusableItems()

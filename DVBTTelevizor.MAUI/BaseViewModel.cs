@@ -39,10 +39,10 @@ namespace DVBTTelevizor.MAUI
 
             _prevActiveDriverType = _configuration.DVBTDriverType;
 
-            //WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
-            //{
-            //    NotifyDriverChange();
-            //});
+            WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
+            {
+                NotifyDriverChange();
+            });
         }
 
         public virtual async Task FillDrivers()
@@ -75,7 +75,7 @@ namespace DVBTTelevizor.MAUI
             await Task.Delay(1000);
             WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
 
-            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
+            //WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 
         public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
