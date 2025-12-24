@@ -17,13 +17,10 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
-        private DriverTypeEnum _prevActiveDriverType = DriverTypeEnum.AndroidDVBTDriver;
         private DriverTypeEnum? _ignoreDriver = null;
 
         private bool _DVBTDriverActive = false;
         private bool _FMDriverActive = false;
-
-        public static SemaphoreSlim IgnoreChangeEventSemaphore { get; set; } = new SemaphoreSlim(1, 1);
 
         public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
 
@@ -42,8 +39,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
-
-            _prevActiveDriverType = _configuration.DVBTDriverType;
 
             WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
             {
@@ -213,14 +208,6 @@ namespace DVBTTelevizor.MAUI
             _configuration.DVBTDriverType = driver;
 
             await ReConnectDriver();
-        }
-
-        public DriverTypeEnum PrevActiveDriverType
-        {
-            get
-            {
-                return _prevActiveDriverType;
-            }
         }
 
         public static string DeviceFriendlyName

@@ -1949,11 +1949,11 @@ namespace DVBTTelevizor.MAUI
                 (!(_driver is DVBTDriverConnector))
                 )
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, DriverTypeEnum.AndroidDVBTDriver);
-                });
+                //MainThread.BeginInvokeOnMainThread(async () =>
+                //{
+                //    var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
+                //    _appMenu.ShowConfirmChangeConnectedDriverMenu(_driver, currentDriverType, DriverTypeEnum.AndroidDVBTDriver);
+                //});
                 return false;
             }
 
@@ -1963,12 +1963,12 @@ namespace DVBTTelevizor.MAUI
                 (!(_driver is RTLSDRDriverConnector))
                 )
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
-                    _appMenu.ShowChangeDriverMenu(_driver, currentDriverType, DriverTypeEnum.RTLSDRDriver);
-                });
-                return false;
+                //MainThread.BeginInvokeOnMainThread(async () =>
+                //{
+                //    var currentDriverType = BaseViewModel.GetDVBTDriverTypeName(GetDriverType());
+                //    _appMenu.ShowConfirmChangeConnectedDriverMenu(_driver, currentDriverType, DriverTypeEnum.RTLSDRDriver);
+                //});
+                //return false;
             }
 
             if (_viewModel.RecordingChannel != null && _viewModel.RecordingChannel != channel)

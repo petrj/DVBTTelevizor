@@ -49,7 +49,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
-
         FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
         DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
 
@@ -76,29 +75,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuChangeDriver":
-                try
-                {
-                    //_viewModel.IgnoreDriverChangeEvent = true;
-                    await _viewModel.ChangeDriver(item.DriverType);
-                } finally
-                {
-                    //.IgnoreDriverChangeEvent = false;
-                }
-
+                await _viewModel.ChangeDriver(item.DriverType);
                 break;
             case "menuCancelChangeDriver":
                 _viewModel.UpdateActiveDriverType();
-                //switch (_configuration.DVBTDriverType)
-                //{
-                //    case DriverTypeEnum.AndroidDVBTDriver:
-                //        _viewModel.DVBTDriverActive = true;
-                //        _viewModel.FMDriverActive = false;
-                //        break;
-                //    case DriverTypeEnum.RTLSDRDriver:
-                //        _viewModel.FMDriverActive = true;
-                //        _viewModel.DVBTDriverActive = false;
-                //        break;
-                //}
                 break;
         }
     }
@@ -108,12 +88,12 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _viewModel.MenuVisible = e.IsVisible;
     }
 
-    private void DriverRadioButtonCheckedChanged(bool value, DriverTypeEnum driver)
+    private void DriverRadioButtonCheckedChanged(bool value, DriverTypeEnum driverType)
     {
         if (!value)
             return;
 
-        if (_viewModel.IgnoreDriver == driver)
+        if (_viewModel.IgnoreDriver == driverType)
         {
             _viewModel.IgnoreDriver = null;
             return;
@@ -121,17 +101,17 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            try
+            await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                await MainThread.InvokeOnMainThreadAsync(async () =>
+                if (_driver.Connected)
                 {
-                    _appMenu.ShowConfirmChangeDriverMenu(_configuration.DVBTDriverType, driver);
-                });
-            }
-            finally
-            {
+                    _appMenu.ShowConfirmChangeConnectedDriverMenu(_driver.Configuration.DeviceName, _configuration.DVBTDriverType, driverType);
+                } else
+                {
+                    _appMenu.ShowConfirmChangeDriverMenu(_configuration.DVBTDriverType, driverType);
+                }
 
-            }
+            });
         });
     }
 

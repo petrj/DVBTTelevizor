@@ -7,66 +7,6 @@
              Title="{local:LngXamlExt Input='Tuning'}">
 
     <ContentPage.Resources>
-
-        <!--ControlTemplate x:Key="RadioButtonTemplate">
-            <Border
-            BackgroundColor="#F3F2F1"
-            HeightRequest="20"
-            HorizontalOptions="Center"
-            Stroke="#F3F2F1"
-            StrokeShape="RoundRectangle 10"
-            StrokeThickness="2"
-            VerticalOptions="Center"
-            WidthRequest="20">
-                <Grid WidthRequest="20">
-                    <Grid
-
-                    HeightRequest="18"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    WidthRequest="18">
-                        <Ellipse
-                        Fill="White"
-                        HeightRequest="15"
-                        HorizontalOptions="Center"
-                        Stroke="Blue"
-                        VerticalOptions="Center"
-                        WidthRequest="15" />
-                        <Ellipse
-                        x:Name="check"
-                        Fill="Blue"
-                        HeightRequest="8"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center"
-                        WidthRequest="8" />
-                    </Grid>
-                    <ContentPresenter />
-                </Grid>
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroupList>
-                        <VisualStateGroup x:Name="CheckedStates">
-                            <VisualState x:Name="Checked">
-                                <VisualState.Setters>
-                                    <Setter Property="Stroke" Value="#FF3300" />
-                                    <Setter TargetName="check" Property="Opacity" Value="1" />
-                                </VisualState.Setters>
-                            </VisualState>
-                            <VisualState x:Name="Unchecked">
-                                <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="#F3F2F1" />
-                                    <Setter Property="Stroke" Value="#F3F2F1" />
-                                    <Setter TargetName="check" Property="Opacity" Value="0" />
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateGroupList>
-                </VisualStateManager.VisualStateGroups>
-            </Border>
-        </ControlTemplate>
-        <Style TargetType="RadioButton">
-            <Setter Property="ControlTemplate" Value="{StaticResource RadioButtonTemplate}" />
-        </Style-->
-
         <ResourceDictionary>
 
             <Style x:Key="CaptionStyle" TargetType="Label">
@@ -116,23 +56,25 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tuning'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tuning'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" />
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.15,0.5,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="#808080" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50*" />
-                <ColumnDefinition Width="50*" />
-            </Grid.ColumnDefinitions>
+        <Frame AbsoluteLayout.LayoutBounds="0.5,0.15,0.5,0.15" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#808080" CornerRadius="10">
+            <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="5,5,5,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
 
-            <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
-            <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
 
-            <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
-            <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
-        </Grid>
+                <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
+            </Grid>
+        </Frame>
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.5" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>
