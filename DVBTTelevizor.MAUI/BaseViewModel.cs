@@ -120,10 +120,10 @@ namespace DVBTTelevizor.MAUI
                 case 0:
                 case 1:
                 case 2:
-                    return "DVBT";
+                    return "DVB-T";
                 case 3:
                 case 4:
-                    return "RTLSDR - FM";
+                    return "FM (SDR Driver)";
                 default:
                     return "";
             }

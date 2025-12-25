@@ -103,13 +103,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                if (_driver.Connected)
-                {
-                    _appMenu.ShowConfirmChangeConnectedDriverMenu(_driver.Configuration.DeviceName, _configuration.DVBTDriverType, driverType);
-                } else
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_configuration.DVBTDriverType, driverType);
-                }
+                _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, driverType);
 
             });
         });

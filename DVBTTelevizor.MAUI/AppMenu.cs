@@ -71,7 +71,7 @@ namespace DVBTTelevizor.MAUI
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(false));
         }
 
-        public void ShowConfirmChangeDriverMenu(DriverTypeEnum currentDriverType, DriverTypeEnum newDriverType)
+        public void ShowConfirmChangeDriverMenu(IDriverConnector driver,DriverTypeEnum currentDriverType, DriverTypeEnum newDriverType)
         {
             //if (_driver == null || !_driver.Connected)
             //{
@@ -85,41 +85,26 @@ namespace DVBTTelevizor.MAUI
             var newDriverName = BaseViewModel.GetDVBTDriverTypeName(newDriverType);
             var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(currentDriverType);
 
-            var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", "Change driver to {0}"
-                .Translated(newDriverName), "refresh.png"));
+            // driver: Not installed => installed > connected
+
+            string question;
+            if (driver != null && !driver.Connected)
+            {
+                question = "Connect to {0}?".Translated(newDriverName);
+            } else
+            {
+                question = "Disconnect {0} and connect {1}?"
+                    .Translated(currentDriverName, newDriverName);
+            }
+
+            var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", question, "driver.png"));
             menuItem.DriverType = newDriverType;
 
-            AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Stay connected to {0}".Translated(currentDriverName), "close.png"));
+            AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Continue using {0}".Translated(currentDriverName), "back.png"));
 
-            Finish("Please confirm change of driver:".Translated());
-
+            Finish("Please confirm driver change:".Translated());
         }
 
-        public void ShowConfirmChangeConnectedDriverMenu(string conectedDeviceName, DriverTypeEnum currentDriverType, DriverTypeEnum newDriverType)
-        {
-            //if (_driver == null || !_driver.Connected)
-            //{
-            //    return;
-            //}
-
-            ShowOrHideMenu();
-
-            if (_menu.IsVisible)
-            {
-                Clear();
-
-                var newDriverName = BaseViewModel.GetDVBTDriverTypeName(newDriverType);
-                var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(currentDriverType);
-
-                var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", "Disconnect {0} ({1}) and connect {2}?"
-                    .Translated(conectedDeviceName, currentDriverName, newDriverName), "refresh.png"));
-                menuItem.DriverType = newDriverType;
-
-                AddItem(_menu.CreateMenuItem("menuCancel", "Stay connected to {0}".Translated(currentDriverName), "close.png"));
-
-                Finish("Please confirm change of driver:".Translated());
-            }
-        }
 
         public void ShowRetryTuneMenu()
         {
