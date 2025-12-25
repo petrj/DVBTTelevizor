@@ -14,8 +14,6 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
     private KeyboardFocusableItemList _focusItems;
 
-    public TuningSettings _tuneSettings { get; set; }
-
     private FrequencyPage _frequencyPage;
     private TuningProgressPage _tuningProgressPage;
     private bool _editingFrom = false;
@@ -28,8 +26,6 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
         _driver = driver;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-
-        _tuneSettings = new TuningSettings(_loggingService);
 
         BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
@@ -67,6 +63,12 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _tuningFrequenciesViewModel.Settings.SaveToConfiguration(_configuration);
     }
 
     public void OnKeyDown(string key, bool longPress)

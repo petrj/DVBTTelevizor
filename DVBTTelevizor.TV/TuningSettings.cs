@@ -32,10 +32,10 @@ namespace DVBTTelevizor
         public long DeviceBandWidthMaxKHz { get; set; } = 10000;
 
 
-        public static long DefaultFrequencyMinKHz { get; set; } = 474000;
-        public static long DefaultFrequencyMaxKHz { get; set; } = 852000;
+        public long DefaultFrequencyMinKHz { get; set; } = 474000;
+        public long DefaultFrequencyMaxKHz { get; set; } = 852000;
 
-        public static long DefaultBandwidthKHz { get; set; } = 8000;
+        public long DefaultBandwidthKHz { get; set; } = 8000;
 
         public TuningSettings(ILoggingService loggingService)
         {
@@ -56,7 +56,12 @@ namespace DVBTTelevizor
                  TuneDVBTPreferred = TuneDVBTPreferred,
                  TuningMode = TuningMode,
                  DeviceFrequencyMinKHz =  DeviceFrequencyMinKHz,
-                 DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz
+                 DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz,
+                 DefaultBandwidthKHz = DefaultBandwidthKHz,
+                 DefaultFrequencyMinKHz = DefaultFrequencyMinKHz,
+                 DefaultFrequencyMaxKHz = DefaultFrequencyMaxKHz,
+                 DeviceBandWidthMinKHz = DeviceBandWidthMinKHz,
+                 DeviceBandWidthMaxKHz = DeviceBandWidthMaxKHz
             };
         }
 
@@ -142,8 +147,12 @@ namespace DVBTTelevizor
 
             DeviceBandWidthMinKHz = 100;
             DeviceBandWidthMaxKHz = 100;
+            DefaultBandwidthKHz = 100;
 
-            BandwidthKHz = 100;
+            DefaultFrequencyMinKHz = DeviceFrequencyMinKHz;
+            DefaultFrequencyMaxKHz = DeviceFrequencyMaxKHz;
+
+            BandwidthKHz = DefaultBandwidthKHz;
         }
 
         public void SetDVBTSettings()
@@ -159,6 +168,11 @@ namespace DVBTTelevizor
 
             DeviceBandWidthMinKHz = 1700;
             DeviceBandWidthMaxKHz = 10000;
+
+            DefaultBandwidthKHz = 8000;
+
+            DefaultFrequencyMinKHz = 474000;
+            DefaultFrequencyMaxKHz = DeviceFrequencyMaxKHz;
 
             BandwidthKHz = DefaultBandwidthKHz;
         }
