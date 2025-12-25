@@ -124,8 +124,8 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverBoxView, DVBTDriverRadioButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverBoxView, FMDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
@@ -150,11 +150,54 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         });
     }
 
+    private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+            case KeyboardNavigationActionEnum.Down:
+                Task.Run(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(_appMenu.MenuItems, false);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Left:
+            case KeyboardNavigationActionEnum.Up:
+                Task.Run(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(_appMenu.MenuItems, true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Back:
+                _appMenu.HideMenu();
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+                var item = _appMenu.GetSelectedMenuItem();
+                if (item != null)
+                {
+                    Menu_Tapped(item);
+                }
+                break;
+        }
+    }
+
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"TuningWelcomePage Page OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+        if (MainMenu.MenuVisible)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnMenuKeyDown(keyAction);
+            });
+            return;
+        }
 
         switch (keyAction)
         {
@@ -200,8 +243,10 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                             TuneButton_Clicked(this, new EventArgs());
                             break;
                         case "DVBTDriver":
+                            DVBTDriverRadioButton.IsChecked = !DVBTDriverRadioButton.IsChecked;
                             break;
                         case "FMDriver":
+                            FMDriverRadioButton.IsChecked = !FMDriverRadioButton.IsChecked;
                             break;
                     }
                 });

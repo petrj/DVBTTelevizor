@@ -45,9 +45,10 @@
             <Style x:Key="RadioButtonStyle" TargetType="RadioButton">
                 <Setter Property="TextColor" Value="Black"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
-                <Setter Property="BackgroundColor" Value="#808080"/>
+                <!--Setter Property="BackgroundColor" Value="#808080"/-->
                 <Setter Property="BorderColor" Value="#808080"/>
-                <Setter Property="Margin" Value="15,5,5,5" />
+                <Setter Property="Margin" Value="10,0,0,0" />
+                <Setter Property="Padding" Value="5,5,5,5" />
                 <Setter Property="BorderWidth" Value="0" />
             </Style>
 

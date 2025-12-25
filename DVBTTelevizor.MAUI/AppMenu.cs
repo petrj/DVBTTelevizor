@@ -31,6 +31,11 @@ namespace DVBTTelevizor.MAUI
             set { _appFontSize = value; }
         }
 
+        public List<MenuItem> MenuItems
+        {
+            get { return _menuItems; }
+        }
+
         public void Clear()
         {
             _menuItems.Clear();
@@ -153,6 +158,24 @@ namespace DVBTTelevizor.MAUI
 
                 Finish(title);
             }
+        }
+
+        public MenuItem? GetSelectedMenuItem()
+        {
+            if (MenuItems == null)
+            {
+                return null;
+            }
+
+            foreach (var item in MenuItems)
+            {
+                if (item.Selected)
+                {
+                    return item;
+                }
+            }
+
+            return null;
         }
     }
 }

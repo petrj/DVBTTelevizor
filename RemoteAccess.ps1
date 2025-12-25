@@ -361,8 +361,9 @@ function Show-GUI {
     }
 }
 
-$IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
-Write-host ("Detected IP:" + $IP)
+#$IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
+#Write-host ("Detected IP:" + $IP)
+$IP = "10.0.0.83"
 
 Show-GUI -SecurityKey "DVBTTelevizor" -IP $IP -Port 49152
 
