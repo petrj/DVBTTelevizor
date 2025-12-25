@@ -159,8 +159,8 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
         if (Settings != null)
         {
-            _configuration.FrequencyFromKHz = Settings.FrequencyFromKHz;
-            _configuration.FrequencyToKHz = Settings.FrequencyToKHz;
+            //_configuration.FrequencyFromKHz = Settings.FrequencyFromKHz;
+            //_configuration.FrequencyToKHz = Settings.FrequencyToKHz;
 
             _tuningProgressPage.UpdateSettings(Settings);
         }

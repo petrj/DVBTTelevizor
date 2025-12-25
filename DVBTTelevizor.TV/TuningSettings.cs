@@ -111,9 +111,7 @@ namespace DVBTTelevizor
 
         public void SaveToConfiguration(ITVConfiguration configuration)
         {
-            configuration.TuneDVBTEnabled = DVBT;
-            configuration.TuneDVBT2Enabled = DVBT2;
-            configuration.TuneDVBTPreferred = TuneDVBTPreferred;
+
 
             switch (configuration.DVBTDriverType)
             {
@@ -126,6 +124,11 @@ namespace DVBTTelevizor
 
                 case MAUI.DriverTypeEnum.AndroidDVBTDriver:
                 default:
+
+                    configuration.TuneDVBTEnabled = DVBT;
+                    configuration.TuneDVBT2Enabled = DVBT2;
+                    configuration.TuneDVBTPreferred = TuneDVBTPreferred;
+
                     configuration.DVBTBandwidthKHz = BandwidthKHz ;
                     configuration.FrequencyKHz = FrequencyKHz;
                     configuration.FrequencyFromKHz = FrequencyFromKHz;
