@@ -32,16 +32,6 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public override async Task FillDrivers()
-        {
-            await base.FillDrivers();
-
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
-                NotifyChange();
-            });
-        }
-
         public async Task CheckDriver()
         {
             try

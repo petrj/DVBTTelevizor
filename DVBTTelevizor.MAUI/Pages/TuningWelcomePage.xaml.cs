@@ -153,7 +153,6 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            await _viewModel.FillDrivers();
             _viewModel.UpdateActiveDriverType();
             _tuningSettings.LoadFromConfiguration(_configuration);
             await _tuningSettings.SetFrequencies(_driver);

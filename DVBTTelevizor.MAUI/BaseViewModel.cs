@@ -22,8 +22,6 @@ namespace DVBTTelevizor.MAUI
         private bool _DVBTDriverActive = false;
         private bool _FMDriverActive = false;
 
-        public ObservableCollection<string> Drivers { get; set; } = new ObservableCollection<string>();
-
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
             ITVConfiguration tvConfiguration,
@@ -46,21 +44,6 @@ namespace DVBTTelevizor.MAUI
                 UpdateActiveDriverType();
                 NotifyDriverChange();
             });
-        }
-
-        public virtual async Task FillDrivers()
-        {
-            Drivers.Clear();
-
-            Drivers.Add("DVBT".Translated());
-            Drivers.Add("RTLSDR - FM".Translated());
-
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
-                OnPropertyChanged(nameof(Drivers));
-            });
-
-            UpdateActiveDriverType();
         }
 
         public void UpdateActiveDriverType()
