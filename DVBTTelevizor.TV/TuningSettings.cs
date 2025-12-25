@@ -81,23 +81,24 @@ namespace DVBTTelevizor
             switch (configuration.DVBTDriverType)
             {
                 case MAUI.DriverTypeEnum.RTLSDRDriver:
-                    BandwidthKHz = configuration.FMDVBTBandwidthKHz;
+
+                    SetFMSettings();
+
+                    //BandwidthKHz = configuration.FMDVBTBandwidthKHz;
                     FrequencyKHz = configuration.FMFrequencyKHz;
                     FrequencyFromKHz = configuration.FMFrequencyFromKHz;
                     FrequencyToKHz = configuration.FMFrequencyToKHz;
-
-                    SetFMSettings();
 
                     break;
 
                 case MAUI.DriverTypeEnum.AndroidDVBTDriver:
                 default:
+                    SetDVBTSettings();
+
                     BandwidthKHz = configuration.DVBTBandwidthKHz;
                     FrequencyKHz = configuration.FrequencyKHz;
                     FrequencyFromKHz = configuration.FrequencyFromKHz;
                     FrequencyToKHz = configuration.FrequencyToKHz;
-
-                    SetDVBTSettings();
 
                     break;
             }
@@ -112,7 +113,7 @@ namespace DVBTTelevizor
             switch (configuration.DVBTDriverType)
             {
                 case MAUI.DriverTypeEnum.RTLSDRDriver:
-                    configuration.FMDVBTBandwidthKHz = BandwidthKHz;
+                    //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
                     configuration.FMFrequencyKHz = FrequencyKHz;
                     configuration.FMFrequencyFromKHz = FrequencyFromKHz;
                     configuration.FMFrequencyToKHz = FrequencyToKHz;
@@ -139,6 +140,9 @@ namespace DVBTTelevizor
             DeviceFrequencyMinKHz = 88000;
             DeviceFrequencyMaxKHz = 108000;
 
+            DeviceBandWidthMinKHz = 100;
+            DeviceBandWidthMaxKHz = 100;
+
             BandwidthKHz = 100;
         }
 
@@ -152,6 +156,9 @@ namespace DVBTTelevizor
 
             DeviceFrequencyMinKHz = 174000; // 174.0 MHz - VHF high-band (band III) channel 7
             DeviceFrequencyMaxKHz = 858000; // 858.0 MHz - UHF band channel 69
+
+            DeviceBandWidthMinKHz = 1700;
+            DeviceBandWidthMaxKHz = 10000;
 
             BandwidthKHz = DefaultBandwidthKHz;
         }

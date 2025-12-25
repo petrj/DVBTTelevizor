@@ -58,7 +58,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             {
                 //BuildConfirmMenu("Tuning failed. Check USB connection".Translated(), "Retry".Translated(), "Cancel".Translated(), "menuRetryTune", "menuCancel");
                 //BuildRetryTuneMenu();
-                _appMenu.ShowRetryTuneMenu();
+                _appMenu.ShowRetryTuneMenu(_driver);
             });
         });
 

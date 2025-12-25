@@ -3437,17 +3437,17 @@ namespace DVBTTelevizor.MAUI
 
         private async Task ChangeDriver(DriverTypeEnum driverType)
         {
-            _loggingService.Info($"ChangeDriver");
+            //_loggingService.Info($"ChangeDriver");
 
-            if ((_driver != null) && (_driver.Connected))
-            {
-                await _driver.Stop();
-                await _driver.Disconnect();
-            }
+            //if ((_driver != null) && (_driver.Connected))
+            //{
+            //    await _driver.Stop();
+            //    await _driver.Disconnect();
+            //}
 
-            _configuration.DVBTDriverType = driverType;
+            //_configuration.DVBTDriverType = driverType;
 
-            await _viewModel.ReConnectDriver();
+            //await _viewModel.ReConnectDriver();
         }
 
         private void TurnOnTeletext()

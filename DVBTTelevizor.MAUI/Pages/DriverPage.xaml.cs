@@ -241,23 +241,23 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private async Task ChangeDriver()
     {
-        _loggingService.Info($"ChangeDriver");
+        //_loggingService.Info($"ChangeDriver");
 
-        if (!_changeToDriverIndex.HasValue)
-            return;
+        //if (!_changeToDriverIndex.HasValue)
+        //    return;
 
-        if ((_driver != null) && (_driver.Connected))
-        {
-            await _driver.Stop();
-            await _driver.Disconnect();
-        }
+        //if ((_driver != null) && (_driver.Connected))
+        //{
+        //    await _driver.Stop();
+        //    await _driver.Disconnect();
+        //}
 
-        _ignoreDriverChangeEvent = _changeToDriverIndex.Value;
-        //_driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
+        //_ignoreDriverChangeEvent = _changeToDriverIndex.Value;
+        ////_driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
 
-        _changeToDriverIndex = null;
+        //_changeToDriverIndex = null;
 
-        await _driverPageViewModel.ReConnectDriver();
+        //await _driverPageViewModel.ReConnectDriver();
     }
 
     private async void Menu_Tapped(MenuItem item)

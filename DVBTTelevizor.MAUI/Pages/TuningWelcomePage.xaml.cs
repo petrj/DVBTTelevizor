@@ -150,6 +150,12 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         });
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _tuningSettings.SaveToConfiguration(_configuration);
+    }
+
     private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
     {
         switch (keyAction)

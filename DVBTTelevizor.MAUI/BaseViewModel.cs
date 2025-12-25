@@ -89,24 +89,6 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public virtual async Task ReConnectDriver()
-        {
-            if (
-                 (DVBTDriverActive && (!(_driver is DVBTDriverConnector)))
-                 ||
-                 (FMDriverActive && (!(_driver is RTLSDRDriverConnector)))
-                )
-            {
-                // switch driver
-                WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
-            }
-
-            await Task.Delay(1000);
-            WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-
-            //WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
-        }
-
         public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
         {
             // DVBTDriverTypeEnum
@@ -207,7 +189,7 @@ namespace DVBTTelevizor.MAUI
 
             _configuration.DVBTDriverType = driver;
 
-            await ReConnectDriver();
+            WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
         }
 
         public static string DeviceFriendlyName

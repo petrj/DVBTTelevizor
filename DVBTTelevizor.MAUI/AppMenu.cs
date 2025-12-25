@@ -111,20 +111,26 @@ namespace DVBTTelevizor.MAUI
         }
 
 
-        public void ShowRetryTuneMenu()
+        public void ShowRetryTuneMenu(IDriverConnector driver)
         {
-            ShowOrHideMenu();
+            ShowMenu();
 
-            if (_menu.IsVisible)
+            Clear();
+
+            var title = "Tuning failed.".Translated();
+            if (driver != null && driver.DriverInstalled)
             {
-                Clear();
-
-                AddItem(_menu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
-                AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
-                AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
-
-                Finish("Tuning failed. Check USB connection".Translated());
+                title += " Check USB connection.".Translated();
+            } else
+            {
+                title += " Driver is not installed.".Translated();
             }
+
+            AddItem(_menu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
+            AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
+            AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
+
+            Finish(title);
         }
 
         public void ShowRetryPlayMenu(string channelId)
