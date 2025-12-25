@@ -111,8 +111,6 @@ namespace DVBTTelevizor
 
         public void SaveToConfiguration(ITVConfiguration configuration)
         {
-
-
             switch (configuration.DVBTDriverType)
             {
                 case MAUI.DriverTypeEnum.RTLSDRDriver:

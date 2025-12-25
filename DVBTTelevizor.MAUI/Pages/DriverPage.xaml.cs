@@ -1,3 +1,4 @@
+
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -14,8 +15,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private int? _ignoreDriverChangeEvent = null;
-    private int? _changeToDriverIndex = null;
 
     private string _publicDirectory;
 
@@ -36,69 +35,61 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _appMenu.FontSize = _configuration.AppFontSize;
         _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged;
 
-        FMDriverRadioButton.CheckedChanged += DriverRadioButton_CheckedChanged;
-        DVBTDriverRadioButton.CheckedChanged += DriverRadioButton_CheckedChanged;
+        FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
+        DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
 
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+
+        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+        {
+            _driver = m.Value;
+            _driverPageViewModel.UpdateActiveDriverType();
+        });
 
         BuildFocusableItems();
     }
 
-    private void DriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    private void DriverRadioButtonCheckedChanged(bool value, DriverTypeEnum driverType)
     {
-        // TODO: Handle driver change
+        if (!value)
+            return;
+
+        if (_driverPageViewModel.IgnoreDriver == driverType)
+        {
+            _driverPageViewModel.IgnoreDriver = null;
+            return;
+        }
+
+        Task.Run(async () =>
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, driverType);
+
+            });
+        });
+    }
+
+    private void DVBTDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.AndroidDVBTDriver);
+    }
+
+    private void FMDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriver);
     }
 
     private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
     {
         _driverPageViewModel.MenuVisible = e.IsVisible;
     }
-
-    //private void DriverPicker_SelectedIndexChanged(object? sender, EventArgs e)
-    //{
-
-    //    if (_ignoreDriverChangeEvent.HasValue && _driverPageViewModel.DriverTypeIndex == _ignoreDriverChangeEvent)
-    //    {
-    //        _ignoreDriverChangeEvent = null;
-    //        return;
-    //    }
-
-    //    try
-    //    {
-    //        if (_driver != null && _driver.Connected)
-    //        {
-    //            // reverse the change and show menu
-    //            _changeToDriverIndex = _driverPageViewModel.DriverTypeIndex;
-    //            _driverPageViewModel.DriverTypeIndex = _driverPageViewModel.PreviousSelectedDriverTypeIndex;
-
-    //            // next driver change to DriverTypeIndex must be ignored now!
-    //            _ignoreDriverChangeEvent = _driverPageViewModel.DriverTypeIndex;
-
-    //            MainThread.BeginInvokeOnMainThread(async () =>
-    //            {
-    //                var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(_driverPageViewModel.SelectedDriverType);
-    //                _appMenu.ShowChangeDriverMenu(_driver, currentDriverName, (DriverTypeEnum)_driverPageViewModel.PreviousSelectedDriverTypeIndex);
-    //            });
-    //        }
-    //        else
-    //        {
-    //            Task.Run(async () =>
-    //            {
-    //                await _driverPageViewModel.ReConnectDriver();
-    //            });
-    //        }
-    //    } finally
-    //    {
-
-    //    }
-    //}
-
     private void BuildFocusableItems()
     {
         _focusItems = new KeyboardFocusableItemList();
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverBoxView, DVBTDriverRadioButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverBoxView, FMDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
@@ -183,11 +174,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                         });
                         break;
 
-                    case "Driver":
-                        MainThread.BeginInvokeOnMainThread(async () =>
-                        {
-                            //DriverPicker.Focus();
-                        });
+                    case "DVBTDriver":
+                        DVBTDriverRadioButton.IsChecked = !DVBTDriverRadioButton.IsChecked;
+                        break;
+                    case "FMDriver":
+                        FMDriverRadioButton.IsChecked = !FMDriverRadioButton.IsChecked;
                         break;
                 }
 
@@ -200,11 +191,21 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"DriverPage OnTextSent {text}");
     }
 
-    private async void InstallDriverButton_Clicked(object sender, EventArgs e)
+    private void InstallDriverButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"DriverPage InstallDriverButton_Clicked");
 
-        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            if (_driverPageViewModel.DVBTDriverActive)
+            {
+                await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+            }
+            else
+            {
+                await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+            }
+        });
     }
 
     private void ConnectButton_Clicked(object sender, EventArgs e)
@@ -225,9 +226,15 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage DriverPreferencesButton_Clicked");
 
-        WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage(String.Empty));
+        if (_driverPageViewModel.DVBTDriverActive)
+        {
+            WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("info.martinmarinov.dvbdriver"));
+        }
+        else
+        {
+            WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("marto.rtl_tcp_andro"));
+        }
     }
-
 
     private void Menu_Tapped(object sender, EventArgs e)
     {
@@ -237,27 +244,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         {
             Menu_Tapped(item);
         }
-    }
-
-    private async Task ChangeDriver()
-    {
-        //_loggingService.Info($"ChangeDriver");
-
-        //if (!_changeToDriverIndex.HasValue)
-        //    return;
-
-        //if ((_driver != null) && (_driver.Connected))
-        //{
-        //    await _driver.Stop();
-        //    await _driver.Disconnect();
-        //}
-
-        //_ignoreDriverChangeEvent = _changeToDriverIndex.Value;
-        ////_driverPageViewModel.DriverTypeIndex = _changeToDriverIndex.Value;
-
-        //_changeToDriverIndex = null;
-
-        //await _driverPageViewModel.ReConnectDriver();
     }
 
     private async void Menu_Tapped(MenuItem item)
@@ -270,7 +256,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuChangeDriver":
-                await ChangeDriver();
+                await _driverPageViewModel.ChangeDriver(item.DriverType);
+                break;
+            case "menuCancelChangeDriver":
+                _driverPageViewModel.UpdateActiveDriverType();
                 break;
         }
     }

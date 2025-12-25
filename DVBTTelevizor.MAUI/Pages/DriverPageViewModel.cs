@@ -20,11 +20,11 @@ namespace DVBTTelevizor.MAUI
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
-            //WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
-            //{
-            //    _driverState = m.Value;
-            //    NotifyChange();
-            //});
+            WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
+            {
+                _driverState = m.Value;
+                NotifyChange();
+            });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverStateChangedMessages>(this, (r, m) =>
             {
@@ -153,7 +153,9 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null && _driver.DriverInstalled && _driver.Connected);
+                return (_driver != null &&
+
+                    _driver.DriverInstalled && _driver.Connected);
             }
         }
 
@@ -161,7 +163,9 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null && !_driver.Connected);
+                return (_driver != null &&
+                        _driver.DriverInstalled &&
+                        !_driver.Connected);
             }
         }
 

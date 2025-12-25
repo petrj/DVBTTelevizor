@@ -274,7 +274,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<ShowDriverPrefrencesMessage>(this, (r, m) =>
             {
-                ShowDriverAppPreferences();
+                ShowDriverAppPreferences(m.Value);
             });
 
 
@@ -719,12 +719,12 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        private void ShowDriverAppPreferences()
+        private void ShowDriverAppPreferences(string appIdentification)
         {
             try
             {
                 var req = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS");
-                req.SetData(Android.Net.Uri.Parse($"package:info.martinmarinov.dvbdriver"));
+                req.SetData(Android.Net.Uri.Parse($"package:{appIdentification}"));
 
                 StartActivityForResult(req, StartRequestCodeDriverPreferences);
             }
