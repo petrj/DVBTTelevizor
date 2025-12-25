@@ -79,9 +79,6 @@ namespace DVBTTelevizor
 
         public void LoadFromConfiguration(ITVConfiguration configuration)
         {
-            DVBT = configuration.TuneDVBTEnabled;
-            DVBT2 = configuration.TuneDVBT2Enabled;
-            TuneDVBTPreferred = configuration.TuneDVBTPreferred;
 
             switch (configuration.DVBTDriverType)
             {
@@ -104,6 +101,9 @@ namespace DVBTTelevizor
                     FrequencyKHz = configuration.FrequencyKHz;
                     FrequencyFromKHz = configuration.FrequencyFromKHz;
                     FrequencyToKHz = configuration.FrequencyToKHz;
+                    DVBT = configuration.TuneDVBTEnabled;
+                    DVBT2 = configuration.TuneDVBT2Enabled;
+                    TuneDVBTPreferred = configuration.TuneDVBTPreferred;
 
                     break;
             }
@@ -137,6 +137,8 @@ namespace DVBTTelevizor
         public void SetFMSettings()
         {
             FM = true;
+            DVBT = false;
+            DVBT2 = false;
             //_tuningSettings.FrequencyKHz = 88000;
             FrequencyFromKHz = 88000;
             FrequencyToKHz = 108000;
@@ -158,6 +160,9 @@ namespace DVBTTelevizor
         public void SetDVBTSettings()
         {
             FM = false;
+
+            DVBT = true;
+            DVBT2 = true;
 
             FrequencyFromKHz = DefaultFrequencyMinKHz;
             FrequencyToKHz = DefaultFrequencyMaxKHz;

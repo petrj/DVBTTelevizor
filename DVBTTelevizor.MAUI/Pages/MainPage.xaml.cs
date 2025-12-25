@@ -825,6 +825,8 @@ namespace DVBTTelevizor.MAUI
             }
 
             _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
+
+            WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
 
         private void _driver_OnRawAudioDemodulated(object sender, DemodulatedEventArgs e)

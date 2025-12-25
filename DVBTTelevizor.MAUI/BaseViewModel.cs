@@ -40,8 +40,9 @@ namespace DVBTTelevizor.MAUI
                 NotifyFontSizeChange();
             });
 
-            WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
+                _driver = m.Value;
                 UpdateActiveDriverType();
                 NotifyDriverChange();
             });
@@ -190,6 +191,8 @@ namespace DVBTTelevizor.MAUI
             _configuration.DVBTDriverType = driver;
 
             WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
+            Task.Delay(500).Wait();
+            WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
         }
 
         public static string DeviceFriendlyName

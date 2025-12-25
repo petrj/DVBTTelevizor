@@ -1,4 +1,6 @@
 
+using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -51,6 +53,15 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
         DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
+
+        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+        {
+            _driver = m.Value;
+
+            _viewModel.UpdateActiveDriverType();
+            _tuningSettings.LoadFromConfiguration(_configuration);
+            _tuningSettings.SetFrequencies(_driver);
+        });
 
         BuildFocusableItems();
     }
@@ -320,30 +331,12 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _tuningSettings.SetFrequencies(_driver);
         _tuningSettings.TuningMode = mode;
 
-        _tuningSettings.FM = false;
-        _tuningSettings.DVBT = false;
-        _tuningSettings.DVBT2 = false;
-
-        switch (_configuration.DVBTDriverType)
+        if (_viewModel.DVBTDriverActive && (mode == TuneModeEnum.Automatic))
         {
-            case MAUI.DriverTypeEnum.RTLSDRDriver:
-                _tuningSettings.FM = true;
-                break;
-            default:
-                if (mode == TuneModeEnum.Automatic)
-                {
-                    _tuningSettings.DVBT = true;
-                    _tuningSettings.DVBT2 = true;
-                    _tuningSettings.TuneDVBTPreferred = false;
-                } else
-                {
-                    _tuningSettings.DVBT = _configuration.TuneDVBTEnabled;
-                    _tuningSettings.DVBT2 = _configuration.TuneDVBT2Enabled;
-                    _tuningSettings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
-                }
-                break;
+            _tuningSettings.DVBT = true;
+            _tuningSettings.DVBT2 = true;
+            _tuningSettings.TuneDVBTPreferred = false;
         }
-
 
         if (page is ITuningPage tuPage)
         {

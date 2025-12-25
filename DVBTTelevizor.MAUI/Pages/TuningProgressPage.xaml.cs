@@ -62,6 +62,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             });
         });
 
+        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+        {
+            _driver = m.Value;
+        });
+
         _commandUpdateBitrate = new Command(() =>
         {
             Task.Run(async () =>
@@ -421,6 +426,20 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             case "menuDriver":
                 var driverPage = new DriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
                 await Navigation.PushAsync(driverPage);
+                break;
+
+            case "menuInstallDriver":
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (_viewModel.DVBTDriverActive)
+                    {
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                    } else
+                    {
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                    }
+                });
                 break;
         }
     }

@@ -117,17 +117,25 @@ namespace DVBTTelevizor.MAUI
 
             Clear();
 
+            AddItem(_menu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
+
             var title = "Tuning failed.".Translated();
-            if (driver != null && driver.DriverInstalled)
-            {
-                title += " Check USB connection.".Translated();
-            } else
+            if (driver == null || !driver.DriverInstalled)
             {
                 title += " Driver is not installed.".Translated();
+                AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
+            }
+            else
+            {
+                title += " Check USB connection.".Translated();
+
+                if (!driver.Connected)
+                {
+                    AddItem(_menu.CreateMenuItem("menuConnectDriver", "Connect".Translated(), "refresh.png"));
+                }
             }
 
-            AddItem(_menu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
-            AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
+            AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "menu.png"));
             AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
 
             Finish(title);
