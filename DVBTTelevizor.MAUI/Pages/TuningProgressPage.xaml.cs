@@ -441,6 +441,14 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                     }
                 });
                 break;
+
+            case "menuConnectDriver":
+                WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+                break;
+
+            case "menuChangeDriver":
+                await _viewModel.ChangeDriver(item.DriverType);
+                break;
         }
     }
 }

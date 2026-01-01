@@ -141,22 +141,37 @@ namespace DVBTTelevizor.MAUI
             Finish(title);
         }
 
-        public void ShowRetryPlayMenu(string channelId)
+        public void ShowRetryPlayMenu(IDriverConnector driver, string channelId)
         {
-            ShowOrHideMenu();
+            ShowMenu();
 
-            if (_menu.IsVisible)
+            Clear();
+
+            var playItem = AddItem(_menu.CreateMenuItem($"menuRetryPlay", "Retry".Translated(), "refresh.png"));
+            playItem.ChannelId = channelId;
+
+
+            var title = "Playing failed.".Translated();
+            if (driver == null || !driver.DriverInstalled)
             {
-                Clear();
-
-                var playItem = AddItem(_menu.CreateMenuItem($"menuRetryPlay", "Retry".Translated(), "refresh.png"));
-                playItem.ChannelId = channelId;
-
-                AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
-                AddItem(_menu.CreateMenuItem("menuCancelPlay", "Cancel".Translated(), "cancel.png"));
-
-                Finish("Playing failed. Check USB connection".Translated());
+                title += " Driver is not installed.".Translated();
+                AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
             }
+            else
+            {
+                title += " Check USB connection.".Translated();
+
+                if (!driver.Connected)
+                {
+                    AddItem(_menu.CreateMenuItem("menuConnectDriver", "Connect".Translated(), "refresh.png"));
+                }
+            }
+
+            AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
+            AddItem(_menu.CreateMenuItem("menuCancelPlay", "Cancel".Translated(), "cancel.png"));
+
+            Finish("Playing failed. Check USB connection".Translated());
+
         }
 
         public void ShowConfirmMenu(string title, string titleYes, string titleNo, string actionConfirm, string actionNotConfirm)

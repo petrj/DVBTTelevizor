@@ -261,6 +261,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             case "menuCancelChangeDriver":
                 _driverPageViewModel.UpdateActiveDriverType();
                 break;
+            case "menuConnectDriver":
+                ConnectButton_Clicked(this, null);
+                break;
         }
     }
 }

@@ -85,6 +85,19 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
         switch (menuId)
         {
+            case "menuInstallDriver":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (_viewModel.DVBTDriverActive)
+                    {
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                    }
+                    else
+                    {
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                    }
+                });
+                break;
             case "menuChangeDriver":
                 await _viewModel.ChangeDriver(item.DriverType);
                 break;
