@@ -17,12 +17,18 @@ namespace DVBTTelevizor.MAUI
         private AppFontSizeEnum _appFontSize = AppFontSizeEnum.Normal;
 
         private List<MenuItem> _menuItems = new List<MenuItem>();
+        private bool _visible = false;
 
         public event EventHandler<MenuVisibleChangedEventArgs>? MenuVisibleChanged;
 
         public AppMenu(Menu menu)
         {
             _menu = menu;
+        }
+
+        public bool IsVisible
+        {
+            get { return _visible; }
         }
 
         public AppFontSizeEnum FontSize
@@ -67,12 +73,14 @@ namespace DVBTTelevizor.MAUI
         public void ShowMenu()
         {
             _menu.MenuVisible = true;
+            _visible = true;
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(true));
         }
 
         public void HideMenu()
         {
             _menu.MenuVisible = false;
+            _visible = false;
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(false));
         }
 

@@ -132,7 +132,7 @@
             </Grid.ColumnDefinitions>
 
             <Button x:Name="DriverPreferencesButton" Grid.Column="1" Text="{local:LngXamlExt Input='Settings..'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverPreferencesVisible}" Clicked="DriverPreferencesButton_Clicked"/>
-            <Button x:Name="InstallDriverButton"  Grid.Column="1"  Text="{local:LngXamlExt Input='Install DVBT driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
+            <Button x:Name="InstallDriverButton"  Grid.Column="1"  Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
 
 
         </Grid>

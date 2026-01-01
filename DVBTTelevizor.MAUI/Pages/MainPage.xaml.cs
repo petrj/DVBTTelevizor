@@ -394,6 +394,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<InitDriverMessage>(this, (r, m) =>
             {
                 InitDriver();
+                ConnectDriver();
             });
 
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
@@ -442,7 +443,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<USBChangedMessage>(this, (r, m) =>
             {
-                USBConnectOrDisconnect();
+                Task.Run(async () => await CheckDriver());
             });
 
             WeakReferenceMessenger.Default.Register<RefreshGUIMessage>(this, (r, m) =>
@@ -744,7 +745,7 @@ namespace DVBTTelevizor.MAUI
             _viewModel.RefreshChannels();
         }
 
-        private async void USBConnectOrDisconnect()
+        private async Task CheckDriver()
         {
             switch (_driver.State)
             {
@@ -757,10 +758,7 @@ namespace DVBTTelevizor.MAUI
                 default:
                     {
                         // check driver state
-                        Task.Run(async () =>
-                        {
-                            await CheckDriverState();
-                        });
+                        await CheckDriverState();
                         break;
                     }
             }
@@ -1349,7 +1347,8 @@ namespace DVBTTelevizor.MAUI
                         if (_viewModel.Channels.Count > 0)
                         {
                             _focusItems.FocusItem("ChannelsListView");
-                        } else
+                        }
+                        else
                         {
                             _focusItems.FocusItem("QuickTuneButton");
                         }
@@ -1807,6 +1806,7 @@ namespace DVBTTelevizor.MAUI
                     _viewModel.PlayingChannel.AudioTracks.Clear();
                 }
 
+                _viewModel.PlayingChannel = null;
             }
 
             //_focusItems.DeFocusAll();
@@ -2293,11 +2293,12 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info("Action not completed!");
             }
         }
+
         public async Task CheckDriverInstallationChange()
         {
             if (!_driver.DriverInstalled)
             {
-               // ConnectDriver();
+                CheckDriver();
             }
         }
 
@@ -2884,10 +2885,12 @@ namespace DVBTTelevizor.MAUI
 
         private MenuItem? GetSelectedMenuItem()
         {
-            if (_activeMenuItems == null)
+            var menuItems = _appMenu.IsVisible ? _appMenu.MenuItems : _activeMenuItems;
+
+            if (menuItems == null)
                 return null;
 
-            foreach (var item in _activeMenuItems)
+            foreach (var item in menuItems)
             {
                 if (item.Selected)
                 {
@@ -2900,13 +2903,15 @@ namespace DVBTTelevizor.MAUI
 
         private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
         {
+            var menuItems = _appMenu.IsVisible ? _appMenu.MenuItems : _activeMenuItems;
+
             switch (keyAction)
             {
                 case KeyboardNavigationActionEnum.Right:
                 case KeyboardNavigationActionEnum.Down:
                     Task.Run(async () =>
                     {
-                        await  MainMenu.SelectNextMenuItem(_activeMenuItems, false);
+                        await  MainMenu.SelectNextMenuItem(menuItems, false);
                     });
                     break;
 
@@ -2914,7 +2919,7 @@ namespace DVBTTelevizor.MAUI
                 case KeyboardNavigationActionEnum.Up:
                     Task.Run(async () =>
                     {
-                        await MainMenu.SelectNextMenuItem(_activeMenuItems, true);
+                        await MainMenu.SelectNextMenuItem(menuItems, true);
                     });
                     break;
 

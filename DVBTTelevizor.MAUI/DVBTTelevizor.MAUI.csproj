@@ -73,7 +73,8 @@
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 
-	  <UseFastDeployment>true</UseFastDeployment>
+	  <UseFastDeployment>false</UseFastDeployment>
+		
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
 	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>

@@ -170,6 +170,11 @@ namespace DVBTTelevizor.MAUI
                 DriverNotInstalled();
             });
 
+            WeakReferenceMessenger.Default.Register<RTLSDRDriverNotInstalledMessage>(this, (r, m) =>
+            {
+                DriverNotInstalled();
+            });
+
             WeakReferenceMessenger.Default.Register<DisConnectMessage>(this, (r, m) =>
             {
                 DisconnectDriver();
@@ -985,8 +990,6 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Connection failed: {message}");
 
-            _driver.DriverInstalled = true;
-
             WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(message)));
 
             UpdateDriverState();
@@ -998,7 +1001,7 @@ namespace DVBTTelevizor.MAUI
 
             _driver.DriverInstalled = false;
 
-            WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed".Translated()));
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
             UpdateDriverState();
         }

@@ -174,8 +174,8 @@ namespace DVBTTelevizor.MAUI
             _configuration.DVBTDriverType = driver;
 
             WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
-            Task.Delay(500).Wait();
-            WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+            ////Task.Delay(500).Wait();
+            ////WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
         }
 
         public static string DeviceFriendlyName

@@ -43,7 +43,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _dispatchKeyEventEnabled = false;
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
-        private NotificationHelper _notificationHelper;
+        private NotificationHelper? _notificationHelper;
 
         private void EnableNLOGLogging()
         {
@@ -100,7 +100,7 @@ namespace DVBTTelevizor.MAUI
             try
             {
                 var msg = playStreamInfo == null || playStreamInfo.Channel == null ? "" : $"Playing {playStreamInfo.Channel.Name}";
-                _notificationHelper.ShowPlayNotification(1, msg, string.Empty, string.Empty);
+                _notificationHelper?.ShowPlayNotification(1, msg, string.Empty, string.Empty);
             }
             catch (Exception ex)
             {
@@ -113,7 +113,7 @@ namespace DVBTTelevizor.MAUI
             try
             {
                 var msg = recStreamInfo == null || recStreamInfo.Channel == null ? "" : $"Recording {recStreamInfo.Channel.Name}";
-                _notificationHelper.ShowRecordNotification(2, msg, string.Empty, string.Empty);
+                _notificationHelper?.ShowRecordNotification(2, msg, string.Empty, string.Empty);
             }
             catch (Exception ex)
             {
@@ -125,7 +125,7 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
-                _notificationHelper.CloseNotification(notificationId);
+                _notificationHelper?.CloseNotification(notificationId);
             }
             catch (Exception ex)
             {
@@ -756,7 +756,7 @@ namespace DVBTTelevizor.MAUI
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
                 _loggingService.Info("Activity not found");
-                WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout".Translated()));
+                WeakReferenceMessenger.Default.Send(new RTLSDRDriverNotInstalledMessage("Device response timeout".Translated()));
             }
             catch (Exception ex)
             {
