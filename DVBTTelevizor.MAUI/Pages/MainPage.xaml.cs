@@ -1412,6 +1412,8 @@ namespace DVBTTelevizor.MAUI
                     break;
             }
 
+            _viewModel.UpdateActiveDriverType();
+
             WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 

@@ -68,7 +68,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 finally
                 {
-
+                    NotifyDriverChange();
                 }
             });
         }
