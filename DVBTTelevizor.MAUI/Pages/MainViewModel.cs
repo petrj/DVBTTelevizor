@@ -990,6 +990,8 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Connection failed: {message}");
 
+            _driver.DriverInstalled = true;
+
             WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(message)));
 
             UpdateDriverState();

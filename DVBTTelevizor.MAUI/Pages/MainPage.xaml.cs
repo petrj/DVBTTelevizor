@@ -394,6 +394,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<InitDriverMessage>(this, (r, m) =>
             {
                 InitDriver();
+                InitializeVLC();
                 ConnectDriver();
             });
 
@@ -1005,7 +1006,7 @@ namespace DVBTTelevizor.MAUI
             {
                 try
                 {
-                    await _semaphoreSlimForRefreshGUI.WaitAsync();
+                    //await _semaphoreSlimForRefreshGUI.WaitAsync();
 
                     if (IsPortrait)
                     {
@@ -1227,7 +1228,7 @@ namespace DVBTTelevizor.MAUI
                         await FixVideo(true);
                     }
 
-                    //_loggingService.Info("RefreshGUI completed");
+                    _loggingService.Info("RefreshGUI completed");
 
                 }
                 catch (Exception ex)
@@ -1236,7 +1237,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 finally
                 {
-                    _semaphoreSlimForRefreshGUI.Release();
+                    //_semaphoreSlimForRefreshGUI.Release();
 
                     UpdateVideoWindowPosition();
                 }
@@ -2315,31 +2316,38 @@ namespace DVBTTelevizor.MAUI
             if (_mediaPlayer == null)
                 return;
 
+
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                if (force)
+                try
                 {
-                    if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
+                    if (force)
                     {
-                        if (_mediaPlayer.VideoTrack != -1)
+                        if (_viewModel.PlayingState != PlayingStateEnum.Stopped)
                         {
-                            videoView.MediaPlayer.Stop();
+                            if (_mediaPlayer.VideoTrack != -1)
+                            {
+                                videoView.MediaPlayer.Stop();
 
+                                VideoStackLayout.Children.Remove(videoView);
+                                VideoStackLayout.Children.Add(videoView);
+
+                                videoView.MediaPlayer.Play();
+                            }
+                        }
+                        else
+                        {
                             VideoStackLayout.Children.Remove(videoView);
                             VideoStackLayout.Children.Add(videoView);
-
-                            videoView.MediaPlayer.Play();
                         }
                     }
-                    else
-                    {
-                        VideoStackLayout.Children.Remove(videoView);
-                        VideoStackLayout.Children.Add(videoView);
-                    }
-                }
 
-                videoView.MediaPlayer = null;
-                videoView.MediaPlayer = _mediaPlayer;
+                    videoView.MediaPlayer = null;
+                    videoView.MediaPlayer = _mediaPlayer;
+                } catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
 
             await Task.Delay(100);
