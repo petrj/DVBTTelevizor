@@ -2149,23 +2149,16 @@ namespace DVBTTelevizor.MAUI
                     }
                     else
                     {
-                        if (DeviceInfo.Platform == DevicePlatform.Android)
+                        switch (_driver.DVBTDriverStreamType)
                         {
-                            switch (_driver.DVBTDriverStreamType)
-                            {
-                                case DVBTDriverStreamTypeEnum.UDP:
-                                    _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
-                                    break;
-                                case DVBTDriverStreamTypeEnum.Stream:
-                                    _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
-                                    break;
-                            }
-
-                        }
-                        else
-                        if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                        {
-                            _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                            case DVBTDriverStreamTypeEnum.UDP:
+                                _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
+                                break;
+                            case DVBTDriverStreamTypeEnum.Stream:
+                                _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                                break;
+                            case DVBTDriverStreamTypeEnum.None:
+                                break;
                         }
                     }
 
@@ -3392,6 +3385,8 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case "menuChangeDriver":
+                    await ActionStop(true);
+                    _pcmInput = null;
                     await _viewModel.ChangeDriver(menuItem.DriverType);
                     break;
 

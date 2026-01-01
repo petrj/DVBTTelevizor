@@ -243,7 +243,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return DVBTDriverStreamTypeEnum.Stream;
+                return DVBTDriverStreamTypeEnum.None;
             }
         }
 
