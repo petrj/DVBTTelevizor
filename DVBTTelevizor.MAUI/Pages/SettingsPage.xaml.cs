@@ -49,6 +49,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         WriteToExternalDeviceSwitch.Toggled += WriteToExternalDeviceSwitch_Toggled;
         PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
         FullscreenSwitch.Toggled += FullscreenSwitch_Toggled;
+        EnableRTLSDRSwitch.Toggled += EnableRTLSDRSwitch_Toggled;
 
         BuildFocusableItems();
 
@@ -73,6 +74,28 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 await ProcessCheckBatterySettingsResult(m.Value);
             });
         });
+    }
+
+    private void EnableRTLSDRSwitch_Toggled(object? sender, ToggledEventArgs e)
+    {
+        if (!_configuration.RTLSDREnabled && _settingsPageViewModel.FMDriverActive)
+        {
+            _loggingService.Info("EnableRTLSDRSwitch_Toggled - FM driver active, cannot enable RTLSDR");
+            // cannot enable RTLSDR when FM driver is active
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                _configuration.RTLSDREnabled = true;
+
+                BuildInfoMenu("Cannot disable FM when driver is active".Translated(), "OK".Translated());
+                _settingsPageViewModel.NotifyDriverChange();
+                _settingsPageViewModel.NotifyConfigChange();
+            });
+            return;
+        } else
+        {
+            _settingsPageViewModel.NotifyDriverChange();
+        }
+
     }
 
     private void FullscreenSwitch_Toggled(object? sender, ToggledEventArgs e)
@@ -123,6 +146,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             .AddItem(KeyboardFocusableItem.CreateFrom("FontSize", new List<View>() { FontSizeBoxView, FontSizePicker }))
             .AddItem(KeyboardFocusableItem.CreateFrom("AutoStart", new List<View>() { AutoStartBoxView, ChannelAutoPlayedAfterStartPicker }))
+
+             .AddItem(KeyboardFocusableItem.CreateFrom("RTLSDR", new List<View>() { EnableRTLSDRBoxView, EnableRTLSDRSwitch }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("ClearEPG", new List<View>() { ClearEPGButton }))
 
@@ -193,11 +218,14 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
+
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
         if (_settingsPageViewModel != null)
         {
+            _settingsPageViewModel.UpdateActiveDriverType();
+
             _settingsPageViewModel.FillAutoPlayChannels();
 
             if (_settingsPageViewModel.FontSizes.Count == 0)
@@ -547,6 +575,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
                         case "ShowFullScreen":
                             FullscreenSwitch.IsToggled = !FullscreenSwitch.IsToggled;
+                            break;
+
+                        case "RTLSDR":
+                            EnableRTLSDRSwitch.IsToggled = !EnableRTLSDRSwitch.IsToggled;
                             break;
 
                         case "ShowPlayOnBackground":

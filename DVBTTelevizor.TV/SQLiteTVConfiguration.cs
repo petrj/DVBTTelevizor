@@ -807,5 +807,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<bool>("UpdatedTo2026", value);
             }
         }
+
+        public bool RTLSDREnabled
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("RTLSDREnabled");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("RTLSDREnabled", value);
+            }
+        }
     }
 }

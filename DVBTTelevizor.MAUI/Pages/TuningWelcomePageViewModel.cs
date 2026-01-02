@@ -32,10 +32,6 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(MenuVisible));
             }
         }
-
-
-
-
     }
 }
 

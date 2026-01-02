@@ -11,6 +11,8 @@ namespace DVBTTelevizor.TV
     public class DummyConfiguration : ITVConfiguration
     {
         public bool UpdatedTo2026 { get; set; } = false;
+        public bool RTLSDREnabled { get; set; } = false;
+
         public string ConfigDirectory { get; set; } = String.Empty;
         public string LastSelectedChannelUniqueIdentifier { get; set; } = String.Empty;
         public string AutoPlayedChannelUniqueID { get; set; } = String.Empty;
@@ -106,6 +108,7 @@ namespace DVBTTelevizor.TV
             configuration.SledovaniTVPIN = SledovaniTVPIN;
             configuration.SledovaniTVDeviceID = SledovaniTVDeviceID;
             configuration.SledovaniTVDevicePassword = SledovaniTVDevicePassword;
+            configuration.RTLSDREnabled = RTLSDREnabled;
         }
     }
 }

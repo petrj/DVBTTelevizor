@@ -240,6 +240,7 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(ConnectedDevice));
                 OnPropertyChanged(nameof(DriverStateStatus));
+                OnPropertyChanged(nameof(DriversBoxVisible));
             });
         }
 
@@ -398,5 +399,12 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool DriversBoxVisible
+        {
+            get
+            {
+                return _configuration.RTLSDREnabled;
+            }
+        }
     }
 }

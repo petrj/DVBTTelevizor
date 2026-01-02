@@ -74,7 +74,7 @@ namespace DVBTTelevizor
         string SledovaniTVPIN { get; set; }
         string SledovaniTVDeviceID { get; set; }
         string SledovaniTVDevicePassword { get; set; }
-
         bool UpdatedTo2026 { get; set; }
+        bool RTLSDREnabled { get; set; }
     }
 }
