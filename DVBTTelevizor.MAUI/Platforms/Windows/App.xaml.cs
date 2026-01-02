@@ -1,16 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI.Notifications;
 using DVBTTelevizor.MAUI.Messages;
-using LibVLCSharp.Shared;
 using LoggerService;
-using Microsoft.Graphics.Canvas.Printing;
-using Microsoft.Maui.Controls.PlatformConfiguration;
-using Microsoft.UI.Xaml;
-using System.Threading;
-using Windows.Data.Xml.Dom;
-using Windows.Networking.Vpn;
-using Windows.UI.Core;
-using Windows.UI.Notifications;
+using RTLSDR;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +31,7 @@ namespace DVBTTelevizor.MAUI.WinUI
                 testDVBTDriver.PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath();
                 testDVBTDriver.Connect();
 
-                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectedMessage(
+                WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
                     new DVBTDriverConfiguration()
                     {
                         DeviceName = "Testing device",
@@ -86,8 +78,23 @@ namespace DVBTTelevizor.MAUI.WinUI
                 }
             });
 
+            WeakReferenceMessenger.Default.Register<RTLSDRDriverConnectMessage>(this, (sender, obj) =>
+            {
+                if (obj.Value is DriverSettings settings)
+                {
+                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(new DVBTDriverConfiguration()
+                    {
+                        DeviceName = "rtl_sdr bin",
+                        ControlPort = 1234,
+                        TransferPort = 1235,
+                        PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                    }));
+                }
+            });
+
             UnhandledException += App_UnhandledException;
         }
+
 
         private void ShowToastMessage(string msg)
         {

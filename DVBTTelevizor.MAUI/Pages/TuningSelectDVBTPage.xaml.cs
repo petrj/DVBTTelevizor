@@ -95,6 +95,12 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _tuningSelectDVBTViewModel.Settings?.SaveToConfiguration(_configuration);
+    }
+
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"TuningSelectDVBTPage Page OnKeyDown {key}");

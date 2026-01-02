@@ -4,7 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.DriverPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Driver state'}">
+             Title="{local:LngXamlExt Input='Driver'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -20,6 +20,15 @@
                 <!--Setter Property="TextColor" Value="#41b3ff"/-->
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
+
+            <Style x:Key="DriverLabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
                 <Setter Property="VerticalTextAlignment" Value="Center"/>
                 <Setter Property="VerticalOptions" Value="Center" />
                 <Setter Property="HorizontalOptions" Value="End" />
@@ -42,6 +51,16 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
+            <Style x:Key="RadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <!--Setter Property="BackgroundColor" Value="#808080"/-->
+                <Setter Property="BorderColor" Value="#808080"/>
+                <Setter Property="Margin" Value="10,0,0,0" />
+                <Setter Property="Padding" Value="0,0,0,0" />
+                <Setter Property="BorderWidth" Value="0" />
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -49,8 +68,28 @@
     <AbsoluteLayout BackgroundColor="Black">
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding DriverStateStatus}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.35" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
+
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.35,0.8,0.25" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
         <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
+
+        <Frame AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.12" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#808080" CornerRadius="10">
+            <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="5,5,5,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
+
+                <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
+
+                <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
+            </Grid>
+        </Frame>
+
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
                 <Grid.RowDefinitions>
@@ -81,7 +120,6 @@
 
         </Grid>
 
-        <Button x:Name="InstallDriverButton" AbsoluteLayout.LayoutBounds="0.5,0.55,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Install DVBT driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
             <Grid.RowDefinitions>
@@ -94,6 +132,8 @@
             </Grid.ColumnDefinitions>
 
             <Button x:Name="DriverPreferencesButton" Grid.Column="1" Text="{local:LngXamlExt Input='Settings..'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverPreferencesVisible}" Clicked="DriverPreferencesButton_Clicked"/>
+            <Button x:Name="InstallDriverButton"  Grid.Column="1"  Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
+
 
         </Grid>
 
@@ -111,6 +151,8 @@
             <Button x:Name="DisconnectButton" Grid.Column="2" Text="{local:LngXamlExt Input='Disconnect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DisconnectButtonVisible}" Clicked="DisconnectButton_Clicked"/>
 
         </Grid>
+
+        <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
     </AbsoluteLayout>
 

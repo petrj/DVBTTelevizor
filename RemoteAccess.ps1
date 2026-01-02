@@ -259,6 +259,9 @@ function Show-GUI {
     )
     
     Process {
+
+        # for key codes use Android.Views.Keycode enum
+
         # Create the Form
         $form = New-Object System.Windows.Forms.Form
         $form.Text = "Simple Navigation"
@@ -271,7 +274,7 @@ function Show-GUI {
         $btnLeft.Location = New-Object System.Drawing.Point(20, 100)
         $btnLeft.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "left" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "DpadLeft" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $btnRight = New-Object System.Windows.Forms.Button
@@ -280,7 +283,7 @@ function Show-GUI {
         $btnRight.Add_Click(
         { 
          
-            Get-KeyDownMessage -keyCode "right" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP        
+            Get-KeyDownMessage -keyCode "DpadRight" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP        
         })
 
         $btnUp = New-Object System.Windows.Forms.Button
@@ -288,7 +291,7 @@ function Show-GUI {
         $btnUp.Location = New-Object System.Drawing.Point(120, 50)
         $btnUp.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "up" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "DpadUp" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $btnDown = New-Object System.Windows.Forms.Button
@@ -296,7 +299,7 @@ function Show-GUI {
         $btnDown.Location = New-Object System.Drawing.Point(120, 150)
         $btnDown.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "down" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "DpadDown" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $okDown = New-Object System.Windows.Forms.Button
@@ -304,7 +307,7 @@ function Show-GUI {
         $okDown.Location = New-Object System.Drawing.Point(120, 100)
         $okDown.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "enter" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "DpadCenter" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $backDown = New-Object System.Windows.Forms.Button
@@ -312,7 +315,7 @@ function Show-GUI {
         $backDown.Location = New-Object System.Drawing.Point(20, 20)
         $backDown.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "back" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "Escape" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
         
         $posx = 350
@@ -324,7 +327,7 @@ function Show-GUI {
             $numDown.Location = New-Object System.Drawing.Point($posx, $posy)
             $numDown.Add_Click(
             { 
-                Get-KeyDownMessage -keyCode ($this.Text) -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+                Get-KeyDownMessage -keyCode ("Num" + $this.Text) -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
             })
 
             $form.Controls.Add($numDown)
@@ -342,7 +345,7 @@ function Show-GUI {
         $num0.Location = New-Object System.Drawing.Point(430, 200)
         $num0.Add_Click(
         { 
-            Get-KeyDownMessage -keyCode "0" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
+            Get-KeyDownMessage -keyCode "Num0" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
 
@@ -361,8 +364,9 @@ function Show-GUI {
     }
 }
 
-$IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
-Write-host ("Detected IP:" + $IP)
+#$IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
+#Write-host ("Detected IP:" + $IP)
+$IP = "10.0.0.5"
 
 Show-GUI -SecurityKey "DVBTTelevizor" -IP $IP -Port 49152
 

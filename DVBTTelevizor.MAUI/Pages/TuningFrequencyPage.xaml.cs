@@ -77,6 +77,11 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        Settings?.SaveToConfiguration(_configuration);
+    }
 
     public void OnKeyDown(string key, bool longPress)
     {

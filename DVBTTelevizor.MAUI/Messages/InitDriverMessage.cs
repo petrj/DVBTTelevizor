@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class PlayRawAdioMessage : ValueChangedMessage<string>
+    internal class InitDriverMessage : ValueChangedMessage<string>
     {
-        public PlayRawAdioMessage(string value) : base(value)
+        public InitDriverMessage(string value) : base(value)
         {
 
         }

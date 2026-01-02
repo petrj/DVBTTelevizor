@@ -5,6 +5,7 @@ namespace DVBTTelevizor.MAUI
     public partial class App : Application
     {
         private MainPage _mp;
+        private bool _resuming = false;
 
         public App(MainPage mp)
         {
@@ -31,22 +32,33 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnResume()
         {
-            if (_mp != null)
-            {
-                Task.Run(async () =>
-                {
-                    if (_mp.PlayingState != PlayingStateEnum.Stopped)
-                    {
-                        await _mp.FixVideo(true);
-                    }
-                    else
-                    {
-                        _mp.SetFixVideNeeded();
-                    }
+            if (_resuming)
+                return;
 
-                    await _mp.CheckDriverInstallationChange();
-                    await _mp.FocusSelectedChannel();
-                });
+            try
+            {
+                _resuming = true;
+
+                if (_mp != null)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (_mp.PlayingState != PlayingStateEnum.Stopped)
+                        {
+                            await _mp.FixVideo(true);
+                        }
+                        else
+                        {
+                            _mp.SetFixVideNeeded();
+                        }
+
+                        await _mp.CheckDriverInstallationChange();
+                        await _mp.FocusSelectedChannel();
+                    });
+                }
+            } finally
+            {
+                _resuming = false;
             }
         }
     }

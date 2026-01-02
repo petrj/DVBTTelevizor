@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI
 {
-    public enum DVBTDriverTypeEnum
+    public enum DriverTypeEnum
     {
          AndroidDVBTDriver = 0,
          AndroidTestingDVBTDriver = 1,
          TestTuneDriver = 2,
-         RTLSDRTCPIPFMDriver = 3,
-         RTLSDRFMDriver = 4
+         RTLSDRDriver = 3
     }
 }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    internal class NotifyAudioChangeMessage : ValueChangedMessage<string>
+    public class ConnectDriverMessage : DVBTDriverConnectMessages<DVBTDriverConfiguration>
     {
-        public NotifyAudioChangeMessage(string value) : base(value)
+        public ConnectDriverMessage(DVBTDriverConfiguration value) : base(value)
         {
 
         }

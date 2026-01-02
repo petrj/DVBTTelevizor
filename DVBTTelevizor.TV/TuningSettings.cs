@@ -23,14 +23,19 @@ namespace DVBTTelevizor
 
         public long FrequencyFromKHz { get; set; } = 474000;
         public long FrequencyToKHz { get; set; } = 852000;
-
         public long FrequencyKHz { get; set; } = 474000;
 
         public long DeviceFrequencyMinKHz { get; set; } = 474000;
         public long DeviceFrequencyMaxKHz { get; set; } = 852000;
 
-        public static long DefaultDVBTFrequencyMinKHz { get; set; } = 474000;
-        public static long DefaultDVBTFrequencyMaxKHz { get; set; } = 852000;
+        public long DeviceBandWidthMinKHz { get; set; } = 1700;
+        public long DeviceBandWidthMaxKHz { get; set; } = 10000;
+
+
+        public long DefaultFrequencyMinKHz { get; set; } = 474000;
+        public long DefaultFrequencyMaxKHz { get; set; } = 852000;
+
+        public long DefaultBandwidthKHz { get; set; } = 8000;
 
         public TuningSettings(ILoggingService loggingService)
         {
@@ -51,7 +56,12 @@ namespace DVBTTelevizor
                  TuneDVBTPreferred = TuneDVBTPreferred,
                  TuningMode = TuningMode,
                  DeviceFrequencyMinKHz =  DeviceFrequencyMinKHz,
-                 DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz
+                 DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz,
+                 DefaultBandwidthKHz = DefaultBandwidthKHz,
+                 DefaultFrequencyMinKHz = DefaultFrequencyMinKHz,
+                 DefaultFrequencyMaxKHz = DefaultFrequencyMaxKHz,
+                 DeviceBandWidthMinKHz = DeviceBandWidthMinKHz,
+                 DeviceBandWidthMaxKHz = DeviceBandWidthMaxKHz
             };
         }
 
@@ -69,20 +79,108 @@ namespace DVBTTelevizor
 
         public void LoadFromConfiguration(ITVConfiguration configuration)
         {
-            BandwidthKHz = configuration.DVBTBandwidthKHz;
 
-            FrequencyKHz = configuration.FrequencyKHz;
-            FrequencyFromKHz = configuration.FrequencyFromKHz;
-            FrequencyToKHz = configuration.FrequencyToKHz;
+            switch (configuration.DVBTDriverType)
+            {
+                case MAUI.DriverTypeEnum.RTLSDRDriver:
+
+                    SetFMSettings();
+
+                    //BandwidthKHz = configuration.FMDVBTBandwidthKHz;
+                    FrequencyKHz = configuration.FMFrequencyKHz;
+                    FrequencyFromKHz = configuration.FMFrequencyFromKHz;
+                    FrequencyToKHz = configuration.FMFrequencyToKHz;
+
+                    break;
+
+                case MAUI.DriverTypeEnum.AndroidDVBTDriver:
+                default:
+                    SetDVBTSettings();
+
+                    BandwidthKHz = configuration.DVBTBandwidthKHz;
+                    FrequencyKHz = configuration.FrequencyKHz;
+                    FrequencyFromKHz = configuration.FrequencyFromKHz;
+                    FrequencyToKHz = configuration.FrequencyToKHz;
+                    DVBT = configuration.TuneDVBTEnabled;
+                    DVBT2 = configuration.TuneDVBT2Enabled;
+                    TuneDVBTPreferred = configuration.TuneDVBTPreferred;
+
+                    break;
+            }
         }
-
 
         public void SaveToConfiguration(ITVConfiguration configuration)
         {
-            configuration.FrequencyKHz = FrequencyKHz;
-            configuration.FrequencyFromKHz = FrequencyFromKHz;
-            configuration.FrequencyToKHz = FrequencyToKHz;
-            configuration.DVBTBandwidthKHz = BandwidthKHz;
+            switch (configuration.DVBTDriverType)
+            {
+                case MAUI.DriverTypeEnum.RTLSDRDriver:
+                    //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
+                    configuration.FMFrequencyKHz = FrequencyKHz;
+                    configuration.FMFrequencyFromKHz = FrequencyFromKHz;
+                    configuration.FMFrequencyToKHz = FrequencyToKHz;
+                    break;
+
+                case MAUI.DriverTypeEnum.AndroidDVBTDriver:
+                default:
+
+                    configuration.TuneDVBTEnabled = DVBT;
+                    configuration.TuneDVBT2Enabled = DVBT2;
+                    configuration.TuneDVBTPreferred = TuneDVBTPreferred;
+
+                    configuration.DVBTBandwidthKHz = BandwidthKHz ;
+                    configuration.FrequencyKHz = FrequencyKHz;
+                    configuration.FrequencyFromKHz = FrequencyFromKHz;
+                    configuration.FrequencyToKHz = FrequencyToKHz;
+                    break;
+            }
+        }
+
+        public void SetFMSettings()
+        {
+            FM = true;
+            DVBT = false;
+            DVBT2 = false;
+            //_tuningSettings.FrequencyKHz = 88000;
+            FrequencyFromKHz = 88000;
+            FrequencyToKHz = 108000;
+            FrequencyKHz = FrequencyFromKHz;
+
+            DeviceFrequencyMinKHz = 88000;
+            DeviceFrequencyMaxKHz = 108000;
+
+            DeviceBandWidthMinKHz = 100;
+            DeviceBandWidthMaxKHz = 100;
+            DefaultBandwidthKHz = 100;
+
+            DefaultFrequencyMinKHz = DeviceFrequencyMinKHz;
+            DefaultFrequencyMaxKHz = DeviceFrequencyMaxKHz;
+
+            BandwidthKHz = DefaultBandwidthKHz;
+        }
+
+        public void SetDVBTSettings()
+        {
+            FM = false;
+
+            DVBT = true;
+            DVBT2 = true;
+
+            FrequencyFromKHz = DefaultFrequencyMinKHz;
+            FrequencyToKHz = DefaultFrequencyMaxKHz;
+            FrequencyKHz = FrequencyFromKHz;
+
+            DeviceFrequencyMinKHz = 174000; // 174.0 MHz - VHF high-band (band III) channel 7
+            DeviceFrequencyMaxKHz = 858000; // 858.0 MHz - UHF band channel 69
+
+            DeviceBandWidthMinKHz = 1700;
+            DeviceBandWidthMaxKHz = 10000;
+
+            DefaultBandwidthKHz = 8000;
+
+            DefaultFrequencyMinKHz = 474000;
+            DefaultFrequencyMaxKHz = DeviceFrequencyMaxKHz;
+
+            BandwidthKHz = DefaultBandwidthKHz;
         }
 
         public async Task SetFrequencies(IDriverConnector driver)
@@ -91,14 +189,14 @@ namespace DVBTTelevizor
             {
                 _loggingService.Info("SetFrequencies");
 
-                if (BandwidthKHz < driver.BandwidthMinKHz ||
-                    BandwidthKHz > driver.BandwidthMaxKHz)
+                if (BandwidthKHz < DeviceBandWidthMinKHz ||
+                    BandwidthKHz > DeviceBandWidthMaxKHz)
                 {
-                    BandwidthKHz = driver.BandwidthMinKHz;
+                    BandwidthKHz = DefaultBandwidthKHz;
                 }
 
-                DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
-                DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
+                //DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
+                //DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
 
                 if (driver.Connected)
                 {
@@ -114,13 +212,12 @@ namespace DVBTTelevizor
 
                             if (!ValidFrequency(DeviceFrequencyMinKHz, false))
                             {
-                                DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
+                                DeviceFrequencyMinKHz = DeviceFrequencyMinKHz;
                             }
                             if (!ValidFrequency(DeviceFrequencyMaxKHz, false))
                             {
-                                DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
+                                DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz;
                             }
-
                         }
                     }
                     catch (Exception ex)

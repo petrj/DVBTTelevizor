@@ -123,6 +123,13 @@ namespace DVBTTelevizor.MAUI
                     boxView.BackgroundColor = Color.FromHex("#303F9F");
                     boxView.Focus();
                 } else
+                if (part is RadioButton radioButton)
+                {
+                    radioButton.BackgroundColor = Color.FromHex("#303F9F");
+                    radioButton.TextColor = Colors.White;
+                    radioButton.Focus();
+                }
+                else
                 if (part is Button button)
                 {
                     button.BackgroundColor = Color.FromHex("#303F9F");
@@ -178,6 +185,12 @@ namespace DVBTTelevizor.MAUI
                     button.BackgroundColor = Colors.Gray;
                     button.TextColor = Colors.Black;
                 } else
+                if (part is RadioButton radioButton)
+                {
+                    radioButton.BackgroundColor = Colors.Gray;
+                    radioButton.TextColor = Colors.Black;
+                }
+                else
                 if (part is ImageButton ibutton)
                 {
                     ibutton.BackgroundColor = Colors.Gray;

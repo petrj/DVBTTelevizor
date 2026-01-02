@@ -44,20 +44,40 @@
 		<VersionName>2025</VersionName>
 	</PropertyGroup>
 
+	<!-- Versions
+		Value 2025003 is too big for Windows
+		-->
+	<!--PropertyGroup Condition="$(TargetFramework.Contains('android'))">
+		<ApplicationDisplayVersion>2025031</ApplicationDisplayVersion>
+		<ApplicationVersion>2025031</ApplicationVersion>
+		<VersionCode>2025031</VersionCode>
+		<VersionName>2025031</VersionName>
+	</PropertyGroup-->
+
+	<!--PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<ApplicationDisplayVersion>2025</ApplicationDisplayVersion>
+		<ApplicationVersion>2025</ApplicationVersion>
+		<VersionCode>2025</VersionCode>
+		<VersionName>2025</VersionName>
+	</PropertyGroup-->
+
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.22000.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
 
-	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
+		<!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 
-	  <UseFastDeployment>true</UseFastDeployment>
+	  <UseFastDeployment>false</UseFastDeployment>
+		
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
 
 	</PropertyGroup>
 
@@ -67,6 +87,15 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.22000.0|AnyCPU'">
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.22000.0|AnyCPU'">
+	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -107,16 +136,19 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.100" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
+		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="NLog" Version="6.0.4" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.3" />
 		<PackageReference Include="Plugin.InAppBilling" Version="9.1.0" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
-		<PackageReference Include="RTLSDR" Version="1.0.1" />
+		<PackageReference Include="RTLSDR" Version="1.0.3" />
+		<PackageReference Include="RTLSDR.Audio" Version="1.0.4" />
 		<PackageReference Include="RTLSDR.Common" Version="1.0.1" />
 		<PackageReference Include="RTLSDR.FM" Version="1.0.1" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.1" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
+		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
 	</ItemGroup>
 
 
@@ -172,6 +204,9 @@
 	    <DependentUpon>SettingsPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Platforms\Android\LoggingProvider.cs">
+	    <ExcludeFromCurrentConfiguration>true</ExcludeFromCurrentConfiguration>
+	  </Compile>
+	  <Compile Update="Platforms\Android\RTLSDRDriverPlatformImplementation.cs">
 	    <ExcludeFromCurrentConfiguration>true</ExcludeFromCurrentConfiguration>
 	  </Compile>
 	  <Compile Update="Platforms\Windows\PublicDirectoryProvider.cs">

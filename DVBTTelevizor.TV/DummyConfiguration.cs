@@ -13,7 +13,7 @@ namespace DVBTTelevizor.TV
         public string ConfigDirectory { get; set; } = String.Empty;
         public string LastSelectedChannelUniqueIdentifier { get; set; } = String.Empty;
         public string AutoPlayedChannelUniqueID { get; set; } = String.Empty;
-        public DVBTDriverTypeEnum DVBTDriverType { get; set; } = DVBTDriverTypeEnum.AndroidDVBTDriver;
+        public DriverTypeEnum DVBTDriverType { get; set; } = DriverTypeEnum.AndroidDVBTDriver;
         public AppFontSizeEnum AppFontSize { get; set; } = AppFontSizeEnum.Normal;
         public string Language { get; set; } = String.Empty;
         public bool Fullscreen { get; set; } = false;
@@ -34,7 +34,11 @@ namespace DVBTTelevizor.TV
         public long FrequencyFromKHz { get; set; } = 0;
         public long FrequencyToKHz { get; set; } = 0;
         public long FrequencyKHz { get; set; } = 0;
+        public long FMFrequencyFromKHz { get; set; } = 0;
+        public long FMFrequencyToKHz { get; set; } = 0;
+        public long FMFrequencyKHz { get; set; } = 0;
         public long DVBTBandwidthKHz { get; set; } = 0;
+        public long FMDVBTBandwidthKHz { get; set; } = 0;
         public int SDRDriverStreamPort { get; set; } = 0;
         public int SDRDriverPort { get; set; } = 0;
         public int SDRSampleRate { get; set; } = 0;

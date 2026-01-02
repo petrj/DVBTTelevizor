@@ -199,12 +199,12 @@ namespace DVBTTelevizor
             }
         }
 
-        public DVBTDriverTypeEnum DVBTDriverType
+        public DriverTypeEnum DVBTDriverType
         {
             get
             {
                 var index = GetPersistingSettingValue<int>("DVBTDriverType");
-                return (DVBTDriverTypeEnum)index;
+                return (DriverTypeEnum)index;
             }
             set
             {
@@ -221,6 +221,18 @@ namespace DVBTTelevizor
             set
             {
                 SavePersistingSettingValue<long>("DVBTBandwidthKHz", value);
+            }
+        }
+
+        public long FMDVBTBandwidthKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FMDVBTBandwidthKHz", 100);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FMDVBTBandwidthKHz", value);
             }
         }
 
@@ -532,6 +544,41 @@ namespace DVBTTelevizor
             set
             {
                 SavePersistingSettingValue<long>("FrequencyKHz", value);
+            }
+        }
+
+        public long FMFrequencyFromKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FMFrequencyFromKHz", 88000);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FMFrequencyFromKHz", value);
+            }
+        }
+
+        public long FMFrequencyToKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FMFrequencyToKHz", 108000);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FMFrequencyToKHz", value);
+            }
+        }
+        public long FMFrequencyKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("FMFrequencyKHz", 104000);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("FMFrequencyKHz", value);
             }
         }
 

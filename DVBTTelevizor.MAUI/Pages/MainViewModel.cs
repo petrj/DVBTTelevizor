@@ -155,7 +155,7 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectedMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<ConnectDriverMessage>(this, (r, m) =>
             {
                 ConnectDriver(m.Value);
             });
@@ -166,6 +166,11 @@ namespace DVBTTelevizor.MAUI
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverNotInstalledMessage>(this, (r, m) =>
+            {
+                DriverNotInstalled();
+            });
+
+            WeakReferenceMessenger.Default.Register<RTLSDRDriverNotInstalledMessage>(this, (r, m) =>
             {
                 DriverNotInstalled();
             });
@@ -962,6 +967,9 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
+            if (_driver.Connected)
+                return;
+
             _driver.DriverInstalled = true;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
@@ -970,7 +978,7 @@ namespace DVBTTelevizor.MAUI
             _driver.PublicDirectory = _publicDirectory;
             _driver.Connect();
 
-            if (_driver is RTLSDRTCPIPFMDriverConnector)
+            if (_driver is RTLSDRDriverConnector)
             {
                 //WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(String.Empty));
             }
@@ -995,7 +1003,7 @@ namespace DVBTTelevizor.MAUI
 
             _driver.DriverInstalled = false;
 
-            WeakReferenceMessenger.Default.Send(new ToastMessage("DVBT driver is not installed".Translated()));
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
             UpdateDriverState();
         }

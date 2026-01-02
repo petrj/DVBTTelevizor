@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging.Messages;
+using RTLSDR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class DVBTDriverConnectedMessage : DVBTDriverConnectMessages<DVBTDriverConfiguration>
+    public class RTLSDRDriverConnectMessage : ValueChangedMessage<DriverSettings>
     {
-        public DVBTDriverConnectedMessage(DVBTDriverConfiguration value) : base(value)
+        public RTLSDRDriverConnectMessage(DriverSettings value) : base(value)
         {
 
         }

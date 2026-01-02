@@ -24,16 +24,76 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
+            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
+            <Style x:Key="DriverLabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
+
+            <Style x:Key="RadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <!--Setter Property="BackgroundColor" Value="#808080"/-->
+                <Setter Property="BorderColor" Value="#808080"/>
+                <Setter Property="Margin" Value="10,0,0,0" />
+                <Setter Property="Padding" Value="5,5,5,5" />
+                <Setter Property="BorderWidth" Value="0" />
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tuning mode'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tuning'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" />
 
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.30,0.8,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.50,0.8,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
-        <Button AbsoluteLayout.LayoutBounds="0.5,0.70,0.8,0.15" AbsoluteLayout.LayoutFlags="All" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
+        <Frame AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.15" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#808080" CornerRadius="10">
+            <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="5,5,5,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
+
+                <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
+
+                <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
+            </Grid>
+        </Frame>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.5" AbsoluteLayout.LayoutFlags="All">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Grid.Row="0" AbsoluteLayout.LayoutFlags="All" x:Name="AutoScanButton" Text="{local:LngXamlExt Input='Automatic scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="AutoScanButton_Clicked" />
+            <Button Grid.Column="0" Grid.Row="1" x:Name="ManualScanButton" Text="{local:LngXamlExt Input='Manual scan'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="ManualScanButton_Clicked"/>
+            <Button Grid.Column="0" Grid.Row="2" x:Name="TuneButton" Text="{local:LngXamlExt Input='Tune frequency'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="TuneButton_Clicked"/>
+        </Grid>
+
+        <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
     </AbsoluteLayout>
 

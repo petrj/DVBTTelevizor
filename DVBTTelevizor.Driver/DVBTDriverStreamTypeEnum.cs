@@ -4,7 +4,8 @@ namespace DVBTTelevizor
 {
     public enum DVBTDriverStreamTypeEnum
     {
-        UDP = 0,
-        Stream = 1
+        None = 0,
+        UDP = 1,
+        Stream = 2
     }
 }
