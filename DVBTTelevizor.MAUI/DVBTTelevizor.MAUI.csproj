@@ -31,17 +31,17 @@
 		Value 2025003 is too big for Windows
 		-->
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationDisplayVersion>2025031</ApplicationDisplayVersion>
-		<ApplicationVersion>2025031</ApplicationVersion>
-		<VersionCode>2025031</VersionCode>
-		<VersionName>2025031</VersionName>
+		<ApplicationDisplayVersion>2026001</ApplicationDisplayVersion>
+		<ApplicationVersion>2026001</ApplicationVersion>
+		<VersionCode>2026001</VersionCode>
+		<VersionName>2026001</VersionName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
-		<ApplicationDisplayVersion>2025</ApplicationDisplayVersion>
-		<ApplicationVersion>2025</ApplicationVersion>
-		<VersionCode>2025</VersionCode>
-		<VersionName>2025</VersionName>
+		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
+		<ApplicationVersion>2026</ApplicationVersion>
+		<VersionCode>2026</VersionCode>
+		<VersionName>2026</VersionName>
 	</PropertyGroup>
 
 	<!-- Versions
@@ -77,7 +77,7 @@
 		
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
-	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
 
 	</PropertyGroup>
 
@@ -87,15 +87,15 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.22000.0|AnyCPU'">
-	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.22000.0|AnyCPU'">
-	  <ApplicationDisplayVersion>2025.31.0</ApplicationDisplayVersion>
+	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
