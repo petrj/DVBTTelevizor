@@ -241,3 +241,6 @@ Playing failed.=چلانے میں ناکامی ہوئی۔
 Playing failed. Check USB connection=چلانے میں ناکامی ہوئی۔ USB کنکشن چیک کریں
 No compatible device=کوئی ہم آہنگ آلہ نہیں ملا
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor ایک مفت، غیر تجارتی شوقیہ پروجیکٹ ہے جو فارغ وقت میں بنایا گیا ہے۔ اگر آپ اسے پسند کرتے ہیں، تو آپ معمولی عطیہ کے ذریعے اس کی ترقی میں تعاون کر سکتے ہیں۔ 🙏
+Enable FM=ایف ایم فعال کریں
+(FM radio is experimental function and requires SDR driver)=(ایف ایم ریڈیو ایک تجرباتی فنکشن ہے اور اس کے لیے SDR ڈرائیور درکار ہے)
+Cannot disable FM when driver is active=ڈرائیور فعال ہونے پر ایف ایم کو غیر فعال نہیں کیا جا سکتا

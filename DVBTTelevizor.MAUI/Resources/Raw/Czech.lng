@@ -241,3 +241,6 @@ Playing failed.=Přehrávání selhalo.
 Playing failed. Check USB connection=Přehrávání selhalo. Zkontrolujte USB připojení.
 No compatible device=Žádné kompatibilní zařízení
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor je bezplatný, nekomerční hobby projekt vytvořený ve volném čase. Pokud se vám líbí, můžete podpořit vývoj malým darem. 🙏
+Enable FM=Povolit FM
+(FM radio is experimental function and requires SDR driver)=(FM rádio je experimentální funkce a vyžaduje SDR ovladač)
+Cannot disable FM when driver is active=Nelze vypnout FM, pokud je ovladač aktivní

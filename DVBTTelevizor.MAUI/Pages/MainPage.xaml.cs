@@ -157,8 +157,9 @@ namespace DVBTTelevizor.MAUI
                     await ExtractAssetFile("Vietnamese_AI.lng");
                     await ExtractAssetFile("Greek_AI.lng");
                     await ExtractAssetFile("Thai_AI.lng");
+                    await ExtractAssetFile("Russian_AI.lng");
 
-                   // _configuration.UpdatedTo2026 = true;
+                    _configuration.UpdatedTo2026 = true;
                 }
 
                 // language

@@ -241,3 +241,6 @@ Playing failed.=প্লেব্যাক ব্যর্থ হয়েছ�
 Playing failed. Check USB connection=প্লেব্যাক ব্যর্থ হয়েছে। USB সংযোগ পরীক্ষা করুন।
 No compatible device=কোনো সামঞ্জস্যপূর্ণ ডিভাইস নেই
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor একটি বিনামূল্যের, অ-বাণিজ্যিক শখের প্রজেক্ট যা অবসর সময়ে তৈরি করা হয়েছে। আপনি যদি এটি পছন্দ করেন, তবে একটি ছোট অনুদানের মাধ্যমে এর উন্নয়নে সহায়তা করতে পারেন। 🙏
+Enable FM=FM সক্ষম করুন
+(FM radio is experimental function and requires SDR driver)=(FM রেডিও একটি পরীক্ষামূলক ফাংশন এবং এর জন্য SDR ড্রাইভার প্রয়োজন)
+Cannot disable FM when driver is active=ড্রাইভার সক্রিয় থাকাকালীন FM নিষ্ক্রিয় করা যাবে না

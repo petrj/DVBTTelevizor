@@ -241,3 +241,6 @@ Playing failed.=Oynatma uğursuz oldu.
 Playing failed. Check USB connection=Oynatma uğursuz oldu. USB bağlantısını yoxlayın.
 No compatible device=Uyğun cihaz tapılmadı
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor asudə vaxtda yaradılmış pulsuz, qeyri-kommersiya hobbi layihəsidir. Əgər bəyənirsinizsə, kiçik bir ianə ilə inkişafına dəstək ola bilərsiniz. 🙏
+Enable FM=FM-i aktivləşdir
+(FM radio is experimental function and requires SDR driver)=(FM radio eksperimental funksiyadır və SDR drayveri tələb edir)
+Cannot disable FM when driver is active=Drayver aktiv olduqda FM-i söndürmək mümkün deyil

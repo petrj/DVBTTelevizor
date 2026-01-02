@@ -241,3 +241,6 @@ Playing failed.=प्लेबैक विफल रहा।
 Playing failed. Check USB connection=प्लेबैक विफल रहा। USB कनेक्शन की जाँच करें।
 No compatible device=कोई संगत डिवाइस नहीं है
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor एक मुफ़्त, गैर-व्यावसायिक हॉबी प्रोजेक्ट है जिसे खाली समय में बनाया गया है। यदि आप इसका आनंद लेते हैं, तो आप एक छोटे से दान के साथ इसके विकास का समर्थन कर सकते हैं। 🙏
+Enable FM=FM सक्षम करें
+(FM radio is experimental function and requires SDR driver)=(FM रेडियो एक प्रयोगात्मक फ़ंक्शन है और इसके लिए SDR ड्राइवर की आवश्यकता होती है)
+Cannot disable FM when driver is active=ड्राइवर सक्रिय होने पर FM को अक्षम नहीं किया जा सकता

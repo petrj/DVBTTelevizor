@@ -241,3 +241,6 @@ Playing failed.=Pemutaran gagal.
 Playing failed. Check USB connection=Pemutaran gagal. Periksa koneksi USB.
 No compatible device=Tidak ada perangkat yang kompatibel
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor adalah proyek hobi gratis dan non-komersial yang dibuat di waktu luang. Jika Anda menikmatinya, Anda dapat mendukung pengembangan dengan donasi kecil. 🙏
+Enable FM=Aktifkan FM
+(FM radio is experimental function and requires SDR driver)=(Radio FM adalah fungsi eksperimental dan memerlukan driver SDR)
+Cannot disable FM when driver is active=Tidak dapat menonaktifkan FM saat driver aktif

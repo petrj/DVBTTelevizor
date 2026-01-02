@@ -241,3 +241,6 @@ Playing failed.=Phát không thành công.
 Playing failed. Check USB connection=Phát không thành công. Kiểm tra kết nối USB.
 No compatible device=Không có thiết bị tương thích
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor là một dự án sở thích cá nhân miễn phí, phi thương mại được tạo ra trong thời gian rảnh rỗi. Nếu bạn yêu thích nó, bạn có thể hỗ trợ phát triển bằng một khoản quyên góp nhỏ. 🙏
+Enable FM=Bật FM
+(FM radio is experimental function and requires SDR driver)=(Đài FM là một chức năng thử nghiệm và yêu cầu trình điều khiển SDR)
+Cannot disable FM when driver is active=Không thể tắt FM khi trình điều khiển đang hoạt động

@@ -241,3 +241,6 @@ Playing failed.=Odtwarzanie nie powiodło się.
 Playing failed. Check USB connection=Odtwarzanie nie powiodło się. Sprawdź połączenie USB.
 No compatible device=Brak kompatybilnego urządzenia
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor to bezpłatny, niekomercyjny projekt hobbystyczny stworzony w czasie wolnym. Jeśli Ci się podoba, możesz wesprzeć jego rozwój niewielką darowizną. 🙏
+Enable FM=Włącz FM
+(FM radio is experimental function and requires SDR driver)=(Radio FM jest funkcją eksperymentalną i wymaga sterownika SDR)
+Cannot disable FM when driver is active=Nie można wyłączyć FM, gdy sterownik jest aktywny

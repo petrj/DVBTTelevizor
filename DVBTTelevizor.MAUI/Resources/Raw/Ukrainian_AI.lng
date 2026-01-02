@@ -241,3 +241,6 @@ Playing failed.=Помилка відтворення.
 Playing failed. Check USB connection=Помилка відтворення. Перевірте USB-з'єднання.
 No compatible device=Немає сумісного пристрою
 DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor — це безкоштовний некомерційний хобі-проєкт, створений у вільний час. Якщо він вам подобається, ви можете підтримати розробку невеликим внеском. 🙏
+Enable FM=Увімкнути FM
+(FM radio is experimental function and requires SDR driver)=(FM-радіо є експериментальною функцією і потребує драйвера SDR)
+Cannot disable FM when driver is active=Неможливо вимкнути FM, коли драйвер активний
