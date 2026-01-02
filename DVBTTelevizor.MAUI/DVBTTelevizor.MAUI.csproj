@@ -27,40 +27,25 @@
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
+		<ApplicationVersion>2026003</ApplicationVersion>
+		<VersionCode>2026003</VersionCode>
+		<VersionName>2026003</VersionName>
+		<ApplicationDisplayVersion>2026003</ApplicationDisplayVersion>
+	</PropertyGroup>
+
 	<!-- Versions
 		Value 2025003 is too big for Windows
 		-->
-	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationDisplayVersion>2026001</ApplicationDisplayVersion>
-		<ApplicationVersion>2026001</ApplicationVersion>
-		<VersionCode>2026001</VersionCode>
-		<VersionName>2026001</VersionName>
-	</PropertyGroup>
-
+	
 	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<ApplicationVersion>2026</ApplicationVersion>
 		<VersionCode>2026</VersionCode>
 		<VersionName>2026</VersionName>
-	</PropertyGroup>
-
-	<!-- Versions
-		Value 2025003 is too big for Windows
-		-->
-	<!--PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationDisplayVersion>2025031</ApplicationDisplayVersion>
-		<ApplicationVersion>2025031</ApplicationVersion>
-		<VersionCode>2025031</VersionCode>
-		<VersionName>2025031</VersionName>
-	</PropertyGroup-->
-
-	<!--PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<ApplicationDisplayVersion>2025</ApplicationDisplayVersion>
-		<ApplicationVersion>2025</ApplicationVersion>
-		<VersionCode>2025</VersionCode>
-		<VersionName>2025</VersionName>
-	</PropertyGroup-->
+		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
+	</PropertyGroup>	
 
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.22000.0</TargetFrameworks>
@@ -68,17 +53,13 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
 
-		<!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
+	  <!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-
-	  <UseFastDeployment>false</UseFastDeployment>
-		
+	  <UseFastDeployment>false</UseFastDeployment>		
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
-	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
-
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
@@ -87,15 +68,7 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.22000.0|AnyCPU'">
-	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.22000.0|AnyCPU'">
-	  <ApplicationDisplayVersion>2026.1.0</ApplicationDisplayVersion>
+	  
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -131,22 +104,22 @@
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
-		<PackageReference Include="LibVLCSharp" Version="3.9.4" />
+		<PackageReference Include="LibVLCSharp" Version="3.9.5" />
 		<PackageReference Include="LoggerService" Version="1.0.5" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.100" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
-		<PackageReference Include="NLog" Version="6.0.4" />
+		<PackageReference Include="NLog" Version="6.0.7" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.3" />
 		<PackageReference Include="Plugin.InAppBilling" Version="9.1.0" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
 		<PackageReference Include="RTLSDR" Version="1.0.3" />
-		<PackageReference Include="RTLSDR.Audio" Version="1.0.4" />
+		<PackageReference Include="RTLSDR.Audio" Version="1.0.6" />
 		<PackageReference Include="RTLSDR.Common" Version="1.0.1" />
 		<PackageReference Include="RTLSDR.FM" Version="1.0.1" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="System.Drawing.Common" Version="8.0.1" />
+		<PackageReference Include="System.Drawing.Common" Version="10.0.1" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
 	</ItemGroup>
@@ -154,7 +127,7 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
-	    <Version>3.9.4</Version>
+	    <Version>3.9.5</Version>
 	  </PackageReference>
 	</ItemGroup>
 
