@@ -10,6 +10,7 @@ namespace DVBTTelevizor.TV
 {
     public class DummyConfiguration : ITVConfiguration
     {
+        public bool UpdatedTo2026 { get; set; } = false;
         public string ConfigDirectory { get; set; } = String.Empty;
         public string LastSelectedChannelUniqueIdentifier { get; set; } = String.Empty;
         public string AutoPlayedChannelUniqueID { get; set; } = String.Empty;
