@@ -3240,7 +3240,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     if (
                         (desc.Id == id) &&
-                        (videoView.MediaPlayer.Spu != ids)
+                        (videoView.MediaPlayer.Spu != id)
                         )
                     {
                         _loggingService.Info($"Changing subtitles to: {desc.Id} ({desc.Name})");
