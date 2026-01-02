@@ -133,10 +133,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteAccessAppLink", new List<View>() { RemoteAccessAppLinkBoxView }))
 
-
-
-            .AddItem(KeyboardFocusableItem.CreateFrom("SelectDriver", new List<View>() { DriverBoxView, DriverPicker }))
-
             .AddItem(KeyboardFocusableItem.CreateFrom("WriteToExternalDevice", new List<View>() { WriteToExternalDeviceSwitchBoxView, WriteToExternalDeviceSwitch }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
@@ -591,10 +587,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
                         case "RemoteAccessAppLink":
                             OnRemoteTelevizorLabelTapped(this, null);
-                            break;
-
-                        case "SelectDriver":
-                            ShowPicker(DriverPicker);
                             break;
 
                         case "WriteToExternalDevice":

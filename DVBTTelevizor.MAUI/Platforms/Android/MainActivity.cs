@@ -972,6 +972,11 @@ namespace DVBTTelevizor.MAUI
             }
             if (requestCode == StartRequestCodeRTLSDR)
             {
+                if (resultCode == Result.Canceled)
+                {
+                    return;
+                }
+
                 if (resultCode == Result.Ok)
                 {
                     var x = data.GetIntExtra("SDRDriverPort", 1234);
