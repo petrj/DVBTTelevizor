@@ -1,8 +1,7 @@
 Menu=Menu
 About=À propos
 Free DVBT/DVBT2 Android Player=Lecteur Android DVBT/DVBT2 gratuit
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor est un projet de loisir gratuit et non commercial créé pendant le temps libre. Si vous l'appréciez, vous pouvez soutenir son développement par un petit don. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor est un projet de loisir gratuit et non commercial créé pendant le temps libre. Si vous l'appréciez, vous pouvez soutenir son développement par un petit don. 🙏
 Donate $1=Faire un don de 1 $
 Billing system is not supported on this device=Le système de facturation n'est pas pris en charge sur cet appareil
 Connection to billing failed=Échec de la connexion à la facturation
@@ -148,8 +147,7 @@ Logging=Journalisation
 Enable logging=Activer la journalisation
 UDP IP=IP UDP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV est une IPTV tchèque. Vous devez avoir un compte existant et être connecté à Internet
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV est une IPTV tchèque. Vous devez avoir un compte existant et être connecté à Internet
 Username=Nom d'utilisateur
 Password=Mot de passe
 Pair device=Associer l'appareil
@@ -232,3 +230,14 @@ Driver is not installed=Le pilote n'est pas installé
 Device response timeout=Délai de réponse de l'appareil expiré
 Driver initializing failed=Échec de l'initialisation du pilote
 Bad result=Mauvais résultat
+Connect to {0}?=Se connecter à {0} ?
+Continue using {0}=Continuer à utiliser {0}
+Please confirm driver change:=Veuillez confirmer le changement de pilote :
+Tuning failed.=Échec de la syntonisation.
+Driver is not installed.=Le pilote n'est pas installé.
+Check USB connection.=Vérifiez la connexion USB.
+Driver ...=Pilote ...
+Playing failed.=Échec de la lecture.
+Playing failed. Check USB connection=Échec de la lecture. Vérifiez la connexion USB.
+No compatible device=Aucun appareil compatible
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor est un projet amateur gratuit et non commercial créé pendant le temps libre. Si vous l'appréciez, vous pouvez soutenir le développement par un petit don. 🙏

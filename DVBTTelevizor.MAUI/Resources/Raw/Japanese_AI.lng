@@ -1,8 +1,7 @@
 Menu=メニュー
 About=について
 Free DVBT/DVBT2 Android Player=無料のDVBT/DVBT2 Androidプレイヤー
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizorは、空き時間に作成された無料の非営利の趣味プロジェクトです。気に入っていただけたら、少額の寄付で開発をサポートしていただけます。🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizorは、空き時間に作成された無料の非営利の趣味プロジェクトです。気に入っていただけたら、少額の寄付で開発をサポートしていただけます。🙏
 Donate $1=1ドル寄付
 Billing system is not supported on this device=このデバイスでは決済システムはサポートされていません
 Connection to billing failed=決済への接続に失敗しました
@@ -148,8 +147,7 @@ Logging=ログ記録
 Enable logging=ログ記録を有効にする
 UDP IP=UDP IP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTVはチェコのIPTVです。既存のアカウントを持ち、インターネットに接続されている必要があります
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTVはチェコのIPTVです。既存のアカウントを持ち、インターネットに接続されている必要があります
 Username=ユーザー名
 Password=パスワード
 Pair device=デバイスをペアリング
@@ -232,3 +230,14 @@ Driver is not installed=ドライバーがインストールされていませ�
 Device response timeout=デバイス応答のタイムアウト
 Driver initializing failed=ドライバーの初期化に失敗しました
 Bad result=不良な結果
+Connect to {0}?={0} に接続しますか？
+Continue using {0}={0} の使用を続ける
+Please confirm driver change:=ドライバーの変更を確認してください：
+Tuning failed.=チューニングに失敗しました。
+Driver is not installed.=ドライバーがインストールされていません。
+Check USB connection.=USB接続を確認してください。
+Driver ...=ドライバー ...
+Playing failed.=再生に失敗しました。
+Playing failed. Check USB connection=再生に失敗しました。USB接続を確認してください。
+No compatible device=互換性のあるデバイスが見つかりません
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizorは、余暇に作成された無料の非営利ホビープロジェクトです。もし気に入っていただけましたら、少額のご寄付で開発を支援していただけると幸いです。🙏

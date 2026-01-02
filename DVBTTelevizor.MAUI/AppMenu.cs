@@ -130,12 +130,12 @@ namespace DVBTTelevizor.MAUI
             var title = "Tuning failed.".Translated();
             if (driver == null || !driver.DriverInstalled)
             {
-                title += " Driver is not installed.".Translated();
+                title += "Driver is not installed.".Translated();
                 AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
             }
             else
             {
-                title += " Check USB connection.".Translated();
+                title += "Check USB connection.".Translated();
 
                 if (!driver.Connected)
                 {
@@ -162,12 +162,12 @@ namespace DVBTTelevizor.MAUI
             var title = "Playing failed.".Translated();
             if (driver == null || !driver.DriverInstalled)
             {
-                title += " Driver is not installed.".Translated();
+                title += "Driver is not installed.".Translated();
                 AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
             }
             else
             {
-                title += " Check USB connection.".Translated();
+                title += "Check USB connection.".Translated();
 
                 if (!driver.Connected)
                 {

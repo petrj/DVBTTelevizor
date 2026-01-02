@@ -1,8 +1,7 @@
 Menu=Menyu
 About=Tətbiq haqqında
 Free DVBT/DVBT2 Android Player=Pulsuz DVBT/DVBT2 Android Pleyer
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor boş vaxtlarda yaradılmış pulsuz, qeyri-kommersiya xobbi layihəsidir. Əgər bəyənsəniz, kiçik bir ianə ilə inkişafı dəstəkləyə bilərsiniz. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor boş vaxtlarda yaradılmış pulsuz, qeyri-kommersiya xobbi layihəsidir. Əgər bəyənsəniz, kiçik bir ianə ilə inkişafı dəstəkləyə bilərsiniz. 🙏
 Donate $1=1$ ianə et
 Billing system is not supported on this device=Bu cihazda ödəniş sistemi dəstəklənmir
 Connection to billing failed=Ödəniş sisteminə qoşulma uğursuz oldu
@@ -148,8 +147,7 @@ Logging=Jurnallaşdırma
 Enable logging=Jurnallaşdırmanı aktivləşdir
 UDP IP=UDP IP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV Çex IPTV xidmətidir. Mövcud hesabınız olmalı və internetə qoşulmalısınız
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV Çex IPTV xidmətidir. Mövcud hesabınız olmalı və internetə qoşulmalısınız
 Username=İstifadəçi adı
 Password=Şifrə
 Pair device=Cihazı cütləşdir
@@ -232,3 +230,14 @@ Driver is not installed=Sürücü quraşdırılmayıb
 Device response timeout=Cihaz cavab vaxtı bitdi
 Driver initializing failed=Sürücünün ilkin yüklənməsi uğursuz oldu
 Bad result=Pis nəticə
+Connect to {0}?={0} cihazına qoşulsun?
+Continue using {0}={0} istifadəsinə davam edilsin
+Please confirm driver change:=Zəhmət olmasa drayver dəyişikliyini təsdiqləyin:
+Tuning failed.=Tənzimləmə uğursuz oldu.
+Driver is not installed.=Drayver quraşdırılmayıb.
+Check USB connection.=USB bağlantısını yoxlayın.
+Driver ...=Drayver ...
+Playing failed.=Oynatma uğursuz oldu.
+Playing failed. Check USB connection=Oynatma uğursuz oldu. USB bağlantısını yoxlayın.
+No compatible device=Uyğun cihaz tapılmadı
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor asudə vaxtda yaradılmış pulsuz, qeyri-kommersiya hobbi layihəsidir. Əgər bəyənirsinizsə, kiçik bir ianə ilə inkişafına dəstək ola bilərsiniz. 🙏

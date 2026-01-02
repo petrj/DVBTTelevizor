@@ -1,8 +1,7 @@
 Menu=Menu
 About=Tentang
 Free DVBT/DVBT2 Android Player=Pemutar Android DVBT/DVBT2 Gratis
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor adalah proyek hobi gratis dan non-komersial yang dibuat di waktu luang. Jika Anda menikmatinya, Anda dapat mendukung pengembangannya dengan donasi kecil. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor adalah proyek hobi gratis dan non-komersial yang dibuat di waktu luang. Jika Anda menikmatinya, Anda dapat mendukung pengembangannya dengan donasi kecil. 🙏
 Donate $1=Donasi $1
 Billing system is not supported on this device=Sistem penagihan tidak didukung pada perangkat ini
 Connection to billing failed=Koneksi ke penagihan gagal
@@ -148,8 +147,7 @@ Logging=Pencatatan
 Enable logging=Aktifkan pencatatan
 UDP IP=UDP IP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV adalah IPTV Ceko. Anda harus memiliki akun yang ada dan terhubung ke Internet
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV adalah IPTV Ceko. Anda harus memiliki akun yang ada dan terhubung ke Internet
 Username=Nama pengguna
 Password=Kata sandi
 Pair device=Pasangkan perangkat
@@ -232,3 +230,14 @@ Driver is not installed=Driver belum terinstal
 Device response timeout=Waktu respons perangkat habis
 Driver initializing failed=Inisialisasi driver gagal
 Bad result=Hasil yang buruk
+Connect to {0}?=Hubungkan ke {0}?
+Continue using {0}=Lanjutkan menggunakan {0}
+Please confirm driver change:=Silakan konfirmasi perubahan driver:
+Tuning failed.=Penyetelan gagal.
+Driver is not installed.=Driver tidak terinstal.
+Check USB connection.=Periksa koneksi USB.
+Driver ...=Driver ...
+Playing failed.=Pemutaran gagal.
+Playing failed. Check USB connection=Pemutaran gagal. Periksa koneksi USB.
+No compatible device=Tidak ada perangkat yang kompatibel
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor adalah proyek hobi gratis dan non-komersial yang dibuat di waktu luang. Jika Anda menikmatinya, Anda dapat mendukung pengembangan dengan donasi kecil. 🙏

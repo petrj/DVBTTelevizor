@@ -795,5 +795,17 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<string>("FilteredMultiplexes", value);
             }
         }
+
+        public bool UpdatedTo2026
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("UpdatedTo2026");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("UpdatedTo2026", value);
+            }
+        }
     }
 }

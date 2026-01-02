@@ -1,8 +1,7 @@
 Menu=Menu
 About=O programie
 Free DVBT/DVBT2 Android Player=Darmowy odtwarzacz Android DVBT/DVBT2
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor to darmowy, niekomercyjny projekt hobbystyczny stworzony w wolnym czasie. Jeśli Ci się podoba, możesz wesprzeć rozwój małą darowizną. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor to darmowy, niekomercyjny projekt hobbystyczny stworzony w wolnym czasie. Jeśli Ci się podoba, możesz wesprzeć rozwój małą darowizną. 🙏
 Donate $1=Wesprzyj 1 $
 Billing system is not supported on this device=System rozliczeniowy nie jest obsługiwany na tym urządzeniu
 Connection to billing failed=Nie udało się połączyć z systemem rozliczeniowym
@@ -148,8 +147,7 @@ Logging=Rejestrowanie
 Enable logging=Włącz rejestrowanie
 UDP IP=IP UDP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV to czeska telewizja IPTV. Musisz mieć istniejące konto i być podłączony do Internetu
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV to czeska telewizja IPTV. Musisz mieć istniejące konto i być podłączony do Internetu
 Username=Nazwa użytkownika
 Password=Hasło
 Pair device=Sparuj urządzenie
@@ -232,3 +230,14 @@ Driver is not installed=Sterownik nie jest zainstalowany
 Device response timeout=Przekroczono limit czasu odpowiedzi urządzenia
 Driver initializing failed=Inicjalizacja sterownika nie powiodła się
 Bad result=Zły wynik
+Connect to {0}?=Połączyć z {0}?
+Continue using {0}=Kontynuuj używanie {0}
+Please confirm driver change:=Proszę potwierdzić zmianę sterownika:
+Tuning failed.=Strojenie nie powiodło się.
+Driver is not installed.=Sterownik nie jest zainstalowany.
+Check USB connection.=Sprawdź połączenie USB.
+Driver ...=Sterownik ...
+Playing failed.=Odtwarzanie nie powiodło się.
+Playing failed. Check USB connection=Odtwarzanie nie powiodło się. Sprawdź połączenie USB.
+No compatible device=Brak kompatybilnego urządzenia
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor to bezpłatny, niekomercyjny projekt hobbystyczny stworzony w czasie wolnym. Jeśli Ci się podoba, możesz wesprzeć jego rozwój niewielką darowizną. 🙏

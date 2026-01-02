@@ -1,8 +1,7 @@
 Menu=菜单
 About=关于
 Free DVBT/DVBT2 Android Player=免费 DVBT/DVBT2 安卓播放器
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor 是一个利用业余时间创建的免费、非商业性兴趣项目。如果您喜欢，可以通过小额捐款支持开发。🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor 是一个利用业余时间创建的免费、非商业性兴趣项目。如果您喜欢，可以通过小额捐款支持开发。🙏
 Donate $1=捐赠 $1
 Billing system is not supported on this device=此设备不支持计费系统
 Connection to billing failed=连接到计费失败
@@ -148,8 +147,7 @@ Logging=日志记录
 Enable logging=启用日志记录
 UDP IP=UDP IP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV 是捷克 IPTV。您必须拥有现有帐户并连接到互联网
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV 是捷克 IPTV。您必须拥有现有帐户并连接到互联网
 Username=用户名
 Password=密码
 Pair device=配对设备
@@ -232,3 +230,14 @@ Driver is not installed=驱动程序未安装
 Device response timeout=设备响应超时
 Driver initializing failed=驱动程序初始化失败
 Bad result=结果不良
+Connect to {0}?=连接到 {0}？
+Continue using {0}=继续使用 {0}
+Please confirm driver change:=请确认驱动程序更改：
+Tuning failed.=调谐失败。
+Driver is not installed.=未安装驱动程序。
+Check USB connection.=请检查 USB 连接。
+Driver ...=驱动程序 ...
+Playing failed.=播放失败。
+Playing failed. Check USB connection=播放失败。请检查 USB 连接。
+No compatible device=没有兼容的设备
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor 是一个在业余时间创建的免费、非商业性业余项目。如果您喜欢它，可以通过小额捐赠来支持开发。 🙏

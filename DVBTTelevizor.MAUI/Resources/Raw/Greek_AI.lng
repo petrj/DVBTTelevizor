@@ -1,8 +1,7 @@
 Menu=Μενού
 About=Σχετικά
 Free DVBT/DVBT2 Android Player=Δωρεάν Αναπαραγωγέας Android DVBT/DVBT2
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=Το DVBT Televizor είναι ένα δωρεάν, μη εμπορικό χόμπι project που δημιουργήθηκε στον ελεύθερο χρόνο. Αν σας αρέσει, μπορείτε να υποστηρίξετε την ανάπτυξη με μια μικρή δωρεά. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=Το DVBT Televizor είναι ένα δωρεάν, μη εμπορικό χόμπι project που δημιουργήθηκε στον ελεύθερο χρόνο. Αν σας αρέσει, μπορείτε να υποστηρίξετε την ανάπτυξη με μια μικρή δωρεά. 🙏
 Donate $1=Δωρεά $1
 Billing system is not supported on this device=Το σύστημα χρέωσης δεν υποστηρίζεται σε αυτή τη συσκευή
 Connection to billing failed=Η σύνδεση στη χρέωση απέτυχε
@@ -148,8 +147,7 @@ Logging=Καταγραφή
 Enable logging=Ενεργοποίηση καταγραφής
 UDP IP=UDP IP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=Το SledovaniTV είναι τσέχικη IPTV. Πρέπει να έχετε υπάρχοντα λογαριασμό και να είστε συνδεδεμένοι στο Internet
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=Το SledovaniTV είναι τσέχικη IPTV. Πρέπει να έχετε υπάρχοντα λογαριασμό και να είστε συνδεδεμένοι στο Internet
 Username=Όνομα χρήστη
 Password=Κωδικός πρόσβασης
 Pair device=Σύζευξη συσκευής
@@ -232,3 +230,14 @@ Driver is not installed=Ο οδηγός δεν είναι εγκατεστημέ
 Device response timeout=Χρονικό όριο απόκρισης συσκευής
 Driver initializing failed=Η εκκίνηση του οδηγού απέτυχε
 Bad result=Κακό αποτέλεσμα
+Connect to {0}?=Σύνδεση σε {0};
+Continue using {0}=Συνέχεια χρήσης του {0}
+Please confirm driver change:=Παρακαλώ επιβεβαιώστε την αλλαγή προγράμματος οδήγησης:
+Tuning failed.=Ο συντονισμός απέτυχε.
+Driver is not installed.=Το πρόγραμμα οδήγησης δεν είναι εγκατεστημένο.
+Check USB connection.=Ελέγξτε τη σύνδεση USB.
+Driver ...=Πρόγραμμα οδήγησης ...
+Playing failed.=Η αναπαραγωγή απέτυχε.
+Playing failed. Check USB connection=Η αναπαραγωγή απέτυχε. Ελέγξτε τη σύνδεση USB.
+No compatible device=Δεν βρέθηκε συμβατή συσκευή
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=Το DVBT Televizor είναι ένα δωρεάν, μη εμπορικό ερασιτεχνικό έργο που δημιουργήθηκε στον ελεύθερο χρόνο. Εάν σας αρέσει, μπορείτε να υποστηρίξετε την ανάπτυξη με μια μικρή δωρεά. 🙏

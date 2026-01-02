@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,5 +74,7 @@ namespace DVBTTelevizor
         string SledovaniTVPIN { get; set; }
         string SledovaniTVDeviceID { get; set; }
         string SledovaniTVDevicePassword { get; set; }
+
+        bool UpdatedTo2026 { get; set; }
     }
 }

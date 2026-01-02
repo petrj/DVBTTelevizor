@@ -1,8 +1,7 @@
 Menu=मेनू
 About=के बारे में
 Free DVBT/DVBT2 Android Player=फ्री डीवीबीटी/डीवीबीटी2 एंड्रॉइड प्लेयर
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=डीवीबीटी टेलीविज़ोर खाली समय में बनाया गया एक मुफ्त, गैर-व्यावसायिक शौक परियोजना है। यदि आप इसका आनंद लेते हैं, तो तो आप एक छोटे दान से विकास में सहयोग कर सकते हैं। 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=डीवीबीटी टेलीविज़ोर खाली समय में बनाया गया एक मुफ्त, गैर-व्यावसायिक शौक परियोजना है। यदि आप इसका आनंद लेते हैं, तो तो आप एक छोटे दान से विकास में सहयोग कर सकते हैं। 🙏
 Donate $1=1$ दान करें
 Billing system is not supported on this device=इस डिवाइस पर बिलिंग सिस्टम समर्थित नहीं है
 Connection to billing failed=बिलिंग से कनेक्शन विफल रहा
@@ -148,8 +147,7 @@ Logging=लॉगिंग
 Enable logging=लॉगिंग सक्षम करें
 UDP IP=यूडीपी आईपी
 SledovaniTV=स्लेडोवानीटीवी
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=स्लेडोवानीटीवी एक चेक आईपीटीवी है। आपके पास एक मौजूदा खाता होना चाहिए और आपको इंटरनेट से कनेक्ट होना चाहिए
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=स्लेडोवानीटीवी एक चेक आईपीटीवी है। आपके पास एक मौजूदा खाता होना चाहिए और आपको इंटरनेट से कनेक्ट होना चाहिए
 Username=उपयोगकर्ता नाम
 Password=पासवर्ड
 Pair device=डिवाइस युग्मित करें
@@ -232,3 +230,14 @@ Driver is not installed=ड्राइवर इंस्टॉल नहीं
 Device response timeout=डिवाइस प्रतिक्रिया का समय समाप्त
 Driver initializing failed=ड्राइवर इनिशियलाइज़ेशन विफल रहा
 Bad result=खराब परिणाम
+Connect to {0}?={0} से कनेक्ट करें?
+Continue using {0}={0} का उपयोग जारी रखें
+Please confirm driver change:=कृपया ड्राइवर परिवर्तन की पुष्टि करें:
+Tuning failed.=ट्यूनिंग विफल रही।
+Driver is not installed.=ड्राइवर इंस्टॉल नहीं है।
+Check USB connection.=USB कनेक्शन की जाँच करें।
+Driver ...=ड्राइवर ...
+Playing failed.=प्लेबैक विफल रहा।
+Playing failed. Check USB connection=प्लेबैक विफल रहा। USB कनेक्शन की जाँच करें।
+No compatible device=कोई संगत डिवाइस नहीं है
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor एक मुफ़्त, गैर-व्यावसायिक हॉबी प्रोजेक्ट है जिसे खाली समय में बनाया गया है। यदि आप इसका आनंद लेते हैं, तो आप एक छोटे से दान के साथ इसके विकास का समर्थन कर सकते हैं। 🙏

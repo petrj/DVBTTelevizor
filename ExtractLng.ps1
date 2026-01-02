@@ -1,6 +1,19 @@
 ﻿cd $PSScriptRoot
 
 $files = Get-ChildItem -Path .\DVBTTelevizor.MAUI -Recurse | where { $_.Name.EndsWith(".cs") -or $_.Name.EndsWith(".xaml") }
+$referenceDict = Get-Content -Path .\DVBTTelevizor.MAUI\Resources\Raw\Czech.lng
+$alreadyTranslatedText = @()
+
+foreach ($line in $referenceDict)
+{
+    $enAndCZ = $line.Split("=")
+
+    if (-not $alreadyTranslatedText.Contains($enAndCZ[0]))
+    {
+         $alreadyTranslatedText += $enAndCZ[0]
+    }
+}
+
 
 
 function Get-TranslatedText 
@@ -109,5 +122,8 @@ foreach ($f in $files)
 
 foreach($word in $dict)
 {
-    Write-Host ($word + "=")
+    if (-not $alreadyTranslatedText.Contains($word))
+    {
+        Write-Host ($word + "=")
+    }
 }

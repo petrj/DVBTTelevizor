@@ -136,25 +136,30 @@ namespace DVBTTelevizor.MAUI
 
             Task.Run(async () =>
             {
-                await ExtractAssetFile("Arabic_AI.lng");
-                await ExtractAssetFile("Azerbaijani_AI.lng");
-                await ExtractAssetFile("Bengali_AI.lng");
-                await ExtractAssetFile("Czech.lng");
-                await ExtractAssetFile("French_AI.lng");
-                await ExtractAssetFile("German_AI.lng");
-                await ExtractAssetFile("Polish_AI.lng");
-                await ExtractAssetFile("Italian_AI.lng");
-                await ExtractAssetFile("Hindi_AI.lng");
-                await ExtractAssetFile("Indonesian_AI.lng");
-                await ExtractAssetFile("MandarinChinese_AI.lng");
-                await ExtractAssetFile("Portuguese_AI.lng");
-                await ExtractAssetFile("Spanish_AI.lng");
-                await ExtractAssetFile("Ukrainian_AI.lng");
-                await ExtractAssetFile("Urdu_AI.lng");
-                await ExtractAssetFile("Japanese_AI.lng");
-                await ExtractAssetFile("Vietnamese_AI.lng");
-                await ExtractAssetFile("Greek_AI.lng");
-                await ExtractAssetFile("Thai_AI.lng");
+                if (!_configuration.UpdatedTo2026)
+                {
+                    await ExtractAssetFile("Arabic_AI.lng");
+                    await ExtractAssetFile("Azerbaijani_AI.lng");
+                    await ExtractAssetFile("Bengali_AI.lng");
+                    await ExtractAssetFile("Czech.lng");
+                    await ExtractAssetFile("French_AI.lng");
+                    await ExtractAssetFile("German_AI.lng");
+                    await ExtractAssetFile("Polish_AI.lng");
+                    await ExtractAssetFile("Italian_AI.lng");
+                    await ExtractAssetFile("Hindi_AI.lng");
+                    await ExtractAssetFile("Indonesian_AI.lng");
+                    await ExtractAssetFile("MandarinChinese_AI.lng");
+                    await ExtractAssetFile("Portuguese_AI.lng");
+                    await ExtractAssetFile("Spanish_AI.lng");
+                    await ExtractAssetFile("Ukrainian_AI.lng");
+                    await ExtractAssetFile("Urdu_AI.lng");
+                    await ExtractAssetFile("Japanese_AI.lng");
+                    await ExtractAssetFile("Vietnamese_AI.lng");
+                    await ExtractAssetFile("Greek_AI.lng");
+                    await ExtractAssetFile("Thai_AI.lng");
+
+                   // _configuration.UpdatedTo2026 = true;
+                }
 
                 // language
                 Lng.LoadLanguages(Path.Join(PublicDirectory, "lng"));
@@ -343,12 +348,15 @@ namespace DVBTTelevizor.MAUI
 
                 string destPath = Path.Combine(lngFolder, sourceFileName);
 
-                if (!File.Exists(destPath)) // only copy if it doesn’t already exist
+                // always update
+                if (File.Exists(destPath))
                 {
-                    using var stream = await FileSystem.OpenAppPackageFileAsync(sourceFileName);
-                    using var destStream = File.Create(destPath);
-                    await stream.CopyToAsync(destStream);
+                    File.Delete(destPath);
                 }
+
+                using var stream = await FileSystem.OpenAppPackageFileAsync(sourceFileName);
+                using var destStream = File.Create(destPath);
+                await stream.CopyToAsync(destStream);
             }
             catch (Exception ex)
             {

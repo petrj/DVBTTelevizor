@@ -1,8 +1,7 @@
 Menu=Menü
 About=Über
 Free DVBT/DVBT2 Android Player=Kostenloser DVBT/DVBT2 Android Player
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor ist ein kostenloses, nicht-kommerzielles Hobbyprojekt, das in der Freizeit erstellt wurde. Wenn es Ihnen gefällt, können Sie die Entwicklung mit einer kleinen Spende unterstützen. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor ist ein kostenloses, nicht-kommerzielles Hobbyprojekt, das in der Freizeit erstellt wurde. Wenn es Ihnen gefällt, können Sie die Entwicklung mit einer kleinen Spende unterstützen. 🙏
 Donate $1=1 $ spenden
 Billing system is not supported on this device=Das Abrechnungssystem wird auf diesem Gerät nicht unterstützt
 Connection to billing failed=Verbindung zur Abrechnung fehlgeschlagen
@@ -148,8 +147,7 @@ Logging=Protokollierung
 Enable logging=Protokollierung aktivieren
 UDP IP=UDP IP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV ist ein tschechisches IPTV. Sie müssen über ein bestehendes Konto verfügen und mit dem Internet verbunden sein
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV ist ein tschechisches IPTV. Sie müssen über ein bestehendes Konto verfügen und mit dem Internet verbunden sein
 Username=Benutzername
 Password=Passwort
 Pair device=Gerät koppeln
@@ -232,3 +230,14 @@ Driver is not installed=Treiber ist nicht installiert
 Device response timeout=Geräteantwort-Timeout
 Driver initializing failed=Treiberinitialisierung fehlgeschlagen
 Bad result=Schlechtes Ergebnis
+Connect to {0}?=Mit {0} verbinden?
+Continue using {0}={0} weiterhin verwenden
+Please confirm driver change:=Bitte bestätigen Sie den Treiberwechsel:
+Tuning failed.=Sendersuchlauf fehlgeschlagen.
+Driver is not installed.=Treiber ist nicht installiert.
+Check USB connection.=USB-Verbindung prüfen.
+Driver ...=Treiber ...
+Playing failed.=Wiedergabe fehlgeschlagen.
+Playing failed. Check USB connection=Wiedergabe fehlgeschlagen. USB-Verbindung prüfen.
+No compatible device=Kein kompatibles Gerät
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor ist ein kostenloses, nicht-kommerzielles Hobbyprojekt, das in der Freizeit erstellt wurde. Wenn es Ihnen gefällt, können Sie die Entwicklung mit einer kleinen Spende unterstützen. 🙏

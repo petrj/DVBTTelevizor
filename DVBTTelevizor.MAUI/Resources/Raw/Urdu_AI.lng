@@ -1,8 +1,7 @@
 Menu=مینو
 About=متعلق
 Free DVBT/DVBT2 Android Player=مفت DVBT/DVBT2 اینڈرائیڈ پلیئر
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=ڈی وی بی ٹی ٹیلی ویژن (DVBT Televizor) فارغ وقت میں بنایا گیا ایک مفت، غیر تجارتی شوقیہ پروجیکٹ ہے۔ اگر آپ اس سے لطف اندوز ہوتے ہیں، تو آپ ایک چھوٹے سے عطیہ کے ساتھ ترقی میں معاونت کر سکتے ہیں۔ 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=ڈی وی بی ٹی ٹیلی ویژن (DVBT Televizor) فارغ وقت میں بنایا گیا ایک مفت، غیر تجارتی شوقیہ پروجیکٹ ہے۔ اگر آپ اس سے لطف اندوز ہوتے ہیں، تو آپ ایک چھوٹے سے عطیہ کے ساتھ ترقی میں معاونت کر سکتے ہیں۔ 🙏
 Donate $1=1$ عطیہ کریں
 Billing system is not supported on this device=اس ڈیوائس پر بلنگ سسٹم سپورٹ نہیں ہے۔
 Connection to billing failed=بلنگ سے رابطہ ناکام ہو گیا
@@ -148,8 +147,7 @@ Logging=لاگنگ
 Enable logging=لاگنگ فعال کریں
 UDP IP=یو ڈی پی آئی پی
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV ایک چیک آئی پی ٹی وی ہے۔ آپ کا موجودہ اکاؤنٹ ہونا چاہیے اور آپ کا انٹرنیٹ سے منسلک ہونا ضروری ہے۔
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV ایک چیک آئی پی ٹی وی ہے۔ آپ کا موجودہ اکاؤنٹ ہونا چاہیے اور آپ کا انٹرنیٹ سے منسلک ہونا ضروری ہے۔
 Username=یوزر نیم
 Password=پاس ورڈ
 Pair device=ڈیوائس جوڑیں
@@ -232,3 +230,14 @@ Driver is not installed=ڈرائیور انسٹال نہیں ہے
 Device response timeout=ڈیوائس کا جواب دینے کا وقت ختم
 Driver initializing failed=ڈرائیور کی شروعات ناکام ہو گئی
 Bad result=برا نتیجہ
+Connect to {0}?=کیا {0} سے منسلک ہوں؟
+Continue using {0}={0} کا استعمال جاری رکھیں
+Please confirm driver change:=براہ کرم ڈرائیور کی تبدیلی کی تصدیق کریں:
+Tuning failed.=ٹیوننگ ناکام ہوگئی۔
+Driver is not installed.=ڈرائیور انسٹال نہیں ہے۔
+Check USB connection.=USB کنکشن چیک کریں۔
+Driver ...=ڈرائیور ...
+Playing failed.=چلانے میں ناکامی ہوئی۔
+Playing failed. Check USB connection=چلانے میں ناکامی ہوئی۔ USB کنکشن چیک کریں
+No compatible device=کوئی ہم آہنگ آلہ نہیں ملا
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor ایک مفت، غیر تجارتی شوقیہ پروجیکٹ ہے جو فارغ وقت میں بنایا گیا ہے۔ اگر آپ اسے پسند کرتے ہیں، تو آپ معمولی عطیہ کے ذریعے اس کی ترقی میں تعاون کر سکتے ہیں۔ 🙏

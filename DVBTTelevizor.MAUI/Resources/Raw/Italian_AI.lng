@@ -1,8 +1,7 @@
 Menu=Menu
 About=Informazioni
 Free DVBT/DVBT2 Android Player=Lettore Android DVBT/DVBT2 Gratuito
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor è un progetto amatoriale gratuito e non commerciale, creato nel tempo libero. Se ti piace, puoi sostenere lo sviluppo con una piccola donazione. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor è un progetto amatoriale gratuito e non commerciale, creato nel tempo libero. Se ti piace, puoi sostenere lo sviluppo con una piccola donazione. 🙏
 Donate $1=Dona 1 $
 Billing system is not supported on this device=Il sistema di fatturazione non è supportato su questo dispositivo
 Connection to billing failed=Connessione alla fatturazione fallita
@@ -148,8 +147,7 @@ Logging=Logging
 Enable logging=Abilita logging
 UDP IP=IP UDP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV è una IPTV ceca. Devi avere un account esistente ed essere connesso a Internet
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV è una IPTV ceca. Devi avere un account esistente ed essere connesso a Internet
 Username=Nome Utente
 Password=Password
 Pair device=Accoppia dispositivo
@@ -232,3 +230,14 @@ Driver is not installed=Driver non installato
 Device response timeout=Timeout risposta dispositivo
 Driver initializing failed=Inizializzazione driver fallita
 Bad result=Risultato non valido
+Connect to {0}?=Connettersi a {0}?
+Continue using {0}=Continua a usare {0}
+Please confirm driver change:=Confermare la modifica del driver:
+Tuning failed.=Sintonizzazione fallita.
+Driver is not installed.=Il driver non è installato.
+Check USB connection.=Controllare la connessione USB.
+Driver ...=Driver ...
+Playing failed.=Riproduzione fallita.
+Playing failed. Check USB connection=Riproduzione fallita. Controllare la connessione USB.
+No compatible device=Nessun dispositivo compatibile
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor è un progetto amatoriale gratuito e non commerciale creato nel tempo libero. Se ti piace, puoi supportarne lo sviluppo con una piccola donazione. 🙏

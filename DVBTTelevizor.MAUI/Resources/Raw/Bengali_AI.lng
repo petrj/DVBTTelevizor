@@ -1,8 +1,7 @@
 Menu=মেনু
 About=সম্পর্কে
 Free DVBT/DVBT2 Android Player=ফ্রি ডিভিবিটি/ডিভিবিটি২ অ্যান্ড্রয়েড প্লেয়ার
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=ডিভিবিটি টেলিভিশন হলো অবসর সময়ে তৈরি একটি ফ্রি, অ-বাণিজ্যিক শখের প্রকল্প। আপনি যদি এটি উপভোগ করেন, তবে একটি ছোট অনুদান দিয়ে উন্নয়নকে সমর্থন করতে পারেন। 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=ডিভিবিটি টেলিভিশন হলো অবসর সময়ে তৈরি একটি ফ্রি, অ-বাণিজ্যিক শখের প্রকল্প। আপনি যদি এটি উপভোগ করেন, তবে একটি ছোট অনুদান দিয়ে উন্নয়নকে সমর্থন করতে পারেন। 🙏
 Donate $1=১$ অনুদান দিন
 Billing system is not supported on this device=এই ডিভাইসে বিলিং সিস্টেম সমর্থিত নয়
 Connection to billing failed=বিলিং-এর সাথে সংযোগ ব্যর্থ হয়েছে
@@ -148,8 +147,7 @@ Logging=লগিং
 Enable logging=লগিং সক্ষম করুন
 UDP IP=ইউডিপি আইপি
 SledovaniTV=স্লেডোভানাইটিভি
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=স্লেডোভানাইটিভি একটি চেক আইপিটিভি। আপনার একটি বিদ্যমান অ্যাকাউন্ট থাকতে হবে এবং আপনাকে ইন্টারনেটের সাথে সংযুক্ত থাকতে হবে
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=স্লেডোভানাইটিভি একটি চেক আইপিটিভি। আপনার একটি বিদ্যমান অ্যাকাউন্ট থাকতে হবে এবং আপনাকে ইন্টারনেটের সাথে সংযুক্ত থাকতে হবে
 Username=ব্যবহারকারীর নাম
 Password=পাসওয়ার্ড
 Pair device=ডিভাইস যুক্ত করুন
@@ -232,3 +230,14 @@ Driver is not installed=ড্রাইভার ইনস্টল করা �
 Device response timeout=ডিভাইস সাড়া দেওয়ার সময়সীমা শেষ
 Driver initializing failed=ড্রাইভার ইনিশিয়ালাইজেশন ব্যর্থ হয়েছে
 Bad result=খারাপ ফলাফল
+Connect to {0}?={0}-এর সাথে সংযোগ করবেন?
+Continue using {0}={0} ব্যবহার করা চালিয়ে যান
+Please confirm driver change:=অনুগ্রহ করে ড্রাইভার পরিবর্তন নিশ্চিত করুন:
+Tuning failed.=টিউনিং ব্যর্থ হয়েছে।
+Driver is not installed.=ড্রাইভার ইনস্টল করা নেই।
+Check USB connection.=USB সংযোগ পরীক্ষা করুন।
+Driver ...=ড্রাইভার ...
+Playing failed.=প্লেব্যাক ব্যর্থ হয়েছে।
+Playing failed. Check USB connection=প্লেব্যাক ব্যর্থ হয়েছে। USB সংযোগ পরীক্ষা করুন।
+No compatible device=কোনো সামঞ্জস্যপূর্ণ ডিভাইস নেই
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor একটি বিনামূল্যের, অ-বাণিজ্যিক শখের প্রজেক্ট যা অবসর সময়ে তৈরি করা হয়েছে। আপনি যদি এটি পছন্দ করেন, তবে একটি ছোট অনুদানের মাধ্যমে এর উন্নয়নে সহায়তা করতে পারেন। 🙏

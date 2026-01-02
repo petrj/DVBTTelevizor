@@ -9,7 +9,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
 
-            <Style x:Key="CaptionStyle" TargetType="Label">
+            <Style x:Key="CaptionStyle" TargetType="Label">o
                 <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
 

@@ -1,8 +1,7 @@
 Menu=Menu
 About=Thông tin
 Free DVBT/DVBT2 Android Player=Trình phát Android DVBT/DVBT2 miễn phí
-DVBT Televizor is a free, non-commercial hobby project created in spare time. If
- you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor là một dự án sở thích miễn phí, phi thương mại, được tạo ra trong thời gian rảnh rỗi. Nếu bạn yêu thích nó, bạn có thể ủng hộ phát triển bằng một khoản đóng góp nhỏ. 🙏
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. ðŸ™=DVBT Televizor là một dự án sở thích miễn phí, phi thương mại, được tạo ra trong thời gian rảnh rỗi. Nếu bạn yêu thích nó, bạn có thể ủng hộ phát triển bằng một khoản đóng góp nhỏ. 🙏
 Donate $1=Quyên góp $1
 Billing system is not supported on this device=Thiết bị này không hỗ trợ hệ thống thanh toán
 Connection to billing failed=Kết nối thanh toán thất bại
@@ -148,8 +147,7 @@ Logging=Ghi nhật ký
 Enable logging=Bật ghi nhật ký
 UDP IP=IP UDP
 SledovaniTV=SledovaniTV
-SledovaniTV is czech IPTV. You must have an existing account and you must be con
-nected to Internet=SledovaniTV là IPTV của Séc. Bạn phải có tài khoản và phải kết nối Internet
+SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet=SledovaniTV là IPTV của Séc. Bạn phải có tài khoản và phải kết nối Internet
 Username=Tên người dùng
 Password=Mật khẩu
 Pair device=Ghép nối thiết bị
@@ -232,3 +230,14 @@ Driver is not installed=Driver chưa được cài đặt
 Device response timeout=Hết thời gian phản hồi của thiết bị
 Driver initializing failed=Khởi tạo driver thất bại
 Bad result=Kết quả xấu
+Connect to {0}?=Kết nối với {0}?
+Continue using {0}=Tiếp tục sử dụng {0}
+Please confirm driver change:=Vui lòng xác nhận thay đổi trình điều khiển:
+Tuning failed.=Dò kênh thất bại.
+Driver is not installed.=Trình điều khiển chưa được cài đặt.
+Check USB connection.=Kiểm tra kết nối USB.
+Driver ...=Trình điều khiển ...
+Playing failed.=Phát không thành công.
+Playing failed. Check USB connection=Phát không thành công. Kiểm tra kết nối USB.
+No compatible device=Không có thiết bị tương thích
+DVBT Televizor is a free, non-commercial hobby project created in spare time. If you enjoy it, you can support development with a small donation. 🙏=DVBT Televizor là một dự án sở thích cá nhân miễn phí, phi thương mại được tạo ra trong thời gian rảnh rỗi. Nếu bạn yêu thích nó, bạn có thể hỗ trợ phát triển bằng một khoản quyên góp nhỏ. 🙏
