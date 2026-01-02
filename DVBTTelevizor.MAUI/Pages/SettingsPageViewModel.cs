@@ -21,6 +21,8 @@ namespace DVBTTelevizor.MAUI
         private bool _requestWriteToSDCardDisabled = false;
         private SledovaniTV.SledovaniTV _iptv;
 
+        public string IgnoreLanguageChangeNotify { get; set; } = null;
+
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
         public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> FontSizes { get; set; } = new ObservableCollection<string>();
@@ -157,6 +159,8 @@ namespace DVBTTelevizor.MAUI
             {
                 Languages.Add(lng);
             }
+
+            IgnoreLanguageChangeNotify = SelectedLanguage;
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {

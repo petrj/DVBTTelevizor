@@ -53,13 +53,16 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         BuildFocusableItems();
 
-        LanguagePicker.Focused += delegate { _lngBefore = _configuration.Language; };
-        LanguagePicker.Unfocused += delegate
+        LanguagePicker.SelectedIndexChanged += delegate
         {
-            if (_lngBefore != _configuration.Language)
+            if (!string.IsNullOrEmpty(_settingsPageViewModel.IgnoreLanguageChangeNotify) &&
+                _settingsPageViewModel.SelectedLanguage == _settingsPageViewModel.IgnoreLanguageChangeNotify)
             {
-                BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
+                _settingsPageViewModel.IgnoreLanguageChangeNotify = String.Empty;
+                return;
             }
+
+             BuildInfoMenu("The change will only take effect after the application is restarted".Translated(), "OK".Translated());
         };
 
         EnableLoggingSwitch.Toggled += delegate
