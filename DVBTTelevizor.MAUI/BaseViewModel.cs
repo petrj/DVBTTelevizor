@@ -88,10 +88,30 @@ namespace DVBTTelevizor.MAUI
                 case 2:
                     return "DVB-T";
                 case 3:
-                case 4:
                     return "FM (SDR Driver)";
                 default:
                     return "";
+            }
+        }
+
+        public static string GetDVBTDriverShortName(DriverTypeEnum driverType)
+        {
+            // DVBTDriverTypeEnum
+            //   *  AndroidDVBTDriver = 0,            => 0
+            //      AndroidTestingDVBTDriver = 1,
+            //      TestTuneDriver = 2,
+            //   *  RTLSDRTCPIPFMDriver = 3,          => 1
+            //      RTLSDRFMDriver = 4
+            switch ((int)driverType)
+            {
+                case 0:
+                case 1:
+                case 2:
+                    return "DVB-T";
+                case 3:
+                    return "FM";
+                default:
+                    return "Driver".Translated();
             }
         }
 

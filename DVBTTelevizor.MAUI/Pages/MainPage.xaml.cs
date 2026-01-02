@@ -376,7 +376,7 @@ namespace DVBTTelevizor.MAUI
                 WeakReferenceMessenger.Default.Send(new SizedToastMessage(
                     new SizedToast
                     {
-                         Message = m.Value,
+                        Message = m.Value,
                         AppFontSize = _configuration.AppFontSize
                     }));
             });
@@ -470,6 +470,11 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<SetSubtitlesMessage>(this, (r, m) =>
             {
                 SetSubtitles(m.Value);
+            });
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                UpdateMenu();
             });
         }
 
@@ -995,6 +1000,37 @@ namespace DVBTTelevizor.MAUI
             RefreshGUI();
         }
 
+        private void UpdateMenu()
+        {
+            var driverName = BaseViewModel.GetDVBTDriverShortName(_configuration.DVBTDriverType);
+
+            if (IsPortrait)
+            {
+                DVBTTelevizorButton.BottomTitleText = "DVBT Televizor".Translated();
+                DriverStateButton.BottomTitleText = driverName;
+                TuneButton.BottomTitleText = "Tune".Translated();
+                MenuButton.BottomTitleText = "Menu".Translated();
+
+                DVBTTelevizorButton.TopTitleText =
+                DriverStateButton.TopTitleText =
+                TuneButton.TopTitleText =
+                MenuButton.TopTitleText = "";
+
+            }
+            else
+            {
+                DVBTTelevizorButton.TopTitleText = "DVBT Televizor".Translated();
+                DriverStateButton.TopTitleText = driverName;
+                TuneButton.TopTitleText = "Tune".Translated();
+                MenuButton.TopTitleText = "Menu".Translated();
+
+                DVBTTelevizorButton.BottomTitleText =
+                DriverStateButton.BottomTitleText =
+                TuneButton.BottomTitleText =
+                MenuButton.BottomTitleText = "";
+            }
+        }
+
         public void RefreshGUI()
         {
             if (!_refreshGUIEnabled)
@@ -1008,31 +1044,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     //await _semaphoreSlimForRefreshGUI.WaitAsync();
 
-                    if (IsPortrait)
-                    {
-                        DVBTTelevizorButton.BottomTitleText = "DVBT Televizor".Translated();
-                        DriverStateButton.BottomTitleText = "Driver".Translated();
-                        TuneButton.BottomTitleText = "Tune".Translated();
-                        MenuButton.BottomTitleText = "Menu".Translated();
-
-                        DVBTTelevizorButton.TopTitleText =
-                        DriverStateButton.TopTitleText =
-                        TuneButton.TopTitleText =
-                        MenuButton.TopTitleText = "";
-
-                    }
-                    else
-                    {
-                        DVBTTelevizorButton.TopTitleText = "DVBT Televizor".Translated();
-                        DriverStateButton.TopTitleText = "Driver".Translated();
-                        TuneButton.TopTitleText = "Tune".Translated();
-                        MenuButton.TopTitleText = "Menu".Translated();
-
-                        DVBTTelevizorButton.BottomTitleText =
-                        DriverStateButton.BottomTitleText =
-                        TuneButton.BottomTitleText =
-                        MenuButton.BottomTitleText = "";
-                    }
+                    UpdateMenu();
 
                     AbsoluteLayout.SetLayoutFlags(VideoStackLayout, AbsoluteLayoutFlags.All);
                     AbsoluteLayout.SetLayoutFlags(NoVideoStackLayout, AbsoluteLayoutFlags.All);
@@ -3226,7 +3238,10 @@ namespace DVBTTelevizor.MAUI
 
                 foreach (var desc in videoView.MediaPlayer.SpuDescription)
                 {
-                    if (desc.Id == id)
+                    if (
+                        (desc.Id == id) &&
+                        (videoView.MediaPlayer.Spu != ids)
+                        )
                     {
                         _loggingService.Info($"Changing subtitles to: {desc.Id} ({desc.Name})");
                         videoView.MediaPlayer.SetSpu(desc.Id);
@@ -3261,7 +3276,10 @@ namespace DVBTTelevizor.MAUI
 
                 foreach (var desc in videoView.MediaPlayer.AudioTrackDescription)
                 {
-                    if (desc.Id == id)
+                    if (
+                        (desc.Id == id) &&
+                        (videoView.MediaPlayer.AudioTrack != id)
+                        )
                     {
                         _loggingService.Info($"Changing audio track to: {desc.Id} ({desc.Name})");
                         videoView.MediaPlayer.SetAudioTrack(desc.Id);
@@ -3495,7 +3513,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuPlay", "Play".Translated(), "play.png"));
                 }
-                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated(), "edit.png"));
+                _menuItems.Add(MainMenu.CreateMenuItem("menuChannel", "Channel detail".Translated()/* + "(" + _viewModel.SelectedChannel.Name + ")"*/, "edit.png"));
 
                 if (_viewModel.EPGDetailVisible)
                 {
@@ -3518,11 +3536,13 @@ namespace DVBTTelevizor.MAUI
                 }
             }
 
-            if (_viewModel.PlayingState != PlayingStateEnum.Playing)
+            if (
+                    (_viewModel.PlayingState != PlayingStateEnum.Playing) &&
+                    (_viewModel.Channels.Count > 0)
+                )
             {
                 _menuItems.Add(MainMenu.CreateMenuItem("menuFilter", "Filter".Translated(), "filter.png"));
             }
-
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuSettings", "Settings".Translated(), "settings.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png"));
