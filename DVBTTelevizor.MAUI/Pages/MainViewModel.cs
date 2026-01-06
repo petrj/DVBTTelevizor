@@ -275,6 +275,11 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Debug($"Scanning EPG for channel {channel}");
 
+            if (channel.ChannelType == ChannelTypeEnum.SledovaniTV)
+            {
+                return;
+            }
+
             if ((_playingChannel != null) && (_playingChannel != channel))
             {
                 if (!silent)

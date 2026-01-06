@@ -1968,6 +1968,14 @@ namespace DVBTTelevizor.MAUI
                 return false;
             }
 
+            if (channel.ChannelType == ChannelTypeEnum.SledovaniTV)
+            {
+                // no driver check needed
+                return true;
+            }
+
+            // DVBT/RTLSDDR driver check
+
             if (!_driver.DriverInstalled || !_driver.Connected)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
@@ -2093,6 +2101,12 @@ namespace DVBTTelevizor.MAUI
                         _loggingService.Debug("Stopping Media player");
                         videoView.MediaPlayer.Stop();
                     });
+                }
+
+                if (channel.ChannelType == ChannelTypeEnum.SledovaniTV)
+                {
+                    // no driver tuning needed
+                    shouldDriverPlay = false;
                 }
 
                 if (shouldDriverPlay)
