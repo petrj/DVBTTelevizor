@@ -65,15 +65,20 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*" />
-                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
+                    <ColumnDefinition Width="33*" />
                 </Grid.ColumnDefinitions>
 
                 <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
-                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVB-T'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
 
                 <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
                 <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
+
+                <BoxView x:Name="DABDriverBoxView" Grid.Row="0" Grid.Column="2"  BackgroundColor="Transparent" />
+                <RadioButton x:Name="DABDriverRadioButton" IsChecked="{Binding DABDriverActive}" Grid.Row="0" Grid.Column="2" Content="{local:LngXamlExt Input='DAB+'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
+
             </Grid>
         </Frame>
 

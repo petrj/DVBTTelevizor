@@ -11,6 +11,7 @@ namespace DVBTTelevizor.MAUI
          AndroidDVBTDriver = 0,
          AndroidTestingDVBTDriver = 1,
          TestTuneDriver = 2,
-         RTLSDRDriver = 3
+         RTLSDRDriverFM = 3,
+         RTLSDRDriverDAB = 4
     }
 }

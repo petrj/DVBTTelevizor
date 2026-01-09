@@ -140,7 +140,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private void FMDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
     {
-        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriver);
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriverFM);
     }
 
     private void BuildFocusableItems()
