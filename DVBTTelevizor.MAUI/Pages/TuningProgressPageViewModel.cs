@@ -698,6 +698,10 @@ namespace DVBTTelevizor.MAUI
                 {
                     return "      FM";
                 }
+                if (Settings.DAB)
+                {
+                    return "     DAB";
+                }
 
                 var res = "";
                 res += DeliverySystem == 0 ? "     DVBT" : "     DVBT2";

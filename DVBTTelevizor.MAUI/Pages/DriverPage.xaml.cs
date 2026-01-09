@@ -96,6 +96,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DABDriver", new List<View>() { DABDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
@@ -185,6 +186,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                         break;
                     case "FMDriver":
                         FMDriverRadioButton.IsChecked = !FMDriverRadioButton.IsChecked;
+                        break;
+                    case "DABDriver":
+                        DABDriverRadioButton.IsChecked = !DABDriverRadioButton.IsChecked;
                         break;
                 }
 

@@ -40,6 +40,9 @@ namespace DVBTTelevizor.TV
         public long FMFrequencyFromKHz { get; set; } = 0;
         public long FMFrequencyToKHz { get; set; } = 0;
         public long FMFrequencyKHz { get; set; } = 0;
+        public long DABFrequencyFromKHz { get; set; } = 0;
+        public long DABFrequencyToKHz { get; set; } = 0;
+        public long DABFrequencyKHz { get; set; } = 0;
         public long DVBTBandwidthKHz { get; set; } = 0;
         public long FMDVBTBandwidthKHz { get; set; } = 0;
         public int SDRDriverStreamPort { get; set; } = 0;
