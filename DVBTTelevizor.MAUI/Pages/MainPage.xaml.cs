@@ -795,27 +795,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private DriverTypeEnum GetDriverType()
-        {
-            if ((_driver == null) ||
-                (_driver is DVBTDriverConnector))
-            {
-                return DriverTypeEnum.AndroidDVBTDriver;
-            }
-
-            if (_driver is TestTuneConnector)
-            {
-                return DriverTypeEnum.TestTuneDriver;
-            }
-
-            if (_driver is RTLSDRDriverConnector)
-            {
-                return DriverTypeEnum.RTLSDRDriver;
-            }
-
-            return DriverTypeEnum.AndroidDVBTDriver;
-        }
-
         private void InitDriver()
         {
             switch (_configuration.DVBTDriverType)
@@ -829,7 +808,8 @@ namespace DVBTTelevizor.MAUI
                 case DriverTypeEnum.TestTuneDriver:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
-                case DriverTypeEnum.RTLSDRDriver:
+                case DriverTypeEnum.RTLSDRDriverFM:
+                case DriverTypeEnum.RTLSDRDriverDAB:
                     _driver = new RTLSDRDriverConnector(_loggingService, _sdrDriverPlatformImplementation.GetRTLSDRDriver());
                     break;
                 default:
@@ -1419,16 +1399,30 @@ namespace DVBTTelevizor.MAUI
 
                     break;
 
-                case DriverTypeEnum.RTLSDRDriver:
+                case DriverTypeEnum.RTLSDRDriverFM:
 
                     var cfg = new RTLSDR.DriverSettings()
                     {
                         Port = _configuration.SDRDriverPort,
                         Streamport = _configuration.SDRDriverStreamPort,
-                        SDRSampleRate = _configuration.SDRSampleRate
+                        SDRSampleRate = BaseViewModel.RTLSDRFMSampleRate
                     };
 
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
+
+                    break;
+
+
+                case DriverTypeEnum.RTLSDRDriverDAB:
+
+                    var DABcfg = new RTLSDR.DriverSettings()
+                    {
+                        Port = _configuration.SDRDriverPort,
+                        Streamport = _configuration.SDRDriverStreamPort,
+                        SDRSampleRate =  BaseViewModel.RTLSDRDABSampleRate
+                    };
+
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
 
                     break;
             }
@@ -1985,26 +1979,34 @@ namespace DVBTTelevizor.MAUI
                 return false;
             }
 
+            if (!_viewModel.FMDriverActive &&
+                (channel.ChannelType == ChannelTypeEnum.FM))
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverFM);
+                });
+                return false;
+            }
+
+            if (!_viewModel.DABDriverActive &&
+                 (channel.ChannelType == ChannelTypeEnum.DAB))
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverDAB);
+                });
+                return false;
+            }
+
             if (
-                _viewModel.FMDriverActive &&
+                !_viewModel.DVBTDriverActive &&
                 ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2))
                 )
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.AndroidDVBTDriver);
-                });
-                return false;
-            }
-
-            if (
-                _viewModel.DVBTDriverActive &&
-                (channel.ChannelType == ChannelTypeEnum.FM)
-                )
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriver);
                 });
                 return false;
             }

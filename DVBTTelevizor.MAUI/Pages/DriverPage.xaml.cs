@@ -37,6 +37,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
         DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
+        DABDriverRadioButton.CheckedChanged += DABDriverRadioButton_CheckedChanged;
 
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
@@ -70,6 +71,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         });
     }
 
+    private void DABDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriverDAB);
+    }
+
     private void DVBTDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
     {
         DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.AndroidDVBTDriver);
@@ -77,7 +83,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private void FMDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
     {
-        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriver);
+        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriverFM);
     }
 
     private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)

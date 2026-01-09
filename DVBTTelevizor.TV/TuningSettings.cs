@@ -82,7 +82,7 @@ namespace DVBTTelevizor
 
             switch (configuration.DVBTDriverType)
             {
-                case MAUI.DriverTypeEnum.RTLSDRDriver:
+                case MAUI.DriverTypeEnum.RTLSDRDriverFM:
 
                     SetFMSettings();
 
@@ -113,7 +113,7 @@ namespace DVBTTelevizor
         {
             switch (configuration.DVBTDriverType)
             {
-                case MAUI.DriverTypeEnum.RTLSDRDriver:
+                case MAUI.DriverTypeEnum.RTLSDRDriverFM:
                     //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
                     configuration.FMFrequencyKHz = FrequencyKHz;
                     configuration.FMFrequencyFromKHz = FrequencyFromKHz;

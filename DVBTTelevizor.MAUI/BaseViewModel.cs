@@ -19,8 +19,12 @@ namespace DVBTTelevizor.MAUI
         protected ITVConfiguration _configuration;
         private DriverTypeEnum? _ignoreDriver = null;
 
+        public static int RTLSDRFMSampleRate =  1024000;
+        public static int RTLSDRDABSampleRate = 2048000;
+
         private bool _DVBTDriverActive = false;
         private bool _FMDriverActive = false;
+        private bool _DABDriverActive = false;
 
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
@@ -54,16 +58,11 @@ namespace DVBTTelevizor.MAUI
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        if (_configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriver)
-                        {
-                            IgnoreDriver = DriverTypeEnum.RTLSDRDriver;
-                        } else
-                        {
-                           IgnoreDriver = DriverTypeEnum.AndroidDVBTDriver;
-                        }
+                        IgnoreDriver = _configuration.DVBTDriverType;
 
-                        FMDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriver;
-                        DVBTDriverActive = !FMDriverActive;
+                        FMDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriverFM;
+                        DVBTDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.AndroidDVBTDriver;
+                        DABDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriverDAB;
                     });
                 }
                 finally
@@ -89,6 +88,8 @@ namespace DVBTTelevizor.MAUI
                     return "DVB-T";
                 case 3:
                     return "FM (SDR Driver)";
+                case 4:
+                    return "DAB (SDR Driver)";
                 default:
                     return "";
             }
@@ -120,29 +121,10 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return _DVBTDriverActive;
-                //switch (_configuration.DVBTDriverType)
-                //{
-                //    case DriverTypeEnum.RTLSDRDriver:
-                //        return false;
-                //    default:
-                //        return true;
-                //}
             }
             set
             {
                 _DVBTDriverActive = value;
-                //if (value)
-                //{
-                //    if (_prevActiveDriverType != _configuration.DVBTDriverType)
-                //    {
-                //        _prevActiveDriverType = _configuration.DVBTDriverType;
-                //    }
-                //    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                //}
-                //else
-                //{
-                //    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                //}
 
                 NotifyDriverChange();
             }
@@ -153,29 +135,24 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return _FMDriverActive;
-                //switch (_configuration.DVBTDriverType)
-                //{
-                //    case DriverTypeEnum.RTLSDRDriver:
-                //        return true;
-                //    default:
-                //        return false;
-                //}
             }
             set
             {
                 _FMDriverActive = value;
-                //if (value)
-                //{
-                //    if (_prevActiveDriverType != _configuration.DVBTDriverType)
-                //    {
-                //        _prevActiveDriverType = _configuration.DVBTDriverType;
-                //    }
-                //    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                //}
-                //else
-                //{
-                //    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                //}
+
+                NotifyDriverChange();
+            }
+        }
+
+        public bool DABDriverActive
+        {
+            get
+            {
+                return _DABDriverActive;
+            }
+            set
+            {
+                _DABDriverActive = value;
 
                 NotifyDriverChange();
             }
@@ -237,6 +214,7 @@ namespace DVBTTelevizor.MAUI
             {
                 OnPropertyChanged(nameof(FMDriverActive));
                 OnPropertyChanged(nameof(DVBTDriverActive));
+                OnPropertyChanged(nameof(DABDriverActive));
 
                 OnPropertyChanged(nameof(ConnectedDevice));
                 OnPropertyChanged(nameof(DriverStateStatus));
