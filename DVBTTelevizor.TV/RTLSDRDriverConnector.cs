@@ -11,22 +11,19 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.TV
 {
-    public class RTLSDRDriverConnector : IDriverConnector
+    public abstract class RTLSDRDriverConnector : IDriverConnector
     {
-        private ILoggingService _log;
-        private ISDR _driver = null;
+        protected ILoggingService _log;
+        protected ISDR _driver = null;
         private IDemodulator _demodulator = null;
-
-        private DateTime _lastStationTest = DateTime.MinValue;
-        private Dictionary<long,bool> _stationOnFrequency = new Dictionary<long, bool>();
 
         public event DemodulatedEventHandler OnRawAudioDemodulated;
 
-        public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver)
+        public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator)
         {
             _log = loggingService;
 
-            _log.Debug($"Initializing RTLSDR TCP-IP FM Driver Connector");
+            _log.Debug($"Initializing RTLSDR TCP-IP Driver Connector");
 
             //_UDPStreamer = new UDPStreamer(_log);
             _driverConfiguration = new DVBTDriverConfiguration();
@@ -34,94 +31,15 @@ namespace DVBTTelevizor.TV
             _driver = driver;
             _driver.OnDataReceived += _driver_OnDataReceived;
 
-            _demodulator = new FMDemodulator(_log);
-            _demodulator.OnDemodulated += _demodulator_OnDemodulated;
+            _demodulator = demodulator;
+            _demodulator.OnDemodulated += OnDataDemodulated;
         }
 
-        public static bool IsStationPresent(byte[] interleavedPcm16)
-        {
-            if (interleavedPcm16 == null || interleavedPcm16.Length < 4000)
-                return false;
-
-            int sampleCount = interleavedPcm16.Length / 4; // stereo 16-bit = 4 bytes/frame
-            float prev = 0f;
-            int zeroCrossings = 0;
-
-            double sumRms = 0, sumRms2 = 0;
-            double totalPower = 0;
-            int window = 960; // ~10 ms @ 96 kHz
-            int rmsSamples = 0;
-
-            double[] rmsBuffer = new double[sampleCount / window + 1];
-            int rmsIndex = 0;
-
-            for (int i = 0; i < sampleCount; i++)
-            {
-                short left = BitConverter.ToInt16(interleavedPcm16, i * 4);
-                short right = BitConverter.ToInt16(interleavedPcm16, i * 4 + 2);
-                float mono = (left + right) * 0.5f / short.MaxValue;
-
-                // Zero crossing count
-                if ((mono > 0 && prev <= 0) || (mono < 0 && prev >= 0))
-                    zeroCrossings++;
-                prev = mono;
-
-                // Power accumulation
-                double sq = mono * mono;
-                sumRms += sq;
-                rmsSamples++;
-                totalPower += sq;
-
-                if (rmsSamples >= window)
-                {
-                    double rms = Math.Sqrt(sumRms / rmsSamples);
-                    rmsBuffer[rmsIndex++] = rms;
-                    sumRms = 0;
-                    rmsSamples = 0;
-                }
-            }
-
-            // Compute variance of RMS values (dynamics)
-            int n = rmsIndex;
-            if (n < 2) return false;
-
-            double mean = 0, var = 0;
-            for (int i = 0; i < n; i++) mean += rmsBuffer[i];
-            mean /= n;
-            for (int i = 0; i < n; i++) var += (rmsBuffer[i] - mean) * (rmsBuffer[i] - mean);
-            var /= n;
-
-            // Average power of the signal
-            double avgPower = totalPower / sampleCount;
-
-            // Normalized zero-crossing rate
-            double zcr = (double)zeroCrossings / sampleCount;
-
-            // --- Heuristic thresholds (tune as needed) ---
-            bool hasDynamics = var > 1e-5;     // real audio has changing RMS
-            bool notTooNoisy = zcr < 0.15;     // noise crosses zero very often
-            bool strongSignal = avgPower > 0.001; // reject weak stations or static
-
-            return hasDynamics && notTooNoisy && strongSignal;
-        }
-
-        private void _demodulator_OnDemodulated(object? sender, EventArgs e)
+        public virtual void OnDataDemodulated(object? sender, EventArgs e)
         {
             if ((e is DataDemodulatedEventArgs de) &&
                 OnRawAudioDemodulated != null)
             {
-                if ((DateTime.Now - _lastStationTest).TotalMilliseconds>300)
-                {
-                    _lastStationTest = DateTime.Now;
-                    var station = IsStationPresent(de.Data);
-                    if (station && !_stationOnFrequency.ContainsKey(_driver.Frequency))
-                    {
-                        _stationOnFrequency.Add(_driver.Frequency, station);
-                    }
-
-                    _log.Debug($"Station: {station}");
-                }
-
                 OnRawAudioDemodulated(this, new DemodulatedEventArgs(de.Data)
                 {
                      Description = new AudioDataDescription()
@@ -146,19 +64,6 @@ namespace DVBTTelevizor.TV
         }
 
         private Stream _recordStream = null;
-
-        private void RecordData(byte[] data, int size)
-        {
-            var fileName = Path.Combine("/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor.MAUI/", $"{(_driver.Frequency / 1000)}_kHz.raw");
-
-            if (!File.Exists(fileName))
-            {
-                _recordStream = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write);
-            }
-
-            _recordStream.Write(data, 0, size);
-            _recordStream.Flush();
-        }
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
@@ -324,7 +229,7 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public void Connect()
+        public virtual void Connect()
         {
             _log.Info($"RTL SDR driver: Connecting");
 
@@ -345,8 +250,6 @@ namespace DVBTTelevizor.TV
 
                 DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
-
-                _stationOnFrequency.Clear();
             }
             catch (Exception ex)
             {
@@ -368,15 +271,15 @@ namespace DVBTTelevizor.TV
             return Task.Run(() => { return Connected && _driver.RTLBitrate > 0; });
         }
 
-        public Task<DVBTDriverCapabilities> GetCapabalities()
+        public virtual Task<DVBTDriverCapabilities> GetCapabalities()
         {
             return Task.Run(() =>
             {
                 return new DVBTDriverCapabilities()
                 {
                     supportedDeliverySystems = 0,
-                    minFrequency = 88000000,
-                    maxFrequency = 108000000,
+                    minFrequency =  88000000,
+                    maxFrequency = 852000000,
                     frequencyStepSize = 1000
                 };
             });
@@ -437,40 +340,16 @@ namespace DVBTTelevizor.TV
             return Task.Run(() => { return new EITScanResult(); });
         }
 
-        public Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
+        public virtual Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
             return Task.Run(() =>
             {
-                if (_stationOnFrequency.ContainsKey(_driver.Frequency) && _stationOnFrequency[_driver.Frequency])
+                return new DVBTDriverSearchProgramMapPIDsResult()
                 {
-                    var dict = new Dictionary<ServiceDescriptor, long>();
-                    dict.Add(new ServiceDescriptor()
-                    {
-                        Free = true,
-                        Length = 0,
-                        ProgramNumber = _driver.Frequency,
-                        ProviderName = "FM radio",
-                        ServiceName = $"{(_driver.Frequency / 1000000.0).ToString("N1")} FM ",
-                        ServisType = (byte)DVBTDriverServiceType.Radio
-
-                    }, _driver.Frequency);
-
-                    return new DVBTDriverSearchProgramMapPIDsResult()
-                    {
-                        Result = DVBTDriverSearchProgramResultEnum.OK,
-                        ServiceDescriptors = dict
-                    };
-                }
-                else
-                {
-                    return new DVBTDriverSearchProgramMapPIDsResult()
-                    {
-                        Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
-                    };
-                }
+                    Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
+                };
             });
         }
-
 
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {

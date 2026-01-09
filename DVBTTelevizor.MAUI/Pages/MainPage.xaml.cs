@@ -11,6 +11,7 @@ using NLog.LayoutRenderers.Wrappers;
 using RTLSDR;
 using RTLSDR.Audio;
 using RTLSDR.Common;
+using RTLSDR.FM;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -810,7 +811,9 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case DriverTypeEnum.RTLSDRDriverFM:
                 case DriverTypeEnum.RTLSDRDriverDAB:
-                    _driver = new RTLSDRDriverConnector(_loggingService, _sdrDriverPlatformImplementation.GetRTLSDRDriver());
+                    _driver = new RTLSDRFMDriverConnector(_loggingService,
+                        _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                        new FMDemodulator(_loggingService));
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
