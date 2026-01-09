@@ -48,11 +48,17 @@ namespace DVBTTelevizor
         public bool TuneDVBTPreferred { get; set; }
 
         public long FrequencyFromKHz { get; set; }
-        public long FMFrequencyFromKHz { get; set; }
         public long FrequencyToKHz { get; set; }
-        public long FMFrequencyToKHz { get; set; }
         public long FrequencyKHz { get; set; }
+
+        public long FMFrequencyFromKHz { get; set; }
         public long FMFrequencyKHz { get; set; }
+        public long FMFrequencyToKHz { get; set; }
+
+        public long DABFrequencyFromKHz { get; set; }
+        public long DABFrequencyKHz { get; set; }
+        public long DABFrequencyToKHz { get; set; }
+
 
         public long DVBTBandwidthKHz { get; set; }
         public long FMDVBTBandwidthKHz { get; set; }

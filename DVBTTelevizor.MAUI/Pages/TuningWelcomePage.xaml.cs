@@ -150,6 +150,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverRadioButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DABDriver", new List<View>() { DABDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
@@ -277,6 +278,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
                         case "FMDriver":
                             FMDriverRadioButton.IsChecked = !FMDriverRadioButton.IsChecked;
                             break;
+                        case "DABDriver":
+                            DABDriverRadioButton.IsChecked = !DABDriverRadioButton.IsChecked;
+                            break;
                     }
                 });
                 break;
@@ -304,9 +308,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
 
-        if (_viewModel.FMDriverActive)
+        if (_viewModel.FMDriverActive ||
+            _viewModel.DABDriverActive)
         {
-            //_tuningSettings.SetFMSettings();
             ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
         } else
         {
@@ -318,9 +322,9 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
 
-        if (_viewModel.FMDriverActive)
+        if (_viewModel.FMDriverActive ||
+            _viewModel.DABDriverActive)
         {
-            //_tuningSettings.SetFMSettings();
             ShowPage(_tuningFrequencyPage, TuneModeEnum.Manual);
         }
         else

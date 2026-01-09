@@ -582,6 +582,41 @@ namespace DVBTTelevizor
             }
         }
 
+        public long DABFrequencyFromKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("DABFrequencyFromKHz", 174928);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("DABFrequencyFromKHz", value);
+            }
+        }
+
+        public long DABFrequencyToKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("DABFrequencyToKHz", 239200);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("DABFrequencyToKHz", value);
+            }
+        }
+        public long DABFrequencyKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("DABFrequencyKHz", 174928);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("DABFrequencyKHz", value);
+            }
+        }
+
         public int SDRDriverStreamPort
         {
             get
