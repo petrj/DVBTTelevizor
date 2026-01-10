@@ -11,6 +11,7 @@ using NLog.LayoutRenderers.Wrappers;
 using RTLSDR;
 using RTLSDR.Audio;
 using RTLSDR.Common;
+using RTLSDR.DAB;
 using RTLSDR.FM;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -810,10 +811,18 @@ namespace DVBTTelevizor.MAUI
                     _driver = new TestTuneConnector(_loggingService);
                     break;
                 case DriverTypeEnum.RTLSDRDriverFM:
-                case DriverTypeEnum.RTLSDRDriverDAB:
                     _driver = new RTLSDRFMDriverConnector(_loggingService,
                         _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
                         new FMDemodulator(_loggingService));
+                    break;
+                case DriverTypeEnum.RTLSDRDriverDAB:
+                        var dabDemoduator = new DABProcessor(_loggingService);
+                        dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
+                        //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
+
+                        _driver = new RTLSDRFMDriverConnector(_loggingService,
+                            _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                            dabDemoduator);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
@@ -823,6 +832,14 @@ namespace DVBTTelevizor.MAUI
             _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
+        }
+
+        private void DabDemoduator_OnServiceFound(object? sender, EventArgs e)
+        {
+            if (e is DABServiceFoundEventArgs de)
+            {
+                _loggingService.Info($"DAB service found: {de.Service}");
+            }
         }
 
         private void _driver_OnRawAudioDemodulated(object sender, DemodulatedEventArgs e)
