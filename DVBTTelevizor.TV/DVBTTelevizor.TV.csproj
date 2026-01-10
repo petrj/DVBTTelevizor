@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LoggerService" Version="1.0.5" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.1" />
     <PackageReference Include="MPEGTS" Version="1.0.26" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="RTLSDR" Version="1.0.3" />
+    <PackageReference Include="RTLSDR" Version="1.0.4" />
     <PackageReference Include="RTLSDR.Common" Version="1.0.1" />
     <PackageReference Include="RTLSDR.FM" Version="1.0.1" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />

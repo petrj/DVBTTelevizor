@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-windows10.0.26100.0</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DVBTTelevizor.MAUI</RootNamespace>
@@ -17,16 +17,15 @@
 		<!-- App Identifier -->
 		<ApplicationId>net.petrjanousek.DVBTTelevizor</ApplicationId>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22000.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">23.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.26100.0</TargetPlatformMinVersion>
 
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
-
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationVersion>2026003</ApplicationVersion>
@@ -45,13 +44,10 @@
 		<VersionCode>2026</VersionCode>
 		<VersionName>2026</VersionName>
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
+		<WindowsPackageType>MSIX</WindowsPackageType>
 	</PropertyGroup>	
-
-	<PropertyGroup>
-	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.22000.0</TargetFrameworks>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android|AnyCPU'">
+	
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
 
 	  <!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
@@ -62,7 +58,7 @@
 	  <MandroidLinkMode>None</MandroidLinkMode>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
 	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
@@ -101,31 +97,33 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
 		<PackageReference Include="LibVLCSharp" Version="3.9.5" />
 		<PackageReference Include="LoggerService" Version="1.0.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.100" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.20" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="NLog" Version="6.0.7" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.3" />
-		<PackageReference Include="Plugin.InAppBilling" Version="9.1.0" />
+		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
-		<PackageReference Include="RTLSDR" Version="1.0.3" />
-		<PackageReference Include="RTLSDR.Audio" Version="1.0.6" />
-		<PackageReference Include="RTLSDR.Common" Version="1.0.1" />
-		<PackageReference Include="RTLSDR.FM" Version="1.0.1" />
+		<PackageReference Include="RTLSDR" Version="1.0.5" />
+		<PackageReference Include="RTLSDR.Audio" Version="1.0.7" />
+		<PackageReference Include="RTLSDR.Common" Version="1.0.2" />
+		<PackageReference Include="RTLSDR.DAB" Version="1.0.2" />
+		<PackageReference Include="RTLSDR.FM" Version="1.0.3" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="System.Drawing.Common" Version="8.0.1" />
+		<PackageReference Include="System.Drawing.Common" Version="10.0.1" />
+		<PackageReference Include="System.Formats.Nrbf" Version="10.0.1" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
 	</ItemGroup>
 
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
 	    <Version>3.9.5</Version>
 	  </PackageReference>
@@ -135,8 +133,9 @@
 	  <ProjectReference Include="..\DVBTTelevizor.TV\DVBTTelevizor.TV.csproj" />
 	</ItemGroup>
 
-	<ItemGroup Condition="$(TargetFramework.Contains('windows'))">
-		<ProjectReference Include="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" />
+	<ItemGroup>
+		<ProjectReference Remove="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" Condition="!$(TargetFramework.Contains('windows'))" />
+		<ProjectReference Include="..\LibVLCSharp.MAUI.Windows\LibVLCSharp.MAUI.Windows.csproj" Condition="$(TargetFramework.Contains('windows'))" />
 	</ItemGroup>
 
 	<ItemGroup>

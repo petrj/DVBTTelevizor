@@ -3556,7 +3556,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (_viewModel.RecordingChannel == null)
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuRecord", "Record".Translated(), "record.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuRecord", "Record".Translated(), "recording.png"));
                 }
                 else
                 {

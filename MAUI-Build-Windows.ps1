@@ -24,7 +24,7 @@ Import-Module .\MAUI-Build-Module.psm1 -Force
 
 $passw = Get-Password
 
-#.\Clear.ps1
+.\Clear.ps1
 
 $aABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
     | Publish-AABPackage `

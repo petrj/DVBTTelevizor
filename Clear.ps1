@@ -1,4 +1,3 @@
-$scriptPath = $PSScriptRoot
 cd $PSScriptRoot
 
 #dotnet nuget locals all --clear
