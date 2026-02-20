@@ -42,13 +42,11 @@ foreach ($folder in `
 
     if (Test-Path -Path $fullPath)
     {
-	    Remove-Item -Path $fullPath -Recurse -Force -Verbose		
+	    Remove-Item -Path $fullPath -Recurse -Force #-Verbose		
     }
 }
 
 
-Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force -Verbose
+Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force #-Verbose
 
 #dotnet restore .\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj --force
-
-
