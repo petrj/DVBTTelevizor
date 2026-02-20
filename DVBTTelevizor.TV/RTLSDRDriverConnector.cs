@@ -310,7 +310,7 @@ namespace DVBTTelevizor.TV
                         state.hasCarrier = 0;
                         state.hasSync = 0;
                         state.hasLock = 0;
-                        state.rfStrengthPercentage = Convert.ToInt64(_demodulator?.PercentSignalPower);
+                        //state.rfStrengthPercentage = Convert.ToInt64(_demodulator?.per);
                         break;
                 }
 
@@ -481,7 +481,7 @@ namespace DVBTTelevizor.TV
                     hasSync = 1,
                     hasSignal = 1,
                     SuccessFlag = true,
-                    rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                    //rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
                 }
             };
         }
