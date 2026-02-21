@@ -1,0 +1,1 @@
+dotnet publish .\DVBTTelevizor.MAUI\ -f net10.0-windows10.0.26100.0 -c Release -p:WindowsPackageType=None -p:SelfContained=true
