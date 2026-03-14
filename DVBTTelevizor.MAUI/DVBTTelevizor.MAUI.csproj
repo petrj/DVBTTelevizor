@@ -27,7 +27,7 @@
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
+	<PropertyGroup  Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationVersion>2026003</ApplicationVersion>
 		<VersionCode>2026003</VersionCode>
 		<VersionName>2026003</VersionName>
@@ -37,7 +37,7 @@
 	<!-- Versions
 		Value 2025003 is too big for Windows
 		-->
-	
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<ApplicationVersion>2026</ApplicationVersion>
@@ -45,7 +45,7 @@
 		<VersionName>2026</VersionName>
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<WindowsPackageType>MSIX</WindowsPackageType>
-	</PropertyGroup>	
+	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
 
@@ -97,16 +97,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
-		<PackageReference Include="LibVLCSharp" Version="3.9.5" />
+		<PackageReference Include="LibVLCSharp" Version="3.9.6" />
 		<PackageReference Include="LoggerService" Version="1.0.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.41" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.41" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.3" />
-		<PackageReference Include="NAudio" Version="2.2.1" />
-		<PackageReference Include="NLog" Version="6.1.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.50" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
+		<PackageReference Include="NAudio" Version="2.3.0" />
+		<PackageReference Include="NLog" Version="6.1.1" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.4" />
 		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
@@ -116,8 +116,8 @@
 		<PackageReference Include="RTLSDR.DAB" Version="1.0.10" />
 		<PackageReference Include="RTLSDR.FM" Version="1.0.7" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="System.Drawing.Common" Version="10.0.3" />
-		<PackageReference Include="System.Formats.Nrbf" Version="10.0.3" />
+		<PackageReference Include="System.Drawing.Common" Version="10.0.5" />
+		<PackageReference Include="System.Formats.Nrbf" Version="10.0.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23" />
 	</ItemGroup>
@@ -125,7 +125,7 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
-	    <Version>3.9.5</Version>
+	    <Version>3.9.6</Version>
 	  </PackageReference>
 	</ItemGroup>
 
