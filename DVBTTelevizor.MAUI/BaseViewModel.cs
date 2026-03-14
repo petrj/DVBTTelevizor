@@ -25,6 +25,7 @@ namespace DVBTTelevizor.MAUI
         private bool _DVBTDriverActive = false;
         private bool _FMDriverActive = false;
         private bool _DABDriverActive = false;
+        private bool _menuVisible = false;
 
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
@@ -50,6 +51,19 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public bool MenuVisible
+        {
+            get
+            {
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
+
+                OnPropertyChanged(nameof(MenuVisible));
+            }
+        }
         public void UpdateActiveDriverType()
         {
             Task.Run(async () =>

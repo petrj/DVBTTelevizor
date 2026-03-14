@@ -27,7 +27,7 @@
 		<RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup  Condition="$(TargetFramework.Contains('android'))">
+	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
 		<ApplicationVersion>2026003</ApplicationVersion>
 		<VersionCode>2026003</VersionCode>
 		<VersionName>2026003</VersionName>
@@ -226,6 +226,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Pages\TuningDriverPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
 	  <None Update="Platforms\Windows\NLog.config">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

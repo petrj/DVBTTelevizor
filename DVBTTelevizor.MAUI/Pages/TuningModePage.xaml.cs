@@ -6,17 +6,14 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningModePage : ContentPage, IOnKeyDown
+public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 {
-    private TuningWelcomePageViewModel _viewModel;
+    private TuningModePageViewModel _viewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
-
-
-    private TuningSettings _tuningSettings;
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -38,13 +35,13 @@ public partial class TuningModePage : ContentPage, IOnKeyDown
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        _tuningSettings = new TuningSettings(_loggingService);
-
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
         _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged; ;
 
-        BindingContext = _viewModel = new TuningWelcomePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _viewModel = new TuningModePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+
+        _viewModel.Settings = new TuningSettings(_loggingService);
 
         _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
@@ -54,16 +51,21 @@ public partial class TuningModePage : ContentPage, IOnKeyDown
         FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
         DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
 
-        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-        {
-            _driver = m.Value;
+        //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+        //{
+        //    _driver = m.Value;
 
-            _viewModel.UpdateActiveDriverType();
-            _tuningSettings.LoadFromConfiguration(_configuration);
-            _tuningSettings.SetFrequencies(_driver);
-        });
+        //    _viewModel.UpdateActiveDriverType();
+        //    _tuningSettings.LoadFromConfiguration(_configuration);
+        //    _tuningSettings.SetFrequencies(_driver);
+        //});
 
         BuildFocusableItems();
+    }
+
+    public void UpdateSettings(TuningSettings tuningSettings)
+    {
+        _viewModel.Settings = tuningSettings;
     }
 
     private void Menu_Tapped(object sender, EventArgs e)
@@ -168,8 +170,8 @@ public partial class TuningModePage : ContentPage, IOnKeyDown
         Task.Run(async () =>
         {
             _viewModel.UpdateActiveDriverType();
-            _tuningSettings.LoadFromConfiguration(_configuration);
-            await _tuningSettings.SetFrequencies(_driver);
+            _viewModel?.Settings.LoadFromConfiguration(_configuration);
+            await _viewModel?.Settings.SetFrequencies(_driver);
             //_tuningSettings.SaveToConfiguration(_configuration);
         });
     }
@@ -177,7 +179,7 @@ public partial class TuningModePage : ContentPage, IOnKeyDown
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        _tuningSettings.SaveToConfiguration(_configuration);
+        _viewModel?.Settings.SaveToConfiguration(_configuration);
     }
 
     private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
@@ -342,21 +344,21 @@ public partial class TuningModePage : ContentPage, IOnKeyDown
         }
 
         // update settings according to selected driver
-        _tuningSettings.LoadFromConfiguration(_configuration);
+        _viewModel?.Settings.LoadFromConfiguration(_configuration);
         // update frequencies according to driver
-        _tuningSettings.SetFrequencies(_driver);
-        _tuningSettings.TuningMode = mode;
+        _viewModel?.Settings.SetFrequencies(_driver);
+        _viewModel?.Settings.TuningMode = mode;
 
         if (_viewModel.DVBTDriverActive && (mode == TuneModeEnum.Automatic))
         {
-            _tuningSettings.DVBT = true;
-            _tuningSettings.DVBT2 = true;
-            _tuningSettings.TuneDVBTPreferred = false;
+            _viewModel?.Settings.DVBT = true;
+            _viewModel?.Settings.DVBT2 = true;
+            _viewModel?.Settings.TuneDVBTPreferred = false;
         }
 
         if (page is ITuningPage tuPage)
         {
-            tuPage.UpdateSettings( _tuningSettings );
+            tuPage.UpdateSettings(_viewModel?.Settings);
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>

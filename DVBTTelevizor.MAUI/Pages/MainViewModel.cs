@@ -45,7 +45,6 @@ namespace DVBTTelevizor.MAUI
 
         private bool _refreshing = false;
         private bool _refreshed = false;
-        private bool _menuVisible = false;
 
         private bool _doNotAutomaticallyShowEPGDetail = false;
 
@@ -102,7 +101,6 @@ namespace DVBTTelevizor.MAUI
         {
             CommandTune = new Command(() =>
             {
-                //MenuVisible = false;
                 WeakReferenceMessenger.Default.Send(new ShowTuneMessage(String.Empty));
             });
 
@@ -217,20 +215,6 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 await RefreshEPG();
-            }
-        }
-
-        public bool MenuVisible
-        {
-            get
-            {
-                return _menuVisible;
-            }
-            set
-            {
-                _menuVisible = value;
-
-                OnPropertyChanged(nameof(MenuVisible));
             }
         }
 
