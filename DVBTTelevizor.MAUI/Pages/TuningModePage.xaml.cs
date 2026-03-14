@@ -6,7 +6,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
-public partial class TuningWelcomePage : ContentPage, IOnKeyDown
+public partial class TuningModePage : ContentPage, IOnKeyDown
 {
     private TuningWelcomePageViewModel _viewModel;
 
@@ -29,7 +29,7 @@ public partial class TuningWelcomePage : ContentPage, IOnKeyDown
 
     private DriverTypeEnum? _prevDriverType;
 
-    public TuningWelcomePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
+    public TuningModePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 

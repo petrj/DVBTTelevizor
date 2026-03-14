@@ -166,7 +166,7 @@
 	  <Compile Update="Pages\TuningFrequenciesPage.xaml.cs">
 	    <DependentUpon>TuningFrequenciesPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Pages\TuningWelcomePage.xaml.cs">
+	  <Compile Update="Pages\TuningModePage.xaml.cs">
 	    <DependentUpon>TuningWelcomePage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Platforms\Android\DVBTTelevizorConfiguration.cs">

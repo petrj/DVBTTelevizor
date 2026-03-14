@@ -82,7 +82,7 @@ namespace DVBTTelevizor.MAUI
         private SledovaniTV.SledovaniTV _iptv;
 
         private SettingsPage _settingsPage = null;
-        private TuningWelcomePage _tuneWelcomePage = null;
+        private TuningModePage _tuneModePage = null;
         private AboutPage _aboutPage = null;
         private DriverPage _driverPage = null;
         private ChannelPage _channelPage = null;
@@ -227,12 +227,12 @@ namespace DVBTTelevizor.MAUI
             _aboutPage = new AboutPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
+            _tuneModePage = new TuningModePage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
             _filterPage = new FilterPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
             _channelPage.Disappearing += _channelPage_Disappearing;
             _filterPage.Disappearing += _filterPage_Disappearing;
-            _tuneWelcomePage.Disappearing += _tuneWelcomePage_Disappearing;
+            _tuneModePage.Disappearing += _tuneWelcomePage_Disappearing;
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -1491,14 +1491,14 @@ namespace DVBTTelevizor.MAUI
 
         private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-            if (_tuneWelcomePage != null &&
-                _tuneWelcomePage.IsLoaded)
+            if (_tuneModePage != null &&
+                _tuneModePage.IsLoaded)
             {
                 // preventing click when the settings page is just (or yet) loaded
                 return;
             }
 
-            await Navigation.PushAsync(_tuneWelcomePage);
+            await Navigation.PushAsync(_tuneModePage);
         }
 
         private void DriverButton_Clicked(object sender, EventArgs e)
