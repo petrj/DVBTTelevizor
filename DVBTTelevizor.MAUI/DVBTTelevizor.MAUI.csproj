@@ -2,6 +2,9 @@
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android;net10.0-windows10.0.26100.0</TargetFrameworks>
 
+		<!-- Ensure a single package version across all target frameworks to avoid NU1105 -->
+		<PackageVersion>1.0.0</PackageVersion>
+
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DVBTTelevizor.MAUI</RootNamespace>
 		<UseMaui>true</UseMaui>
