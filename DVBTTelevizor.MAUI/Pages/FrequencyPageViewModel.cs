@@ -106,6 +106,8 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+
+
         public long FrequencyKHz
         {
             get
