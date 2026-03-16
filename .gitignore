@@ -336,3 +336,4 @@ OnlineTelevizor\OnlineTelevizor.UWP\BundleArtifacts\*
 
 *.appxsym
 *.appxbundle
+*.odg#

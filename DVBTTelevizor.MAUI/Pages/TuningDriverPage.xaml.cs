@@ -20,6 +20,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     private KeyboardFocusableItemList _focusItems;
 
     private TuningModePage _tuningModePage;
+    private TuningFrequencyPage _tuningFrequencyPage;
 
     public TuningDriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -35,6 +36,8 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         BindingContext = _viewModel = new TuningModePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _tuningModePage = new TuningModePage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+
 
         BuildFocusableItems();
     }
@@ -55,8 +58,17 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
+
         _focusItems.DeFocusAll();
-        MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));        
+        MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+
+        //Task.Run(async () =>
+        //{
+        //    _viewModel.UpdateActiveDriverType();
+        //    _viewModel?.Settings.LoadFromConfiguration(_configuration);
+        //    await _viewModel?.Settings.SetFrequencies(_driver);
+        //    //_tuningSettings.SaveToConfiguration(_configuration);
+        //});
     }
 
     protected override void OnDisappearing()
@@ -129,35 +141,37 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningDriverPage: DVBTButton_Clicked");
 
-        ShowPage(DriverTypeEnum.AndroidDVBTDriver);
+        await ShowPage(_tuningModePage, DriverTypeEnum.AndroidDVBTDriver);
     }
 
-    private void FMButton_Clicked(object sender, EventArgs e)
+    private async void FMButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage: FMButton_Clicked");
 
-        ShowPage(DriverTypeEnum.RTLSDRDriverFM);
+        await ShowPage(_tuningFrequencyPage, DriverTypeEnum.RTLSDRDriverFM);
     }
 
-    private void DABButton_Clicked(object sender, EventArgs e)
+    private async void DABButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage:     private void DABButton_Clicked(object sender, EventArgs e)\r\n");
 
-        ShowPage(DriverTypeEnum.RTLSDRDriverDAB);
+        await ShowPage(_tuningFrequencyPage, DriverTypeEnum.RTLSDRDriverDAB);
     }
 
-    private void ShowPage(DriverTypeEnum driverType)
+    private async Task ShowPage(Page page, DriverTypeEnum driverType)
     {
-        if (_tuningModePage.IsLoaded)
+        if (page.IsLoaded)
         {
             // preventing click when the settings page is just (or yet) loaded
             return;
         }
 
+        _configuration.DVBTDriverType = driverType;
         // update settings according to selected driver
         _tuningSettings.LoadFromConfiguration(_configuration);
+
         // update frequencies according to driver
-        _tuningSettings.SetFrequencies(_driver);
+        await _tuningSettings.SetFrequencies(_driver);
 
         _tuningSettings.DVBT = false;
         _tuningSettings.DVBT2 = false;
@@ -168,7 +182,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         {
             case DriverTypeEnum.AndroidDVBTDriver:
                 _tuningSettings.DVBT = true;
-                _tuningSettings.DVBT2 = true;                
+                _tuningSettings.DVBT2 = true;
                 break;
             case DriverTypeEnum.RTLSDRDriverFM:
                 _tuningSettings.FM = true;
@@ -178,11 +192,14 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
                 break;
         }
 
-        _tuningModePage.UpdateSettings( _tuningSettings );
-
-        MainThread.BeginInvokeOnMainThread(async () =>
+        if (page is ITuningPage tuPage)
         {
-            await Navigation.PushAsync(_tuningModePage);
+            tuPage.UpdateSettings(_tuningSettings);
+        }
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            await Navigation.PushAsync(page);
         });
     }
 }

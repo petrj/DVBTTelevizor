@@ -17,14 +17,10 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 
     private KeyboardFocusableItemList _focusItems;
 
-    private AppMenu _appMenu = null;
-
     private TuningSelectDVBTPage _selectDVBTPage;
     private TuningProgressPage _tuningProgressPage;
     private TuningFrequencyPage _tuningFrequencyPage;
     private TuningFrequenciesPage _tuningFrequenciesPage;
-
-    private DriverTypeEnum? _prevDriverType;
 
     public TuningModePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -35,10 +31,6 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
-        _appMenu = new AppMenu(MainMenu);
-        _appMenu.FontSize = _configuration.AppFontSize;
-        _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged; ;
-
         BindingContext = _viewModel = new TuningModePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _viewModel.Settings = new TuningSettings(_loggingService);
@@ -48,18 +40,6 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
-        FMDriverRadioButton.CheckedChanged += FMDriverRadioButton_CheckedChanged;
-        DVBTDriverRadioButton.CheckedChanged += DVBTDriverRadioButton_CheckedChanged;
-
-        //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-        //{
-        //    _driver = m.Value;
-
-        //    _viewModel.UpdateActiveDriverType();
-        //    _tuningSettings.LoadFromConfiguration(_configuration);
-        //    _tuningSettings.SetFrequencies(_driver);
-        //});
-
         BuildFocusableItems();
     }
 
@@ -68,91 +48,11 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         _viewModel.Settings = tuningSettings;
     }
 
-    private void Menu_Tapped(object sender, EventArgs e)
-    {
-        if (e != null &&
-            e is TappedEventArgs tea &&
-            tea.Parameter is MenuItem item)
-        {
-            Menu_Tapped(item);
-        }
-    }
-
-    private async void Menu_Tapped(MenuItem item)
-    {
-        var menuId = item.Id;
-        _loggingService.Info($"Menu tapped: {menuId}");
-
-        _appMenu.HideMenu();
-
-        switch (menuId)
-        {
-            case "menuInstallDriver":
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    if (_viewModel.DVBTDriverActive)
-                    {
-                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                    }
-                    else
-                    {
-                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                    }
-                });
-                break;
-            case "menuChangeDriver":
-                await _viewModel.ChangeDriver(item.DriverType);
-                break;
-            case "menuCancelChangeDriver":
-                _viewModel.UpdateActiveDriverType();
-                break;
-        }
-    }
-
-    private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
-    {
-        _viewModel.MenuVisible = e.IsVisible;
-    }
-
-    private void DriverRadioButtonCheckedChanged(bool value, DriverTypeEnum driverType)
-    {
-        if (!value)
-            return;
-
-        if (_viewModel.IgnoreDriver == driverType)
-        {
-            _viewModel.IgnoreDriver = null;
-            return;
-        }
-
-        Task.Run(async () =>
-        {
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
-                _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, driverType);
-
-            });
-        });
-    }
-
-    private void DVBTDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
-    {
-        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.AndroidDVBTDriver);
-    }
-
-    private void FMDriverRadioButton_CheckedChanged(object? sender, CheckedChangedEventArgs e)
-    {
-        DriverRadioButtonCheckedChanged(e.Value, DriverTypeEnum.RTLSDRDriverFM);
-    }
-
     private void BuildFocusableItems()
     {
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriver", new List<View>() { DVBTDriverRadioButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("FMDriver", new List<View>() { FMDriverRadioButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("DABDriver", new List<View>() { DABDriverRadioButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Auto", new List<View>() { AutoScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Manual", new List<View>() { ManualScanButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Tune", new List<View>() { TuneButton }));
@@ -166,70 +66,19 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
-
-        Task.Run(async () =>
-        {
-            _viewModel.UpdateActiveDriverType();
-            _viewModel?.Settings.LoadFromConfiguration(_configuration);
-            await _viewModel?.Settings.SetFrequencies(_driver);
-            //_tuningSettings.SaveToConfiguration(_configuration);
-        });
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        _viewModel?.Settings.SaveToConfiguration(_configuration);
     }
 
-    private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
-    {
-        switch (keyAction)
-        {
-            case KeyboardNavigationActionEnum.Right:
-            case KeyboardNavigationActionEnum.Down:
-                Task.Run(async () =>
-                {
-                    await MainMenu.SelectNextMenuItem(_appMenu.MenuItems, false);
-                });
-                break;
-
-            case KeyboardNavigationActionEnum.Left:
-            case KeyboardNavigationActionEnum.Up:
-                Task.Run(async () =>
-                {
-                    await MainMenu.SelectNextMenuItem(_appMenu.MenuItems, true);
-                });
-                break;
-
-            case KeyboardNavigationActionEnum.Back:
-                _appMenu.HideMenu();
-                break;
-
-            case KeyboardNavigationActionEnum.OK:
-                var item = _appMenu.GetSelectedMenuItem();
-                if (item != null)
-                {
-                    Menu_Tapped(item);
-                }
-                break;
-        }
-    }
 
     public void OnKeyDown(string key, bool longPress)
     {
-        _loggingService.Debug($"TuningWelcomePage Page OnKeyDown {key}");
+        _loggingService.Debug($"TuningModePage Page OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
-
-        if (MainMenu.MenuVisible)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                OnMenuKeyDown(keyAction);
-            });
-            return;
-        }
 
         switch (keyAction)
         {
@@ -274,15 +123,6 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
                         case "Tune":
                             TuneButton_Clicked(this, new EventArgs());
                             break;
-                        case "DVBTDriver":
-                            DVBTDriverRadioButton.IsChecked = !DVBTDriverRadioButton.IsChecked;
-                            break;
-                        case "FMDriver":
-                            FMDriverRadioButton.IsChecked = !FMDriverRadioButton.IsChecked;
-                            break;
-                        case "DABDriver":
-                            DABDriverRadioButton.IsChecked = !DABDriverRadioButton.IsChecked;
-                            break;
                     }
                 });
                 break;
@@ -291,47 +131,40 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 
     public void OnTextSent(string text)
     {
-        _loggingService.Debug($"TuningWelcomePage Page OnTextSent {text}");
+        _loggingService.Debug($"TuningModePage Page OnTextSent {text}");
     }
 
     private async void AutoScanButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningWelcomePage: AutoScanButton_Clicked");
-
-        //if (_viewModel.SelectedDriverType == DriverTypeEnum.RTLSDRDriver)
-        //{
-        //    _tuningSettings.SetFMSettings();
-        //}
+        _loggingService.Debug($"TuningModePage: AutoScanButton_Clicked");
 
         ShowPage(_tuningProgressPage, TuneModeEnum.Automatic);
     }
 
     private void ManualScanButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningWelcomePage: ManualScanButton_Clicked");
+        _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");
 
-        if (_viewModel.FMDriverActive ||
-            _viewModel.DABDriverActive)
-        {
-            ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
-        } else
+        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
         {
             ShowPage(_selectDVBTPage, TuneModeEnum.Manual);
+        } else
+        {
+            ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
         }
     }
 
     private void TuneButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningWelcomePage: TuneButton_Clicked");
+        _loggingService.Debug($"TuningModePage: TuneButton_Clicked");
 
-        if (_viewModel.FMDriverActive ||
-            _viewModel.DABDriverActive)
+        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
         {
-            ShowPage(_tuningFrequencyPage, TuneModeEnum.Manual);
+            ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
         }
         else
         {
-            ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
+            ShowPage(_tuningFrequencyPage, TuneModeEnum.Frequency);
         }
     }
 
