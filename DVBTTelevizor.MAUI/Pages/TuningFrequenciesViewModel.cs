@@ -124,28 +124,26 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private bool ISDabFreq(int freq)
+        public static string ParseDabFreq(int freq)
         {
             foreach (var kvp in RTLSDR.Common.AudioTools.DabFrequenciesHz)
             {
                 if (kvp.Value == freq)
                 {
-                    return true;
+                    return kvp.Key;
                 }
             }
-            return false;
+            return null;
         }
 
         public string FrequencyWholePartMHzCaption
         {
             get
             {
-                foreach (var kvp in RTLSDR.Common.AudioTools.DabFrequenciesHz)
+                var dabFreq = ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
                 {
-                    if (kvp.Value == FrequencyKHz * 1000)
-                    {
-                        return kvp.Key;
-                    }
+                    return dabFreq;
                 }
                 return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
             }
@@ -155,7 +153,8 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (ISDabFreq((int)(FrequencyKHz * 1000)))
+                var dabFreq = ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
                 {
                     return "";
                 }
@@ -169,9 +168,10 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (ISDabFreq((int)(FrequencyKHz * 1000)))
+                var dabFreq = ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
                 {
-                     return $"";
+                    return "";
                 }
                 return $"MHz".Translated();
             }

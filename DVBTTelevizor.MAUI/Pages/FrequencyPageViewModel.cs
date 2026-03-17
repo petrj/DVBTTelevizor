@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
+using RTLSDR.Common;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -74,7 +75,7 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(FrequencyKHz));   // this invokes value change! using "isReadonly" disables changing the value
                 OnPropertyChanged(nameof(FrequencyMHz));
-                OnPropertyChanged(nameof(FrequencyWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyWholePartMHzCaption));
                 OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
@@ -88,11 +89,16 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public long FrequencyWholePartMHz
+        public string FrequencyWholePartMHzCaption
         {
             get
             {
-                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return dabFreq;
+                }
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
             }
         }
 
@@ -100,7 +106,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+
+                var part = (FrequencyKHz / 1000.0) - Math.Floor(FrequencyKHz / 1000.0);
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000} MHz";
             }
@@ -173,6 +185,8 @@ namespace DVBTTelevizor.MAUI
             }
             Settings.FrequencyKHz = freq;
 
+            RoundFrequency();
+
             NotifyChange();
         }
 
@@ -185,6 +199,8 @@ namespace DVBTTelevizor.MAUI
             }
             Settings.FrequencyKHz = freq;
 
+            RoundFrequency();
+
             NotifyChange();
         }
 
@@ -196,17 +212,31 @@ namespace DVBTTelevizor.MAUI
                 if (!_tuneSettings.ValidFrequency(FrequencyKHz, true))
                     return;
 
-                // rounding to start freq 474 MHZ
-                var startFreq = _tuneSettings.DefaultFrequencyMinKHz;
+                Int64 freqRounded = _tuneSettings.DefaultFrequencyMinKHz;
 
-                var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz)));
+                // rounding to start freq
+                if (_tuneSettings.DAB)
+                {
+                    // there is not constant bandwidth, so rounding is different
+                    var minFreqDist = long.MaxValue;
+                    foreach (var freq in AudioTools.DabFrequenciesHz)
+                    {
+                        var dist = freq.Value - FrequencyKHz * 1000;
+                        if (Math.Abs(dist) < Math.Abs(minFreqDist))
+                        {
+                            minFreqDist = dist;
+                            freqRounded = freq.Value / 1000;
+                        }
+                    }
+                }
+                else
+                {
+                    var startFreq = _tuneSettings.DefaultFrequencyMinKHz;
 
-                var freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
+                    var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(FrequencyKHz - startFreq) / Convert.ToDecimal(Settings.BandwidthKHz)));
 
-                // corrected min/max:
-
-                //var minFreqRounded = Convert.ToInt64(_tuneSettings.DeviceFrequencyMinKHz startFreq + stepFreq * Settings.BandwidthKHz);
-
+                    freqRounded = Convert.ToInt64(startFreq + stepFreq * Settings.BandwidthKHz);
+                }
 
 
                 if (freqRounded > _tuneSettings.DeviceFrequencyMaxKHz)

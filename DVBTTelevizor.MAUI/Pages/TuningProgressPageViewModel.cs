@@ -571,7 +571,7 @@ namespace DVBTTelevizor.MAUI
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 OnPropertyChanged(nameof(FrequencyKHz));
-                OnPropertyChanged(nameof(FrequencyWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyWholePartMHzCaption));
                 OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
 
                 OnPropertyChanged(nameof(DeliverySystem));
@@ -726,11 +726,17 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public long FrequencyWholePartMHz
+        public string FrequencyWholePartMHzCaption
         {
             get
             {
-                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return dabFreq;
+                }
+
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
             }
         }
 
@@ -738,7 +744,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+
+                var part = (FrequencyKHz / 1000.0) - Math.Floor(FrequencyKHz / 1000.0);
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000} MHz";
             }
@@ -877,6 +889,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyFromKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return $"< {dabFreq}";
+                }
+
                 return "< " + FrequencyFromMHz.ToString();
             }
         }
@@ -885,6 +903,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyToKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return $"{dabFreq} >";
+                }
+
                 return FrequencyToMHz.ToString() + " >";
             }
         }
