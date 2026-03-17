@@ -103,7 +103,7 @@
 		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
-		<PackageReference Include="LibVLCSharp" Version="3.9.6" />
+		<PackageReference Include="LibVLCSharp" Version="3.9.5" />
 		<PackageReference Include="LoggerService" Version="1.0.5" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.50" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
@@ -128,7 +128,7 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
 	  <PackageReference Include="LibVLCSharp.MAUI">
-	    <Version>3.9.6</Version>
+	    <Version>3.9.5</Version>
 	  </PackageReference>
 	</ItemGroup>
 
