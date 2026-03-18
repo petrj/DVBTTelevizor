@@ -84,7 +84,7 @@ namespace DVBTTelevizor.MAUI
         private SettingsPage _settingsPage = null;
         private TuningDriverPage _tuningPage = null;
         private AboutPage _aboutPage = null;
-        private DriverPage _driverPage = null;
+        private SelectDriverPage _driverPage = null;
         private ChannelPage _channelPage = null;
         private FilterPage _filterPage = null;
 
@@ -225,7 +225,8 @@ namespace DVBTTelevizor.MAUI
 
             _settingsPage = new SettingsPage(_loggingService, _driver, _iptv, _configuration, publicDirectoryProvider);
             _aboutPage = new AboutPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-            _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _driverPage = new SelectDriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+
             _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
             _tuningPage = new TuningDriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
             _filterPage = new FilterPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
