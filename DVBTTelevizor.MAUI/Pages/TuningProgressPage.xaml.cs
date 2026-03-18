@@ -432,13 +432,13 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    if (_viewModel.DVBTDriverActive)
-                    {
-                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                    } else
-                    {
-                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                    }
+                    //if (_viewModel.DVBTDriverActive)
+                    //{
+                    //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                    //} else
+                    //{
+                    //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                    //}
                 });
                 break;
 

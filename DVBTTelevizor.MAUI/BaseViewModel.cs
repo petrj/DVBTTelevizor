@@ -43,12 +43,12 @@ namespace DVBTTelevizor.MAUI
                 NotifyFontSizeChange();
             });
 
-            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-            {
-                _driver = m.Value;
-                UpdateActiveDriverType();
-                NotifyDriverChange();
-            });
+            //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            //{
+            //    _driver = m.Value;
+            //    UpdateActiveDriverType();
+            //    NotifyDriverChange();
+            //});
         }
 
         public bool MenuVisible
@@ -63,27 +63,6 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(MenuVisible));
             }
-        }
-        public void UpdateActiveDriverType()
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        IgnoreDriver = _configuration.DVBTDriverType;
-
-                        FMDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriverFM;
-                        DVBTDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.AndroidDVBTDriver;
-                        DABDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriverDAB;
-                    });
-                }
-                finally
-                {
-                    NotifyDriverChange();
-                }
-            });
         }
 
         public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
@@ -127,48 +106,6 @@ namespace DVBTTelevizor.MAUI
                     return "FM";
                 default:
                     return "Driver".Translated();
-            }
-        }
-
-        public bool DVBTDriverActive
-        {
-            get
-            {
-                return _DVBTDriverActive;
-            }
-            set
-            {
-                _DVBTDriverActive = value;
-
-                NotifyDriverChange();
-            }
-        }
-
-        public bool FMDriverActive
-        {
-            get
-            {
-                return _FMDriverActive;
-            }
-            set
-            {
-                _FMDriverActive = value;
-
-                NotifyDriverChange();
-            }
-        }
-
-        public bool DABDriverActive
-        {
-            get
-            {
-                return _DABDriverActive;
-            }
-            set
-            {
-                _DABDriverActive = value;
-
-                NotifyDriverChange();
             }
         }
 
@@ -226,10 +163,6 @@ namespace DVBTTelevizor.MAUI
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                OnPropertyChanged(nameof(FMDriverActive));
-                OnPropertyChanged(nameof(DVBTDriverActive));
-                OnPropertyChanged(nameof(DABDriverActive));
-
                 OnPropertyChanged(nameof(ConnectedDevice));
                 OnPropertyChanged(nameof(DriverStateStatus));
                 OnPropertyChanged(nameof(DriversBoxVisible));

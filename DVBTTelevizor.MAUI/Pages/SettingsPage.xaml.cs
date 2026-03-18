@@ -81,23 +81,23 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void EnableRTLSDRSwitch_Toggled(object? sender, ToggledEventArgs e)
     {
-        if (!_configuration.RTLSDREnabled && _settingsPageViewModel.FMDriverActive)
-        {
-            _loggingService.Info("EnableRTLSDRSwitch_Toggled - FM driver active, cannot enable RTLSDR");
-            // cannot enable RTLSDR when FM driver is active
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                _configuration.RTLSDREnabled = true;
+        //if (!_configuration.RTLSDREnabled && _settingsPageViewModel.FMDriverActive)
+        //{
+        //    _loggingService.Info("EnableRTLSDRSwitch_Toggled - FM driver active, cannot enable RTLSDR");
+        //    // cannot enable RTLSDR when FM driver is active
+        //    MainThread.BeginInvokeOnMainThread(() =>
+        //    {
+        //        _configuration.RTLSDREnabled = true;
 
-                BuildInfoMenu("Cannot disable FM when driver is active".Translated(), "OK".Translated());
-                _settingsPageViewModel.NotifyDriverChange();
-                _settingsPageViewModel.NotifyConfigChange();
-            });
-            return;
-        } else
-        {
-            _settingsPageViewModel.NotifyDriverChange();
-        }
+        //        BuildInfoMenu("Cannot disable FM when driver is active".Translated(), "OK".Translated());
+        //        _settingsPageViewModel.NotifyDriverChange();
+        //        _settingsPageViewModel.NotifyConfigChange();
+        //    });
+        //    return;
+        //} else
+        //{
+        //    _settingsPageViewModel.NotifyDriverChange();
+        //}
 
     }
 
@@ -227,7 +227,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         if (_settingsPageViewModel != null)
         {
-            _settingsPageViewModel.UpdateActiveDriverType();
+            //_settingsPageViewModel.UpdateActiveDriverType();
 
             _settingsPageViewModel.FillAutoPlayChannels();
 

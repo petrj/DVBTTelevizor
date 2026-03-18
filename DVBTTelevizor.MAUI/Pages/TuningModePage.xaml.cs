@@ -182,7 +182,7 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         _viewModel?.Settings.SetFrequencies(_driver);
         _viewModel?.Settings.TuningMode = mode;
 
-        if (_viewModel.DVBTDriverActive && (mode == TuneModeEnum.Automatic))
+        if (mode == TuneModeEnum.Automatic)
         {
             _viewModel?.Settings.DVBT = true;
             _viewModel?.Settings.DVBT2 = true;

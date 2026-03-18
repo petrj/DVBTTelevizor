@@ -1448,7 +1448,7 @@ namespace DVBTTelevizor.MAUI
                     break;
             }
 
-            _viewModel.UpdateActiveDriverType();
+           // _viewModel.UpdateActiveDriverType();
 
             WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
@@ -1999,38 +1999,39 @@ namespace DVBTTelevizor.MAUI
                 });
                 return false;
             }
+            /*
+           if (!_viewModel.FMDriverActive &&
+               (channel.ChannelType == ChannelTypeEnum.FM))
+           {
+               MainThread.BeginInvokeOnMainThread(async () =>
+               {
+                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverFM);
+               });
+               return false;
+           }
 
-            if (!_viewModel.FMDriverActive &&
-                (channel.ChannelType == ChannelTypeEnum.FM))
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverFM);
-                });
-                return false;
-            }
+           if (!_viewModel.DABDriverActive &&
+                (channel.ChannelType == ChannelTypeEnum.DAB))
+           {
+               MainThread.BeginInvokeOnMainThread(async () =>
+               {
+                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverDAB);
+               });
+               return false;
+           }
 
-            if (!_viewModel.DABDriverActive &&
-                 (channel.ChannelType == ChannelTypeEnum.DAB))
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverDAB);
-                });
-                return false;
-            }
-
-            if (
-                !_viewModel.DVBTDriverActive &&
-                ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2))
-                )
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.AndroidDVBTDriver);
-                });
-                return false;
-            }
+           if (
+               !_viewModel.DVBTDriverActive &&
+               ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2))
+               )
+           {
+               MainThread.BeginInvokeOnMainThread(async () =>
+               {
+                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.AndroidDVBTDriver);
+               });
+               return false;
+           }
+           */
 
             return true;
         }
@@ -3474,14 +3475,14 @@ namespace DVBTTelevizor.MAUI
                 case "menuInstallDriver":
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        if (_viewModel.DVBTDriverActive)
-                        {
-                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                        }
-                        else
-                        {
-                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                        }
+                        //if (_viewModel.DVBTDriverActive)
+                        //{
+                        //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                        //}
+                        //else
+                        //{
+                        //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                        //}
                     });
                     break;
 

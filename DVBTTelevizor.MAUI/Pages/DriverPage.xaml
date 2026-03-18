@@ -72,30 +72,6 @@
         <Image AbsoluteLayout.LayoutBounds="0.5,0.35,0.8,0.25" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
         <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
 
-        <Frame AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.12" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#808080" CornerRadius="10"  IsVisible="{Binding DriversBoxVisible}">
-            <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="5,5,5,5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                    <ColumnDefinition Width="33*" />
-                </Grid.ColumnDefinitions>
-
-                <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
-                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
-
-                <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
-                <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
-
-                <BoxView x:Name="DABDriverBoxView" Grid.Row="0" Grid.Column="2"  BackgroundColor="Transparent" />
-                <RadioButton x:Name="DABDriverRadioButton" IsChecked="{Binding DABDriverActive}" Grid.Row="0" Grid.Column="2" Content="{local:LngXamlExt Input='DAB+'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
-
-            </Grid>
-        </Frame>
-
-
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
