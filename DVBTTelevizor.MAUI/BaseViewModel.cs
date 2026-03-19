@@ -17,14 +17,8 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
-        private DriverTypeEnum? _ignoreDriver = null;
+        private DriverTypeEnum? _selectedDriver = null;
 
-        public static int RTLSDRFMSampleRate =  1024000;
-        public static int RTLSDRDABSampleRate = 2048000;
-
-        private bool _DVBTDriverActive = false;
-        private bool _FMDriverActive = false;
-        private bool _DABDriverActive = false;
         private bool _menuVisible = false;
 
         public BaseViewModel(ILoggingService loggingService,
@@ -113,6 +107,12 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"ChangeDriver");
 
+            if (_configuration.DVBTDriverType == driver)
+            {
+                _loggingService.Info($"ChangeDriver: already using {driver}");
+                return;
+            }
+
             if ((_driver != null) && (_driver.Connected))
             {
                 await _driver.Stop();
@@ -169,16 +169,46 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public DriverTypeEnum? IgnoreDriver
+        public void NotifySelectedDriverChange()
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(SelectedDriver));
+                OnPropertyChanged(nameof(SelectedDriverTitle));
+            });
+        }
+
+        public DriverTypeEnum? SelectedDriver
         {
             get
             {
-                return _ignoreDriver;
+                return _selectedDriver;
             }
             set
             {
-                _ignoreDriver = value;
+                _selectedDriver = value;
+
+                NotifySelectedDriverChange();
             }
+        }
+
+        public string SelectedDriverTitle
+        {
+            get
+            {
+                switch (_selectedDriver)
+                {
+                    case DriverTypeEnum.AndroidDVBTDriver:
+                    case DriverTypeEnum.AndroidTestingDVBTDriver:
+                    case DriverTypeEnum.TestTuneDriver:
+                        return "DVB-T Driver".Translated();
+                    case DriverTypeEnum.RTLSDRDriverDAB:
+                    case DriverTypeEnum.RTLSDRDriverFM:
+                        return "SDR Driver".Translated();
+                    default:
+                        return "Driver".Translated();
+                }
+            }            
         }
 
         public int GetScaledSize(int normalSize)

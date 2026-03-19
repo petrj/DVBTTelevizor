@@ -8,7 +8,7 @@ namespace DVBTTelevizor.MAUI;
 
 public partial class SelectDriverPage : ContentPage, IOnKeyDown
 {
-    private BaseViewModel _viewModel;
+    private TuningSelectDriverPageViewModel _viewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
@@ -31,9 +31,16 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
 
         _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
-        BindingContext = _viewModel = new BaseViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _viewModel = new TuningSelectDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
+
+        WeakReferenceMessenger.Default.Register<ShowDriverPageMessage>(this, (r, m) =>
+        {
+            Task.Run(async () => await MainThread.InvokeOnMainThreadAsync(
+                        async () =>await ShowPage(m.Value)
+                    ));
+        });
     }
 
     private void BuildFocusableItems()
@@ -103,10 +110,10 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
                     switch (_focusItems.FocusedItem.Name)
                     {
                         case "DVBT":
-                            DVBTButton_Clicked(this, new EventArgs());
+                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(DriverTypeEnum.AndroidDVBTDriver));
                             break;
                         case "SDR":
-                            SDRButton_Clicked(this, new EventArgs());
+                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(DriverTypeEnum.RTLSDRDriverDAB));
                             break;
                     }
                 });
@@ -119,21 +126,6 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"SelectDriverPage OnTextSent {text}");
     }
 
-    private async void DVBTButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"SelectDriverPage: DVBTButton_Clicked");
-
-        await ShowPage(DriverTypeEnum.AndroidDVBTDriver);
-    }
-
-    private async void SDRButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"SelectDriverPage: SDRButton_Clicked");
-
-       await ShowPage(DriverTypeEnum.RTLSDRDriverFM);
-    }
-
-
     private async Task ShowPage(DriverTypeEnum driverType)
     {
         if (_driverPage.IsLoaded)
@@ -141,6 +133,8 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
             // preventing click when the settings page is just (or yet) loaded
             return;
         }
+
+        _driverPage.SelectedDriver = driverType;
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {

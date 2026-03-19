@@ -4,7 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.SelectDriverPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Tuning'}">
+             Title="{local:LngXamlExt Input='Driver'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -59,7 +59,7 @@
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Select driver'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" />
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.5" AbsoluteLayout.LayoutFlags="All">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.7,0.3" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
@@ -68,8 +68,9 @@
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Grid.Row="0" x:Name="DVBTDriverButton" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DVBTButton_Clicked" />
-            <Button Grid.Column="0" Grid.Row="1" x:Name="SDRDriverButton" Text="{local:LngXamlExt Input='SDR'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="SDRButton_Clicked"/>
+            <local:ImgButton Grid.Column="0" Grid.Row="0" TopTitleText="{local:LngXamlExt Input='DVBT (DVBT/DVBT2)'}" x:Name="DVBTDriverButton" TextFontSize="{Binding FontSizeForLabel}" Img="configdriver.png" TapCommand="{Binding CommandDVBT}" HorizontalOptions="Center" VerticalOptions="Center" Margin="10,0,0,0"/>
+            <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='SDR  (FM/DAB)'}" x:Name="SDRDriverButton" TextFontSize="{Binding FontSizeForLabel}" Img="configdriver.png" TapCommand="{Binding CommandSDR}" HorizontalOptions="Center" VerticalOptions="Center" Margin="10,0,0,0"/>            
+            
           </Grid>
 
     </AbsoluteLayout>

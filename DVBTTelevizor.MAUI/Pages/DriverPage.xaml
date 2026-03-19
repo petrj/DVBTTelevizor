@@ -4,7 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.DriverPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Driver'}">
+             Title="{Binding SelectedDriverTitle}">
 
     <ContentPage.Resources>
         <ResourceDictionary>

@@ -46,6 +46,18 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
+    public DriverTypeEnum? SelectedDriver
+    {
+        get
+        {
+            return _driverPageViewModel?.SelectedDriver;
+        }
+        set
+        {
+            _driverPageViewModel?.SelectedDriver = value;
+        }
+    }
+
     private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
     {
         _driverPageViewModel.MenuVisible = e.IsVisible;
