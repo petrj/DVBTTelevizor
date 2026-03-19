@@ -62,14 +62,21 @@
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.7,0.3" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <local:ImgButton Grid.Column="0" Grid.Row="0" TopTitleText="{local:LngXamlExt Input='DVBT (DVBT/DVBT2)'}" x:Name="DVBTDriverButton" TextFontSize="{Binding FontSizeForLabel}" Img="configdriver.png" TapCommand="{Binding CommandDVBT}" HorizontalOptions="Center" VerticalOptions="Center" Margin="10,0,0,0"/>
-            <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='SDR  (FM/DAB)'}" x:Name="SDRDriverButton" TextFontSize="{Binding FontSizeForLabel}" Img="configdriver.png" TapCommand="{Binding CommandSDR}" HorizontalOptions="Center" VerticalOptions="Center" Margin="10,0,0,0"/>            
+            <Frame Grid.Column="0" Grid.Row="0" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton  TopTitleText="{local:LngXamlExt Input='DVBT (DVBT/DVBT2)'}" x:Name="DVBTDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandDVBT}" HorizontalOptions="Center" VerticalOptions="Center" Margin="10,0,0,0" TextColor="Black"/>
+            </Frame>
+
+            <Frame Grid.Column="0" Grid.Row="2" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='SDR  (FM/DAB)'}" x:Name="SDRDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandSDR}" HorizontalOptions="Center" VerticalOptions="Center" Margin="10,0,0,0"  TextColor="Black"/>
+            </Frame>
+            
             
           </Grid>
 
