@@ -27,11 +27,11 @@
                         HorizontalTextAlignment="Start"
                         VerticalOptions="Center"
                         HorizontalOptions="StartAndExpand"
-                        TextColor="White"
+                        TextColor="{Binding TextColor, Source={x:Reference ImgBtn}}"
                         Margin="5,0,0,0"/>
 
                 <Label x:Name="BottomTitle" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding BottomTitleText, Source={x:Reference ImgBtn}}"
-                        FontSize="{Binding TextFontSize, Source={x:Reference ImgBtn}}"
+                        FontSize="{Binding TextColor, Source={x:Reference ImgBtn}}"
                         FontAttributes="Bold"
                         HorizontalTextAlignment="Start"
                         VerticalOptions="Start"

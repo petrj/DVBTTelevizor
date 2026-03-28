@@ -1426,7 +1426,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         Port = _configuration.SDRDriverPort,
                         Streamport = _configuration.SDRDriverStreamPort,
-                        SDRSampleRate = BaseViewModel.RTLSDRFMSampleRate
+                        SDRSampleRate = AudioTools.FMSampleRate
                     };
 
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
@@ -1440,7 +1440,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         Port = _configuration.SDRDriverPort,
                         Streamport = _configuration.SDRDriverStreamPort,
-                        SDRSampleRate =  BaseViewModel.RTLSDRDABSampleRate
+                        SDRSampleRate = AudioTools.DABSampleRate
                     };
 
                     WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
