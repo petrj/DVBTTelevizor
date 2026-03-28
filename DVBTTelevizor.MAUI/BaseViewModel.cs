@@ -17,7 +17,7 @@ namespace DVBTTelevizor.MAUI
         protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
-        private DriverTypeEnum? _selectedDriver = null;
+
 
         private bool _menuVisible = false;
 
@@ -164,51 +164,8 @@ namespace DVBTTelevizor.MAUI
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 OnPropertyChanged(nameof(ConnectedDevice));
-                OnPropertyChanged(nameof(DriverStateStatus));
                 OnPropertyChanged(nameof(DriversBoxVisible));
             });
-        }
-
-        public void NotifySelectedDriverChange()
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                OnPropertyChanged(nameof(SelectedDriver));
-                OnPropertyChanged(nameof(SelectedDriverTitle));
-            });
-        }
-
-        public DriverTypeEnum? SelectedDriver
-        {
-            get
-            {
-                return _selectedDriver;
-            }
-            set
-            {
-                _selectedDriver = value;
-
-                NotifySelectedDriverChange();
-            }
-        }
-
-        public string SelectedDriverTitle
-        {
-            get
-            {
-                switch (_selectedDriver)
-                {
-                    case DriverTypeEnum.AndroidDVBTDriver:
-                    case DriverTypeEnum.AndroidTestingDVBTDriver:
-                    case DriverTypeEnum.TestTuneDriver:
-                        return "DVB-T Driver".Translated();
-                    case DriverTypeEnum.RTLSDRDriverDAB:
-                    case DriverTypeEnum.RTLSDRDriverFM:
-                        return "SDR Driver".Translated();
-                    default:
-                        return "Driver".Translated();
-                }
-            }            
         }
 
         public int GetScaledSize(int normalSize)
@@ -336,23 +293,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string DriverStateStatus
-        {
-            get
-            {
-                if (_driver == null || !_driver.DriverInstalled)
-                {
-                    return "Driver not installed!".Translated();
-                }
 
-                if (_driver.Connected)
-                {
-                    return "Connected".Translated();
-                }
-
-                return "Disconnected".Translated();
-            }
-        }
 
         public bool DriversBoxVisible
         {

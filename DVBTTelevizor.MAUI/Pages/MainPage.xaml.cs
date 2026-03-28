@@ -821,7 +821,7 @@ namespace DVBTTelevizor.MAUI
                         dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
                         //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
 
-                        _driver = new RTLSDRFMDriverConnector(_loggingService,
+                        _driver = new RTLSDRDABDriverConnector(_loggingService,
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
                             dabDemoduator);
                     break;

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using RTLSDR;
 using System;
@@ -15,6 +16,7 @@ namespace DVBTTelevizor.MAUI
     {
         private string _range = string.Empty;
         private DriverState? _driverState = null;
+        private DriverTypeEnum? _pageDriver = null;
 
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
@@ -54,18 +56,57 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+
+        public DriverTypeEnum? PageDriver
+        {
+            get
+            {
+                return _pageDriver;
+            }
+            set
+            {
+                _pageDriver = value;
+
+                NotifyChange();
+            }
+        }
+
+        public string PageDriverTitle
+        {
+            get
+            {
+                switch (_pageDriver)
+                {
+                    case DriverTypeEnum.AndroidDVBTDriver:
+                    case DriverTypeEnum.AndroidTestingDVBTDriver:
+                    case DriverTypeEnum.TestTuneDriver:
+                        return "DVB-T Driver".Translated();
+                    case DriverTypeEnum.RTLSDRDriverDAB:
+                    case DriverTypeEnum.RTLSDRDriverFM:
+                        return "SDR Driver".Translated();
+                    default:
+                        return "Driver".Translated();
+                }
+            }
+        }
+
         public void NotifyChange()
         {
+            //MainThread.BeginInvokeOnMainThread(async () =>
+            //{
+            OnPropertyChanged(nameof(PageDriver));
+            OnPropertyChanged(nameof(PageDriverTitle));
             OnPropertyChanged(nameof(DriverIconImage));
             OnPropertyChanged(nameof(LastTuneFrequency));
             OnPropertyChanged(nameof(ConnectedDeviceVisible));
-            OnPropertyChanged(nameof(DriverStateStatus));
+            OnPropertyChanged(nameof(StatusTitle));
             OnPropertyChanged(nameof(InstallDriverButtonVisible));
             OnPropertyChanged(nameof(DisconnectButtonVisible));
             OnPropertyChanged(nameof(ConnectButtonVisible));
             OnPropertyChanged(nameof(ConnectedDeviceRange));
             OnPropertyChanged(nameof(DriverPreferencesVisible));
             OnPropertyChanged(nameof(Bitrate));
+            //});
         }
 
 
@@ -99,6 +140,60 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return "dongleorange.png";
+            }
+        }
+
+        private bool SameDriver
+        {
+            get
+            {
+                if (_driver == null || _pageDriver == null)
+                {
+                    return false;
+                }
+
+                if (_driver is RTLSDRDABDriverConnector)
+                {
+                    return
+                            _pageDriver == DriverTypeEnum.RTLSDRDriverDAB ||
+                            _pageDriver == DriverTypeEnum.RTLSDRDriverFM;
+                }
+
+                if (_driver is RTLSDRDriverConnector)
+                {
+                    return
+                            _pageDriver == DriverTypeEnum.AndroidDVBTDriver;
+                }
+
+                return false;
+            }
+        }
+
+        public string StatusTitle
+        {
+            get
+            {
+                if (_driver == null)
+                {
+                    return "No driver".Translated();
+                }
+
+                if (!SameDriver)
+                {
+                    return "Not connected".Translated();
+                }
+
+                if ( !_driver.DriverInstalled)
+                {
+                    return "Driver not installed".Translated();
+                }
+
+                if (_driver.Connected)
+                {
+                    return "Connected".Translated();
+                }
+
+                return "Disconnected".Translated();
             }
         }
 

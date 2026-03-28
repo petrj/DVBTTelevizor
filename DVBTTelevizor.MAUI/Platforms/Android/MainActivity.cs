@@ -30,6 +30,7 @@ namespace DVBTTelevizor.MAUI
         private const int StartRequestCodeDriverPreferences = 1002;
         private const int FolderAccessRequestCode = 1003;
         private const int StorageAccessRequestCode = 1004;
+        private Dictionary<int,bool> _ignoreRequest = new Dictionary<int,bool>();
         private int _audioSampleRate = 96000;
         private int _audioChannels = 2;
         private bool _startAudioReceiverThread = false;
@@ -749,12 +750,13 @@ namespace DVBTTelevizor.MAUI
                 _SDRDriverStreamPort = streamPort;
                 _SDRDriverPort = port;
 
+                _ignoreRequest[StartRequestCodeRTLSDR] = false;
                 StartActivityForResult(req, StartRequestCodeRTLSDR);
             }
             catch (ActivityNotFoundException ex)
             {
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
-
+                _ignoreRequest[StartRequestCodeRTLSDR] = true;
                 _loggingService.Info("Activity not found");
                 WeakReferenceMessenger.Default.Send(new RTLSDRDriverNotInstalledMessage("Device response timeout".Translated()));
             }
@@ -790,11 +792,13 @@ namespace DVBTTelevizor.MAUI
                 });
 
                 _loggingService.Info("Starting activity");
+                _ignoreRequest[StartRequestCode] = false;
                 StartActivityForResult(req, StartRequestCode);
 
             } catch (ActivityNotFoundException e)
             {
                 _loggingService.Info("Activity not found");
+                _ignoreRequest[StartRequestCode] = true;
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
                 WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout".Translated()));
             }
@@ -966,17 +970,19 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
+            if (_ignoreRequest.ContainsKey(requestCode) && _ignoreRequest[requestCode])
+            {
+                _loggingService.Debug($"Ignoring activity result for request code: {requestCode}");
+                _ignoreRequest[requestCode] = false; // reset the flag
+                return;
+            }
+
             if (requestCode == StartRequestCode)
             {
                 ProcessDriverConnectResult(resultCode,data);
             }
             if (requestCode == StartRequestCodeRTLSDR)
             {
-                if (resultCode == Result.Canceled)
-                {
-                    return;
-                }
-
                 if (resultCode == Result.Ok)
                 {
                     var x = data.GetIntExtra("SDRDriverPort", 1234);

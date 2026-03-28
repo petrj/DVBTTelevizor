@@ -134,7 +134,7 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
             return;
         }
 
-        _driverPage.SelectedDriver = driverType;
+        _driverPage.PageDriver = driverType;
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {

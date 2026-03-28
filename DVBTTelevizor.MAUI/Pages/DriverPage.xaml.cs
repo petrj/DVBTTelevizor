@@ -46,15 +46,15 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
-    public DriverTypeEnum? SelectedDriver
+    public DriverTypeEnum? PageDriver
     {
         get
         {
-            return _driverPageViewModel?.SelectedDriver;
+            return _driverPageViewModel?.PageDriver;
         }
         set
         {
-            _driverPageViewModel?.SelectedDriver = value;
+            _driverPageViewModel?.PageDriver = value;
         }
     }
 
@@ -167,14 +167,16 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            //if (_driverPageViewModel.DVBTDriverActive)
-            //{
-            //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-            //}
-            //else
-            //{
-            //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-            //}
+            switch (_driverPageViewModel.PageDriver)
+            {
+                case DriverTypeEnum.AndroidDVBTDriver:
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                        break;
+                    case DriverTypeEnum.RTLSDRDriverDAB:
+                case DriverTypeEnum.RTLSDRDriverFM:
+                    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                        break;
+            }
         });
     }
 
@@ -196,14 +198,16 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage DriverPreferencesButton_Clicked");
 
-        //if (_driverPageViewModel.DVBTDriverActive)
-        //{
-        //    WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("info.martinmarinov.dvbdriver"));
-        //}
-        //else
-        //{
-        //    WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("marto.rtl_tcp_andro"));
-        //}
+        switch (_driverPageViewModel.PageDriver)
+        {
+            case DriverTypeEnum.AndroidDVBTDriver:
+                    WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("info.martinmarinov.dvbdriver"));
+                 break;
+            case DriverTypeEnum.RTLSDRDriverDAB:
+            case DriverTypeEnum.RTLSDRDriverFM:
+                    WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("marto.rtl_tcp_andro"));
+                 break;
+        }
     }
 
     private void Menu_Tapped(object sender, EventArgs e)
