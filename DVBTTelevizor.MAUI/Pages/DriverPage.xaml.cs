@@ -39,8 +39,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
         //{
-        //    _driver = m.Value;
-        //    _driverPageViewModel.UpdateActiveDriverType();
+        //    //_driver = m.Value;
+        //    //.UpdateActiveDriverType();
         //});
 
         BuildFocusableItems();

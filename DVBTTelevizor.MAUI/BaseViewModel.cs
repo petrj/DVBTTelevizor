@@ -2,6 +2,7 @@
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
+using NAudio.Dsp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +19,8 @@ namespace DVBTTelevizor.MAUI
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
 
+        private bool? _dvbtDriverInstalled = null;
+        private bool? _rtlsdrDriverInstalled = null;
 
         private bool _menuVisible = false;
 
@@ -36,6 +39,14 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
+
+            WeakReferenceMessenger.Default.Register<CheckDriversResultMessage>(this, (r, m) =>
+            {
+                DvbtDriverInstalled = m.Value.DVBT;
+                RtlsdrDriverInstalled = m.Value.RTLSDR;
+
+            });
+
 
             //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             //{
@@ -300,6 +311,23 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return _configuration.RTLSDREnabled;
+            }
+        }
+
+        public bool? DvbtDriverInstalled
+        {
+            get => _dvbtDriverInstalled;
+            set
+            {
+                _dvbtDriverInstalled = value;
+            }
+        }
+        public bool? RtlsdrDriverInstalled
+        {
+            get => _rtlsdrDriverInstalled;
+            set
+            {
+                _rtlsdrDriverInstalled = value;
             }
         }
     }

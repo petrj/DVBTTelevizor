@@ -229,7 +229,20 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver == null || !_driver.DriverInstalled);
+                if (_pageDriver == DriverTypeEnum.AndroidDVBTDriver ||
+                    _pageDriver == DriverTypeEnum.AndroidTestingDVBTDriver ||
+                    _pageDriver == DriverTypeEnum.TestTuneDriver)
+                {
+                    return DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value;
+                }
+
+                if (_pageDriver == DriverTypeEnum.RTLSDRDriverFM ||
+                    _pageDriver == DriverTypeEnum.RTLSDRDriverDAB )
+                {
+                    return RtlsdrDriverInstalled.HasValue && !RtlsdrDriverInstalled.Value;
+                }
+
+                return false;
             }
         }
 

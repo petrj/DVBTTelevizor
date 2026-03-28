@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="net.petrjanousek.DVBTTelevizor" >
-	<application 
+    <!-- Declare package visibility for Android 11+ so GetApplicationInfo/GetLaunchIntentForPackage can detect these apps -->
+    <queries>
+        <package android:name="marto.rtl_tcp_andro" />
+        <package android:name="info.martinmarinov.dvbdriver" />
+    </queries>
+
+    <application 
 		android:allowBackup="true" 
 		android:supportsRtl="true" 
 		android:label="DVBT Televizor" 

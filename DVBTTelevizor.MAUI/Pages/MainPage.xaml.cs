@@ -1357,7 +1357,8 @@ namespace DVBTTelevizor.MAUI
 
                 InitializeVLC();
 
-                ConnectDriver();
+                //ConnectDriver();
+                WeakReferenceMessenger.Default.Send(new CheckDriversRequestMessage(null));
 
                 Task.Run(async () =>
                 {

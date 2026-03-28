@@ -316,6 +316,14 @@ namespace DVBTTelevizor.MAUI
                 OpenBatterySettings();
             });
 
+            WeakReferenceMessenger.Default.Register<CheckDriversRequestMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new CheckDriversResultMessage(new CheckDriversResult()
+                {
+                    DVBT = IsAppAvailable("info.martinmarinov.dvbdriver"),
+                    RTLSDR = IsAppAvailable("marto.rtl_tcp_andro")
+                }));
+            });
         }
 
         public void SetFullScreen(bool enable)
@@ -733,6 +741,26 @@ namespace DVBTTelevizor.MAUI
             {
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Failed to show driver preferences".Translated()));
                 _loggingService.Error(ex, "Failed to show driver preferences");
+            }
+        }
+
+        public bool IsAppAvailable(string packageName)
+        {
+            try
+            {
+                var pm = Android.App.Application.Context.PackageManager;
+                // GetApplicationInfo throws NameNotFoundException if package not installed
+                pm.GetApplicationInfo(packageName, 0);
+                return true;
+            }
+            catch (PackageManager.NameNotFoundException)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _loggingService?.Error(ex, "IsAppAvailable failed");
+                return false;
             }
         }
 
