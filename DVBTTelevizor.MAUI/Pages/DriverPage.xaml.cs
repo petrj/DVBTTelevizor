@@ -37,6 +37,13 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         BindingContext = _driverPageViewModel = new DriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
+        WeakReferenceMessenger.Default.Register<CheckDriversResultMessage>(this, (r, m) =>
+        {
+            _driverPageViewModel.DvbtDriverInstalled = m.Value.DVBT;
+            _driverPageViewModel.RtlsdrDriverInstalled = m.Value.RTLSDR;
+
+        });
+
         //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
         //{
         //    //_driver = m.Value;
@@ -77,13 +84,14 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     protected override void OnAppearing()
     {
-        base.OnAppearing();
+        base.OnAppearing();        
 
         Task.Run(async () =>
         {
+
             //_driverPageViewModel.UpdateActiveDriverType();
-            await _driverPageViewModel.CheckDriver();
-            _driverPageViewModel.NotifyChange();
+            //await _driverPageViewModel.CheckDriver();
+            //_driverPageViewModel.NotifyChange();
         });
 
         _focusItems.DeFocusAll();

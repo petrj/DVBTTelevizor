@@ -1346,6 +1346,7 @@ namespace DVBTTelevizor.MAUI
 
             base.OnAppearing();
 
+
             if (_firstAppearing)
             {
                 if (_configuration.Fullscreen)
@@ -1357,8 +1358,7 @@ namespace DVBTTelevizor.MAUI
 
                 InitializeVLC();
 
-                //ConnectDriver();
-                WeakReferenceMessenger.Default.Send(new CheckDriversRequestMessage(null));
+                //ConnectDriver();                
 
                 Task.Run(async () =>
                 {
@@ -2352,14 +2352,6 @@ namespace DVBTTelevizor.MAUI
             if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
             {
                 _loggingService.Info("Action not completed!");
-            }
-        }
-
-        public async Task CheckDriverInstallationChange()
-        {
-            if (!_driver.DriverInstalled)
-            {
-                CheckDriver();
             }
         }
 

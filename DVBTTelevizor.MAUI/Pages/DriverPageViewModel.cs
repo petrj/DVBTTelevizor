@@ -16,7 +16,11 @@ namespace DVBTTelevizor.MAUI
     {
         private string _range = string.Empty;
         private DriverState? _driverState = null;
+        
         private DriverTypeEnum? _pageDriver = null;
+        private bool? _dvbtDriverInstalled = null;
+        private bool? _rtlsdrDriverInstalled = null;
+
 
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
@@ -31,6 +35,25 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run(async () => CheckDriver());
             });
+        }
+
+        public bool? DvbtDriverInstalled
+        {
+            get => _dvbtDriverInstalled;
+            set
+            {
+                _dvbtDriverInstalled = value;
+                NotifyChange();
+            }
+        }
+        public bool? RtlsdrDriverInstalled
+        {
+            get => _rtlsdrDriverInstalled;
+            set
+            {
+                _rtlsdrDriverInstalled = value;
+                NotifyChange();
+            }
         }
 
         public async Task CheckDriver()
@@ -92,21 +115,24 @@ namespace DVBTTelevizor.MAUI
 
         public void NotifyChange()
         {
-            //MainThread.BeginInvokeOnMainThread(async () =>
-            //{
-            OnPropertyChanged(nameof(PageDriver));
-            OnPropertyChanged(nameof(PageDriverTitle));
-            OnPropertyChanged(nameof(DriverIconImage));
-            OnPropertyChanged(nameof(LastTuneFrequency));
-            OnPropertyChanged(nameof(ConnectedDeviceVisible));
-            OnPropertyChanged(nameof(StatusTitle));
-            OnPropertyChanged(nameof(InstallDriverButtonVisible));
-            OnPropertyChanged(nameof(DisconnectButtonVisible));
-            OnPropertyChanged(nameof(ConnectButtonVisible));
-            OnPropertyChanged(nameof(ConnectedDeviceRange));
-            OnPropertyChanged(nameof(DriverPreferencesVisible));
-            OnPropertyChanged(nameof(Bitrate));
-            //});
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                OnPropertyChanged(nameof(PageDriver));
+                OnPropertyChanged(nameof(PageDriverTitle));
+                OnPropertyChanged(nameof(ConnectButtonVisible));
+                OnPropertyChanged(nameof(DriverPreferencesVisible));
+
+                OnPropertyChanged(nameof(InstallDriverButtonVisible));
+                OnPropertyChanged(nameof(DriverIconImage));
+                OnPropertyChanged(nameof(LastTuneFrequency));
+                OnPropertyChanged(nameof(ConnectedDeviceVisible));
+                OnPropertyChanged(nameof(StatusTitle));
+                
+                OnPropertyChanged(nameof(DisconnectButtonVisible));                
+                OnPropertyChanged(nameof(ConnectedDeviceRange));
+                
+                OnPropertyChanged(nameof(Bitrate));
+            });
         }
 
 
@@ -201,7 +227,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && _driver.DriverInstalled;
+                return !InstallDriverButtonVisible;
             }
         }
 
@@ -223,36 +249,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-
-
-        public bool InstallDriverButtonVisible
-        {
-            get
-            {
-                if (_pageDriver == DriverTypeEnum.AndroidDVBTDriver ||
-                    _pageDriver == DriverTypeEnum.AndroidTestingDVBTDriver ||
-                    _pageDriver == DriverTypeEnum.TestTuneDriver)
-                {
-                    return DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value;
-                }
-
-                if (_pageDriver == DriverTypeEnum.RTLSDRDriverFM ||
-                    _pageDriver == DriverTypeEnum.RTLSDRDriverDAB )
-                {
-                    return RtlsdrDriverInstalled.HasValue && !RtlsdrDriverInstalled.Value;
-                }
-
-                return false;
-            }
-        }
-
         public bool DisconnectButtonVisible
         {
             get
             {
-                return (_driver != null &&
+                if (!SameDriver)
+                    return false;
 
-                    _driver.DriverInstalled && _driver.Connected);
+                return !InstallDriverButtonVisible && _driver.Connected;
             }
         }
 
@@ -260,9 +264,56 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null &&
-                        _driver.DriverInstalled &&
-                        !_driver.Connected);
+                if (_driver == null)
+                {
+                    return false;
+                }
+
+                if (SameDriver)
+                {
+                    return !_driver.Connected;
+                } else
+                {
+                    if (_driver.Connected)
+                        return false; // other driver is already connected
+
+                    // show connect button only if the other driver is installed
+                    switch (_pageDriver)
+                    {
+                        case DriverTypeEnum.AndroidDVBTDriver:
+                        case DriverTypeEnum.AndroidTestingDVBTDriver:
+                        case DriverTypeEnum.TestTuneDriver:
+                            return DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value;
+
+                        case DriverTypeEnum.RTLSDRDriverFM:
+                        case DriverTypeEnum.RTLSDRDriverDAB:
+                            return RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value;
+
+                        default:
+                            return false;
+                    }
+                }
+            }
+        }
+
+        public bool InstallDriverButtonVisible
+        {
+            get
+            {
+                switch (_pageDriver)
+                {
+                    case DriverTypeEnum.AndroidDVBTDriver:
+                    case DriverTypeEnum.AndroidTestingDVBTDriver:
+                    case DriverTypeEnum.TestTuneDriver:
+                        return DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value;
+
+                    case DriverTypeEnum.RTLSDRDriverFM:
+                    case DriverTypeEnum.RTLSDRDriverDAB:
+                        return RtlsdrDriverInstalled.HasValue && !RtlsdrDriverInstalled.Value;
+
+                    default:
+                        return false;
+                }
             }
         }
 

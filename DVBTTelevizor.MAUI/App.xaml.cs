@@ -1,4 +1,5 @@
-﻿using DVBTTelevizor.MAUI.Messages;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.MAUI.Messages;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -17,6 +18,8 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnStart()
         {
+            // always check driver change when appearing main page
+            WeakReferenceMessenger.Default.Send(new CheckDriversRequestMessage(null));
         }
 
         protected override void OnSleep()
@@ -39,6 +42,9 @@ namespace DVBTTelevizor.MAUI
             {
                 _resuming = true;
 
+                // always check driver change when appearing main page
+                WeakReferenceMessenger.Default.Send(new CheckDriversRequestMessage(null));
+
                 if (_mp != null)
                 {
                     Task.Run(async () =>
@@ -52,7 +58,7 @@ namespace DVBTTelevizor.MAUI
                             _mp.SetFixVideNeeded();
                         }
 
-                        await _mp.CheckDriverInstallationChange();
+                        //await _mp.CheckDriverInstallationChange();
                         await _mp.FocusSelectedChannel();
                     });
                 }
