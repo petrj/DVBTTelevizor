@@ -192,9 +192,16 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage ConnectButton_Clicked");
 
-        // TODO: check driver!
+        // SameDriver: 
+        //  -   RTLSDR driver: show menu Conenct FM or DAB
+        //  -   DVTB driver: Connect (no menu, because only one driver)
+        // NOT same driver:
+        //  -   RTLSDR driver: Show confirm menu to change driver and connect
+        //  -   DVBT driver: Show confirm menu to change driver and connect FM/DAB
 
-        WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+
+        // WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+        // _appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver, _driverPageViewModel.PageDriver);        
     }
 
     private void DisconnectButton_Clicked(object sender, EventArgs e)

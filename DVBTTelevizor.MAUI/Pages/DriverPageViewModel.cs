@@ -169,7 +169,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private bool SameDriver
+        public bool SameDriver
         {
             get
             {
