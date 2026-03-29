@@ -178,14 +178,14 @@ namespace DVBTTelevizor.MAUI
                     return false;
                 }
 
-                if (_driver is RTLSDRDABDriverConnector)
+                if (_driver is RTLSDRDriverConnector)
                 {
                     return
                             _pageDriver == DriverTypeEnum.RTLSDRDriverDAB ||
                             _pageDriver == DriverTypeEnum.RTLSDRDriverFM;
                 }
 
-                if (_driver is RTLSDRDriverConnector)
+                if (_driver is DVBTDriverConnector)
                 {
                     return
                             _pageDriver == DriverTypeEnum.AndroidDVBTDriver;
@@ -253,10 +253,19 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (!SameDriver)
+                if (_driver == null)
+                {
                     return false;
+                }
 
-                return !InstallDriverButtonVisible && _driver.Connected;
+                if (SameDriver)
+                {
+                    return _driver.Connected;
+                }
+                else
+                {
+                    return false;                    
+                }
             }
         }
 
