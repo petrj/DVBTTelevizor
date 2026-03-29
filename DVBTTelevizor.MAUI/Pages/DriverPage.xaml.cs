@@ -192,6 +192,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage ConnectButton_Clicked");
 
+        // TODO: check driver!
+
         WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
     }
 
