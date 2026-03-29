@@ -4,6 +4,7 @@ using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Maui.Handlers;
+using RTLSDR.Common;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -197,11 +198,25 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         //  -   DVTB driver: Connect (no menu, because only one driver)
         // NOT same driver:
         //  -   RTLSDR driver: Show confirm menu to change driver and connect
-        //  -   DVBT driver: Show confirm menu to change driver and connect FM/DAB
+        //  -   DVBT driver: Show confirm menu to change driver and connect FM/DAB        
 
+        switch (_driverPageViewModel.PageDriver)
+        {
+            case DriverTypeEnum.RTLSDRDriverDAB:
+            case DriverTypeEnum.RTLSDRDriverFM:
+                if (_driverPageViewModel.SameDriver || !_driver.Connected)
+                {
+                    _appMenu.ShowFMorDABConnectMenu();
+                }
+                else
+                {
+                    // TODO: reconnect menu
+                }                 
+                break;
+        }
 
         // WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-        // _appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver, _driverPageViewModel.PageDriver);        
+         //_appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver, _driverPageViewModel.PageDriver);        
     }
 
     private void DisconnectButton_Clicked(object sender, EventArgs e)
@@ -254,6 +269,14 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                 break;
             case "menuConnectDriver":
                 ConnectButton_Clicked(this, null);
+                break;
+            case "menuConnectFM":                
+                _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriverFM;
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
+                break;
+            case "menuConnectDAB":
+                _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriverDAB;
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
                 break;
         }
     }

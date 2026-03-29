@@ -2,6 +2,7 @@
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
+using RTLSDR.DAB;
 using RTLSDR.FM;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace DVBTTelevizor.TV
         protected ILoggingService _log;
         protected ISDR _driver = null;
         private IDemodulator _demodulator = null;
+        private DateTime _lastTimeForGettingStatus = DateTime.MinValue;
 
         public event DemodulatedEventHandler OnRawAudioDemodulated;
 
@@ -57,6 +59,12 @@ namespace DVBTTelevizor.TV
             if (_demodulator != null && e.Size>0)
             {
                 _demodulator.AddSamples(e.Data, e.Size);
+
+                if ((_demodulator is DABProcessor dab) && ((DateTime.UtcNow - _lastTimeForGettingStatus).TotalMilliseconds>500))
+                {
+                    _log.Debug(dab.Stat(true));
+                    _lastTimeForGettingStatus = DateTime.UtcNow;
+                }                
 
                 // save raw data for analysis
                 //RecordData(e.Data, e.Size);

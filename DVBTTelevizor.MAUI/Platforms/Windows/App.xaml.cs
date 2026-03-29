@@ -31,7 +31,7 @@ namespace DVBTTelevizor.MAUI.WinUI
                 testDVBTDriver.PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath();
                 testDVBTDriver.Connect();
 
-                WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
+                WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
                     new DVBTDriverConfiguration()
                     {
                         DeviceName = "Testing device",
@@ -82,7 +82,7 @@ namespace DVBTTelevizor.MAUI.WinUI
             {
                 if (obj.Value is DriverSettings settings)
                 {
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(new DVBTDriverConfiguration()
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                     {
                         DeviceName = "rtl_sdr bin",
                         ControlPort = 1234,

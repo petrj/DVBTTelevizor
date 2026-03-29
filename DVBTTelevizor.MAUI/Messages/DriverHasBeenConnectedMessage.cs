@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class ConnectDriverMessage : DVBTDriverConnectMessages<DVBTDriverConfiguration>
+    public class DriverHasBeenConnectedMessage : DVBTDriverConnectMessages<DVBTDriverConfiguration>
     {
-        public ConnectDriverMessage(DVBTDriverConfiguration value) : base(value)
+        public DriverHasBeenConnectedMessage(DVBTDriverConfiguration value) : base(value)
         {
 
         }

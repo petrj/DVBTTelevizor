@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -398,16 +399,16 @@ namespace DVBTTelevizor.MAUI
                 OnKeyDown(m.Value, m.Long);
             });
 
-            WeakReferenceMessenger.Default.Register<ConnectMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<SendConnectDriverRequestMessage>(this, (r, m) =>
             {
-                ConnectDriver();
+                SendConnectDriverRequest();
             });
 
             WeakReferenceMessenger.Default.Register<InitDriverMessage>(this, (r, m) =>
             {
                 InitDriver();
                 InitializeVLC();
-                ConnectDriver();
+                SendConnectDriverRequest();
             });
 
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
@@ -770,7 +771,7 @@ namespace DVBTTelevizor.MAUI
                 case DVBTDriverStateEnum.Unknown:
                 case DVBTDriverStateEnum.Disconnected:
                     {
-                        ConnectDriver();
+                        SendConnectDriverRequest();
                         break;
                     }
                 default:
@@ -812,18 +813,27 @@ namespace DVBTTelevizor.MAUI
                     _driver = new TestTuneConnector(_loggingService);
                     break;
                 case DriverTypeEnum.RTLSDRDriverFM:
+
+                    var fmDemodulator = new FMDemodulator(_loggingService);
+
                     _driver = new RTLSDRFMDriverConnector(_loggingService,
                         _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
-                        new FMDemodulator(_loggingService));
+                        fmDemodulator);
+
+                        fmDemodulator.Start();
                     break;
                 case DriverTypeEnum.RTLSDRDriverDAB:
                         var dabDemoduator = new DABProcessor(_loggingService);
+                         
                         dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
                         //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
 
                         _driver = new RTLSDRDABDriverConnector(_loggingService,
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
                             dabDemoduator);
+
+                        dabDemoduator.Start();  
+                        _driver.Tune(199360000, 1024, 0);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
@@ -1383,7 +1393,7 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void ConnectDriver()
+        private void SendConnectDriverRequest()
         {
             if (_driver.Connected)
                 return;
@@ -1402,7 +1412,7 @@ namespace DVBTTelevizor.MAUI
                     _testDVBTDriver.PublicDirectory = PublicDirectory;
                     _testDVBTDriver.Connect();
 
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
                         new DVBTDriverConfiguration()
                         {
                             DeviceName = "Testing DVBT driver",
@@ -1413,7 +1423,7 @@ namespace DVBTTelevizor.MAUI
 
                 case DriverTypeEnum.TestTuneDriver:
 
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
                         new DVBTDriverConfiguration()
                         {
                             DeviceName = "Test tune driver"
@@ -3462,7 +3472,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case "menuConnectDriver":
-                    WeakReferenceMessenger.Default.Send(new ConnectMessage(System.String.Empty));
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(System.String.Empty));
                     break;
 
                 case "menuInstallDriver":

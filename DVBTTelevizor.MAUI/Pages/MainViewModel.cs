@@ -153,7 +153,7 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
-            WeakReferenceMessenger.Default.Register<ConnectDriverMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<DriverHasBeenConnectedMessage>(this, (r, m) =>
             {
                 ConnectDriver(m.Value);
             });
@@ -952,6 +952,11 @@ namespace DVBTTelevizor.MAUI
             UpdateDriverState();
         }
 
+
+        /// <summary>
+        /// Called only from one single place -> on message DriverHasBeenConnectedMessage received
+        /// </summary>
+        /// <param name="config"></param>
         private void ConnectDriver(DVBTDriverConfiguration config)
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);

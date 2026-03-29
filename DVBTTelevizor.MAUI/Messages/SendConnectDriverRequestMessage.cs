@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    internal class ConnectMessage : ValueChangedMessage<string>
+    internal class SendConnectDriverRequestMessage : ValueChangedMessage<string>
     {
-        public ConnectMessage(string value) : base(value)
+        public SendConnectDriverRequestMessage(string value) : base(value)
         {
 
         }

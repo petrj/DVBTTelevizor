@@ -118,6 +118,22 @@ namespace DVBTTelevizor.MAUI
             Finish("Please confirm driver change:".Translated());
         }
 
+        public void ShowFMorDABConnectMenu()
+        {
+            ShowMenu();
+
+            Clear();
+
+            AddItem(_menu.CreateMenuItem("menuConnectFM", "FM".Translated(), "driver.png"));
+            AddItem(_menu.CreateMenuItem("menuConnectDAB", "DAB".Translated(), "driver.png"));
+
+            var title = "Connect RTLSDR driver".Translated();            
+            
+            AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
+
+            Finish(title);
+        }
+
 
         public void ShowRetryTuneMenu(IDriverConnector driver)
         {
