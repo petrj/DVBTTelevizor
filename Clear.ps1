@@ -15,7 +15,7 @@ foreach ($folder in `
     "DVBTTelevizor.Driver\bin",
     "DVBTTelevizor.Driver\obj",
     "DVBTTelevizor.TV\bin",
-    "DVBTTelevizor.TV\obj",    
+    "DVBTTelevizor.TV\obj",
     "DVBTTelevizor.MAUI\bin",
     "DVBTTelevizor.MAUI\obj",
     "LibVLCSharp.MAUI.Windows\bin",
@@ -47,6 +47,6 @@ foreach ($folder in `
 }
 
 
-Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force #-Verbose
+#Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force #-Verbose
 
 #dotnet restore .\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj --force

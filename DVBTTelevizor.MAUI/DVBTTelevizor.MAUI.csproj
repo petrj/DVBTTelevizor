@@ -24,6 +24,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.26100.0</TargetPlatformMinVersion>
 
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
@@ -49,14 +50,14 @@
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<WindowsPackageType>MSIX</WindowsPackageType>
 	</PropertyGroup>
-	
+
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
 
 	  <!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <UseFastDeployment>false</UseFastDeployment>		
+	  <UseFastDeployment>false</UseFastDeployment>
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
 	</PropertyGroup>
@@ -67,7 +68,7 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  
+
 	</PropertyGroup>
 
 	<ItemGroup>
