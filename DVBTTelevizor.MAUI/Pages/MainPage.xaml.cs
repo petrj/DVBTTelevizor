@@ -40,7 +40,7 @@ namespace DVBTTelevizor.MAUI
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
 
-        private VLCMediaInput _pcmInput = null;
+        private VLCMediaInput _vlcRawAudioInput = null;
 
         private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
@@ -78,7 +78,7 @@ namespace DVBTTelevizor.MAUI
         public Microsoft.Maui.Controls.Command CommandUpdateDriverState { get; set; }
 
         private LibVLC? _LibVLC;
-        private MediaPlayer? _mediaPlayer;
+        private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
         private Media _media;
         private SledovaniTV.SledovaniTV _iptv;
 
@@ -854,31 +854,112 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void _driver_OnRawAudioDemodulated(object sender, DemodulatedEventArgs e)
+        private void ProcessAACAudioData(AACDataDemodulatedEventArgs ed)
+        {
+            try
+            {
+                // Combine ADTS header and AAC payload into a single buffer before sending to the player/UDP.
+                var adtsHeaderLength = ed.ADTSHeader?.Length ?? 0;
+                var dataLength = ed.Data?.Length ?? 0;
+                var adtsFrame = new byte[adtsHeaderLength + dataLength];
+                if (ed.ADTSHeader != null)
+                {
+                    Buffer.BlockCopy(ed.ADTSHeader, 0, adtsFrame, 0, adtsHeaderLength);
+                }
+                if (ed.Data != null)
+                {
+                    Buffer.BlockCopy(ed.Data, 0, adtsFrame, adtsHeaderLength, dataLength);
+                }
+
+                if (_vlcRawAudioInput == null)
+                {
+                    _vlcRawAudioInput = new VLCMediaInput();
+
+                    var mediaOptions = new[]
+                        {
+                        ":demux=aac",
+                        ":live-caching=0",
+                        ":network-caching=0",
+                        ":file-caching=0",
+                        ":sout-mux-caching=0"
+                    };
+
+                    _media = new Media(_LibVLC, _vlcRawAudioInput, mediaOptions);
+
+                    _mediaPlayer.Play(_media);
+                }
+
+                _vlcRawAudioInput.PushData(adtsFrame);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+
+        private void ProcessPCMAudioData(DataDemodulatedEventArgs ed)
+        {
+            try
+            {
+                    if (_vlcRawAudioInput ==null)
+                    {
+                    _vlcRawAudioInput = new VLCMediaInput();
+
+                    var mediaOptions = new[]
+                            {
+                            ":demux=rawaud",
+                            $":rawaud-channels={ed.AudioDescription.Channels}",
+                            $":rawaud-samplerate={ed.AudioDescription.SampleRate}",
+                            ":live-caching=50",
+                            ":file-caching=50",
+                            ":clock-jitter=0",
+                            ":clock-synchro=0",
+                            ":rawaud-fourcc=s16l"
+                        };
+
+                    _media = new Media(_LibVLC, _vlcRawAudioInput, mediaOptions);
+
+                    _mediaPlayer.Play(_media);
+                }
+
+                _vlcRawAudioInput.PushData(ed.Data);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void _driver_OnRawAudioDemodulated(object sender, EventArgs e)
         {
             if (_LibVLC == null)
                 return;
 
-            if (_pcmInput == null)
+            if (e is AACDataDemodulatedEventArgs ed)
             {
-                _pcmInput = new VLCMediaInput();
+                if (ed.Data == null || ed.Data.Length == 0)
+                {
+                    return;
+                }
 
-                var mediaOptions = new[] {
-                    ":demux=rawaud",
-                    $":rawaud-channels={e.Description.Channels}",
-                    $":rawaud-samplerate={e.Description.SampleRate}",
-                    ":live-caching=50",
-                    ":file-caching=50",
-                    ":clock-jitter=0",
-                    ":clock-synchro=0",
-                    $":rawaud-fourcc=s{e.Description.BitsPerSample}l"
-                };
-                _media = new Media(_LibVLC, _pcmInput, mediaOptions);
-
-                _mediaPlayer.Play(_media);
+                ProcessAACAudioData(ed);
             }
+            else
+            {
+                if (e is DataDemodulatedEventArgs dd)
+                {
 
-            _pcmInput.PushData(e.DemodulatedData);
+                    if (dd.Data == null || dd.Data.Length == 0)
+                    {
+                        return;
+                    }
+
+                    ProcessPCMAudioData(dd);
+                }
+            }
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)
@@ -3468,7 +3549,7 @@ namespace DVBTTelevizor.MAUI
 
                 case "menuChangeDriver":
                     await ActionStop(true);
-                    _pcmInput = null;
+                    _vlcRawAudioInput = null;
                     await _viewModel.ChangeDriver(menuItem.DriverType);
                     break;
 

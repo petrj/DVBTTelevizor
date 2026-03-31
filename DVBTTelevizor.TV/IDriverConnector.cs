@@ -29,7 +29,7 @@ namespace DVBTTelevizor
         Stream VideoStream { get; }
         string StreamUrl { get; }
 
-        public event DemodulatedEventHandler OnRawAudioDemodulated;
+        public event EventHandler OnRawAudioDemodulated;
 
         bool Recording { get; }
         bool ReadingStream { get; }

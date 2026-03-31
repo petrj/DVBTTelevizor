@@ -19,7 +19,7 @@ namespace DVBTTelevizor.TV
         private IDemodulator _demodulator = null;
         private DateTime _lastTimeForGettingStatus = DateTime.MinValue;
 
-        public event DemodulatedEventHandler OnRawAudioDemodulated;
+        public event EventHandler OnRawAudioDemodulated;
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator)
         {
@@ -69,18 +69,9 @@ namespace DVBTTelevizor.TV
 
         public virtual void OnDataDemodulated(object? sender, EventArgs e)
         {
-            if ((e is DataDemodulatedEventArgs de) &&
-                OnRawAudioDemodulated != null)
+            if (OnRawAudioDemodulated != null)
             {
-                OnRawAudioDemodulated(this, new DemodulatedEventArgs(de.Data)
-                {
-                     Description = new AudioDataDescription()
-                     {
-                          BitsPerSample = 16,
-                          Channels = 2,
-                          SampleRate = _demodulator.Samplerate
-                     }
-                });
+                OnRawAudioDemodulated(sender, e);
             }
         }
 
