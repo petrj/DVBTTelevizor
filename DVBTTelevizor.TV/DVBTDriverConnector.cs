@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using MPEGTS;
 using System.Threading;
 using LoggerService;
+using DVBTTelevizor.TV;
 
 namespace DVBTTelevizor
 {
@@ -1770,6 +1771,12 @@ namespace DVBTTelevizor
                 res.Result = DVBTDriverSearchProgramResultEnum.Error;
                 return res;
             }
+        }
+
+        public Task SetGain(GainEnum gain, int value = 0)
+        {
+            // not needed in DVBT
+            return Task.CompletedTask;
         }
 
         //public int FrequencyMinKHz

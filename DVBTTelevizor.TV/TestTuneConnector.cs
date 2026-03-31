@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.TV;
+using LoggerService;
 using MPEGTS;
 using System;
 using System.Collections.Generic;
@@ -575,6 +576,12 @@ namespace DVBTTelevizor
                 string streamFileName = Path.Combine(PublicDirectory, streamName);
                 return new FileStream(streamFileName, FileMode.Open, FileAccess.Read);
             }
+        }
+
+        public Task SetGain(GainEnum gain, int value = 0)
+        {
+            // not needed in DVBT
+            return Task.CompletedTask;
         }
 
         //public int FrequencyMinKHz

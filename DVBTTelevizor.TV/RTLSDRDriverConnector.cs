@@ -37,6 +37,36 @@ namespace DVBTTelevizor.TV
             _demodulator.OnDemodulated += OnDataDemodulated;
         }
 
+        public async Task SetGain(GainEnum gain, int value = 0)
+        {
+            if (_driver == null)
+            {
+                return;
+            }
+
+            if (gain == GainEnum.HW)
+            {
+                _driver?.SetGain(0);
+                _driver?.SetGainMode(false);
+                _driver?.SetIfGain(true);
+                _driver?.SetAGCMode(true);
+            }
+            else
+            {
+                // always manual
+                _driver?.SetGainMode(true);
+                if (gain == GainEnum.Auto)
+                {
+                    _driver?.SetGain(0);
+                    await _driver?.AutoSetGain();
+                }
+                else
+                {
+                    _driver?.SetGain(value);
+                }
+            }
+        }
+
         public virtual void OnDataDemodulated(object? sender, EventArgs e)
         {
             if ((e is DataDemodulatedEventArgs de) &&
@@ -64,7 +94,7 @@ namespace DVBTTelevizor.TV
                 {
                     _log.Debug(dab.Stat(true));
                     _lastTimeForGettingStatus = DateTime.UtcNow;
-                }                
+                }
 
                 // save raw data for analysis
                 //RecordData(e.Data, e.Size);

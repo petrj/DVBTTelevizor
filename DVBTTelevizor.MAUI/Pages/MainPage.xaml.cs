@@ -824,7 +824,7 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case DriverTypeEnum.RTLSDRDriverDAB:
                         var dabDemoduator = new DABProcessor(_loggingService);
-                         
+
                         dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
                         //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
 
@@ -832,7 +832,8 @@ namespace DVBTTelevizor.MAUI
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
                             dabDemoduator);
 
-                        dabDemoduator.Start();  
+                        dabDemoduator.Start();
+                        _driver.SetGain(GainEnum.Auto);
                         _driver.Tune(199360000, 1024, 0);
                     break;
                 default:
@@ -1368,7 +1369,7 @@ namespace DVBTTelevizor.MAUI
 
                 InitializeVLC();
 
-                //ConnectDriver();                
+                //ConnectDriver();
 
                 Task.Run(async () =>
                 {
