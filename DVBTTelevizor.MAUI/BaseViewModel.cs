@@ -61,12 +61,6 @@ namespace DVBTTelevizor.MAUI
 
         public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
         {
-            // DVBTDriverTypeEnum
-            //   *  AndroidDVBTDriver = 0,            => 0
-            //      AndroidTestingDVBTDriver = 1,
-            //      TestTuneDriver = 2,
-            //   *  RTLSDRTCPIPFMDriver = 3,          => 1
-            //      RTLSDRFMDriver = 4
             switch ((int)driverType)
             {
                 case 0:
@@ -84,12 +78,6 @@ namespace DVBTTelevizor.MAUI
 
         public static string GetDVBTDriverShortName(DriverTypeEnum driverType)
         {
-            // DVBTDriverTypeEnum
-            //   *  AndroidDVBTDriver = 0,            => 0
-            //      AndroidTestingDVBTDriver = 1,
-            //      TestTuneDriver = 2,
-            //   *  RTLSDRTCPIPFMDriver = 3,          => 1
-            //      RTLSDRFMDriver = 4
             switch ((int)driverType)
             {
                 case 0:
@@ -98,6 +86,8 @@ namespace DVBTTelevizor.MAUI
                     return "DVB-T";
                 case 3:
                     return "FM";
+                case 4:
+                    return "DAB";
                 default:
                     return "Driver".Translated();
             }
@@ -303,6 +293,6 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-       
+
     }
 }

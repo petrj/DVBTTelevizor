@@ -16,7 +16,7 @@ namespace DVBTTelevizor.MAUI
     {
         private string _range = string.Empty;
         private DriverState? _driverState = null;
-        
+
         private DriverTypeEnum? _pageDriver = null;
         private bool? _dvbtDriverInstalled = null;
         private bool? _rtlsdrDriverInstalled = null;
@@ -127,10 +127,10 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(LastTuneFrequency));
                 OnPropertyChanged(nameof(ConnectedDeviceVisible));
                 OnPropertyChanged(nameof(StatusTitle));
-                
-                OnPropertyChanged(nameof(DisconnectButtonVisible));                
+
+                OnPropertyChanged(nameof(DisconnectButtonVisible));
                 OnPropertyChanged(nameof(ConnectedDeviceRange));
-                
+
                 OnPropertyChanged(nameof(Bitrate));
             });
         }
@@ -227,6 +227,15 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (_driver == null ||
+                    DvbtDriverInstalled == null ||
+                    !DvbtDriverInstalled.HasValue ||
+                    RtlsdrDriverInstalled == null ||
+                    !RtlsdrDriverInstalled.HasValue)
+                {
+                    return false;
+                }
+
                 return !InstallDriverButtonVisible;
             }
         }
@@ -264,7 +273,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 else
                 {
-                    return false;                    
+                    return false;
                 }
             }
         }
@@ -273,7 +282,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null)
+                if (_driver == null ||
+                    DvbtDriverInstalled == null ||
+                    !DvbtDriverInstalled.HasValue ||
+                    RtlsdrDriverInstalled == null ||
+                    !RtlsdrDriverInstalled.HasValue)
                 {
                     return false;
                 }
@@ -292,11 +305,11 @@ namespace DVBTTelevizor.MAUI
                         case DriverTypeEnum.AndroidDVBTDriver:
                         case DriverTypeEnum.AndroidTestingDVBTDriver:
                         case DriverTypeEnum.TestTuneDriver:
-                            return DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value;
+                            return DvbtDriverInstalled.Value;
 
                         case DriverTypeEnum.RTLSDRDriverFM:
                         case DriverTypeEnum.RTLSDRDriverDAB:
-                            return RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value;
+                            return RtlsdrDriverInstalled.Value;
 
                         default:
                             return false;
