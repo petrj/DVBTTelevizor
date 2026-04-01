@@ -54,7 +54,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
-    public DriverTypeEnum? PageDriver
+    public AppDriverTypeEnum? PageDriver
     {
         get
         {
@@ -85,7 +85,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     protected override void OnAppearing()
     {
-        base.OnAppearing();        
+        base.OnAppearing();
 
         Task.Run(async () =>
         {
@@ -178,11 +178,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         {
             switch (_driverPageViewModel.PageDriver)
             {
-                case DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DVBT:
                         await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
                         break;
-                    case DriverTypeEnum.RTLSDRDriverDAB:
-                case DriverTypeEnum.RTLSDRDriverFM:
+                    case AppDriverTypeEnum.FM:
+                    case AppDriverTypeEnum.DAB:
                     await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
                         break;
             }
@@ -193,17 +193,17 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage ConnectButton_Clicked");
 
-        // SameDriver: 
+        // SameDriver:
         //  -   RTLSDR driver: show menu Conenct FM or DAB
         //  -   DVTB driver: Connect (no menu, because only one driver)
         // NOT same driver:
         //  -   RTLSDR driver: Show confirm menu to change driver and connect
-        //  -   DVBT driver: Show confirm menu to change driver and connect FM/DAB        
+        //  -   DVBT driver: Show confirm menu to change driver and connect FM/DAB
 
         switch (_driverPageViewModel.PageDriver)
         {
-            case DriverTypeEnum.RTLSDRDriverDAB:
-            case DriverTypeEnum.RTLSDRDriverFM:
+            case AppDriverTypeEnum.DAB:
+            case AppDriverTypeEnum.FM:
                 if (_driverPageViewModel.SameDriver || !_driver.Connected)
                 {
                     _appMenu.ShowFMorDABConnectMenu();
@@ -211,12 +211,12 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                 else
                 {
                     // TODO: reconnect menu
-                }                 
+                }
                 break;
         }
 
         // WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-         //_appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver, _driverPageViewModel.PageDriver);        
+         //_appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver, _driverPageViewModel.PageDriver);
     }
 
     private void DisconnectButton_Clicked(object sender, EventArgs e)
@@ -232,11 +232,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         switch (_driverPageViewModel.PageDriver)
         {
-            case DriverTypeEnum.AndroidDVBTDriver:
+            case AppDriverTypeEnum.DVBT:
                     WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("info.martinmarinov.dvbdriver"));
                  break;
-            case DriverTypeEnum.RTLSDRDriverDAB:
-            case DriverTypeEnum.RTLSDRDriverFM:
+            case AppDriverTypeEnum.DAB:
+            case AppDriverTypeEnum.FM:
                     WeakReferenceMessenger.Default.Send(new ShowDriverPrefrencesMessage("marto.rtl_tcp_andro"));
                  break;
         }
@@ -270,12 +270,12 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             case "menuConnectDriver":
                 ConnectButton_Clicked(this, null);
                 break;
-            case "menuConnectFM":                
-                _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriverFM;
+            case "menuConnectFM":
+                _configuration.AppDriverType = AppDriverTypeEnum.FM;
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
                 break;
             case "menuConnectDAB":
-                _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriverDAB;
+                _configuration.AppDriverType = AppDriverTypeEnum.DAB;
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
                 break;
         }

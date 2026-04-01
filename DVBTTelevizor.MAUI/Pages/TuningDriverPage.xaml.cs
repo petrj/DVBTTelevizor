@@ -1,6 +1,7 @@
 
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -141,24 +142,24 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningDriverPage: DVBTButton_Clicked");
 
-        await ShowPage(_tuningModePage, DriverTypeEnum.AndroidDVBTDriver);
+        await ShowPage(_tuningModePage, AppDriverTypeEnum.DVBT);
     }
 
     private async void FMButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage: FMButton_Clicked");
 
-        await ShowPage(_tuningFrequencyPage, DriverTypeEnum.RTLSDRDriverFM);
+        await ShowPage(_tuningFrequencyPage, AppDriverTypeEnum.FM);
     }
 
     private async void DABButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage:     private void DABButton_Clicked(object sender, EventArgs e)\r\n");
 
-        await ShowPage(_tuningFrequencyPage, DriverTypeEnum.RTLSDRDriverDAB);
+        await ShowPage(_tuningFrequencyPage, AppDriverTypeEnum.DAB);
     }
 
-    private async Task ShowPage(Page page, DriverTypeEnum driverType)
+    private async Task ShowPage(Page page, AppDriverTypeEnum driverType)
     {
         if (page.IsLoaded)
         {
@@ -166,7 +167,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
             return;
         }
 
-        _configuration.DVBTDriverType = driverType;
+        _configuration.AppDriverType = driverType;
         // update settings according to selected driver
         _tuningSettings.LoadFromConfiguration(_configuration);
 
@@ -180,14 +181,14 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
 
         switch (driverType)
         {
-            case DriverTypeEnum.AndroidDVBTDriver:
+            case AppDriverTypeEnum.DVBT:
                 _tuningSettings.DVBT = true;
                 _tuningSettings.DVBT2 = true;
                 break;
-            case DriverTypeEnum.RTLSDRDriverFM:
+            case AppDriverTypeEnum.FM:
                 _tuningSettings.FM = true;
                 break;
-            case DriverTypeEnum.RTLSDRDriverDAB:
+            case AppDriverTypeEnum.DAB:
                 _tuningSettings.DAB = true;
                 break;
         }

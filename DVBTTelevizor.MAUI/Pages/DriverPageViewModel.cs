@@ -17,7 +17,7 @@ namespace DVBTTelevizor.MAUI
         private string _range = string.Empty;
         private DriverState? _driverState = null;
 
-        private DriverTypeEnum? _pageDriver = null;
+        private AppDriverTypeEnum? _pageDriver = null;
         private bool? _dvbtDriverInstalled = null;
         private bool? _rtlsdrDriverInstalled = null;
 
@@ -80,7 +80,7 @@ namespace DVBTTelevizor.MAUI
         }
 
 
-        public DriverTypeEnum? PageDriver
+        public AppDriverTypeEnum? PageDriver
         {
             get
             {
@@ -100,12 +100,10 @@ namespace DVBTTelevizor.MAUI
             {
                 switch (_pageDriver)
                 {
-                    case DriverTypeEnum.AndroidDVBTDriver:
-                    case DriverTypeEnum.AndroidTestingDVBTDriver:
-                    case DriverTypeEnum.TestTuneDriver:
+                    case AppDriverTypeEnum.DVBT:
                         return "DVB-T Driver".Translated();
-                    case DriverTypeEnum.RTLSDRDriverDAB:
-                    case DriverTypeEnum.RTLSDRDriverFM:
+                    case AppDriverTypeEnum.DAB:
+                    case AppDriverTypeEnum.FM:
                         return "SDR Driver".Translated();
                     default:
                         return "Driver".Translated();
@@ -181,14 +179,14 @@ namespace DVBTTelevizor.MAUI
                 if (_driver is RTLSDRDriverConnector)
                 {
                     return
-                            _pageDriver == DriverTypeEnum.RTLSDRDriverDAB ||
-                            _pageDriver == DriverTypeEnum.RTLSDRDriverFM;
+                            _pageDriver == AppDriverTypeEnum.DAB ||
+                            _pageDriver == AppDriverTypeEnum.FM;
                 }
 
                 if (_driver is DVBTDriverConnector)
                 {
                     return
-                            _pageDriver == DriverTypeEnum.AndroidDVBTDriver;
+                            _pageDriver == AppDriverTypeEnum.DVBT;
                 }
 
                 return false;
@@ -302,13 +300,11 @@ namespace DVBTTelevizor.MAUI
                     // show connect button only if the other driver is installed
                     switch (_pageDriver)
                     {
-                        case DriverTypeEnum.AndroidDVBTDriver:
-                        case DriverTypeEnum.AndroidTestingDVBTDriver:
-                        case DriverTypeEnum.TestTuneDriver:
+                        case AppDriverTypeEnum.DVBT:
                             return DvbtDriverInstalled.Value;
 
-                        case DriverTypeEnum.RTLSDRDriverFM:
-                        case DriverTypeEnum.RTLSDRDriverDAB:
+                        case AppDriverTypeEnum.FM:
+                        case AppDriverTypeEnum.DAB:
                             return RtlsdrDriverInstalled.Value;
 
                         default:
@@ -324,13 +320,11 @@ namespace DVBTTelevizor.MAUI
             {
                 switch (_pageDriver)
                 {
-                    case DriverTypeEnum.AndroidDVBTDriver:
-                    case DriverTypeEnum.AndroidTestingDVBTDriver:
-                    case DriverTypeEnum.TestTuneDriver:
+                    case AppDriverTypeEnum.DVBT:
                         return DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value;
 
-                    case DriverTypeEnum.RTLSDRDriverFM:
-                    case DriverTypeEnum.RTLSDRDriverDAB:
+                    case AppDriverTypeEnum.FM:
+                    case AppDriverTypeEnum.DAB:
                         return RtlsdrDriverInstalled.HasValue && !RtlsdrDriverInstalled.Value;
 
                     default:

@@ -1,4 +1,5 @@
 ﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.TV;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace DVBTTelevizor
 
         public string AutoPlayedChannelUniqueID { get; set; }
 
-        public DriverTypeEnum DVBTDriverType { get; set; }
+        public AppDriverTypeEnum AppDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }
         public string Language { get; set; }
 

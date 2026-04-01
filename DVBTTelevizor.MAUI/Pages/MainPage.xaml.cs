@@ -801,18 +801,13 @@ namespace DVBTTelevizor.MAUI
 
         private void InitDriver()
         {
-            switch (_configuration.DVBTDriverType)
+            switch (_configuration.AppDriverType)
             {
-                case DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DVBT:
                     _driver = new DVBTDriverConnector(_loggingService);
+                    //_driver = new TestTuneConnector(_loggingService);
                     break;
-                case DriverTypeEnum.AndroidTestingDVBTDriver:
-                    _driver = new DVBTDriverConnector(_loggingService);
-                    break;
-                case DriverTypeEnum.TestTuneDriver:
-                    _driver = new TestTuneConnector(_loggingService);
-                    break;
-                case DriverTypeEnum.RTLSDRDriverFM:
+                case AppDriverTypeEnum.FM:
 
                     var fmDemodulator = new FMDemodulator(_loggingService);
 
@@ -822,7 +817,7 @@ namespace DVBTTelevizor.MAUI
 
                         fmDemodulator.Start();
                     break;
-                case DriverTypeEnum.RTLSDRDriverDAB:
+                case AppDriverTypeEnum.DAB:
                         var dabDemoduator = new DABProcessor(_loggingService);
 
                         dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
@@ -1104,7 +1099,7 @@ namespace DVBTTelevizor.MAUI
 
         private void UpdateMenu()
         {
-            var driverName = BaseViewModel.GetDVBTDriverShortName(_configuration.DVBTDriverType);
+            var driverName = BaseViewModel.GetDVBTDriverShortName(_configuration.AppDriverType);
 
             if (IsPortrait)
             {
@@ -1480,40 +1475,40 @@ namespace DVBTTelevizor.MAUI
             if (_driver.Connected)
                 return;
 
-            switch (_configuration.DVBTDriverType)
+            switch (_configuration.AppDriverType)
             {
-                case DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DVBT:
 
                     _loggingService.Info("Sending connect message");
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
                     break;
 
-                case DriverTypeEnum.AndroidTestingDVBTDriver:
+                //case DriverTypeEnum.AndroidTestingDVBTDriver:
 
-                    _testDVBTDriver = new TestDVBTDriver(_loggingService);
-                    _testDVBTDriver.PublicDirectory = PublicDirectory;
-                    _testDVBTDriver.Connect();
+                //    _testDVBTDriver = new TestDVBTDriver(_loggingService);
+                //    _testDVBTDriver.PublicDirectory = PublicDirectory;
+                //    _testDVBTDriver.Connect();
 
-                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                        new DVBTDriverConfiguration()
-                        {
-                            DeviceName = "Testing DVBT driver",
-                            ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
-                            TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
-                        }));
-                    break;
+                //    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
+                //        new DVBTDriverConfiguration()
+                //        {
+                //            DeviceName = "Testing DVBT driver",
+                //            ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
+                //            TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
+                //        }));
+                //    break;
 
-                case DriverTypeEnum.TestTuneDriver:
+                //case DriverTypeEnum.TestTuneDriver:
 
-                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                        new DVBTDriverConfiguration()
-                        {
-                            DeviceName = "Test tune driver"
-                        }));
+                //    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
+                //        new DVBTDriverConfiguration()
+                //        {
+                //            DeviceName = "Test tune driver"
+                //        }));
 
-                    break;
+                //    break;
 
-                case DriverTypeEnum.RTLSDRDriverFM:
+                case AppDriverTypeEnum.FM:
 
                     var cfg = new RTLSDR.DriverSettings()
                     {
@@ -1527,7 +1522,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
 
-                case DriverTypeEnum.RTLSDRDriverDAB:
+                case AppDriverTypeEnum.DAB:
 
                     var DABcfg = new RTLSDR.DriverSettings()
                     {

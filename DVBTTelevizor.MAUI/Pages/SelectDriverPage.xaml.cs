@@ -1,6 +1,7 @@
 
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -110,10 +111,10 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
                     switch (_focusItems.FocusedItem.Name)
                     {
                         case "DVBT":
-                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(DriverTypeEnum.AndroidDVBTDriver));
+                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DVBT));
                             break;
                         case "SDR":
-                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(DriverTypeEnum.RTLSDRDriverDAB));
+                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DAB));
                             break;
                     }
                 });
@@ -126,7 +127,7 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"SelectDriverPage OnTextSent {text}");
     }
 
-    private async Task ShowPage(DriverTypeEnum driverType)
+    private async Task ShowPage(AppDriverTypeEnum driverType)
     {
         if (_driverPage.IsLoaded)
         {

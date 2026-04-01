@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging.Messages;
+using DVBTTelevizor.TV;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    internal class ShowDriverPageMessage : ValueChangedMessage<DriverTypeEnum>
+    internal class ShowDriverPageMessage : ValueChangedMessage<AppDriverTypeEnum>
     {
-        public ShowDriverPageMessage(DriverTypeEnum value) : base(value)
+        public ShowDriverPageMessage(AppDriverTypeEnum value) : base(value)
         {
 
         }

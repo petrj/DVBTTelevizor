@@ -1,5 +1,6 @@
 ﻿using Android.OS.Storage;
 using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Newtonsoft.Json;
 using System;
@@ -67,16 +68,16 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public DriverTypeEnum DVBTDriverType
+        public AppDriverTypeEnum AppDriverType
         {
             get
             {
-                var index = GetPersistingSettingValue<int>("DVBTDriverType");
-                return (DriverTypeEnum)index;
+                var index = GetPersistingSettingValue<int>("AppDriverType");
+                return (AppDriverTypeEnum)index;
             }
             set
             {
-                SavePersistingSettingValue<int>("DVBTDriverType", (int)value);
+                SavePersistingSettingValue<int>("AppDriverType", (int)value);
             }
         }
 

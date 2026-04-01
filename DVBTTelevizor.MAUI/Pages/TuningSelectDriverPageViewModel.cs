@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using System;
 using System.Collections.Generic;
@@ -22,15 +23,15 @@ namespace DVBTTelevizor.MAUI
             CommandDVBT = new Command(() =>
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandDVBT executed");
-                WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(DriverTypeEnum.AndroidDVBTDriver));
+                WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DVBT));
             });
 
             CommandSDR = new Command(() =>
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandSDR executed");
-                WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(DriverTypeEnum.RTLSDRDriverDAB));
+                WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DAB));
             });
-        }        
+        }
     }
 }
 

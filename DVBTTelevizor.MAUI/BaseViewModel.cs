@@ -59,45 +59,41 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
+        public static string GetDVBTDriverTypeName(AppDriverTypeEnum driverType)
         {
-            switch ((int)driverType)
+            switch (driverType)
             {
-                case 0:
-                case 1:
-                case 2:
+                case  AppDriverTypeEnum.DVBT:
                     return "DVB-T";
-                case 3:
+                case  AppDriverTypeEnum.FM:
                     return "FM (SDR Driver)";
-                case 4:
+                case  AppDriverTypeEnum.DAB:
                     return "DAB (SDR Driver)";
                 default:
                     return "";
             }
         }
 
-        public static string GetDVBTDriverShortName(DriverTypeEnum driverType)
+        public static string GetDVBTDriverShortName(AppDriverTypeEnum driverType)
         {
-            switch ((int)driverType)
+            switch (driverType)
             {
-                case 0:
-                case 1:
-                case 2:
+                case  AppDriverTypeEnum.DVBT:
                     return "DVB-T";
-                case 3:
+                case  AppDriverTypeEnum.FM:
                     return "FM";
-                case 4:
+                case AppDriverTypeEnum.DAB:
                     return "DAB";
                 default:
-                    return "Driver".Translated();
+                    return String.Empty;
             }
         }
 
-        public async Task ChangeDriver(DriverTypeEnum driver)
+        public async Task ChangeDriver(AppDriverTypeEnum driver)
         {
             _loggingService.Info($"ChangeDriver");
 
-            if (_configuration.DVBTDriverType == driver)
+            if (_configuration.AppDriverType == driver)
             {
                 _loggingService.Info($"ChangeDriver: already using {driver}");
                 return;
@@ -109,7 +105,7 @@ namespace DVBTTelevizor.MAUI
                 await _driver.Disconnect();
             }
 
-            _configuration.DVBTDriverType = driver;
+            _configuration.AppDriverType = driver;
 
             WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
             ////Task.Delay(500).Wait();

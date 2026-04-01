@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.TV;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,9 +84,9 @@ namespace DVBTTelevizor
         public void LoadFromConfiguration(ITVConfiguration configuration)
         {
 
-            switch (configuration.DVBTDriverType)
+            switch (configuration.AppDriverType)
             {
-                case MAUI.DriverTypeEnum.RTLSDRDriverFM:
+                case AppDriverTypeEnum.FM:
 
                     SetFMSettings();
 
@@ -96,7 +97,7 @@ namespace DVBTTelevizor
 
                     break;
 
-                case MAUI.DriverTypeEnum.RTLSDRDriverDAB:
+                case AppDriverTypeEnum.DAB:
 
                     SetDABSettings();
 
@@ -106,7 +107,7 @@ namespace DVBTTelevizor
 
                     break;
 
-                case MAUI.DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DVBT:
                 default:
                     SetDVBTSettings();
 
@@ -124,23 +125,23 @@ namespace DVBTTelevizor
 
         public void SaveToConfiguration(ITVConfiguration configuration)
         {
-            switch (configuration.DVBTDriverType)
+            switch (configuration.AppDriverType)
             {
-                case MAUI.DriverTypeEnum.RTLSDRDriverFM:
+                case AppDriverTypeEnum.FM:
                     //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
                     configuration.FMFrequencyKHz = FrequencyKHz;
                     configuration.FMFrequencyFromKHz = FrequencyFromKHz;
                     configuration.FMFrequencyToKHz = FrequencyToKHz;
                     break;
 
-                case MAUI.DriverTypeEnum.RTLSDRDriverDAB:
+                case AppDriverTypeEnum.DAB:
 
                     configuration.DABFrequencyKHz = FrequencyKHz;
                     configuration.DABFrequencyFromKHz = FrequencyFromKHz;
                     configuration.DABFrequencyToKHz = FrequencyToKHz;
                     break;
 
-                case MAUI.DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DVBT:
                 default:
 
                     configuration.TuneDVBTEnabled = DVBT;

@@ -84,7 +84,7 @@ namespace DVBTTelevizor.MAUI
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(false));
         }
 
-        public void ShowConfirmChangeDriverMenu(IDriverConnector driver,DriverTypeEnum currentDriverType, DriverTypeEnum newDriverType)
+        public void ShowConfirmChangeDriverMenu(IDriverConnector driver, AppDriverTypeEnum currentDriverType, AppDriverTypeEnum newDriverType)
         {
             //if (_driver == null || !_driver.Connected)
             //{
@@ -127,8 +127,8 @@ namespace DVBTTelevizor.MAUI
             AddItem(_menu.CreateMenuItem("menuConnectFM", "FM".Translated(), "driver.png"));
             AddItem(_menu.CreateMenuItem("menuConnectDAB", "DAB".Translated(), "driver.png"));
 
-            var title = "Connect RTLSDR driver".Translated();            
-            
+            var title = "Connect RTLSDR driver".Translated();
+
             AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
 
             Finish(title);

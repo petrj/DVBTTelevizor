@@ -1,4 +1,5 @@
 ﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
@@ -199,16 +200,16 @@ namespace DVBTTelevizor
             }
         }
 
-        public DriverTypeEnum DVBTDriverType
+        public AppDriverTypeEnum AppDriverType
         {
             get
             {
-                var index = GetPersistingSettingValue<int>("DVBTDriverType");
-                return (DriverTypeEnum)index;
+                var index = GetPersistingSettingValue<int>("AppDriverType");
+                return (AppDriverTypeEnum)index;
             }
             set
             {
-                SavePersistingSettingValue<int>("DVBTDriverType", (int)value);
+                SavePersistingSettingValue<int>("AppDriverType", (int)value);
             }
         }
 
