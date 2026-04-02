@@ -37,6 +37,11 @@ namespace DVBTTelevizor.TV
             _demodulator.OnDemodulated += OnDataDemodulated;
         }
 
+        public virtual AppDriverTypeEnum DriverType
+        {
+            get { return AppDriverTypeEnum.DAB; }
+        }
+
         public async Task SetGain(GainEnum gain, int value = 0)
         {
             if (_driver == null)
@@ -100,8 +105,6 @@ namespace DVBTTelevizor.TV
         private bool _driverStreamDataAvailable = false;
         private string? _recordingFileName = null;
 
-        private bool _driverInstalled = false;
-
         private bool _readingStream = true;
         private bool _streaming = false;
         private bool _recording = false;
@@ -154,22 +157,9 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return
-                        _driverInstalled &&
+                return                        
                         _driver != null &&
                         _driver.State == DriverStateEnum.Connected;
-            }
-        }
-
-        public bool DriverInstalled
-        {
-            get
-            {
-                return _driverInstalled;
-            }
-            set
-            {
-                _driverInstalled = value;
             }
         }
 
@@ -247,8 +237,7 @@ namespace DVBTTelevizor.TV
         {
             return Task.Run(() =>
             {
-                if (!_driverInstalled ||
-                   _driver == null ||
+                if (_driver == null ||
                     _driver.State != DriverStateEnum.Connected)
                 {
                     return false;
@@ -277,7 +266,6 @@ namespace DVBTTelevizor.TV
                 _driver.SetFrequencyCorrection(0);
                 _driver.SetGainMode(false);
 
-                DriverInstalled = true;
                 State = DVBTDriverStateEnum.Connected;
             }
             catch (Exception ex)

@@ -229,6 +229,7 @@ namespace DVBTTelevizor
 
             BandwidthKHz = DefaultBandwidthKHz;
         }
+        
 
         public async Task SetFrequencies(IDriverConnector driver)
         {

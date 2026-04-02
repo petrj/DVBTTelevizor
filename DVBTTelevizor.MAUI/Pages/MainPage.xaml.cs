@@ -2077,9 +2077,9 @@ namespace DVBTTelevizor.MAUI
                 return true;
             }
 
-            // DVBT/RTLSDDR driver check
+            // TODO : DVBT/RTLSDDR driver installation check
 
-            if (!_driver.DriverInstalled || !_driver.Connected)
+            if ( !_driver.Connected)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {

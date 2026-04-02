@@ -20,6 +20,8 @@ namespace DVBTTelevizor.TV
         {
         }
 
+        public override AppDriverTypeEnum DriverType => AppDriverTypeEnum.DAB;
+
         public override Task<DVBTDriverCapabilities> GetCapabalities()
         {
             return Task.Run(() =>

@@ -92,6 +92,15 @@ namespace DVBTTelevizor.MAUI.WinUI
                 }
             });
 
+            WeakReferenceMessenger.Default.Register<CheckDriversRequestMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new CheckDriversResultMessage(new CheckDriversResult()
+                {
+                    DVBT = false,
+                    RTLSDR = true // TODO: check if rtl_sdr is installed
+                }));
+            });
+
             UnhandledException += App_UnhandledException;
         }
 

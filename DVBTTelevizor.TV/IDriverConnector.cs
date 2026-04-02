@@ -16,13 +16,13 @@ namespace DVBTTelevizor
 {
     public interface IDriverConnector
     {
+        AppDriverTypeEnum DriverType { get; }
+
         DVBTDriverStateEnum State { get; }
 
         DVBTDriverConfiguration Configuration { get; set; }
 
-        bool Connected { get; }
-
-        bool DriverInstalled { get; set; }
+        bool Connected { get; }        
 
         DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }
 

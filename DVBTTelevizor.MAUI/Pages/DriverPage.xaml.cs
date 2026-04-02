@@ -204,14 +204,14 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         {
             case AppDriverTypeEnum.DAB:
             case AppDriverTypeEnum.FM:
-                if (_driverPageViewModel.SameDriver || !_driver.Connected)
-                {
+                //if (_driverPageViewModel.SameDriver || !_driver.Connected)
+                //{
                     _appMenu.ShowFMorDABConnectMenu();
-                }
-                else
-                {
+                //}
+                //else
+                //{
                     // TODO: reconnect menu
-                }
+                //}
                 break;
         }
 

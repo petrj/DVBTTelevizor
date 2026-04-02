@@ -823,8 +823,7 @@ namespace DVBTTelevizor.MAUI
                 return
                     (Channels.Count == 0) &&
                     Refreshed &&
-                    (_driver!= null) &&
-                    _driver.DriverInstalled;
+                    (_driver!= null);
             }
         }
 
@@ -835,8 +834,7 @@ namespace DVBTTelevizor.MAUI
                 return
                     (Channels.Count == 0) &&
                     Refreshed &&
-                    (_driver != null) &&
-                    !_driver.DriverInstalled;
+                    (_driver != null);
             }
         }
 
@@ -962,9 +960,7 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
             if (_driver.Connected)
-                return;
-
-            _driver.DriverInstalled = true;
+                return;            
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 
@@ -979,8 +975,6 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Connection failed: {message}");
 
-            _driver.DriverInstalled = true;
-
             WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(message)));
 
             UpdateDriverState();
@@ -989,8 +983,6 @@ namespace DVBTTelevizor.MAUI
         private void DriverNotInstalled()
         {
             _loggingService.Info($"Driver is not installed");
-
-            _driver.DriverInstalled = false;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
@@ -1013,7 +1005,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null ||!_driver.DriverInstalled)
+                if (_driver == null)
                 {
                     return "donglered.png";
                 }

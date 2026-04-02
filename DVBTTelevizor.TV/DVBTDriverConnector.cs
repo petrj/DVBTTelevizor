@@ -30,8 +30,6 @@ namespace DVBTTelevizor
         private NetworkStream? _controlStream = null;
         private NetworkStream? _transferStream = null;
 
-        public bool DriverInstalled { get; set; } = false;
-
         private long _lastTunedFreq = -1;
         private long _lastTunedDeliverySystem = -1;
         private long _bitrate = 0;
@@ -257,7 +255,7 @@ namespace DVBTTelevizor
 
         public void StartStream()
         {
-             _log.Debug($"PlayStream");
+            _log.Debug($"PlayStream");
 
             try
             {
@@ -541,7 +539,8 @@ namespace DVBTTelevizor
                     if (_lastTunedFreq >= 0)
                     {
                         status = $"Tuned {(_lastTunedFreq / 1000000).ToString("N2")} MHz";
-                    } else
+                    }
+                    else
                     {
                         status = $"Not tuned";
                     }
@@ -662,19 +661,20 @@ namespace DVBTTelevizor
             if (herz == null)
             {
                 return "--";
-            } else
-            if (herz > 1000000)
-            {
-                return $" {(herz.Value / 1000000.0).ToString("N1")} MHz";
-            }
-            else if (herz > 1000)
-            {
-                return $" {(herz.Value / 1000.0).ToString("N1")} KHz";
             }
             else
-            {
-                return $" {herz} Hz";
-            }
+                if (herz > 1000000)
+                {
+                    return $" {(herz.Value / 1000000.0).ToString("N1")} MHz";
+                }
+                else if (herz > 1000)
+                {
+                    return $" {(herz.Value / 1000.0).ToString("N1")} KHz";
+                }
+                else
+                {
+                    return $" {herz} Hz";
+                }
         }
 
         public static string GetHumanReadableBitRate(long bitrate)
@@ -723,7 +723,8 @@ namespace DVBTTelevizor
 
                 return true;
 
-             } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _log.Error(ex, "Error while checking status");
                 return false;
@@ -754,7 +755,7 @@ namespace DVBTTelevizor
             var response = await SendRequest(req);
 
             if (response.Bytes.Count < responseSize)
-                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
+                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count}");
 
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
@@ -785,7 +786,7 @@ namespace DVBTTelevizor
             var response = await SendRequest(req, 5);
 
             if (response.Bytes.Count < responseSize)
-                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
+                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count}");
 
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
@@ -836,7 +837,8 @@ namespace DVBTTelevizor
                     RequestTime = response.RequestTime,
                     ResponseTime = response.ResponseTime
                 };
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _log.Error(ex, "Tune error");
 
@@ -904,7 +906,8 @@ namespace DVBTTelevizor
                         if (PIDs.Contains(pidPackets.Key))
                         {
                             pidsFound[pidPackets.Key] = pidPackets.Value.Count;
-                        } else
+                        }
+                        else
                         {
                             wrongPIDsFound[pidPackets.Key] = pidPackets.Value.Count;
                         }
@@ -940,10 +943,12 @@ namespace DVBTTelevizor
 
                 _log.Debug($"Wait for PIDs timeout!");
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _log.Error(ex);
-            } finally
+            }
+            finally
             {
                 StopReadBuffer();
             }
@@ -976,7 +981,8 @@ namespace DVBTTelevizor
                     RequestTime = response.RequestTime,
                     ResponseTime = response.ResponseTime
                 };
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return new DVBTDriverResponse()
                 {
@@ -1008,7 +1014,7 @@ namespace DVBTTelevizor
             var response = await SendRequest(req, 5);
 
             if (response.Bytes.Count < responseSize)
-                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count  }");
+                throw new Exception($"Bad response, expected {responseSize} bytes, received {response.Bytes.Count}");
 
             var requestNumber = response.Bytes[0];
             var longsCountInResponse = response.Bytes[1];
@@ -1062,7 +1068,7 @@ namespace DVBTTelevizor
                     return res;
                 }
 
-                var pmtTables = new Dictionary<long,PMTTable>();
+                var pmtTables = new Dictionary<long, PMTTable>();
 
                 try
                 {
@@ -1231,7 +1237,8 @@ namespace DVBTTelevizor
                         try
                         {
                             allPackets = MPEGTransportStreamPacket.Parse(GetReadBufferData());
-                        } catch (Exception ex)
+                        }
+                        catch (Exception ex)
                         {
                             _log.Error(ex, "Error while parsing packets from read buffer");
                             allPackets = null;
@@ -1446,7 +1453,7 @@ namespace DVBTTelevizor
             {
                 var totalTime = (DateTime.Now - tuningStartTime).TotalMilliseconds;
 
-                _log.Debug($"-----------Tuning {(frequency/1000).ToString("N0")} MHz ---------------------");
+                _log.Debug($"-----------Tuning {(frequency / 1000).ToString("N0")} MHz ---------------------");
                 _log.Debug($"Tune:                   {tuneTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"Set PIDs:               {setPIDsTime.ToString("N2").PadLeft(20, ' ')} ms");
                 _log.Debug($"Get signal:             {getSignalTime.ToString("N2").PadLeft(20, ' ')} ms");
@@ -1562,7 +1569,8 @@ namespace DVBTTelevizor
                 res.Result = DVBTDriverSearchProgramResultEnum.OK;
 
                 return res;
-            } finally
+            }
+            finally
             {
                 var totalTime = (DateTime.Now - startTime).TotalMilliseconds;
 
@@ -1596,7 +1604,7 @@ namespace DVBTTelevizor
                 }
             }
 
-            var middleTime = min.AddSeconds((max - min).TotalSeconds/2.0);
+            var middleTime = min.AddSeconds((max - min).TotalSeconds / 2.0);
             var moveTime = DateTime.Now - middleTime;
 
             // move all
@@ -1654,7 +1662,8 @@ namespace DVBTTelevizor
                 {
                     OK = false
                 };
-            } finally
+            }
+            finally
             {
                 ClearReadBuffer();
             }
@@ -1695,7 +1704,7 @@ namespace DVBTTelevizor
 
                 List<MPEGTransportStreamPacket> packets = null;
 
-                while ((DateTime.Now-startTime).TotalSeconds < timeoutForReadingBuffer)
+                while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
                 {
                     // searching for PID 0 (PSI) and 17 (SDT) packets ..
 
@@ -1706,7 +1715,8 @@ namespace DVBTTelevizor
                         sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
                         psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
 
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         _log.Debug($"Wrong data in Buffer");
                         ClearReadBuffer();
@@ -1722,7 +1732,8 @@ namespace DVBTTelevizor
                         if (serviceDescriptors.Count > 0)
                         {
                             break;
-                        } else
+                        }
+                        else
                         {
                             _log.Debug($"Wrong SDTTable in buffer!");
                             ClearReadBuffer();
@@ -1764,7 +1775,8 @@ namespace DVBTTelevizor
 
                 return res;
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _log.Error(ex);
 
@@ -1798,5 +1810,11 @@ namespace DVBTTelevizor
         //{
         //    get { return 10000; }
         //}
-    }
+
+
+        public AppDriverTypeEnum DriverType
+        {
+            get { return AppDriverTypeEnum.DVBT; }
+        }
+    }        
 }

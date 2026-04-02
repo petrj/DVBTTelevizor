@@ -151,7 +151,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null || !_driver.DriverInstalled)
+                if (_driver == null)
                 {
                     return "donglered.png";
                 }
@@ -167,57 +167,38 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public bool SameDriver
-        {
-            get
-            {
-                if (_driver == null || _pageDriver == null)
-                {
-                    return false;
-                }
-
-                if (_driver is RTLSDRDriverConnector)
-                {
-                    return
-                            _pageDriver == AppDriverTypeEnum.DAB ||
-                            _pageDriver == AppDriverTypeEnum.FM;
-                }
-
-                if (_driver is DVBTDriverConnector)
-                {
-                    return
-                            _pageDriver == AppDriverTypeEnum.DVBT;
-                }
-
-                return false;
-            }
-        }
 
         public string StatusTitle
         {
             get
             {
-                if (_driver == null)
+                if (_driver == null || _pageDriver == null)
                 {
-                    return "No driver".Translated();
+                    return "No driver".Translated(); // page is not yet initialized
                 }
 
-                if (!SameDriver)
-                {
-                    return "Not connected".Translated();
-                }
-
-                if ( !_driver.DriverInstalled)
+                if (!IsDriverInstalled(_pageDriver.Value))
                 {
                     return "Driver not installed".Translated();
                 }
 
-                if (_driver.Connected)
+                if (_driver.DriverType == _pageDriver.Value)
                 {
-                    return "Connected".Translated();
+                    // same driver
+                    if (_driver.Connected)
+                    {
+                        return "Connected".Translated();
+                    }
+                    else
+                    {
+                        return "Disconnected".Translated();
+                    }
                 }
-
-                return "Disconnected".Translated();
+                else
+                {
+                    // different driver
+                    return "Not connected".Translated();
+                }
             }
         }
 
@@ -225,16 +206,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null ||
-                    DvbtDriverInstalled == null ||
-                    !DvbtDriverInstalled.HasValue ||
-                    RtlsdrDriverInstalled == null ||
-                    !RtlsdrDriverInstalled.HasValue)
+                if (_pageDriver == null)
                 {
-                    return false;
+                    return false; // page is not yet initialized
                 }
 
-                return !InstallDriverButtonVisible;
+                return IsDriverInstalled(_pageDriver.Value);
             }
         }
 
@@ -242,7 +219,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && _driver.DriverInstalled && _driver.Connected;
+                return (_driver != null) && _driver.Connected;
             }
         }
 
@@ -250,7 +227,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && _driver.DriverInstalled && _driver.Connected
+                return (_driver != null) && _driver.Connected
                     ? _range
                     : String.Empty;
             }
@@ -260,56 +237,71 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null)
+                if (_driver == null || _pageDriver == null)
                 {
-                    return false;
+                    return false; // page is not yet initialized
                 }
 
-                if (SameDriver)
+                if (!IsDriverInstalled(_pageDriver.Value))
                 {
+                    return false; // driver not installed
+                }
+
+                if (_driver.DriverType == _pageDriver.Value)
+                {
+                    // same driver, show button if connected 
                     return _driver.Connected;
                 }
                 else
                 {
+                    // different driver
                     return false;
                 }
             }
+        }
+
+        private bool IsDriverInstalled(AppDriverTypeEnum appDriverType)
+        {
+            if (_driver == null)
+            {
+                return false;
+            }
+
+            if (appDriverType == AppDriverTypeEnum.DVBT)
+            {
+                return DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value;
+            }
+
+            if ((appDriverType == AppDriverTypeEnum.FM) || (appDriverType == AppDriverTypeEnum.DAB))
+            {
+                return RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value;
+            }
+
+            return false;
         }
 
         public bool ConnectButtonVisible
         {
             get
             {
-                if (_driver == null ||
-                    DvbtDriverInstalled == null ||
-                    !DvbtDriverInstalled.HasValue ||
-                    RtlsdrDriverInstalled == null ||
-                    !RtlsdrDriverInstalled.HasValue)
+                if (_driver == null || _pageDriver == null)
                 {
-                    return false;
+                    return false; // page is not yet initialized
                 }
 
-                if (SameDriver)
+                if (!IsDriverInstalled(_pageDriver.Value))
                 {
+                    return false; // driver not installed
+                }
+
+                if (_driver.DriverType == _pageDriver.Value)
+                {
+                    // same driver, show connect button if not connected 
                     return !_driver.Connected;
                 } else
                 {
-                    if (_driver.Connected)
-                        return false; // other driver is already connected
-
-                    // show connect button only if the other driver is installed
-                    switch (_pageDriver)
-                    {
-                        case AppDriverTypeEnum.DVBT:
-                            return DvbtDriverInstalled.Value;
-
-                        case AppDriverTypeEnum.FM:
-                        case AppDriverTypeEnum.DAB:
-                            return RtlsdrDriverInstalled.Value;
-
-                        default:
-                            return false;
-                    }
+                    // different driver
+                    return true;// show connect button to allow user to switch driver                    
                 }
             }
         }
@@ -318,18 +310,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                switch (_pageDriver)
+                if (_pageDriver == null)
                 {
-                    case AppDriverTypeEnum.DVBT:
-                        return DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value;
-
-                    case AppDriverTypeEnum.FM:
-                    case AppDriverTypeEnum.DAB:
-                        return RtlsdrDriverInstalled.HasValue && !RtlsdrDriverInstalled.Value;
-
-                    default:
-                        return false;
+                    return false; // page is not yet initialized
                 }
+
+                return !IsDriverInstalled(_pageDriver.Value);
             }
         }
 

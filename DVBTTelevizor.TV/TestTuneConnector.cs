@@ -17,25 +17,11 @@ namespace DVBTTelevizor
 
         private long _lastFreq { get; set; }
         private long _lastPID { get; set; }
-
-        private bool _driverInstalled = true;
-
+ 
         public event EventHandler? StatusChanged = null;
         ILoggingService _log;
 
-        //public bool DriverInstalled { get; set; } = false;
-
-        public bool DriverInstalled
-        {
-            get
-            {
-                return _driverInstalled;
-            }
-            set
-            {
-                _driverInstalled = value;
-            }
-        }
+        public AppDriverTypeEnum DriverType => AppDriverTypeEnum.DVBT;  
 
         public TestTuneConnector(ILoggingService loggingService)
         {
