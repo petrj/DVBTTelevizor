@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -43,6 +44,8 @@ namespace DVBTTelevizor.MAUI
         private VLCMediaInput _vlcRawAudioInput = null;
 
         private TestDVBTDriver _testDVBTDriver = null;
+        private RTLSDRTestDriverConnector _rtlSDRTestDriverConnector = null;
+
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private List<string> _remoteDevicesConnected = new List<string>();
 
@@ -1483,6 +1486,7 @@ namespace DVBTTelevizor.MAUI
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
                     break;
 
+
                 //case DriverTypeEnum.AndroidTestingDVBTDriver:
 
                 //    _testDVBTDriver = new TestDVBTDriver(_loggingService);
@@ -1531,7 +1535,26 @@ namespace DVBTTelevizor.MAUI
                         SDRSampleRate = AudioTools.DABSampleRate
                     };
 
-                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
+#if DEBUG
+
+                    var dabDemoduator = new DABProcessor(_loggingService);
+                    dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
+                    dabDemoduator.Start();
+
+                    _rtlSDRTestDriverConnector = new RTLSDRTestDriverConnector(_loggingService, dabDemoduator, AppDriverTypeEnum.DAB);
+
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
+                    new DVBTDriverConfiguration()
+                    {
+                        DeviceName = "Testing DAB driver",                        
+                    }));
+                break;
+                    
+#else
+    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
+#endif
+
+
 
                     break;
             }

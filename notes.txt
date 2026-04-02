@@ -1,0 +1,15 @@
+SendConnectDriverRequestMessage
+
+→ DVBTDriverConnectAndroidMessage
+
+
+→ RTLSDRDriverConnectMessage  FM/DAB
+
+	→ RTLSDRDriverNotInstalledMessage
+	→ DriverHasBeenConnectedMessage
+	
+		MainViewModel.ConnectDriver()
+
+
+	
+

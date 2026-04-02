@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.TV
 {
-    public abstract class RTLSDRTestDriverConnector : IDriverConnector
+    public class RTLSDRTestDriverConnector : IDriverConnector
     {
         protected ILoggingService _log;
         private IDemodulator _demodulator = null;
