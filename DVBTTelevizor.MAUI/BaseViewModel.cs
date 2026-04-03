@@ -37,6 +37,14 @@ namespace DVBTTelevizor.MAUI
                 NotifyFontSizeChange();
             });
 
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessages>(this, (r, m) =>
+            {
+                _driver = m.Value;
+
+                NotifyDriverChange();
+            });
+
             //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             //{
             //    _driver = m.Value;
@@ -89,28 +97,28 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async Task ChangeDriver(AppDriverTypeEnum driver)
-        {
-            _loggingService.Info($"ChangeDriver");
+        //public async Task ChangeDriver(AppDriverTypeEnum driver)
+        //{
+        //    _loggingService.Info($"ChangeDriver");
 
-            if (_configuration.AppDriverType == driver)
-            {
-                _loggingService.Info($"ChangeDriver: already using {driver}");
-                return;
-            }
+        //    if (_configuration.AppDriverType == driver)
+        //    {
+        //        _loggingService.Info($"ChangeDriver: already using {driver}");
+        //        return;
+        //    }
 
-            if ((_driver != null) && (_driver.Connected))
-            {
-                await _driver.Stop();
-                await _driver.Disconnect();
-            }
+        //    if ((_driver != null) && (_driver.Connected))
+        //    {
+        //        await _driver.Stop();
+        //        await _driver.Disconnect();
+        //    }
 
-            _configuration.AppDriverType = driver;
+        //    _configuration.AppDriverType = driver;
 
-            WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
-            ////Task.Delay(500).Wait();
-            ////WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-        }
+        //    WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
+        //    ////Task.Delay(500).Wait();
+        //    ////WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+        //}
 
         public static string DeviceFriendlyName
         {
@@ -145,8 +153,10 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public void NotifyDriverChange()
+        public virtual void NotifyDriverChange()
         {
+            _loggingService.Info($"NotifyDriverChange");
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 OnPropertyChanged(nameof(ConnectedDevice));

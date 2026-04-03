@@ -50,7 +50,8 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
 
         _focusItems
             .AddItem(KeyboardFocusableItem.CreateFrom("DVBT", new List<View>() { DVBTDriverButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("FM", new List<View>() { SDRDriverButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("FM", new List<View>() { FMDriverButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DAB", new List<View>() { DABDriverButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
@@ -113,7 +114,10 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
                         case "DVBT":
                             WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DVBT));
                             break;
-                        case "SDR":
+                        case "FM":
+                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.FM));
+                            break;
+                        case "DAB":
                             WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DAB));
                             break;
                     }

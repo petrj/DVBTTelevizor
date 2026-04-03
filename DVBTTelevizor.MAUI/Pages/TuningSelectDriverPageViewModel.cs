@@ -15,7 +15,9 @@ namespace DVBTTelevizor.MAUI
     public class TuningSelectDriverPageViewModel : BaseViewModel
     {
         public ICommand CommandDVBT { get; set; }
-        public ICommand CommandSDR { get; set; }
+
+        public ICommand CommandFM { get; set; }
+        public ICommand CommandDAB { get; set; }
 
         public TuningSelectDriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
@@ -26,9 +28,15 @@ namespace DVBTTelevizor.MAUI
                 WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DVBT));
             });
 
-            CommandSDR = new Command(() =>
+            CommandFM = new Command(() =>
             {
-                _loggingService.Info($"TuningSelectDriverPageViewModel: CommandSDR executed");
+                _loggingService.Info($"TuningSelectDriverPageViewModel: CommandFM executed");
+                WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.FM));
+            });
+
+            CommandDAB = new Command(() =>
+            {
+                _loggingService.Info($"TuningSelectDriverPageViewModel: CommandDAB executed");
                 WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DAB));
             });
         }

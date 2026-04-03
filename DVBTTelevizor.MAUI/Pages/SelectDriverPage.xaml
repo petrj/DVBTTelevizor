@@ -64,6 +64,8 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100*" />
@@ -74,11 +76,15 @@
             </Frame>
 
             <Frame Grid.Column="0" Grid.Row="2" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
-                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='FM / DAB'}" x:Name="SDRDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandSDR}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='FM'}" x:Name="FMDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandFM}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
             </Frame>
-            
-            
-          </Grid>
+
+            <Frame Grid.Column="0" Grid.Row="4" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='DAB'}" x:Name="DABDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandDAB}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            </Frame>
+
+
+        </Grid>
 
     </AbsoluteLayout>
 

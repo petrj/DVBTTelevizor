@@ -43,9 +43,6 @@ namespace DVBTTelevizor.MAUI
 
         private VLCMediaInput _vlcRawAudioInput = null;
 
-        private TestDVBTDriver _testDVBTDriver = null;
-        private RTLSDRTestDriverConnector _rtlSDRTestDriverConnector = null;
-
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private List<string> _remoteDevicesConnected = new List<string>();
 
@@ -404,14 +401,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<SendConnectDriverRequestMessage>(this, (r, m) =>
             {
-                SendConnectDriverRequest();
-            });
-
-            WeakReferenceMessenger.Default.Register<InitDriverMessage>(this, (r, m) =>
-            {
-                InitDriver();
-                InitializeVLC();
-                SendConnectDriverRequest();
+                SendConnectDriverRequest(m.Value);
             });
 
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
@@ -511,8 +501,8 @@ namespace DVBTTelevizor.MAUI
                     bitrate = _driver.Bitrate;
                 }
 
-                WeakReferenceMessenger.Default.Send(new DriverUpdateStateMessage(
-                    new DriverState()
+                WeakReferenceMessenger.Default.Send(new DriverUpdateStatMessage(
+                    new DriverStat()
                     {
                         BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
                         Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
@@ -769,21 +759,21 @@ namespace DVBTTelevizor.MAUI
 
         private async Task CheckDriver()
         {
-            switch (_driver.State)
-            {
-                case DVBTDriverStateEnum.Unknown:
-                case DVBTDriverStateEnum.Disconnected:
-                    {
-                        SendConnectDriverRequest();
-                        break;
-                    }
-                default:
-                    {
-                        // check driver state
-                        await CheckDriverState();
-                        break;
-                    }
-            }
+            //switch (_driver.State)
+            //{
+            //    case DVBTDriverStateEnum.Unknown:
+            //    case DVBTDriverStateEnum.Disconnected:
+            //        {
+            //            SendConnectDriverRequest();
+            //            break;
+            //        }
+            //    default:
+            //        {
+            //            // check driver state
+            //            await CheckDriverState();
+            //            break;
+            //        }
+            //}
         }
 
         private async Task CheckDriverState()
@@ -826,11 +816,17 @@ namespace DVBTTelevizor.MAUI
                         dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
                         //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
 
-                        _driver = new RTLSDRDABDriverConnector(_loggingService,
+#if DEBUG
+                    _driver = new RTLSDRTestDriverConnector(_loggingService,dabDemoduator, AppDriverTypeEnum.DAB);
+#else
+                    _driver = new RTLSDRDABDriverConnector(_loggingService,
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
                             dabDemoduator);
+#endif
 
-                        dabDemoduator.Start();
+
+
+                    dabDemoduator.Start();
                         _driver.SetGain(GainEnum.Auto);
                         _driver.Tune(199360000, 1024, 0);
                     break;
@@ -841,7 +837,7 @@ namespace DVBTTelevizor.MAUI
 
             _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
 
-            WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
+                WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
 
         private void DabDemoduator_OnServiceFound(object? sender, EventArgs e)
@@ -1447,8 +1443,7 @@ namespace DVBTTelevizor.MAUI
                 _firstAppearing = false;
 
                 InitializeVLC();
-
-                //ConnectDriver();
+                SendConnectDriverRequest();
 
                 Task.Run(async () =>
                 {
@@ -1473,16 +1468,30 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void SendConnectDriverRequest()
+        private void SendConnectDriverRequest(AppDriverTypeEnum? appDriverType = null)
         {
-            if (_driver.Connected)
-                return;
+            if (appDriverType == null)
+            {
+                appDriverType = _configuration.AppDriverType;
+            }
 
-            switch (_configuration.AppDriverType)
+            _loggingService.Info($"Sending connect message to appDriverType {appDriverType}");
+
+            // TODO: show menu and confirm disconnect/driver change
+
+            if  (_driver != null && _driver.Connected)
+            {
+                _driver.Disconnect();
+            }
+            if (_configuration.AppDriverType != appDriverType)
+            {
+                _configuration.AppDriverType = appDriverType.Value;
+                InitDriver();
+            }
+
+            switch (appDriverType)
             {
                 case AppDriverTypeEnum.DVBT:
-
-                    _loggingService.Info("Sending connect message");
                     WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
                     break;
 
@@ -1535,33 +1544,12 @@ namespace DVBTTelevizor.MAUI
                         SDRSampleRate = AudioTools.DABSampleRate
                     };
 
-#if DEBUG
-
-                    var dabDemoduator = new DABProcessor(_loggingService);
-                    dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
-                    dabDemoduator.Start();
-
-                    _rtlSDRTestDriverConnector = new RTLSDRTestDriverConnector(_loggingService, dabDemoduator, AppDriverTypeEnum.DAB);
-
-                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                    new DVBTDriverConfiguration()
-                    {
-                        DeviceName = "Testing DAB driver",                        
-                    }));
-                break;
-                    
-#else
-    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
-#endif
-
-
-
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
                     break;
             }
 
            // _viewModel.UpdateActiveDriverType();
-
-            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
+           // WeakReferenceMessenger.Default.Send(new DriverChangedMessages(_driver));
         }
 
         protected override void OnDisappearing()
@@ -3568,11 +3556,11 @@ namespace DVBTTelevizor.MAUI
                 case "menuChangeDriver":
                     await ActionStop(true);
                     _vlcRawAudioInput = null;
-                    await _viewModel.ChangeDriver(menuItem.DriverType);
+                    //await _viewModel.ChangeDriver(menuItem.DriverType);
                     break;
 
                 case "menuConnectDriver":
-                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(System.String.Empty));
+                    //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(System.String.Empty));
                     break;
 
                 case "menuInstallDriver":

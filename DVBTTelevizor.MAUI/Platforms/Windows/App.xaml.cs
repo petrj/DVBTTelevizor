@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI.Notifications;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using RTLSDR;
+using RTLSDR.DAB;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -82,6 +84,14 @@ namespace DVBTTelevizor.MAUI.WinUI
             {
                 if (obj.Value is DriverSettings settings)
                 {
+#if DEBUG
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
+                    new DVBTDriverConfiguration()
+                    {
+                        DeviceName = "Testing RTLSDR DAB driver",
+                        PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                    }));
+#else
                     WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                     {
                         DeviceName = "rtl_sdr bin",
@@ -89,6 +99,7 @@ namespace DVBTTelevizor.MAUI.WinUI
                         TransferPort = 1235,
                         PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                     }));
+#endif
                 }
             });
 

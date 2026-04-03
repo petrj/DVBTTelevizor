@@ -443,11 +443,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 break;
 
             case "menuConnectDriver":
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
+                //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
                 break;
 
             case "menuChangeDriver":
-                await _viewModel.ChangeDriver(item.DriverType);
+                //await _viewModel.ChangeDriver(item.DriverType);
                 break;
         }
     }

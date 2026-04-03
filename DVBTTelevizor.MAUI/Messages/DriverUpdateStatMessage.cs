@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace DVBTTelevizor.MAUI.Messages
 {
-    public class DriverState
+    public class DriverStat
     {
         public string BitRate { get; set; }
         public string Frequency { get; set; }
     }
 
-    public class DriverUpdateStateMessage : ValueChangedMessage<DriverState?>
+    public class DriverUpdateStatMessage : ValueChangedMessage<DriverStat?>
     {
-        public DriverUpdateStateMessage(DriverState? value) : base(value)
+        public DriverUpdateStatMessage(DriverStat? value) : base(value)
         {
 
         }

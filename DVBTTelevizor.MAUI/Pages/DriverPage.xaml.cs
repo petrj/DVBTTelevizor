@@ -14,7 +14,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private DriverPageViewModel _driverPageViewModel;
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
     private ITVConfiguration _configuration;
 
     private string _publicDirectory;
@@ -28,7 +27,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
@@ -44,12 +42,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             _driverPageViewModel.RtlsdrDriverInstalled = m.Value.RTLSDR;
 
         });
-
-        //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-        //{
-        //    //_driver = m.Value;
-        //    //.UpdateActiveDriverType();
-        //});
 
         BuildFocusableItems();
     }
@@ -202,16 +194,14 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         switch (_driverPageViewModel.PageDriver)
         {
+            case AppDriverTypeEnum.DVBT:
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DVBT));
+                break;
             case AppDriverTypeEnum.DAB:
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DAB));
+                break;
             case AppDriverTypeEnum.FM:
-                //if (_driverPageViewModel.SameDriver || !_driver.Connected)
-                //{
-                    _appMenu.ShowFMorDABConnectMenu();
-                //}
-                //else
-                //{
-                    // TODO: reconnect menu
-                //}
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.FM));
                 break;
         }
 
@@ -262,21 +252,21 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuChangeDriver":
-                await _driverPageViewModel.ChangeDriver(item.DriverType);
+                //await _driverPageViewModel.ChangeDriver(item.DriverType);
                 break;
             case "menuCancelChangeDriver":
                 //_driverPageViewModel.UpdateActiveDriverType();
                 break;
             case "menuConnectDriver":
-                ConnectButton_Clicked(this, null);
+                //ConnectButton_Clicked(this, null);
                 break;
             case "menuConnectFM":
-                _configuration.AppDriverType = AppDriverTypeEnum.FM;
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
+                //_configuration.AppDriverType = AppDriverTypeEnum.FM;
+                //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.FM));
                 break;
             case "menuConnectDAB":
-                _configuration.AppDriverType = AppDriverTypeEnum.DAB;
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
+                //_configuration.AppDriverType = AppDriverTypeEnum.DAB;
+                //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DAB));
                 break;
         }
     }

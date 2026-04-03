@@ -842,7 +842,7 @@ namespace DVBTTelevizor.MAUI
         {
             NotifyChange();
 
-            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(String.Empty));
+            WeakReferenceMessenger.Default.Send(new DriverChangedMessages(_driver));
         }
 
         public async Task ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)
@@ -960,7 +960,7 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
             if (_driver.Connected)
-                return;            
+                return;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 

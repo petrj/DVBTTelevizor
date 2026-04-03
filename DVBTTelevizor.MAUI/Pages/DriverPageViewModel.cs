@@ -15,7 +15,7 @@ namespace DVBTTelevizor.MAUI
     public class DriverPageViewModel : BaseViewModel
     {
         private string _range = string.Empty;
-        private DriverState? _driverState = null;
+        private DriverStat? _driverState = null;
 
         private AppDriverTypeEnum? _pageDriver = null;
         private bool? _dvbtDriverInstalled = null;
@@ -25,16 +25,18 @@ namespace DVBTTelevizor.MAUI
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
-            WeakReferenceMessenger.Default.Register<DriverUpdateStateMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
                 _driverState = m.Value;
-                NotifyChange();
+                NotifyDriverChange();
             });
 
-            WeakReferenceMessenger.Default.Register<DVBTDriverStateChangedMessages>(this, (r, m) =>
-            {
-                Task.Run(async () => CheckDriver());
-            });
+            //WeakReferenceMessenger.Default.Register<DriverChangedMessages>(this, (r, m) =>
+            //{
+            //    _driver = m.Value;
+
+            //    NotifyChange();
+            //});
         }
 
         public bool? DvbtDriverInstalled
@@ -43,7 +45,7 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _dvbtDriverInstalled = value;
-                NotifyChange();
+                NotifyDriverChange();
             }
         }
         public bool? RtlsdrDriverInstalled
@@ -52,32 +54,32 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _rtlsdrDriverInstalled = value;
-                NotifyChange();
+                NotifyDriverChange();
             }
         }
 
-        public async Task CheckDriver()
-        {
-            try
-            {
-                _range = string.Empty;
+        //public async Task CheckDriver()
+        //{
+        //    try
+        //    {
+        //        _range = string.Empty;
 
-                if (_driver == null || !_driver.Connected)
-                    return;
+        //        if (_driver == null || !_driver.Connected)
+        //            return;
 
-                var cap = await _driver.GetCapabalities();
+        //        var cap = await _driver.GetCapabalities();
 
-                // setting min/max frequencies from device
-                if (cap.SuccessFlag)
-                {
-                    _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")}";
-                }
-            }
-            finally
-            {
-                NotifyChange();
-            }
-        }
+        //        // setting min/max frequencies from device
+        //        if (cap.SuccessFlag)
+        //        {
+        //            _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")}";
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        NotifyChange();
+        //    }
+        //}
 
 
         public AppDriverTypeEnum? PageDriver
@@ -90,7 +92,7 @@ namespace DVBTTelevizor.MAUI
             {
                 _pageDriver = value;
 
-                NotifyChange();
+                NotifyDriverChange();
             }
         }
 
@@ -101,18 +103,23 @@ namespace DVBTTelevizor.MAUI
                 switch (_pageDriver)
                 {
                     case AppDriverTypeEnum.DVBT:
-                        return "DVB-T Driver".Translated();
+                        return "DVB-T".Translated();
                     case AppDriverTypeEnum.DAB:
+                        return "DAB".Translated();
                     case AppDriverTypeEnum.FM:
-                        return "SDR Driver".Translated();
+                        return "FM".Translated();
                     default:
                         return "Driver".Translated();
                 }
             }
         }
 
-        public void NotifyChange()
+        public override void NotifyDriverChange()
         {
+            _loggingService.Info($"DriverPageViewModel: NotifyDriverChange");
+
+            base.NotifyDriverChange();
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 OnPropertyChanged(nameof(PageDriver));
@@ -249,7 +256,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (_driver.DriverType == _pageDriver.Value)
                 {
-                    // same driver, show button if connected 
+                    // same driver, show button if connected
                     return _driver.Connected;
                 }
                 else
@@ -296,12 +303,12 @@ namespace DVBTTelevizor.MAUI
 
                 if (_driver.DriverType == _pageDriver.Value)
                 {
-                    // same driver, show connect button if not connected 
+                    // same driver, show connect button if not connected
                     return !_driver.Connected;
                 } else
                 {
                     // different driver
-                    return true;// show connect button to allow user to switch driver                    
+                    return true;// show connect button to allow user to switch driver
                 }
             }
         }
