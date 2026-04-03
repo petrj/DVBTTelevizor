@@ -37,6 +37,22 @@ namespace DVBTTelevizor.TV
             _demodulator.OnDemodulated += OnDataDemodulated;
         }
 
+        public int QueueSize
+        {
+            get
+            {
+                return _demodulator == null ? 0 : _demodulator.QueueSize;
+            }
+        }
+
+        public bool Synced
+        {
+            get
+            {
+                return _demodulator == null ? false : _demodulator.Synced;
+            }
+        }
+
         public virtual AppDriverTypeEnum DriverType
         {
             get { return AppDriverTypeEnum.DAB; }
@@ -157,7 +173,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return                        
+                return
                         _driver != null &&
                         _driver.State == DriverStateEnum.Connected;
             }

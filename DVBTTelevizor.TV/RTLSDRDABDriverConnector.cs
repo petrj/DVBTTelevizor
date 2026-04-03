@@ -31,7 +31,8 @@ namespace DVBTTelevizor.TV
                     supportedDeliverySystems = 0,
                     minFrequency = 174928000,
                     maxFrequency = 239200000,
-                    frequencyStepSize = 1712000
+                    frequencyStepSize = 1712000,
+                    SuccessFlag = true
                 };
             });
         }

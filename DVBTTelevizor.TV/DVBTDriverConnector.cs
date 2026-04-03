@@ -14,6 +14,7 @@ using MPEGTS;
 using System.Threading;
 using LoggerService;
 using DVBTTelevizor.TV;
+using RTLSDR.Common;
 
 namespace DVBTTelevizor
 {
@@ -83,6 +84,22 @@ namespace DVBTTelevizor
             get
             {
                 return _driverStreamDataAvailable;
+            }
+        }
+
+        public int QueueSize
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public bool Synced
+        {
+            get
+            {
+                return true;
             }
         }
 
@@ -658,6 +675,12 @@ namespace DVBTTelevizor
 
         public static string GetHumanReadableFrequency(long? herz)
         {
+            var herzm = Convert.ToDouble(herz / 1000000.0);
+            if (AudioTools.FrequenciesDabMHz.ContainsKey(herzm))
+            {
+                return $" {AudioTools.FrequenciesDabMHz[herzm]}";
+            }
+
             if (herz == null)
             {
                 return "--";
@@ -1816,5 +1839,5 @@ namespace DVBTTelevizor
         {
             get { return AppDriverTypeEnum.DVBT; }
         }
-    }        
+    }
 }

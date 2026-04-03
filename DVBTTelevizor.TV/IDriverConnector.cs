@@ -22,7 +22,7 @@ namespace DVBTTelevizor
 
         DVBTDriverConfiguration Configuration { get; set; }
 
-        bool Connected { get; }        
+        bool Connected { get; }
 
         DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }
 
@@ -30,6 +30,9 @@ namespace DVBTTelevizor
         string StreamUrl { get; }
 
         public event EventHandler OnRawAudioDemodulated;
+
+        int QueueSize { get; }
+        bool Synced { get; }
 
         bool Recording { get; }
         bool ReadingStream { get; }

@@ -19,6 +19,7 @@ namespace DVBTTelevizor.TV
         private DateTime _lastTimeForGettingStatus = DateTime.MinValue;
         private AppDriverTypeEnum _driverType = AppDriverTypeEnum.DAB;
         private CancellationTokenSource? _cts;
+        private long _bytesPerSecond = 2114628;
 
         public event EventHandler OnRawAudioDemodulated;
 
@@ -42,6 +43,22 @@ namespace DVBTTelevizor.TV
             State = DVBTDriverStateEnum.Unknown;
         }
 
+        public int QueueSize
+        {
+            get
+            {
+                return _demodulator == null ? 0 : _demodulator.QueueSize;
+            }
+        }
+
+        public bool Synced
+        {
+            get
+            {
+                return _demodulator == null ? false : _demodulator.Synced;
+            }
+        }
+
         public virtual AppDriverTypeEnum DriverType
         {
             get { return _driverType; }
@@ -57,23 +74,6 @@ namespace DVBTTelevizor.TV
             if (OnRawAudioDemodulated != null)
             {
                 OnRawAudioDemodulated(sender, e);
-            }
-        }
-
-        private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
-        {
-            if (_demodulator != null && e.Size > 0)
-            {
-                _demodulator.AddSamples(e.Data, e.Size);
-
-                if ((_demodulator is DABProcessor dab) && ((DateTime.UtcNow - _lastTimeForGettingStatus).TotalMilliseconds > 500))
-                {
-                    _log.Debug(dab.Stat(true));
-                    _lastTimeForGettingStatus = DateTime.UtcNow;
-                }
-
-                // save raw data for analysis
-                //RecordData(e.Data, e.Size);
             }
         }
 
@@ -172,7 +172,7 @@ namespace DVBTTelevizor.TV
                 if (!Connected)
                     return 0;
 
-                return 1;
+                return _bytesPerSecond*8;
             }
         }
 
@@ -209,25 +209,26 @@ namespace DVBTTelevizor.TV
         private async Task ReadData(CancellationToken token)
         {
             var fName = "data.raw";
-            int bytesPerSecond = 2114628;
 
             // read data from driver and feed to demodulator
             if (DriverType == AppDriverTypeEnum.FM)
             {
                 fName = Path.Join(PublicDirectory, "FM.raw");
-                bytesPerSecond = 2114628;
+                _bytesPerSecond = 2114628;
             }
             else
             if (DriverType == AppDriverTypeEnum.DAB)
             {
                 fName = Path.Join(PublicDirectory, "DAB.raw");
-                    bytesPerSecond = 2114628*2;
+                _bytesPerSecond = 2114628*2;
             }
 
             if (!File.Exists(fName))
             {
                 throw new FileNotFoundException($"File {fName} not found");
             }
+
+            _log.Info($"RTL SDR Test driver: Reading data from {fName} at {_bytesPerSecond*8} Bits/s");
 
             const int bufferSize = 16 * 1024; // 16 KB buffer
             byte[] buffer = new byte[bufferSize];
@@ -250,7 +251,8 @@ namespace DVBTTelevizor.TV
                 if (bytesRead == 0)
                 {
                     // EOF reached – stop (or loop if needed)
-                    break;
+                    fs.Seek(0, SeekOrigin.Begin);
+                    continue;
                 }
 
                 totalBytesRead += bytesRead;
@@ -258,7 +260,7 @@ namespace DVBTTelevizor.TV
                 _demodulator.AddSamples(buffer, bytesRead);
 
                 // 🧠 Timing control (keeps correct bitrate)
-                double expectedSeconds = (double)totalBytesRead / bytesPerSecond;
+                double expectedSeconds = (double)totalBytesRead / _bytesPerSecond;
                 double actualSeconds = stopwatch.Elapsed.TotalSeconds;
 
                 if (expectedSeconds > actualSeconds)
@@ -297,7 +299,8 @@ namespace DVBTTelevizor.TV
                     supportedDeliverySystems = 0,
                     minFrequency =  _driverType == AppDriverTypeEnum.FM ? AudioTools.FMMinFreq : AudioTools.DABMinFreq,
                     maxFrequency = _driverType == AppDriverTypeEnum.FM ? AudioTools.FMMaxFreq: AudioTools.DABMaxFreq,
-                    frequencyStepSize = 1000
+                    frequencyStepSize = 1000,
+                    SuccessFlag = true
                 };
             });
         }
@@ -416,6 +419,11 @@ namespace DVBTTelevizor.TV
 
         public Task<bool> Stop()
         {
+            if (_cts != null)
+            {
+                _cts.Cancel();
+            }
+
             return Task.Run(() => { return true; });
         }
 
@@ -431,6 +439,8 @@ namespace DVBTTelevizor.TV
         {
             _log.Info($"RTL SDR driver: Tuning {frequency}");
 
+            LastTunedFreq = frequency;
+
             return Task.Run(() =>
             {
                 return new DVBTDriverResponse()
@@ -443,6 +453,8 @@ namespace DVBTTelevizor.TV
         public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             _log.Info($"RTLSDRTestDriverConnector: TuneEnhanced freq {frequency / 1000} kHz");
+
+            LastTunedFreq = frequency;
 
             return new DVBTDriverTuneResult()
             {

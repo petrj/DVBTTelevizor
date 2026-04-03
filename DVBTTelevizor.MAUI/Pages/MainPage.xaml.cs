@@ -37,6 +37,7 @@ namespace DVBTTelevizor.MAUI
         private IDriverConnector _driver { get; set; }
         private ITVConfiguration _configuration;
         private IRTLSDRDriverPlatformImplementation _sdrDriverPlatformImplementation;
+        private DABService? _playingDABService = null;
         public string PublicDirectory { get; set; }
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
@@ -509,6 +510,12 @@ namespace DVBTTelevizor.MAUI
                         Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
                     }
                     ));
+
+                if (_demodulator != null)
+                {
+                    _loggingService.Debug(_demodulator.Stat(true));
+                }
+
             } catch (Exception ex)
             {
                 _loggingService.Error(ex);
@@ -849,6 +856,15 @@ namespace DVBTTelevizor.MAUI
             if (e is DABServiceFoundEventArgs de)
             {
                 _loggingService.Info($"DAB service found: {de.Service}");
+
+                // autoplay DAB service when found
+                if ((_playingDABService == null) &&
+                    (_demodulator != null) &&
+                    (_demodulator is DABProcessor dab))
+                {
+                    _playingDABService = de.Service;
+                    dab.SetProcessingService(_playingDABService);
+                }
             }
         }
 
@@ -872,6 +888,7 @@ namespace DVBTTelevizor.MAUI
                 if (_vlcRawAudioInput == null)
                 {
                     _vlcRawAudioInput = new VLCMediaInput();
+                    _vlcRawAudioInput.MaxDataRequestSize = 8192;
 
                     var mediaOptions = new[]
                         {
@@ -903,7 +920,8 @@ namespace DVBTTelevizor.MAUI
             {
                     if (_vlcRawAudioInput ==null)
                     {
-                    _vlcRawAudioInput = new VLCMediaInput();
+                        _vlcRawAudioInput = new VLCMediaInput();
+                    _vlcRawAudioInput.MaxDataRequestSize = 384000u;
 
                     var mediaOptions = new[]
                             {

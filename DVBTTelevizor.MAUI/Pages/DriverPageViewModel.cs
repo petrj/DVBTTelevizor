@@ -36,15 +36,18 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;
-                NotifyDriverChange();
+                Task.Run(async () =>
+                 {
+                    await CheckDriver();
+                    NotifyDriverChange();
+                 });
             });
 
-            //WeakReferenceMessenger.Default.Register<DriverChangedMessages>(this, (r, m) =>
-            //{
-            //    _driver = m.Value;
-
-            //    NotifyChange();
-            //});
+            WeakReferenceMessenger.Default.Register<CheckDriversResultMessage>(this, (r, m) =>
+            {
+                DvbtDriverInstalled = m.Value.DVBT;
+                RtlsdrDriverInstalled = m.Value.RTLSDR;
+            });
         }
 
         public bool? DvbtDriverInstalled
@@ -66,28 +69,28 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        //public async Task CheckDriver()
-        //{
-        //    try
-        //    {
-        //        _range = string.Empty;
+        public async Task CheckDriver()
+        {
+            try
+            {
+                _range = string.Empty;
 
-        //        if (_driver == null || !_driver.Connected)
-        //            return;
+                if (_driver == null || !_driver.Connected)
+                    return;
 
-        //        var cap = await _driver.GetCapabalities();
+                var cap = await _driver.GetCapabalities();
 
-        //        // setting min/max frequencies from device
-        //        if (cap.SuccessFlag)
-        //        {
-        //            _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")}";
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        NotifyChange();
-        //    }
-        //}
+                // setting min/max frequencies from device
+                if (cap.SuccessFlag)
+                {
+                    _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")} MHz";
+                }
+            }
+            finally
+            {
+                NotifyDriverChange();
+            }
+        }
 
 
         public AppDriverTypeEnum? PageDriver
@@ -141,6 +144,8 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(DisconnectButtonVisible));
                 OnPropertyChanged(nameof(ConnectedDeviceRange));
+                OnPropertyChanged(nameof(ConnectedDeviceQueue));
+                OnPropertyChanged(nameof(ConnectedDeviceSynced));
 
                 OnPropertyChanged(nameof(Bitrate));
             });
@@ -242,6 +247,31 @@ namespace DVBTTelevizor.MAUI
             {
                 return (_driver != null) && _driver.Connected
                     ? _range
+                    : String.Empty;
+            }
+        }
+
+
+        public bool ConnectedDeviceSynced
+        {
+
+            get
+            {
+                return (_driver != null) && (_driver.Connected)
+                    ? _driver.Synced
+                    : false;
+            }
+        }
+
+
+
+        public string ConnectedDeviceQueue
+        {
+
+            get
+            {
+                return (_driver != null) && (_driver.Connected)
+                    ? _driver.QueueSize.ToString()
                     : String.Empty;
             }
         }
