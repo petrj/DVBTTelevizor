@@ -208,22 +208,26 @@ namespace DVBTTelevizor.TV
 
         private async Task ReadData(CancellationToken token)
         {
-            // read data from driver and feed to demodulator
-            if (DriverType != AppDriverTypeEnum.FM)
-            {
-                return;
-            }
+            var fName = "data.raw";
+            int bytesPerSecond = 2114628;
 
-            var fName = Path.Join(PublicDirectory, "FM.raw");
+            // read data from driver and feed to demodulator
+            if (DriverType == AppDriverTypeEnum.FM)
+            {
+                fName = Path.Join(PublicDirectory, "FM.raw");
+                bytesPerSecond = 2114628;
+            }
+            else
+            if (DriverType == AppDriverTypeEnum.DAB)
+            {
+                fName = Path.Join(PublicDirectory, "DAB.raw");
+                    bytesPerSecond = 2114628*2;
+            }
 
             if (!File.Exists(fName))
             {
                 throw new FileNotFoundException($"File {fName} not found");
             }
-
-            // 🔧 सेट your desired bitrate here (bytes per second)
-            // Example: 240k samples/sec * 2 bytes (I+Q, 8-bit each)
-            int bytesPerSecond = 2114628;
 
             const int bufferSize = 16 * 1024; // 16 KB buffer
             byte[] buffer = new byte[bufferSize];
@@ -266,7 +270,6 @@ namespace DVBTTelevizor.TV
                     }
                 }
             }
-
         }
 
         public Task Disconnect()

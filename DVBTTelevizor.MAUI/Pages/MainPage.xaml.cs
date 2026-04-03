@@ -33,6 +33,7 @@ namespace DVBTTelevizor.MAUI
     {
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
+        private IDemodulator? _demodulator { get; set; } = null;
         private IDriverConnector _driver { get; set; }
         private ITVConfiguration _configuration;
         private IRTLSDRDriverPlatformImplementation _sdrDriverPlatformImplementation;
@@ -802,10 +803,10 @@ namespace DVBTTelevizor.MAUI
                     break;
                 case AppDriverTypeEnum.FM:
 
-                    var fmDemodulator = new FMDemodulator(_loggingService);
+                    _demodulator = new FMDemodulator(_loggingService);
 
 #if DEBUG
-                    _driver = new RTLSDRTestDriverConnector(_loggingService, fmDemodulator, AppDriverTypeEnum.FM);
+                    _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
 #else
                   _driver = new RTLSDRFMDriverConnector(_loggingService,
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
@@ -813,23 +814,23 @@ namespace DVBTTelevizor.MAUI
 #endif
 
 
-                        fmDemodulator.Start();
+                    _demodulator.Start();
                     break;
                 case AppDriverTypeEnum.DAB:
-                        var dabDemoduator = new DABProcessor(_loggingService);
+                        _demodulator = new DABProcessor(_loggingService);
 
-                        dabDemoduator.OnServiceFound += DabDemoduator_OnServiceFound;
+                        _demodulator.OnServiceFound += DabDemoduator_OnServiceFound;
                         //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
 
 #if DEBUG
-                    _driver = new RTLSDRTestDriverConnector(_loggingService,dabDemoduator, AppDriverTypeEnum.DAB);
+                    _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
 #else
                     _driver = new RTLSDRDABDriverConnector(_loggingService,
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
                             dabDemoduator);
 #endif
 
-                    dabDemoduator.Start();
+                        _demodulator.Start();
                         _driver.SetGain(GainEnum.Auto);
                         _driver.Tune(199360000, 1024, 0);
                     break;
