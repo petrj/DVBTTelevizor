@@ -18,8 +18,9 @@ namespace DVBTTelevizor.TV
         private IDemodulator _demodulator = null;
         private DateTime _lastTimeForGettingStatus = DateTime.MinValue;
         private AppDriverTypeEnum _driverType = AppDriverTypeEnum.DAB;
+        private CancellationTokenSource? _cts;
 
-        public event EventHandler OnRawAudioDemodulated;            
+        public event EventHandler OnRawAudioDemodulated;
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
@@ -197,14 +198,86 @@ namespace DVBTTelevizor.TV
             _log.Info($"RTL SDR Test driver: Connecting");
 
             State = DVBTDriverStateEnum.Connected;
+
+            _= Task.Run(async () =>
+             {
+                 _cts = new CancellationTokenSource();
+                 await ReadData(_cts.Token);
+             });
+        }
+
+        private async Task ReadData(CancellationToken token)
+        {
+            // read data from driver and feed to demodulator
+            if (DriverType != AppDriverTypeEnum.FM)
+            {
+                return;
+            }
+
+            var fName = Path.Join(PublicDirectory, "FM.raw");
+
+            if (!File.Exists(fName))
+            {
+                throw new FileNotFoundException($"File {fName} not found");
+            }
+
+            // 🔧 सेट your desired bitrate here (bytes per second)
+            // Example: 240k samples/sec * 2 bytes (I+Q, 8-bit each)
+            int bytesPerSecond = 2114628;
+
+            const int bufferSize = 16 * 1024; // 16 KB buffer
+            byte[] buffer = new byte[bufferSize];
+
+            using var fs = new FileStream(
+                fName,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                bufferSize,
+                useAsync: true);
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            long totalBytesRead = 0;
+
+            while (!token.IsCancellationRequested)
+            {
+                int bytesRead = await fs.ReadAsync(buffer, 0, buffer.Length, token);
+
+                if (bytesRead == 0)
+                {
+                    // EOF reached – stop (or loop if needed)
+                    break;
+                }
+
+                totalBytesRead += bytesRead;
+
+                _demodulator.AddSamples(buffer, bytesRead);
+
+                // 🧠 Timing control (keeps correct bitrate)
+                double expectedSeconds = (double)totalBytesRead / bytesPerSecond;
+                double actualSeconds = stopwatch.Elapsed.TotalSeconds;
+
+                if (expectedSeconds > actualSeconds)
+                {
+                    int delayMs = (int)((expectedSeconds - actualSeconds) * 1000);
+                    if (delayMs > 0)
+                    {
+                        await Task.Delay(delayMs, token);
+                    }
+                }
+            }
+
         }
 
         public Task Disconnect()
         {
-            return Task.Run(() =>
-            {                
-                State = DVBTDriverStateEnum.Disconnected;
-            });
+            if (_cts != null)
+            {
+                _cts.Cancel();
+            }
+            State = DVBTDriverStateEnum.Disconnected;
+
+            return Task.CompletedTask;
         }
 
         public Task<bool> DriverSendingData(int readMsTimeout = 500)
@@ -247,7 +320,7 @@ namespace DVBTTelevizor.TV
                     state.hasCarrier = 0;
                     state.hasSync = 0;
                     state.hasLock = 0;
-                }                
+                }
 
                 if (StatusChanged != null)
                 {
