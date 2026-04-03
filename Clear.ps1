@@ -7,11 +7,7 @@ cd $PSScriptRoot
 
 
 foreach ($folder in `
-    @(
-    "DVBTTelevizor\DVBTTelevizor\bin",
-    "DVBTTelevizor\DVBTTelevizor\obj",
-    "DVBTTelevizor\DVBTTelevizor.Android\bin",
-    "DVBTTelevizor\DVBTTelevizor.Android\obj",
+    @(    
     "DVBTTelevizor.Driver\bin",
     "DVBTTelevizor.Driver\obj",
     "DVBTTelevizor.TV\bin",
