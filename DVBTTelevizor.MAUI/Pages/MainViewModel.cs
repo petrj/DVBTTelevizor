@@ -66,6 +66,8 @@ namespace DVBTTelevizor.MAUI
         public ICommand RefreshCommand { get; set; }
         public Command CommandScanEPG { get; set; }
 
+        private bool? _dvbtDriverInstalled = null;
+        private bool? _rtlsdrDriverInstalled = null;
         public bool MainLayoutVisible { get; set; } = true;
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
@@ -155,8 +157,33 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public bool? DvbtDriverInstalled
+        {
+            get => _dvbtDriverInstalled;
+            set
+            {
+                _dvbtDriverInstalled = value;
+                NotifyChange();
+            }
+        }
+        public bool? RtlsdrDriverInstalled
+        {
+            get => _rtlsdrDriverInstalled;
+            set
+            {
+                _rtlsdrDriverInstalled = value;
+                NotifyChange();
+            }
+        }
+
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<CheckDriversResultMessage>(this, (r, m) =>
+            {
+                DvbtDriverInstalled = m.Value.DVBT;
+                RtlsdrDriverInstalled = m.Value.RTLSDR;
+            });
+
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;
@@ -830,24 +857,59 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                //return false;
-                return
-                    (Channels.Count == 0) &&
-                    Refreshed &&
-                    (_driver!= null);
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value)
+                        ||
+                        (RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value);
             }
         }
 
-        public bool InstallDriverButtonVisible
+        public bool DriveImageVisible
         {
             get
             {
-                return
-                    (Channels.Count == 0) &&
-                    Refreshed &&
-                    (_driver != null);
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue &&
+                        RtlsdrDriverInstalled.HasValue &&
+                        !DvbtDriverInstalled.Value &&
+                        !RtlsdrDriverInstalled.Value);
             }
         }
+
+        public bool InstallDVBTDriverButtonVisible
+        {
+            get
+            {
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value);
+            }
+        }
+
+        public bool InstallFMDABDriverButtonVisible
+        {
+            get
+            {
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return _rtlsdrDriverInstalled.HasValue && !_rtlsdrDriverInstalled.Value;
+            }
+        }
+
 
         public void UpdateDriverState()
         {
@@ -1268,9 +1330,11 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(Refreshed));
             OnPropertyChanged(nameof(NotRefreshed));
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
-            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+            OnPropertyChanged(nameof(InstallDVBTDriverButtonVisible));
+            OnPropertyChanged(nameof(InstallFMDABDriverButtonVisible));
             OnPropertyChanged(nameof(Channels));
             OnPropertyChanged(nameof(DriverIconImage));
+            OnPropertyChanged(nameof(DriveImageVisible));
         }
 
         public bool Refreshed

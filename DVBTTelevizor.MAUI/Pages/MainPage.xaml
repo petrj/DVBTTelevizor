@@ -185,7 +185,7 @@
 
     <AbsoluteLayout x:Name="MainAbsoluteLayout" BackgroundColor="Black" Margin="0,0,0,0">
 
-        <StackLayout x:Name="VideoStackLayout" IsVisible="{Binding VideoStackLayoutVisible}" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
+       <StackLayout x:Name="VideoStackLayout" IsVisible="{Binding VideoStackLayoutVisible}" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Transparent">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
@@ -378,24 +378,27 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Label Text="{local:LngXamlExt Input='No channel'}" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.15,0.75,0.15" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+        <Label Text="{local:LngXamlExt Input='No channel'}" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.1,0.75,0.15" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
 
-
-        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="tunebig.png">
+        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.3,0.3,0.25" Source="tunebig.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="TuneImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
-        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
-        <Image x:Name="DriverImage" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.3,0.3" Source="donglered.png">
+        <Image x:Name="DriverImage" IsVisible="{Binding DriveImageVisible}" AbsoluteLayout.LayoutFlags="All"  AbsoluteLayout.LayoutBounds="0.5,0.3,0.8,0.25" Source="donglered.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="DriverImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
-        <Button x:Name="QuickDriverButton" IsVisible="{Binding InstallDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="QuickDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
-         <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
+
+         <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.55,0.75,0.15" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+
+        <Button x:Name="DVBTDriverButton" IsVisible="{Binding InstallDVBTDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Install DVBT driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="DVBTDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="FMDABDriverButton" IsVisible="{Binding InstallFMDABDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.95,0.75,0.15" Text="{local:LngXamlExt Input='Install FM/DAB driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="FMDABDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+
+        <local:Menu x:Name="MainMenu" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.5,0.75,0.75" IsVisible="{Binding MenuVisible}" Tapped="Menu_Tapped"  />
 
         <!--BoxView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="1.0, 1.0, 0.3, 0.9"  Color="Green"/-->
 

@@ -9,8 +9,8 @@ namespace DVBTTelevizor.MAUI.Messages
 {
     public class CheckDriversResult
     {
-        public bool DVBT { get; set; } = false;
-        public bool RTLSDR { get; set; } = false;
+        public bool? DVBT { get; set; } = false;
+        public bool? RTLSDR { get; set; } = false;
 
     }
 

@@ -1034,7 +1034,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     _remoteAccessService.StopListening();
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _loggingService.Error(ex);
             }
@@ -1047,7 +1048,8 @@ namespace DVBTTelevizor.MAUI
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBTTelevizorButton", new List<View>() { DVBTTelevizorButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsListView", new List<View>() { ChannelsListView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("InstallDriverButton", new List<View>() { QuickDriverButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriverButton", new List<View>() { DVBTDriverButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FMDABDriverButton", new List<View>() { FMDABDriverButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("QuickTuneButton", new List<View>() { QuickTuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("EPGDetailGrid", new List<View>() { EPGDetailGrid }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
@@ -3585,17 +3587,16 @@ namespace DVBTTelevizor.MAUI
                     //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(System.String.Empty));
                     break;
 
-                case "menuInstallDriver":
+                case "DVBTDriverButton":
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        //if (_viewModel.DVBTDriverActive)
-                        //{
-                        //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                        //}
-                        //else
-                        //{
-                        //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                        //}
+                         await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                    });
+                    break;
+                case "FMDABDriverButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
                     });
                     break;
 
@@ -3764,9 +3765,15 @@ namespace DVBTTelevizor.MAUI
             TuneButton_Clicked(this, new EventArgs());
         }
 
-        private void QuickDriverButton_Clicked(object sender, EventArgs e)
+        private async void DVBTDriverButton_Clicked(object sender, EventArgs e)
         {
-            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(System.String.Empty));
+            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+
+        }
+
+        private async void FMDABDriverButton_Clicked(object sender, EventArgs e)
+        {
+            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
         }
 
         private void OnChannel_Tapped(object sender, TappedEventArgs e)
