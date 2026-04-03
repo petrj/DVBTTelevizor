@@ -47,13 +47,16 @@ namespace DVBTTelevizor.MAUI
 
         public event EventHandler? ChannelFound = null;
 
+        private IDriverConnector? _driver = null;
+
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
+            _driver = driver;
             Settings = new TuningSettings(loggingService);
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
-            _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+            //_driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
 
             _listViewSelector = new ListViewSelector(Channels);
         }

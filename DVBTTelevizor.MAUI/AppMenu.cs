@@ -84,24 +84,24 @@ namespace DVBTTelevizor.MAUI
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(false));
         }
 
-        public void ShowConfirmChangeDriverMenu(IDriverConnector driver, AppDriverTypeEnum currentDriverType, AppDriverTypeEnum newDriverType)
+        public void ShowConfirmChangeDriverMenu(IDriverConnector driver, AppDriverTypeEnum? newDriverType)
         {
-            //if (_driver == null || !_driver.Connected)
-            //{
-            //    return;
-            //}
+            if (driver == null)
+            {
+                return;
+            }
 
             ShowMenu();
 
             Clear();
 
             var newDriverName = BaseViewModel.GetDVBTDriverTypeName(newDriverType);
-            var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(currentDriverType);
+            var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(driver.DriverType);
 
             // driver: Not installed => installed > connected
 
             string question;
-            if (driver != null && !driver.Connected)
+            if (!driver.Connected)
             {
                 question = "Connect to {0}?".Translated(newDriverName);
             } else
@@ -110,8 +110,8 @@ namespace DVBTTelevizor.MAUI
                     .Translated(currentDriverName, newDriverName);
             }
 
-            var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", question, "driver.png"));
-            menuItem.DriverType = newDriverType;
+            var menuItem = AddItem(_menu.CreateMenuItem("menuConfirmChangeDriver", question, "driver.png"));
+            menuItem.DriverType = newDriverType == null ? AppDriverTypeEnum.DVBT : newDriverType.Value;
 
             AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Continue using {0}".Translated(currentDriverName), "back.png"));
 

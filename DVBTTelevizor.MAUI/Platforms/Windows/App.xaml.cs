@@ -88,7 +88,7 @@ namespace DVBTTelevizor.MAUI.WinUI
                     WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
                     new DVBTDriverConfiguration()
                     {
-                        DeviceName = "Testing RTLSDR DAB driver",
+                        DeviceName = "Testing RTLSDR driver",
                         PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                     }));
 #else

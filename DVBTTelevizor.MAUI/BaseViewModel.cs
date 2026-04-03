@@ -15,7 +15,6 @@ namespace DVBTTelevizor.MAUI
     public class BaseViewModel : BaseNotifableObject
     {
         protected ILoggingService _loggingService;
-        protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
 
@@ -27,7 +26,6 @@ namespace DVBTTelevizor.MAUI
             IPublicDirectoryProvider publicDirectoryProvider)
         {
             _loggingService = loggingService;
-            _driver = driver;
             _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
             _configuration = tvConfiguration;
 
@@ -36,21 +34,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
-
-
-            WeakReferenceMessenger.Default.Register<DriverChangedMessages>(this, (r, m) =>
-            {
-                _driver = m.Value;
-
-                NotifyDriverChange();
-            });
-
-            //WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-            //{
-            //    _driver = m.Value;
-            //    UpdateActiveDriverType();
-            //    NotifyDriverChange();
-            //});
         }
 
         public bool MenuVisible
@@ -67,7 +50,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public static string GetDVBTDriverTypeName(AppDriverTypeEnum driverType)
+        public static string GetDVBTDriverTypeName(AppDriverTypeEnum? driverType)
         {
             switch (driverType)
             {
@@ -82,7 +65,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public static string GetDVBTDriverShortName(AppDriverTypeEnum driverType)
+        public static string GetDVBTDriverShortName(AppDriverTypeEnum? driverType)
         {
             switch (driverType)
             {
@@ -150,17 +133,6 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(ImageIconSize));
                 OnPropertyChanged(nameof(FontSizeForDescription));
                 OnPropertyChanged(nameof(FontSizeForLargeCaption));
-            });
-        }
-
-        public virtual void NotifyDriverChange()
-        {
-            _loggingService.Info($"NotifyDriverChange");
-
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                OnPropertyChanged(nameof(ConnectedDevice));
-                OnPropertyChanged(nameof(DriversBoxVisible));
             });
         }
 
@@ -271,31 +243,6 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return GetScaledSize(9).ToString();
-            }
-        }
-
-        public string ConnectedDevice
-        {
-            get
-            {
-                if (_driver == null ||
-                    _driver.Configuration == null ||
-                    String.IsNullOrWhiteSpace(_driver.Configuration.DeviceName))
-                {
-                    return "No compatible device".Translated();
-                }
-
-                return _driver.Configuration.DeviceName;
-            }
-        }
-
-
-
-        public bool DriversBoxVisible
-        {
-            get
-            {
-                return _configuration.RTLSDREnabled;
             }
         }
 

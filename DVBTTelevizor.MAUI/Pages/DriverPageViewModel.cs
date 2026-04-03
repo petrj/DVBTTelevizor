@@ -20,14 +20,22 @@ namespace DVBTTelevizor.MAUI
         private AppDriverTypeEnum? _pageDriver = null;
         private bool? _dvbtDriverInstalled = null;
         private bool? _rtlsdrDriverInstalled = null;
+        private IDriverConnector? _driver = null;
 
-
-        public DriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+        public DriverPageViewModel(ILoggingService loggingService, IDriverConnector? driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
+            _driver = driver;
+
             WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
                 _driverState = m.Value;
+                NotifyDriverChange();
+            });
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                _driver = m.Value;
                 NotifyDriverChange();
             });
 
@@ -114,11 +122,9 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public override void NotifyDriverChange()
+        public void NotifyDriverChange()
         {
             _loggingService.Info($"DriverPageViewModel: NotifyDriverChange");
-
-            base.NotifyDriverChange();
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {

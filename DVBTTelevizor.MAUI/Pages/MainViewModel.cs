@@ -29,6 +29,8 @@ namespace DVBTTelevizor.MAUI
 
         public bool IsRecording { get; set; } = false;
 
+        private IDriverConnector? _driver = null;
+
         private SledovaniTV.SledovaniTV _iptv;
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
@@ -69,6 +71,8 @@ namespace DVBTTelevizor.MAUI
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
+            _driver = driver;
+
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 
@@ -153,6 +157,13 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                _driver = m.Value;
+
+                NotifyChange();
+            });
+
             WeakReferenceMessenger.Default.Register<DriverHasBeenConnectedMessage>(this, (r, m) =>
             {
                 ConnectDriver(m.Value);
@@ -959,16 +970,21 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
-            if (_driver.Connected)
-                return;
+            try
+            {
+                if (_driver.Connected)
+                    return;
 
-            WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 
-            _driver.Configuration = config;
-            _driver.PublicDirectory = _publicDirectory;
-            _driver.Connect();
-
-            UpdateDriverState();
+                _driver.Configuration = config;
+                _driver.PublicDirectory = _publicDirectory;
+                _driver.Connect();
+            }
+            finally
+            {
+                UpdateDriverState();
+            }
         }
 
         private void ConnectDriverFailed(string message)

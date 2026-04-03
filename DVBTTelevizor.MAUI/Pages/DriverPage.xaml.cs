@@ -15,6 +15,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private ITVConfiguration _configuration;
+    private IDriverConnector _driver;
 
     private string _publicDirectory;
 
@@ -29,6 +30,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _loggingService = loggingService;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+        _driver = driver;
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
@@ -185,28 +187,27 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage ConnectButton_Clicked");
 
-        // SameDriver:
-        //  -   RTLSDR driver: show menu Conenct FM or DAB
-        //  -   DVTB driver: Connect (no menu, because only one driver)
-        // NOT same driver:
-        //  -   RTLSDR driver: Show confirm menu to change driver and connect
-        //  -   DVBT driver: Show confirm menu to change driver and connect FM/DAB
-
-        switch (_driverPageViewModel.PageDriver)
+        if (_driverPageViewModel.PageDriver != _driver.DriverType)
         {
-            case AppDriverTypeEnum.DVBT:
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DVBT));
-                break;
-            case AppDriverTypeEnum.DAB:
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DAB));
-                break;
-            case AppDriverTypeEnum.FM:
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.FM));
-                break;
+            _appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver);
+            return;
         }
 
-        // WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-         //_appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver, _driverPageViewModel.PageDriver);
+        if  (_driverPageViewModel.PageDriver == _driver.DriverType)
+        {
+            switch (_driverPageViewModel.PageDriver)
+            {
+                case AppDriverTypeEnum.DVBT:
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DVBT));
+                    break;
+                case AppDriverTypeEnum.DAB:
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DAB));
+                    break;
+                case AppDriverTypeEnum.FM:
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.FM));
+                    break;
+            }
+        }
     }
 
     private void DisconnectButton_Clicked(object sender, EventArgs e)
@@ -251,23 +252,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         switch (menuId)
         {
-            case "menuChangeDriver":
-                //await _driverPageViewModel.ChangeDriver(item.DriverType);
+            case "menuConfirmChangeDriver":
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
-            case "menuCancelChangeDriver":
-                //_driverPageViewModel.UpdateActiveDriverType();
-                break;
-            case "menuConnectDriver":
-                //ConnectButton_Clicked(this, null);
-                break;
-            case "menuConnectFM":
-                //_configuration.AppDriverType = AppDriverTypeEnum.FM;
-                //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.FM));
-                break;
-            case "menuConnectDAB":
-                //_configuration.AppDriverType = AppDriverTypeEnum.DAB;
-                //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(AppDriverTypeEnum.DAB));
-                break;
+
         }
     }
 }

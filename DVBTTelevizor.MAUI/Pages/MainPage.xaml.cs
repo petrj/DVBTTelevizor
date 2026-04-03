@@ -804,9 +804,14 @@ namespace DVBTTelevizor.MAUI
 
                     var fmDemodulator = new FMDemodulator(_loggingService);
 
-                    _driver = new RTLSDRFMDriverConnector(_loggingService,
-                        _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
-                        fmDemodulator);
+#if DEBUG
+                    _driver = new RTLSDRTestDriverConnector(_loggingService, fmDemodulator, AppDriverTypeEnum.FM);
+#else
+                  _driver = new RTLSDRFMDriverConnector(_loggingService,
+                            _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                            fmDemodulator);
+#endif
+
 
                         fmDemodulator.Start();
                     break;
@@ -824,8 +829,6 @@ namespace DVBTTelevizor.MAUI
                             dabDemoduator);
 #endif
 
-
-
                     dabDemoduator.Start();
                         _driver.SetGain(GainEnum.Auto);
                         _driver.Tune(199360000, 1024, 0);
@@ -837,7 +840,7 @@ namespace DVBTTelevizor.MAUI
 
             _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
 
-                WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
+            WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
 
         private void DabDemoduator_OnServiceFound(object? sender, EventArgs e)
