@@ -33,6 +33,11 @@ namespace DVBTTelevizor.MAUI
                 NotifyDriverChange();
             });
 
+            WeakReferenceMessenger.Default.Register<DriverChangedMessages>(this, (r, m) =>
+            {
+                NotifyDriverChange();
+            });
+
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;

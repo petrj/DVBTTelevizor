@@ -8,6 +8,7 @@ using LoggerService;
 using Microsoft.Maui;
 using Microsoft.Maui.Animations;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
 using RTLSDR;
@@ -812,14 +813,15 @@ namespace DVBTTelevizor.MAUI
 
                     _demodulator = new FMDemodulator(_loggingService);
 
-#if DEBUG
-                    _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
-#else
-                  _driver = new RTLSDRFMDriverConnector(_loggingService,
-                            _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
-                            fmDemodulator);
-#endif
-
+                    if (_configuration.TestingMode)
+                    {
+                        _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
+                    } else
+                    {
+                        _driver = new RTLSDRFMDriverConnector(_loggingService,
+                                  _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                                  _demodulator, 104000000);
+                    }
 
                     _demodulator.Start();
                     break;
@@ -829,13 +831,16 @@ namespace DVBTTelevizor.MAUI
                         _demodulator.OnServiceFound += DabDemoduator_OnServiceFound;
                         //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
 
-#if DEBUG
-                    _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
-#else
-                    _driver = new RTLSDRDABDriverConnector(_loggingService,
-                            _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
-                            dabDemoduator);
-#endif
+                        if (_configuration.TestingMode)
+                        {
+                            _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
+                        }
+                        else
+                        {
+                            _driver = new RTLSDRDABDriverConnector(_loggingService,
+                                _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                                _demodulator, 199360000); // 8C on startup
+                        }
 
                         _demodulator.Start();
                         _driver.SetGain(_configuration.Gain,_configuration.GainValue);
@@ -889,6 +894,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     _vlcRawAudioInput = new VLCMediaInput();
                     _vlcRawAudioInput.MaxDataRequestSize = 8192;
+
 
                     var mediaOptions = new[]
                         {

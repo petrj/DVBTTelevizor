@@ -84,14 +84,6 @@ namespace DVBTTelevizor.MAUI.WinUI
             {
                 if (obj.Value is DriverSettings settings)
                 {
-#if DEBUG
-                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                    new DVBTDriverConfiguration()
-                    {
-                        DeviceName = "Testing RTLSDR driver",
-                        PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
-                    }));
-#else
                     WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                     {
                         DeviceName = "rtl_sdr bin",
@@ -99,7 +91,6 @@ namespace DVBTTelevizor.MAUI.WinUI
                         TransferPort = 1235,
                         PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                     }));
-#endif
                 }
             });
 

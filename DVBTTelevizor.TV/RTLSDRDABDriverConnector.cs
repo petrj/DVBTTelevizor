@@ -15,8 +15,8 @@ namespace DVBTTelevizor.TV
         private DateTime _lastStationTest = DateTime.MinValue;
         private Dictionary<long, bool> _stationOnFrequency = new Dictionary<long, bool>();
 
-        public RTLSDRDABDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator)
-            : base(loggingService, driver, demodulator)
+        public RTLSDRDABDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
+            : base(loggingService, driver, demodulator, startupFrequency)
         {
         }
 

@@ -21,8 +21,13 @@ namespace DVBTTelevizor.TV
 
         public event EventHandler OnRawAudioDemodulated;
 
-        public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator)
+        public long LastTunedFreq { get; set; }
+
+        public event EventHandler StatusChanged;
+
+        public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
+            LastTunedFreq = startupFrequency;
             _log = loggingService;
 
             _log.Debug($"Initializing RTLSDR TCP-IP Driver Connector");
@@ -240,9 +245,7 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public long LastTunedFreq { get; set; } = 104000000;
 
-        public event EventHandler StatusChanged;
 
         public Task CheckPIDs()
         {

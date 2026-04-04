@@ -111,6 +111,11 @@ namespace DVBTTelevizor.MAUI
 
                 _tvConfiguration.Gain = g;
 
+                if ((_driver != null) && (_driver.Connected))
+                {
+                    _driver.SetGain(g, GainValue);
+                }
+
                 NotifyChange();
             } finally
             {
