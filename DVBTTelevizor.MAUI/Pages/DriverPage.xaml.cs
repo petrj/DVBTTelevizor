@@ -80,10 +80,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-
-            //_driverPageViewModel.UpdateActiveDriverType();
             await _driverPageViewModel.CheckDriver();
-            //_driverPageViewModel.NotifyChange();
         });
 
         _focusItems.DeFocusAll();

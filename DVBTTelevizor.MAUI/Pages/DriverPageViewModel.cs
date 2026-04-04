@@ -38,8 +38,7 @@ namespace DVBTTelevizor.MAUI
                 _driver = m.Value;
                 Task.Run(async () =>
                  {
-                    await CheckDriver();
-                    NotifyDriverChange();
+                    await CheckDriver();;
                  });
             });
 
@@ -247,9 +246,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && _driver.Connected
-                    ? _range
-                    : String.Empty;
+                return _range;
             }
         }
 
