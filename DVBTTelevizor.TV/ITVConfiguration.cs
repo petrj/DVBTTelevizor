@@ -83,5 +83,9 @@ namespace DVBTTelevizor
         string SledovaniTVDevicePassword { get; set; }
         bool UpdatedTo2026 { get; set; }
         bool RTLSDREnabled { get; set; }
+
+        bool TestingMode { get; set; }
+        GainEnum Gain { get; set; }
+        int GainValue { get; set; }
     }
 }

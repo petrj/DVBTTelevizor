@@ -62,6 +62,9 @@ namespace DVBTTelevizor.TV
         public string SledovaniTVPIN { get; set; } = String.Empty;
         public string SledovaniTVDeviceID { get; set; } = String.Empty;
         public string SledovaniTVDevicePassword { get; set; } = String.Empty;
+        public bool TestingMode { get; set; } = true;
+        public GainEnum Gain { get; set; } = GainEnum.HW;
+        public int GainValue { get; set; } = 0;
 
         public ObservableCollection<Channel> GetChannels()
         {
@@ -112,6 +115,9 @@ namespace DVBTTelevizor.TV
             configuration.SledovaniTVDeviceID = SledovaniTVDeviceID;
             configuration.SledovaniTVDevicePassword = SledovaniTVDevicePassword;
             configuration.RTLSDREnabled = RTLSDREnabled;
+            configuration.Gain = Gain;
+            configuration.TestingMode = TestingMode;
+            configuration.GainValue = GainValue;
         }
     }
 }
