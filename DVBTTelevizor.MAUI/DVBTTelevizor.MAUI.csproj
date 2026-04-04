@@ -32,10 +32,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationVersion>2026003</ApplicationVersion>
-		<VersionCode>2026003</VersionCode>
-		<VersionName>2026003</VersionName>
-		<ApplicationDisplayVersion>2026003</ApplicationDisplayVersion>
+		<ApplicationVersion>2026004</ApplicationVersion>
+		<VersionCode>2026004</VersionCode>
+		<VersionName>2026004</VersionName>
+		<ApplicationDisplayVersion>2026004</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<!-- Versions
@@ -155,6 +155,9 @@
 	  <Compile Update="Pages\DriverPage.xaml.cs">
 	    <DependentUpon>DriverPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\GainPage.xaml.cs">
+	    <DependentUpon>GainPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\FrequencyPage.xaml.cs">
 	    <DependentUpon>FrequencyPage.xaml</DependentUpon>
 	  </Compile>
@@ -207,6 +210,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\DriverPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\GainPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\FrequencyPage.xaml">

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.GainPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='Gain'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
+
+            <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="Color" Value="Blue"/>
+            </Style>
+
+            <Style x:Key="EntryStyle" TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="#111111"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="FlowDirection" Value="LeftToRight"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="TextColor" Value="White"/>
+            </Style>
+
+            <Style x:Key="SliderStyle" TargetType="Slider">
+                <!--Setter Property="ThumbColor" Value="AliceBlue"/-->
+                <Setter Property="MinimumTrackColor" Value="Blue"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="10,0,10,0"/>
+            </Style>
+
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="5,5,5,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="True"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNumberTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+            </Style>
+
+            <Style x:Key="ChannelNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="Margin" Value="0,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+            <Style x:Key="ProviderNameTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="Margin" Value="0,0,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="End"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+            </Style>
+
+
+            <Style x:Key="SwitchStyle" TargetType="Switch">
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <!--Setter Property="FlowDirection" Value="RightToLeft"/-->
+                <Setter Property="ThumbColor" Value="Blue"/>
+                <Setter Property="OnColor" Value="CornflowerBlue"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="Margin" Value="20,0,20,0"/>
+            </Style>
+
+            <Style x:Key="BoxViewStyle" TargetType="BoxView">
+                <Setter Property="CornerRadius" Value="15"/>
+                <Setter Property="BackgroundColor" Value="#333333"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
+
+            <Style x:Key="RadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <!--Setter Property="BackgroundColor" Value="#808080"/-->
+                <Setter Property="BorderColor" Value="#808080"/>
+                <Setter Property="Margin" Value="10,0,0,0" />
+                <Setter Property="Padding" Value="5,5,5,5" />
+                <Setter Property="BorderWidth" Value="0" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+            </Style>
+
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout>
+
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.05,0.8,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Gain'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.4" AbsoluteLayout.LayoutFlags="All" IsVisible="True" BackgroundColor="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70*" />
+                <ColumnDefinition Width="30*" />
+            </Grid.ColumnDefinitions>
+
+            <BoxView x:Name="HWBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='HW'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Best choice for dongles supporting HW gain'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <BoxView Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource BoxViewStyle}"/>
+            <RadioButton Grid.Row="0" Grid.Column="1"  Grid.RowSpan="2" x:Name="RadioButtonHW" Style="{DynamicResource RadioButtonStyle}" IsChecked="{Binding HW, Mode=TwoWay}"/>
+
+            <BoxView x:Name="SWBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='SW auto'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Autodetecting gain'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <BoxView Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource BoxViewStyle}"/>
+            <RadioButton Grid.Row="2" Grid.Column="1" Grid.RowSpan="2" x:Name="RadioButtonSW" Style="{DynamicResource RadioButtonStyle}" IsChecked="{Binding SWAuto, Mode=TwoWay}"/>
+
+            <BoxView x:Name="ManualBoxView" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="4" Grid.Column="0" Text="{local:LngXamlExt Input='Manual'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="5" Grid.Column="0" Text="{local:LngXamlExt Input='Enter manually gain value in dB'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <BoxView Grid.Row="4" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource BoxViewStyle}"/>
+            <RadioButton Grid.Row="4" Grid.Column="1" Grid.RowSpan="2" x:Name="RadioButtonManual" Style="{DynamicResource RadioButtonStyle}"  IsChecked="{Binding Manual, Mode=TwoWay}"/>
+
+        </Grid>
+
+        <Grid x:Name="ManualGainGrid" IsVisible="{Binding ManualGainBoxVisible}" AbsoluteLayout.LayoutBounds="0.5, 0.70, 0.95, 0.15" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70*" />
+                <RowDefinition Height="30*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding GainCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
+            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding GaunUnitCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
+
+        </Grid>
+
+        <Grid x:Name="SliderGrid" IsVisible="{Binding ManualGainBoxVisible}" RowSpacing="0" AbsoluteLayout.LayoutBounds="0.5, 0.95, 0.8, 0.25" AbsoluteLayout.LayoutFlags="All" Margin="0,20,0,0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50*" />
+                <RowDefinition Height="25*" />
+                <RowDefinition Height="25*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="80*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="LeftButton_Clicked"/>
+            <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="RightButton_Clicked"/>
+
+            <BoxView x:Name="SliderFrequencyBoxView" Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent"/>
+            <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding GainMax}" Value="{Binding GainValue, Mode=TwoWay}" Minimum="{Binding GainMin}" Style="{DynamicResource SliderStyle}" ValueChanged="SliderFrequency_ValueChanged"/>
+
+
+            <Label Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Min'}" FontSize="{Binding FontSizeForDetailNote}" Style="{DynamicResource LabelStyle}" HorizontalTextAlignment="End"/>
+            <Label Grid.Row="1" Grid.Column="2" Text="{local:LngXamlExt Input='Max'}" FontSize="{Binding FontSizeForDetailNote}" Style="{DynamicResource LabelStyle}"/>
+
+            <Label Grid.Row="2" Grid.Column="0" Text="{Binding GainMinTitle}" FontSize="{Binding FontSizeForDetailNote}" Style="{DynamicResource LabelStyle}"  HorizontalTextAlignment="End"/>
+            <Label Grid.Row="2" Grid.Column="2" Text="{Binding GainMaxTitle}" FontSize="{Binding FontSizeForDetailNote}" Style="{DynamicResource LabelStyle}"/>
+
+        </Grid>
+
+    </AbsoluteLayout>
+
+</ContentPage>

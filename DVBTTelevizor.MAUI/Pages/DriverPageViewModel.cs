@@ -134,6 +134,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(PageDriver));
                 OnPropertyChanged(nameof(PageDriverTitle));
                 OnPropertyChanged(nameof(ConnectButtonVisible));
+                OnPropertyChanged(nameof(GainButtonVisible));
                 OnPropertyChanged(nameof(DriverPreferencesVisible));
 
                 OnPropertyChanged(nameof(InstallDriverButtonVisible));
@@ -148,6 +149,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(ConnectedDeviceSynced));
 
                 OnPropertyChanged(nameof(Bitrate));
+                OnPropertyChanged(nameof(GainTitle));
             });
         }
 
@@ -323,6 +325,37 @@ namespace DVBTTelevizor.MAUI
             return false;
         }
 
+        public bool GainButtonVisible
+        {
+            get
+            {
+                if (_driver == null || _pageDriver == null)
+                {
+                    return false; // page is not yet initialized
+                }
+
+                if (!IsDriverInstalled(_pageDriver.Value))
+                {
+                    return false; // driver not installed
+                }
+
+                if (!  (_driver.DriverType == AppDriverTypeEnum.DAB ||
+                        _driver.DriverType == AppDriverTypeEnum.FM)
+                    )
+                {
+                    return false; // gain is supported for RTLSDR driver
+                }
+
+                if (_driver.DriverType == _pageDriver.Value)
+                {
+                    // same driver, show if connected
+                    return _driver.Connected;
+                }
+
+                return false; // different driver, do not show gain button
+            }
+        }
+
         public bool ConnectButtonVisible
         {
             get
@@ -372,6 +405,39 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return _driverState.BitRate;
+            }
+        }
+
+        public string GainTitle
+        {
+            get
+            {
+                switch (_configuration?.Gain)
+                {
+                    case GainEnum.Auto:
+                        if (_configuration == null)
+                        {
+                            return "SW Auto".Translated();
+                        }
+                        else
+                        {
+                            return $"{"SW Auto".Translated()} ({(_configuration.GainValue / 10).ToString("N1")} {"dB".Translated()})";
+                        }
+                    case GainEnum.Manual:
+                        if (_configuration == null)
+                        {
+                            return "Manual".Translated();
+                        }
+                        else
+                        {
+                            return $"{"Manual".Translated()} ({(_configuration.GainValue / 10).ToString("N1")} {"dB".Translated()})";
+                        }
+
+                    case GainEnum.HW:
+                        return "HW".Translated();
+                    default:
+                        return "-";
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private string _publicDirectory;
 
     private KeyboardFocusableItemList _focusItems;
+    private GainPage _gainPage;
 
     private AppMenu _appMenu = null;
 
@@ -31,6 +32,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
         _driver = driver;
+
+        _gainPage = new GainPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
@@ -65,6 +68,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Install", new List<View>() { InstallDriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Gain", new List<View>() { GainButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("DisConnect", new List<View>() { DisconnectButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
@@ -146,6 +150,14 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                             DisconnectButton_Clicked(this, new EventArgs());
                         });
                         break;
+
+
+                    case "Gain":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            GainButton_Clicked(this, new EventArgs());
+                        });
+                        break;
                 }
 
                 break;
@@ -210,6 +222,13 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         WeakReferenceMessenger.Default.Send(new DisConnectMessage(String.Empty));
     }
 
+    private async void GainButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"DriverPage GaintButton_Clicked");
+
+        await ShowGainPage();
+    }
+
     private void DriverPreferencesButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"DriverPage DriverPreferencesButton_Clicked");
@@ -250,5 +269,21 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                 break;
 
         }
+    }
+
+    private async Task ShowGainPage()
+    {
+        if (_gainPage.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
+
+        //_gainPage.PageDriver = driverType;
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            await Navigation.PushAsync(_gainPage);
+        });
     }
 }
