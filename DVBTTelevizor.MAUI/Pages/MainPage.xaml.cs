@@ -844,7 +844,7 @@ namespace DVBTTelevizor.MAUI
 
                         _demodulator.Start();
                         _driver.SetGain(_configuration.Gain,_configuration.GainValue);
-                        _driver.Tune(199360000, 0, 0);
+                        //_driver.Tune(199360000, 0, 0);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);

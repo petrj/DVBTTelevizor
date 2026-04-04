@@ -40,6 +40,7 @@ namespace DVBTTelevizor.TV
         public override void Connect()
         {
             _stationOnFrequency.Clear();
+            _driver.Settings.SDRSampleRate = AudioTools.DABSampleRate;
             base.Connect();
         }
 
