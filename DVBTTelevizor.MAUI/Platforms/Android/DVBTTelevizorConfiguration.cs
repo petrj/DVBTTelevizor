@@ -800,5 +800,43 @@ namespace DVBTTelevizor.MAUI
                 SavePersistingSettingValue<bool>("RTLSDREnabled", value);
             }
         }
+
+        public bool TestingMode
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("TestingMode");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("TestingMode", value);
+            }
+        }
+
+
+        public GainEnum Gain
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("Gain");
+                return (GainEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("Gain", (int)value);
+            }
+        }
+
+        public int GainValue
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("GainValue", 0);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("GainValue", value);
+            }
+        }
     }
 }
