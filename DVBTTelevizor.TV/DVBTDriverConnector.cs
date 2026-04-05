@@ -22,7 +22,7 @@ namespace DVBTTelevizor
     {
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
-        public event EventHandler OnRawAudioDemodulated; // not used, DVBT uses VideoStream
+        public event EventHandler? OnRawAudioDemodulated; // not used, DVBT uses VideoStream
 
         private ILoggingService _log;
         private DVBTDriverConfiguration _driverConfiguration;
@@ -56,6 +56,7 @@ namespace DVBTTelevizor
 
         public delegate void StatusChangedEventHandler(object sender, DVBTDriverStatusChangedEventArgs e);
         public event EventHandler? StatusChanged = null;
+        public event EventHandler? OnServiceFound = null;
 
         public string PublicDirectory { get; set; } = "";
 
@@ -71,11 +72,11 @@ namespace DVBTTelevizor
             _driverConfiguration = new DVBTDriverConfiguration();
         }
 
-        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        public DriverStreamTypeEnum DVBTDriverStreamType
         {
             get
             {
-                return _readingStream ? DVBTDriverStreamTypeEnum.UDP : DVBTDriverStreamTypeEnum.Stream;
+                return _readingStream ? DriverStreamTypeEnum.UDP : DriverStreamTypeEnum.Stream;
             }
         }
 
@@ -1838,6 +1839,11 @@ namespace DVBTTelevizor
         public AppDriverTypeEnum DriverType
         {
             get { return AppDriverTypeEnum.DVBT; }
+        }
+
+        public void Clear()
+        {
+
         }
     }
 }

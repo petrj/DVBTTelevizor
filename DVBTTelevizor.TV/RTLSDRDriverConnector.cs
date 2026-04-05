@@ -24,6 +24,7 @@ namespace DVBTTelevizor.TV
         public long LastTunedFreq { get; set; }
 
         public event EventHandler StatusChanged;
+        public event EventHandler OnServiceFound;
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
@@ -40,6 +41,20 @@ namespace DVBTTelevizor.TV
 
             _demodulator = demodulator;
             _demodulator.OnDemodulated += OnDataDemodulated;
+            _demodulator.OnServiceFound += Demodulator_OnServiceFound;
+        }
+
+        private void Demodulator_OnServiceFound(object? sender, EventArgs e)
+        {
+            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+            {
+                _log.Info($"DAB service found: {de.Service}");
+
+                if (OnServiceFound != null)
+                {
+                    OnServiceFound(this, e);
+                }
+            }
         }
 
         public int QueueSize
@@ -184,11 +199,11 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        public virtual DriverStreamTypeEnum DVBTDriverStreamType
         {
             get
             {
-                return DVBTDriverStreamTypeEnum.None;
+                return DriverStreamTypeEnum.None;
             }
         }
 
@@ -530,6 +545,14 @@ namespace DVBTTelevizor.TV
         public Task<DVBTDriverTuneResult> WaitForSignal(bool fastTuning)
         {
             return Task.Run( () => { return new DVBTDriverTuneResult();  } );
+        }
+
+        public virtual void Clear()
+        {
+            if ((_demodulator != null) && (_demodulator is DABProcessor dab))
+            {
+                dab.Clear();
+            }
         }
     }
 }

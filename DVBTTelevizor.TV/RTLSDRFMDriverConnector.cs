@@ -37,6 +37,14 @@ namespace DVBTTelevizor.TV
             });
         }
 
+        public override DriverStreamTypeEnum DVBTDriverStreamType
+        {
+            get
+            {
+                return DriverStreamTypeEnum.RAWPCMAudio;
+            }
+        }
+
         public override void Connect()
         {
             _stationOnFrequency.Clear();

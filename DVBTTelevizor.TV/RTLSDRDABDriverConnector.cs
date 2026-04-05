@@ -2,11 +2,13 @@
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
+using RTLSDR.DAB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace DVBTTelevizor.TV
 {
@@ -14,13 +16,23 @@ namespace DVBTTelevizor.TV
     {
         private DateTime _lastStationTest = DateTime.MinValue;
         private Dictionary<long, bool> _stationOnFrequency = new Dictionary<long, bool>();
+        private ILoggingService _loggingService;
 
         public RTLSDRDABDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
             : base(loggingService, driver, demodulator, startupFrequency)
         {
+            _loggingService = loggingService;
         }
 
         public override AppDriverTypeEnum DriverType => AppDriverTypeEnum.DAB;
+
+        public override DriverStreamTypeEnum DVBTDriverStreamType
+        {
+            get
+            {
+                return DriverStreamTypeEnum.RAWAACAudio;
+            }
+        }
 
         public override Task<DVBTDriverCapabilities> GetCapabalities()
         {

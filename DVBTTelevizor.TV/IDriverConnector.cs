@@ -24,12 +24,13 @@ namespace DVBTTelevizor
 
         bool Connected { get; }
 
-        DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }
+        DriverStreamTypeEnum DVBTDriverStreamType { get; }
 
         Stream VideoStream { get; }
         string StreamUrl { get; }
 
-        public event EventHandler OnRawAudioDemodulated;
+        public event EventHandler? OnRawAudioDemodulated;
+        public event EventHandler? OnServiceFound;
 
         int QueueSize { get; }
         bool Synced { get; }
@@ -84,5 +85,7 @@ namespace DVBTTelevizor
         event EventHandler StatusChanged;
 
         Task SetGain(GainEnum gain, int value = 0);
+
+        void Clear();
     }
 }

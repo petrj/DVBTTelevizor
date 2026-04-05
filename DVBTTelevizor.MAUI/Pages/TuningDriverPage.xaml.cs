@@ -187,9 +187,11 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
                 break;
             case AppDriverTypeEnum.FM:
                 _tuningSettings.FM = true;
+                _tuningSettings.TuningMode = TuneModeEnum.Frequency;
                 break;
             case AppDriverTypeEnum.DAB:
                 _tuningSettings.DAB = true;
+                _tuningSettings.TuningMode = TuneModeEnum.Frequency;
                 break;
         }
 

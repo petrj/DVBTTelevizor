@@ -858,19 +858,19 @@ namespace DVBTTelevizor.MAUI
 
         private void DabDemoduator_OnServiceFound(object? sender, EventArgs e)
         {
-            if (e is DABServiceFoundEventArgs de)
-            {
-                _loggingService.Info($"DAB service found: {de.Service}");
+            //if (e is DABServiceFoundEventArgs de)
+            //{
+            //    _loggingService.Info($"DAB service found: {de.Service}");
 
-                // autoplay DAB service when found
-                if ((_playingDABService == null) &&
-                    (_demodulator != null) &&
-                    (_demodulator is DABProcessor dab))
-                {
-                    _playingDABService = de.Service;
-                    dab.SetProcessingService(_playingDABService);
-                }
-            }
+            //     autoplay DAB service when found
+            //    if ((_playingDABService == null) &&
+            //        (_demodulator != null) &&
+            //        (_demodulator is DABProcessor dab))
+            //    {
+            //        _playingDABService = de.Service;
+            //        dab.SetProcessingService(_playingDABService);
+            //    }
+            //}
         }
 
         private void ProcessAACAudioData(AACDataDemodulatedEventArgs ed)
@@ -2340,39 +2340,50 @@ namespace DVBTTelevizor.MAUI
                     {
                         switch (_driver.DVBTDriverStreamType)
                         {
-                            case DVBTDriverStreamTypeEnum.UDP:
+                            case DriverStreamTypeEnum.UDP:
                                 _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
                                 break;
-                            case DVBTDriverStreamTypeEnum.Stream:
+                            case DriverStreamTypeEnum.Stream:
                                 _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
                                 break;
-                            case DVBTDriverStreamTypeEnum.None:
+                            case DriverStreamTypeEnum.RAWPCMAudio:
+
+                                break;
+                            case DriverStreamTypeEnum.RAWAACAudio:
+
+                                (_demodulator as DABProcessor).ServiceNumber = Convert.ToInt32(channel.ProgramMapPID);
+
+                                break;
+                            case DriverStreamTypeEnum.None:
                                 break;
                         }
                     }
 
-                    _media.AddOption(":fullscreen");
-                    _media.AddOption(":avcodec-hw=any");
-
-                    _media.AddOption(new MediaConfiguration()
+                    if (_media != null)
                     {
-                        EnableHardwareDecoding = true
-                    });
+                        _media.AddOption(":fullscreen");
+                        _media.AddOption(":avcodec-hw=any");
 
-                    CallWithTimeout(delegate
-                    {
-                        videoView.MediaPlayer.Play(_media);
-
-                        /* Video is fixed in RefreshGUI
-                        Task.Run(async () =>
+                        _media.AddOption(new MediaConfiguration()
                         {
-                            // When user visits some page and return back, video is only black screen
-                            // calls fix video will re-attach the video and set correct video position
-                            await FixVideo(false);
+                            EnableHardwareDecoding = true
                         });
-                        */
 
-                    }, 350);
+                        CallWithTimeout(delegate
+                        {
+                            videoView.MediaPlayer.Play(_media);
+
+                            /* Video is fixed in RefreshGUI
+                            Task.Run(async () =>
+                            {
+                                // When user visits some page and return back, video is only black screen
+                                // calls fix video will re-attach the video and set correct video position
+                                await FixVideo(false);
+                            });
+                            */
+
+                        }, 350);
+                    }
 
                     if (!System.String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
                     {

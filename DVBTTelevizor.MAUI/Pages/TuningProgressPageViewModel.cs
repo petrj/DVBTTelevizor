@@ -4,6 +4,7 @@ using LoggerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using MPEGTS;
+using RTLSDR.DAB;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,8 +58,28 @@ namespace DVBTTelevizor.MAUI
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             //_driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+            _driver.OnServiceFound += Demodulator_OnServiceFound;
 
             _listViewSelector = new ListViewSelector(Channels);
+        }
+
+        private void Demodulator_OnServiceFound(object? sender, EventArgs e)
+        {
+            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+            {
+                var chType = Settings.FM
+                            ? ChannelTypeEnum.FM
+                            : ChannelTypeEnum.DAB;
+
+                var sd = new MPEGTS.ServiceDescriptor()
+                {
+                    Free = true,
+                    ServiceName = de.Service.ServiceName,
+                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService)
+                };
+
+                AddChannel(chType, sd, de.Service.ServiceNumber, _actualTunningFreqKHz, 0);
+            }
         }
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
@@ -165,6 +186,7 @@ namespace DVBTTelevizor.MAUI
                         foreach (var configChannel in configChannels)
                         {
                             if (
+                                (configChannel.ChannelType == che.Channel.ChannelType) &&
                                 (configChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
                                 (configChannel.Frequency == che.Channel.Frequency)
                                )
@@ -317,7 +339,7 @@ namespace DVBTTelevizor.MAUI
                         return;
                     }
 
-                    if (FMTuning)
+                    if (FMTuning || DABTuning)
                     {
                         if (dvbtTypeIndex > 0)
                             continue;
@@ -394,6 +416,8 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
+                _driver.Clear();
+
                 switch (tuneResult.Result)
                 {
                     case DVBTDriverSearchProgramResultEnum.Error:
@@ -453,40 +477,12 @@ namespace DVBTTelevizor.MAUI
                         continue;
                     }
 
-                    var ch = new Channel();
-                    ch.ProgramMapPID = serviceDescriptor.Value;
-                    ch.Name = serviceDescriptor.Key.ServiceName;
-                    ch.ProviderName = serviceDescriptor.Key.ProviderName;
-                    ch.Frequency = freq;
-                    ch.Bandwdith = bandWidth;
-                    ch.Number = String.Empty;
 
-                    if (FMTuning)
-                    {
-                        ch.ChannelType = ChannelTypeEnum.FM;
-                    }
-                    else
-                    {
-                        switch (dvbtTypeIndex)
-                        {
-                            case 0:
-                                ch.ChannelType = ChannelTypeEnum.DVBT;
-                                break;
-                            case 1:
-                                ch.ChannelType = ChannelTypeEnum.DVBT2;
-                                break;
-                        }
-                    }
+                    var chType = Settings.FM ? ChannelTypeEnum.FM :
+                                 Settings.DAB ? ChannelTypeEnum.DAB :
+                                 dvbtTypeIndex == 0 ? ChannelTypeEnum.DVBT : ChannelTypeEnum.DVBT2;
 
-                    ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
-                    ch.NonFree = !serviceDescriptor.Key.Free;
-
-                    _loggingService.Debug($"Found channel \"{serviceDescriptor.Key.ServiceName}\"");
-
-                    if (ChannelFound != null)
-                    {
-                        ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
-                    }
+                    AddChannel(chType, serviceDescriptor.Key, serviceDescriptor.Value, freq, bandWidth);
                 }
 
             }
@@ -494,6 +490,28 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Error(ex);
                 throw;
+            }
+        }
+
+        private void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
+        {
+            var ch = new Channel();
+            ch.ProgramMapPID = MapPID;
+            ch.Name = serviceDescriptor.ServiceName;
+            ch.ProviderName = serviceDescriptor.ProviderName;
+            ch.Frequency = frequency;
+            ch.Bandwdith = bandWidth;
+            ch.Number = String.Empty;
+            ch.ChannelType = chType;
+
+            ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
+            ch.NonFree = !serviceDescriptor.Free;
+
+            _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
+
+            if (ChannelFound != null)
+            {
+                ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
             }
         }
 
@@ -786,6 +804,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.FM;
+            }
+        }
+
+        public bool DABTuning
+        {
+            get
+            {
+                return Settings.DAB;
             }
         }
 

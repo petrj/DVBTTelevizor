@@ -21,7 +21,8 @@ namespace DVBTTelevizor.TV
         private CancellationTokenSource? _cts;
         private long _bytesPerSecond = 2114628;
 
-        public event EventHandler OnRawAudioDemodulated;
+        public event EventHandler? OnRawAudioDemodulated;
+        public event EventHandler? OnServiceFound = null;
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
@@ -42,6 +43,7 @@ namespace DVBTTelevizor.TV
 
             State = DVBTDriverStateEnum.Unknown;
         }
+
 
         public int QueueSize
         {
@@ -121,11 +123,11 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        public DriverStreamTypeEnum DVBTDriverStreamType
         {
             get
             {
-                return DVBTDriverStreamTypeEnum.None;
+                return DriverStreamTypeEnum.None;
             }
         }
 
@@ -479,6 +481,11 @@ namespace DVBTTelevizor.TV
         public Task<DVBTDriverTuneResult> WaitForSignal(bool fastTuning)
         {
             return Task.Run( () => { return new DVBTDriverTuneResult();  } );
+        }
+
+        public void Clear()
+        {
+
         }
     }
 }

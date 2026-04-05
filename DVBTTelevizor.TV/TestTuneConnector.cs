@@ -13,7 +13,8 @@ namespace DVBTTelevizor
     {
         public DVBTDriverStateEnum State { get; private set; }
 
-        public event EventHandler OnRawAudioDemodulated;
+        public event EventHandler? OnRawAudioDemodulated;
+        public event EventHandler? OnServiceFound = null;
 
         private long _lastFreq { get; set; }
         private long _lastPID { get; set; }
@@ -45,11 +46,11 @@ namespace DVBTTelevizor
             }
         }
 
-        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+        public DriverStreamTypeEnum DVBTDriverStreamType
         {
             get
             {
-                return DVBTDriverStreamTypeEnum.Stream;
+                return DriverStreamTypeEnum.Stream;
             }
         }
 
@@ -586,26 +587,10 @@ namespace DVBTTelevizor
             // not needed in DVBT
             return Task.CompletedTask;
         }
+        public void Clear()
+        {
 
-        //public int FrequencyMinKHz
-        //{
-        //    get { return 174000; } // 174.0 MHz - VHF high-band (band III) channel 7 }
-        //}
-
-        //public int FrequencyMaxKHz
-        //{
-        //    get { return 858000; } // 858.0 MHz - UHF band channel 69
-        //}
-
-        //public int BandwidthMinKHz
-        //{
-        //    get { return 1700; }
-        //}
-
-        //public int BandwidthMaxKHz
-        //{
-        //    get { return 10000; }
-        //}
+        }
 
     }
 }
