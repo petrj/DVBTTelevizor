@@ -50,6 +50,8 @@ namespace DVBTTelevizor.MAUI
 
         private IDriverConnector? _driver = null;
 
+        private List<uint> _tunedServices = new List<uint>();
+
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
@@ -65,8 +67,15 @@ namespace DVBTTelevizor.MAUI
 
         private void Demodulator_OnServiceFound(object? sender, EventArgs e)
         {
-            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+            if ((State == TuneStateEnum.InProgress) &&  (e is DABServiceFoundEventArgs de) && (de.Service != null))
             {
+                if (_tunedServices.Contains(de.Service.ServiceNumber))
+                {
+                    return; // already tuned
+                }
+
+                _tunedServices.Add(de.Service.ServiceNumber);
+
                 var chType = Settings.FM
                             ? ChannelTypeEnum.FM
                             : ChannelTypeEnum.DAB;
@@ -250,6 +259,8 @@ namespace DVBTTelevizor.MAUI
         public void ResetTune(bool clearChannels = true)
         {
             _loggingService.Info("RestartTune");
+
+            _tunedServices.Clear();
 
             if (clearChannels)
             {

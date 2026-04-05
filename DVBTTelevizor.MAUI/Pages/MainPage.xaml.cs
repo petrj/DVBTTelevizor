@@ -53,6 +53,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
+        private DateTime _lastStatUpdate = DateTime.MinValue;
         private bool _lastDataAnimation = false;
         private Size _lastAllocatedSize = new Size(-1, -1);
 
@@ -514,7 +515,11 @@ namespace DVBTTelevizor.MAUI
 
                 if (_demodulator != null)
                 {
-                    _loggingService.Debug(_demodulator.Stat(true));
+                    if ((DateTime.UtcNow-_lastStatUpdate).TotalMilliseconds>5000)
+                    {
+                        _lastStatUpdate = DateTime.UtcNow;
+                        _loggingService.Debug(_demodulator.Stat(false));
+                    }
                 }
 
             } catch (Exception ex)
@@ -2280,6 +2285,7 @@ namespace DVBTTelevizor.MAUI
                         WeakReferenceMessenger.Default.Send(new ToastMessage("Tuning {0} ....".Translated(channel.FrequencyShortLabel)));
 
                         var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
+                        _driver.Clear();
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             switch (tunedRes.Result)
