@@ -78,7 +78,7 @@ namespace DVBTTelevizor.MAUI
                     ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService)
                 };
 
-                AddChannel(chType, sd, de.Service.ServiceNumber, _actualTunningFreqKHz, 0);
+                AddChannel(chType, sd, de.Service.ServiceNumber, _actualTunningFreqKHz*1000, 0);
             }
         }
 
