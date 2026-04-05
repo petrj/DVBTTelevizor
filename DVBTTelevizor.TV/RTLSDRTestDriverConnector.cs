@@ -38,12 +38,25 @@ namespace DVBTTelevizor.TV
 
             _demodulator = demodulator;
             _demodulator.OnDemodulated += OnDataDemodulated;
+            _demodulator.OnServiceFound += _demodulator_OnServiceFound; ;
 
             _driverType = driverType;
 
             State = DVBTDriverStateEnum.Unknown;
         }
 
+        private void _demodulator_OnServiceFound(object? sender, EventArgs e)
+        {
+            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+            {
+                _log.Info($"DAB service found: {de.Service}");
+
+                if (OnServiceFound != null)
+                {
+                    OnServiceFound(this, e);
+                }
+            }
+        }
 
         public int QueueSize
         {
@@ -485,7 +498,10 @@ namespace DVBTTelevizor.TV
 
         public void Clear()
         {
-
+            if ((_demodulator != null) && (_demodulator is DABProcessor dab))
+            {
+                dab.Clear();
+            }
         }
     }
 }

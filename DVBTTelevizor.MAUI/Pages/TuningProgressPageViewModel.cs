@@ -67,7 +67,7 @@ namespace DVBTTelevizor.MAUI
 
         private void Demodulator_OnServiceFound(object? sender, EventArgs e)
         {
-            if ((State == TuneStateEnum.InProgress) &&  (e is DABServiceFoundEventArgs de) && (de.Service != null))
+            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
             {
                 if (_tunedServices.Contains(de.Service.ServiceNumber))
                 {
@@ -261,6 +261,7 @@ namespace DVBTTelevizor.MAUI
             _loggingService.Info("RestartTune");
 
             _tunedServices.Clear();
+            _driver?.Clear();
 
             if (clearChannels)
             {
@@ -307,17 +308,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (Settings.TuningMode == TuneModeEnum.Frequency)
                 {
-                    do
-                    {
-                        await Tune();
-
-                        if (_tuneState == TuneStateEnum.Failed)
-                        {
-                            break;
-                        }
-
-                    }
-                    while (_tuneState != TuneStateEnum.Stopped);
+                    await Tune();
                 } else
                 {
                     await Tune();
