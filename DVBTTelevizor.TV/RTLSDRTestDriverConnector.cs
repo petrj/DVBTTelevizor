@@ -412,17 +412,6 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
-        {
-            return Task.Run(() => {
-                return new DVBTDriverSearchPIDsResult()
-                {
-                    PIDs = new List<long>(),
-                    Result = DVBTDriverSearchProgramResultEnum.OK
-                };
-            });
-        }
-
         public Task StartRecording(string path)
         {
             return Task.Run(() => { return; });
@@ -498,10 +487,24 @@ namespace DVBTTelevizor.TV
 
         public void Clear()
         {
-            if ((_demodulator != null) && (_demodulator is DABProcessor dab))
+            _demodulator?.Clear();
+        }
+
+        public Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        {
+            if (_demodulator is DABProcessor dab)
             {
-                dab.Clear();
+                dab.SetProcessingService(Convert.ToInt32(mapPID));
             }
+
+            return Task.Run(() =>
+            {
+                return new DVBTDriverSearchPIDsResult()
+                {
+                    PIDs = new List<long>() { mapPID },
+                    Result = DVBTDriverSearchProgramResultEnum.OK
+                };
+            });
         }
     }
 }

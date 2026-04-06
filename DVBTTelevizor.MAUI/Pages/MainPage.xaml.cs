@@ -2357,8 +2357,6 @@ namespace DVBTTelevizor.MAUI
                                 break;
                             case DriverStreamTypeEnum.RAWAACAudio:
 
-                                (_demodulator as DABProcessor).ServiceNumber = Convert.ToInt32(channel.ProgramMapPID);
-
                                 break;
                             case DriverStreamTypeEnum.None:
                                 break;

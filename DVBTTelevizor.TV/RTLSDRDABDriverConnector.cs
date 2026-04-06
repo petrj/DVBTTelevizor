@@ -66,5 +66,14 @@ namespace DVBTTelevizor.TV
                 };
             });
         }
+
+        public override Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        {
+            if (_demodulator is DABProcessor dab)
+            {
+                dab.SetProcessingService(Convert.ToInt32(mapPID));
+            }
+            return base.SetupChannelPIDs(mapPID, fastTuning);
+        }
     }
 }

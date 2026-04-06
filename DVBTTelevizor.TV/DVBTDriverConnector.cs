@@ -1544,7 +1544,8 @@ namespace DVBTTelevizor
         /// <returns></returns>
         public async Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
-            _log.Debug($"Set up channle PIDs for mapPID: {mapPID}, fastTuning: {fastTuning}");
+            _log.Debug($"Set up channle PIDs for mapPI" +
+                $"D: {mapPID}, fastTuning: {fastTuning}");
 
             double searchPIDsTime = 0;
             double setPIDsTime = 0;

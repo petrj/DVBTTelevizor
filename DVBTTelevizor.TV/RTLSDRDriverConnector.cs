@@ -16,7 +16,7 @@ namespace DVBTTelevizor.TV
     {
         protected ILoggingService _log;
         protected ISDR _driver = null;
-        private IDemodulator _demodulator = null;
+        protected IDemodulator _demodulator = null;
 
         public event EventHandler OnRawAudioDemodulated;
 
@@ -427,12 +427,12 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
+        public virtual Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
             return Task.Run(() => {
                 return new DVBTDriverSearchPIDsResult()
                 {
-                    PIDs = new List<long>(),
+                    PIDs = new List<long>() { mapPID },
                     Result = DVBTDriverSearchProgramResultEnum.OK
                 };
             });
@@ -542,10 +542,7 @@ namespace DVBTTelevizor.TV
 
         public virtual void Clear()
         {
-            if ((_demodulator != null) && (_demodulator is DABProcessor dab))
-            {
-                dab.Clear();
-            }
+            _demodulator.Clear();
         }
     }
 }

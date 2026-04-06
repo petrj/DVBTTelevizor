@@ -260,15 +260,14 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("RestartTune");
 
-            _tunedServices.Clear();
-            _driver?.Clear();
-
             if (clearChannels)
             {
                 _loggingService.Info("Clearing channels");
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
+                    _tunedServices.Clear();
+                    _driver?.Clear();
                     _tunedMultiplexes.Clear();
                     _tunedNewChannels = 0;
                     Channels.Clear();
