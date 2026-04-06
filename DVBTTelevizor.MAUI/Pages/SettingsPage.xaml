@@ -427,7 +427,7 @@
 
                 <StackLayout Margin="0,10,0,10" x:Name="StackLayoutDebugDrivers" IsVisible="{Binding DebugSettingsVisible}">
 
-                    <Label Text="{local:LngXamlExt Input='Logging'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                    <Label Text="{local:LngXamlExt Input='Debug drivers'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
                     <Grid Margin="30,10,10,0">
                         <Grid.RowDefinitions>
