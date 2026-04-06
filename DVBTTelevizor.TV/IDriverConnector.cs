@@ -31,6 +31,7 @@ namespace DVBTTelevizor
 
         public event EventHandler? OnRawAudioDemodulated;
         public event EventHandler? OnServiceFound;
+        public event EventHandler? RawDataReceived;
 
         int QueueSize { get; }
         bool Synced { get; }

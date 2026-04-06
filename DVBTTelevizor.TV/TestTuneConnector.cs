@@ -15,6 +15,7 @@ namespace DVBTTelevizor
 
         public event EventHandler? OnRawAudioDemodulated;
         public event EventHandler? OnServiceFound = null;
+        public event EventHandler? RawDataReceived;
 
         private long _lastFreq { get; set; }
         private long _lastPID { get; set; }

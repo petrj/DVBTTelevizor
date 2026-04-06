@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.MAUI;
+using LoggerService;
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
@@ -24,6 +25,7 @@ namespace DVBTTelevizor.TV
 
         public event EventHandler StatusChanged;
         public event EventHandler OnServiceFound;
+        public event EventHandler? RawDataReceived;
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
@@ -120,6 +122,16 @@ namespace DVBTTelevizor.TV
             if (_demodulator != null && e.Size>0)
             {
                 _demodulator.AddSamples(e.Data, e.Size);
+
+
+                if (RawDataReceived != null)
+                {
+                    RawDataReceived(this, new RawDataReceivedEventArgs()
+                    {
+                        Data = e.Data,
+                        DataSize = e.Size
+                    });
+                }
 
                 // save raw data for analysis
                 //RecordData(e.Data, e.Size);

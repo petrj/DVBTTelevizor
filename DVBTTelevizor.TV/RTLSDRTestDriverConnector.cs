@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.MAUI;
+using LoggerService;
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
@@ -23,6 +24,7 @@ namespace DVBTTelevizor.TV
 
         public event EventHandler? OnRawAudioDemodulated;
         public event EventHandler? OnServiceFound = null;
+        public event EventHandler? RawDataReceived;
 
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
@@ -273,6 +275,15 @@ namespace DVBTTelevizor.TV
                 totalBytesRead += bytesRead;
 
                 _demodulator.AddSamples(buffer, bytesRead);
+
+                if (RawDataReceived != null)
+                {
+                    RawDataReceived(this, new RawDataReceivedEventArgs()
+                    {
+                        Data = buffer,
+                        DataSize = bytesRead
+                    });
+                }
 
                 // 🧠 Timing control (keeps correct bitrate)
                 double expectedSeconds = (double)totalBytesRead / _bytesPerSecond;

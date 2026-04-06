@@ -1,20 +1,21 @@
-﻿using Newtonsoft.Json;
+﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.TV;
+using LoggerService;
+using MPEGTS;
+using Newtonsoft.Json;
+using RTLSDR.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Runtime.InteropServices;
-using MPEGTS;
+using System.Text;
 using System.Threading;
-using LoggerService;
-using DVBTTelevizor.TV;
-using RTLSDR.Common;
+using System.Threading.Tasks;
 
 namespace DVBTTelevizor
 {
@@ -57,6 +58,7 @@ namespace DVBTTelevizor
         public delegate void StatusChangedEventHandler(object sender, DVBTDriverStatusChangedEventArgs e);
         public event EventHandler? StatusChanged = null;
         public event EventHandler? OnServiceFound = null;
+        public event EventHandler? RawDataReceived;
 
         public string PublicDirectory { get; set; } = "";
 
@@ -591,6 +593,14 @@ namespace DVBTTelevizor
                             totalBytesRead += bytesRead;
                             bytesReadFromLastMeasureStartTime += bytesRead;
 
+                            if (RawDataReceived != null)
+                            {
+                                RawDataReceived(this, new RawDataReceivedEventArgs()
+                                {
+                                    Data = buffer,
+                                    DataSize = bytesRead
+                                });
+                            }
 
                             if (rec)
                             {

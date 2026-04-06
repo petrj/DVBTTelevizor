@@ -4,6 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.DriverStatPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              Title="{local:LngXamlExt Input='Driver statistics'}">
 
     <ContentPage.Resources>
@@ -38,6 +39,10 @@
     </ContentPage.Resources>
 
     <AbsoluteLayout BackgroundColor="Black">
+
+        <skia:SKCanvasView AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0" AbsoluteLayout.LayoutFlags="All"
+            x:Name="SpectrumCanvas"
+            PaintSurface="OnPaintSurface" />
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.5,0.9,0.9" AbsoluteLayout.LayoutFlags="All" Text="{Binding Stat}" Style="{DynamicResource StatLabelStyle}" FontSize="{Binding AppFontSize}" />
 

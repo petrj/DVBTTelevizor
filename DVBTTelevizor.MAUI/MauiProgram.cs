@@ -4,6 +4,7 @@ using DVBTTelevizor.TV;
 using LibVLCSharp.MAUI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -15,6 +16,7 @@ namespace DVBTTelevizor.MAUI
             builder
                 .UseMauiApp<App>()
                 .UseLibVLCSharp()
+                 .UseSkiaSharp()
                 .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
