@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.DriverStatPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='Driver statistics'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="StatLabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="LineBreakMode" Value="NoWrap" />
+
+                <Setter Property="FontFamily">
+                    <OnPlatform x:TypeArguments="x:String">
+                        <On Platform="Android" Value="monospace" />
+                        <On Platform="WinUI" Value="Consolas" />
+                    </OnPlatform>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout BackgroundColor="Black">
+
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.5,0.9,0.9" AbsoluteLayout.LayoutFlags="All" Text="{Binding Stat}" Style="{DynamicResource StatLabelStyle}" FontSize="{Binding FontSizeLabel}" />
+
+    </AbsoluteLayout>
+
+</ContentPage>

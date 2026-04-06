@@ -21,6 +21,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
     private GainPage _gainPage;
+    private DriverStatPage _statPage;
 
     private AppMenu _appMenu = null;
 
@@ -34,6 +35,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _driver = driver;
 
         _gainPage = new GainPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+        _statPage = new DriverStatPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
@@ -69,6 +71,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Preferences", new List<View>() { DriverPreferencesButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Connect", new List<View>() { ConnectButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Gain", new List<View>() { GainButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Stat", new List<View>() { StatButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("DisConnect", new List<View>() { DisconnectButton }));
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
@@ -148,7 +151,12 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                         });
                         break;
 
-
+                    case "Stat":
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            StatButton_Clicked(this, new EventArgs());
+                        });
+                        break;
                     case "Gain":
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
@@ -223,7 +231,14 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage GaintButton_Clicked");
 
-        await ShowGainPage();
+        await ShowPage(_gainPage);
+    }
+
+    private async void StatButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"DriverPage StatButton_Clicked");
+
+        await ShowPage(_statPage);
     }
 
     private void DriverPreferencesButton_Clicked(object sender, EventArgs e)
@@ -268,19 +283,17 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         }
     }
 
-    private async Task ShowGainPage()
+    private async Task ShowPage(ContentPage page)
     {
-        if (_gainPage.IsLoaded)
+        if (page.IsLoaded)
         {
             // preventing click when the settings page is just (or yet) loaded
             return;
         }
 
-        //_gainPage.PageDriver = driverType;
-
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            await Navigation.PushAsync(_gainPage);
+            await Navigation.PushAsync(page);
         });
     }
 }

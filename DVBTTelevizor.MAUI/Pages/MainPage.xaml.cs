@@ -505,22 +505,18 @@ namespace DVBTTelevizor.MAUI
                     bitrate = _driver.Bitrate;
                 }
 
-                WeakReferenceMessenger.Default.Send(new DriverUpdateStatMessage(
-                    new DriverStat()
-                    {
-                        BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
-                        Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
-                    }
-                    ));
+                var stat = new DriverStat()
+                {
+                    BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
+                    Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
+                };
 
                 if (_demodulator != null)
                 {
-                    if ((DateTime.UtcNow-_lastStatUpdate).TotalMilliseconds>5000)
-                    {
-                        _lastStatUpdate = DateTime.UtcNow;
-                        _loggingService.Debug(_demodulator.Stat(false));
-                    }
+                    stat.Stat = _demodulator.Stat(false);
                 }
+
+                WeakReferenceMessenger.Default.Send(new DriverUpdateStatMessage(stat));
 
             } catch (Exception ex)
             {

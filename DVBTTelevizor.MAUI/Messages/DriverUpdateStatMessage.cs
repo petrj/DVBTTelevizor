@@ -11,6 +11,8 @@ namespace DVBTTelevizor.MAUI.Messages
     {
         public string BitRate { get; set; }
         public string Frequency { get; set; }
+
+        public string Stat { get; set; }
     }
 
     public class DriverUpdateStatMessage : ValueChangedMessage<DriverStat?>
