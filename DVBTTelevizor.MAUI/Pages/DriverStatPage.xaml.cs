@@ -20,9 +20,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
 
-
-    private int[]? spectrum = null;
-    private readonly Random rnd = new Random();
+    private System.Drawing.Point[]? _spectrum = null;
 
     private KeyboardFocusableItemList _focusItems;
     private SpectrumWorker? _spectrumWorker = null;
@@ -73,7 +71,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
             return;
         }
 
-        spectrum = _spectrumWorker.GetScaledSpectrum(400,200);
+        _spectrum = _spectrumWorker?.Spectrum;
     }
 
     private void BuildFocusableItems()
@@ -153,7 +151,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-        if (spectrum == null)
+        if (_spectrum == null)
         {
             return;
         }
@@ -161,7 +159,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Black);
 
-        var paint = new SKPaint
+        using var paint = new SKPaint
         {
             Color = SKColors.Lime,
             StrokeWidth = 2,
@@ -171,11 +169,12 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
         int width = e.Info.Width;
         int height = e.Info.Height;
 
-        float barWidth = (float)width / spectrum.Length;
+        float barWidth = (float)width / _spectrum.Length;
 
-        for (int i = 0; i < spectrum.Length; i++)
+        for (int i = 0; i < _spectrum.Length; i++)
         {
-            float value = spectrum[i] / 200f; // normalize 0–1
+            // Use Point.Y as value
+            float value = (float)_spectrum[i].Y / 200f; // normalize 0–1
             float barHeight = value * height;
             float x = i * barWidth;
             float y = height - barHeight;

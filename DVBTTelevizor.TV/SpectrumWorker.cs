@@ -55,68 +55,6 @@ public class SpectrumWorker
         }
     }
 
-    public int[] GetScaledSpectrum(int width=1638, int height=20)
-    {
-        double xFactor = _fftSize / width;
-
-        float epsilon = 0.0001f;
-        var res = new int[width];
-        var k=0;
-        var j = 0;
-        long sum = 0;
-        var min = int.MaxValue;
-        var max = int.MinValue;
-
-        var localMax = int.MinValue;
-
-        for (var i= 0;i<_fftSize;i++)
-        {
-            sum += Spectrum[i].Y;
-            j++;
-
-            if (Spectrum[i].Y>localMax)
-            {
-                localMax = Spectrum[i].Y;
-            }
-
-            if (Math.Abs(j-xFactor) < epsilon)
-            {
-                res[k] = Math.Abs(localMax);
-                if (min>res[k])
-                {
-                    min = res[k];
-                }
-                if (max<res[k])
-                {
-                    max = res[k];
-                }
-                j=0;
-                sum = 0;
-                localMax = int.MinValue;
-                k++;
-
-                if (k>=width-1)
-                {
-                    break;
-                }
-            }
-        }
-
-        var spectrumHeight = Math.Abs(max);
-        if (spectrumHeight<height)
-        {
-            spectrumHeight = height;
-        }
-        double yFactor = (double)height /spectrumHeight;
-
-        for (var i= 0;i<width;i++)
-        {
-            res[i] = Convert.ToInt32(yFactor * res[i]);
-        }
-
-        return res;
-    }
-
     public void Stop()
     {
         _spectrumThreadWorker.Stop();
