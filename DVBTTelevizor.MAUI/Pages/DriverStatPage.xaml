@@ -25,12 +25,36 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+                <!--Setter Property="Background" Value="#444444"/-->
+                <Setter Property="CornerRadius" Value="7"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.5,0.9,0.9" AbsoluteLayout.LayoutFlags="All" Text="{Binding Stat}" Style="{DynamicResource StatLabelStyle}" FontSize="{Binding FontSizeLabel}" />
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.5,0.9,0.9" AbsoluteLayout.LayoutFlags="All" Text="{Binding Stat}" Style="{DynamicResource StatLabelStyle}" FontSize="{Binding AppFontSize}" />
+
+        <Grid x:Name="ButtonsGrid" AbsoluteLayout.LayoutBounds="0.5,0.98,0.95,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True" Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" />
+                <ColumnDefinition Width="70*" />
+                <ColumnDefinition Width="15*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="MinusButton" Grid.Column="0" Text="{local:LngXamlExt Input='-'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLageCaption}" IsVisible="{Binding MinusVisible}" Clicked="MinusButton_Clicked"/>
+            <Button x:Name="PlusButton" Grid.Column="2" Text="{local:LngXamlExt Input='+'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLageCaption}" IsVisible="{Binding PlusVisible}" Clicked="PlusButton_Clicked"/>
+          </Grid>
+
 
     </AbsoluteLayout>
 
