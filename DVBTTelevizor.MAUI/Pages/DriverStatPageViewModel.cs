@@ -49,7 +49,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var normalSize = 14;
+                var normalSize = 12;
                 switch (FontSize)
                 {
                     case 0:
