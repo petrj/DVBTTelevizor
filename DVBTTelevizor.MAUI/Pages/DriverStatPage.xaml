@@ -14,9 +14,11 @@
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="LineBreakMode" Value="NoWrap" />
+
+                <Setter Property="VerticalOptions" Value="Fill" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+
+                <Setter Property="LineBreakMode" Value="CharacterWrap" />
 
                 <Setter Property="FontFamily">
                     <OnPlatform x:TypeArguments="x:String">
@@ -25,7 +27,6 @@
                     </OnPlatform>
                 </Setter>
             </Style>
-
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="5,0,5,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>

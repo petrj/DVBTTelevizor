@@ -1575,7 +1575,20 @@ namespace DVBTTelevizor.MAUI
                         SDRSampleRate = AudioTools.DABSampleRate
                     };
 
-                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
+                    if (_configuration.TestingMode)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "rtl_sdr test",
+                            ControlPort = 1234,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
+                    }
                     break;
             }
 

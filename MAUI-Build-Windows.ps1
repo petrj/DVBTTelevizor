@@ -22,9 +22,9 @@ Script for creating AAB/APK release for publishing to Google Play
 Set-Location $PSScriptRoot
 Import-Module .\MAUI-Build-Module.psm1 -Force
 
-#$passw = Get-Password
+$passw = Get-SecureStringFromUserInput -Message "Enter password to Android store:" -EnvironmentVariable $Env:PJsAndroidStore
 
-#.\Clear.ps1
+.\Clear.ps1
 
 $aABPackage = Get-Item ".\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj" `
     | Publish-AABPackage `
