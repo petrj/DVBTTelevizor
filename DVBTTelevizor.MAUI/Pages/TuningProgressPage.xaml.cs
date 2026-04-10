@@ -4,6 +4,7 @@ using LoggerService;
 using Microsoft.Maui.Layouts;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using static DVBTTelevizor.MAUI.TuningProgressPageViewModel;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -384,6 +385,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
 
         _viewModel.ResetTune(true);
+
+        _viewModel.State = TuneStateEnum.Finished;
 
         WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
     }

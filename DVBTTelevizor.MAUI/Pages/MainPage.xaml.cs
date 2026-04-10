@@ -829,9 +829,6 @@ namespace DVBTTelevizor.MAUI
                 case AppDriverTypeEnum.DAB:
                         _demodulator = new DABProcessor(_loggingService);
 
-                        _demodulator.OnServiceFound += DabDemoduator_OnServiceFound;
-                        //dabDemoduator.OnServicePlayed += DABProcessor_OnServicePlayed;
-
                         if (_configuration.TestingMode)
                         {
                             _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
@@ -855,23 +852,6 @@ namespace DVBTTelevizor.MAUI
             _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
-        }
-
-        private void DabDemoduator_OnServiceFound(object? sender, EventArgs e)
-        {
-            //if (e is DABServiceFoundEventArgs de)
-            //{
-            //    _loggingService.Info($"DAB service found: {de.Service}");
-
-            //     autoplay DAB service when found
-            //    if ((_playingDABService == null) &&
-            //        (_demodulator != null) &&
-            //        (_demodulator is DABProcessor dab))
-            //    {
-            //        _playingDABService = de.Service;
-            //        dab.SetProcessingService(_playingDABService);
-            //    }
-            //}
         }
 
         private void ProcessAACAudioData(AACDataDemodulatedEventArgs ed)

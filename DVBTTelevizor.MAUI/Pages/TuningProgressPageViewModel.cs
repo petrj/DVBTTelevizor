@@ -67,6 +67,14 @@ namespace DVBTTelevizor.MAUI
 
         private void Demodulator_OnServiceFound(object? sender, EventArgs e)
         {
+            _loggingService.Info($"Demodulator_OnServiceFound");
+
+            if (State != TuneStateEnum.InProgress )
+            {
+                _loggingService.Info($"Tuning is not in progress, ingoring event");
+                return;
+            }
+
             if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
             {
                 if (_tunedServices.Contains(de.Service.ServiceNumber))
@@ -84,10 +92,11 @@ namespace DVBTTelevizor.MAUI
                 {
                     Free = true,
                     ServiceName = de.Service.ServiceName,
-                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService)
+                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
+                    ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
                 };
 
-                AddChannel(chType, sd, de.Service.ServiceNumber, _actualTunningFreqKHz*1000, 0);
+                AddChannel(chType, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
             }
         }
 
@@ -293,31 +302,17 @@ namespace DVBTTelevizor.MAUI
 
         public async Task StartTune()
         {
-            if (State == TuneStateEnum.Inactive)
+            switch (State)
             {
-                ResetTune();
+                case TuneStateEnum.Finished:
+                    ResetTune(false);
+                    break;
+                default:
+                    ResetTune();
+                    break;
             }
 
-            if (State == TuneStateEnum.Finished)
-            {
-                ResetTune(false);
-            }
-
-            await Task.Run(async () =>
-            {
-                if (Settings.TuningMode == TuneModeEnum.Frequency)
-                {
-                    await Tune();
-                } else
-                {
-                    await Tune();
-                }
-
-                if (_tuneState == TuneStateEnum.Failed)
-                {
-                    WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
-                }
-            });
+            await Tune();
         }
 
         private async Task Tune()
@@ -387,9 +382,12 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                State = TuneStateEnum.Finished;
-                //SignalStrengthProgress = 0;
-                //MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+                // when tunning FM/DAB, demmodulator is searching for freequencies in the background and the tuning never ends....
+                if (_driver.DriverType == TV.AppDriverTypeEnum.DVBT)
+                {
+                    State = TuneStateEnum.Finished;
+                }
+
             }
             catch (Exception ex)
             {
@@ -399,6 +397,12 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 _loggingService.Info("Tuning finished");
+
+                if (_tuneState == TuneStateEnum.Failed)
+                {
+                    WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
+                }
+
                 NotifyChange();
             }
 

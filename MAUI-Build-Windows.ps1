@@ -22,7 +22,7 @@ Script for creating AAB/APK release for publishing to Google Play
 Set-Location $PSScriptRoot
 Import-Module .\MAUI-Build-Module.psm1 -Force
 
-$passw = Get-SecureStringFromUserInput -Message "Enter password to Android store:" -EnvironmentVariable $Env:PJsAndroidStore
+$passw = Get-SecureStringFromUserInput -Message "Enter password to Android store:" -EnvironmentVariable $env:PJsAndroidStore
 
 .\Clear.ps1
 
