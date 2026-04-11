@@ -11,10 +11,10 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
     <PackageReference Include="MPEGTS" Version="1.0.26" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-	<PackageReference Include="RTLSDR" Version="1.4.0" />
-	<PackageReference Include="RTLSDR.Common" Version="1.4.0" />
-	<PackageReference Include="RTLSDR.DAB" Version="1.4.0" />
-	<PackageReference Include="RTLSDR.FM" Version="1.4.0" />
+	<PackageReference Include="RTLSDR" Version="1.5.0" />
+	<PackageReference Include="RTLSDR.Common" Version="1.5.3" />
+	<PackageReference Include="RTLSDR.DAB" Version="1.5.0" />
+	<PackageReference Include="RTLSDR.FM" Version="1.5.0" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
   </ItemGroup>
 

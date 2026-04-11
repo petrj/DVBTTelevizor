@@ -20,10 +20,9 @@ foreach ($file in Get-ChildItem -Path "TestingDVBTDriverData")
         
     } else
     {
-        Invoke-Expression "adb push $($file.FullName) $androidFolder"
+        Invoke-Expression "$adbPath push $($file.FullName) $androidFolder"
     }
 }
 
-#Invoke-Expression "adb push TestingDVBTDriverData/DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts $androidFolder"
 
  

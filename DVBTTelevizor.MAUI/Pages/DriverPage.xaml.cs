@@ -60,7 +60,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
     {
-        _driverPageViewModel.MenuVisible = e.IsVisible;
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _driverPageViewModel.MenuVisible = e.IsVisible;
+        });
     }
 
     private void BuildFocusableItems()
@@ -199,7 +202,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         if (_driverPageViewModel.PageDriver != _driver.DriverType)
         {
-            _appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver);
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver);
+            });
             return;
         }
 
@@ -272,7 +278,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
 
-        _appMenu.HideMenu();
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _appMenu.HideMenu();
+        });
 
         switch (menuId)
         {
