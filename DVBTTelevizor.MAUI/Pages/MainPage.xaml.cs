@@ -1490,14 +1490,22 @@ namespace DVBTTelevizor.MAUI
 
             // TODO: show menu and confirm disconnect/driver change
 
-            if  (_driver != null && _driver.Connected)
+            if (_driver != null)
             {
-                _driver.Disconnect();
+                if (_driver.Connected)
+                {
+                    _driver.Disconnect();
+                }
+                if (_driver.DriverType != appDriverType)
+                {
+                    _configuration.AppDriverType = appDriverType.Value;
+                    InitDriver();
+                }
             }
+
             if (_configuration.AppDriverType != appDriverType)
             {
                 _configuration.AppDriverType = appDriverType.Value;
-                InitDriver();
             }
 
             switch (appDriverType)
@@ -1541,7 +1549,20 @@ namespace DVBTTelevizor.MAUI
                         SDRSampleRate = AudioTools.FMSampleRate
                     };
 
-                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
+                    if (_configuration.TestingMode)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "rtl_sdr test",
+                            ControlPort = 1234,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
+                    }
 
                     break;
 
