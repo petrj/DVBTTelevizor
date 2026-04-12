@@ -808,8 +808,15 @@ namespace DVBTTelevizor.MAUI
             switch (_configuration.AppDriverType)
             {
                 case AppDriverTypeEnum.DVBT:
-                    _driver = new DVBTDriverConnector(_loggingService);
-                    //_driver = new TestTuneConnector(_loggingService);
+
+                    if (_configuration.TestingMode)
+                    {
+                        _driver = new TestTuneConnector(_loggingService);
+                    }
+                    else
+                    {
+                        _driver = new DVBTDriverConnector(_loggingService);
+                    }
                     break;
                 case AppDriverTypeEnum.FM:
 
@@ -1507,34 +1514,23 @@ namespace DVBTTelevizor.MAUI
             switch (appDriverType)
             {
                 case AppDriverTypeEnum.DVBT:
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
-                    break;
 
 
-                //case DriverTypeEnum.AndroidTestingDVBTDriver:
-
-                //    _testDVBTDriver = new TestDVBTDriver(_loggingService);
-                //    _testDVBTDriver.PublicDirectory = PublicDirectory;
-                //    _testDVBTDriver.Connect();
-
-                //    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                //        new DVBTDriverConfiguration()
-                //        {
-                //            DeviceName = "Testing DVBT driver",
-                //            ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
-                //            TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
-                //        }));
-                //    break;
-
-                //case DriverTypeEnum.TestTuneDriver:
-
-                //    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                //        new DVBTDriverConfiguration()
-                //        {
-                //            DeviceName = "Test tune driver"
-                //        }));
-
-                //    break;
+                    if (_configuration.TestingMode)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "Testing DVBT driver",
+                            ControlPort = 1234,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
+                    }
+                break;
 
                 case AppDriverTypeEnum.FM:
 
@@ -1549,7 +1545,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                         {
-                            DeviceName = "rtl_sdr test",
+                            DeviceName = "rtl_sdr FM test",
                             ControlPort = 1234,
                             TransferPort = 1235,
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
@@ -1576,7 +1572,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                         {
-                            DeviceName = "rtl_sdr test",
+                            DeviceName = "rtl_sdr DAB test",
                             ControlPort = 1234,
                             TransferPort = 1235,
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()

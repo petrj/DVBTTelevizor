@@ -312,7 +312,7 @@ namespace DVBTTelevizor.MAUI
                     break;
             }
 
-            await Tune();
+            Task.Run(async ()=> await Tune());
         }
 
         private async Task Tune()
