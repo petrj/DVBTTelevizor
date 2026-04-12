@@ -2,6 +2,7 @@
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Plugin.InAppBilling;
+using RTLSDR.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,116 +14,41 @@ namespace DVBTTelevizor.MAUI
 {
     public class DriverStatPageViewModel : BaseViewModel
     {
-        private string _stat = string.Empty;
-        private int _fontSize = 0;
+        public ObservableCollection<StatValue> Stats { get; } = new();
 
         public DriverStatPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
-
             WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
                 Task.Run(async () =>
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        Stat = m.Value == null ? String.Empty : m.Value.Stat;
+                        FillStat(m?.Value?.StatValues);
                     });
                 });
             });
         }
 
-        public string Stat
+        private void FillStat(List<StatValue>? values)
         {
-            get { return _stat; }
-            set
+            try
             {
-                if (_stat != value)
+                Stats.Clear();
+
+                if (values == null || values.Count == 0)
                 {
-                    _stat = value;
-                    OnPropertyChanged(nameof(Stat));
+                    return;
                 }
-            }
-        }
 
-        public int AppFontSize
-        {
-            get
-            {
-                var normalSize = 10;
-                switch (FontSize)
+                foreach (var item in values)
                 {
-                    case 0:
-                        return Convert.ToInt32(Math.Round(normalSize * 1.12));
-                    case 1:
-                        return Convert.ToInt32(Math.Round(normalSize * 1.25));
-                    case 2:
-                        return Convert.ToInt32(Math.Round(normalSize * 1.5));
-                    case 3:
-                        return Convert.ToInt32(Math.Round(normalSize * 1.75));
-                    case 4:
-                        return Convert.ToInt32(Math.Round(normalSize * 2.0));
-                    case 5:
-                        return Convert.ToInt32(Math.Round(normalSize * 2.20));
-                    case 6:
-                        return Convert.ToInt32(Math.Round(normalSize * 2.50));
-                    default: return normalSize;
+                    Stats.Add(item);
                 }
-            }
-        }
-
-        public int FontSize
-        {
-            get
+            } finally
             {
-                return _fontSize;
-            }
-            set
-            {
-                _fontSize = value;
-
-                Task.Run(async () =>
-                {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        OnPropertyChanged(nameof(FontSize));
-                        OnPropertyChanged(nameof(AppFontSize));
-                        OnPropertyChanged(nameof(PlusVisible));
-                        OnPropertyChanged(nameof(MinusVisible));
-                    });
-                });
-            }
-        }
-
-        public async void Plus()
-        {
-            if (FontSize < 6)
-            {
-                FontSize++;
-            }
-        }
-
-        public async void Minus()
-        {
-            if (FontSize > 0)
-            {
-                FontSize--;
-            }
-        }
-
-        public bool PlusVisible
-        {
-            get
-            {
-                return FontSize < 7;
-            }
-        }
-
-        public bool MinusVisible
-        {
-            get
-            {
-                return FontSize > 0;
+                OnPropertyChanged(nameof(Stats));
             }
         }
     }

@@ -308,6 +308,8 @@ namespace DVBTTelevizor.TV
             }
             State = DVBTDriverStateEnum.Disconnected;
 
+            _demodulator?.Clear();
+
             return Task.CompletedTask;
         }
 

@@ -36,30 +36,46 @@
                 <Setter Property="CornerRadius" Value="7"/>
             </Style>
 
+            <!-- Converter -->
+            <local:StatValueConverter x:Key="ValueConverter" />
+
+            <!-- TEXT TEMPLATE -->
+            <DataTemplate x:Key="TextTemplate">
+                <Grid ColumnDefinitions="60*,25*,15*" Padding="5"  ColumnSpacing="12">
+                    <Label Text="{Binding Title}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}" />
+                    <Label Text="{Binding Value, Converter={StaticResource ValueConverter}}" Grid.Column="1"
+                           HorizontalOptions="End" HorizontalTextAlignment="End" FontSize="{Binding FontSizeForLabel}" />
+                    <Label Text="{Binding Unit}" Grid.Column="2" HorizontalTextAlignment="Start" FontSize="{Binding FontSizeForLabel}"/>
+                </Grid>
+            </DataTemplate>
+
+            <!-- BOOL TEMPLATE -->
+            <DataTemplate x:Key="BoolTemplate">
+                <Grid ColumnDefinitions="2*,2*,Auto" Padding="5"  ColumnSpacing="12">
+                    <Label Text="{Binding Title}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}"/>
+                    <CheckBox IsChecked="{Binding Value}" Grid.Column="1" HorizontalOptions="End" />
+                    <Label Text="{Binding Unit}" Grid.Column="2" HorizontalTextAlignment="Start" FontSize="{Binding FontSizeForLabel}"/>
+                </Grid>
+            </DataTemplate>
+
+            <!-- TEMPLATE SELECTOR -->
+            <local:StatValueTemplateSelector
+            x:Key="StatSelector"
+            TextTemplate="{StaticResource TextTemplate}"
+            BoolTemplate="{StaticResource BoolTemplate}" />
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <skia:SKCanvasView AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0" AbsoluteLayout.LayoutFlags="All"
+        <skia:SKCanvasView AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0" AbsoluteLayout.LayoutFlags="All" IsVisible="True"
             x:Name="SpectrumCanvas"
             PaintSurface="OnPaintSurface" />
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.5,0.9,0.9" AbsoluteLayout.LayoutFlags="All" Text="{Binding Stat}" Style="{DynamicResource StatLabelStyle}" FontSize="{Binding AppFontSize}" />
-
-        <Grid x:Name="ButtonsGrid" AbsoluteLayout.LayoutBounds="0.5,0.98,0.95,0.1" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True" Margin="0,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="15*" />
-                <ColumnDefinition Width="70*" />
-                <ColumnDefinition Width="15*" />
-            </Grid.ColumnDefinitions>
-
-            <Button x:Name="MinusButton" Grid.Column="0" Text="{local:LngXamlExt Input='-'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLageCaption}" IsVisible="{Binding MinusVisible}" Clicked="MinusButton_Clicked"/>
-            <Button x:Name="PlusButton" Grid.Column="2" Text="{local:LngXamlExt Input='+'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLageCaption}" IsVisible="{Binding PlusVisible}" Clicked="PlusButton_Clicked"/>
-          </Grid>
+        <CollectionView  AbsoluteLayout.LayoutBounds="0.5,0.5,0.95,0.95" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent"
+        ItemsSource="{Binding Stats}"
+        ItemTemplate="{StaticResource StatSelector}" />
 
 
     </AbsoluteLayout>

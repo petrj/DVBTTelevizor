@@ -514,6 +514,7 @@ namespace DVBTTelevizor.MAUI
                 if (_demodulator != null)
                 {
                     stat.Stat = _demodulator.Stat(false);
+                    stat.StatValues = _demodulator.GetStat();
                 }
 
                 WeakReferenceMessenger.Default.Send(new DriverUpdateStatMessage(stat));
@@ -1454,7 +1455,7 @@ namespace DVBTTelevizor.MAUI
                 _firstAppearing = false;
 
                 InitializeVLC();
-                SendConnectDriverRequest();
+                SendConnectDriverRequest(_configuration.AppDriverType);
 
                 Task.Run(async () =>
                 {
@@ -1479,13 +1480,8 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void SendConnectDriverRequest(AppDriverTypeEnum? appDriverType = null)
+        private void SendConnectDriverRequest(AppDriverTypeEnum appDriverType)
         {
-            if (appDriverType == null)
-            {
-                appDriverType = _configuration.AppDriverType;
-            }
-
             _loggingService.Info($"Sending connect message to appDriverType {appDriverType}");
 
             // TODO: show menu and confirm disconnect/driver change
@@ -1498,14 +1494,14 @@ namespace DVBTTelevizor.MAUI
                 }
                 if (_driver.DriverType != appDriverType)
                 {
-                    _configuration.AppDriverType = appDriverType.Value;
+                    _configuration.AppDriverType = appDriverType;
                     InitDriver();
                 }
             }
 
             if (_configuration.AppDriverType != appDriverType)
             {
-                _configuration.AppDriverType = appDriverType.Value;
+                _configuration.AppDriverType = appDriverType;
             }
 
             switch (appDriverType)

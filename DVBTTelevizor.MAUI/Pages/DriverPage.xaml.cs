@@ -15,7 +15,6 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private ITVConfiguration _configuration;
-    private IDriverConnector _driver;
 
     private string _publicDirectory;
 
@@ -32,10 +31,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _loggingService = loggingService;
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-        _driver = driver;
 
-        _gainPage = new GainPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-        _statPage = new DriverStatPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+        _gainPage = new GainPage(_loggingService, driver, _configuration, publicDirectoryProvider);
+        _statPage = new DriverStatPage(_loggingService, driver, _configuration, publicDirectoryProvider);
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
@@ -46,11 +44,11 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         BuildFocusableItems();
     }
 
-    public AppDriverTypeEnum? PageDriver
+    public AppDriverTypeEnum PageDriver
     {
         get
         {
-            return _driverPageViewModel?.PageDriver;
+            return _driverPageViewModel.PageDriver;
         }
         set
         {
@@ -200,16 +198,16 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage ConnectButton_Clicked");
 
-        if (_driverPageViewModel.PageDriver != _driver.DriverType)
+        if (_driverPageViewModel.PageDriver != _driverPageViewModel.Driver.DriverType)
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _appMenu.ShowConfirmChangeDriverMenu(_driver, _driverPageViewModel.PageDriver);
+                _appMenu.ShowConfirmChangeDriverMenu(_driverPageViewModel.Driver, _driverPageViewModel.PageDriver);
             });
             return;
         }
 
-        if  (_driverPageViewModel.PageDriver == _driver.DriverType)
+        if  (_driverPageViewModel.PageDriver == _driverPageViewModel.Driver.DriverType)
         {
             switch (_driverPageViewModel.PageDriver)
             {

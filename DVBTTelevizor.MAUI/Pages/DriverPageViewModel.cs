@@ -17,7 +17,7 @@ namespace DVBTTelevizor.MAUI
         private string _range = string.Empty;
         private DriverStat? _driverState = null;
 
-        private AppDriverTypeEnum? _pageDriver = null;
+        private AppDriverTypeEnum _pageDriver = AppDriverTypeEnum.DVBT;
         private bool? _dvbtDriverInstalled = null;
         private bool? _rtlsdrDriverInstalled = null;
         private IDriverConnector? _driver = null;
@@ -33,14 +33,10 @@ namespace DVBTTelevizor.MAUI
                 NotifyDriverChange();
             });
 
-            WeakReferenceMessenger.Default.Register<DriverChangedMessages>(this, (r, m) =>
-            {
-                NotifyDriverChange();
-            });
-
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;
+                PageDriver = _driver.DriverType;
                 Task.Run(async () =>
                  {
                     await CheckDriver();;
@@ -96,8 +92,16 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public IDriverConnector Driver
+        {
+            get
+            {
+                return _driver;
+            }
+        }
 
-        public AppDriverTypeEnum? PageDriver
+
+        public AppDriverTypeEnum PageDriver
         {
             get
             {
@@ -201,12 +205,12 @@ namespace DVBTTelevizor.MAUI
                     return "No driver".Translated(); // page is not yet initialized
                 }
 
-                if (!IsDriverInstalled(_pageDriver.Value))
+                if (!IsDriverInstalled(_pageDriver))
                 {
                     return "Driver not installed".Translated();
                 }
 
-                if (_driver.DriverType == _pageDriver.Value)
+                if (_driver.DriverType == _pageDriver)
                 {
                     // same driver
                     if (_driver.Connected)
@@ -235,7 +239,7 @@ namespace DVBTTelevizor.MAUI
                     return false; // page is not yet initialized
                 }
 
-                return IsDriverInstalled(_pageDriver.Value);
+                return IsDriverInstalled(_pageDriver);
             }
         }
 
@@ -289,12 +293,12 @@ namespace DVBTTelevizor.MAUI
                     return false; // page is not yet initialized
                 }
 
-                if (!IsDriverInstalled(_pageDriver.Value))
+                if (!IsDriverInstalled(_pageDriver))
                 {
                     return false; // driver not installed
                 }
 
-                if (_driver.DriverType == _pageDriver.Value)
+                if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show button if connected
                     return _driver.Connected;
@@ -336,7 +340,7 @@ namespace DVBTTelevizor.MAUI
                     return false; // page is not yet initialized
                 }
 
-                if (!IsDriverInstalled(_pageDriver.Value))
+                if (!IsDriverInstalled(_pageDriver))
                 {
                     return false; // driver not installed
                 }
@@ -348,7 +352,7 @@ namespace DVBTTelevizor.MAUI
                     return false; // gain is supported for RTLSDR driver
                 }
 
-                if (_driver.DriverType == _pageDriver.Value)
+                if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show if connected
                     return _driver.Connected;
@@ -367,12 +371,12 @@ namespace DVBTTelevizor.MAUI
                     return false; // page is not yet initialized
                 }
 
-                if (!IsDriverInstalled(_pageDriver.Value))
+                if (!IsDriverInstalled(_pageDriver))
                 {
                     return false; // driver not installed
                 }
 
-                if (_driver.DriverType == _pageDriver.Value)
+                if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show connect button if not connected
                     return !_driver.Connected;
@@ -393,7 +397,7 @@ namespace DVBTTelevizor.MAUI
                     return false; // page is not yet initialized
                 }
 
-                return !IsDriverInstalled(_pageDriver.Value);
+                return !IsDriverInstalled(_pageDriver);
             }
         }
 

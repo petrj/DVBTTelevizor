@@ -78,10 +78,6 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
 
-        _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("Minus", new List<View>() { MinusButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Plus", new List<View>() { PlusButton }));
-
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
 
@@ -122,12 +118,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
-                        case "Minus":
-                            MinusButton_Clicked(this, new EventArgs());
-                            break;
-                        case "Plus":
-                            PlusButton_Clicked(this, new EventArgs());
-                            break;
+
                     }
                 });
                 break;
@@ -137,16 +128,6 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     public void OnTextSent(string text)
     {
         _loggingService.Debug($"DriverStatPage Page OnTextSent {text}");
-    }
-
-    private void MinusButton_Clicked(object sender, EventArgs e)
-    {
-        _viewModel.Minus();
-    }
-
-    private void PlusButton_Clicked(object sender, EventArgs e)
-    {
-        _viewModel.Plus();
     }
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
