@@ -58,11 +58,55 @@
                 </Grid>
             </DataTemplate>
 
+
+            <!-- TABLE TEMPLATE -->
+
+            <DataTemplate x:Key="TableTemplate">
+                <VerticalStackLayout Padding="5" Spacing="4">
+
+                    <!-- Title -->
+                    <Label Text="{Binding Title}" FontAttributes="Bold"  FontSize="{Binding FontSizeForLabel}"/>
+
+                    <!-- HEADER -->
+                    <Grid ColumnDefinitions="*,*,*,*"
+                          ColumnSpacing="10"
+                          Padding="2"
+                          BackgroundColor="#333333">
+
+                        <Label Text="{Binding Value.Columns[0].ColumnName}" Grid.Column="0" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
+                        <Label Text="{Binding Value.Columns[1].ColumnName}" Grid.Column="1" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
+                        <Label Text="{Binding Value.Columns[2].ColumnName}" Grid.Column="2" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
+                        <Label Text="{Binding Value.Columns[3].ColumnName}" Grid.Column="3" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
+
+                    </Grid>
+
+                    <!-- ROWS -->
+                    <CollectionView ItemsSource="{Binding Value.Rows}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,*,*,*"
+                                      ColumnSpacing="10"
+                                      Padding="2">
+
+                                    <Label Text="{Binding [0]}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}" />
+                                    <Label Text="{Binding [1]}" Grid.Column="1" FontSize="{Binding FontSizeForLabel}"/>
+                                    <Label Text="{Binding [2]}" Grid.Column="2" FontSize="{Binding FontSizeForLabel}"/>
+                                    <Label Text="{Binding [3]}" Grid.Column="3" FontSize="{Binding FontSizeForLabel}"/>
+
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </DataTemplate>
+
             <!-- TEMPLATE SELECTOR -->
             <local:StatValueTemplateSelector
             x:Key="StatSelector"
             TextTemplate="{StaticResource TextTemplate}"
-            BoolTemplate="{StaticResource BoolTemplate}" />
+            BoolTemplate="{StaticResource BoolTemplate}"
+            TableTemplate="{StaticResource TableTemplate}" />
 
         </ResourceDictionary>
     </ContentPage.Resources>

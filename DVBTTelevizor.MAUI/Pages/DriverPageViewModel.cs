@@ -36,7 +36,6 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;
-                PageDriver = _driver.DriverType;
                 Task.Run(async () =>
                  {
                     await CheckDriver();;
