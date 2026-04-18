@@ -19,9 +19,19 @@ namespace DVBTTelevizor.MAUI
         public ICommand CommandFM { get; set; }
         public ICommand CommandDAB { get; set; }
 
+        private IDriverConnector _driver;
+
         public TuningSelectDriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
+            _driver = driver;
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                _driver = m.Value;
+                NotifyChange();
+            });
+
             CommandDVBT = new Command(() =>
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandDVBT executed");
@@ -38,6 +48,39 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandDAB executed");
                 WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DAB));
+            });
+        }
+
+        public string DVBTDriverConnectButtonBackgroundColor
+        {
+            get
+            {
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DVBT) ? HighlightedButtonColor : ButtonColor;
+            }
+        }
+
+        public string FMDriverConnectButtonBackgroundColor
+        {
+            get
+            {
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.FM) ? HighlightedButtonColor : ButtonColor;
+            }
+        }
+
+        public string DABDriverConnectButtonBackgroundColor
+        {
+            get
+            {
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DAB) ? HighlightedButtonColor : ButtonColor;
+            }
+        }
+
+
+        public async void NotifyChange()
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnPropertyChanged(nameof(DVBTDriverConnectButtonBackgroundColor));
             });
         }
     }

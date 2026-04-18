@@ -2288,6 +2288,7 @@ namespace DVBTTelevizor.MAUI
 
                         var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
                         _driver.Clear();
+                        _demodulator?.Clear();
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             switch (tunedRes.Result)

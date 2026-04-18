@@ -246,6 +246,15 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public string HighlightedButtonColor
+        {
+            get { return "#41b3ff"; }
+        }
+
+        public string ButtonColor
+        {
+            get { return "Gray"; }
+        }
 
     }
 }

@@ -71,6 +71,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             _driver = m.Value;
 
+            _viewModel.NotifyChange();
+
             //StartButton_Clicked(this, new EventArgs());
         });
 
