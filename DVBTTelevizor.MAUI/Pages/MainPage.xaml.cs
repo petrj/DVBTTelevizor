@@ -3136,7 +3136,7 @@ namespace DVBTTelevizor.MAUI
                     var item = GetSelectedMenuItem();
                     if (item != null)
                     {
-                        Menu_Tapped(item);
+                        OnMenuIsTapped(item);
                     }
                     break;
             }
@@ -3175,15 +3175,6 @@ namespace DVBTTelevizor.MAUI
         }
         */
 
-        private void Menu_Tapped(object sender, EventArgs e)
-        {
-            if (e != null &&
-                e is TappedEventArgs tea &&
-                tea.Parameter is MenuItem item)
-            {
-                Menu_Tapped(item);
-            }
-        }
 
         private async Task BuildTeletextMenu()
         {
@@ -3485,7 +3476,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async void Menu_Tapped(MenuItem menuItem)
+
+        private void Menu_Tapped(object sender, EventArgs e)
+        {
+            if (e != null &&
+                e is TappedEventArgs tea &&
+                tea.Parameter is MenuItem item)
+            {
+                OnMenuIsTapped(item);
+            }
+        }
+
+        private async void OnMenuIsTapped(MenuItem menuItem)
         {
             var menuId = menuItem.Id;
             HideMenu();
@@ -3843,16 +3845,5 @@ namespace DVBTTelevizor.MAUI
         {
             await ActionDown();
         }
-
-        private void OnChannel_LongTapped(object sender, CommunityToolkit.Maui.Core.LongPressCompletedEventArgs e)
-        {
-
-        }
-
-        private void OnVideo_LongPress(object sender, CommunityToolkit.Maui.Core.LongPressCompletedEventArgs e)
-        {
-
-        }
     }
-
 }

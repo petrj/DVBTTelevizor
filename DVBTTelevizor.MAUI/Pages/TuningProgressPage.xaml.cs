@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Maui.Layouts;
 using Newtonsoft.Json;
@@ -50,7 +51,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
-        _appMenu.MenuVisibleChanged += _appMenu_MenuVisibleChanged;
+        _appMenu.MenuVisibleChanged += _appMenuVisibleChanged;
 
         BuildFocusableItems();
 
@@ -69,6 +70,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
         {
             _driver = m.Value;
+
+            //StartButton_Clicked(this, new EventArgs());
         });
 
         _commandUpdateBitrate = new Command(() =>
@@ -83,7 +86,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         BackgroundCommandWorker.RunInBackground(_commandUpdateBitrate, 5);
     }
 
-    private void _appMenu_MenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
+    private void _appMenuVisibleChanged(object? sender, MenuVisibleChangedEventArgs e)
     {
         _viewModel.MenuVisible = e.IsVisible;
     }
@@ -345,6 +348,41 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
 
+        if ((_driver == null))
+        {
+            _loggingService.Error("StartButton_Clicked - no driver");
+            WeakReferenceMessenger.Default.Send(new ToastMessage("Error - no driver".Translated()));
+            return;
+        }
+
+        AppDriverTypeEnum? driverToChange = null;
+        if ((_viewModel.Settings.FM) && (_driver.DriverType != TV.AppDriverTypeEnum.FM))
+        {
+            // need to change driver
+            driverToChange = AppDriverTypeEnum.FM;
+        }
+        if ((_viewModel.Settings.DAB) && (_driver.DriverType != TV.AppDriverTypeEnum.DAB))
+        {
+            // need to change driver
+            driverToChange = AppDriverTypeEnum.DAB;
+        }
+        if ((_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2) && (_driver.DriverType != TV.AppDriverTypeEnum.DVBT))
+        {
+            // need to change driver
+            driverToChange = AppDriverTypeEnum.DVBT;
+        }
+
+        if (driverToChange != null)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _appMenu.ShowConfirmChangeDriverMenu(_driver, driverToChange);
+            });
+
+            return;
+        }
+
+
         if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
             _viewModel.Settings.TuningMode != TuneModeEnum.Frequency)
         {
@@ -434,11 +472,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             e is TappedEventArgs tea &&
             tea.Parameter is MenuItem item)
         {
-            Menu_Tapped(item);
+            OnMenuIsTapped(item);
         }
     }
 
-    private async void Menu_Tapped(MenuItem item)
+    private async void OnMenuIsTapped(MenuItem item)
     {
         var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
@@ -483,8 +521,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(_driver.DriverType));
                 break;
 
-            case "menuChangeDriver":
-                //await _viewModel.ChangeDriver(item.DriverType);
+            case "menuConfirmChangeDriver":
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
         }
     }

@@ -254,16 +254,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         base.OnDisappearing();
     }
 
-    private void Menu_Tapped(object sender, EventArgs e)
-    {
-        if (e != null &&
-            e is TappedEventArgs tea &&
-            tea.Parameter is MenuItem item)
-        {
-            Menu_Tapped(item);
-        }
-    }
-
     private void ShowOrHideMenu()
     {
         if (MainMenu.MenuVisible)
@@ -434,7 +424,17 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         }
     }
 
-    private async void Menu_Tapped(MenuItem item)
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null &&
+            e is TappedEventArgs tea &&
+            tea.Parameter is MenuItem item)
+        {
+            OnMenuIsTapped(item);
+        }
+    }
+
+    private async void OnMenuIsTapped(MenuItem item)
     {
         var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
@@ -571,7 +571,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 var menu = GetSelectedMenuItem();
                 if (menu != null)
                 {
-                    Menu_Tapped(menu);
+                    OnMenuIsTapped(menu);
                 }
                 break;
         }

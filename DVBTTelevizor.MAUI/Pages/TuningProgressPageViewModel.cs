@@ -74,7 +74,7 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        private void UpdateDriverStat(DriverStat? stat)
+        private async void UpdateDriverStat(DriverStat? stat)
         {
             if (stat == null)
             {
