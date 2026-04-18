@@ -15,7 +15,7 @@ namespace DVBTTelevizor.MAUI
     public class DriverPageViewModel : BaseViewModel
     {
         private string _range = string.Empty;
-        private DriverStat? _driverState = null;
+        private DriverStat? _driverStat = null;
 
         private AppDriverTypeEnum _pageDriver = AppDriverTypeEnum.DVBT;
         private bool? _dvbtDriverInstalled = null;
@@ -29,7 +29,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
-                _driverState = m.Value;
+                _driverStat = m.Value;
                 NotifyDriverChange();
             });
 
@@ -165,12 +165,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driverState == null)
+                if (_driverStat == null)
                 {
                     return String.Empty;
                 }
 
-                return _driverState.Frequency;
+                return _driverStat.Frequency;
             }
         }
 
@@ -404,12 +404,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driverState == null)
+                if (_driverStat == null)
                 {
                     return String.Empty;
                 }
 
-                return _driverState.BitRate;
+                return _driverStat.BitRate;
             }
         }
 

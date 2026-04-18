@@ -1122,7 +1122,7 @@ namespace DVBTTelevizor.MAUI
             if (IsPortrait)
             {
                 DVBTTelevizorButton.BottomTitleText = "DVBT Televizor".Translated();
-                DriverStateButton.BottomTitleText = driverName;
+                DriverStateButton.BottomTitleText = "Driver".Translated();
                 TuneButton.BottomTitleText = "Tune".Translated();
                 MenuButton.BottomTitleText = "Menu".Translated();
 
@@ -1135,7 +1135,7 @@ namespace DVBTTelevizor.MAUI
             else
             {
                 DVBTTelevizorButton.TopTitleText = "DVBT Televizor".Translated();
-                DriverStateButton.TopTitleText = driverName;
+                DriverStateButton.TopTitleText = "Driver".Translated();
                 TuneButton.TopTitleText = "Tune".Translated();
                 MenuButton.TopTitleText = "Menu".Translated();
 

@@ -59,10 +59,39 @@ namespace DVBTTelevizor.MAUI
             Settings = new TuningSettings(loggingService);
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
-            //_driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+            _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
             _driver.OnServiceFound += Demodulator_OnServiceFound;
 
             _listViewSelector = new ListViewSelector(Channels);
+
+            WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
+            {
+                UpdateDriverStat(m.Value);
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    NotifyChange();
+                });
+            });
+        }
+
+        private void UpdateDriverStat(DriverStat? stat)
+        {
+            if (stat == null)
+            {
+                return;
+            }
+
+            if (_driver == null || _driver.DriverType == TV.AppDriverTypeEnum.DVBT)
+            {
+                return; //  handled by TuningProgressPageViewModel_SignalChanged
+            }
+
+            _signalProgress = _driver.Synced ? 1 : 0;
+            _signalSynced = _driver.Synced;
+
+            _signalCarrier = _driver.Synced;
+            _signalLocked = _driver.Synced;
+            _signalSNR = 0;
         }
 
         private void Demodulator_OnServiceFound(object? sender, EventArgs e)
@@ -639,6 +668,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(StopButtonVisible));
                 OnPropertyChanged(nameof(BackButtonVisible));
                 OnPropertyChanged(nameof(FinishButtonVisible));
+                OnPropertyChanged(nameof(DriverButtonVisible));
 
                 OnPropertyChanged(nameof(TunedMultiplexesCount));
                 OnPropertyChanged(nameof(TunedChannelsCount));
@@ -1074,6 +1104,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+
         public bool FinishButtonVisible
         {
             get
@@ -1084,6 +1115,20 @@ namespace DVBTTelevizor.MAUI
                     (State == TuneStateEnum.Failed)
                     ||
                     (State == TuneStateEnum.Stopped);
+            }
+        }
+
+        public bool DriverButtonVisible
+        {
+            get
+            {
+                return
+                        (State == TuneStateEnum.InProgress) &&
+                        (_driver != null) &&
+                        (
+                            (_driver.DriverType == TV.AppDriverTypeEnum.FM) ||
+                            (_driver.DriverType == TV.AppDriverTypeEnum.DAB)
+                        );
             }
         }
 

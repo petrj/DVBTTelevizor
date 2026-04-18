@@ -261,9 +261,9 @@
             <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="BackButton_Clicked"/>
 
             <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
-            <!--Button x:Name="ContinueButton" Grid.Column="2" Text="{local:LngXamlExt Input='Continue'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ContinueButtonVisible}" Clicked="ContinueButton_Clicked"/-->
             <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
 
+            <Button x:Name="DriverButton" Grid.Column="2" Text="{local:LngXamlExt Input='Driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverButtonVisible}" Clicked="DriverButton_Clicked"/>
             <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding FinishButtonVisible}" Clicked="FinishButton_Clicked"/>
         </Grid>
 

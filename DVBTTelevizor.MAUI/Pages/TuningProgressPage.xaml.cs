@@ -30,6 +30,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     private KeyboardFocusableItemList _focusItems;
 
     private Command _commandUpdateBitrate;
+    private DriverPage _driverPage;
 
     private AppMenu _appMenu = null;
 
@@ -44,6 +45,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new TuningProgressPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+
+        _driverPage = new DriverPage(_loggingService, driver, _configuration, publicDirectoryProvider);
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
@@ -110,6 +113,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }));
 
@@ -323,6 +327,9 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                         case "Finish":
                             FinishButton_Clicked(this, new EventArgs());
                             break;
+                        case "Driver":
+                            DriverButton_Clicked(this, new EventArgs());
+                            break;
                     }
                 });
                 break;
@@ -377,6 +384,30 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         MainThread.BeginInvokeOnMainThread(async () =>
         {
             await Navigation.PopAsync();
+        });
+    }
+
+
+    private async void DriverButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningProgressPage DriverButton_Clicked");
+
+        _driverPage.PageDriver = _driver.DriverType;
+
+        await ShowPage(_driverPage);
+    }
+
+    private async Task ShowPage(ContentPage page)
+    {
+        if (page.IsLoaded)
+        {
+            // preventing click when the settings page is just (or yet) loaded
+            return;
+        }
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            await Navigation.PushAsync(page);
         });
     }
 
@@ -435,18 +466,21 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    //if (_viewModel.DVBTDriverActive)
-                    //{
-                    //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                    //} else
-                    //{
-                    //    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                    //}
+                    switch (_driver.DriverType)
+                    {
+                        case TV.AppDriverTypeEnum.DVBT:
+                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                            break;
+                        case TV.AppDriverTypeEnum.FM:
+                        case TV.AppDriverTypeEnum.DAB:
+                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                            break;
+                    }
                 });
                 break;
 
             case "menuConnectDriver":
-                //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(String.Empty));
+                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(_driver.DriverType));
                 break;
 
             case "menuChangeDriver":

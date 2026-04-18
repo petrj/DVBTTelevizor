@@ -73,7 +73,7 @@
                           Padding="2"
                           BackgroundColor="#333333">
 
-                        <Label Text="{Binding Value.Columns[0].ColumnName}" Grid.Column="0" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
+                       <Label Text="{Binding Value.Columns[0].ColumnName}" Grid.Column="0" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
                         <Label Text="{Binding Value.Columns[1].ColumnName}" Grid.Column="1" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
                         <Label Text="{Binding Value.Columns[2].ColumnName}" Grid.Column="2" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
                         <Label Text="{Binding Value.Columns[3].ColumnName}" Grid.Column="3" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
