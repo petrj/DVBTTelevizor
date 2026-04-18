@@ -61,19 +61,33 @@
 
         <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.5" AbsoluteLayout.LayoutFlags="All">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="30*" />
+                <RowDefinition Height="5*" />
+                <RowDefinition Height="30*" />
+                <RowDefinition Height="5*" />
+                <RowDefinition Height="30*" />
 
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Grid.Row="0" x:Name="DVBTButton" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DVBTButton_Clicked" />
+            <Frame Grid.Column="0" Grid.Row="0" BackgroundColor="{Binding DVBTDriverConnectButtonBackgroundColor}" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton  TopTitleText="{local:LngXamlExt Input='DVBT'}" x:Name="DVBTButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandDVBT}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0" TextColor="Black"/>
+            </Frame>
+
+            <Frame Grid.Column="0" Grid.Row="2" BackgroundColor="{Binding FMDriverConnectButtonBackgroundColor}" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='FM'}" x:Name="FMButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandFM}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            </Frame>
+
+            <Frame Grid.Column="0" Grid.Row="4" BackgroundColor="{Binding DABDriverConnectButtonBackgroundColor}" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='DAB'}" x:Name="DABButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandDAB}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            </Frame>
+
+            <!--Button Grid.Column="0" Grid.Row="0" x:Name="DVBTButton" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DVBTButton_Clicked" />
             <Button Grid.Column="0" Grid.Row="1" x:Name="FMButton" Text="{local:LngXamlExt Input='FM'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="FMButton_Clicked"/>
-            <Button Grid.Column="0" Grid.Row="2" x:Name="DABButton" Text="{local:LngXamlExt Input='DAB+'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DABButton_Clicked"/>
-        </Grid>        
+            <Button Grid.Column="0" Grid.Row="2" x:Name="DABButton" Text="{local:LngXamlExt Input='DAB+'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DABButton_Clicked"/-->
+        </Grid>
 
     </AbsoluteLayout>
 

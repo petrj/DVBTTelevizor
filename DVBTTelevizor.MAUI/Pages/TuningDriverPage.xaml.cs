@@ -34,10 +34,28 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
 
         _tuningSettings = new TuningSettings(_loggingService);
 
-        BindingContext = _viewModel = new TuningModePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _viewModel = new TuningSelectDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _tuningModePage = new TuningModePage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+
+
+        WeakReferenceMessenger.Default.Register<ShowDriverPageMessage>(this, (r, m) =>
+        {
+            switch(m.Value)
+            {
+                case AppDriverTypeEnum.DVBT:
+                    DVBTButton_Clicked(this, new EventArgs());
+                    break;
+                case AppDriverTypeEnum.FM:
+                    FMButton_Clicked(this, new EventArgs());
+                    break;
+                case AppDriverTypeEnum.DAB:
+                    DABButton_Clicked(this, new EventArgs());
+                    break;
+            }
+
+        });
 
 
         BuildFocusableItems();

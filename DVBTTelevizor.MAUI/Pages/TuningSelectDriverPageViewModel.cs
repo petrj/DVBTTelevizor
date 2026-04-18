@@ -81,6 +81,8 @@ namespace DVBTTelevizor.MAUI
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 OnPropertyChanged(nameof(DVBTDriverConnectButtonBackgroundColor));
+                OnPropertyChanged(nameof(FMDriverConnectButtonBackgroundColor));
+                OnPropertyChanged(nameof(DABDriverConnectButtonBackgroundColor));
             });
         }
     }

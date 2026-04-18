@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace DVBTTelevizor.MAUI
 {
     public class TuningModePageViewModel : BaseViewModel
-    {       
+    {
 
         public TuningModePageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
