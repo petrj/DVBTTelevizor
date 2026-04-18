@@ -202,7 +202,7 @@
             </StackLayout.Behaviors>
         </StackLayout>
 
-        <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.5,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" />
+        <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.4,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" />
 
         <Grid
             x:Name="EPGDetailGrid"
@@ -380,13 +380,13 @@
 
         <Label Text="{local:LngXamlExt Input='No channel'}" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.1,0.75,0.15" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
 
-        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.3,0.3,0.25" Source="tunebig.png">
+        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.3,0.2" Source="tunebig.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="TuneImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
         </Image>
 
-        <Image x:Name="DriverImage" IsVisible="{Binding DriveImageVisible}" AbsoluteLayout.LayoutFlags="All"  AbsoluteLayout.LayoutBounds="0.5,0.3,0.8,0.25" Source="donglered.png">
+        <Image x:Name="DriverImage" IsVisible="{Binding DriveImageVisible}" AbsoluteLayout.LayoutFlags="All"  AbsoluteLayout.LayoutBounds="0.5,0.25,0.8,0.2" Source="donglered.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="DriverImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>

@@ -11,21 +11,10 @@
         <ResourceDictionary>
 
             <Style x:Key="StatLabelStyle" TargetType="Label">
-                <Setter Property="TextColor" Value="White"/>
-                <Setter Property="HorizontalTextAlignment" Value="Start"/>
-                <Setter Property="VerticalTextAlignment" Value="Start"/>
-
-                <Setter Property="VerticalOptions" Value="Fill" />
-                <Setter Property="HorizontalOptions" Value="Fill" />
-
-                <Setter Property="LineBreakMode" Value="CharacterWrap" />
-
-                <Setter Property="FontFamily">
-                    <OnPlatform x:TypeArguments="x:String">
-                        <On Platform="Android" Value="monospace" />
-                        <On Platform="WinUI" Value="Consolas" />
-                    </OnPlatform>
-                </Setter>
+                <Setter Property="TextColor" Value="white"/>
+            </Style>
+            <Style x:Key="StatCaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="5,0,5,0"/>
@@ -42,19 +31,19 @@
             <!-- TEXT TEMPLATE -->
             <DataTemplate x:Key="TextTemplate">
                 <Grid ColumnDefinitions="60*,25*,15*" Padding="5"  ColumnSpacing="12">
-                    <Label Text="{Binding Title}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}" />
+                    <Label Text="{Binding Title}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}" Style="{DynamicResource StatCaptionStyle}"/>
                     <Label Text="{Binding Value, Converter={StaticResource ValueConverter}}" Grid.Column="1"
-                           HorizontalOptions="End" HorizontalTextAlignment="End" FontSize="{Binding FontSizeForLabel}" />
-                    <Label Text="{Binding Unit}" Grid.Column="2" HorizontalTextAlignment="Start" FontSize="{Binding FontSizeForLabel}"/>
+                           HorizontalOptions="End" HorizontalTextAlignment="End" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}" />
+                    <Label Text="{Binding Unit}" Grid.Column="2" HorizontalTextAlignment="Start" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}"/>
                 </Grid>
             </DataTemplate>
 
             <!-- BOOL TEMPLATE -->
             <DataTemplate x:Key="BoolTemplate">
                 <Grid ColumnDefinitions="2*,2*,Auto" Padding="5"  ColumnSpacing="12">
-                    <Label Text="{Binding Title}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Text="{Binding Title}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatCaptionStyle}"/>
                     <CheckBox IsChecked="{Binding Value}" Grid.Column="1" HorizontalOptions="End" />
-                    <Label Text="{Binding Unit}" Grid.Column="2" HorizontalTextAlignment="Start" FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Text="{Binding Unit}" Grid.Column="2" HorizontalTextAlignment="Start" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}"/>
                 </Grid>
             </DataTemplate>
 
@@ -65,7 +54,7 @@
                 <VerticalStackLayout Padding="5" Spacing="4">
 
                     <!-- Title -->
-                    <Label Text="{Binding Title}" FontAttributes="Bold"  FontSize="{Binding FontSizeForLabel}"/>
+                    <Label Text="{Binding Title}" FontAttributes="Bold"  FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatCaptionStyle}"/>
 
                     <!-- HEADER -->
                     <Grid ColumnDefinitions="*,*,*,*"
@@ -73,10 +62,10 @@
                           Padding="2"
                           BackgroundColor="#333333">
 
-                       <Label Text="{Binding Value.Columns[0].ColumnName}" Grid.Column="0" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
-                        <Label Text="{Binding Value.Columns[1].ColumnName}" Grid.Column="1" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
-                        <Label Text="{Binding Value.Columns[2].ColumnName}" Grid.Column="2" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
-                        <Label Text="{Binding Value.Columns[3].ColumnName}" Grid.Column="3" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"/>
+                        <Label Text="{Binding Value.Columns[0].ColumnName}" Grid.Column="0" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource StatLabelStyle}"/>
+                        <Label Text="{Binding Value.Columns[1].ColumnName}" Grid.Column="1" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource StatLabelStyle}"/>
+                        <Label Text="{Binding Value.Columns[2].ColumnName}" Grid.Column="2" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource StatLabelStyle}"/>
+                        <Label Text="{Binding Value.Columns[3].ColumnName}" Grid.Column="3" FontAttributes="Bold" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource StatLabelStyle}"/>
 
                     </Grid>
 
@@ -88,10 +77,10 @@
                                       ColumnSpacing="10"
                                       Padding="2">
 
-                                    <Label Text="{Binding [0]}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}" />
-                                    <Label Text="{Binding [1]}" Grid.Column="1" FontSize="{Binding FontSizeForLabel}"/>
-                                    <Label Text="{Binding [2]}" Grid.Column="2" FontSize="{Binding FontSizeForLabel}"/>
-                                    <Label Text="{Binding [3]}" Grid.Column="3" FontSize="{Binding FontSizeForLabel}"/>
+                                    <Label Text="{Binding [0]}" Grid.Column="0" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}"/>
+                                    <Label Text="{Binding [1]}" Grid.Column="1" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}"/>
+                                    <Label Text="{Binding [2]}" Grid.Column="2" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}"/>
+                                    <Label Text="{Binding [3]}" Grid.Column="3" FontSize="{Binding FontSizeForLabel}"  Style="{DynamicResource StatLabelStyle}"/>
 
                                 </Grid>
                             </DataTemplate>
@@ -113,14 +102,14 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <skia:SKCanvasView AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0" AbsoluteLayout.LayoutFlags="All" IsVisible="True"
+        <skia:SKCanvasView AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0" AbsoluteLayout.LayoutFlags="All"
+            IsVisible="True"
             x:Name="SpectrumCanvas"
             PaintSurface="OnPaintSurface" />
 
         <CollectionView  AbsoluteLayout.LayoutBounds="0.5,0.5,0.95,0.95" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent"
         ItemsSource="{Binding Stats}"
         ItemTemplate="{StaticResource StatSelector}" />
-
 
     </AbsoluteLayout>
 

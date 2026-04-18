@@ -857,7 +857,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (Channels.Count > 0)
+                if (NotRefreshed || (Channels.Count > 0))
                 {
                     return false;
                 }
