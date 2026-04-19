@@ -503,6 +503,20 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool AllowRemoteSDR
+        {
+            get
+            {
+                return _configuration.AllowRemoteSDR;
+            }
+            set
+            {
+                _configuration.AllowRemoteSDR = value;
+
+                OnPropertyChanged(nameof(AllowRemoteSDR));
+            }
+        }
+
 
     }
 }

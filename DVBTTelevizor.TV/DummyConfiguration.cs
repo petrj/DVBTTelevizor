@@ -66,6 +66,12 @@ namespace DVBTTelevizor.TV
         public GainEnum Gain { get; set; } = GainEnum.HW;
         public int GainValue { get; set; } = 0;
 
+        public bool AllowRemoteSDR { get; set; } = false;
+
+        public string RemoteSDRIP { get; set; } = "127.0.0.1";
+
+        public int RemoteSDRPort { get; set; } = 1234;
+
         public ObservableCollection<Channel> GetChannels()
         {
             return new ObservableCollection<Channel>();
@@ -118,6 +124,10 @@ namespace DVBTTelevizor.TV
             configuration.Gain = Gain;
             configuration.TestingMode = TestingMode;
             configuration.GainValue = GainValue;
+
+            configuration.AllowRemoteSDR = AllowRemoteSDR;
+            configuration.RemoteSDRIP = RemoteSDRIP;
+            configuration.RemoteSDRPort = RemoteSDRPort;
         }
     }
 }

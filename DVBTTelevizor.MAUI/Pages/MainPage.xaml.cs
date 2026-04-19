@@ -827,9 +827,16 @@ namespace DVBTTelevizor.MAUI
                         _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
                     } else
                     {
+                        var sdrDriver = _sdrDriverPlatformImplementation.GetRTLSDRDriver();
                         _driver = new RTLSDRFMDriverConnector(_loggingService,
-                                  _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                                  sdrDriver,
                                   _demodulator, 104000000);
+
+                        if (_configuration.AllowRemoteSDR)
+                        {
+                            sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
+                            sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
+                        }
                     }
 
                     _demodulator.Start();
@@ -843,9 +850,16 @@ namespace DVBTTelevizor.MAUI
                         }
                         else
                         {
+                            var sdrDriver = _sdrDriverPlatformImplementation.GetRTLSDRDriver();
                             _driver = new RTLSDRDABDriverConnector(_loggingService,
-                                _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                                sdrDriver,
                                 _demodulator, 199360000); // 8C on startup
+
+                            if (_configuration.AllowRemoteSDR)
+                            {
+                                sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
+                                sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
+                            }
                         }
 
                         _demodulator.Start();
@@ -1530,7 +1544,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
                     }
-                break;
+                    break;
 
                 case AppDriverTypeEnum.FM:
 
@@ -1551,7 +1565,16 @@ namespace DVBTTelevizor.MAUI
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                         }));
                     }
-                    else
+                    else if (_configuration.AllowRemoteAccessService)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = $"rtl_tcp DAB on {_configuration.RemoteSDRIP}",
+                            ControlPort = _configuration.RemoteSDRPort,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    } else
                     {
                         WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
                     }
@@ -1578,15 +1601,25 @@ namespace DVBTTelevizor.MAUI
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                         }));
                     }
-                    else
+                    else if (_configuration.AllowRemoteAccessService)
                     {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = $"rtl_tcp DAB on {_configuration.RemoteSDRIP}",
+                            ControlPort = _configuration.RemoteSDRPort,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    } else
+                    {
+
                         WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
                     }
                     break;
-            }
 
-           // _viewModel.UpdateActiveDriverType();
-           // WeakReferenceMessenger.Default.Send(new DriverChangedMessages(_driver));
+                    // _viewModel.UpdateActiveDriverType();
+                    // WeakReferenceMessenger.Default.Send(new DriverChangedMessages(_driver));
+            }
         }
 
         protected override void OnDisappearing()

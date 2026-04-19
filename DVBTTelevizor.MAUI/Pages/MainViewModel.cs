@@ -1467,7 +1467,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     _semaphoreSlim.Release();
                 }
-                ;
+
             }
         }
 

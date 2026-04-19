@@ -87,5 +87,9 @@ namespace DVBTTelevizor
         bool TestingMode { get; set; }
         GainEnum Gain { get; set; }
         int GainValue { get; set; }
+
+        bool AllowRemoteSDR { get; set; }
+        string RemoteSDRIP { get; set; }
+        int RemoteSDRPort { get; set; }
     }
 }

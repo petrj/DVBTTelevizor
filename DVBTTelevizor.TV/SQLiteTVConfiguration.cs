@@ -893,5 +893,41 @@ namespace DVBTTelevizor
                 SavePersistingSettingValue<int>("GainValue", value);
             }
         }
+
+        public bool AllowRemoteSDR
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("AllowRemoteSDR");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("AllowRemoteSDR", value);
+            }
+        }
+
+        public string RemoteSDRIP
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("RemoteSDRIP");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("RemoteSDRIP", value);
+            }
+        }
+
+        public int RemoteSDRPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("RemoteSDRPort", 1234);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("RemoteSDRPort", value);
+            }
+        }
     }
 }

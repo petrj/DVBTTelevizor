@@ -451,6 +451,52 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
+                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutRemoteSDR" IsVisible="{Binding DebugSettingsVisible}">
+
+                    <Label Text="{local:LngXamlExt Input='Remote SDR'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                    <Grid Margin="30,10,10,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="RemoteSDRBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Allow remote SDR via rtl_tcp'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="RemoteSDRSwitch"  IsToggled="{Binding AllowRemoteSDR, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="60,10,10,0" IsVisible="{Binding AllowRemoteSDR}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+
+                        <BoxView x:Name="RemoteSDRIPBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="0" Grid.Column="1" x:Name="RemoteSDRIPEntry"  Text="{Binding Config.RemoteSDRIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                        <BoxView x:Name="RemoteSDRPortBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                        <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Port'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                        <Entry Grid.Row="1" Grid.Column="1" x:Name="RemoteSDRportEntry"  Text="{Binding Config.RemoteSDRPort, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}" Keyboard="Numeric"/>
+                    </Grid>
+
+                </StackLayout>
+
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
                 <StackLayout Margin="0,10,0,10" x:Name="StackLayoutSledovaniTV">
                     <Label Text="{local:LngXamlExt Input='SledovaniTV'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 

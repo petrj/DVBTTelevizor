@@ -169,6 +169,10 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("DebugDrivers", new List<View>() { DebugDriversBoxView, DebugDriversSwitch }))
 
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDR", new List<View>() { RemoteSDRBoxView, RemoteSDRSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDRIP", new List<View>() { RemoteSDRIPBoxView, RemoteSDRIPEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDRPort", new List<View>() { RemoteSDRPortBoxView, RemoteSDRportEntry }))
+
             .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVEnabled", new List<View>() { SledovaniTVEnabledBoxView, SledovaniTVSwitch }))
@@ -775,6 +779,16 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                         case "DebugDrivers":
                             DebugDriversSwitch.IsToggled = !DebugDriversSwitch.IsToggled;
                             break;
+                        case "RemoteSDR":
+                            RemoteSDRSwitch.IsToggled = !RemoteSDRSwitch.IsToggled;
+                            break;
+                        case "RemoteSDRIP":
+                            RemoteSDRIPEntry.Focus();
+                            break;
+                        case "RemoteSDRport":
+                            RemoteSDRportEntry.Focus();
+                            break;
+
                     }
                 });
                 break;
