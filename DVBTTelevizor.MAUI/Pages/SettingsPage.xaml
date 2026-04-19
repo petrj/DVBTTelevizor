@@ -451,7 +451,7 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutRemoteSDR" IsVisible="{Binding DebugSettingsVisible}">
+                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutRemoteSDR">
 
                     <Label Text="{local:LngXamlExt Input='Remote SDR'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
