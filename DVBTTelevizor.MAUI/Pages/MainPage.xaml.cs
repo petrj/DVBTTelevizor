@@ -831,6 +831,10 @@ namespace DVBTTelevizor.MAUI
                         var sdrDriver = new RTLSDR.RTLSDRPCDriver(_loggingService);
                         sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
                         sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
+
+                        _driver = new RTLSDRFMDriverConnector(_loggingService,
+                                    sdrDriver,
+                                    _demodulator, 104000000);
                     }
                     else
                     {

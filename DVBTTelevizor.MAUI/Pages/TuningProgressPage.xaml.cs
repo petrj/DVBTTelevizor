@@ -384,6 +384,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             return;
         }
 
+        if (!_driver.Connected)
+        {
+            // TODO!
+        }
 
         if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
             _viewModel.Settings.TuningMode != TuneModeEnum.Frequency)
