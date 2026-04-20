@@ -1042,6 +1042,8 @@ namespace DVBTTelevizor.MAUI
                 _driver.Configuration = config;
                 _driver.PublicDirectory = _publicDirectory;
                 _driver.Connect();
+
+                var state = _driver.State;
             }
             finally
             {

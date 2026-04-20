@@ -825,46 +825,49 @@ namespace DVBTTelevizor.MAUI
                     if (_configuration.TestingMode)
                     {
                         _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
-                    } else
+                    }
+                    else if (_configuration.AllowRemoteSDR)
+                    {
+                        var sdrDriver = new RTLSDR.RTLSDRPCDriver(_loggingService);
+                        sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
+                        sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
+                    }
+                    else
                     {
                         var sdrDriver = _sdrDriverPlatformImplementation.GetRTLSDRDriver();
                         _driver = new RTLSDRFMDriverConnector(_loggingService,
-                                  sdrDriver,
-                                  _demodulator, 104000000);
-
-                        if (_configuration.AllowRemoteSDR)
-                        {
-                            sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
-                            sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
-                        }
+                                    sdrDriver,
+                                    _demodulator, 104000000);
                     }
 
                     _demodulator.Start();
                     break;
                 case AppDriverTypeEnum.DAB:
-                        _demodulator = new DABProcessor(_loggingService);
+                    _demodulator = new DABProcessor(_loggingService);
 
-                        if (_configuration.TestingMode)
-                        {
-                            _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
-                        }
-                        else
-                        {
-                            var sdrDriver = _sdrDriverPlatformImplementation.GetRTLSDRDriver();
-                            _driver = new RTLSDRDABDriverConnector(_loggingService,
-                                sdrDriver,
-                                _demodulator, 199360000); // 8C on startup
+                    if (_configuration.TestingMode)
+                    {
+                        _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
+                    }
+                    else if (_configuration.AllowRemoteSDR)
+                    {
+                        var sdrDriver = new RTLSDR.RTLSDRPCDriver(_loggingService);
+                        sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
+                        sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
 
-                            if (_configuration.AllowRemoteSDR)
-                            {
-                                sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
-                                sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
-                            }
-                        }
+                        _driver = new RTLSDRDABDriverConnector(_loggingService,
+                        sdrDriver,
+                        _demodulator, 199360000); // 8C on startup
+                    } else
+                    {
+                        _driver = new RTLSDRDABDriverConnector(_loggingService,
+                            _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                            _demodulator, 199360000); // 8C on startup
+                    }
 
-                        _demodulator.Start();
-                        _driver.SetGain(_configuration.Gain,_configuration.GainValue);
-                        //_driver.Tune(199360000, 0, 0);
+                    _demodulator.Start();
+                    _driver.SetGain(_configuration.Gain,_configuration.GainValue);
+                    //_driver.Tune(199360000, 0, 0);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
@@ -1601,7 +1604,7 @@ namespace DVBTTelevizor.MAUI
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                         }));
                     }
-                    else if (_configuration.AllowRemoteAccessService)
+                    else if (_configuration.AllowRemoteSDR)
                     {
                         WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                         {
