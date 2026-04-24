@@ -152,6 +152,9 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
         float barWidth = (float)width / _spectrum.Length;
 
+        float lastx = 0;
+        float lasty = height;
+
         for (int i = 0; i < _spectrum.Length; i++)
         {
             // Use Point.Y as value
@@ -160,7 +163,13 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
             float x = i * barWidth;
             float y = height - barHeight;
 
-            canvas.DrawLine(x, height, x, y, paint);
+            if (i>0)
+            {
+                canvas.DrawLine(lastx, lasty, x, y, paint);
+            }
+
+            lastx = x;
+            lasty = y;
         }
     }
 }
