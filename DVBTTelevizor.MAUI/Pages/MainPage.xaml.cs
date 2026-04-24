@@ -1572,11 +1572,11 @@ namespace DVBTTelevizor.MAUI
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                         }));
                     }
-                    else if (_configuration.AllowRemoteAccessService)
+                    else if (_configuration.AllowRemoteSDR)
                     {
                         WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                         {
-                            DeviceName = $"rtl_tcp DAB on {_configuration.RemoteSDRIP}",
+                            DeviceName = $"rtl_tcp FM on {_configuration.RemoteSDRIP}",
                             ControlPort = _configuration.RemoteSDRPort,
                             TransferPort = 1235,
                             PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
