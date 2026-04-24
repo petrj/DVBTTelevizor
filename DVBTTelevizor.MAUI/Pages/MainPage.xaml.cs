@@ -315,7 +315,7 @@ namespace DVBTTelevizor.MAUI
                 });
             }
 
-            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 2, 10);
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
         }
 
@@ -619,11 +619,11 @@ namespace DVBTTelevizor.MAUI
                             MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                             MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
                             */
-            }
-                        else if (timeFromPlayMSecs > 5000)
-                        {
-                            _loggingService.Info($"CheckStream - no data for {timeFromPlayMSecs} ms");
-                        }
+                    }
+                    else if (timeFromPlayMSecs > 5000)
+                    {
+                        _loggingService.Info($"CheckStream - no data for {timeFromPlayMSecs} ms");
+                    }
                     } else
                     {
                         _lastDataAnimation = !_lastDataAnimation;
@@ -878,7 +878,8 @@ namespace DVBTTelevizor.MAUI
                     break;
             }
 
-            _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
+            _driver.OnRawAudioDemodulated += OnRawAudioDemodulated;
+            _demodulator.OnDynamicLabelChanged += OnDynamicLabelChanged;
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
@@ -965,7 +966,37 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void _driver_OnRawAudioDemodulated(object sender, EventArgs e)
+        private void OnDynamicLabelChanged(object sender, EventArgs e)
+        {
+            if (_viewModel.EIT == null)
+                return;
+
+            if (e is DynamicLabelChangedEventArgs dea)
+            {
+                if (_viewModel.PlayingChannel == null)
+                {
+                    return;
+                }
+
+                _viewModel.PlayingChannel.SetCurrentEvent(new EPGCurrentEvent()
+                {
+                     CurrentEventItem = new MPEGTS.EventItem()
+                     {
+                          EventId = 0,
+                           EventName = dea.Label,
+                            ServiceId = Convert.ToInt32(_viewModel.PlayingChannel.ProgramMapPID),
+                             StartTime = DateTime.Now.Date,
+                             FinishTime = DateTime.Now.Date.AddDays(1).AddSeconds(-1)
+                     }
+                });
+
+                _viewModel.PlayingChannel.NotifyChanges();
+                _viewModel.NotifyChannelChange();
+            }
+
+        }
+
+        private void OnRawAudioDemodulated(object sender, EventArgs e)
         {
             if (_LibVLC == null)
                 return;
@@ -2347,8 +2378,8 @@ namespace DVBTTelevizor.MAUI
                         signalStrengthPercentage = tunedRes.SignalState.rfStrengthPercentage;
                     }
 
-                    //var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.Frequency, channel.ProgramMapPID);
-                    var cachedPIDs = new List<long>();
+                    var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.Frequency, channel.ProgramMapPID);
+                    //var cachedPIDs = new List<long>();
 
                     if (cachedPIDs != null &&
                         cachedPIDs.Count > 0)

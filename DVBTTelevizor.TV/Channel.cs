@@ -368,7 +368,16 @@ namespace DVBTTelevizor
                     CurrentEventItem.FinishTime < DateTime.Now)
                     return string.Empty;
 
-                return CurrentEventItem.StartTime.ToString("HH:mm") + " - " + CurrentEventItem.FinishTime.ToString("HH:mm");
+                switch (ChannelType)
+                {
+                    case ChannelTypeEnum.DVBT:
+                    case ChannelTypeEnum.DVBT2:
+                    case ChannelTypeEnum.SledovaniTV:
+                        return CurrentEventItem.StartTime.ToString("HH:mm") + " - " + CurrentEventItem.FinishTime.ToString("HH:mm");
+                    default:
+                        return string.Empty;
+                }
+
             }
         }
 

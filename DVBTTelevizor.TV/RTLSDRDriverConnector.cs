@@ -143,7 +143,6 @@ namespace DVBTTelevizor.TV
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
         private DVBTDriverConfiguration _driverConfiguration;
-        private bool _driverStreamDataAvailable = false;
         private string? _recordingFileName = null;
 
         private bool _readingStream = true;
@@ -179,7 +178,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return _driverStreamDataAvailable;
+                return Connected && _driver.RTLBitrate > 0;
             }
         }
 
@@ -200,7 +199,7 @@ namespace DVBTTelevizor.TV
             {
                 return
                         _driver != null &&
-                        _driver.State == DriverStateEnum.Connected;
+                        _driver.State.HasFlag(DriverStateEnum.Connected);
             }
         }
 
