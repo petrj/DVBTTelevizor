@@ -199,7 +199,7 @@ namespace DVBTTelevizor.TV
             {
                 return
                         _driver != null &&
-                        _driver.State.HasFlag(DriverStateEnum.Connected);
+                        _driver.State == DriverStateEnum.Connected;
             }
         }
 

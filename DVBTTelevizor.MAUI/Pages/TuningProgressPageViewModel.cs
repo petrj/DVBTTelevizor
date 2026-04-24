@@ -76,8 +76,10 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;
-
-                NotifyChange();
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    NotifyChange();
+                });
             });
 
 
