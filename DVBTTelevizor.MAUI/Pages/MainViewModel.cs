@@ -915,7 +915,7 @@ namespace DVBTTelevizor.MAUI
         {
             NotifyChange();
 
-            WeakReferenceMessenger.Default.Send(new DriverChangedMessages(_driver));
+            WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
 
         public async Task ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)

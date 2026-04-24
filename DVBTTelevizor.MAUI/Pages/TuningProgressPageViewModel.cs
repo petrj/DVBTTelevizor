@@ -72,6 +72,23 @@ namespace DVBTTelevizor.MAUI
                     NotifyChange();
                 });
             });
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                _driver = m.Value;
+
+                NotifyChange();
+            });
+
+
+        }
+
+        public IDriverConnector? Driver
+        {
+            get
+            {
+                return _driver;
+            }
         }
 
         private async void UpdateDriverStat(DriverStat? stat)
@@ -358,7 +375,7 @@ namespace DVBTTelevizor.MAUI
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
-                    if (!_driver.Connected)
+                    if (!(_driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
                     {
                         _tuneState = TuneStateEnum.Failed;
                         return;
@@ -411,7 +428,7 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                // when tunning FM/DAB, demmodulator is searching for freequencies in the background and the tuning never ends....
+                // when tunning FM/DAB, demmodulator is searching for frequencies in the background and the tuning never ends....
                 if (_driver.DriverType == TV.AppDriverTypeEnum.DVBT)
                 {
                     State = TuneStateEnum.Finished;

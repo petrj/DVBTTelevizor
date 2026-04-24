@@ -118,6 +118,31 @@ namespace DVBTTelevizor.MAUI
             Finish("Please confirm driver change:".Translated());
         }
 
+        public void ShowConnectDriverMenu(IDriverConnector driver)
+        {
+            if (driver == null || driver.Connected)
+            {
+                return;
+            }
+
+            ShowMenu();
+
+            Clear();
+
+            var driverName = BaseViewModel.GetDVBTDriverTypeName(driver.DriverType);
+
+            // driver: Not installed => installed > connected
+
+            var question = "Connect {0}?".Translated(driverName);
+
+            var menuItem = AddItem(_menu.CreateMenuItem("menuConfirmConnectDriver", question, "driver.png"));
+            menuItem.DriverType = driver.DriverType;
+
+            AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Cancel".Translated(), "back.png"));
+
+            Finish("Please confirm:".Translated());
+        }
+
         public void ShowFMorDABConnectMenu()
         {
             ShowMenu();
@@ -135,7 +160,7 @@ namespace DVBTTelevizor.MAUI
         }
 
 
-        public void ShowRetryTuneMenu(IDriverConnector driver)
+        public void ShowRetryTuneMenu(IDriverConnector? driver)
         {
             ShowMenu();
 
@@ -153,7 +178,7 @@ namespace DVBTTelevizor.MAUI
             //{
                 title += "Check USB connection.".Translated();
 
-                if (!driver.Connected)
+                if (!driver?.Connected ?? false)
                 {
                     AddItem(_menu.CreateMenuItem("menuConnectDriver", "Connect".Translated(), "refresh.png"));
                 }

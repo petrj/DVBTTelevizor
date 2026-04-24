@@ -1,3 +1,4 @@
+
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -23,7 +24,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     private List<MenuItem> _menuItems = new List<MenuItem>();
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
     private IPublicDirectoryProvider _publicDirectoryProvider;
@@ -40,7 +40,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
         _configuration = tvConfiguration;
         _publicDirectoryProvider = publicDirectoryProvider;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
@@ -63,17 +62,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             {
                 //BuildConfirmMenu("Tuning failed. Check USB connection".Translated(), "Retry".Translated(), "Cancel".Translated(), "menuRetryTune", "menuCancel");
                 //BuildRetryTuneMenu();
-                _appMenu.ShowRetryTuneMenu(_driver);
+                _appMenu.ShowRetryTuneMenu(_viewModel.Driver);
             });
-        });
-
-        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-        {
-            _driver = m.Value;
-
-            _viewModel.NotifyChange();
-
-            //StartButton_Clicked(this, new EventArgs());
         });
 
         _commandUpdateBitrate = new Command(() =>
@@ -350,7 +340,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
 
-        if ((_driver == null))
+        if ((_viewModel.Driver == null))
         {
             _loggingService.Error("StartButton_Clicked - no driver");
             WeakReferenceMessenger.Default.Send(new ToastMessage("Error - no driver".Translated()));
@@ -358,17 +348,17 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         }
 
         AppDriverTypeEnum? driverToChange = null;
-        if ((_viewModel.Settings.FM) && (_driver.DriverType != TV.AppDriverTypeEnum.FM))
+        if ((_viewModel.Settings.FM) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.FM))
         {
             // need to change driver
             driverToChange = AppDriverTypeEnum.FM;
         }
-        if ((_viewModel.Settings.DAB) && (_driver.DriverType != TV.AppDriverTypeEnum.DAB))
+        if ((_viewModel.Settings.DAB) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.DAB))
         {
             // need to change driver
             driverToChange = AppDriverTypeEnum.DAB;
         }
-        if ((_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2) && (_driver.DriverType != TV.AppDriverTypeEnum.DVBT))
+        if ((_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.DVBT))
         {
             // need to change driver
             driverToChange = AppDriverTypeEnum.DVBT;
@@ -378,15 +368,20 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _appMenu.ShowConfirmChangeDriverMenu(_driver, driverToChange);
+                _appMenu.ShowConfirmChangeDriverMenu(_viewModel.Driver, driverToChange);
             });
 
             return;
         }
 
-        if (!_driver.Connected)
+        if (!_viewModel.Driver.Connected)
         {
-            // TODO!
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _appMenu.ShowConnectDriverMenu(_viewModel.Driver);
+            });
+
+            return;
         }
 
         if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
@@ -436,7 +431,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage DriverButton_Clicked");
 
-        _driverPage.PageDriver = _driver.DriverType;
+        _driverPage.PageDriver = _viewModel.Driver.DriverType;
 
         await ShowPage(_driverPage);
     }
@@ -502,7 +497,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 break;
 
             case "menuDriver":
-                var driverPage = new DriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
+                var driverPage = new DriverPage(_loggingService, _viewModel.Driver, _configuration, _publicDirectoryProvider);
                 await Navigation.PushAsync(driverPage);
                 break;
 
@@ -510,7 +505,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    switch (_driver.DriverType)
+                    switch (_viewModel.Driver.DriverType)
                     {
                         case TV.AppDriverTypeEnum.DVBT:
                             await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
@@ -523,10 +518,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 });
                 break;
 
-            case "menuConnectDriver":
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(_driver.DriverType));
-                break;
-
+            case "menuConfirmConnectDriver":
             case "menuConfirmChangeDriver":
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
