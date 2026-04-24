@@ -122,7 +122,7 @@
 		<PackageReference Include="RTLSDR" Version="1.5.0" />
 		<PackageReference Include="RTLSDR.Audio" Version="1.5.0" />
 		<PackageReference Include="RTLSDR.Common" Version="1.5.3" />
-		<PackageReference Include="RTLSDR.DAB" Version="1.5.3" />
+		<PackageReference Include="RTLSDR.DAB" Version="1.5.8" />
 		<PackageReference Include="RTLSDR.FM" Version="1.5.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />

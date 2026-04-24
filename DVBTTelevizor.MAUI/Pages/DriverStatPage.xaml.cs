@@ -142,7 +142,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
         using var paint = new SKPaint
         {
-            Color = SKColors.Lime,
+            Color = SKColors.ForestGreen,
             StrokeWidth = 2,
             IsAntialias = false
         };
