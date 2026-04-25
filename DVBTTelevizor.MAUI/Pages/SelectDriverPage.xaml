@@ -71,16 +71,16 @@
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Frame Grid.Column="0" Grid.Row="0" BackgroundColor="{Binding DVBTDriverConnectButtonBackgroundColor}" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
-                <local:ImgButton  TopTitleText="{local:LngXamlExt Input='DVBT'}" x:Name="DVBTDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandDVBT}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0" TextColor="Black"/>
+            <Frame Grid.Column="0" Grid.Row="0" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton  TopTitleText="{local:LngXamlExt Input='DVBT'}" x:Name="DVBTDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="{Binding DVBTDriverImage}" TapCommand="{Binding CommandDVBT}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0" TextColor="Black"/>
             </Frame>
 
-            <Frame Grid.Column="0" Grid.Row="2" BackgroundColor="{Binding FMDriverConnectButtonBackgroundColor}" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
-                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='FM'}" x:Name="FMDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandFM}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            <Frame Grid.Column="0" Grid.Row="2" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='FM'}" x:Name="FMDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="{Binding FMDriverImage}" TapCommand="{Binding CommandFM}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
             </Frame>
 
-            <Frame Grid.Column="0" Grid.Row="4" BackgroundColor="{Binding DABDriverConnectButtonBackgroundColor}" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
-                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='DAB'}" x:Name="DABDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="configdriver.png" TapCommand="{Binding CommandDAB}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            <Frame Grid.Column="0" Grid.Row="4" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='DAB'}" x:Name="DABDriverButton" TextFontSize="{Binding FontSizeForCaption}" Img="{Binding DABDriverImage}" TapCommand="{Binding CommandDAB}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
             </Frame>
 
 

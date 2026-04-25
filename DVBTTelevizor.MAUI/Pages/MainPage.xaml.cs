@@ -879,7 +879,7 @@ namespace DVBTTelevizor.MAUI
             }
 
             _driver.OnRawAudioDemodulated += OnRawAudioDemodulated;
-            _demodulator.OnDynamicLabelChanged += OnDynamicLabelChanged;
+            _demodulator?.OnDynamicLabelChanged += OnDynamicLabelChanged;
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }

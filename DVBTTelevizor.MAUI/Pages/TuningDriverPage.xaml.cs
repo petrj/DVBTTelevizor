@@ -34,7 +34,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
 
         _tuningSettings = new TuningSettings(_loggingService);
 
-        BindingContext = _viewModel = new TuningSelectDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _viewModel = new TuningDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _tuningModePage = new TuningModePage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
@@ -189,8 +189,24 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         // update settings according to selected driver
         _tuningSettings.LoadFromConfiguration(_configuration);
 
+        switch (driverType)
+        {
+            case AppDriverTypeEnum.DVBT:
+                _tuningSettings.SetDVBTSettings();
+                break;
+            case AppDriverTypeEnum.DAB:
+                _tuningSettings.SetDABSettings();
+                break;
+            case AppDriverTypeEnum.FM:
+                _tuningSettings.SetFMSettings();
+                break;
+        }
+
         // update frequencies according to driver
-        await _tuningSettings.SetFrequencies(_driver);
+        if (_driver.DriverType == driverType)
+        {
+            await _tuningSettings.SetFrequencies(_driver);
+        }
 
         _tuningSettings.DVBT = false;
         _tuningSettings.DVBT2 = false;

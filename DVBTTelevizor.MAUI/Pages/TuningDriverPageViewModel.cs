@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace DVBTTelevizor.MAUI
 {
-    public class TuningSelectDriverPageViewModel : BaseViewModel
+    public class TuningDriverPageViewModel : BaseViewModel
     {
         public ICommand CommandDVBT { get; set; }
 
@@ -21,7 +21,7 @@ namespace DVBTTelevizor.MAUI
 
         private IDriverConnector _driver;
 
-        public TuningSelectDriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+        public TuningDriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             _driver = driver;
@@ -51,27 +51,27 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public string DVBTDriverConnectButtonBackgroundColor
+        public string DVBTDriverImage
         {
             get
             {
-                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DVBT) ? HighlightedButtonColor : ButtonColor;
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DVBT) ? "configdriverconnected.png" : "configdriver.png";
             }
         }
 
-        public string FMDriverConnectButtonBackgroundColor
+        public string FMDriverImage
         {
             get
             {
-                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.FM) ? HighlightedButtonColor : ButtonColor;
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.FM) ? "configdriverconnected.png" : "configdriver.png";
             }
         }
 
-        public string DABDriverConnectButtonBackgroundColor
+        public string DABDriverImage
         {
             get
             {
-                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DAB) ? HighlightedButtonColor : ButtonColor;
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DAB) ? "configdriverconnected.png" : "configdriver.png";
             }
         }
 
@@ -80,9 +80,9 @@ namespace DVBTTelevizor.MAUI
         {
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                OnPropertyChanged(nameof(DVBTDriverConnectButtonBackgroundColor));
-                OnPropertyChanged(nameof(FMDriverConnectButtonBackgroundColor));
-                OnPropertyChanged(nameof(DABDriverConnectButtonBackgroundColor));
+                OnPropertyChanged(nameof(DVBTDriverImage));
+                OnPropertyChanged(nameof(FMDriverImage));
+                OnPropertyChanged(nameof(DABDriverImage));
             });
         }
     }
