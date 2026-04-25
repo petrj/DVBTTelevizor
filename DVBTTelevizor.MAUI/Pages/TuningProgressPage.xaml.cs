@@ -127,7 +127,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverButton }))
+          //  .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }));
 
