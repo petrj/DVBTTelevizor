@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace DVBTTelevizor.MAUI
@@ -23,6 +25,8 @@ namespace DVBTTelevizor.MAUI
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public TuningSettings Settings { get; set; }
+        public ICommand CommandDriver { get; set; }
+
 
         private int _actualTuningDVBTType = 0; // 0 .. DVBT, 1 .. DVBT2
         private long _actualTunningFreqKHz = 474000;
@@ -82,6 +86,10 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
+            CommandDriver = new Command(() =>
+            {
+                WeakReferenceMessenger.Default.Send(new ShowTuningProgressDriverPageMessage(_driver.DriverType));
+            });
 
         }
 
@@ -678,6 +686,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SignalSynced));
                 OnPropertyChanged(nameof(SignalSNR));
                 OnPropertyChanged(nameof(Bitrate));
+                OnPropertyChanged(nameof(Queue));
 
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(SelectedChannel));
@@ -694,7 +703,20 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TunedNewChannelsCount));
 
                 OnPropertyChanged(nameof(SignalStrengthProgress));
+                OnPropertyChanged(nameof(DVBTPropertiesVisible));
+
             });
+        }
+
+        public bool DVBTPropertiesVisible
+        {
+            get
+            {
+                if (_driver == null)
+                    return false;
+
+                return (_driver.DriverType == TV.AppDriverTypeEnum.DVBT);
+            }
         }
 
         public async Task NotifyBitrateChange()
@@ -935,6 +957,18 @@ namespace DVBTTelevizor.MAUI
                 return DVBTDriverConnector.GetHumanReadableBitRate(_driver.Bitrate);
             }
         }
+
+        public string Queue
+        {
+            get
+            {
+                if (_driver == null)
+                    return "-";
+
+                return _driver.QueueSize.ToString();
+            }
+        }
+
 
         public bool DVBT2Tuning
         {

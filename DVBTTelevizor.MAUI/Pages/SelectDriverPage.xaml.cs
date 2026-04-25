@@ -9,12 +9,11 @@ namespace DVBTTelevizor.MAUI;
 
 public partial class SelectDriverPage : ContentPage, IOnKeyDown
 {
-    private TuningSelectDriverPageViewModel _viewModel;
+    private SelectDriverPageViewModel _viewModel;
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
 
     private DriverPage _driverPage = null;
 
@@ -28,15 +27,13 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-
         _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
-        BindingContext = _viewModel = new TuningSelectDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
+        BindingContext = _viewModel = new SelectDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
 
-        WeakReferenceMessenger.Default.Register<ShowDriverPageMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<ShowSelectDriverDriverPageMessage>(this, (r, m) =>
         {
             Task.Run(async () => await MainThread.InvokeOnMainThreadAsync(
                         async () =>await ShowPage(m.Value)
@@ -112,13 +109,13 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
                     switch (_focusItems.FocusedItem.Name)
                     {
                         case "DVBT":
-                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DVBT));
+                            WeakReferenceMessenger.Default.Send(new ShowSelectDriverDriverPageMessage(AppDriverTypeEnum.DVBT));
                             break;
                         case "FM":
-                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.FM));
+                            WeakReferenceMessenger.Default.Send(new ShowSelectDriverDriverPageMessage(AppDriverTypeEnum.FM));
                             break;
                         case "DAB":
-                            WeakReferenceMessenger.Default.Send(new ShowDriverPageMessage(AppDriverTypeEnum.DAB));
+                            WeakReferenceMessenger.Default.Send(new ShowSelectDriverDriverPageMessage(AppDriverTypeEnum.DAB));
                             break;
                     }
                 });

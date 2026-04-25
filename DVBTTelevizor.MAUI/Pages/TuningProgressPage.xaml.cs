@@ -66,6 +66,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             });
         });
 
+        WeakReferenceMessenger.Default.Register<ShowTuningProgressDriverPageMessage>(this, (r, m) =>
+        {
+            DriverButton_Clicked(this, new EventArgs());
+        });
+
         _commandUpdateBitrate = new Command(() =>
         {
             Task.Run(async () =>
@@ -90,13 +95,27 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private void ChannelFound(object? sender, EventArgs e)
     {
-        if (e is ChannelFoundEventArgs che)
+        try
         {
-            _loggingService.Info($"Adding new channel: {che.Channel.Name}");
-            MainThread.BeginInvokeOnMainThread(async () =>
+            if (e is ChannelFoundEventArgs che)
             {
-                ChannelsListView.ScrollTo(che.Channel, ScrollToPosition.MakeVisible, false);
-            });
+                _loggingService.Info($"Adding new channel: {che.Channel.Name}");
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    try
+                    {
+                        ChannelsListView.ScrollTo(che.Channel, ScrollToPosition.MakeVisible, false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
         }
     }
 
@@ -181,8 +200,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.5, 0.0, 0.95, 0.1));
             AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.5, 0.1, 0.25, 0.05));
             AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.5, 0.14, 0.95, 0.15));
-            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.9, 0.29, 0.95, 0.15));
-            AbsoluteLayout.SetLayoutBounds(SplitterBoxView, new Rect(0.5, 0.41, 1, 0.005));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.9, 0.29, 1.0, 0.15));
             AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.5, 0.46, 0.95, 0.14));
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.98, 0.95, 0.1));
             AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, 0.815, 0.95, 0.325));
@@ -192,8 +210,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.05, 0.00, 0.45, 0.15));
             AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.125, 0.15, 0.25, 0.05));
             AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.05, 0.25, 0.45, 0.15));
-            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.05, 0.45, 0.45, 0.2));
-            AbsoluteLayout.SetLayoutBounds(SplitterBoxView, new Rect(0.5, 0.5, 0.005, 1));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.0, 0.45, 0.5, 0.2));
             AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.05, 0.7, 0.45, 0.2));
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.95, 0.45, 0.1));
             AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(1, 0.5, 0.5, 1));

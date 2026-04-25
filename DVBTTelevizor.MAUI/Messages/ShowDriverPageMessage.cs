@@ -15,4 +15,25 @@ namespace DVBTTelevizor.MAUI.Messages
 
         }
     }
+
+    internal class ShowTuningProgressDriverPageMessage : ShowDriverPageMessage
+    {
+        public ShowTuningProgressDriverPageMessage(AppDriverTypeEnum value) : base(value)
+        {
+        }
+    }
+
+    internal class ShowSelectDriverDriverPageMessage : ShowDriverPageMessage
+    {
+        public ShowSelectDriverDriverPageMessage(AppDriverTypeEnum value) : base(value)
+        {
+        }
+    }
+
+    internal class ShowTuneDriverPageMessage : ShowDriverPageMessage
+    {
+        public ShowTuneDriverPageMessage(AppDriverTypeEnum value) : base(value)
+        {
+        }
+    }
 }

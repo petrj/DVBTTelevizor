@@ -129,9 +129,10 @@
             <!--Label Grid.Row="2" Grid.Column="3" Text="{Binding FrequencyToMHz}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/-->
         </Grid>
 
-        <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.05, 0.4, 0.45, 0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="30,10,30,0" BackgroundColor="Transparent" ColumnSpacing="5">
+        <Grid x:Name="SignalDetailsGrid" AbsoluteLayout.LayoutBounds="0.05, 0.4, 0.45, 0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True"  Margin="0,10,0,0" BackgroundColor="#121212" ColumnSpacing="5" Padding="10,10,30,10">
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="33*" />
                 <RowDefinition Height="33*" />
                 <RowDefinition Height="33*" />
                 <RowDefinition Height="33*" />
@@ -143,26 +144,28 @@
                 <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
-            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding SignalCarrier}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-            <Label Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
-            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding SignalSynced}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-            <Label Grid.Row="1" Grid.Column="1" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding SignalSynced}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
+            <Label Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Sync'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
-            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding SignalLocked}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"/>
-            <Label Grid.Row="2" Grid.Column="1" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
 
-            <Label Grid.Row="0" Grid.Column="2" Text="{local:LngXamlExt Input='SNR'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-            <Label Grid.Row="0" Grid.Column="3" Text="{Binding SignalSNR}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding SignalCarrier}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}" IsVisible="{Binding DVBTPropertiesVisible}" />
+            <Label Grid.Row="1" Grid.Column="1" Text="{local:LngXamlExt Input='Carrier'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  IsVisible="{Binding DVBTPropertiesVisible}"/>
 
-            <Label Grid.Row="2" Grid.Column="2" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-            <Label Grid.Row="2" Grid.Column="3" Text="{Binding Bitrate}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding SignalLocked}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource CheckBoxStyle}"  IsVisible="{Binding DVBTPropertiesVisible}"/>
+            <Label Grid.Row="2" Grid.Column="1" Text="{local:LngXamlExt Input='Lock'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" IsVisible="{Binding DVBTPropertiesVisible}" />
 
+            <Label Grid.Row="0" Grid.Column="2" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <Label Grid.Row="0" Grid.Column="3" Text="{Binding Bitrate}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+
+            <Label Grid.Row="1" Grid.Column="2" Text="{local:LngXamlExt Input='Queue'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+            <Label Grid.Row="1" Grid.Column="3" Text="{Binding Queue}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
+
+
+            <Frame Grid.Column="3" Grid.Row="2" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5" >
+                <local:ImgButton  TopTitleText="{local:LngXamlExt Input='Driver..'}" x:Name="DriverButton" TextFontSize="{Binding FontSizeForDetailNote}" Img="configdriver.png" TapCommand="{Binding CommandDriver}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="0,0,0,0" TextColor="Black" BackgroundColor="Gray" />
+            </Frame>
         </Grid>
-
-        <BoxView x:Name="SplitterBoxView" AbsoluteLayout.LayoutBounds="0.5,0.4,1,0.005" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#29242a" />
-
-        <!--Label x:Name="ResultLabel" AbsoluteLayout.LayoutBounds="0.5,0.5,0.5,0.1" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tune result'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" BackgroundColor="Transparent"/-->
 
         <Grid x:Name="TuneResultDetailsGrid" AbsoluteLayout.LayoutBounds="0.5, 0.46, 0.95, 0.14" AbsoluteLayout.LayoutFlags="All" IsVisible="True"  Margin="10,10,10,0" BackgroundColor="Transparent">
 
@@ -263,7 +266,6 @@
             <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
             <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
 
-            <Button x:Name="DriverButton" Grid.Column="2" Text="{local:LngXamlExt Input='Driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverButtonVisible}" Clicked="DriverButton_Clicked"/>
             <Button x:Name="FinishButton" Grid.Column="2" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding FinishButtonVisible}" Clicked="FinishButton_Clicked"/>
         </Grid>
 

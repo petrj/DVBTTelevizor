@@ -40,7 +40,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
 
-        WeakReferenceMessenger.Default.Register<ShowDriverPageMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<ShowTuneDriverPageMessage>(this, (r, m) =>
         {
             switch(m.Value)
             {

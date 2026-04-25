@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace DVBTTelevizor.MAUI
 {
-    public class TuningSelectDriverPageViewModel : BaseViewModel
+    public class SelectDriverPageViewModel : BaseViewModel
     {
         public ICommand CommandDVBT { get; set; }
 
@@ -21,7 +21,7 @@ namespace DVBTTelevizor.MAUI
 
         private IDriverConnector _driver;
 
-        public TuningSelectDriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
+        public SelectDriverPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             _driver = driver;
@@ -35,19 +35,19 @@ namespace DVBTTelevizor.MAUI
             CommandDVBT = new Command(() =>
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandDVBT executed");
-                WeakReferenceMessenger.Default.Send(new ShowTuneDriverPageMessage(AppDriverTypeEnum.DVBT));
+                WeakReferenceMessenger.Default.Send(new ShowSelectDriverDriverPageMessage(AppDriverTypeEnum.DVBT));
             });
 
             CommandFM = new Command(() =>
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandFM executed");
-                WeakReferenceMessenger.Default.Send(new ShowTuneDriverPageMessage(AppDriverTypeEnum.FM));
+                WeakReferenceMessenger.Default.Send(new ShowSelectDriverDriverPageMessage(AppDriverTypeEnum.FM));
             });
 
             CommandDAB = new Command(() =>
             {
                 _loggingService.Info($"TuningSelectDriverPageViewModel: CommandDAB executed");
-                WeakReferenceMessenger.Default.Send(new ShowTuneDriverPageMessage(AppDriverTypeEnum.DAB));
+                WeakReferenceMessenger.Default.Send(new ShowSelectDriverDriverPageMessage(AppDriverTypeEnum.DAB));
             });
         }
 
