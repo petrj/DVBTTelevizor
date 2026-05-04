@@ -222,10 +222,12 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
             case AppDriverTypeEnum.FM:
                 _tuningSettings.FM = true;
                 _tuningSettings.TuningMode = TuneModeEnum.Frequency;
+                _tuningSettings.FrequencyKHz = _configuration.FMFrequencyKHz;
                 break;
             case AppDriverTypeEnum.DAB:
                 _tuningSettings.DAB = true;
                 _tuningSettings.TuningMode = TuneModeEnum.Frequency;
+                _tuningSettings.FrequencyKHz = _configuration.DABFrequencyKHz;
                 break;
         }
 

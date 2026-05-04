@@ -18,7 +18,7 @@
                 <Setter Property="FontAttributes" Value="Bold"/>
 
                 <Setter Property="Padding" Value="0,0,0,0"/>
-                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="BorderWidth" Value="0" />
                 <Setter Property="CornerRadius" Value="7"/>
                 <Setter Property="BackgroundColor" Value="Gray"/>
                 <Setter Property="CornerRadius" Value="20"/>
@@ -60,7 +60,7 @@
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='Free DVBT/DVBT2 Android Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='DVBT/ Android Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
 
             <BoxView Grid.Column="0" Grid.Row="1" x:Name="GithubBoxView" />
             <Label Grid.Column="0" Grid.Row="1" x:Name="GithubLabel"  Text="github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" TextDecorations="Underline">

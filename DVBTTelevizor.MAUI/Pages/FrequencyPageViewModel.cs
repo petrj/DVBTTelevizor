@@ -90,16 +90,33 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        private static long GetNearestDABFreq(long freq)
+        {
+            var min = long.MaxValue;
+            foreach (var kvp in RTLSDR.Common.AudioTools.DabFrequenciesHz)
+            {
+                if (Math.Abs(kvp.Value - freq) < Math.Abs(min - freq))
+                {
+                    min = kvp.Value;
+                }
+            }
+
+            return min;
+        }
+
         public string FrequencyWholePartMHzCaption
         {
             get
             {
-                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
-                if (dabFreq != null)
+                if (Settings.DAB)
                 {
-                    return dabFreq;
+                    var dabFreq = GetNearestDABFreq(FrequencyKHz * 1000);
+                    return TuningFrequenciesViewModel.ParseDabFreq((int)(dabFreq));
                 }
-                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
+                else
+                {
+                    return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
+                }
             }
         }
 
@@ -107,8 +124,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
-                if (dabFreq != null)
+                if (Settings.DAB)
                 {
                     return "";
                 }
