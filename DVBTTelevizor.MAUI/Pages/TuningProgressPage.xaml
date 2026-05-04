@@ -159,11 +159,11 @@
             <Label Grid.Row="1" Grid.Column="2" Text="{local:LngXamlExt Input='Bitrate'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
             <Label Grid.Row="1" Grid.Column="3" Text="{Binding Bitrate}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" Margin="0,0,0,5" />
 
-            <Label Grid.Row="2" Grid.Column="2" Text="{local:LngXamlExt Input='Queue'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"/>
-            <Label Grid.Row="2" Grid.Column="3" Text="{Binding Queue}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" Margin="0,0,20,5"/>
+            <Label Grid.Row="2" Grid.Column="2" Text="{local:LngXamlExt Input='Queue'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  IsVisible="{Binding FMDABTuningVisible}"/>
+            <Label Grid.Row="2" Grid.Column="3" Text="{Binding Queue}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" Margin="0,0,20,5"  IsVisible="{Binding FMDABTuningVisible}"/>
 
 
-            <Frame Grid.Column="3" Grid.Row="3" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,20,5" Padding="5,5,5,5" >
+            <Frame Grid.Column="3" Grid.Row="3" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,20,5" Padding="5,5,5,5" IsVisible="{Binding FMDABTuningVisible}">
                 <local:ImgButton  TopTitleText="{local:LngXamlExt Input='Driver..'}" x:Name="DriverButton" TextFontSize="{Binding FontSizeForDetailNote}" Img="configdriver.png" TapCommand="{Binding CommandDriver}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="0,0,0,0" TextColor="Black" BackgroundColor="Gray" />
             </Frame>
 

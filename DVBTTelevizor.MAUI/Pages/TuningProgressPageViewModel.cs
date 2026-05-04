@@ -385,7 +385,8 @@ namespace DVBTTelevizor.MAUI
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
-                    if (!(_driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
+                    // DVBT using Connected, DAB/FM State, TODO: refactor to use State for all drivers
+                    if (!(_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
                     {
                         _tuneState = TuneStateEnum.Failed;
                         return;
@@ -665,6 +666,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TuningProgressVisible));
                 OnPropertyChanged(nameof(TuningProgressCaption));
                 OnPropertyChanged(nameof(State));
+                OnPropertyChanged(nameof(FMDABTuningVisible));
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(DVBTTuning));
@@ -812,6 +814,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return State == TuneStateEnum.InProgress;
+            }
+        }
+
+        public bool FMDABTuningVisible
+        {
+            get
+            {
+                return Settings.FM || Settings.DAB;
             }
         }
 

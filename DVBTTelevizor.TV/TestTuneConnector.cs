@@ -371,7 +371,8 @@ namespace DVBTTelevizor
                     {
                         ProviderName = "Multiplex A",
                         ServiceName = "Advertisment",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 310);
                 }
 
@@ -381,13 +382,15 @@ namespace DVBTTelevizor
                     {
                         ProviderName = "Multiplex B",
                         ServiceName = "News",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 2300);
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
                         ProviderName = "Multiplex B",
                         ServiceName = "Sport",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 2400);
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
@@ -404,7 +407,8 @@ namespace DVBTTelevizor
                     {
                         ProviderName = "Multiplex C",
                         ServiceName = "INFO CHANNEL",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 8888);
 
                     for (var i=8889; i<= 8899; i++)
@@ -413,7 +417,8 @@ namespace DVBTTelevizor
                         {
                             ProviderName = "Multiplex C",
                             ServiceName = "CHANNEL " + (i-8888).ToString(),
-                            ServisType = (byte)DVBTDriverServiceType.TV
+                            ServisType = (byte)DVBTDriverServiceType.TV,
+                            Free = true
                         }, i);
                     }
                 }

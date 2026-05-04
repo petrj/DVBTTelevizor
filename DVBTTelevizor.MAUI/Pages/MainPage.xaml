@@ -378,9 +378,9 @@
 
         <Label Text="{Binding RecordingLabel}" IsVisible="True" x:Name="RecordingLabel"  AbsoluteLayout.LayoutBounds="1,1,0.1,0.1" AbsoluteLayout.LayoutFlags="All" Style="{DynamicResource RecordingLabelTextStyle}" FontSize="{Binding FontSizeForLargeCaption}" BackgroundColor="Transparent" HorizontalOptions="End" VerticalOptions="End" Margin="10,10,10,0" />
 
-        <Label Text="{local:LngXamlExt Input='No channel'}" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.1,0.75,0.15" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+        <Label Text="{local:LngXamlExt Input='No channel'}" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.15,0.75,0.15" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
 
-        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.25,0.3,0.2" Source="tunebig.png">
+        <Image x:Name="TuneImage" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.35,0.3,0.2" Source="tunebig.png">
             <Image.GestureRecognizers>
                 <TapGestureRecognizer Tapped="TuneImageTapped" NumberOfTapsRequired="1" />
             </Image.GestureRecognizers>
