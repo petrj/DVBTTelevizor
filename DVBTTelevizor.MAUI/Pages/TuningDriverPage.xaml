@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.TuningDriverPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='Tuning'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="30,10,20,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style x:Key="CommonPickerTextStyle" TargetType="Picker">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="HorizontalTextAlignment" Value="Start"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="3,3,3,3"/>
+            </Style>
+
+            <Style x:Key="DriverLabelStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="End"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="End" />
+            </Style>
+
+            <Style x:Key="RadioButtonStyle" TargetType="RadioButton">
+                <Setter Property="TextColor" Value="Black"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <!--Setter Property="BackgroundColor" Value="#808080"/-->
+                <Setter Property="BorderColor" Value="#808080"/>
+                <Setter Property="Margin" Value="10,0,0,0" />
+                <Setter Property="Padding" Value="5,5,5,5" />
+                <Setter Property="BorderWidth" Value="0" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout BackgroundColor="Black">
+
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{local:LngXamlExt Input='Tuning'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}" />
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.5" AbsoluteLayout.LayoutFlags="All">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30*" />
+                <RowDefinition Height="5*" />
+                <RowDefinition Height="30*" />
+                <RowDefinition Height="5*" />
+                <RowDefinition Height="30*" />
+
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*" />
+            </Grid.ColumnDefinitions>
+
+            <Frame Grid.Column="0" Grid.Row="0" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton  TopTitleText="{local:LngXamlExt Input='DVBT'}" x:Name="DVBTButton" TextFontSize="{Binding FontSizeForCaption}" Img="{Binding DVBTDriverImage}" TapCommand="{Binding CommandDVBT}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0" TextColor="Black"/>
+            </Frame>
+
+            <Frame Grid.Column="0" Grid.Row="2" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='FM'}" x:Name="FMButton" TextFontSize="{Binding FontSizeForCaption}" Img="{Binding FMDriverImage}" TapCommand="{Binding CommandFM}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            </Frame>
+
+            <Frame Grid.Column="0" Grid.Row="4" BackgroundColor="Gray" CornerRadius="15" Margin="0,0,0,0" Padding="5,5,5,5">
+                <local:ImgButton Grid.Column="0" Grid.Row="1" TopTitleText="{local:LngXamlExt Input='DAB'}" x:Name="DABButton" TextFontSize="{Binding FontSizeForCaption}" Img="{Binding DABDriverImage}" TapCommand="{Binding CommandDAB}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="10,0,0,0"  TextColor="Black"/>
+            </Frame>
+
+            <!--Button Grid.Column="0" Grid.Row="0" x:Name="DVBTButton" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DVBTButton_Clicked" />
+            <Button Grid.Column="0" Grid.Row="1" x:Name="FMButton" Text="{local:LngXamlExt Input='FM'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="FMButton_Clicked"/>
+            <Button Grid.Column="0" Grid.Row="2" x:Name="DABButton" Text="{local:LngXamlExt Input='DAB+'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForCaption}" Clicked="DABButton_Clicked"/-->
+        </Grid>
+
+    </AbsoluteLayout>
+
+</ContentPage>

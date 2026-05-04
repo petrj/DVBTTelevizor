@@ -84,24 +84,24 @@ namespace DVBTTelevizor.MAUI
             MenuVisibleChanged?.Invoke(this, new MenuVisibleChangedEventArgs(false));
         }
 
-        public void ShowConfirmChangeDriverMenu(IDriverConnector driver,DriverTypeEnum currentDriverType, DriverTypeEnum newDriverType)
+        public void ShowConfirmChangeDriverMenu(IDriverConnector driver, AppDriverTypeEnum? newDriverType)
         {
-            //if (_driver == null || !_driver.Connected)
-            //{
-            //    return;
-            //}
+            if (driver == null)
+            {
+                return;
+            }
 
             ShowMenu();
 
             Clear();
 
             var newDriverName = BaseViewModel.GetDVBTDriverTypeName(newDriverType);
-            var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(currentDriverType);
+            var currentDriverName = BaseViewModel.GetDVBTDriverTypeName(driver.DriverType);
 
             // driver: Not installed => installed > connected
 
             string question;
-            if (driver != null && !driver.Connected)
+            if (!driver.Connected)
             {
                 question = "Connect to {0}?".Translated(newDriverName);
             } else
@@ -110,16 +110,57 @@ namespace DVBTTelevizor.MAUI
                     .Translated(currentDriverName, newDriverName);
             }
 
-            var menuItem = AddItem(_menu.CreateMenuItem("menuChangeDriver", question, "driver.png"));
-            menuItem.DriverType = newDriverType;
+            var menuItem = AddItem(_menu.CreateMenuItem("menuConfirmChangeDriver", question, "driver.png"));
+            menuItem.DriverType = newDriverType == null ? AppDriverTypeEnum.DVBT : newDriverType.Value;
 
             AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Continue using {0}".Translated(currentDriverName), "back.png"));
 
             Finish("Please confirm driver change:".Translated());
         }
 
+        public void ShowConnectDriverMenu(IDriverConnector driver)
+        {
+            if (driver == null || driver.Connected)
+            {
+                return;
+            }
 
-        public void ShowRetryTuneMenu(IDriverConnector driver)
+            ShowMenu();
+
+            Clear();
+
+            var driverName = BaseViewModel.GetDVBTDriverTypeName(driver.DriverType);
+
+            // driver: Not installed => installed > connected
+
+            var question = "Connect {0}?".Translated(driverName);
+
+            var menuItem = AddItem(_menu.CreateMenuItem("menuConfirmConnectDriver", question, "driver.png"));
+            menuItem.DriverType = driver.DriverType;
+
+            AddItem(_menu.CreateMenuItem("menuCancelChangeDriver", "Cancel".Translated(), "back.png"));
+
+            Finish("Please confirm:".Translated());
+        }
+
+        public void ShowFMorDABConnectMenu()
+        {
+            ShowMenu();
+
+            Clear();
+
+            AddItem(_menu.CreateMenuItem("menuConnectFM", "FM".Translated(), "driver.png"));
+            AddItem(_menu.CreateMenuItem("menuConnectDAB", "DAB".Translated(), "driver.png"));
+
+            var title = "Connect RTLSDR driver".Translated();
+
+            AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
+
+            Finish(title);
+        }
+
+
+        public void ShowRetryTuneMenu(IDriverConnector? driver)
         {
             ShowMenu();
 
@@ -128,20 +169,20 @@ namespace DVBTTelevizor.MAUI
             AddItem(_menu.CreateMenuItem("menuRetryTune", "Retry".Translated(), "refresh.png"));
 
             var title = "Tuning failed.".Translated();
-            if (driver == null || !driver.DriverInstalled)
-            {
-                title += "Driver is not installed.".Translated();
-                AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
-            }
-            else
-            {
+            //if (driver == null || !driver.DriverInstalled)
+            //{
+            //    title += "Driver is not installed.".Translated();
+            //    AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
+            //}
+            //else
+            //{
                 title += "Check USB connection.".Translated();
 
-                if (!driver.Connected)
+                if (!driver?.Connected ?? false)
                 {
                     AddItem(_menu.CreateMenuItem("menuConnectDriver", "Connect".Translated(), "refresh.png"));
                 }
-            }
+            //}
 
             AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "menu.png"));
             AddItem(_menu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
@@ -160,20 +201,20 @@ namespace DVBTTelevizor.MAUI
 
 
             var title = "Playing failed.".Translated();
-            if (driver == null || !driver.DriverInstalled)
-            {
-                title += "Driver is not installed.".Translated();
-                AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
-            }
-            else
-            {
+            //if (driver == null || !driver.DriverInstalled)
+            //{
+            //    title += "Driver is not installed.".Translated();
+            //    AddItem(_menu.CreateMenuItem("menuInstallDriver", "Install driver".Translated(), "driver.png"));
+            //}
+            //else
+            //{
                 title += "Check USB connection.".Translated();
 
                 if (!driver.Connected)
                 {
                     AddItem(_menu.CreateMenuItem("menuConnectDriver", "Connect".Translated(), "refresh.png"));
                 }
-            }
+            //}
 
             AddItem(_menu.CreateMenuItem("menuDriver", "Driver ...".Translated(), "driver.png"));
             AddItem(_menu.CreateMenuItem("menuCancelPlay", "Cancel".Translated(), "cancel.png"));

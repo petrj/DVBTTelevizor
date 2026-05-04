@@ -1,4 +1,6 @@
-﻿Function Send-TCPMessage
+﻿Param($IP)
+
+Function Send-TCPMessage
 {
     # https://riptutorial.com/powershell/example/18118/tcp-sender
     Param
@@ -364,9 +366,17 @@ function Show-GUI {
     }
 }
 
+
+if ([String]::IsNullOrWhiteSpace($IP))
+{
+    $IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
+    Write-host ("Detected IP:" + $IP) 
+}
+
+
 #$IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
 #Write-host ("Detected IP:" + $IP)
-$IP = "10.0.0.5"
+#$IP = "10.0.0.233"
 
 Show-GUI -SecurityKey "DVBTTelevizor" -IP $IP -Port 49152
 

@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using MPEGTS;
+using RTLSDR.DAB;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace DVBTTelevizor.MAUI
@@ -22,6 +25,8 @@ namespace DVBTTelevizor.MAUI
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public TuningSettings Settings { get; set; }
+        public ICommand CommandDriver { get; set; }
+
 
         private int _actualTuningDVBTType = 0; // 0 .. DVBT, 1 .. DVBT2
         private long _actualTunningFreqKHz = 474000;
@@ -47,15 +52,108 @@ namespace DVBTTelevizor.MAUI
 
         public event EventHandler? ChannelFound = null;
 
+        private IDriverConnector? _driver = null;
+
+        private List<uint> _tunedServices = new List<uint>();
+
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
+            _driver = driver;
             Settings = new TuningSettings(loggingService);
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+            _driver.OnServiceFound += Demodulator_OnServiceFound;
 
             _listViewSelector = new ListViewSelector(Channels);
+
+            WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
+            {
+                UpdateDriverStat(m.Value);
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    NotifyChange();
+                });
+            });
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                _driver = m.Value;
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    NotifyChange();
+                });
+            });
+
+            CommandDriver = new Command(() =>
+            {
+                WeakReferenceMessenger.Default.Send(new ShowTuningProgressDriverPageMessage(_driver.DriverType));
+            });
+
+        }
+
+        public IDriverConnector? Driver
+        {
+            get
+            {
+                return _driver;
+            }
+        }
+
+        private async void UpdateDriverStat(DriverStat? stat)
+        {
+            if (stat == null)
+            {
+                return;
+            }
+
+            if (_driver == null || _driver.DriverType == TV.AppDriverTypeEnum.DVBT)
+            {
+                return; //  handled by TuningProgressPageViewModel_SignalChanged
+            }
+
+            _signalProgress = _driver.Synced ? 1 : 0;
+            _signalSynced = _driver.Synced;
+
+            _signalCarrier = _driver.Synced;
+            _signalLocked = _driver.Synced;
+            _signalSNR = 0;
+        }
+
+        private void Demodulator_OnServiceFound(object? sender, EventArgs e)
+        {
+            _loggingService.Info($"Demodulator_OnServiceFound");
+
+            if (State != TuneStateEnum.InProgress )
+            {
+                _loggingService.Info($"Tuning is not in progress, ingoring event");
+                return;
+            }
+
+            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+            {
+                if (_tunedServices.Contains(de.Service.ServiceNumber))
+                {
+                    return; // already tuned
+                }
+
+                _tunedServices.Add(de.Service.ServiceNumber);
+
+                var chType = Settings.FM
+                            ? ChannelTypeEnum.FM
+                            : ChannelTypeEnum.DAB;
+
+                var sd = new MPEGTS.ServiceDescriptor()
+                {
+                    Free = true,
+                    ServiceName = de.Service.ServiceName,
+                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
+                    ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
+                };
+
+                AddChannel(chType, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
+            }
         }
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
@@ -162,6 +260,7 @@ namespace DVBTTelevizor.MAUI
                         foreach (var configChannel in configChannels)
                         {
                             if (
+                                (configChannel.ChannelType == che.Channel.ChannelType) &&
                                 (configChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
                                 (configChannel.Frequency == che.Channel.Frequency)
                                )
@@ -232,6 +331,8 @@ namespace DVBTTelevizor.MAUI
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
+                    _tunedServices.Clear();
+                    _driver?.Clear();
                     _tunedMultiplexes.Clear();
                     _tunedNewChannels = 0;
                     Channels.Clear();
@@ -257,41 +358,17 @@ namespace DVBTTelevizor.MAUI
 
         public async Task StartTune()
         {
-            if (State == TuneStateEnum.Inactive)
+            switch (State)
             {
-                ResetTune();
+                case TuneStateEnum.Finished:
+                    ResetTune(false);
+                    break;
+                default:
+                    ResetTune();
+                    break;
             }
 
-            if (State == TuneStateEnum.Finished)
-            {
-                ResetTune(false);
-            }
-
-            await Task.Run(async () =>
-            {
-                if (Settings.TuningMode == TuneModeEnum.Frequency)
-                {
-                    do
-                    {
-                        await Tune();
-
-                        if (_tuneState == TuneStateEnum.Failed)
-                        {
-                            break;
-                        }
-
-                    }
-                    while (_tuneState != TuneStateEnum.Stopped);
-                } else
-                {
-                    await Tune();
-                }
-
-                if (_tuneState == TuneStateEnum.Failed)
-                {
-                    WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
-                }
-            });
+            Task.Run(async ()=> await Tune());
         }
 
         private async Task Tune()
@@ -308,13 +385,14 @@ namespace DVBTTelevizor.MAUI
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
-                    if (!_driver.Connected)
+                    // DVBT using Connected, DAB/FM State, TODO: refactor to use State for all drivers
+                    if (!(_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
                     {
                         _tuneState = TuneStateEnum.Failed;
                         return;
                     }
 
-                    if (FMTuning)
+                    if (FMTuning || DABTuning)
                     {
                         if (dvbtTypeIndex > 0)
                             continue;
@@ -361,9 +439,12 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                State = TuneStateEnum.Finished;
-                //SignalStrengthProgress = 0;
-                //MessagingCenter.Send("FinishButton", BaseViewModel.MSG_UpdateTuningPageFocus);
+                // when tunning FM/DAB, demmodulator is searching for frequencies in the background and the tuning never ends....
+                if (_driver.DriverType == TV.AppDriverTypeEnum.DVBT)
+                {
+                    State = TuneStateEnum.Finished;
+                }
+
             }
             catch (Exception ex)
             {
@@ -373,6 +454,12 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 _loggingService.Info("Tuning finished");
+
+                if (_tuneState == TuneStateEnum.Failed)
+                {
+                    WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
+                }
+
                 NotifyChange();
             }
 
@@ -390,6 +477,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     return;
                 }
+
+                _driver.Clear();
 
                 switch (tuneResult.Result)
                 {
@@ -450,40 +539,12 @@ namespace DVBTTelevizor.MAUI
                         continue;
                     }
 
-                    var ch = new Channel();
-                    ch.ProgramMapPID = serviceDescriptor.Value;
-                    ch.Name = serviceDescriptor.Key.ServiceName;
-                    ch.ProviderName = serviceDescriptor.Key.ProviderName;
-                    ch.Frequency = freq;
-                    ch.Bandwdith = bandWidth;
-                    ch.Number = String.Empty;
 
-                    if (FMTuning)
-                    {
-                        ch.ChannelType = ChannelTypeEnum.FM;
-                    }
-                    else
-                    {
-                        switch (dvbtTypeIndex)
-                        {
-                            case 0:
-                                ch.ChannelType = ChannelTypeEnum.DVBT;
-                                break;
-                            case 1:
-                                ch.ChannelType = ChannelTypeEnum.DVBT2;
-                                break;
-                        }
-                    }
+                    var chType = Settings.FM ? ChannelTypeEnum.FM :
+                                 Settings.DAB ? ChannelTypeEnum.DAB :
+                                 dvbtTypeIndex == 0 ? ChannelTypeEnum.DVBT : ChannelTypeEnum.DVBT2;
 
-                    ch.Type = (ServiceTypeEnum)serviceDescriptor.Key.ServisType;
-                    ch.NonFree = !serviceDescriptor.Key.Free;
-
-                    _loggingService.Debug($"Found channel \"{serviceDescriptor.Key.ServiceName}\"");
-
-                    if (ChannelFound != null)
-                    {
-                        ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
-                    }
+                    AddChannel(chType, serviceDescriptor.Key, serviceDescriptor.Value, freq, bandWidth);
                 }
 
             }
@@ -491,6 +552,28 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Error(ex);
                 throw;
+            }
+        }
+
+        private void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
+        {
+            var ch = new Channel();
+            ch.ProgramMapPID = MapPID;
+            ch.Name = serviceDescriptor.ServiceName;
+            ch.ProviderName = serviceDescriptor.ProviderName;
+            ch.Frequency = frequency;
+            ch.Bandwdith = bandWidth;
+            ch.Number = String.Empty;
+            ch.ChannelType = chType;
+
+            ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
+            ch.NonFree = !serviceDescriptor.Free;
+
+            _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
+
+            if (ChannelFound != null)
+            {
+                ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
             }
         }
 
@@ -571,7 +654,7 @@ namespace DVBTTelevizor.MAUI
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 OnPropertyChanged(nameof(FrequencyKHz));
-                OnPropertyChanged(nameof(FrequencyWholePartMHz));
+                OnPropertyChanged(nameof(FrequencyWholePartMHzCaption));
                 OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
 
                 OnPropertyChanged(nameof(DeliverySystem));
@@ -583,6 +666,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TuningProgressVisible));
                 OnPropertyChanged(nameof(TuningProgressCaption));
                 OnPropertyChanged(nameof(State));
+                OnPropertyChanged(nameof(FMDABTuningVisible));
 
                 OnPropertyChanged(nameof(TuneBandWidthKHz));
                 OnPropertyChanged(nameof(DVBTTuning));
@@ -604,6 +688,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SignalSynced));
                 OnPropertyChanged(nameof(SignalSNR));
                 OnPropertyChanged(nameof(Bitrate));
+                OnPropertyChanged(nameof(Queue));
 
                 OnPropertyChanged(nameof(Channels));
                 OnPropertyChanged(nameof(SelectedChannel));
@@ -613,13 +698,27 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(StopButtonVisible));
                 OnPropertyChanged(nameof(BackButtonVisible));
                 OnPropertyChanged(nameof(FinishButtonVisible));
+                OnPropertyChanged(nameof(DriverButtonVisible));
 
                 OnPropertyChanged(nameof(TunedMultiplexesCount));
                 OnPropertyChanged(nameof(TunedChannelsCount));
                 OnPropertyChanged(nameof(TunedNewChannelsCount));
 
                 OnPropertyChanged(nameof(SignalStrengthProgress));
+                OnPropertyChanged(nameof(DVBTPropertiesVisible));
+
             });
+        }
+
+        public bool DVBTPropertiesVisible
+        {
+            get
+            {
+                if (_driver == null)
+                    return false;
+
+                return (_driver.DriverType == TV.AppDriverTypeEnum.DVBT);
+            }
         }
 
         public async Task NotifyBitrateChange()
@@ -698,6 +797,10 @@ namespace DVBTTelevizor.MAUI
                 {
                     return "      FM";
                 }
+                if (Settings.DAB)
+                {
+                    return "     DAB";
+                }
 
                 var res = "";
                 res += DeliverySystem == 0 ? "     DVBT" : "     DVBT2";
@@ -714,6 +817,14 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool FMDABTuningVisible
+        {
+            get
+            {
+                return Settings.FM || Settings.DAB;
+            }
+        }
+
         public bool TuningProgressVisible
         {
             get
@@ -722,11 +833,17 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public long FrequencyWholePartMHz
+        public string FrequencyWholePartMHzCaption
         {
             get
             {
-                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return dabFreq;
+                }
+
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
             }
         }
 
@@ -734,7 +851,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+
+                var part = (FrequencyKHz / 1000.0) - Math.Floor(FrequencyKHz / 1000.0);
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000} MHz";
             }
@@ -767,6 +890,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return Settings.FM;
+            }
+        }
+
+        public bool DABTuning
+        {
+            get
+            {
+                return Settings.DAB;
             }
         }
 
@@ -837,6 +968,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public string Queue
+        {
+            get
+            {
+                if (_driver == null)
+                    return "-";
+
+                return _driver.QueueSize.ToString();
+            }
+        }
+
+
         public bool DVBT2Tuning
         {
             get
@@ -873,6 +1016,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyFromKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return $"< {dabFreq}";
+                }
+
                 return "< " + FrequencyFromMHz.ToString();
             }
         }
@@ -881,6 +1030,12 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                var dabFreq = TuningFrequenciesViewModel.ParseDabFreq((int)(FrequencyToKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return $"{dabFreq} >";
+                }
+
                 return FrequencyToMHz.ToString() + " >";
             }
         }
@@ -1012,6 +1167,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+
         public bool FinishButtonVisible
         {
             get
@@ -1022,6 +1178,20 @@ namespace DVBTTelevizor.MAUI
                     (State == TuneStateEnum.Failed)
                     ||
                     (State == TuneStateEnum.Stopped);
+            }
+        }
+
+        public bool DriverButtonVisible
+        {
+            get
+            {
+                return
+                        (State == TuneStateEnum.InProgress) &&
+                        (_driver != null) &&
+                        (
+                            (_driver.DriverType == TV.AppDriverTypeEnum.FM) ||
+                            (_driver.DriverType == TV.AppDriverTypeEnum.DAB)
+                        );
             }
         }
 

@@ -15,7 +15,6 @@ namespace DVBTTelevizor.MAUI
     public class ChannelPageViewModel : BaseViewModel
     {
         private Channel? _channel = null;
-        private bool _menuVisible = false;
 
         public ObservableCollection<MediaTrack> AudioTracks { get; set; } = new ObservableCollection<MediaTrack>();
         public ObservableCollection<MediaTrack> Subtitles { get; set; } = new ObservableCollection<MediaTrack>();
@@ -70,20 +69,6 @@ namespace DVBTTelevizor.MAUI
         {
             SetAudioTracks(_channel.AudioTracks, _channel.SelectedAudioTrack);
             SetSubtitleTracks(_channel.Subtitles, _channel.SelectedSubtitle);
-        }
-
-        public bool MenuVisible
-        {
-            get
-            {
-                return _menuVisible;
-            }
-            set
-            {
-                _menuVisible = value;
-
-                OnPropertyChanged(nameof(MenuVisible));
-            }
         }
 
         private void SetAudioTracks(Dictionary<int, string> playingChannelAudioTracks, string activeId)

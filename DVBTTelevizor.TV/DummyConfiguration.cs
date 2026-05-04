@@ -16,7 +16,7 @@ namespace DVBTTelevizor.TV
         public string ConfigDirectory { get; set; } = String.Empty;
         public string LastSelectedChannelUniqueIdentifier { get; set; } = String.Empty;
         public string AutoPlayedChannelUniqueID { get; set; } = String.Empty;
-        public DriverTypeEnum DVBTDriverType { get; set; } = DriverTypeEnum.AndroidDVBTDriver;
+        public AppDriverTypeEnum AppDriverType { get; set; } = AppDriverTypeEnum.DVBT;
         public AppFontSizeEnum AppFontSize { get; set; } = AppFontSizeEnum.Normal;
         public string Language { get; set; } = String.Empty;
         public bool Fullscreen { get; set; } = false;
@@ -40,6 +40,9 @@ namespace DVBTTelevizor.TV
         public long FMFrequencyFromKHz { get; set; } = 0;
         public long FMFrequencyToKHz { get; set; } = 0;
         public long FMFrequencyKHz { get; set; } = 0;
+        public long DABFrequencyFromKHz { get; set; } = 0;
+        public long DABFrequencyToKHz { get; set; } = 0;
+        public long DABFrequencyKHz { get; set; } = 0;
         public long DVBTBandwidthKHz { get; set; } = 0;
         public long FMDVBTBandwidthKHz { get; set; } = 0;
         public int SDRDriverStreamPort { get; set; } = 0;
@@ -59,6 +62,15 @@ namespace DVBTTelevizor.TV
         public string SledovaniTVPIN { get; set; } = String.Empty;
         public string SledovaniTVDeviceID { get; set; } = String.Empty;
         public string SledovaniTVDevicePassword { get; set; } = String.Empty;
+        public bool TestingMode { get; set; } = true;
+        public GainEnum Gain { get; set; } = GainEnum.HW;
+        public int GainValue { get; set; } = 0;
+
+        public bool AllowRemoteSDR { get; set; } = false;
+
+        public string RemoteSDRIP { get; set; } = "127.0.0.1";
+
+        public int RemoteSDRPort { get; set; } = 1234;
 
         public ObservableCollection<Channel> GetChannels()
         {
@@ -73,7 +85,7 @@ namespace DVBTTelevizor.TV
         {
             configuration.LastSelectedChannelUniqueIdentifier = LastSelectedChannelUniqueIdentifier;
             configuration.AutoPlayedChannelUniqueID = AutoPlayedChannelUniqueID;
-            configuration.DVBTDriverType = DVBTDriverType;
+            configuration.AppDriverType = AppDriverType;
             configuration.AppFontSize = AppFontSize;
             configuration.Language = Language;
             configuration.Fullscreen = Fullscreen;
@@ -109,6 +121,13 @@ namespace DVBTTelevizor.TV
             configuration.SledovaniTVDeviceID = SledovaniTVDeviceID;
             configuration.SledovaniTVDevicePassword = SledovaniTVDevicePassword;
             configuration.RTLSDREnabled = RTLSDREnabled;
+            configuration.Gain = Gain;
+            configuration.TestingMode = TestingMode;
+            configuration.GainValue = GainValue;
+
+            configuration.AllowRemoteSDR = AllowRemoteSDR;
+            configuration.RemoteSDRIP = RemoteSDRIP;
+            configuration.RemoteSDRPort = RemoteSDRPort;
         }
     }
 }

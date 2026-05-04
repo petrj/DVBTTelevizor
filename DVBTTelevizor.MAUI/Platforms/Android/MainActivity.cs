@@ -30,6 +30,7 @@ namespace DVBTTelevizor.MAUI
         private const int StartRequestCodeDriverPreferences = 1002;
         private const int FolderAccessRequestCode = 1003;
         private const int StorageAccessRequestCode = 1004;
+        private Dictionary<int,bool> _ignoreRequest = new Dictionary<int,bool>();
         private int _audioSampleRate = 96000;
         private int _audioChannels = 2;
         private bool _startAudioReceiverThread = false;
@@ -315,6 +316,14 @@ namespace DVBTTelevizor.MAUI
                 OpenBatterySettings();
             });
 
+            WeakReferenceMessenger.Default.Register<CheckDriversRequestMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new CheckDriversResultMessage(new CheckDriversResult()
+                {
+                    DVBT = IsAppAvailable("info.martinmarinov.dvbdriver"),
+                    RTLSDR = IsAppAvailable("marto.rtl_tcp_andro")
+                }));
+            });
         }
 
         public void SetFullScreen(bool enable)
@@ -735,6 +744,26 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool IsAppAvailable(string packageName)
+        {
+            try
+            {
+                var pm = Android.App.Application.Context.PackageManager;
+                // GetApplicationInfo throws NameNotFoundException if package not installed
+                pm.GetApplicationInfo(packageName, 0);
+                return true;
+            }
+            catch (PackageManager.NameNotFoundException)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _loggingService?.Error(ex, "IsAppAvailable failed");
+                return false;
+            }
+        }
+
         private void InitRTLSDRDriver(int port, int streamPort, int samplerate = 2048000)
         {
             try
@@ -749,12 +778,13 @@ namespace DVBTTelevizor.MAUI
                 _SDRDriverStreamPort = streamPort;
                 _SDRDriverPort = port;
 
+                _ignoreRequest[StartRequestCodeRTLSDR] = false;
                 StartActivityForResult(req, StartRequestCodeRTLSDR);
             }
             catch (ActivityNotFoundException ex)
             {
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
-
+                _ignoreRequest[StartRequestCodeRTLSDR] = true;
                 _loggingService.Info("Activity not found");
                 WeakReferenceMessenger.Default.Send(new RTLSDRDriverNotInstalledMessage("Device response timeout".Translated()));
             }
@@ -790,11 +820,13 @@ namespace DVBTTelevizor.MAUI
                 });
 
                 _loggingService.Info("Starting activity");
+                _ignoreRequest[StartRequestCode] = false;
                 StartActivityForResult(req, StartRequestCode);
 
             } catch (ActivityNotFoundException e)
             {
                 _loggingService.Info("Activity not found");
+                _ignoreRequest[StartRequestCode] = true;
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
                 WeakReferenceMessenger.Default.Send(new DVBTDriverNotInstalledMessage("Device response timeout".Translated()));
             }
@@ -891,7 +923,7 @@ namespace DVBTTelevizor.MAUI
 
                     cfg.PublicDirectory = GetAndroidDirectory(null);
 
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(cfg));
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(cfg));
                 }
                 else
                 {
@@ -966,23 +998,25 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
+            if (_ignoreRequest.ContainsKey(requestCode) && _ignoreRequest[requestCode])
+            {
+                _loggingService.Debug($"Ignoring activity result for request code: {requestCode}");
+                _ignoreRequest[requestCode] = false; // reset the flag
+                return;
+            }
+
             if (requestCode == StartRequestCode)
             {
                 ProcessDriverConnectResult(resultCode,data);
             }
             if (requestCode == StartRequestCodeRTLSDR)
             {
-                if (resultCode == Result.Canceled)
-                {
-                    return;
-                }
-
                 if (resultCode == Result.Ok)
                 {
                     var x = data.GetIntExtra("SDRDriverPort", 1234);
                     var y = data.GetIntExtra("SDRDriverStreamPort", 1235);
 
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(new DVBTDriverConfiguration()
+                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                     {
                         //SupportedTcpCommands = data.GetIntArrayExtra("supportedTcpCommands"),
                         DeviceName = data.GetStringExtra("deviceName"),

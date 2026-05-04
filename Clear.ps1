@@ -7,15 +7,11 @@ cd $PSScriptRoot
 
 
 foreach ($folder in `
-    @(
-    "DVBTTelevizor\DVBTTelevizor\bin",
-    "DVBTTelevizor\DVBTTelevizor\obj",
-    "DVBTTelevizor\DVBTTelevizor.Android\bin",
-    "DVBTTelevizor\DVBTTelevizor.Android\obj",
+    @(    
     "DVBTTelevizor.Driver\bin",
     "DVBTTelevizor.Driver\obj",
     "DVBTTelevizor.TV\bin",
-    "DVBTTelevizor.TV\obj",    
+    "DVBTTelevizor.TV\obj",
     "DVBTTelevizor.MAUI\bin",
     "DVBTTelevizor.MAUI\obj",
     "LibVLCSharp.MAUI.Windows\bin",
@@ -42,13 +38,11 @@ foreach ($folder in `
 
     if (Test-Path -Path $fullPath)
     {
-	    Remove-Item -Path $fullPath -Recurse -Force -Verbose		
+	    Remove-Item -Path $fullPath -Recurse -Force #-Verbose		
     }
 }
 
 
-Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force -Verbose
+#Get-ChildItem -Path ($env:LOCALAPPDATA + "\Microsoft") -Recurse -Directory | Where-Object { $_.FullName -like "*VisualStudio\*\ComponentModelCache"  } | Get-ChildItem | Remove-Item -Force #-Verbose
 
 #dotnet restore .\DVBTTelevizor.MAUI\DVBTTelevizor.MAUI.csproj --force
-
-

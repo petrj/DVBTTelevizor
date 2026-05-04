@@ -2,6 +2,9 @@
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android;net10.0-windows10.0.26100.0</TargetFrameworks>
 
+		<!-- Ensure a single package version across all target frameworks to avoid NU1105 -->
+		<PackageVersion>1.0.0</PackageVersion>
+
 		<OutputType>Exe</OutputType>
 		<RootNamespace>DVBTTelevizor.MAUI</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -21,6 +24,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.26100.0</TargetPlatformMinVersion>
 
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
@@ -28,16 +32,16 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationVersion>2026003</ApplicationVersion>
-		<VersionCode>2026003</VersionCode>
-		<VersionName>2026003</VersionName>
-		<ApplicationDisplayVersion>2026003</ApplicationDisplayVersion>
+		<ApplicationVersion>2026005</ApplicationVersion>
+		<VersionCode>2026005</VersionCode>
+		<VersionName>2026005</VersionName>
+		<ApplicationDisplayVersion>2026005</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<!-- Versions
 		Value 2025003 is too big for Windows
 		-->
-	
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<ApplicationVersion>2026</ApplicationVersion>
@@ -45,15 +49,15 @@
 		<VersionName>2026</VersionName>
 		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<WindowsPackageType>MSIX</WindowsPackageType>
-	</PropertyGroup>	
-	
+	</PropertyGroup>
+
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
 
 	  <!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <UseFastDeployment>false</UseFastDeployment>		
+	  <UseFastDeployment>false</UseFastDeployment>
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
 	</PropertyGroup>
@@ -64,7 +68,7 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <PublishTrimmed>True</PublishTrimmed>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  
+
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -96,29 +100,36 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 
+	<!-- this will disable fast deploy -->
+	<!--PropertyGroup>
+		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+	</PropertyGroup-->
+
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
 		<PackageReference Include="LibVLCSharp" Version="3.9.5" />
 		<PackageReference Include="LoggerService" Version="1.0.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.20" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
-		<PackageReference Include="NAudio" Version="2.2.1" />
-		<PackageReference Include="NLog" Version="6.0.7" />
-		<PackageReference Include="NLog.Targets.Network" Version="6.0.3" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.50" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
+		<PackageReference Include="NAudio" Version="2.3.0" />
+		<PackageReference Include="NLog" Version="6.1.1" />
+		<PackageReference Include="NLog.Targets.Network" Version="6.0.4" />
 		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
-		<PackageReference Include="RTLSDR" Version="1.0.4" />
-		<PackageReference Include="RTLSDR.Audio" Version="1.0.6" />
-		<PackageReference Include="RTLSDR.Common" Version="1.0.1" />
-		<PackageReference Include="RTLSDR.FM" Version="1.0.1" />
+		<PackageReference Include="RTLSDR" Version="1.5.0" />
+		<PackageReference Include="RTLSDR.Audio" Version="1.5.0" />
+		<PackageReference Include="RTLSDR.Common" Version="1.5.3" />
+		<PackageReference Include="RTLSDR.DAB" Version="1.5.8" />
+		<PackageReference Include="RTLSDR.FM" Version="1.5.0" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="System.Drawing.Common" Version="10.0.1" />
-		<PackageReference Include="System.Formats.Nrbf" Version="10.0.1" />
+		<PackageReference Include="System.Drawing.Common" Version="10.0.5" />
+		<PackageReference Include="System.Formats.Nrbf" Version="10.0.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
-		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
+		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23" />
 	</ItemGroup>
 
 
@@ -141,6 +152,9 @@
 	  <Compile Update="Menu.xaml.cs">
 	    <DependentUpon>Menu.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\DriverStatPage.xaml.cs">
+	    <DependentUpon>DriverStatPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\ChannelPage.xaml.cs">
 	    <DependentUpon>ChannelPage.xaml</DependentUpon>
 	  </Compile>
@@ -150,8 +164,14 @@
 	  <Compile Update="Pages\DriverPage.xaml.cs">
 	    <DependentUpon>DriverPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\GainPage.xaml.cs">
+	    <DependentUpon>GainPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\FrequencyPage.xaml.cs">
 	    <DependentUpon>FrequencyPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Pages\SelectDriverPage.xaml.cs">
+	    <DependentUpon>SelectDriverPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Pages\TuningFrequencyPage.xaml.cs">
 	    <DependentUpon>TuningFrequencyPage.xaml</DependentUpon>
@@ -165,7 +185,7 @@
 	  <Compile Update="Pages\TuningFrequenciesPage.xaml.cs">
 	    <DependentUpon>TuningFrequenciesPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Pages\TuningWelcomePage.xaml.cs">
+	  <Compile Update="Pages\TuningModePage.xaml.cs">
 	    <DependentUpon>TuningWelcomePage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Platforms\Android\DVBTTelevizorConfiguration.cs">
@@ -192,6 +212,9 @@
 	  <MauiXaml Update="ImgButton.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\DriverStatPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\ChannelPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -201,7 +224,13 @@
 	  <MauiXaml Update="Pages\DriverPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\GainPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\FrequencyPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\SelectDriverPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\TuningFrequencyPage.xaml">
@@ -225,6 +254,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Pages\TuningDriverPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
 	  <None Update="Platforms\Windows\NLog.config">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

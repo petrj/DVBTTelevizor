@@ -1,6 +1,7 @@
 namespace DVBTTelevizor.MAUI;
 
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics.Text;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -54,6 +55,14 @@ public partial class ImgButton : ContentView
         default(int),
         propertyChanged: OnAnyValueChanged);
 
+    public static readonly BindableProperty TextColorProperty =
+    BindableProperty.Create(
+        nameof(TextColor),
+        typeof(Color),
+        typeof(ImgButton),
+        default(Color),
+        propertyChanged: OnAnyValueChanged);
+
     private static void OnAnyValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
 
@@ -64,6 +73,7 @@ public partial class ImgButton : ContentView
 		InitializeComponent();
 
         ButtonColor = Colors.Gray;
+        TextColor = Colors.White;
     }
 
     public void FocusItem(bool focus)
@@ -116,6 +126,12 @@ public partial class ImgButton : ContentView
     {
         get => (Color)GetValue(ButtonColorProperty);
         set => SetValue(ButtonColorProperty, value);
+    }
+
+    public Color TextColor
+    {
+        get => (Color)GetValue(TextColorProperty);
+        set => SetValue(TextColorProperty, value);
     }
 
 }

@@ -4,8 +4,9 @@ using System.Text;
 
 namespace DVBTTelevizor.MAUI
 {
-    public class ChannelFoundEventArgs : EventArgs
+    public class RawDataReceivedEventArgs : EventArgs
     {
-        public Channel Channel { get; set; }
+        public byte[] Data { get; set; }
+        public int DataSize { get; set; }
     }
 }

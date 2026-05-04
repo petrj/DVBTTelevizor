@@ -2,6 +2,7 @@
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
+using NAudio.Dsp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,13 +15,10 @@ namespace DVBTTelevizor.MAUI
     public class BaseViewModel : BaseNotifableObject
     {
         protected ILoggingService _loggingService;
-        protected IDriverConnector _driver;
         protected string _publicDirectory;
         protected ITVConfiguration _configuration;
-        private DriverTypeEnum? _ignoreDriver = null;
 
-        private bool _DVBTDriverActive = false;
-        private bool _FMDriverActive = false;
+        private bool _menuVisible = false;
 
         public BaseViewModel(ILoggingService loggingService,
             IDriverConnector driver,
@@ -28,7 +26,6 @@ namespace DVBTTelevizor.MAUI
             IPublicDirectoryProvider publicDirectoryProvider)
         {
             _loggingService = loggingService;
-            _driver = driver;
             _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
             _configuration = tvConfiguration;
 
@@ -37,166 +34,74 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Info($"BaseViewModel: FontSizeChanged");
                 NotifyFontSizeChange();
             });
-
-            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
-            {
-                _driver = m.Value;
-                UpdateActiveDriverType();
-                NotifyDriverChange();
-            });
         }
 
-        public void UpdateActiveDriverType()
+        public bool MenuVisible
         {
-            Task.Run(async () =>
+            get
             {
-                try
-                {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        if (_configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriver)
-                        {
-                            IgnoreDriver = DriverTypeEnum.RTLSDRDriver;
-                        } else
-                        {
-                           IgnoreDriver = DriverTypeEnum.AndroidDVBTDriver;
-                        }
+                return _menuVisible;
+            }
+            set
+            {
+                _menuVisible = value;
 
-                        FMDriverActive = _configuration.DVBTDriverType == DriverTypeEnum.RTLSDRDriver;
-                        DVBTDriverActive = !FMDriverActive;
-                    });
-                }
-                finally
-                {
-                    NotifyDriverChange();
-                }
-            });
+                OnPropertyChanged(nameof(MenuVisible));
+            }
         }
 
-        public static string GetDVBTDriverTypeName(DriverTypeEnum driverType)
+        public static string GetDVBTDriverTypeName(AppDriverTypeEnum? driverType)
         {
-            // DVBTDriverTypeEnum
-            //   *  AndroidDVBTDriver = 0,            => 0
-            //      AndroidTestingDVBTDriver = 1,
-            //      TestTuneDriver = 2,
-            //   *  RTLSDRTCPIPFMDriver = 3,          => 1
-            //      RTLSDRFMDriver = 4
-            switch ((int)driverType)
+            switch (driverType)
             {
-                case 0:
-                case 1:
-                case 2:
+                case  AppDriverTypeEnum.DVBT:
                     return "DVB-T";
-                case 3:
+                case  AppDriverTypeEnum.FM:
                     return "FM (SDR Driver)";
+                case  AppDriverTypeEnum.DAB:
+                    return "DAB (SDR Driver)";
                 default:
                     return "";
             }
         }
 
-        public static string GetDVBTDriverShortName(DriverTypeEnum driverType)
+        public static string GetDVBTDriverShortName(AppDriverTypeEnum? driverType)
         {
-            // DVBTDriverTypeEnum
-            //   *  AndroidDVBTDriver = 0,            => 0
-            //      AndroidTestingDVBTDriver = 1,
-            //      TestTuneDriver = 2,
-            //   *  RTLSDRTCPIPFMDriver = 3,          => 1
-            //      RTLSDRFMDriver = 4
-            switch ((int)driverType)
+            switch (driverType)
             {
-                case 0:
-                case 1:
-                case 2:
+                case  AppDriverTypeEnum.DVBT:
                     return "DVB-T";
-                case 3:
+                case  AppDriverTypeEnum.FM:
                     return "FM";
+                case AppDriverTypeEnum.DAB:
+                    return "DAB";
                 default:
-                    return "Driver".Translated();
+                    return String.Empty;
             }
         }
 
-        public bool DVBTDriverActive
-        {
-            get
-            {
-                return _DVBTDriverActive;
-                //switch (_configuration.DVBTDriverType)
-                //{
-                //    case DriverTypeEnum.RTLSDRDriver:
-                //        return false;
-                //    default:
-                //        return true;
-                //}
-            }
-            set
-            {
-                _DVBTDriverActive = value;
-                //if (value)
-                //{
-                //    if (_prevActiveDriverType != _configuration.DVBTDriverType)
-                //    {
-                //        _prevActiveDriverType = _configuration.DVBTDriverType;
-                //    }
-                //    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                //}
-                //else
-                //{
-                //    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                //}
+        //public async Task ChangeDriver(AppDriverTypeEnum driver)
+        //{
+        //    _loggingService.Info($"ChangeDriver");
 
-                NotifyDriverChange();
-            }
-        }
+        //    if (_configuration.AppDriverType == driver)
+        //    {
+        //        _loggingService.Info($"ChangeDriver: already using {driver}");
+        //        return;
+        //    }
 
-        public bool FMDriverActive
-        {
-            get
-            {
-                return _FMDriverActive;
-                //switch (_configuration.DVBTDriverType)
-                //{
-                //    case DriverTypeEnum.RTLSDRDriver:
-                //        return true;
-                //    default:
-                //        return false;
-                //}
-            }
-            set
-            {
-                _FMDriverActive = value;
-                //if (value)
-                //{
-                //    if (_prevActiveDriverType != _configuration.DVBTDriverType)
-                //    {
-                //        _prevActiveDriverType = _configuration.DVBTDriverType;
-                //    }
-                //    _configuration.DVBTDriverType = DriverTypeEnum.RTLSDRDriver;
-                //}
-                //else
-                //{
-                //    _configuration.DVBTDriverType = DriverTypeEnum.AndroidDVBTDriver;
-                //}
+        //    if ((_driver != null) && (_driver.Connected))
+        //    {
+        //        await _driver.Stop();
+        //        await _driver.Disconnect();
+        //    }
 
-                NotifyDriverChange();
-            }
-        }
+        //    _configuration.AppDriverType = driver;
 
-        public async Task ChangeDriver(DriverTypeEnum driver)
-        {
-            _loggingService.Info($"ChangeDriver");
-
-            if ((_driver != null) && (_driver.Connected))
-            {
-                await _driver.Stop();
-                await _driver.Disconnect();
-            }
-
-            _configuration.DVBTDriverType = driver;
-
-            WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
-            ////Task.Delay(500).Wait();
-            ////WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
-        }
+        //    WeakReferenceMessenger.Default.Send(new InitDriverMessage(String.Empty));
+        //    ////Task.Delay(500).Wait();
+        //    ////WeakReferenceMessenger.Default.Send(new ConnectMessage(String.Empty));
+        //}
 
         public static string DeviceFriendlyName
         {
@@ -229,31 +134,6 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(FontSizeForDescription));
                 OnPropertyChanged(nameof(FontSizeForLargeCaption));
             });
-        }
-
-        public void NotifyDriverChange()
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                OnPropertyChanged(nameof(FMDriverActive));
-                OnPropertyChanged(nameof(DVBTDriverActive));
-
-                OnPropertyChanged(nameof(ConnectedDevice));
-                OnPropertyChanged(nameof(DriverStateStatus));
-                OnPropertyChanged(nameof(DriversBoxVisible));
-            });
-        }
-
-        public DriverTypeEnum? IgnoreDriver
-        {
-            get
-            {
-                return _ignoreDriver;
-            }
-            set
-            {
-                _ignoreDriver = value;
-            }
         }
 
         public int GetScaledSize(int normalSize)
@@ -366,45 +246,15 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string ConnectedDevice
+        public string HighlightedButtonColor
         {
-            get
-            {
-                if (_driver == null ||
-                    _driver.Configuration == null ||
-                    String.IsNullOrWhiteSpace(_driver.Configuration.DeviceName))
-                {
-                    return "No compatible device".Translated();
-                }
-
-                return _driver.Configuration.DeviceName;
-            }
+            get { return "#00AA00"; }
         }
 
-        public string DriverStateStatus
+        public string ButtonColor
         {
-            get
-            {
-                if (_driver == null || !_driver.DriverInstalled)
-                {
-                    return "Driver not installed!".Translated();
-                }
-
-                if (_driver.Connected)
-                {
-                    return "Connected".Translated();
-                }
-
-                return "Disconnected".Translated();
-            }
+            get { return "Gray"; }
         }
 
-        public bool DriversBoxVisible
-        {
-            get
-            {
-                return _configuration.RTLSDREnabled;
-            }
-        }
     }
 }

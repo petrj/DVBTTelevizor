@@ -1,4 +1,5 @@
 ﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
@@ -199,16 +200,16 @@ namespace DVBTTelevizor
             }
         }
 
-        public DriverTypeEnum DVBTDriverType
+        public AppDriverTypeEnum AppDriverType
         {
             get
             {
-                var index = GetPersistingSettingValue<int>("DVBTDriverType");
-                return (DriverTypeEnum)index;
+                var index = GetPersistingSettingValue<int>("AppDriverType");
+                return (AppDriverTypeEnum)index;
             }
             set
             {
-                SavePersistingSettingValue<int>("DVBTDriverType", (int)value);
+                SavePersistingSettingValue<int>("AppDriverType", (int)value);
             }
         }
 
@@ -582,6 +583,41 @@ namespace DVBTTelevizor
             }
         }
 
+        public long DABFrequencyFromKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("DABFrequencyFromKHz", 174928);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("DABFrequencyFromKHz", value);
+            }
+        }
+
+        public long DABFrequencyToKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("DABFrequencyToKHz", 239200);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("DABFrequencyToKHz", value);
+            }
+        }
+        public long DABFrequencyKHz
+        {
+            get
+            {
+                return GetPersistingSettingValue<long>("DABFrequencyKHz", 174928);
+            }
+            set
+            {
+                SavePersistingSettingValue<long>("DABFrequencyKHz", value);
+            }
+        }
+
         public int SDRDriverStreamPort
         {
             get
@@ -817,6 +853,80 @@ namespace DVBTTelevizor
             set
             {
                 SavePersistingSettingValue<bool>("RTLSDREnabled", value);
+            }
+        }
+
+        public bool TestingMode
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("TestingMode");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("TestingMode", value);
+            }
+        }
+
+
+        public GainEnum Gain
+        {
+            get
+            {
+                var index = GetPersistingSettingValue<int>("Gain");
+                return (GainEnum)index;
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("Gain", (int)value);
+            }
+        }
+
+        public int GainValue
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("GainValue", 0);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("GainValue", value);
+            }
+        }
+
+        public bool AllowRemoteSDR
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("AllowRemoteSDR");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("AllowRemoteSDR", value);
+            }
+        }
+
+        public string RemoteSDRIP
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("RemoteSDRIP");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("RemoteSDRIP", value);
+            }
+        }
+
+        public int RemoteSDRPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("RemoteSDRPort", 1234);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("RemoteSDRPort", value);
             }
         }
     }

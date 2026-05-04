@@ -1,34 +1,40 @@
-﻿using System;
+﻿using DVBTTelevizor.TV;
+using MPEGTS;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Runtime.InteropServices;
-using MPEGTS;
 
 namespace DVBTTelevizor
 {
     public interface IDriverConnector
     {
+        AppDriverTypeEnum DriverType { get; }
+
         DVBTDriverStateEnum State { get; }
 
         DVBTDriverConfiguration Configuration { get; set; }
 
         bool Connected { get; }
 
-        bool DriverInstalled { get; set; }
-
-        DVBTDriverStreamTypeEnum DVBTDriverStreamType { get; }
+        DriverStreamTypeEnum DVBTDriverStreamType { get; }
 
         Stream VideoStream { get; }
         string StreamUrl { get; }
 
-        public event DemodulatedEventHandler OnRawAudioDemodulated;
+        public event EventHandler? OnRawAudioDemodulated;
+        public event EventHandler? OnServiceFound;
+        public event EventHandler? RawDataReceived;
+
+        int QueueSize { get; }
+        bool Synced { get; }
 
         bool Recording { get; }
         bool ReadingStream { get; }
@@ -78,5 +84,9 @@ namespace DVBTTelevizor
 
         //void StatusChangedEventHandler(object sender, StatusChangedEventArgs e);
         event EventHandler StatusChanged;
+
+        Task SetGain(GainEnum gain, int value = 0);
+
+        void Clear();
     }
 }

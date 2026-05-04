@@ -29,7 +29,6 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<string> Languages { get; set; } = new ObservableCollection<string>();
 
         public Channel _selectedChannel = null;
-        private bool _menuVisible = false;
         private bool _showPairedDevice = false;
 
         public SettingsPageViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
@@ -92,20 +91,6 @@ namespace DVBTTelevizor.MAUI
 
             // check SD card permissions
             WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteRequestMessage(String.Empty));
-        }
-
-        public bool MenuVisible
-        {
-            get
-            {
-                return _menuVisible;
-            }
-            set
-            {
-                _menuVisible = value;
-
-                OnPropertyChanged(nameof(MenuVisible));
-            }
         }
 
         public string SelectedLanguage
@@ -515,6 +500,20 @@ namespace DVBTTelevizor.MAUI
 #else
                 return false;
 #endif
+            }
+        }
+
+        public bool AllowRemoteSDR
+        {
+            get
+            {
+                return _configuration.AllowRemoteSDR;
+            }
+            set
+            {
+                _configuration.AllowRemoteSDR = value;
+
+                OnPropertyChanged(nameof(AllowRemoteSDR));
             }
         }
 

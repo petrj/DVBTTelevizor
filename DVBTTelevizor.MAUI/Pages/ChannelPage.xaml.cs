@@ -67,11 +67,11 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             e is TappedEventArgs tea &&
             tea.Parameter is MenuItem item)
         {
-            Menu_Tapped(item);
+            OnMenuIsTapped(item);
         }
     }
 
-    private async void Menu_Tapped(MenuItem item)
+    private async void OnMenuIsTapped(MenuItem item)
     {
         var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
@@ -412,7 +412,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                 var menuItem = GetSelectedMenu();
                 if (menuItem != null)
                 {
-                    Menu_Tapped(menuItem);
+                    OnMenuIsTapped(menuItem);
                 }
                 break;
         }

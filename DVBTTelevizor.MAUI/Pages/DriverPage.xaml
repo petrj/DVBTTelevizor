@@ -4,7 +4,7 @@
              x:Class="DVBTTelevizor.MAUI.DriverPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Driver'}">
+             Title="{Binding PageDriverTitle}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -67,35 +67,19 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding DriverStateStatus}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
+        <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding StatusTitle}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.35,0.8,0.25" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Image AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.20" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
         <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
 
-        <Frame AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.12" AbsoluteLayout.LayoutFlags="All" BackgroundColor="#808080" CornerRadius="10"  IsVisible="{Binding DriversBoxVisible}">
-            <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="5,5,5,5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*" />
-                    <ColumnDefinition Width="50*" />
-                </Grid.ColumnDefinitions>
-
-                <BoxView x:Name="DVBTDriverBoxView" Grid.Row="0" Grid.Column="0"  BackgroundColor="Transparent" />
-                <RadioButton x:Name="DVBTDriverRadioButton" IsChecked="{Binding DVBTDriverActive}" Grid.Row="0" Grid.Column="0" Content="{local:LngXamlExt Input='DVBT'}"   Style="{DynamicResource RadioButtonStyle}" FontSize="{Binding FontSizeForCaption}" />
-
-                <BoxView x:Name="FMDriverBoxView" Grid.Row="0" Grid.Column="1"  BackgroundColor="Transparent" />
-                <RadioButton x:Name="FMDriverRadioButton" IsChecked="{Binding FMDriverActive}" Grid.Row="0" Grid.Column="1" Content="{local:LngXamlExt Input='FM'}"  Style="{DynamicResource RadioButtonStyle}"  FontSize="{Binding FontSizeForCaption}" />
-            </Grid>
-        </Frame>
-
-
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.8,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.70,0.6,0.25" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40*" />
@@ -107,7 +91,7 @@
             <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Bitrate'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Label  Grid.Row="0" Grid.Column="1" Text="{Binding Bitrate}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
-            <BoxView x:Name="FrequencyBoxView" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="FrequencyBoxView" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
             <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Label  Grid.Row="1" Grid.Column="1" Text="{Binding LastTuneFrequency}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
@@ -117,11 +101,25 @@
             <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Frequency range'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Label  Grid.Row="2" Grid.Column="1" Text="{Binding ConnectedDeviceRange}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
 
+            <BoxView x:Name="QueueRangeBoxView" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="3" Grid.Column="0" Text="{local:LngXamlExt Input='Queue'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="3" Grid.Column="1" Text="{Binding ConnectedDeviceQueue}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+            <BoxView x:Name="GainBoxView" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="4" Grid.Column="0" Text="{local:LngXamlExt Input='Gain'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <Label  Grid.Row="4" Grid.Column="1" Text="{Binding GainTitle}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
+
+            <BoxView x:Name="SyncedRangeBoxView" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+
+            <Label  Grid.Row="5" Grid.Column="0" Text="{local:LngXamlExt Input='Synced'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
+            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ConnectedDeviceSynced}" HorizontalOptions="End" Margin="0"  FlowDirection="RightToLeft" />
 
         </Grid>
 
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.6,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.4,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -134,21 +132,25 @@
             <Button x:Name="DriverPreferencesButton" Grid.Column="1" Text="{local:LngXamlExt Input='Settings..'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverPreferencesVisible}" Clicked="DriverPreferencesButton_Clicked"/>
             <Button x:Name="InstallDriverButton"  Grid.Column="1"  Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
 
-
         </Grid>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.9,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.95,0.9,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="45*" />
-                <ColumnDefinition Width="10*" />
-                <ColumnDefinition Width="45*" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="30*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="ConnectButton" Grid.Column="0" Text="{local:LngXamlExt Input='Connect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectButtonVisible}" Clicked="ConnectButton_Clicked"/>
-            <Button x:Name="DisconnectButton" Grid.Column="2" Text="{local:LngXamlExt Input='Disconnect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DisconnectButtonVisible}" Clicked="DisconnectButton_Clicked"/>
+            <Button x:Name="ConnectButton" Grid.Column="0" Grid.RowSpan="2" Text="{local:LngXamlExt Input='Connect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectButtonVisible}" Clicked="ConnectButton_Clicked"/>
+            <Button x:Name="GainButton" Grid.Column="2" Grid.Row="0"  Text="{local:LngXamlExt Input='Gain'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding GainButtonVisible}" Clicked="GainButton_Clicked"/>
+            <Button x:Name="StatButton" Grid.Column="2" Grid.Row="1" Text="{local:LngXamlExt Input='Stat'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding GainButtonVisible}" Clicked="StatButton_Clicked"/>
+            <Button x:Name="DisconnectButton" Grid.Column="4"  Grid.RowSpan="2" Text="{local:LngXamlExt Input='Disconnect'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DisconnectButtonVisible}" Clicked="DisconnectButton_Clicked"/>
 
         </Grid>
 

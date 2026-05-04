@@ -31,8 +31,9 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(FrequencyFromDecimalPartMHzCaption));
             OnPropertyChanged(nameof(FrequencyToWholePartMHz));
             OnPropertyChanged(nameof(FrequencyToDecimalPartMHzCaption));
-            OnPropertyChanged(nameof(FrequencyWholePartMHz));
+            OnPropertyChanged(nameof(FrequencyWholePartMHzCaption));
             OnPropertyChanged(nameof(FrequencyDecimalPartMHzCaption));
+            OnPropertyChanged(nameof(FrequencyUnit));
         }
 
         public TuningSettings Settings
@@ -123,11 +124,28 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public long FrequencyWholePartMHz
+        public static string ParseDabFreq(int freq)
+        {
+            foreach (var kvp in RTLSDR.Common.AudioTools.DabFrequenciesHz)
+            {
+                if (kvp.Value == freq)
+                {
+                    return kvp.Key;
+                }
+            }
+            return null;
+        }
+
+        public string FrequencyWholePartMHzCaption
         {
             get
             {
-                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
+                var dabFreq = ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return dabFreq;
+                }
+                return Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0)).ToString();
             }
         }
 
@@ -135,9 +153,27 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var part = (FrequencyKHz / 1000.0) - FrequencyWholePartMHz;
+                var dabFreq = ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+                var part = (FrequencyKHz / 1000.0) - Convert.ToInt64(Math.Floor(FrequencyKHz / 1000.0));
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000}";
+            }
+        }
+
+        public string FrequencyUnit
+        {
+            get
+            {
+                var dabFreq = ParseDabFreq((int)(FrequencyKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+                return $"MHz".Translated();
             }
         }
     }

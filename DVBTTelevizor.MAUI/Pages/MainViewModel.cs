@@ -29,6 +29,8 @@ namespace DVBTTelevizor.MAUI
 
         public bool IsRecording { get; set; } = false;
 
+        private IDriverConnector? _driver = null;
+
         private SledovaniTV.SledovaniTV _iptv;
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
@@ -45,7 +47,6 @@ namespace DVBTTelevizor.MAUI
 
         private bool _refreshing = false;
         private bool _refreshed = false;
-        private bool _menuVisible = false;
 
         private bool _doNotAutomaticallyShowEPGDetail = false;
 
@@ -65,11 +66,15 @@ namespace DVBTTelevizor.MAUI
         public ICommand RefreshCommand { get; set; }
         public Command CommandScanEPG { get; set; }
 
+        private bool? _dvbtDriverInstalled = null;
+        private bool? _rtlsdrDriverInstalled = null;
         public bool MainLayoutVisible { get; set; } = true;
 
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
+            _driver = driver;
+
             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 
@@ -102,7 +107,6 @@ namespace DVBTTelevizor.MAUI
         {
             CommandTune = new Command(() =>
             {
-                //MenuVisible = false;
                 WeakReferenceMessenger.Default.Send(new ShowTuneMessage(String.Empty));
             });
 
@@ -153,9 +157,41 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public bool? DvbtDriverInstalled
+        {
+            get => _dvbtDriverInstalled;
+            set
+            {
+                _dvbtDriverInstalled = value;
+                NotifyChange();
+            }
+        }
+        public bool? RtlsdrDriverInstalled
+        {
+            get => _rtlsdrDriverInstalled;
+            set
+            {
+                _rtlsdrDriverInstalled = value;
+                NotifyChange();
+            }
+        }
+
         private void SubscribeMessages()
         {
-            WeakReferenceMessenger.Default.Register<ConnectDriverMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<CheckDriversResultMessage>(this, (r, m) =>
+            {
+                DvbtDriverInstalled = m.Value.DVBT;
+                RtlsdrDriverInstalled = m.Value.RTLSDR;
+            });
+
+            WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+            {
+                _driver = m.Value;
+
+                NotifyChange();
+            });
+
+            WeakReferenceMessenger.Default.Register<DriverHasBeenConnectedMessage>(this, (r, m) =>
             {
                 ConnectDriver(m.Value);
             });
@@ -217,20 +253,6 @@ namespace DVBTTelevizor.MAUI
             finally
             {
                 await RefreshEPG();
-            }
-        }
-
-        public bool MenuVisible
-        {
-            get
-            {
-                return _menuVisible;
-            }
-            set
-            {
-                _menuVisible = value;
-
-                OnPropertyChanged(nameof(MenuVisible));
             }
         }
 
@@ -835,32 +857,65 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                //return false;
-                return
-                    (Channels.Count == 0) &&
-                    Refreshed &&
-                    (_driver!= null) &&
-                    _driver.DriverInstalled;
+                if (NotRefreshed || (Channels.Count > 0))
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value)
+                        ||
+                        (RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value);
             }
         }
 
-        public bool InstallDriverButtonVisible
+        public bool DriveImageVisible
         {
             get
             {
-                return
-                    (Channels.Count == 0) &&
-                    Refreshed &&
-                    (_driver != null) &&
-                    !_driver.DriverInstalled;
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue &&
+                        RtlsdrDriverInstalled.HasValue &&
+                        !DvbtDriverInstalled.Value &&
+                        !RtlsdrDriverInstalled.Value);
             }
         }
+
+        public bool InstallDVBTDriverButtonVisible
+        {
+            get
+            {
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue && !DvbtDriverInstalled.Value);
+            }
+        }
+
+        public bool InstallFMDABDriverButtonVisible
+        {
+            get
+            {
+                if (Channels.Count > 0)
+                {
+                    return false;
+                }
+
+                return _rtlsdrDriverInstalled.HasValue && !_rtlsdrDriverInstalled.Value;
+            }
+        }
+
 
         public void UpdateDriverState()
         {
             NotifyChange();
 
-            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(String.Empty));
+            WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
 
         public async Task ShowActualPlayingMessage(PlayStreamInfo playStreamInfo = null)
@@ -968,34 +1023,37 @@ namespace DVBTTelevizor.MAUI
             UpdateDriverState();
         }
 
+
+        /// <summary>
+        /// Called only from one single place -> on message DriverHasBeenConnectedMessage received
+        /// </summary>
+        /// <param name="config"></param>
         private void ConnectDriver(DVBTDriverConfiguration config)
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
-            if (_driver.Connected)
-                return;
-
-            _driver.DriverInstalled = true;
-
-            WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
-
-            _driver.Configuration = config;
-            _driver.PublicDirectory = _publicDirectory;
-            _driver.Connect();
-
-            if (_driver is RTLSDRDriverConnector)
+            try
             {
-                //WeakReferenceMessenger.Default.Send(new PlayRawAdioMessage(String.Empty));
-            }
+                if (_driver.Connected)
+                    return;
 
-            UpdateDriverState();
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
+
+                _driver.Configuration = config;
+                _driver.PublicDirectory = _publicDirectory;
+                _driver.Connect();
+
+                var state = _driver.State;
+            }
+            finally
+            {
+                UpdateDriverState();
+            }
         }
 
         private void ConnectDriverFailed(string message)
         {
             _loggingService.Info($"Connection failed: {message}");
-
-            _driver.DriverInstalled = true;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(message)));
 
@@ -1005,8 +1063,6 @@ namespace DVBTTelevizor.MAUI
         private void DriverNotInstalled()
         {
             _loggingService.Info($"Driver is not installed");
-
-            _driver.DriverInstalled = false;
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
@@ -1029,7 +1085,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (_driver == null ||!_driver.DriverInstalled)
+                if (_driver == null)
                 {
                     return "donglered.png";
                 }
@@ -1276,9 +1332,11 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(Refreshed));
             OnPropertyChanged(nameof(NotRefreshed));
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
-            OnPropertyChanged(nameof(InstallDriverButtonVisible));
+            OnPropertyChanged(nameof(InstallDVBTDriverButtonVisible));
+            OnPropertyChanged(nameof(InstallFMDABDriverButtonVisible));
             OnPropertyChanged(nameof(Channels));
             OnPropertyChanged(nameof(DriverIconImage));
+            OnPropertyChanged(nameof(DriveImageVisible));
         }
 
         public bool Refreshed
@@ -1411,7 +1469,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     _semaphoreSlim.Release();
                 }
-                ;
+
             }
         }
 

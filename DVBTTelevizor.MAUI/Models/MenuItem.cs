@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DVBTTelevizor.TV;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace DVBTTelevizor.MAUI
 
         public Thickness Margin { get; set; } = new Thickness(10,8,10,8);
 
-        public DriverTypeEnum DriverType { get; set; } = DriverTypeEnum.AndroidDVBTDriver;
+        public AppDriverTypeEnum DriverType { get; set; } = AppDriverTypeEnum.DVBT;
 
         public string BackgroundColor
         {

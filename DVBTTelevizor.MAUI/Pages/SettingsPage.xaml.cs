@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
@@ -81,23 +82,23 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void EnableRTLSDRSwitch_Toggled(object? sender, ToggledEventArgs e)
     {
-        if (!_configuration.RTLSDREnabled && _settingsPageViewModel.FMDriverActive)
-        {
-            _loggingService.Info("EnableRTLSDRSwitch_Toggled - FM driver active, cannot enable RTLSDR");
-            // cannot enable RTLSDR when FM driver is active
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                _configuration.RTLSDREnabled = true;
+        //if (!_configuration.RTLSDREnabled && _settingsPageViewModel.FMDriverActive)
+        //{
+        //    _loggingService.Info("EnableRTLSDRSwitch_Toggled - FM driver active, cannot enable RTLSDR");
+        //    // cannot enable RTLSDR when FM driver is active
+        //    MainThread.BeginInvokeOnMainThread(() =>
+        //    {
+        //        _configuration.RTLSDREnabled = true;
 
-                BuildInfoMenu("Cannot disable FM when driver is active".Translated(), "OK".Translated());
-                _settingsPageViewModel.NotifyDriverChange();
-                _settingsPageViewModel.NotifyConfigChange();
-            });
-            return;
-        } else
-        {
-            _settingsPageViewModel.NotifyDriverChange();
-        }
+        //        BuildInfoMenu("Cannot disable FM when driver is active".Translated(), "OK".Translated());
+        //        _settingsPageViewModel.NotifyDriverChange();
+        //        _settingsPageViewModel.NotifyConfigChange();
+        //    });
+        //    return;
+        //} else
+        //{
+        //    _settingsPageViewModel.NotifyDriverChange();
+        //}
 
     }
 
@@ -166,6 +167,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SelectLanguage", new List<View>() { LanguageBoxView, LanguagePicker }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("EnableLogging", new List<View>() { EnableLoggingBoxView, EnableLoggingSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("DebugDrivers", new List<View>() { DebugDriversBoxView, DebugDriversSwitch }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDR", new List<View>() { RemoteSDRBoxView, RemoteSDRSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDRIP", new List<View>() { RemoteSDRIPBoxView, RemoteSDRIPEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDRPort", new List<View>() { RemoteSDRPortBoxView, RemoteSDRportEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }))
 
@@ -227,7 +233,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
         if (_settingsPageViewModel != null)
         {
-            _settingsPageViewModel.UpdateActiveDriverType();
+            //_settingsPageViewModel.UpdateActiveDriverType();
 
             _settingsPageViewModel.FillAutoPlayChannels();
 
@@ -250,16 +256,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-    }
-
-    private void Menu_Tapped(object sender, EventArgs e)
-    {
-        if (e != null &&
-            e is TappedEventArgs tea &&
-            tea.Parameter is MenuItem item)
-        {
-            Menu_Tapped(item);
-        }
     }
 
     private void ShowOrHideMenu()
@@ -301,8 +297,39 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         _menuItems.Clear();
 
         var channels = _configuration.GetChannels();
+        var chByType = new Dictionary<ChannelTypeEnum, int>();
+        foreach (var ch in channels)
+        {
+            if (!chByType.ContainsKey(ch.ChannelType))
+            {
+                chByType.Add(ch.ChannelType, 0);
+            }
 
-        _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
+            chByType[ch.ChannelType]++;
+        }
+
+        var dvbtCount = chByType.ContainsKey(ChannelTypeEnum.DVBT) ? chByType[ChannelTypeEnum.DVBT] : 0;
+            dvbtCount += chByType.ContainsKey(ChannelTypeEnum.DVBT2) ? chByType[ChannelTypeEnum.DVBT2] : 0;
+        var fmCount = chByType.ContainsKey(ChannelTypeEnum.FM) ? chByType[ChannelTypeEnum.FM] : 0;
+        var dabcount = chByType.ContainsKey(ChannelTypeEnum.DAB) ? chByType[ChannelTypeEnum.DAB] : 0;
+
+        if (dvbtCount > 0)
+        {
+            _menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDVBTDelete", "Delete all DVBT channels".Translated() + $" ({dvbtCount})", "confirm.png"));
+        }
+        if (fmCount > 0)
+        {
+            _menuItems.Add(MainMenu.CreateMenuItem("menuConfirmFMDelete", "Delete all FM channels".Translated() + $" ({fmCount})", "confirm.png"));
+        }
+        if (dabcount > 0)
+        {
+            _menuItems.Add(MainMenu.CreateMenuItem("menuConfirmDABDelete", "Delete all DAB channels".Translated() + $" ({dabcount})", "confirm.png"));
+        }
+
+        if (channels.Count > 0)
+        {
+            _menuItems.Add(MainMenu.CreateMenuItem("menuConfirm", "Delete all channels".Translated() + $" ({channels.Count})", "confirm.png"));
+        }
         _menuItems.Add(MainMenu.CreateMenuItem("menuCancel", "Cancel".Translated(), "cancel.png"));
 
         MainMenu.UpdateMenu((int)_configuration.AppFontSize, "Confirmatiom".Translated(), _menuItems);
@@ -356,7 +383,62 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         }
     }
 
-    private async void Menu_Tapped(MenuItem item)
+    private void DeleteChannels(ChannelTypeEnum? channelType, bool update = true)
+    {
+        if (channelType == null)
+        {
+            // delete all channels
+            _configuration.SaveChannels(new ObservableCollection<Channel>());
+
+            if (update)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("All existing channels were deleted".Translated()));
+            }
+        }
+        else
+        {
+            var channelsToDelete = new List<Channel>();
+            var channels = _configuration.GetChannels();
+            foreach (var channel in channels)
+            {
+                if (channel.ChannelType == channelType)
+                {
+                    channelsToDelete.Add(channel);
+                }
+            }
+
+            var cnt = channelsToDelete.Count;
+            while (channelsToDelete.Count > 0)
+            {
+                channels.Remove(channelsToDelete[0]);
+                channelsToDelete.RemoveAt(0);
+            }
+
+            _configuration.SaveChannels(channels);
+
+            if (update)
+            {
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Selected channels were deleted".Translated()));
+            }
+        }
+
+        if (update)
+        {
+            WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+        }
+    }
+
+    private void Menu_Tapped(object sender, EventArgs e)
+    {
+        if (e != null &&
+            e is TappedEventArgs tea &&
+            tea.Parameter is MenuItem item)
+        {
+            OnMenuIsTapped(item);
+        }
+    }
+
+    private async void OnMenuIsTapped(MenuItem item)
     {
         var menuId = item.Id;
         _loggingService.Info($"Menu tapped: {menuId}");
@@ -366,9 +448,17 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         switch (menuId)
         {
             case "menuConfirm":
-                _configuration.SaveChannels(new ObservableCollection<Channel>());
-                WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
-                WeakReferenceMessenger.Default.Send(new  ToastMessage("All existing channels were deleted".Translated()));
+                DeleteChannels(null);
+                break;
+            case "menuConfirmDVBTDelete":
+                DeleteChannels(ChannelTypeEnum.DVBT,false);
+                DeleteChannels(ChannelTypeEnum.DVBT2);
+                break;
+            case "menuConfirmFMDelete":
+                DeleteChannels(ChannelTypeEnum.FM);
+                break;
+            case "menuConfirmDABDelete":
+                DeleteChannels(ChannelTypeEnum.DAB);
                 break;
             case "menuCancel":
                 break;
@@ -485,7 +575,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 var menu = GetSelectedMenuItem();
                 if (menu != null)
                 {
-                    Menu_Tapped(menu);
+                    OnMenuIsTapped(menu);
                 }
                 break;
         }
@@ -686,6 +776,19 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                         case "ImportSettingsFromFil":
                             ImportSettingsFromFileButton_Clicked(this, new EventArgs());
                             break;
+                        case "DebugDrivers":
+                            DebugDriversSwitch.IsToggled = !DebugDriversSwitch.IsToggled;
+                            break;
+                        case "RemoteSDR":
+                            RemoteSDRSwitch.IsToggled = !RemoteSDRSwitch.IsToggled;
+                            break;
+                        case "RemoteSDRIP":
+                            RemoteSDRIPEntry.Focus();
+                            break;
+                        case "RemoteSDRport":
+                            RemoteSDRportEntry.Focus();
+                            break;
+
                     }
                 });
                 break;

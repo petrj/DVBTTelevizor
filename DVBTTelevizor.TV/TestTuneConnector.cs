@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.TV;
+using LoggerService;
 using MPEGTS;
 using System;
 using System.Collections.Generic;
@@ -12,40 +13,45 @@ namespace DVBTTelevizor
     {
         public DVBTDriverStateEnum State { get; private set; }
 
-        public event DemodulatedEventHandler OnRawAudioDemodulated;
+        public event EventHandler? OnRawAudioDemodulated;
+        public event EventHandler? OnServiceFound = null;
+        public event EventHandler? RawDataReceived;
 
         private long _lastFreq { get; set; }
         private long _lastPID { get; set; }
 
-        private bool _driverInstalled = true;
-
         public event EventHandler? StatusChanged = null;
         ILoggingService _log;
 
-        //public bool DriverInstalled { get; set; } = false;
-
-        public bool DriverInstalled
-        {
-            get
-            {
-                return _driverInstalled;
-            }
-            set
-            {
-                _driverInstalled = value;
-            }
-        }
+        public AppDriverTypeEnum DriverType => AppDriverTypeEnum.DVBT;
 
         public TestTuneConnector(ILoggingService loggingService)
         {
             _log = loggingService;
         }
 
-        public DVBTDriverStreamTypeEnum DVBTDriverStreamType
+
+        public int QueueSize
         {
             get
             {
-                return DVBTDriverStreamTypeEnum.Stream;
+                return 0;
+            }
+        }
+
+        public bool Synced
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public DriverStreamTypeEnum DVBTDriverStreamType
+        {
+            get
+            {
+                return DriverStreamTypeEnum.Stream;
             }
         }
 
@@ -365,7 +371,8 @@ namespace DVBTTelevizor
                     {
                         ProviderName = "Multiplex A",
                         ServiceName = "Advertisment",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 310);
                 }
 
@@ -375,13 +382,15 @@ namespace DVBTTelevizor
                     {
                         ProviderName = "Multiplex B",
                         ServiceName = "News",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 2300);
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
                         ProviderName = "Multiplex B",
                         ServiceName = "Sport",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 2400);
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
@@ -398,7 +407,8 @@ namespace DVBTTelevizor
                     {
                         ProviderName = "Multiplex C",
                         ServiceName = "INFO CHANNEL",
-                        ServisType = (byte)DVBTDriverServiceType.TV
+                        ServisType = (byte)DVBTDriverServiceType.TV,
+                        Free = true
                     }, 8888);
 
                     for (var i=8889; i<= 8899; i++)
@@ -407,7 +417,8 @@ namespace DVBTTelevizor
                         {
                             ProviderName = "Multiplex C",
                             ServiceName = "CHANNEL " + (i-8888).ToString(),
-                            ServisType = (byte)DVBTDriverServiceType.TV
+                            ServisType = (byte)DVBTDriverServiceType.TV,
+                            Free = true
                         }, i);
                     }
                 }
@@ -577,25 +588,15 @@ namespace DVBTTelevizor
             }
         }
 
-        //public int FrequencyMinKHz
-        //{
-        //    get { return 174000; } // 174.0 MHz - VHF high-band (band III) channel 7 }
-        //}
+        public Task SetGain(GainEnum gain, int value = 0)
+        {
+            // not needed in DVBT
+            return Task.CompletedTask;
+        }
+        public void Clear()
+        {
 
-        //public int FrequencyMaxKHz
-        //{
-        //    get { return 858000; } // 858.0 MHz - UHF band channel 69
-        //}
-
-        //public int BandwidthMinKHz
-        //{
-        //    get { return 1700; }
-        //}
-
-        //public int BandwidthMaxKHz
-        //{
-        //    get { return 10000; }
-        //}
+        }
 
     }
 }

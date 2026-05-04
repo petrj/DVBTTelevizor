@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -6,11 +8,14 @@ using LoggerService;
 using Microsoft.Maui;
 using Microsoft.Maui.Animations;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Layouts;
 using NLog.LayoutRenderers.Wrappers;
 using RTLSDR;
 using RTLSDR.Audio;
 using RTLSDR.Common;
+using RTLSDR.DAB;
+using RTLSDR.FM;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -29,17 +34,18 @@ namespace DVBTTelevizor.MAUI
     {
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
+        private IDemodulator? _demodulator { get; set; } = null;
         private IDriverConnector _driver { get; set; }
         private ITVConfiguration _configuration;
         private IRTLSDRDriverPlatformImplementation _sdrDriverPlatformImplementation;
+        private DABService? _playingDABService = null;
         public string PublicDirectory { get; set; }
         private string _currentTeletextNum = null;
         private bool _fixVideoNeeded = false;
         private bool _lastTimeHome = false;
 
-        private VLCMediaInput _pcmInput = null;
+        private VLCMediaInput _vlcRawAudioInput = null;
 
-        private TestDVBTDriver _testDVBTDriver = null;
         private RemoteAccessService.RemoteAccessService _remoteAccessService;
         private List<string> _remoteDevicesConnected = new List<string>();
 
@@ -47,6 +53,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool _firstAppearing = true;
         private DateTime _lastActionPlayTime = DateTime.MinValue;
+        private DateTime _lastStatUpdate = DateTime.MinValue;
         private bool _lastDataAnimation = false;
         private Size _lastAllocatedSize = new Size(-1, -1);
 
@@ -75,14 +82,14 @@ namespace DVBTTelevizor.MAUI
         public Microsoft.Maui.Controls.Command CommandUpdateDriverState { get; set; }
 
         private LibVLC? _LibVLC;
-        private MediaPlayer? _mediaPlayer;
+        private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
         private Media _media;
         private SledovaniTV.SledovaniTV _iptv;
 
         private SettingsPage _settingsPage = null;
-        private TuningWelcomePage _tuneWelcomePage = null;
+        private TuningDriverPage _tuningPage = null;
         private AboutPage _aboutPage = null;
-        private DriverPage _driverPage = null;
+        private SelectDriverPage _driverPage = null;
         private ChannelPage _channelPage = null;
         private FilterPage _filterPage = null;
 
@@ -223,14 +230,15 @@ namespace DVBTTelevizor.MAUI
 
             _settingsPage = new SettingsPage(_loggingService, _driver, _iptv, _configuration, publicDirectoryProvider);
             _aboutPage = new AboutPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-            _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+            _driverPage = new SelectDriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+
             _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-            _tuneWelcomePage = new TuningWelcomePage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
+            _tuningPage = new TuningDriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
             _filterPage = new FilterPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
 
             _channelPage.Disappearing += _channelPage_Disappearing;
             _filterPage.Disappearing += _filterPage_Disappearing;
-            _tuneWelcomePage.Disappearing += _tuneWelcomePage_Disappearing;
+            _tuningPage.Disappearing += _tuneWelcomePage_Disappearing;
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -307,7 +315,7 @@ namespace DVBTTelevizor.MAUI
                 });
             }
 
-            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 3, 10);
+            BackgroundCommandWorker.RunInBackground(CommandCheckStream, 2, 10);
             BackgroundCommandWorker.RunInBackground(CommandUpdateDriverState, 3, 5);
         }
 
@@ -395,16 +403,9 @@ namespace DVBTTelevizor.MAUI
                 OnKeyDown(m.Value, m.Long);
             });
 
-            WeakReferenceMessenger.Default.Register<ConnectMessage>(this, (r, m) =>
+            WeakReferenceMessenger.Default.Register<SendConnectDriverRequestMessage>(this, (r, m) =>
             {
-                ConnectDriver();
-            });
-
-            WeakReferenceMessenger.Default.Register<InitDriverMessage>(this, (r, m) =>
-            {
-                InitDriver();
-                InitializeVLC();
-                ConnectDriver();
+                SendConnectDriverRequest(m.Value);
             });
 
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
@@ -504,13 +505,20 @@ namespace DVBTTelevizor.MAUI
                     bitrate = _driver.Bitrate;
                 }
 
-                WeakReferenceMessenger.Default.Send(new DriverUpdateStateMessage(
-                    new DriverState()
-                    {
-                        BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
-                        Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
-                    }
-                    ));
+                var stat = new DriverStat()
+                {
+                    BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
+                    Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
+                };
+
+                if (_demodulator != null)
+                {
+                    stat.Stat = _demodulator.Stat(false);
+                    stat.StatValues = _demodulator.GetStat();
+                }
+
+                WeakReferenceMessenger.Default.Send(new DriverUpdateStatMessage(stat));
+
             } catch (Exception ex)
             {
                 _loggingService.Error(ex);
@@ -611,11 +619,11 @@ namespace DVBTTelevizor.MAUI
                             MessagingCenter.Send("", BaseViewModel.MSG_StopStream);
                             MessagingCenter.Send($"Error - no data from device", BaseViewModel.MSG_ToastMessage);
                             */
-            }
-                        else if (timeFromPlayMSecs > 5000)
-                        {
-                            _loggingService.Info($"CheckStream - no data for {timeFromPlayMSecs} ms");
-                        }
+                    }
+                    else if (timeFromPlayMSecs > 5000)
+                    {
+                        _loggingService.Info($"CheckStream - no data for {timeFromPlayMSecs} ms");
+                    }
                     } else
                     {
                         _lastDataAnimation = !_lastDataAnimation;
@@ -762,21 +770,21 @@ namespace DVBTTelevizor.MAUI
 
         private async Task CheckDriver()
         {
-            switch (_driver.State)
-            {
-                case DVBTDriverStateEnum.Unknown:
-                case DVBTDriverStateEnum.Disconnected:
-                    {
-                        ConnectDriver();
-                        break;
-                    }
-                default:
-                    {
-                        // check driver state
-                        await CheckDriverState();
-                        break;
-                    }
-            }
+            //switch (_driver.State)
+            //{
+            //    case DVBTDriverStateEnum.Unknown:
+            //    case DVBTDriverStateEnum.Disconnected:
+            //        {
+            //            SendConnectDriverRequest();
+            //            break;
+            //        }
+            //    default:
+            //        {
+            //            // check driver state
+            //            await CheckDriverState();
+            //            break;
+            //        }
+            //}
         }
 
         private async Task CheckDriverState()
@@ -795,78 +803,226 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private DriverTypeEnum GetDriverType()
-        {
-            if ((_driver == null) ||
-                (_driver is DVBTDriverConnector))
-            {
-                return DriverTypeEnum.AndroidDVBTDriver;
-            }
-
-            if (_driver is TestTuneConnector)
-            {
-                return DriverTypeEnum.TestTuneDriver;
-            }
-
-            if (_driver is RTLSDRDriverConnector)
-            {
-                return DriverTypeEnum.RTLSDRDriver;
-            }
-
-            return DriverTypeEnum.AndroidDVBTDriver;
-        }
-
         private void InitDriver()
         {
-            switch (_configuration.DVBTDriverType)
+            switch (_configuration.AppDriverType)
             {
-                case DriverTypeEnum.AndroidDVBTDriver:
-                    _driver = new DVBTDriverConnector(_loggingService);
+                case AppDriverTypeEnum.DVBT:
+
+                    if (_configuration.TestingMode)
+                    {
+                        _driver = new TestTuneConnector(_loggingService);
+                    }
+                    else
+                    {
+                        _driver = new DVBTDriverConnector(_loggingService);
+                    }
                     break;
-                case DriverTypeEnum.AndroidTestingDVBTDriver:
-                    _driver = new DVBTDriverConnector(_loggingService);
+                case AppDriverTypeEnum.FM:
+
+                    _demodulator = new FMDemodulator(_loggingService);
+
+                    if (_configuration.TestingMode)
+                    {
+                        _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
+                    }
+                    else if (_configuration.AllowRemoteSDR)
+                    {
+                        var sdrDriver = new RTLSDR.RTLSDRPCDriver(_loggingService);
+                        sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
+                        sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
+
+                        _driver = new RTLSDRFMDriverConnector(_loggingService,
+                                    sdrDriver,
+                                    _demodulator, 104000000);
+                    }
+                    else
+                    {
+                        var sdrDriver = _sdrDriverPlatformImplementation.GetRTLSDRDriver();
+                        _driver = new RTLSDRFMDriverConnector(_loggingService,
+                                    sdrDriver,
+                                    _demodulator, 104000000);
+                    }
+
+                    _demodulator.Start();
                     break;
-                case DriverTypeEnum.TestTuneDriver:
-                    _driver = new TestTuneConnector(_loggingService);
-                    break;
-                case DriverTypeEnum.RTLSDRDriver:
-                    _driver = new RTLSDRDriverConnector(_loggingService, _sdrDriverPlatformImplementation.GetRTLSDRDriver());
+                case AppDriverTypeEnum.DAB:
+                    _demodulator = new DABProcessor(_loggingService);
+
+                    if (_configuration.TestingMode)
+                    {
+                        _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.DAB);
+                    }
+                    else if (_configuration.AllowRemoteSDR)
+                    {
+                        var sdrDriver = new RTLSDR.RTLSDRPCDriver(_loggingService);
+                        sdrDriver.Settings.IP = _configuration.RemoteSDRIP;
+                        sdrDriver.Settings.Port = _configuration.RemoteSDRPort;
+
+                        _driver = new RTLSDRDABDriverConnector(_loggingService,
+                        sdrDriver,
+                        _demodulator, 199360000); // 8C on startup
+                    } else
+                    {
+                        _driver = new RTLSDRDABDriverConnector(_loggingService,
+                            _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
+                            _demodulator, 199360000); // 8C on startup
+                    }
+
+                    _demodulator.Start();
+                    _driver.SetGain(_configuration.Gain,_configuration.GainValue);
+                    //_driver.Tune(199360000, 0, 0);
                     break;
                 default:
                     _driver = new TestTuneConnector(_loggingService);
                     break;
             }
 
-            _driver.OnRawAudioDemodulated += _driver_OnRawAudioDemodulated;
+            _driver.OnRawAudioDemodulated += OnRawAudioDemodulated;
+            _demodulator?.OnDynamicLabelChanged += OnDynamicLabelChanged;
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
 
-        private void _driver_OnRawAudioDemodulated(object sender, DemodulatedEventArgs e)
+        private void ProcessAACAudioData(AACDataDemodulatedEventArgs ed)
+        {
+            try
+            {
+                // Combine ADTS header and AAC payload into a single buffer before sending to the player/UDP.
+                var adtsHeaderLength = ed.ADTSHeader?.Length ?? 0;
+                var dataLength = ed.Data?.Length ?? 0;
+                var adtsFrame = new byte[adtsHeaderLength + dataLength];
+                if (ed.ADTSHeader != null)
+                {
+                    Buffer.BlockCopy(ed.ADTSHeader, 0, adtsFrame, 0, adtsHeaderLength);
+                }
+                if (ed.Data != null)
+                {
+                    Buffer.BlockCopy(ed.Data, 0, adtsFrame, adtsHeaderLength, dataLength);
+                }
+
+                if (_vlcRawAudioInput == null)
+                {
+                    _vlcRawAudioInput = new VLCMediaInput();
+                    _vlcRawAudioInput.MaxDataRequestSize = 8192;
+
+
+                    var mediaOptions = new[]
+                        {
+                        ":demux=aac",
+                        ":live-caching=0",
+                        ":network-caching=0",
+                        ":file-caching=0",
+                        ":sout-mux-caching=0"
+                    };
+
+                    _media = new Media(_LibVLC, _vlcRawAudioInput, mediaOptions);
+
+                    _mediaPlayer.Play(_media);
+                }
+
+                _vlcRawAudioInput.PushData(adtsFrame);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+
+        private void ProcessPCMAudioData(DataDemodulatedEventArgs ed)
+        {
+            try
+            {
+                    if (_vlcRawAudioInput ==null)
+                    {
+                        _vlcRawAudioInput = new VLCMediaInput();
+                    _vlcRawAudioInput.MaxDataRequestSize = 384000u;
+
+                    var mediaOptions = new[]
+                            {
+                            ":demux=rawaud",
+                            $":rawaud-channels={ed.AudioDescription.Channels}",
+                            $":rawaud-samplerate={ed.AudioDescription.SampleRate}",
+                            ":live-caching=50",
+                            ":file-caching=50",
+                            ":clock-jitter=0",
+                            ":clock-synchro=0",
+                            ":rawaud-fourcc=s16l"
+                        };
+
+                    _media = new Media(_LibVLC, _vlcRawAudioInput, mediaOptions);
+
+                    _mediaPlayer.Play(_media);
+                }
+
+                _vlcRawAudioInput.PushData(ed.Data);
+
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void OnDynamicLabelChanged(object sender, EventArgs e)
+        {
+            if (_viewModel.EIT == null)
+                return;
+
+            if (e is DynamicLabelChangedEventArgs dea)
+            {
+                if (_viewModel.PlayingChannel == null)
+                {
+                    return;
+                }
+
+                _viewModel.PlayingChannel.SetCurrentEvent(new EPGCurrentEvent()
+                {
+                     CurrentEventItem = new MPEGTS.EventItem()
+                     {
+                          EventId = 0,
+                           EventName = dea.Label,
+                            ServiceId = Convert.ToInt32(_viewModel.PlayingChannel.ProgramMapPID),
+                             StartTime = DateTime.Now.Date,
+                             FinishTime = DateTime.Now.Date.AddDays(1).AddSeconds(-1)
+                     }
+                });
+
+                _viewModel.PlayingChannel.NotifyChanges();
+                _viewModel.NotifyChannelChange();
+            }
+
+        }
+
+        private void OnRawAudioDemodulated(object sender, EventArgs e)
         {
             if (_LibVLC == null)
                 return;
 
-            if (_pcmInput == null)
+            if (e is AACDataDemodulatedEventArgs ed)
             {
-                _pcmInput = new VLCMediaInput();
+                if (ed.Data == null || ed.Data.Length == 0)
+                {
+                    return;
+                }
 
-                var mediaOptions = new[] {
-                    ":demux=rawaud",
-                    $":rawaud-channels={e.Description.Channels}",
-                    $":rawaud-samplerate={e.Description.SampleRate}",
-                    ":live-caching=50",
-                    ":file-caching=50",
-                    ":clock-jitter=0",
-                    ":clock-synchro=0",
-                    $":rawaud-fourcc=s{e.Description.BitsPerSample}l"
-                };
-                _media = new Media(_LibVLC, _pcmInput, mediaOptions);
-
-                _mediaPlayer.Play(_media);
+                ProcessAACAudioData(ed);
             }
+            else
+            {
+                if (e is DataDemodulatedEventArgs dd)
+                {
 
-            _pcmInput.PushData(e.DemodulatedData);
+                    if (dd.Data == null || dd.Data.Length == 0)
+                    {
+                        return;
+                    }
+
+                    ProcessPCMAudioData(dd);
+                }
+            }
         }
 
         private void OnRemoteMessageReceived(RemoteAccessService.RemoteAccessMessage message)
@@ -925,7 +1081,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     _remoteAccessService.StopListening();
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _loggingService.Error(ex);
             }
@@ -938,7 +1095,8 @@ namespace DVBTTelevizor.MAUI
             _focusItems
                 .AddItem(KeyboardFocusableItem.CreateFrom("DVBTTelevizorButton", new List<View>() { DVBTTelevizorButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsListView", new List<View>() { ChannelsListView }))
-                .AddItem(KeyboardFocusableItem.CreateFrom("InstallDriverButton", new List<View>() { QuickDriverButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("DVBTDriverButton", new List<View>() { DVBTDriverButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FMDABDriverButton", new List<View>() { FMDABDriverButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("QuickTuneButton", new List<View>() { QuickTuneButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("EPGDetailGrid", new List<View>() { EPGDetailGrid }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
@@ -1011,12 +1169,12 @@ namespace DVBTTelevizor.MAUI
 
         private void UpdateMenu()
         {
-            var driverName = BaseViewModel.GetDVBTDriverShortName(_configuration.DVBTDriverType);
+            var driverName = BaseViewModel.GetDVBTDriverShortName(_configuration.AppDriverType);
 
             if (IsPortrait)
             {
                 DVBTTelevizorButton.BottomTitleText = "DVBT Televizor".Translated();
-                DriverStateButton.BottomTitleText = driverName;
+                DriverStateButton.BottomTitleText = "Driver".Translated();
                 TuneButton.BottomTitleText = "Tune".Translated();
                 MenuButton.BottomTitleText = "Menu".Translated();
 
@@ -1029,7 +1187,7 @@ namespace DVBTTelevizor.MAUI
             else
             {
                 DVBTTelevizorButton.TopTitleText = "DVBT Televizor".Translated();
-                DriverStateButton.TopTitleText = driverName;
+                DriverStateButton.TopTitleText = "Driver".Translated();
                 TuneButton.TopTitleText = "Tune".Translated();
                 MenuButton.TopTitleText = "Menu".Translated();
 
@@ -1345,6 +1503,7 @@ namespace DVBTTelevizor.MAUI
 
             base.OnAppearing();
 
+
             if (_firstAppearing)
             {
                 if (_configuration.Fullscreen)
@@ -1355,8 +1514,7 @@ namespace DVBTTelevizor.MAUI
                 _firstAppearing = false;
 
                 InitializeVLC();
-
-                ConnectDriver();
+                SendConnectDriverRequest(_configuration.AppDriverType);
 
                 Task.Run(async () =>
                 {
@@ -1381,61 +1539,125 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void ConnectDriver()
+        private void SendConnectDriverRequest(AppDriverTypeEnum appDriverType)
         {
-            if (_driver.Connected)
-                return;
+            _loggingService.Info($"Sending connect message to appDriverType {appDriverType}");
 
-            switch (_configuration.DVBTDriverType)
+            // TODO: show menu and confirm disconnect/driver change
+
+            if (_driver != null)
             {
-                case DriverTypeEnum.AndroidDVBTDriver:
+                if (_driver.Connected)
+                {
+                    _driver.Disconnect();
+                }
+                if (_driver.DriverType != appDriverType)
+                {
+                    _configuration.AppDriverType = appDriverType;
+                    InitDriver();
+                }
+            }
 
-                    _loggingService.Info("Sending connect message");
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
-                    break;
+            if (_configuration.AppDriverType != appDriverType)
+            {
+                _configuration.AppDriverType = appDriverType;
+            }
 
-                case DriverTypeEnum.AndroidTestingDVBTDriver:
+            switch (appDriverType)
+            {
+                case AppDriverTypeEnum.DVBT:
 
-                    _testDVBTDriver = new TestDVBTDriver(_loggingService);
-                    _testDVBTDriver.PublicDirectory = PublicDirectory;
-                    _testDVBTDriver.Connect();
 
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
-                        new DVBTDriverConfiguration()
+                    if (_configuration.TestingMode)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                         {
                             DeviceName = "Testing DVBT driver",
-                            ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
-                            TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
+                            ControlPort = 1234,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                         }));
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
+                    }
                     break;
 
-                case DriverTypeEnum.TestTuneDriver:
-
-                    WeakReferenceMessenger.Default.Send(new ConnectDriverMessage(
-                        new DVBTDriverConfiguration()
-                        {
-                            DeviceName = "Test tune driver"
-                        }));
-
-                    break;
-
-                case DriverTypeEnum.RTLSDRDriver:
+                case AppDriverTypeEnum.FM:
 
                     var cfg = new RTLSDR.DriverSettings()
                     {
                         Port = _configuration.SDRDriverPort,
                         Streamport = _configuration.SDRDriverStreamPort,
-                        SDRSampleRate = _configuration.SDRSampleRate
+                        SDRSampleRate = AudioTools.FMSampleRate
                     };
 
-                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
+                    if (_configuration.TestingMode)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "rtl_sdr FM test",
+                            ControlPort = 1234,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    }
+                    else if (_configuration.AllowRemoteSDR)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = $"rtl_tcp FM on {_configuration.RemoteSDRIP}",
+                            ControlPort = _configuration.RemoteSDRPort,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    } else
+                    {
+                        WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(cfg));
+                    }
 
                     break;
+
+
+                case AppDriverTypeEnum.DAB:
+
+                    var DABcfg = new RTLSDR.DriverSettings()
+                    {
+                        Port = _configuration.SDRDriverPort,
+                        Streamport = _configuration.SDRDriverStreamPort,
+                        SDRSampleRate = AudioTools.DABSampleRate
+                    };
+
+                    if (_configuration.TestingMode)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = "rtl_sdr DAB test",
+                            ControlPort = 1234,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    }
+                    else if (_configuration.AllowRemoteSDR)
+                    {
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            DeviceName = $"rtl_tcp DAB on {_configuration.RemoteSDRIP}",
+                            ControlPort = _configuration.RemoteSDRPort,
+                            TransferPort = 1235,
+                            PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                        }));
+                    } else
+                    {
+
+                        WeakReferenceMessenger.Default.Send(new RTLSDRDriverConnectMessage(DABcfg));
+                    }
+                    break;
+
+                    // _viewModel.UpdateActiveDriverType();
+                    // WeakReferenceMessenger.Default.Send(new DriverChangedMessages(_driver));
             }
-
-            _viewModel.UpdateActiveDriverType();
-
-            WeakReferenceMessenger.Default.Send(new DVBTDriverStateChangedMessages(null));
         }
 
         protected override void OnDisappearing()
@@ -1477,14 +1699,14 @@ namespace DVBTTelevizor.MAUI
 
         private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-            if (_tuneWelcomePage != null &&
-                _tuneWelcomePage.IsLoaded)
+            if (_tuningPage != null &&
+                _tuningPage.IsLoaded)
             {
                 // preventing click when the settings page is just (or yet) loaded
                 return;
             }
 
-            await Navigation.PushAsync(_tuneWelcomePage);
+            await Navigation.PushAsync(_tuningPage);
         }
 
         private void DriverButton_Clicked(object sender, EventArgs e)
@@ -1974,9 +2196,9 @@ namespace DVBTTelevizor.MAUI
                 return true;
             }
 
-            // DVBT/RTLSDDR driver check
+            // TODO : DVBT/RTLSDDR driver installation check
 
-            if (!_driver.DriverInstalled || !_driver.Connected)
+            if ( !_driver.Connected)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
@@ -1984,30 +2206,39 @@ namespace DVBTTelevizor.MAUI
                 });
                 return false;
             }
+            /*
+           if (!_viewModel.FMDriverActive &&
+               (channel.ChannelType == ChannelTypeEnum.FM))
+           {
+               MainThread.BeginInvokeOnMainThread(async () =>
+               {
+                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverFM);
+               });
+               return false;
+           }
 
-            if (
-                _viewModel.FMDriverActive &&
-                ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2))
-                )
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.AndroidDVBTDriver);
-                });
-                return false;
-            }
+           if (!_viewModel.DABDriverActive &&
+                (channel.ChannelType == ChannelTypeEnum.DAB))
+           {
+               MainThread.BeginInvokeOnMainThread(async () =>
+               {
+                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverDAB);
+               });
+               return false;
+           }
 
-            if (
-                _viewModel.DVBTDriverActive &&
-                (channel.ChannelType == ChannelTypeEnum.FM)
-                )
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriver);
-                });
-                return false;
-            }
+           if (
+               !_viewModel.DVBTDriverActive &&
+               ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2))
+               )
+           {
+               MainThread.BeginInvokeOnMainThread(async () =>
+               {
+                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.AndroidDVBTDriver);
+               });
+               return false;
+           }
+           */
 
             return true;
         }
@@ -2127,6 +2358,8 @@ namespace DVBTTelevizor.MAUI
                         WeakReferenceMessenger.Default.Send(new ToastMessage("Tuning {0} ....".Translated(channel.FrequencyShortLabel)));
 
                         var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
+                        _driver.Clear();
+                        _demodulator?.Clear();
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             switch (tunedRes.Result)
@@ -2145,8 +2378,8 @@ namespace DVBTTelevizor.MAUI
                         signalStrengthPercentage = tunedRes.SignalState.rfStrengthPercentage;
                     }
 
-                    //var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.Frequency, channel.ProgramMapPID);
-                    var cachedPIDs = new List<long>();
+                    var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.Frequency, channel.ProgramMapPID);
+                    //var cachedPIDs = new List<long>();
 
                     if (cachedPIDs != null &&
                         cachedPIDs.Count > 0)
@@ -2187,39 +2420,48 @@ namespace DVBTTelevizor.MAUI
                     {
                         switch (_driver.DVBTDriverStreamType)
                         {
-                            case DVBTDriverStreamTypeEnum.UDP:
+                            case DriverStreamTypeEnum.UDP:
                                 _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
                                 break;
-                            case DVBTDriverStreamTypeEnum.Stream:
+                            case DriverStreamTypeEnum.Stream:
                                 _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
                                 break;
-                            case DVBTDriverStreamTypeEnum.None:
+                            case DriverStreamTypeEnum.RAWPCMAudio:
+
+                                break;
+                            case DriverStreamTypeEnum.RAWAACAudio:
+
+                                break;
+                            case DriverStreamTypeEnum.None:
                                 break;
                         }
                     }
 
-                    _media.AddOption(":fullscreen");
-                    _media.AddOption(":avcodec-hw=any");
-
-                    _media.AddOption(new MediaConfiguration()
+                    if (_media != null)
                     {
-                        EnableHardwareDecoding = true
-                    });
+                        _media.AddOption(":fullscreen");
+                        _media.AddOption(":avcodec-hw=any");
 
-                    CallWithTimeout(delegate
-                    {
-                        videoView.MediaPlayer.Play(_media);
-
-                        /* Video is fixed in RefreshGUI
-                        Task.Run(async () =>
+                        _media.AddOption(new MediaConfiguration()
                         {
-                            // When user visits some page and return back, video is only black screen
-                            // calls fix video will re-attach the video and set correct video position
-                            await FixVideo(false);
+                            EnableHardwareDecoding = true
                         });
-                        */
 
-                    }, 350);
+                        CallWithTimeout(delegate
+                        {
+                            videoView.MediaPlayer.Play(_media);
+
+                            /* Video is fixed in RefreshGUI
+                            Task.Run(async () =>
+                            {
+                                // When user visits some page and return back, video is only black screen
+                                // calls fix video will re-attach the video and set correct video position
+                                await FixVideo(false);
+                            });
+                            */
+
+                        }, 350);
+                    }
 
                     if (!System.String.IsNullOrWhiteSpace(channel.SelectedAudioTrack))
                     {
@@ -2327,14 +2569,6 @@ namespace DVBTTelevizor.MAUI
             if (!task.Wait(TimeSpan.FromMilliseconds(miliseconds)))
             {
                 _loggingService.Info("Action not completed!");
-            }
-        }
-
-        public async Task CheckDriverInstallationChange()
-        {
-            if (!_driver.DriverInstalled)
-            {
-                CheckDriver();
             }
         }
 
@@ -2974,7 +3208,7 @@ namespace DVBTTelevizor.MAUI
                     var item = GetSelectedMenuItem();
                     if (item != null)
                     {
-                        Menu_Tapped(item);
+                        OnMenuIsTapped(item);
                     }
                     break;
             }
@@ -3013,15 +3247,6 @@ namespace DVBTTelevizor.MAUI
         }
         */
 
-        private void Menu_Tapped(object sender, EventArgs e)
-        {
-            if (e != null &&
-                e is TappedEventArgs tea &&
-                tea.Parameter is MenuItem item)
-            {
-                Menu_Tapped(item);
-            }
-        }
 
         private async Task BuildTeletextMenu()
         {
@@ -3323,7 +3548,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async void Menu_Tapped(MenuItem menuItem)
+
+        private void Menu_Tapped(object sender, EventArgs e)
+        {
+            if (e != null &&
+                e is TappedEventArgs tea &&
+                tea.Parameter is MenuItem item)
+            {
+                OnMenuIsTapped(item);
+            }
+        }
+
+        private async void OnMenuIsTapped(MenuItem menuItem)
         {
             var menuId = menuItem.Id;
             HideMenu();
@@ -3440,25 +3676,24 @@ namespace DVBTTelevizor.MAUI
 
                 case "menuChangeDriver":
                     await ActionStop(true);
-                    _pcmInput = null;
-                    await _viewModel.ChangeDriver(menuItem.DriverType);
+                    _vlcRawAudioInput = null;
+                    //await _viewModel.ChangeDriver(menuItem.DriverType);
                     break;
 
                 case "menuConnectDriver":
-                    WeakReferenceMessenger.Default.Send(new ConnectMessage(System.String.Empty));
+                    //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(System.String.Empty));
                     break;
 
-                case "menuInstallDriver":
+                case "DVBTDriverButton":
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        if (_viewModel.DVBTDriverActive)
-                        {
-                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                        }
-                        else
-                        {
-                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                        }
+                         await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                    });
+                    break;
+                case "FMDABDriverButton":
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
                     });
                     break;
 
@@ -3627,9 +3862,15 @@ namespace DVBTTelevizor.MAUI
             TuneButton_Clicked(this, new EventArgs());
         }
 
-        private void QuickDriverButton_Clicked(object sender, EventArgs e)
+        private async void DVBTDriverButton_Clicked(object sender, EventArgs e)
         {
-            WeakReferenceMessenger.Default.Send(new InstallDriverMessage(System.String.Empty));
+            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+
+        }
+
+        private async void FMDABDriverButton_Clicked(object sender, EventArgs e)
+        {
+            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
         }
 
         private void OnChannel_Tapped(object sender, TappedEventArgs e)
@@ -3676,16 +3917,5 @@ namespace DVBTTelevizor.MAUI
         {
             await ActionDown();
         }
-
-        private void OnChannel_LongTapped(object sender, CommunityToolkit.Maui.Core.LongPressCompletedEventArgs e)
-        {
-
-        }
-
-        private void OnVideo_LongPress(object sender, CommunityToolkit.Maui.Core.LongPressCompletedEventArgs e)
-        {
-
-        }
     }
-
 }

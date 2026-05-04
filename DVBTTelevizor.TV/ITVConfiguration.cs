@@ -1,4 +1,5 @@
 ﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.TV;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace DVBTTelevizor
 
         public string AutoPlayedChannelUniqueID { get; set; }
 
-        public DriverTypeEnum DVBTDriverType { get; set; }
+        public AppDriverTypeEnum AppDriverType { get; set; }
         public AppFontSizeEnum AppFontSize { get; set; }
         public string Language { get; set; }
 
@@ -48,11 +49,17 @@ namespace DVBTTelevizor
         public bool TuneDVBTPreferred { get; set; }
 
         public long FrequencyFromKHz { get; set; }
-        public long FMFrequencyFromKHz { get; set; }
         public long FrequencyToKHz { get; set; }
-        public long FMFrequencyToKHz { get; set; }
         public long FrequencyKHz { get; set; }
+
+        public long FMFrequencyFromKHz { get; set; }
         public long FMFrequencyKHz { get; set; }
+        public long FMFrequencyToKHz { get; set; }
+
+        public long DABFrequencyFromKHz { get; set; }
+        public long DABFrequencyKHz { get; set; }
+        public long DABFrequencyToKHz { get; set; }
+
 
         public long DVBTBandwidthKHz { get; set; }
         public long FMDVBTBandwidthKHz { get; set; }
@@ -76,5 +83,13 @@ namespace DVBTTelevizor
         string SledovaniTVDevicePassword { get; set; }
         bool UpdatedTo2026 { get; set; }
         bool RTLSDREnabled { get; set; }
+
+        bool TestingMode { get; set; }
+        GainEnum Gain { get; set; }
+        int GainValue { get; set; }
+
+        bool AllowRemoteSDR { get; set; }
+        string RemoteSDRIP { get; set; }
+        int RemoteSDRPort { get; set; }
     }
 }

@@ -42,10 +42,10 @@
                 <ColumnDefinition Width="50*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
+            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding FrequencyWholePartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
             <Label Grid.Row="0" Grid.Column="1"  Text="{Binding FrequencyDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
 
-            <Label Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2" Text="{Binding FrequencyUnit}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
 
         </Grid>
 

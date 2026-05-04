@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using DVBTTelevizor.TV;
+using LoggerService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace DVBTTelevizor
         public bool DVBT { get; set; } = true;
         public bool DVBT2 { get; set; } = true;
         public bool FM { get; set; } = false;
+        public bool DAB { get; set; } = false;
 
         public bool TuneDVBTPreferred { get; set; } = false;
 
@@ -36,6 +38,7 @@ namespace DVBTTelevizor
         public long DefaultFrequencyMaxKHz { get; set; } = 852000;
 
         public long DefaultBandwidthKHz { get; set; } = 8000;
+        public long DefaultDABBandwidthKHz { get; set; } = 1712;
 
         public TuningSettings(ILoggingService loggingService)
         {
@@ -49,6 +52,7 @@ namespace DVBTTelevizor
                  DVBT = DVBT,
                  DVBT2 = DVBT2,
                  FM = FM,
+                 DAB = DAB,
                  BandwidthKHz = BandwidthKHz,
                  FrequencyFromKHz = FrequencyFromKHz,
                  FrequencyToKHz = FrequencyToKHz,
@@ -80,9 +84,9 @@ namespace DVBTTelevizor
         public void LoadFromConfiguration(ITVConfiguration configuration)
         {
 
-            switch (configuration.DVBTDriverType)
+            switch (configuration.AppDriverType)
             {
-                case MAUI.DriverTypeEnum.RTLSDRDriver:
+                case AppDriverTypeEnum.FM:
 
                     SetFMSettings();
 
@@ -93,7 +97,17 @@ namespace DVBTTelevizor
 
                     break;
 
-                case MAUI.DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DAB:
+
+                    SetDABSettings();
+
+                    FrequencyKHz = configuration.DABFrequencyKHz;
+                    FrequencyFromKHz = configuration.DABFrequencyFromKHz;
+                    FrequencyToKHz = configuration.DABFrequencyToKHz;
+
+                    break;
+
+                case AppDriverTypeEnum.DVBT:
                 default:
                     SetDVBTSettings();
 
@@ -111,16 +125,23 @@ namespace DVBTTelevizor
 
         public void SaveToConfiguration(ITVConfiguration configuration)
         {
-            switch (configuration.DVBTDriverType)
+            switch (configuration.AppDriverType)
             {
-                case MAUI.DriverTypeEnum.RTLSDRDriver:
+                case AppDriverTypeEnum.FM:
                     //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
                     configuration.FMFrequencyKHz = FrequencyKHz;
                     configuration.FMFrequencyFromKHz = FrequencyFromKHz;
                     configuration.FMFrequencyToKHz = FrequencyToKHz;
                     break;
 
-                case MAUI.DriverTypeEnum.AndroidDVBTDriver:
+                case AppDriverTypeEnum.DAB:
+
+                    configuration.DABFrequencyKHz = FrequencyKHz;
+                    configuration.DABFrequencyFromKHz = FrequencyFromKHz;
+                    configuration.DABFrequencyToKHz = FrequencyToKHz;
+                    break;
+
+                case AppDriverTypeEnum.DVBT:
                 default:
 
                     configuration.TuneDVBTEnabled = DVBT;
@@ -138,6 +159,7 @@ namespace DVBTTelevizor
         public void SetFMSettings()
         {
             FM = true;
+            DAB = false;
             DVBT = false;
             DVBT2 = false;
             //_tuningSettings.FrequencyKHz = 88000;
@@ -158,10 +180,35 @@ namespace DVBTTelevizor
             BandwidthKHz = DefaultBandwidthKHz;
         }
 
+        public void SetDABSettings()
+        {
+            DAB = true;
+            FM = false;
+            DVBT = false;
+            DVBT2 = false;
+
+            DeviceFrequencyMinKHz = 174928;
+            DeviceFrequencyMaxKHz = 239200;
+
+            FrequencyFromKHz = 174928; // 5A
+            FrequencyToKHz = 239200;  // 13F
+            FrequencyKHz = FrequencyFromKHz;
+
+            // DAB has dynamic bandwidths, but we set some defaults
+            DeviceBandWidthMinKHz = 1712;
+            DeviceBandWidthMaxKHz = 1712;
+            DefaultBandwidthKHz = 1712;
+
+            DefaultFrequencyMinKHz = DeviceFrequencyMinKHz;
+            DefaultFrequencyMaxKHz = DeviceFrequencyMaxKHz;
+
+            BandwidthKHz = DefaultDABBandwidthKHz;
+        }
+
         public void SetDVBTSettings()
         {
             FM = false;
-
+            DAB = false;
             DVBT = true;
             DVBT2 = true;
 
@@ -182,6 +229,7 @@ namespace DVBTTelevizor
 
             BandwidthKHz = DefaultBandwidthKHz;
         }
+
 
         public async Task SetFrequencies(IDriverConnector driver)
         {
