@@ -30,7 +30,7 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
                 _driverStat = m.Value;
-                NotifyDriverChange();
+                NotifyDriverStatChange();
             });
 
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
@@ -154,7 +154,15 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(ConnectedDeviceRange));
                 OnPropertyChanged(nameof(ConnectedDeviceQueue));
                 OnPropertyChanged(nameof(ConnectedDeviceSynced));
+            });
+        }
 
+        public void NotifyDriverStatChange()
+        {
+            //_loggingService.Info($"DriverPageViewModel: NotifyDriverStatChange");
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
                 OnPropertyChanged(nameof(Bitrate));
                 OnPropertyChanged(nameof(GainTitle));
             });
