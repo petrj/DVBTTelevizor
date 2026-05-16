@@ -118,6 +118,7 @@
 		<PackageReference Include="NLog" Version="6.1.1" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.4" />
 		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
+		<PackageReference Include="Powershell.Modules" Version="1.0.3" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
 		<PackageReference Include="RTLSDR" Version="1.5.0" />
 		<PackageReference Include="RTLSDR.Audio" Version="1.5.0" />

@@ -1,3 +1,44 @@
+WIFI debug
+----------
+
+@rem https://docs.microsoft.com/cs-cz/xamarin/android/get-started/installation/set-up-device-for-development
+@rem adb kill-server
+adb devices
+adb tcpip 5555
+adb connect 10.0.0.15:5555
+@rem adb usb
+
+TCP dump
+--------
+
+@rem https://www.andreafortuna.org/2018/05/28/how-to-install-and-run-tcpdump-on-android-devices/
+@rem adb shell
+@rem tcpdump -D
+@rem tcpdump -vv -i any -s 0 -w /sdcard/dump.pcap
+
+Windows deploy
+--------------
+
+dotnet publish .\DVBTTelevizor.MAUI\ -f net10.0-windows10.0.26100.0 -c Release -p:WindowsPackageType=None -p:SelfContained=true
+
+
+Linux emulation
+---------------
+
+# create emulator:
+./avdmanager create avd -n Pixel_34 -k "system-images;android-34;google_apis;x86_64" -d "pixel"
+
+# run emulator:
+./emulator -avd Pixel_34
+
+adb uninstall net.petrjanousek.DVBTTelevizor.MAUI
+adb install DVBTTelevizor.MAUI/bin/Release/net9.0-android35.0/net.petrjanousek.DVBTTelevizor.MAUI-x86_64-Signed.apk
+adb shell monkey -p net.petrjanousek.DVBTTelevizor.MAUI -c android.intent.category.LAUNCHER 1
+
+
+Known devices:
+--------------
+
 Astrometa DVB-T2:
 {
 	"supportedDeliverySystems": 7,

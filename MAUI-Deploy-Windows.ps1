@@ -1,4 +1,5 @@
-﻿<#
+﻿Set-Location $PSScriptRoot
+<#
 
 Script for creating AAB/APK release for publishing to Google Play
 
@@ -19,8 +20,21 @@ Script for creating AAB/APK release for publishing to Google Play
 
 #>
 
-Set-Location $PSScriptRoot
-Import-Module .\MAUI-Build-Module.psm1 -Force
+# Using Powershell.Modules from latest NuGet package
+
+    $maxVersion = Get-ChildItem "$env:USERPROFILE\.nuget\packages\powershell.modules\" | Select-Object -Property Name -ExpandProperty Name | sort-object -Descending | Select-Object -First 1
+    $modulePath = "$env:USERPROFILE\.nuget\packages\powershell.modules\$maxVersion\PowerShell.Modules\"
+
+    if (Get-Module -Name BuildModule) 
+    {
+        Write-Host "Reloading BuildModule module version $maxVersion..."
+        Remove-Module BuildModule
+    } else
+    {
+        Write-Host "Loading BuildModule module version $maxVersion..."
+    }
+
+    Import-Module $modulePath\BuildModule\BuildModule.psd1
 
 $passw = Get-SecureStringFromUserInput -Message "Enter password to Android store:" -EnvironmentVariable $env:PJsAndroidStore
 
@@ -53,7 +67,7 @@ if (-not [String]::IsNullOrEmpty($passw))
     
     $aABPackage | Copy-Item -Destination . -Force -Verbose
 }
-    
+  
 
 
    
