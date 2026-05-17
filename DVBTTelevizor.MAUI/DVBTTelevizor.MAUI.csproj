@@ -57,9 +57,11 @@
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <UseFastDeployment>false</UseFastDeployment>
+		<AndroidFastDeploymentEnabled>false</AndroidFastDeploymentEnabled>
+		<UseFastDeployment>false</UseFastDeployment>
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
+		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
