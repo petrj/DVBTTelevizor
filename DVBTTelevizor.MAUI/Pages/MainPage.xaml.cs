@@ -73,7 +73,6 @@ namespace DVBTTelevizor.MAUI
 
         private List<MenuItem> _activeMenuItems = null;
 
-        private static SemaphoreSlim _semaphoreSlimForRefreshGUI = new SemaphoreSlim(1, 1);
         private bool _refreshGUIEnabled = true;
         private bool _menuShowEnabled = true;
 
@@ -85,13 +84,6 @@ namespace DVBTTelevizor.MAUI
         private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
         private Media _media;
         private SledovaniTV.SledovaniTV _iptv;
-
-        private SettingsPage _settingsPage = null;
-        private TuningDriverPage _tuningPage = null;
-        private AboutPage _aboutPage = null;
-        private SelectDriverPage _driverPage = null;
-        private ChannelPage _channelPage = null;
-        private FilterPage _filterPage = null;
 
         private AppMenu _appMenu = null;
 
@@ -132,6 +124,8 @@ namespace DVBTTelevizor.MAUI
         private Rect ChannelsListViewPortraitPositionWhenEPGDetailVisibleForPreview { get; } = new Rect(0.5, 0.2, 1.0, 0.5);
 
         private Rect? LastVideoStackLayoutPosition { get; set; }
+
+        public static Dictionary<Type, Page> Pages { get; set; }  = new Dictionary<Type, Page>();
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration, IRTLSDRDriverPlatformImplementation sdrDriverPlatformImplementation)
         {
@@ -228,18 +222,6 @@ namespace DVBTTelevizor.MAUI
 
             BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, _iptv, tvConfiguration, publicDirectoryProvider);
 
-            _settingsPage = new SettingsPage(_loggingService, _driver, _iptv, _configuration, publicDirectoryProvider);
-            _aboutPage = new AboutPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-            _driverPage = new SelectDriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-
-            _channelPage = new ChannelPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-            _tuningPage = new TuningDriverPage(_loggingService, _driver, _configuration, _publicDirectoryProvider);
-            _filterPage = new FilterPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
-
-            _channelPage.Disappearing += _channelPage_Disappearing;
-            _filterPage.Disappearing += _filterPage_Disappearing;
-            _tuningPage.Disappearing += _tuneWelcomePage_Disappearing;
-
             NavigationPage.SetHasNavigationBar(this, false);
 
             BuildFocusableItems();
@@ -249,14 +231,6 @@ namespace DVBTTelevizor.MAUI
             RestartRemoteAccessService();
 
             SubscribeMessages();
-
-             _settingsPage.Disappearing += delegate
-            {
-                Task.Run(async () =>
-                {
-                    await _viewModel.RefreshChannels();
-                });
-            };
 
             CommandCheckStream = new Microsoft.Maui.Controls.Command(() =>
             {
@@ -330,14 +304,6 @@ namespace DVBTTelevizor.MAUI
         }
 
         private void _tuneWelcomePage_Disappearing(object? sender, EventArgs e)
-        {
-            Task.Run(async () =>
-            {
-                await _viewModel.RefreshChannels();
-            });
-        }
-
-        private void _filterPage_Disappearing(object? sender, EventArgs e)
         {
             Task.Run(async () =>
             {
@@ -1699,14 +1665,7 @@ namespace DVBTTelevizor.MAUI
 
         private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-            if (_tuningPage != null &&
-                _tuningPage.IsLoaded)
-            {
-                // preventing click when the settings page is just (or yet) loaded
-                return;
-            }
-
-            await Navigation.PushAsync(_tuningPage);
+            ShowPage<TuningDriverPage>();
         }
 
         private void DriverButton_Clicked(object sender, EventArgs e)
@@ -2657,12 +2616,7 @@ namespace DVBTTelevizor.MAUI
 
         private async void DriverStateButton_Clicked(object sender, EventArgs e)
         {
-            if (_driverPage.IsLoaded)
-            {
-                // preventing click when the settings page is just (or yet) loaded
-                return;
-            }
-            await Navigation.PushAsync(_driverPage);
+            ShowPage<SelectDriverPage>();
         }
 
         private void ShowOrHideMenu()
@@ -2746,24 +2700,112 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private async void SettingsButton_Clicked(object sender, EventArgs e)
+        public static Page GetOrCreatePage<T>(
+           ILoggingService loggingService,
+           IDriverConnector driverConnector,
+           SledovaniTV.SledovaniTV iptv,
+           ITVConfiguration configuration,
+           IPublicDirectoryProvider publicDirectoryProvider,
+           Action? dissapearing = null
+           ) where T : Page
         {
-            if (_settingsPage.IsLoaded)
+            Page? page = null;
+
+            if (Pages.ContainsKey(typeof(T)))
+            {
+                return Pages[typeof(T)];
+            }
+            else
+            {
+                // create new page
+
+                switch (typeof(T))
+                {
+                    case Type t when t == typeof(SettingsPage):
+                        page = new SettingsPage(loggingService, driverConnector, iptv, configuration, publicDirectoryProvider);
+                        break;
+
+                    case Type t when t == typeof(AboutPage):
+                        page = new AboutPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+
+                    case Type t when t == typeof(FilterPage):
+                        page = new FilterPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(SelectDriverPage):
+                        page = new SelectDriverPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(TuningDriverPage):
+                        page = new TuningDriverPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(ChannelPage):
+                        page = new ChannelPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+
+                    default:
+                        throw new ArgumentException("Unknown page");
+                }
+
+                page.Disappearing += delegate
+                {
+                    dissapearing?.Invoke();
+                };
+
+                Pages.Add(typeof(T), page);
+
+                return page;
+            }
+        }
+
+        public Page GetOrCreatePage<T>() where T : Page
+        {
+            return MainPage.GetOrCreatePage<T>(_loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
+        }
+
+        public void ShowPage<T>() where T : Page
+        {
+            MainPage.ShowPage<T>(Navigation, _loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
+        }
+
+        public static void ShowPage<T>(
+            INavigation navigation,
+            ILoggingService loggingService,
+            IDriverConnector driverConnector,
+            SledovaniTV.SledovaniTV iptv,
+            ITVConfiguration configuration,
+            IPublicDirectoryProvider publicDirectoryProvider
+            ) where T : Page
+        {
+
+            var page = GetOrCreatePage<T>(loggingService, driverConnector, iptv, configuration, publicDirectoryProvider);
+
+            ShowPage<T>(navigation, page);
+        }
+
+        public static void ShowPage<T>(
+           INavigation navigation,
+           Page page
+           ) where T : Page
+        {
+            if (page.IsLoaded)
             {
                 // preventing click when the settings page is just (or yet) loaded
                 return;
             }
-            await Navigation.PushAsync(_settingsPage);
+
+            navigation.PushAsync(page);
+
+            return;
+        }
+
+        private async void SettingsButton_Clicked(object sender, EventArgs e)
+        {
+            ShowPage<SettingsPage>();
         }
 
         private async void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
         {
-            if (_aboutPage.IsLoaded)
-            {
-                // preventing click when the settings page is just (or yet) loaded
-                return;
-            }
-            await Navigation.PushAsync(_aboutPage);
+            ShowPage<AboutPage>();
         }
 
         public Page GetPageFromStack(IReadOnlyList<Page> stack)
@@ -3216,15 +3258,22 @@ namespace DVBTTelevizor.MAUI
 
         private async void EditChannel(Channel? channel)
         {
-            if (_viewModel.SelectedChannel == null || _channelPage.IsLoaded)
+            if (_viewModel.SelectedChannel == null)
             {
                 return;
             }
 
-            _channelPage.Channel = channel;
-            _channelPage.Channels = _viewModel.Channels;
+            var channelPage = GetOrCreatePage<ChannelPage>() as ChannelPage;
 
-            await Navigation.PushAsync(_channelPage);
+            if (channelPage == null)
+            {
+                return;
+            }
+
+            channelPage.Channel = channel;
+            channelPage.Channels = _viewModel.Channels;
+
+            MainPage.ShowPage<ChannelPage>(Navigation, channelPage);
         }
 
         /*
@@ -3663,8 +3712,9 @@ namespace DVBTTelevizor.MAUI
                         _mediaPlayer.SetSpu(-1);
                     }
                     break;
-                    case "menuFilter":
-                        await Navigation.PushAsync(_filterPage);
+                case "menuFilter":
+                        ShowPage<FilterPage>();
+
                     break;
                 case "menuCancelPlay":
                     await ActionStop(true);
