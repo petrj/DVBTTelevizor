@@ -2724,11 +2724,9 @@ namespace DVBTTelevizor.MAUI
                     case Type t when t == typeof(SettingsPage):
                         page = new SettingsPage(loggingService, driverConnector, iptv, configuration, publicDirectoryProvider);
                         break;
-
                     case Type t when t == typeof(AboutPage):
                         page = new AboutPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
                         break;
-
                     case Type t when t == typeof(FilterPage):
                         page = new FilterPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
                         break;
