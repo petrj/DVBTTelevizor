@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -2739,6 +2737,33 @@ namespace DVBTTelevizor.MAUI
                     case Type t when t == typeof(ChannelPage):
                         page = new ChannelPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
                         break;
+                    case Type t when t == typeof(GainPage):
+                        page = new GainPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(DriverStatPage):
+                        page = new DriverStatPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(TuningSelectDVBTPage):
+                        page = new TuningSelectDVBTPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(TuningProgressPage):
+                        page = new TuningProgressPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(TuningFrequencyPage):
+                        page = new TuningFrequencyPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(TuningFrequenciesPage):
+                        page = new TuningFrequenciesPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(FrequencyPage):
+                        page = new FrequencyPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(TuningModePage):
+                        page = new TuningModePage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+                    case Type t when t == typeof(DriverPage):
+                        page = new DriverPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
 
                     default:
                         throw new ArgumentException("Unknown page");
@@ -2760,12 +2785,12 @@ namespace DVBTTelevizor.MAUI
             return MainPage.GetOrCreatePage<T>(_loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
         }
 
-        public void ShowPage<T>() where T : Page
+        public async Task ShowPage<T>() where T : Page
         {
-            MainPage.ShowPage<T>(Navigation, _loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
+            await MainPage.ShowPage<T>(Navigation, _loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
         }
 
-        public static void ShowPage<T>(
+        public static async Task ShowPage<T>(
             INavigation navigation,
             ILoggingService loggingService,
             IDriverConnector driverConnector,
@@ -2777,10 +2802,10 @@ namespace DVBTTelevizor.MAUI
 
             var page = GetOrCreatePage<T>(loggingService, driverConnector, iptv, configuration, publicDirectoryProvider);
 
-            ShowPage<T>(navigation, page);
+            await ShowPage<T>(navigation, page);
         }
 
-        public static void ShowPage<T>(
+        public static async Task ShowPage<T>(
            INavigation navigation,
            Page page
            ) where T : Page
@@ -2791,19 +2816,19 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            navigation.PushAsync(page);
+            await navigation.PushAsync(page);
 
             return;
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
         {
-            ShowPage<SettingsPage>();
+            await ShowPage<SettingsPage>();
         }
 
         private async void DVBTTelevizorButton_Clicked(object sender, EventArgs e)
         {
-            ShowPage<AboutPage>();
+            await ShowPage<AboutPage>();
         }
 
         public Page GetPageFromStack(IReadOnlyList<Page> stack)

@@ -10,12 +10,9 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
-
-    private FrequencyPage _frequencyPage;
-    private TuningProgressPage _tuningProgressPage;
 
     public TuningFrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -24,17 +21,19 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+        _publicDirectoryProvider = publicDirectoryProvider;
 
         BindingContext = _tuningFrequenciesViewModel = new TuningFrequenciesViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _tuningFrequenciesViewModel.Settings = new TuningSettings(_loggingService);
 
-        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _frequencyPage = new FrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _frequencyPage.Disappearing += _frequencyPage_Disappearing;
-
         BuildFocusableItems();
+    }
+
+    public async Task ShowPage<T>(Action dissapearing) where T : Page
+    {
+        var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider, dissapearing);
+        await MainPage.ShowPage<T>(Navigation, page);
     }
 
     private void _frequencyPage_Disappearing(object? sender, EventArgs e)
@@ -42,10 +41,13 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (Settings == null)
             return;
 
-        if (_frequencyPage.Confirmed)
+        if (sender is FrequencyPage page)
         {
-            _tuningFrequenciesViewModel.FrequencyKHz =
-                _frequencyPage.Settings.FrequencyKHz;
+            if (page.Confirmed)
+            {
+                _tuningFrequenciesViewModel.FrequencyKHz =
+                    page.Settings.FrequencyKHz;
+            }
         }
     }
 
@@ -159,11 +161,7 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningFrequencyPage NextButton_Clicked");
 
-        if (_tuningProgressPage.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
+        var page = MainPage.GetOrCreatePage<TuningProgressPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider) as TuningProgressPage;
 
         if (Settings != null)
         {
@@ -172,41 +170,31 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
             _configuration.FrequencyKHz = Settings.FrequencyKHz;
 
-            _tuningProgressPage.UpdateSettings(Settings);
+            page?.UpdateSettings(Settings);
         }
 
-        //_tuningProgressPage.Settings = Settings;
-        //_tuningProgressPage.Settings.FrequencyFromKHz = Settings.FrequencyKHz;
-        //_tuningProgressPage.Settings.FrequencyToKHz = Settings.FrequencyKHz;
-        //_tuningProgressPage.UpdateActualFreq();
-
-        await Navigation.PushAsync(_tuningProgressPage);
+        await MainPage.ShowPage<TuningProgressPage>(Navigation, page);
     }
 
-    private void ShowFreqPage()
+    private async Task ShowFreqPage()
     {
-        if (_frequencyPage.IsLoaded)
+        var page = MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
+            ()=> { _frequencyPage_Disappearing(this, new EventArgs()); } ) as FrequencyPage;
+
+
+        if (page.Settings != null && Settings != null)
         {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
+            page.UpdateSettings(Settings);
         }
 
-        if (_frequencyPage.Settings != null && Settings != null)
-        {
-            _frequencyPage.UpdateSettings(Settings);
-        }
+        page.Confirmed = false;
 
-        _frequencyPage.Confirmed = false;
-
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Navigation.PushAsync(_frequencyPage);
-        });
+        await MainPage.ShowPage<FrequencyPage>(Navigation, page);
     }
 
-    private void EditFreqButton_Clicked(object sender, EventArgs e)
+    private async void EditFreqButton_Clicked(object sender, EventArgs e)
     {
-        ShowFreqPage();
+        await ShowFreqPage();
     }
 
     public void UpdateSettings(TuningSettings tuningSettings)

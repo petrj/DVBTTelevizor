@@ -14,13 +14,9 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
     private string _publicDirectory = "";
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
-
-    private TuningSelectDVBTPage _selectDVBTPage;
-    private TuningProgressPage _tuningProgressPage;
-    private TuningFrequencyPage _tuningFrequencyPage;
-    private TuningFrequenciesPage _tuningFrequenciesPage;
 
     public TuningModePage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -29,16 +25,13 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
+        _publicDirectoryProvider = publicDirectoryProvider;
+
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new TuningModePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _viewModel.Settings = new TuningSettings(_loggingService);
-
-        _selectDVBTPage = new TuningSelectDVBTPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
     }
@@ -138,43 +131,12 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
     {
         _loggingService.Debug($"TuningModePage: AutoScanButton_Clicked");
 
-        ShowPage(_tuningProgressPage, TuneModeEnum.Automatic);
+        await ShowPage<TuningProgressPage>(TuneModeEnum.Automatic);
     }
 
-    private void ManualScanButton_Clicked(object sender, EventArgs e)
+    public async Task ShowPage<T>(TuneModeEnum mode) where T : Page
     {
-        _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");
-
-        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
-        {
-            ShowPage(_selectDVBTPage, TuneModeEnum.Manual);
-        } else
-        {
-            ShowPage(_tuningFrequenciesPage, TuneModeEnum.Manual);
-        }
-    }
-
-    private void TuneButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"TuningModePage: TuneButton_Clicked");
-
-        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
-        {
-            ShowPage(_selectDVBTPage, TuneModeEnum.Frequency);
-        }
-        else
-        {
-            ShowPage(_tuningFrequencyPage, TuneModeEnum.Frequency);
-        }
-    }
-
-    private void ShowPage(Page page, TuneModeEnum mode)
-    {
-        if (page.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
+        var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
 
         // update settings according to selected driver
         _viewModel?.Settings.LoadFromConfiguration(_configuration);
@@ -194,9 +156,33 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
             tuPage.UpdateSettings(_viewModel?.Settings);
         }
 
-        MainThread.BeginInvokeOnMainThread(async () =>
+        await MainPage.ShowPage<T>(Navigation, page);
+    }
+
+    private async void ManualScanButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");
+
+        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
         {
-            await Navigation.PushAsync(page);
-        });
+            await ShowPage<TuningSelectDVBTPage>(TuneModeEnum.Manual);
+        } else
+        {
+            await ShowPage<TuningFrequenciesPage>(TuneModeEnum.Manual);
+        }
+    }
+
+    private async void TuneButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"TuningModePage: TuneButton_Clicked");
+
+        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
+        {
+            await ShowPage<TuningSelectDVBTPage>(TuneModeEnum.Frequency);
+        }
+        else
+        {
+            await ShowPage<TuningFrequencyPage>(TuneModeEnum.Frequency);
+        }
     }
 }

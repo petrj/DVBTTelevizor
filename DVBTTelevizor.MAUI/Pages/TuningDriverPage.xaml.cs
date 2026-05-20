@@ -14,14 +14,11 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
 
     private TuningSettings _tuningSettings;
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
-
-    private TuningModePage _tuningModePage;
-    private TuningFrequencyPage _tuningFrequencyPage;
 
     public TuningDriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -30,15 +27,11 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
+        _publicDirectoryProvider = publicDirectoryProvider;
 
         _tuningSettings = new TuningSettings(_loggingService);
 
         BindingContext = _viewModel = new TuningDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-
-        _tuningModePage = new TuningModePage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-
 
         WeakReferenceMessenger.Default.Register<ShowTuneDriverPageMessage>(this, (r, m) =>
         {
@@ -156,25 +149,86 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"TuningDriverPage OnTextSent {text}");
     }
 
+    public async Task ShowPage<T>(AppDriverTypeEnum? driverType) where T : Page
+    {
+        if (driverType != null)
+        {
+            _configuration.AppDriverType = driverType.Value;
+            // update settings according to selected driver
+            _tuningSettings.LoadFromConfiguration(_configuration);
+
+            switch (driverType)
+            {
+                case AppDriverTypeEnum.DVBT:
+                    _tuningSettings.SetDVBTSettings();
+                    break;
+                case AppDriverTypeEnum.DAB:
+                    _tuningSettings.SetDABSettings();
+                    break;
+                case AppDriverTypeEnum.FM:
+                    _tuningSettings.SetFMSettings();
+                    break;
+            }
+
+            // update frequencies according to driver
+            if (_driver.DriverType == driverType)
+            {
+                await _tuningSettings.SetFrequencies(_driver);
+            }
+
+            _tuningSettings.DVBT = false;
+            _tuningSettings.DVBT2 = false;
+            _tuningSettings.DAB = false;
+            _tuningSettings.FM = false;
+
+            switch (driverType)
+            {
+                case AppDriverTypeEnum.DVBT:
+                    _tuningSettings.DVBT = true;
+                    _tuningSettings.DVBT2 = true;
+                    break;
+                case AppDriverTypeEnum.FM:
+                    _tuningSettings.FM = true;
+                    _tuningSettings.TuningMode = TuneModeEnum.Frequency;
+                    _tuningSettings.FrequencyKHz = _configuration.FMFrequencyKHz;
+                    break;
+                case AppDriverTypeEnum.DAB:
+                    _tuningSettings.DAB = true;
+                    _tuningSettings.TuningMode = TuneModeEnum.Frequency;
+                    _tuningSettings.FrequencyKHz = _configuration.DABFrequencyKHz;
+                    break;
+            }
+        }
+
+        var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
+
+        if (page is ITuningPage tuPage)
+        {
+            tuPage.UpdateSettings(_tuningSettings);
+        }
+
+        await MainPage.ShowPage<T>(Navigation, page);
+    }
+
     private async void DVBTButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage: DVBTButton_Clicked");
 
-        await ShowPage(_tuningModePage, AppDriverTypeEnum.DVBT);
+        await ShowPage<TuningModePage>(null);
     }
 
     private async void FMButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage: FMButton_Clicked");
 
-        await ShowPage(_tuningFrequencyPage, AppDriverTypeEnum.FM);
+        await ShowPage<TuningFrequencyPage>(AppDriverTypeEnum.FM);
     }
 
     private async void DABButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage:     private void DABButton_Clicked(object sender, EventArgs e)\r\n");
 
-        await ShowPage(_tuningFrequencyPage, AppDriverTypeEnum.DAB);
+        await ShowPage<TuningFrequencyPage>(AppDriverTypeEnum.DAB);
     }
 
     private async Task ShowPage(Page page, AppDriverTypeEnum driverType)

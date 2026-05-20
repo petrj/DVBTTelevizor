@@ -3,9 +3,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
-using Microsoft.Maui.Handlers;
-using RTLSDR.Common;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -16,11 +13,9 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     private ILoggingService _loggingService;
     private ITVConfiguration _configuration;
 
-    private string _publicDirectory;
-
     private KeyboardFocusableItemList _focusItems;
-    private GainPage _gainPage;
-    private DriverStatPage _statPage;
+    private IDriverConnector _driver;
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private AppMenu _appMenu = null;
 
@@ -28,12 +23,10 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         InitializeComponent();
 
+        _driver = driver;
         _loggingService = loggingService;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
-
-        _gainPage = new GainPage(_loggingService, driver, _configuration, publicDirectoryProvider);
-        _statPage = new DriverStatPage(_loggingService, driver, _configuration, publicDirectoryProvider);
+        _publicDirectoryProvider = publicDirectoryProvider;
 
         _appMenu = new AppMenu(MainMenu);
         _appMenu.FontSize = _configuration.AppFontSize;
@@ -235,14 +228,19 @@ public partial class DriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"DriverPage GaintButton_Clicked");
 
-        await ShowPage(_gainPage);
+        await ShowPage<GainPage>();
     }
 
     private async void StatButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"DriverPage StatButton_Clicked");
 
-        await ShowPage(_statPage);
+        await ShowPage<DriverStatPage>();
+    }
+
+    public async Task ShowPage<T>() where T : Page
+    {
+        await MainPage.ShowPage<T>(Navigation, _loggingService, _driver, null, _configuration, _publicDirectoryProvider);
     }
 
     private void DriverPreferencesButton_Clicked(object sender, EventArgs e)
@@ -290,17 +288,4 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         }
     }
 
-    private async Task ShowPage(ContentPage page)
-    {
-        if (page.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
-
-        await MainThread.InvokeOnMainThreadAsync(async () =>
-        {
-            await Navigation.PushAsync(page);
-        });
-    }
 }

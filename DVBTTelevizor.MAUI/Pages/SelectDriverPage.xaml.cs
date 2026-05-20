@@ -15,10 +15,8 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
 
-    private DriverPage _driverPage = null;
-
-
     private KeyboardFocusableItemList _focusItems;
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     public SelectDriverPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration,  IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -27,7 +25,7 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
-        _driverPage = new DriverPage(_loggingService, _driver, _configuration, publicDirectoryProvider);
+        _publicDirectoryProvider = publicDirectoryProvider;
 
         BindingContext = _viewModel = new SelectDriverPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
@@ -130,17 +128,10 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
 
     private async Task ShowPage(AppDriverTypeEnum driverType)
     {
-        if (_driverPage.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
+        var page = MainPage.GetOrCreatePage<DriverPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider) as DriverPage;
 
-        _driverPage.PageDriver = driverType;
+        page.PageDriver = driverType;
 
-        await MainThread.InvokeOnMainThreadAsync(async () =>
-        {
-            await Navigation.PushAsync(_driverPage);
-        });
+        await MainPage.ShowPage<DriverPage>(Navigation, page);
     }
 }

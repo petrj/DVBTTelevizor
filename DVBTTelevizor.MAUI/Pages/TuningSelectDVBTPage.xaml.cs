@@ -14,12 +14,10 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
     private KeyboardFocusableItemList _focusItems;
 
     private string? _lastSelectedCenterItem = null;
+    private IPublicDirectoryProvider _publicDirectoryProvider;
 
     public bool Finished { get; set; } = false;
 
-    private TuningProgressPage _tuningProgressPage;
-    private TuningFrequenciesPage _tuningFrequenciesPage;
-    private TuningFrequencyPage _tuningFrequencyPage;
 
     public TuningSelectDVBTPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -28,14 +26,11 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService = loggingService;
         _driver = driver;
         _configuration = tvConfiguration;
+        _publicDirectoryProvider = publicDirectoryProvider;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _tuningSelectDVBTViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningSelectDVBTViewModel.Initializing = false;
-
-        _tuningProgressPage = new TuningProgressPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _tuningFrequenciesPage = new TuningFrequenciesPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
-        _tuningFrequencyPage = new TuningFrequencyPage(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         _focusItems = BuildFocusableItems();
     }
@@ -234,13 +229,9 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
         });
     }
 
-    private void ShowPage(Page page)
+    public async Task ShowPage<T>() where T : Page
     {
-        if (page.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
+        var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
 
         if (_tuningSelectDVBTViewModel.Settings != null)
         {
@@ -250,15 +241,12 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
             _configuration.TuneDVBTPreferred = _tuningSelectDVBTViewModel.Settings.TuneDVBTPreferred;
         }
 
-        if (page is ITuningPage tPage)
+        if (page is ITuningPage tuPage)
         {
-            tPage.UpdateSettings(_tuningSelectDVBTViewModel.Settings);
+            tuPage.UpdateSettings(_tuningSelectDVBTViewModel?.Settings);
         }
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Navigation.PushAsync(page);
-        });
+        await MainPage.ShowPage<T>(Navigation, page);
     }
 
     private async void NextButton_Clicked(object sender, EventArgs e)
@@ -266,10 +254,10 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
         switch (_tuningSelectDVBTViewModel.Settings.TuningMode)
         {
             case TuneModeEnum.Manual:
-                ShowPage(_tuningFrequenciesPage);
+                await ShowPage<TuningFrequenciesPage>();
                 break;
             case TuneModeEnum.Frequency:
-                ShowPage(_tuningFrequencyPage);
+                await ShowPage<TuningFrequencyPage>();
                 break;
         }
     }
