@@ -35,6 +35,7 @@
             <Style x:Key="DonateButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="20,10,20,10"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="BorderWidth" Value="0"/>
                 <Setter Property="CornerRadius" Value="7"/>
@@ -60,7 +61,7 @@
                 <ColumnDefinition Width="100*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='DVBT/ Android Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+            <Label Grid.Column="0" Grid.Row="0" Text="{local:LngXamlExt Input='DVBT/DAB/FM Android Player'}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
 
             <BoxView Grid.Column="0" Grid.Row="1" x:Name="GithubBoxView" />
             <Label Grid.Column="0" Grid.Row="1" x:Name="GithubLabel"  Text="github.com/petrj/DVBTTelevizor"  Style="{DynamicResource LabelStyle}" TextDecorations="Underline">
