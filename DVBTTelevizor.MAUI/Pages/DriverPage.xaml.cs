@@ -77,7 +77,7 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            await _driverPageViewModel.CheckDriver();
+            WeakReferenceMessenger.Default.Send(new CheckDriversRequestMessage(null));
         });
 
         _focusItems.DeFocusAll();

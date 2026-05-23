@@ -44,6 +44,11 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<CheckDriversResultMessage>(this, (r, m) =>
             {
+                Task.Run(async () =>
+                {
+                    await CheckDriver();
+                });
+
                 DvbtDriverInstalled = m.Value.DVBT;
                 RtlsdrDriverInstalled = m.Value.RTLSDR;
             });

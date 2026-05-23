@@ -57,8 +57,8 @@
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-		<AndroidFastDeploymentEnabled>false</AndroidFastDeploymentEnabled>
-		<UseFastDeployment>false</UseFastDeployment>
+		<AndroidFastDeploymentEnabled>true</AndroidFastDeploymentEnabled>
+		<UseFastDeployment>true</UseFastDeployment>
 	  <UseSharedRuntime>true</UseSharedRuntime>
 	  <MandroidLinkMode>None</MandroidLinkMode>
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
