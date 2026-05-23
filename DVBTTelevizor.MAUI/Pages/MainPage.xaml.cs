@@ -3736,7 +3736,7 @@ namespace DVBTTelevizor.MAUI
                     }
                     break;
                 case "menuFilter":
-                        ShowPage<FilterPage>();
+                    await ShowPage<FilterPage>();
 
                     break;
                 case "menuCancelPlay":

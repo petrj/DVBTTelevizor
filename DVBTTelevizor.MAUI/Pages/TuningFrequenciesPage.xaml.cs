@@ -166,18 +166,16 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
         if (Settings == null)
             return;
 
-        if (sender is FrequencyPage page)
-        {
-            if (_editingFrom)
-            {
-                _tuningFrequenciesViewModel.FrequencyFromKHz = page.Settings.FrequencyKHz;
-            }
-            else
-            {
-                _tuningFrequenciesViewModel.FrequencyToKHz = page.Settings.FrequencyKHz;
-            }
-        }
+        var page = GetFreqPage();
 
+        if (_editingFrom)
+        {
+            _tuningFrequenciesViewModel.FrequencyFromKHz = page.Settings.FrequencyKHz;
+        }
+        else
+        {
+            _tuningFrequenciesViewModel.FrequencyToKHz = page.Settings.FrequencyKHz;
+        }
     }
 
     private async void EditFreqFromButton_Clicked(object sender, EventArgs e)
@@ -186,11 +184,15 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
         await ShowFreqPage();
     }
 
+    private FrequencyPage GetFreqPage()
+    {
+        return MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
+            () => { _frequencyPage_Disappearing(this, new EventArgs()); }) as FrequencyPage;
+    }
+
     private async Task ShowFreqPage()
     {
-        var page = MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
-            () => { _frequencyPage_Disappearing(this, new EventArgs()); }) as FrequencyPage;
-
+        var page = GetFreqPage();
 
         if (page.Settings != null && Settings != null)
         {

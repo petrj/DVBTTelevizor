@@ -214,7 +214,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningDriverPage: DVBTButton_Clicked");
 
-        await ShowPage<TuningModePage>(null);
+        await ShowPage<TuningModePage>(AppDriverTypeEnum.DVBT);
     }
 
     private async void FMButton_Clicked(object sender, EventArgs e)
@@ -226,73 +226,8 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
 
     private async void DABButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningDriverPage:     private void DABButton_Clicked(object sender, EventArgs e)\r\n");
+        _loggingService.Debug($"TuningDriverPage: DABButton_Clicked(object sender, EventArgs e)\r\n");
 
         await ShowPage<TuningFrequencyPage>(AppDriverTypeEnum.DAB);
-    }
-
-    private async Task ShowPage(Page page, AppDriverTypeEnum driverType)
-    {
-        if (page.IsLoaded)
-        {
-            // preventing click when the settings page is just (or yet) loaded
-            return;
-        }
-
-        _configuration.AppDriverType = driverType;
-        // update settings according to selected driver
-        _tuningSettings.LoadFromConfiguration(_configuration);
-
-        switch (driverType)
-        {
-            case AppDriverTypeEnum.DVBT:
-                _tuningSettings.SetDVBTSettings();
-                break;
-            case AppDriverTypeEnum.DAB:
-                _tuningSettings.SetDABSettings();
-                break;
-            case AppDriverTypeEnum.FM:
-                _tuningSettings.SetFMSettings();
-                break;
-        }
-
-        // update frequencies according to driver
-        if (_driver.DriverType == driverType)
-        {
-            await _tuningSettings.SetFrequencies(_driver);
-        }
-
-        _tuningSettings.DVBT = false;
-        _tuningSettings.DVBT2 = false;
-        _tuningSettings.DAB = false;
-        _tuningSettings.FM = false;
-
-        switch (driverType)
-        {
-            case AppDriverTypeEnum.DVBT:
-                _tuningSettings.DVBT = true;
-                _tuningSettings.DVBT2 = true;
-                break;
-            case AppDriverTypeEnum.FM:
-                _tuningSettings.FM = true;
-                _tuningSettings.TuningMode = TuneModeEnum.Frequency;
-                _tuningSettings.FrequencyKHz = _configuration.FMFrequencyKHz;
-                break;
-            case AppDriverTypeEnum.DAB:
-                _tuningSettings.DAB = true;
-                _tuningSettings.TuningMode = TuneModeEnum.Frequency;
-                _tuningSettings.FrequencyKHz = _configuration.DABFrequencyKHz;
-                break;
-        }
-
-        if (page is ITuningPage tuPage)
-        {
-            tuPage.UpdateSettings(_tuningSettings);
-        }
-
-        await MainThread.InvokeOnMainThreadAsync(async () =>
-        {
-            await Navigation.PushAsync(page);
-        });
     }
 }
