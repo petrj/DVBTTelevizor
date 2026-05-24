@@ -452,26 +452,20 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        /// <summary>
+        /// Updating driver status in GUI,
+        /// this method is called every 5s
+        /// </summary>
+        /// <returns></returns>
         private async Task UpdateDriverState()
         {
             //_loggingService.Debug($"Updating bitrate");
 
             try
             {
-                long bitrate = 0;
-                DVBTDriverStatus state = new DVBTDriverStatus()
-                {
-                    rfStrengthPercentage = 0
-                };
-
-                if (_driver != null)
-                {
-                    bitrate = _driver.Bitrate;
-                }
-
                 var stat = new DriverStat()
                 {
-                    BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : bitrate),
+                    BitRate = DVBTDriverConnector.GetHumanReadableBitRate(_driver == null ? 0 : _driver.Bitrate),
                     Frequency = DVBTDriverConnector.GetHumanReadableFrequency(_driver == null ? null : _driver.LastTunedFreq)
                 };
 
@@ -480,6 +474,8 @@ namespace DVBTTelevizor.MAUI
                     stat.Stat = _demodulator.Stat(false);
                     stat.StatValues = _demodulator.GetStat();
                 }
+
+                _loggingService.Debug($"BitRate: {stat.BitRate}");
 
                 WeakReferenceMessenger.Default.Send(new DriverUpdateStatMessage(stat));
 
