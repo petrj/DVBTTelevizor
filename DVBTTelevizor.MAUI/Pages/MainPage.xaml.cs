@@ -734,21 +734,15 @@ namespace DVBTTelevizor.MAUI
 
         private async Task CheckDriver()
         {
-            //switch (_driver.State)
-            //{
-            //    case DVBTDriverStateEnum.Unknown:
-            //    case DVBTDriverStateEnum.Disconnected:
-            //        {
-            //            SendConnectDriverRequest();
-            //            break;
-            //        }
-            //    default:
-            //        {
-            //            // check driver state
-            //            await CheckDriverState();
-            //            break;
-            //        }
-            //}
+            if (_driver.State.HasFlag(DVBTDriverStateEnum.Unknown) ||
+                _driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
+            {
+                SendConnectDriverRequest(_configuration.AppDriverType);
+            } else
+            {
+                // check driver state
+                await CheckDriverState();
+            }
         }
 
         private async Task CheckDriverState()
