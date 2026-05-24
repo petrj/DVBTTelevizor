@@ -368,7 +368,7 @@ namespace DVBTTelevizor.MAUI
                     break;
             }
 
-            Task.Run(async ()=> await Tune());
+            await Tune();
         }
 
         private async Task Tune()
@@ -440,7 +440,7 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 // when tunning FM/DAB, demmodulator is searching for frequencies in the background and the tuning never ends....
-                if (_driver.DriverType == TV.AppDriverTypeEnum.DVBT)
+                if ((_driver.DriverType == TV.AppDriverTypeEnum.DVBT) && (Settings.TuningMode != TuneModeEnum.Frequency))
                 {
                     State = TuneStateEnum.Finished;
                 }
