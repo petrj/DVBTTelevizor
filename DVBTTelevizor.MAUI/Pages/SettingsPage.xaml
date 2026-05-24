@@ -401,12 +401,12 @@
 
                         <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Enable logging'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
                         <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding Config.EnableLogging, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
+                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableLoggingSwitch"  IsToggled="{Binding EnableLogging, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
 
                         <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/DVBTTelevizor.log" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}" IsVisible="{Binding EnableLogging}"/>
                     </Grid>
 
-                    <Grid Margin="30,10,10,0" IsVisible="{Binding DebugSettingsVisible}">
+                    <Grid Margin="30,10,10,0" IsVisible="{Binding EnableLogging}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>

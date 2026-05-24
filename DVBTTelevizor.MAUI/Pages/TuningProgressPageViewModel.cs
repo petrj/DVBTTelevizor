@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using MPEGTS;
 using RTLSDR.DAB;
+using RTLSDR.FM;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -125,10 +126,9 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Demodulator_OnServiceFound");
 
-            if (State != TuneStateEnum.InProgress )
+            if ((e is FMServiceFoundEventArgs fm))
             {
-                _loggingService.Info($"Tuning is not in progress, ingoring event");
-                return;
+
             }
 
             if ((e is DABServiceFoundEventArgs de) && (de.Service != null))

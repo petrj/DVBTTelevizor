@@ -67,6 +67,7 @@ namespace DVBTTelevizor.MAUI
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 OnPropertyChanged(nameof(Config));
+                OnPropertyChanged(nameof(EnableLogging));
             });
         }
 
@@ -112,6 +113,19 @@ namespace DVBTTelevizor.MAUI
                 _configuration.Language = value;
 
                 NotifyLanguageChange();
+            }
+        }
+
+        public bool EnableLogging
+        {
+            get
+            {
+                return _configuration.EnableLogging;
+            } set
+            {
+                _configuration.EnableLogging = value;
+
+                NotifyConfigChange();
             }
         }
 
