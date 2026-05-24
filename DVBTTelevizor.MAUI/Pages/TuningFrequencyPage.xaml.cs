@@ -41,13 +41,12 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         if (Settings == null)
             return;
 
-        if (sender is FrequencyPage page)
+        var page = GetFreqPage();
+
+        if (page.Confirmed && page.Settings != null)
         {
-            if (page.Confirmed)
-            {
-                _tuningFrequenciesViewModel.FrequencyKHz =
-                    page.Settings.FrequencyKHz;
-            }
+            _tuningFrequenciesViewModel.FrequencyKHz =
+                page.Settings.FrequencyKHz;
         }
     }
 
@@ -175,12 +174,15 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         await MainPage.ShowPage<TuningProgressPage>(Navigation, page);
     }
+    private FrequencyPage GetFreqPage()
+    {
+        return MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
+            () => { _frequencyPage_Disappearing(this, new EventArgs()); }) as FrequencyPage;
+    }
 
     private async Task ShowFreqPage()
     {
-        var page = MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
-            ()=> { _frequencyPage_Disappearing(this, new EventArgs()); } ) as FrequencyPage;
-
+        var page = GetFreqPage();
 
         if (page.Settings != null && Settings != null)
         {
