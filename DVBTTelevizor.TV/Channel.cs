@@ -49,6 +49,26 @@ namespace DVBTTelevizor
 
         private bool _recording = false;
 
+        public bool IsVideoAvailable()
+        {
+            var videoAvailable = true;
+            switch (ChannelType)
+            {
+                case ChannelTypeEnum.DAB:
+                case ChannelTypeEnum.FM:
+                    videoAvailable = false;
+                    break;
+                case ChannelTypeEnum.DVBT:
+                case ChannelTypeEnum.DVBT2:
+                    videoAvailable = ServiceType != DVBTDriverServiceType.Radio;
+                    break;
+                default:
+                    videoAvailable = true;
+                    break;
+            }
+
+            return videoAvailable;
+        }
         public string UniqueIdentifier
         {
             get

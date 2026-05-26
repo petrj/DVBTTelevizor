@@ -1159,6 +1159,13 @@ namespace DVBTTelevizor.MAUI
 
             _loggingService.Debug("RefreshGUI");
 
+            var videoAvailable = _viewModel?.PlayingChannel?.IsVideoAvailable() ?? true;
+
+            if (!videoAvailable)
+            {
+                _loggingService.Debug("no video present");
+            }
+
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 try
@@ -1183,9 +1190,17 @@ namespace DVBTTelevizor.MAUI
                             //VideoStackLayout.IsVisible = true;
                             //NoVideoStackLayout.IsVisible = false;
 
-                            _viewModel.SetVideoStackLayoutvisible(true);
-                            VideoStackLayout.IsVisible = true;
-                            NoVideoStackLayout.IsVisible = false;
+                            if (videoAvailable)
+                            {
+                                _viewModel.SetVideoStackLayoutvisible(true);
+                                VideoStackLayout.IsVisible = true;
+                                NoVideoStackLayout.IsVisible = false;
+                            } else
+                            {
+                                _viewModel.SetVideoStackLayoutvisible(false);
+                                VideoStackLayout.IsVisible = false;
+                                NoVideoStackLayout.IsVisible = true;
+                            }
 
                             ChannelsListView.IsVisible = false;
                             MainToolBar.IsVisible = false;
@@ -1244,9 +1259,17 @@ namespace DVBTTelevizor.MAUI
                             //VideoStackLayout.IsVisible = true;
                             //NoVideoStackLayout.IsVisible = false;
 
-                            _viewModel.SetVideoStackLayoutvisible(true);
-                            VideoStackLayout.IsVisible = true;
-                            NoVideoStackLayout.IsVisible = false;
+                            if (videoAvailable)
+                            {
+                                _viewModel.SetVideoStackLayoutvisible(true);
+                                VideoStackLayout.IsVisible = true;
+                                NoVideoStackLayout.IsVisible = false;
+                            } else
+                            {
+                                _viewModel.SetVideoStackLayoutvisible(false);
+                                VideoStackLayout.IsVisible = false;
+                                NoVideoStackLayout.IsVisible = true;
+                            }
 
                             ChannelsListView.IsVisible = true;
                             _viewModel.MainLayoutVisible = true;
@@ -2145,7 +2168,7 @@ namespace DVBTTelevizor.MAUI
 
             // TODO : DVBT/RTLSDDR driver installation check
 
-            if ( !_driver.Connected)
+            if ( !(_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
@@ -2249,21 +2272,9 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                /*
-                if (
-                    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRFMDriver) ||
-                    (_configuration.DVBTDriverType == DVBTDriverTypeEnum.RTLSDRTCPIPFMDriver)
-                    )
-                {
-                    shouldMediaStop = false;
-                    shouldMediaPlay = false;
-                }
-                */
-
                 _viewModel.EPGDetailEnabled = false;
 
-                //VideoStackLayout.IsVisible = false;
-                //NoVideoStackLayout.IsVisible = true;
+                _viewModel.PlayingChannel = channel;
 
                 PlayingState = PlayingStateEnum.Playing;
 
@@ -2336,6 +2347,7 @@ namespace DVBTTelevizor.MAUI
                         if (!setPIDres.SuccessFlag)
                         {
                             WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
+                            _viewModel.PlayingChannel = null;
                             return;
                         }
                     }
@@ -2346,6 +2358,7 @@ namespace DVBTTelevizor.MAUI
                         if (setupPIDsRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
+                            _viewModel.PlayingChannel = null;
                             return;
                         }
 
@@ -2452,22 +2465,20 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 _viewModel.SelectedChannel = channel;
-                _viewModel.PlayingChannel = channel;
                 _viewModel.PlayingChannel.Subtitles.Clear();
                 _viewModel.PlayingChannel.AudioTracks.Clear();
                 _viewModel.PlayingChannelAspect = new Size(-1, -1);
+                _viewModel.NotifyChannelChange();
 
                 _lastActionPlayTime = DateTime.Now;
 
-                _mediaPlayer.Teletext = 100;
+                //_mediaPlayer.Teletext = 100;
 
                 if (_lastPlayedChannels[1] != channel)
                 {
                     _lastPlayedChannels[0] = _lastPlayedChannels[1];
                     _lastPlayedChannels[1] = channel;
                 }
-
-                _viewModel.NotifyChannelChange();
 
                 await Task.Run(async () =>
                 {

@@ -51,6 +51,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
         FullscreenSwitch.Toggled += FullscreenSwitch_Toggled;
         EnableRTLSDRSwitch.Toggled += EnableRTLSDRSwitch_Toggled;
+        RemoteSDRSwitch.Toggled += RemoteSDRSwitch_Toggled;
 
         BuildFocusableItems();
 
@@ -78,6 +79,14 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 await ProcessCheckBatterySettingsResult(m.Value);
             });
         });
+    }
+
+    private void RemoteSDRSwitch_Toggled(object? sender, ToggledEventArgs e)
+    {
+        if (RemoteSDRSwitch.IsToggled)
+        {
+            BuildInfoMenu("Now you can start rtl_tcp by:  rtl_tcp -a 0.0.0.0 -s 2048000".Translated(), "OK".Translated());
+        }
     }
 
     private void EnableRTLSDRSwitch_Toggled(object? sender, ToggledEventArgs e)
