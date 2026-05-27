@@ -271,7 +271,6 @@ Enable SDR=SDR-i aktiv et
 Debug drivers=Sürücülərin ayıklanması
 Remote SDR=Uzaq SDR
 Allow remote SDR via rtl_tcp=rtl_tcp vasitəsilə uzaq SDR-ə icazə ver
-Now you can start rtl_tcp by: rtl_tcp -a 0.0.0.0 -s 2048000=İndi rtl_tcp-ı belə işə sala bilərsiniz: rtl_tcp -a 0.0.0.0 -s 2048000
 Delete all DVBT channels=Bütün DVBT kanallarını sil
 Delete all FM channels=Bütün FM kanallarını sil
 Delete all DAB channels=Bütün DAB kanallarını sil

@@ -271,7 +271,6 @@ Enable SDR=Abilita SDR
 Debug drivers=Debug driver
 Remote SDR=SDR remoto
 Allow remote SDR via rtl_tcp=Consenti SDR remoto tramite rtl_tcp
-Now you can start rtl_tcp by: rtl_tcp -a 0.0.0.0 -s 2048000=Ora puoi avviare rtl_tcp con: rtl_tcp -a 0.0.0.0 -s 2048000
 Delete all DVBT channels=Elimina tutti i canali DVBT
 Delete all FM channels=Elimina tutti i canali FM
 Delete all DAB channels=Elimina tutti i canali DAB

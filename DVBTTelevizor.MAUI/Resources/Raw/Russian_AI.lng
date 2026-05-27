@@ -270,7 +270,6 @@ Enable SDR=Включить SDR
 Debug drivers=Отладка драйверов
 Remote SDR=Удаленный SDR
 Allow remote SDR via rtl_tcp=Разрешить удаленный SDR через rtl_tcp
-Now you can start rtl_tcp by: rtl_tcp -a 0.0.0.0 -s 2048000=Теперь вы можете запустить rtl_tcp командой: rtl_tcp -a 0.0.0.0 -s 2048000
 Delete all DVBT channels=Удалить все DVBT каналы
 Delete all FM channels=Удалить все FM каналы
 Delete all DAB channels=Удалить все DAB каналы

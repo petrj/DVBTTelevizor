@@ -271,7 +271,6 @@ Enable SDR=Bật SDR
 Debug drivers=Gỡ lỗi trình điều khiển
 Remote SDR=SDR từ xa
 Allow remote SDR via rtl_tcp=Cho phép SDR từ xa qua rtl_tcp
-Now you can start rtl_tcp by: rtl_tcp -a 0.0.0.0 -s 2048000=Bây giờ bạn có thể khởi động rtl_tcp bằng: rtl_tcp -a 0.0.0.0 -s 2048000
 Delete all DVBT channels=Xóa tất cả các kênh DVBT
 Delete all FM channels=Xóa tất cả các kênh FM
 Delete all DAB channels=Xóa tất cả các kênh DAB
