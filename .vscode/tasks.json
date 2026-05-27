@@ -9,8 +9,11 @@
               "publish",
               "${workspaceFolder}/DVBTTelevizor.MAUI/DVBTTelevizor.MAUI.csproj",
               "--configuration", "Release",
-              "--framework", "net9.0-android35.0",
-              "/p:AndroidSdkDirectory=/home/kirk/Android/Sdk/",
+              "--framework", "net10.0-android",
+              "/p:AndroidSdkDirectory=/home/sisko/Android/Sdk",
+              "/p:AndroidCompileSdkVersion=android-35",
+              "/p:AndroidTargetSdkVersion=35",
+              "/p:AcceptAndroidSDKLicenses=true",
               "/p:AndroidPackageFormat=apk"
             ],
             "group": {

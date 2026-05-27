@@ -2,15 +2,50 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Linux release build",
+            "name": "Build MAUI Android Release",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Linux - release build",
-            "program": "/bin/true",
-            "args": [],
+            "program": "dotnet",
+            "args": [
+                "publish",
+                "${workspaceFolder}/DVBTTelevizor.MAUI/DVBTTelevizor.MAUI.csproj",
+                "--configuration",
+                "Release",
+                "--framework",
+                "net10.0-android",
+                "/p:AndroidSdkDirectory=/home/sisko/Android/Sdk",
+                "/p:AndroidCompileSdkVersion=android-35",
+                "/p:AndroidTargetSdkVersion=35",
+                "/p:AcceptAndroidSDKLicenses=true",
+                "/p:AndroidPackageFormat=apk"
+            ],
             "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "noDebug": true
+        },
+        {
+            "name": "Build MAUI Android Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "publish",
+                "${workspaceFolder}/DVBTTelevizor.MAUI/DVBTTelevizor.MAUI.csproj",
+                "--configuration",
+                "Debug",
+                "--framework",
+                "net10.0-android",
+                "/p:AndroidSdkDirectory=/home/sisko/Android/Sdk",
+                "/p:AndroidCompileSdkVersion=android-35",
+                "/p:AndroidTargetSdkVersion=35",
+                "/p:AcceptAndroidSDKLicenses=true",
+                "/p:AndroidPackageFormat=apk"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "noDebug": true
         }
-    ]        
+    ]
 }
