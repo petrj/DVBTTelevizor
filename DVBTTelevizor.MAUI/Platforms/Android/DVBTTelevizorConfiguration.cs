@@ -789,6 +789,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool UpdatedTo2026_rev2
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("UpdatedTo2026_rev2");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("UpdatedTo2026_rev2", value);
+            }
+        }
+
         public bool RTLSDREnabled
         {
             get

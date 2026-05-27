@@ -135,7 +135,7 @@ namespace DVBTTelevizor.MAUI
 
             Task.Run(async () =>
             {
-                if (!_configuration.UpdatedTo2026)
+                if (!_configuration.UpdatedTo2026 || !_configuration.UpdatedTo2026_rev2)
                 {
                     await ExtractAssetFile("Arabic_AI.lng");
                     await ExtractAssetFile("Azerbaijani_AI.lng");
@@ -159,6 +159,7 @@ namespace DVBTTelevizor.MAUI
                     await ExtractAssetFile("Russian_AI.lng");
 
                     _configuration.UpdatedTo2026 = true;
+                    _configuration.UpdatedTo2026_rev2 = true;
                 }
 
                 // language
@@ -2168,6 +2169,37 @@ namespace DVBTTelevizor.MAUI
 
             // TODO : DVBT/RTLSDDR driver installation check
 
+
+            AppDriverTypeEnum? driverToChange = null;
+            if ((channel.ChannelType == ChannelTypeEnum.FM) && (_driver.DriverType != TV.AppDriverTypeEnum.FM))
+            {
+                // need to change driver
+                driverToChange = AppDriverTypeEnum.FM;
+            }
+            if ((channel.ChannelType == ChannelTypeEnum.DAB) && (_driver.DriverType != TV.AppDriverTypeEnum.DAB))
+            {
+                // need to change driver
+                driverToChange = AppDriverTypeEnum.DAB;
+            }
+            if ((channel.ChannelType == ChannelTypeEnum.DVBT ||
+                channel.ChannelType == ChannelTypeEnum.DVBT2) &&
+                (_driver.DriverType != TV.AppDriverTypeEnum.DVBT))
+            {
+                // need to change driver
+                driverToChange = AppDriverTypeEnum.DVBT;
+            }
+
+            if (driverToChange != null)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _appMenu.ShowConfirmChangeDriverMenu
+                    (_driver, driverToChange);
+                });
+
+                return false;
+            }
+
             if ( !(_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
@@ -2176,39 +2208,6 @@ namespace DVBTTelevizor.MAUI
                 });
                 return false;
             }
-            /*
-           if (!_viewModel.FMDriverActive &&
-               (channel.ChannelType == ChannelTypeEnum.FM))
-           {
-               MainThread.BeginInvokeOnMainThread(async () =>
-               {
-                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverFM);
-               });
-               return false;
-           }
-
-           if (!_viewModel.DABDriverActive &&
-                (channel.ChannelType == ChannelTypeEnum.DAB))
-           {
-               MainThread.BeginInvokeOnMainThread(async () =>
-               {
-                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.RTLSDRDriverDAB);
-               });
-               return false;
-           }
-
-           if (
-               !_viewModel.DVBTDriverActive &&
-               ((channel.ChannelType == ChannelTypeEnum.DVBT) || (channel.ChannelType == ChannelTypeEnum.DVBT2))
-               )
-           {
-               MainThread.BeginInvokeOnMainThread(async () =>
-               {
-                   _appMenu.ShowConfirmChangeDriverMenu(_driver, _configuration.DVBTDriverType, DriverTypeEnum.AndroidDVBTDriver);
-               });
-               return false;
-           }
-           */
 
             return true;
         }
@@ -2220,10 +2219,14 @@ namespace DVBTTelevizor.MAUI
             try
             {
                 if (channel == null)
+                {
                     channel = _viewModel.SelectedChannel;
+                }
 
                 if (channel == null)
+                {
                     return;
+                }
 
                 _loggingService.Debug($"playing: {channel.Name} ({channel.Number})");
 

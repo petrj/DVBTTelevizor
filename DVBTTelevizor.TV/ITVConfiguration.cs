@@ -81,7 +81,7 @@ namespace DVBTTelevizor
         string SledovaniTVPIN { get; set; }
         string SledovaniTVDeviceID { get; set; }
         string SledovaniTVDevicePassword { get; set; }
-        bool UpdatedTo2026 { get; set; }
+
         bool RTLSDREnabled { get; set; }
 
         bool TestingMode { get; set; }
@@ -91,5 +91,8 @@ namespace DVBTTelevizor
         bool AllowRemoteSDR { get; set; }
         string RemoteSDRIP { get; set; }
         int RemoteSDRPort { get; set; }
+
+        bool UpdatedTo2026 { get; set; }
+        bool UpdatedTo2026_rev2 { get; set; }
     }
 }

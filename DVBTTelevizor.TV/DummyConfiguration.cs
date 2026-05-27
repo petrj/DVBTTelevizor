@@ -11,6 +11,7 @@ namespace DVBTTelevizor.TV
     public class DummyConfiguration : ITVConfiguration
     {
         public bool UpdatedTo2026 { get; set; } = false;
+        public bool UpdatedTo2026_rev2 { get; set; } = false;
         public bool RTLSDREnabled { get; set; } = false;
 
         public string ConfigDirectory { get; set; } = String.Empty;
