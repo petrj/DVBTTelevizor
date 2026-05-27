@@ -110,10 +110,17 @@ foreach ($f in $files)
 }
 
 
+$count = 0
 foreach($word in $dict)
 {
     if (-not $alreadyTranslatedText.Contains($word))
     {
+        $count++
         Write-Host ($word + "=")
     }
+}
+
+if ($count -eq 0)
+{
+    Write-Host "All text is already translated."
 }
