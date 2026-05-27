@@ -23,7 +23,7 @@ foreach ($line in $referenceDict)
     {
          $alreadyTranslatedText += $enAndCZ[0]
     }
-
+}
 
 function Get-TranslatedText
 {
@@ -69,62 +69,43 @@ function Get-XamlTranslatedText {
 
 
 $dict = @()
+$translatedRegex = [regex] '"((?:[^"\\]|\\.)*)"\s*\.Translated\s*\('
+$xamlRegex = [regex] "Input='([^']*)'"
 foreach ($f in $files)
 {
-    foreach ($line in Get-Content -Path $f.FullName)
+    $content = Get-Content -Path $f.FullName -Raw
+
+    foreach ($match in $translatedRegex.Matches($content))
     {
-        # searching  "text".Translated()
-        if ($line.Contains("Translated("))
+        $txt = $match.Groups[1].Value -replace '\\"', '"'
+
+        if ([String]::IsNullOrWhiteSpace($txt))
         {
-                foreach ($l in $line.Split(","))
-                {
-                    if ([String]::IsNullOrWhiteSpace($l))
-                    {
-                        continue
-                    }
-
-                    $txt = $l | Get-TranslatedText
-
-                    if ([String]::IsNullOrWhiteSpace($txt))
-                    {
-                        continue
-                    }
-
-                    if (-not $dict.Contains($txt))
-                    {
-                        $dict+= $txt
-                    }
-                }
-
+            continue
         }
 
-
-        # searching Text="{local:LngXamlExt Input='No channel'}"
-        if ($line.Contains("{local:LngXamlExt"))
+        if (-not $dict.Contains($txt))
         {
-             foreach ($l in $line.Split("`""))
+            $dict += $txt
+        }
+    }
+
+    if ($content -match '\{local:LngXamlExt')
+    {
+        foreach ($match in $xamlRegex.Matches($content))
+        {
+            $txt = $match.Groups[1].Value
+
+            if ([String]::IsNullOrWhiteSpace($txt))
             {
-                if ([String]::IsNullOrWhiteSpace($l))
-                {
-                    continue
-                }
+                continue
+            }
 
-               # Write-Host $l -ForegroundColor Yellow
-
-                $txt = $l | Get-XamlTranslatedText
-
-                if ([String]::IsNullOrWhiteSpace($txt))
-                {
-                    continue
-                }
-
-                if (-not $dict.Contains($txt))
-                {
-                    $dict+= $txt
-                }
+            if (-not $dict.Contains($txt))
+            {
+                $dict += $txt
             }
         }
-
     }
 }
 
