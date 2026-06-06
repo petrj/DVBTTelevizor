@@ -139,9 +139,10 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
 
         // update settings according to selected driver
-        _viewModel?.Settings.LoadFromConfiguration(_configuration);
+        //_viewModel?.Settings.LoadFromConfiguration(_configuration, _viewModel?.Settings.dri);
         // update frequencies according to driver
-        _viewModel?.Settings.SetFrequencies(_driver);
+        //_viewModel?.Settings.SetFrequencies(_driver);
+
         _viewModel?.Settings.TuningMode = mode;
 
         if (mode == TuneModeEnum.Automatic)

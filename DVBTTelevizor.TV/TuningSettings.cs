@@ -81,10 +81,10 @@ namespace DVBTTelevizor
             return (freq >= DeviceFrequencyMinKHz) && (freq <= DeviceFrequencyMaxKHz);
         }
 
-        public void LoadFromConfiguration(ITVConfiguration configuration)
+        public void LoadFromConfiguration(ITVConfiguration configuration, AppDriverTypeEnum driverType)
         {
 
-            switch (configuration.AppDriverType)
+            switch (driverType)
             {
                 case AppDriverTypeEnum.FM:
 

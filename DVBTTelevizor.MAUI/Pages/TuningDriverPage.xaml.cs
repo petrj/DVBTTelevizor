@@ -155,7 +155,7 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
         {
             _configuration.AppDriverType = driverType.Value;
             // update settings according to selected driver
-            _tuningSettings.LoadFromConfiguration(_configuration);
+            _tuningSettings.LoadFromConfiguration(_configuration, driverType.Value);
 
             switch (driverType)
             {
