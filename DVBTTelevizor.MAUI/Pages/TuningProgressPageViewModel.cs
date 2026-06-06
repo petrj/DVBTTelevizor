@@ -1185,13 +1185,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return
-                        (State == TuneStateEnum.InProgress) &&
-                        (_driver != null) &&
-                        (
-                            (_driver.DriverType == TV.AppDriverTypeEnum.FM) ||
-                            (_driver.DriverType == TV.AppDriverTypeEnum.DAB)
-                        );
+                return (_driver != null);
             }
         }
 

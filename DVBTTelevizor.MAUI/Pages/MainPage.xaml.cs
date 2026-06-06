@@ -3640,8 +3640,6 @@ namespace DVBTTelevizor.MAUI
             var menuId = menuItem.Id;
             HideMenu();
 
-            // TODO: Handle menuConfirmChangeDriver
-
             if (menuId.StartsWith("setAudio"))
             {
                 SetAudio(menuId);
