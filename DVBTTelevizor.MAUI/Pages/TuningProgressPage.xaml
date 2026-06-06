@@ -267,7 +267,9 @@
             <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
             <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
 
-            <Button x:Name="DriverButton" Grid.Column="2" Text="{local:LngXamlExt Input='Driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverButtonVisible}" Command="{Binding CommandDriver}" />
+            <Frame Grid.Column="2" BackgroundColor="Gray" CornerRadius="15" Margin="5,5,5,0" Padding="5,5,5,5">
+                <local:ImgButton BottomTitleText="{local:LngXamlExt Input='Driver..'}" x:Name="DriverButton" TextFontSize="{Binding FontSizeForDetailNote}" Img="configdriver.png" TapCommand="{Binding CommandDriver}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="0,0,0,0" TextColor="Black" BackgroundColor="Gray" />
+            </Frame>
 
             <Button x:Name="FinishButton" Grid.Column="3" Text="{local:LngXamlExt Input='Finish'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding FinishButtonVisible}" Clicked="FinishButton_Clicked"/>
         </Grid>
