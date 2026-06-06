@@ -51,7 +51,10 @@ public class SpectrumWorker
     {
         get
         {
-            return _spectrum;
+            lock (_spectrumLock)
+            {
+                return (System.Drawing.Point[])_spectrum.Clone();
+            }
         }
     }
 

@@ -3640,6 +3640,8 @@ namespace DVBTTelevizor.MAUI
             var menuId = menuItem.Id;
             HideMenu();
 
+            // TODO: Handle menuConfirmChangeDriver
+
             if (menuId.StartsWith("setAudio"))
             {
                 SetAudio(menuId);
@@ -3755,6 +3757,10 @@ namespace DVBTTelevizor.MAUI
                     await ActionStop(true);
                     _vlcRawAudioInput = null;
                     //await _viewModel.ChangeDriver(menuItem.DriverType);
+                    break;
+
+                case "menuConfirmChangeDriver":
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(menuItem.DriverType));
                     break;
 
                 case "menuConnectDriver":
