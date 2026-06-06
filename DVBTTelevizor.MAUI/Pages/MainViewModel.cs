@@ -1066,6 +1066,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
 
+
             UpdateDriverState();
         }
 

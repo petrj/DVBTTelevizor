@@ -24,6 +24,7 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
     private KeyboardFocusableItemList _focusItems;
     private SpectrumWorker? _spectrumWorker = null;
+    private bool _visible = false;
 
     public DriverStatPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -43,15 +44,19 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
         // Start a timer to update the spectrum ~60 FPS
         Dispatcher.StartTimer(TimeSpan.FromMilliseconds(200), () =>
         {
-            UpdateSpectrum();
-            SpectrumCanvas.InvalidateSurface();
+            if (_visible)
+            {
+                UpdateSpectrum();
+                SpectrumCanvas.InvalidateSurface();
+            }
+
             return true; // repeat
         });
     }
 
     private void _driver_RawDataReceived(object? sender, EventArgs e)
     {
-        if (e is RawDataReceivedEventArgs args)
+        if (_visible && e is RawDataReceivedEventArgs args)
         {
             _spectrumWorker?.AddData(args.Data, args.DataSize);
         }
@@ -60,15 +65,17 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        _spectrumWorker?.Stop();
-        _spectrumWorker = null;
+
+        _visible = false;
+        //_spectrumWorker?.Stop();
+        //_spectrumWorker = null;
     }
 
     private void UpdateSpectrum()
     {
         if (_spectrumWorker == null)
         {
-            return;
+            _spectrumWorker = new SpectrumWorker(_loggingService, 16384, _driver.DriverType == TV.AppDriverTypeEnum.DAB ? AudioTools.DABSampleRate : AudioTools.FMSampleRate);
         }
 
         _spectrum = _spectrumWorker?.Spectrum;
@@ -85,13 +92,10 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     {
         base.OnAppearing();
 
-        if (_driver != null && _driver.Connected)
-        {
-            _spectrumWorker = new SpectrumWorker(_loggingService, 16384, _driver.DriverType == TV.AppDriverTypeEnum.DAB ? AudioTools.DABSampleRate : AudioTools.FMSampleRate);
-        }
-
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+
+        _visible = true;
     }
 
     public void OnKeyDown(string key, bool longPress)
