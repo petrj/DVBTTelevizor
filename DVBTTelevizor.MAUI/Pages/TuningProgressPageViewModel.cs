@@ -27,6 +27,7 @@ namespace DVBTTelevizor.MAUI
 
         public TuningSettings Settings { get; set; }
         public ICommand CommandDriver { get; set; }
+        public ICommand CommandStart { get; set; }
 
 
         private int _actualTuningDVBTType = 0; // 0 .. DVBT, 1 .. DVBT2
@@ -92,6 +93,10 @@ namespace DVBTTelevizor.MAUI
                 WeakReferenceMessenger.Default.Send(new ShowTuningProgressDriverPageMessage(_driver.DriverType));
             });
 
+            CommandStart = new Command(() =>
+            {
+                WeakReferenceMessenger.Default.Send(new StartTuneMessage(String.Empty));
+            });
         }
 
         public IDriverConnector? Driver

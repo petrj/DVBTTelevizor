@@ -66,6 +66,15 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             });
         });
 
+        WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                StartButton_Clicked(this, new EventArgs());
+            });
+        });
+
+
         WeakReferenceMessenger.Default.Register<ShowTuningProgressDriverPageMessage>(this, (r, m) =>
         {
             DriverButton_Clicked(this, new EventArgs());

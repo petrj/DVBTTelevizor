@@ -264,7 +264,10 @@
 
             <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="BackButton_Clicked"/>
 
-            <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
+            <Frame Grid.Column="1" BackgroundColor="Gray" CornerRadius="15" Margin="5,5,5,0" Padding="5,5,5,5">
+                <local:ImgButton BottomTitleText="{local:LngXamlExt Input='Start'}" x:Name="StartButton" TextFontSize="{Binding FontSizeForDetailNote}" Img="start.png" TapCommand="{Binding CommandStart}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="0,0,0,0" TextColor="Black" BackgroundColor="Gray" />
+            </Frame>
+
             <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
 
             <Frame Grid.Column="2" BackgroundColor="Gray" CornerRadius="15" Margin="5,5,5,0" Padding="5,5,5,5">
