@@ -1,4 +1,3 @@
-
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -239,19 +238,21 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         }
     }
 
+    private void ContentPage_Loaded(object sender, EventArgs e)
+    {
+        //StartButton_Clicked(this, new EventArgs());
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
         Title = "Tuning".Translated();
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            StartButton_Clicked(this, new EventArgs());
-        });
-
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+
+
     }
 
     private void ActionDown()
@@ -372,6 +373,12 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     public void OnTextSent(string text)
     {
         _loggingService.Debug($"TuningProgressPage OnTextSent {text}");
+    }
+
+
+    public void ResetTune(bool clearChannels)
+    {
+        _viewModel?.ResetTune(clearChannels);
     }
 
     private async void StartButton_Clicked(object sender, EventArgs e)

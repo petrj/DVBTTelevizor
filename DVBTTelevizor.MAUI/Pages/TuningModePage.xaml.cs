@@ -145,11 +145,35 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 
         _viewModel?.Settings.TuningMode = mode;
 
-        if (mode == TuneModeEnum.Automatic)
+        switch (mode)
         {
-            _viewModel?.Settings.DVBT = true;
-            _viewModel?.Settings.DVBT2 = true;
-            _viewModel?.Settings.TuneDVBTPreferred = false;
+            case TuneModeEnum.Automatic:
+                _viewModel?.Settings.DVBT = true;
+                _viewModel?.Settings.DVBT2 = true;
+                _viewModel?.Settings.TuneDVBTPreferred = false;
+
+                _viewModel?.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyMinKHz;
+                _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.DefaultFrequencyMinKHz;
+                _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.DefaultFrequencyMaxKHz;
+                break;
+            case TuneModeEnum.Manual:
+                _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
+                _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+
+                _viewModel?.Settings.FrequencyKHz = _configuration.FrequencyFromKHz;
+                _viewModel?.Settings.FrequencyFromKHz = _configuration.FrequencyFromKHz;
+                _viewModel?.Settings.FrequencyToKHz = _configuration.FrequencyToKHz;
+                break;
+            case TuneModeEnum.Frequency:
+                _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
+                _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+
+                _viewModel?.Settings.FrequencyKHz = _configuration.FrequencyKHz;
+                _viewModel?.Settings.FrequencyFromKHz = _configuration.FrequencyKHz;
+                _viewModel?.Settings.FrequencyToKHz = _configuration.FrequencyKHz;
+                break;
         }
 
         if (page is ITuningPage tuPage)
@@ -157,6 +181,10 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
             tuPage.UpdateSettings(_viewModel?.Settings);
         }
 
+        if (page is TuningProgressPage tp)
+        {
+            tp.ResetTune(true);
+        }
         await MainPage.ShowPage<T>(Navigation, page);
     }
 

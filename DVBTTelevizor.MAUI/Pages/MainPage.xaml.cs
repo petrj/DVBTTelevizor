@@ -2773,10 +2773,13 @@ namespace DVBTTelevizor.MAUI
                         throw new ArgumentException("Unknown page");
                 }
 
-                page.Disappearing += delegate
+                if (dissapearing != null)
                 {
-                    dissapearing?.Invoke();
-                };
+                    page.Disappearing += delegate
+                    {
+                        dissapearing.Invoke();
+                    };
+                }
 
                 Pages.Add(typeof(T), page);
 

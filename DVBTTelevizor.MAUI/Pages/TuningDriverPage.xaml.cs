@@ -186,6 +186,9 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
                 case AppDriverTypeEnum.DVBT:
                     _tuningSettings.DVBT = true;
                     _tuningSettings.DVBT2 = true;
+                    _tuningSettings.FrequencyKHz = _configuration.FrequencyKHz;
+                    _tuningSettings.FrequencyFromKHz = _configuration.FrequencyFromKHz;
+                    _tuningSettings.FrequencyToKHz = _configuration.FrequencyToKHz;
                     break;
                 case AppDriverTypeEnum.FM:
                     _tuningSettings.FM = true;

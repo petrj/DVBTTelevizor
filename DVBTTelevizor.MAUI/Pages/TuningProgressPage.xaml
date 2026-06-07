@@ -4,7 +4,8 @@
              x:Class="DVBTTelevizor.MAUI.TuningProgressPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
              BackgroundColor="Black"
-             Title="{local:LngXamlExt Input='Tuning'}">
+             Title="{local:LngXamlExt Input='Tuning'}"
+             Loaded="ContentPage_Loaded">
 
     <ContentPage.Resources>
         <ResourceDictionary>

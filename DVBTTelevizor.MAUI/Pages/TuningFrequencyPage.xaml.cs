@@ -164,14 +164,14 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         if (Settings != null)
         {
+            _configuration.FrequencyKHz = Settings.FrequencyKHz;
             Settings.FrequencyFromKHz = Settings.FrequencyKHz;
             Settings.FrequencyToKHz = Settings.FrequencyKHz;
-
-            _configuration.FrequencyKHz = Settings.FrequencyKHz;
 
             page?.UpdateSettings(Settings);
         }
 
+        page?.ResetTune(true);
         await MainPage.ShowPage<TuningProgressPage>(Navigation, page);
     }
     private FrequencyPage GetFreqPage()
@@ -190,6 +190,7 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         }
 
         page.Confirmed = false;
+        page.TuneFrequencyMode = TuneFrequencyModeEnum.Center;
 
         await MainPage.ShowPage<FrequencyPage>(Navigation, page);
     }

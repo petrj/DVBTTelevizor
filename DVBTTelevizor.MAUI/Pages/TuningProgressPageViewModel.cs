@@ -350,7 +350,7 @@ namespace DVBTTelevizor.MAUI
                 _actualTuningDVBTType = 1;
             }
 
-            _actualTunningFreqKHz = FrequencyFromKHz;
+            _actualTunningFreqKHz = Settings.FrequencyFromKHz;
 
             _signalSNR = 0;
             _signalCarrier = false;

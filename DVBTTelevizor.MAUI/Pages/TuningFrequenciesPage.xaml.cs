@@ -16,6 +16,8 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
     private bool _editingFrom = false;
     private IPublicDirectoryProvider _publicDirectoryProvider;
 
+    private bool _dissapearingRegistered = false;
+
     public TuningFrequenciesPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
@@ -149,9 +151,13 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
         if (Settings != null)
         {
+            _configuration.FrequencyFromKHz = Settings.FrequencyFromKHz;
+            _configuration.FrequencyToKHz = Settings.FrequencyToKHz;
+
             page?.UpdateSettings(Settings);
         }
 
+        page?.ResetTune(true);
         await MainPage.ShowPage<TuningProgressPage>(Navigation, page);
     }
 
@@ -186,8 +192,15 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
     private FrequencyPage GetFreqPage()
     {
-        return MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
-            () => { _frequencyPage_Disappearing(this, new EventArgs()); }) as FrequencyPage;
+        var page = MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider) as FrequencyPage;
+
+        if (!_dissapearingRegistered)
+        {
+            page.Disappearing += _frequencyPage_Disappearing;
+            _dissapearingRegistered = true;
+        }
+
+        return page;
     }
 
     private async Task ShowFreqPage()
