@@ -1,3 +1,4 @@
+using DVBTTelevizor.TV;
 using LoggerService;
 
 namespace DVBTTelevizor.MAUI;
@@ -93,7 +94,24 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        _tuningSelectDVBTViewModel.Settings?.SaveToConfiguration(_configuration);
+        SaveToConfiguration();
+    }
+
+    private void SaveToConfiguration()
+    {
+        switch (_configuration.AppDriverType)
+        {
+            case AppDriverTypeEnum.DVBT:
+
+                _configuration.TuneDVBTEnabled = _tuningSelectDVBTViewModel.Settings.DVBT;
+                _configuration.TuneDVBT2Enabled = _tuningSelectDVBTViewModel.Settings.DVBT2;
+                _configuration.TuneDVBTPreferred = _tuningSelectDVBTViewModel.Settings.TuneDVBTPreferred;
+
+                _configuration.DVBTBandwidthKHz = _tuningSelectDVBTViewModel.Settings.BandwidthKHz;
+            break;
+            default:
+                break;
+        }
     }
 
     public void OnKeyDown(string key, bool longPress)
@@ -232,14 +250,6 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
     public async Task ShowPage<T>() where T : Page
     {
         var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
-
-        if (_tuningSelectDVBTViewModel.Settings != null)
-        {
-            _configuration.TuneDVBTEnabled = _tuningSelectDVBTViewModel.Settings.DVBT;
-            _configuration.TuneDVBT2Enabled = _tuningSelectDVBTViewModel.Settings.DVBT2;
-            _configuration.DVBTBandwidthKHz = _tuningSelectDVBTViewModel.Settings.BandwidthKHz;
-            _configuration.TuneDVBTPreferred = _tuningSelectDVBTViewModel.Settings.TuneDVBTPreferred;
-        }
 
         if (page is ITuningPage tuPage)
         {

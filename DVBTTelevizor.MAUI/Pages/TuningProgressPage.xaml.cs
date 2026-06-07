@@ -252,7 +252,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
-
+        //StartButton_Clicked(this, new EventArgs());
     }
 
     private void ActionDown()
@@ -432,12 +432,15 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
             _viewModel.Settings.TuningMode != TuneModeEnum.Frequency)
         {
-            _appMenu.ShowConfirmMenu(
-            "Tuning is in progress".Translated(),
-            "Start from beginning".Translated(),
-            "Continue".Translated(),
-            "menuFromBeginning",
-            "menuContinue");
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _appMenu.ShowConfirmMenu(
+                "Tuning is in progress".Translated(),
+                "Start from beginning".Translated(),
+                "Continue".Translated(),
+                "menuFromBeginning",
+                "menuContinue");
+            });
         } else
         {
             await _viewModel.StartTune();

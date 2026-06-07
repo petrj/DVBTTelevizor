@@ -123,39 +123,6 @@ namespace DVBTTelevizor
             }
         }
 
-        public void SaveToConfiguration(ITVConfiguration configuration)
-        {
-            switch (configuration.AppDriverType)
-            {
-                case AppDriverTypeEnum.FM:
-                    //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
-                    configuration.FMFrequencyKHz = FrequencyKHz;
-                    configuration.FMFrequencyFromKHz = FrequencyFromKHz;
-                    configuration.FMFrequencyToKHz = FrequencyToKHz;
-                    break;
-
-                case AppDriverTypeEnum.DAB:
-
-                    configuration.DABFrequencyKHz = FrequencyKHz;
-                    configuration.DABFrequencyFromKHz = FrequencyFromKHz;
-                    configuration.DABFrequencyToKHz = FrequencyToKHz;
-                    break;
-
-                case AppDriverTypeEnum.DVBT:
-                default:
-
-                    configuration.TuneDVBTEnabled = DVBT;
-                    configuration.TuneDVBT2Enabled = DVBT2;
-                    configuration.TuneDVBTPreferred = TuneDVBTPreferred;
-
-                    configuration.DVBTBandwidthKHz = BandwidthKHz ;
-                    configuration.FrequencyKHz = FrequencyKHz;
-                    configuration.FrequencyFromKHz = FrequencyFromKHz;
-                    configuration.FrequencyToKHz = FrequencyToKHz;
-                    break;
-            }
-        }
-
         public void SetFMSettings()
         {
             FM = true;

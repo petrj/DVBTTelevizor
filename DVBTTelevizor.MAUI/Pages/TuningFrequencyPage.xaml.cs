@@ -1,3 +1,4 @@
+using DVBTTelevizor.TV;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -13,6 +14,8 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
+
+    private bool _dissapearingRegistered = false;
 
     public TuningFrequencyPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -43,7 +46,8 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         var page = GetFreqPage();
 
-        if (page.Confirmed && page.Settings != null)
+        if (page.Confirmed && page.Settings != null &&
+            page.TuneFrequencyMode == TuneFrequencyModeEnum.Center)
         {
             _tuningFrequenciesViewModel.FrequencyKHz =
                 page.Settings.FrequencyKHz;
@@ -81,7 +85,26 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        Settings?.SaveToConfiguration(_configuration);
+        SaveToConfiguration();
+    }
+
+    private void SaveToConfiguration()
+    {
+        switch (_configuration.AppDriverType)
+        {
+            case AppDriverTypeEnum.FM:
+                _configuration.FMFrequencyKHz = _tuningFrequenciesViewModel.Settings.FrequencyKHz;
+                break;
+
+            case AppDriverTypeEnum.DAB:
+                _configuration.DABFrequencyKHz = _tuningFrequenciesViewModel.Settings.FrequencyKHz;
+                break;
+
+            case AppDriverTypeEnum.DVBT:
+            default:
+                _configuration.FrequencyKHz = _tuningFrequenciesViewModel.Settings.FrequencyKHz;
+                break;
+        }
     }
 
     public void OnKeyDown(string key, bool longPress)
@@ -164,7 +187,6 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
         if (Settings != null)
         {
-            _configuration.FrequencyKHz = Settings.FrequencyKHz;
             Settings.FrequencyFromKHz = Settings.FrequencyKHz;
             Settings.FrequencyToKHz = Settings.FrequencyKHz;
 
@@ -176,8 +198,15 @@ public partial class TuningFrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     }
     private FrequencyPage GetFreqPage()
     {
-        return MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider,
-            () => { _frequencyPage_Disappearing(this, new EventArgs()); }) as FrequencyPage;
+        var page = MainPage.GetOrCreatePage<FrequencyPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider) as FrequencyPage;
+
+        if (!_dissapearingRegistered)
+        {
+            page.Disappearing += _frequencyPage_Disappearing;
+            _dissapearingRegistered = true;
+        }
+
+        return page;
     }
 
     private async Task ShowFreqPage()

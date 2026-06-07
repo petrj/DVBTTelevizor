@@ -1,3 +1,4 @@
+using DVBTTelevizor.TV;
 using LoggerService;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -64,7 +65,30 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        _tuningFrequenciesViewModel.Settings.SaveToConfiguration(_configuration);
+        SaveToConfiguration();
+    }
+
+    private void SaveToConfiguration()
+    {
+        switch (_configuration.AppDriverType)
+        {
+            case AppDriverTypeEnum.FM:
+                //configuration.FMDVBTBandwidthKHz = BandwidthKHz;
+                _configuration.FMFrequencyFromKHz = _tuningFrequenciesViewModel.Settings.FrequencyFromKHz;
+                _configuration.FMFrequencyToKHz = _tuningFrequenciesViewModel.Settings.FrequencyToKHz;
+                break;
+
+            case AppDriverTypeEnum.DAB:
+                _configuration.DABFrequencyFromKHz = _tuningFrequenciesViewModel.Settings.FrequencyFromKHz;
+                _configuration.DABFrequencyToKHz = _tuningFrequenciesViewModel.Settings.FrequencyToKHz;
+                break;
+
+            case AppDriverTypeEnum.DVBT:
+            default:
+                _configuration.FrequencyFromKHz = _tuningFrequenciesViewModel.Settings.FrequencyFromKHz;
+                _configuration.FrequencyToKHz = _tuningFrequenciesViewModel.Settings.FrequencyToKHz;
+                break;
+        }
     }
 
     public void OnKeyDown(string key, bool longPress)
@@ -151,8 +175,7 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
         if (Settings != null)
         {
-            _configuration.FrequencyFromKHz = Settings.FrequencyFromKHz;
-            _configuration.FrequencyToKHz = Settings.FrequencyToKHz;
+            Settings.FrequencyKHz = Settings.FrequencyFromKHz;
 
             page?.UpdateSettings(Settings);
         }
@@ -174,13 +197,15 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
         var page = GetFreqPage();
 
-        if (_editingFrom)
+        // this event handler can be called from TuningFrequenciesPage, but it has different mode
+        switch (page.TuneFrequencyMode)
         {
-            _tuningFrequenciesViewModel.FrequencyFromKHz = page.Settings.FrequencyKHz;
-        }
-        else
-        {
-            _tuningFrequenciesViewModel.FrequencyToKHz = page.Settings.FrequencyKHz;
+            case TuneFrequencyModeEnum.From:
+                _tuningFrequenciesViewModel.FrequencyFromKHz = page.Settings.FrequencyKHz;
+                break;
+            case TuneFrequencyModeEnum.To:
+                _tuningFrequenciesViewModel.FrequencyToKHz = page.Settings.FrequencyKHz;
+                break;
         }
     }
 
