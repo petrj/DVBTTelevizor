@@ -166,7 +166,13 @@
             <Label Grid.Row="1" Grid.Column="2" Text="{local:LngXamlExt Input='Queue'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}"  IsVisible="{Binding FMDABTuningVisible}"/>
             <Label Grid.Row="1 " Grid.Column="3" Text="{Binding Queue}"  HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForDetailNote}" Margin="0,0,20,5"  IsVisible="{Binding FMDABTuningVisible}"/>
 
-            <Button x:Name="DriverButton" Grid.Row="2" Grid.Column="3" Text="{local:LngXamlExt Input='Driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" Clicked="DriverButton_Clicked"/>
+            <BoxView x:Name="DriverBoxView"  Grid.Row="2" Grid.Column="3" />
+
+            <Image Grid.Row="2" Grid.Column="3" Source="configdriver.png" x:Name="DriverButton" VerticalOptions="CenterAndExpand" HorizontalOptions="End">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CommandDriver}" NumberOfTapsRequired="1" />
+                </Image.GestureRecognizers>
+            </Image>
 
         </Grid>
 

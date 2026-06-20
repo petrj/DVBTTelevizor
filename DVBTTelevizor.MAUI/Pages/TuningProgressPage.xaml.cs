@@ -137,7 +137,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverButton }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverBoxView, DriverButton }));
 
         _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
     }
@@ -213,12 +213,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.98, 0.95, 0.15));
             AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, 0.8, 0.95, 0.325));
             AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0.5, 0.76, 0.95, 0.28));
-
-            //StartButton.BottomTitleText = "Start".Translated();
-            //StartButton.TopTitleText = String.Empty;
-
-            //DriverButton.BottomTitleText = "Driver".Translated();
-            //DriverButton.TopTitleText = String.Empty;
         } else
         {
             AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.05, 0.00, 0.45, 0.15));
@@ -229,11 +223,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.95, 0.45, 0.15));
             AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, -0.5, 0.0, 0.0));
             AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(1.0, 0.5, 0.5, 1));
-
-            //StartButton.BottomTitleText = String.Empty;
-            //StartButton.TopTitleText = "Start".Translated();
-            //DriverButton.BottomTitleText = String.Empty;
-            //DriverButton.TopTitleText = "Driver".Translated();
         }
     }
 
