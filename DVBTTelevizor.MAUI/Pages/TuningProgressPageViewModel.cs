@@ -708,6 +708,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(TunedMultiplexesCount));
                 OnPropertyChanged(nameof(TunedChannelsCount));
                 OnPropertyChanged(nameof(TunedNewChannelsCount));
+                OnPropertyChanged(nameof(FoundNewChannels));
 
                 OnPropertyChanged(nameof(SignalStrengthProgress));
                 OnPropertyChanged(nameof(DVBTPropertiesVisible));
@@ -778,6 +779,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return _tunedNewChannels;
+            }
+        }
+
+        public string FoundNewChannels
+        {
+            get
+            {
+                return $"{Channels.Count}/{_tunedNewChannels}";
             }
         }
 

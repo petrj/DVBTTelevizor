@@ -135,9 +135,9 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Finish", new List<View>() { FinishButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("ChannelsList", new List<View>() { ChannelsListView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Driver", new List<View>() { DriverButton }));
 
         _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
     }
@@ -208,33 +208,32 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.5, 0.0, 0.95, 0.1));
             AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.5, 0.1, 0.25, 0.05));
             AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.5, 0.14, 0.95, 0.15));
-            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.9, 0.29, 1.0, 0.15));
-            AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.5, 0.46, 0.95, 0.14));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.5, 0.32, 0.9, 0.15));
+            AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.5, 0.46, 0.9, 0.1));
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.98, 0.95, 0.15));
-            AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, 0.815, 0.95, 0.325));
-            AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0.5, 0.815, 0.95, 0.325));
+            AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, 0.8, 0.95, 0.325));
+            AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(0.5, 0.76, 0.95, 0.28));
 
-            StartButton.BottomTitleText = "Start".Translated();
-            StartButton.TopTitleText = String.Empty;
+            //StartButton.BottomTitleText = "Start".Translated();
+            //StartButton.TopTitleText = String.Empty;
 
-            DriverButton.BottomTitleText = "Driver".Translated();
-            DriverButton.TopTitleText = String.Empty;
+            //DriverButton.BottomTitleText = "Driver".Translated();
+            //DriverButton.TopTitleText = String.Empty;
         } else
         {
             AbsoluteLayout.SetLayoutBounds(FrequencyGrid, new Rect(0.05, 0.00, 0.45, 0.15));
             AbsoluteLayout.SetLayoutBounds(TuneIndicator, new Rect(0.125, 0.15, 0.25, 0.05));
             AbsoluteLayout.SetLayoutBounds(ProgressGrid, new Rect(0.05, 0.25, 0.45, 0.15));
-            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.0, 0.45, 0.5, 0.2));
-            AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.05, 0.7, 0.45, 0.2));
+            AbsoluteLayout.SetLayoutBounds(SignalDetailsGrid, new Rect(0.05, 0.5, 0.45, 0.25));
+            AbsoluteLayout.SetLayoutBounds(TuneResultDetailsGrid, new Rect(0.05, 0.75, 0.45, 0.15));
             AbsoluteLayout.SetLayoutBounds(ButtonsGrid, new Rect(0.05, 0.95, 0.45, 0.15));
-            AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(1, 0.5, 0.5, 1));
+            AbsoluteLayout.SetLayoutBounds(ChannelsSplitterGrid, new Rect(0.5, -0.5, 0.0, 0.0));
             AbsoluteLayout.SetLayoutBounds(ChannelsListView, new Rect(1.0, 0.5, 0.5, 1));
 
-            StartButton.BottomTitleText = String.Empty;
-            StartButton.TopTitleText = "Start".Translated();
-
-            DriverButton.BottomTitleText = String.Empty;
-            DriverButton.TopTitleText = "Driver".Translated();
+            //StartButton.BottomTitleText = String.Empty;
+            //StartButton.TopTitleText = "Start".Translated();
+            //DriverButton.BottomTitleText = String.Empty;
+            //DriverButton.TopTitleText = "Driver".Translated();
         }
     }
 
@@ -571,5 +570,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
         }
+    }
+
+    private void DriverhButton_Clicked(object sender, EventArgs e)
+    {
+
     }
 }
