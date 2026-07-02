@@ -240,7 +240,13 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
-        //StartButton_Clicked(this, new EventArgs());
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Task.Delay(200); // Allow UI to render first
+            StartButton_Clicked(this, new EventArgs());
+        });
+
+        _viewModel.NotifyChange();
     }
 
     private void ActionDown()

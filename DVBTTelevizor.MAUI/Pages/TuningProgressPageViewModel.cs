@@ -369,7 +369,7 @@ namespace DVBTTelevizor.MAUI
                     ResetTune(false);
                     break;
                 default:
-                    ResetTune();
+                    ResetTune(false);
                     break;
             }
 
