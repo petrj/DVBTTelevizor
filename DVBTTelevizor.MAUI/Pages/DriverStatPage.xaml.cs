@@ -136,13 +136,33 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-        if (_spectrum == null)
+        if (_spectrum == null || _spectrum.Length == 0)
         {
             return;
         }
 
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Black);
+
+        int width = e.Info.Width;
+        int height = e.Info.Height;
+
+        // Find min/max dB values for normalization
+        float minDb = float.MaxValue;
+        float maxDb = float.MinValue;
+
+        foreach (var point in _spectrum)
+        {
+            float db = point.Y;
+            if (db < minDb) minDb = db;
+            if (db > maxDb) maxDb = db;
+        }
+
+        // Avoid division by zero
+        if (maxDb <= minDb)
+        {
+            maxDb = minDb + 1;
+        }
 
         using var paint = new SKPaint
         {
@@ -151,23 +171,24 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
             IsAntialias = false
         };
 
-        int width = e.Info.Width;
-        int height = e.Info.Height;
-
         float barWidth = (float)width / _spectrum.Length;
+        float dbRange = maxDb - minDb;
+        float centerY = height / 2f;
 
         float lastx = 0;
-        float lasty = height;
+        float lasty = centerY;
 
         for (int i = 0; i < _spectrum.Length; i++)
         {
-            // Use Point.Y as value
-            float value = (float)_spectrum[i].Y / 200f; // normalize 0–1
-            float barHeight = value * height;
-            float x = i * barWidth;
-            float y = height - barHeight;
+            // Normalize dB value to range -1 to 1 (centered)
+            float normalizedValue = ((_spectrum[i].Y - minDb) / dbRange) * 2f - 1f;
 
-            if (i>0)
+            // Map to canvas: positive dB values go up, negative go down
+            float barHeight = normalizedValue * (height / 2f);
+            float x = i * barWidth;
+            float y = centerY - barHeight;
+
+            if (i > 0)
             {
                 canvas.DrawLine(lastx, lasty, x, y, paint);
             }
