@@ -1016,7 +1016,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(Channels));
         }
 
-        public async void DisconnectDriver()
+        public async Task DisconnectDriver()
         {
             _loggingService.Info("DisconnectDriver");
 
@@ -1027,8 +1027,8 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
-                _driver.Stop();
-                await _driver.Disconnect();
+                await _driver.Stop();
+                _driver.Disconnect(); // when calling with await, the driver is not disconnected and the state is not updated, so we call it without await
             }
             catch (Exception ex)
             {

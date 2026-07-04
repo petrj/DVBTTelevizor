@@ -370,7 +370,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<SendConnectDriverRequestMessage>(this, (r, m) =>
             {
-                SendConnectDriverRequest(m.Value);
+                Task.Run(async () => await SendConnectDriverRequest(m.Value));
             });
 
             WeakReferenceMessenger.Default.Register<FinishTuningMessage>(this, (r, m) =>
@@ -738,7 +738,7 @@ namespace DVBTTelevizor.MAUI
                     _driver.State.HasFlag(DVBTDriverStateEnum.Unknown) ||
                     _driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
                 {
-                    SendConnectDriverRequest(_configuration.AppDriverType);
+                    await SendConnectDriverRequest(_configuration.AppDriverType);
                 } else
                 {
                     // check driver state
@@ -746,7 +746,7 @@ namespace DVBTTelevizor.MAUI
                     var status = await _driver.CheckStatus();
                     if (!status)
                     {
-                        DisconnectDriver();
+                        await DisconnectDriver();
                     }
                 }
             }
@@ -1490,10 +1490,11 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 InitializeVLC();
-                SendConnectDriverRequest(_configuration.AppDriverType);
 
                 Task.Run(async () =>
                 {
+                    await SendConnectDriverRequest(_configuration.AppDriverType);
+
                     await _viewModel.RefreshChannels();
 
                     await AutoPlay();
@@ -1515,19 +1516,19 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private void DisconnectDriver()
+        private async Task DisconnectDriver()
         {
             if (_driver != null)
             {
                 _driver.OnRawAudioDemodulated -= OnRawAudioDemodulated;
                 _demodulator?.OnDynamicLabelChanged -= OnDynamicLabelChanged;
                 _demodulator?.Stop();
-                _viewModel.DisconnectDriver();
+                await _viewModel.DisconnectDriver();
                 _driver = null;
             }
         }
 
-        private void SendConnectDriverRequest(AppDriverTypeEnum appDriverType)
+        private async Task SendConnectDriverRequest(AppDriverTypeEnum appDriverType)
         {
             _loggingService.Info($"Sending connect message to appDriverType {appDriverType}");
 
@@ -1538,7 +1539,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     if (_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected))
                     {
-                        DisconnectDriver();
+                        await DisconnectDriver();
+                        await Task.Delay(2000); // wait for driver to disconnect
                     }
                 }
 
