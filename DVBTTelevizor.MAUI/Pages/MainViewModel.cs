@@ -1018,9 +1018,25 @@ namespace DVBTTelevizor.MAUI
 
         public async void DisconnectDriver()
         {
-            await _driver.Disconnect();
+            _loggingService.Info("DisconnectDriver");
 
-            UpdateDriverState();
+            try
+            {
+                if (_driver == null)
+                {
+                    return;
+                }
+
+                _driver.Stop();
+                await _driver.Disconnect();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            } finally
+            {
+                UpdateDriverState();
+            }
         }
 
 
