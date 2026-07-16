@@ -138,41 +138,45 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
     {
         var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
 
-        // update settings according to selected driver
-        //_viewModel?.Settings.LoadFromConfiguration(_configuration, _viewModel?.Settings.dri);
-        // update frequencies according to driver
-        //_viewModel?.Settings.SetFrequencies(_driver);
-
         _viewModel?.Settings.TuningMode = mode;
+
+        if (_configuration.AppDriverType == TV.AppDriverTypeEnum.DVBT)
+        {
+            switch (mode)
+            {
+                case TuneModeEnum.Automatic:
+                    _viewModel?.Settings.DVBT = true;
+                    _viewModel?.Settings.DVBT2 = true;
+                    _viewModel?.Settings.TuneDVBTPreferred = false;
+                   break;
+                case TuneModeEnum.Manual:
+
+                        _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
+                        _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                        _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+
+                    break;
+                case TuneModeEnum.Frequency:
+
+                        _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
+                        _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                        _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+
+
+                    break;
+            }
+        }
 
         switch (mode)
         {
             case TuneModeEnum.Automatic:
-                _viewModel?.Settings.DVBT = true;
-                _viewModel?.Settings.DVBT2 = true;
-                _viewModel?.Settings.TuneDVBTPreferred = false;
-
-                _viewModel?.Settings.FrequencyKHz = _viewModel.Settings.DefaultFrequencyMinKHz;
+            case TuneModeEnum.Manual:
                 _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.DefaultFrequencyMinKHz;
                 _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.DefaultFrequencyMaxKHz;
                 break;
-            case TuneModeEnum.Manual:
-                _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
-                _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
-                _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
-
-                _viewModel?.Settings.FrequencyKHz = _configuration.FrequencyFromKHz;
-                _viewModel?.Settings.FrequencyFromKHz = _configuration.FrequencyFromKHz;
-                _viewModel?.Settings.FrequencyToKHz = _configuration.FrequencyToKHz;
-                break;
             case TuneModeEnum.Frequency:
-                _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
-                _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
-                _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
-
-                _viewModel?.Settings.FrequencyKHz = _configuration.FrequencyKHz;
-                _viewModel?.Settings.FrequencyFromKHz = _configuration.FrequencyKHz;
-                _viewModel?.Settings.FrequencyToKHz = _configuration.FrequencyKHz;
+                _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.FrequencyKHz;
+                _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.FrequencyKHz;
                 break;
         }
 
@@ -188,6 +192,10 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         await MainPage.ShowPage<T>(Navigation, page);
     }
 
+    private void SetDVBTSettings(TuneModeEnum mode)
+    {
+
+    }
     private async void ManualScanButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");

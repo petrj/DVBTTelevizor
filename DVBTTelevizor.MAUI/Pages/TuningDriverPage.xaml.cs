@@ -194,11 +194,15 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
                     _tuningSettings.FM = true;
                     _tuningSettings.TuningMode = TuneModeEnum.Frequency;
                     _tuningSettings.FrequencyKHz = _configuration.FMFrequencyKHz;
+                    _tuningSettings.FrequencyFromKHz = _configuration.FMFrequencyFromKHz;
+                    _tuningSettings.FrequencyToKHz = _configuration.FMFrequencyToKHz;
                     break;
                 case AppDriverTypeEnum.DAB:
                     _tuningSettings.DAB = true;
                     _tuningSettings.TuningMode = TuneModeEnum.Frequency;
                     _tuningSettings.FrequencyKHz = _configuration.DABFrequencyKHz;
+                    _tuningSettings.FrequencyFromKHz = _configuration.DABFrequencyFromKHz;
+                    _tuningSettings.FrequencyToKHz = _configuration.DABFrequencyToKHz;
                     break;
             }
         }
@@ -224,13 +228,13 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningDriverPage: FMButton_Clicked");
 
-        await ShowPage<TuningFrequencyPage>(AppDriverTypeEnum.FM);
+        await ShowPage<TuningModePage>(AppDriverTypeEnum.FM);
     }
 
     private async void DABButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningDriverPage: DABButton_Clicked(object sender, EventArgs e)\r\n");
 
-        await ShowPage<TuningFrequencyPage>(AppDriverTypeEnum.DAB);
+        await ShowPage<TuningModePage>(AppDriverTypeEnum.DAB);
     }
 }
