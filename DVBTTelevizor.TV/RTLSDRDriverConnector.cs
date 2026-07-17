@@ -22,7 +22,7 @@ namespace DVBTTelevizor.TV
         protected ISDR _driver = null;
         protected IDemodulator _demodulator = null;
 
-        private SpectrumWorker? _spectrumWorker;
+        protected SpectrumWorker? _spectrumWorker;
 
         public event EventHandler OnRawAudioDemodulated;
 
@@ -37,6 +37,7 @@ namespace DVBTTelevizor.TV
         public const int SpectrumHeight = 100;
         public const int SpectrumHThresholdOffset = 15;
         public bool LastFreqHasSignal { get; set; } = false;
+        protected List<DABService> FoundServices { get; set; } = new List<DABService>();
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
@@ -68,6 +69,19 @@ namespace DVBTTelevizor.TV
                 {
                     OnServiceFound(this, e);
                 }
+
+                // updating inner list of found services
+
+                foreach (var s in FoundServices)
+                {
+                    if (s.ServiceName == de.Service.ServiceName &&
+                        s.ServiceNumber == de.Service.ServiceNumber)
+                    {
+                        return;
+                    }
+                }
+
+                FoundServices.Add(de.Service);
             }
         }
 
@@ -518,25 +532,10 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public bool IsOnSpectrumFMSignal()
+        public virtual bool IsOnSpectrumSignal()
         {
-            // check spectrum
-            if (_spectrumWorker != null)
-            {
-                var spectrum = _spectrumWorker.GetScaledSpectrum(SpectrumWidth, SpectrumHeight);
-
-                var medianNoise = SpectrumWorker.GetMedian(spectrum);
-                var fmPeaks = SpectrumWorker.GetPeaksAroundCenter(spectrum, medianNoise, thresholdOffset: SpectrumHThresholdOffset);
-
-                if (fmPeaks.Count > 0)
-                {
-                    return true;
-                }
-            }
-
             return false;
         }
-
 
         public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
@@ -567,7 +566,7 @@ namespace DVBTTelevizor.TV
 
             await Task.Delay(1000);
 
-            if (IsOnSpectrumFMSignal())
+            if (IsOnSpectrumSignal())
             {
                 //await Task.Delay(1000); // play tuned signal for a while
 
@@ -580,7 +579,7 @@ namespace DVBTTelevizor.TV
                     {
                         hasCarrier = 1,
                         hasLock = 1,
-                        hasSync = 1,
+                        hasSync = 0,
                         hasSignal = 1,
                         SuccessFlag = true,
                         //rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)

@@ -66,7 +66,6 @@ namespace DVBTTelevizor.MAUI
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
-            _driver.OnServiceFound += Demodulator_OnServiceFound;
 
             _listViewSelector = new ListViewSelector(Channels);
 
@@ -127,39 +126,35 @@ namespace DVBTTelevizor.MAUI
             _signalSNR = 0;
         }
 
-        private void Demodulator_OnServiceFound(object? sender, EventArgs e)
-        {
-            _loggingService.Info($"Demodulator_OnServiceFound");
+        //private void Demodulator_OnServiceFound(object? sender, EventArgs e)
+        //{
+        //    _loggingService.Info($"Demodulator_OnServiceFound");
 
-            if ((e is FMServiceFoundEventArgs fm))
-            {
+        //    if ((e is FMServiceFoundEventArgs fm))
+        //    {
+        //        return; // Fm is tuned on accord the spectrum
+        //    }
 
-            }
+        //    if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+        //    {
+        //        if (_tunedServices.Contains(de.Service.ServiceNumber))
+        //        {
+        //            return; // already tuned
+        //        }
 
-            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
-            {
-                if (_tunedServices.Contains(de.Service.ServiceNumber))
-                {
-                    return; // already tuned
-                }
+        //        _tunedServices.Add(de.Service.ServiceNumber);
 
-                _tunedServices.Add(de.Service.ServiceNumber);
+        //        var sd = new MPEGTS.ServiceDescriptor()
+        //        {
+        //            Free = true,
+        //            ServiceName = de.Service.ServiceName,
+        //            ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
+        //            ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
+        //        };
 
-                var chType = Settings.FM
-                            ? ChannelTypeEnum.FM
-                            : ChannelTypeEnum.DAB;
-
-                var sd = new MPEGTS.ServiceDescriptor()
-                {
-                    Free = true,
-                    ServiceName = de.Service.ServiceName,
-                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
-                    ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
-                };
-
-                AddChannel(chType, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
-            }
-        }
+        //        AddChannel(ChannelTypeEnum.DAB, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
+        //    }
+        //}
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
         {

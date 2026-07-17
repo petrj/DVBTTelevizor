@@ -56,13 +56,49 @@ namespace DVBTTelevizor.TV
             base.Connect();
         }
 
+        public override bool IsOnSpectrumSignal()
+        {
+            // TODO: check DAB spectrum
+            // For now, we will just return true to indicate that there is a signal present.
+
+            return true;
+        }
+
         public override Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
+                FoundServices.Clear();
+
+                await Task.Delay(10000); // wait for demodulator sync and find the services
+
+                if (FoundServices.Count == 0)
+                {
+                    return new DVBTDriverSearchProgramMapPIDsResult()
+                    {
+                        Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
+                    };
+                }
+
+                var dict = new Dictionary<ServiceDescriptor, long>();
+                foreach (var service in FoundServices)
+                {
+                    dict.Add(new ServiceDescriptor()
+                    {
+                        Free = true,
+                        Length = 0,
+                        ProgramNumber = Convert.ToInt32(service.ServiceNumber),
+                        ProviderName = "DAB",
+                        ServiceName = service.ServiceName,
+                        ServisType = (byte)DVBTDriverServiceType.Radio
+
+                    }, _driver.Frequency);
+                }
+
                 return new DVBTDriverSearchProgramMapPIDsResult()
                 {
-                    Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
+                    Result = DVBTDriverSearchProgramResultEnum.OK,
+                    ServiceDescriptors = dict
                 };
             });
         }

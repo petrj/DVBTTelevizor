@@ -48,6 +48,25 @@ namespace DVBTTelevizor.TV
             base.Connect();
         }
 
+        public override bool IsOnSpectrumSignal()
+        {
+            // check spectrum
+            if (_spectrumWorker != null)
+            {
+                var spectrum = _spectrumWorker.GetScaledSpectrum(SpectrumWidth, SpectrumHeight);
+
+                var medianNoise = SpectrumWorker.GetMedian(spectrum);
+                var fmPeaks = SpectrumWorker.GetPeaksAroundCenter(spectrum, medianNoise, thresholdOffset: SpectrumHThresholdOffset);
+
+                if (fmPeaks.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public override Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
             return Task.Run(() =>
