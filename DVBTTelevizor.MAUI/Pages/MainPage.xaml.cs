@@ -472,7 +472,6 @@ namespace DVBTTelevizor.MAUI
 
                 if (_demodulator != null)
                 {
-                    stat.Stat = _demodulator.Stat(false);
                     stat.StatValues = _demodulator.GetStat();
                 }
 
