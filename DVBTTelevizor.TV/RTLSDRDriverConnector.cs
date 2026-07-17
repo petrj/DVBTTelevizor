@@ -1,6 +1,7 @@
 ﻿using DVBTTelevizor.MAUI;
 using LoggerService;
 using MPEGTS;
+using Newtonsoft.Json.Bson;
 using RTLSDR;
 using RTLSDR.Common;
 using RTLSDR.DAB;
@@ -8,8 +9,10 @@ using RTLSDR.FM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace DVBTTelevizor.TV
 {
@@ -19,6 +22,8 @@ namespace DVBTTelevizor.TV
         protected ISDR _driver = null;
         protected IDemodulator _demodulator = null;
 
+        private SpectrumWorker? _spectrumWorker;
+
         public event EventHandler OnRawAudioDemodulated;
 
         public long LastTunedFreq { get; set; }
@@ -26,6 +31,12 @@ namespace DVBTTelevizor.TV
         public event EventHandler StatusChanged;
         public event EventHandler OnServiceFound;
         public event EventHandler? RawDataReceived;
+
+        public const int SpectrumFFTSize = 16384;
+        public const int SpectrumWidth = 1024;
+        public const int SpectrumHeight = 100;
+        public const int SpectrumHThresholdOffset = 15;
+        public bool LastFreqHasSignal { get; set; } = false;
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
@@ -43,6 +54,8 @@ namespace DVBTTelevizor.TV
             _demodulator = demodulator;
             _demodulator.OnDemodulated += OnDataDemodulated;
             _demodulator.OnServiceFound += Demodulator_OnServiceFound;
+
+            _spectrumWorker = new SpectrumWorker(_log, SpectrumFFTSize, AudioTools.DABSampleRate);
         }
 
         private void Demodulator_OnServiceFound(object? sender, EventArgs e)
@@ -123,6 +136,7 @@ namespace DVBTTelevizor.TV
             {
                 _demodulator.AddSamples(e.Data, e.Size);
 
+                _spectrumWorker?.AddData(e.Data, e.Size);
 
                 if (RawDataReceived != null)
                 {
@@ -304,6 +318,12 @@ namespace DVBTTelevizor.TV
                 _driver.SetGainMode(false);
 
                 State = DVBTDriverStateEnum.Connected;
+
+                if (_spectrumWorker != null)
+                {
+                    _spectrumWorker.Stop();
+                }
+                _spectrumWorker = new SpectrumWorker(_log, SpectrumFFTSize, _driver.Settings.SDRSampleRate);
             }
             catch (Exception ex)
             {
@@ -498,6 +518,26 @@ namespace DVBTTelevizor.TV
             });
         }
 
+        public bool IsOnSpectrumFMSignal()
+        {
+            // check spectrum
+            if (_spectrumWorker != null)
+            {
+                var spectrum = _spectrumWorker.GetScaledSpectrum(SpectrumWidth, SpectrumHeight);
+
+                var medianNoise = SpectrumWorker.GetMedian(spectrum);
+                var fmPeaks = SpectrumWorker.GetPeaksAroundCenter(spectrum, medianNoise, thresholdOffset: SpectrumHThresholdOffset);
+
+                if (fmPeaks.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
         public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
             _log.Info($"RTLSDRTCPIPFMDriverConnector: TuneEnhanced freq {frequency / 1000} kHz");
@@ -513,7 +553,9 @@ namespace DVBTTelevizor.TV
                 };
             }
 
+            _demodulator?.Clear();
             var tuneResult = await Tune(frequency, bandWidth, deliverySystem);
+
             if (!tuneResult.SuccessFlag)
             {
                 _log.Debug($"Tune failed");
@@ -523,17 +565,40 @@ namespace DVBTTelevizor.TV
                 };
             }
 
-            await Task.Delay(2000);
+            await Task.Delay(1000);
+
+            if (IsOnSpectrumFMSignal())
+            {
+                //await Task.Delay(1000); // play tuned signal for a while
+
+                LastFreqHasSignal = true;
+
+                return new DVBTDriverTuneResult()
+                {
+                    Result = DVBTDriverSearchProgramResultEnum.OK,
+                    SignalState = new DVBTDriverStatus()
+                    {
+                        hasCarrier = 1,
+                        hasLock = 1,
+                        hasSync = 1,
+                        hasSignal = 1,
+                        SuccessFlag = true,
+                        //rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                    }
+                };
+            }
+
+            LastFreqHasSignal = false;
 
             return new DVBTDriverTuneResult()
             {
-                Result = DVBTDriverSearchProgramResultEnum.OK,
+                Result = DVBTDriverSearchProgramResultEnum.NoSignal,
                 SignalState = new DVBTDriverStatus()
                 {
-                    hasCarrier = 1,
-                    hasLock = 1,
-                    hasSync = 1,
-                    hasSignal = 1,
+                    hasCarrier = 0,
+                    hasLock = 0,
+                    hasSync = 0,
+                    hasSignal = 0,
                     SuccessFlag = true,
                     //rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
                 }

@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
-using DVBTelevizor;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using RTLSDR.Common;
