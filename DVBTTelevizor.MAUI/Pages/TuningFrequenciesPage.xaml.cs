@@ -239,7 +239,7 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
             page.TuneFrequencyMode = _editingFrom ? TuneFrequencyModeEnum.From : TuneFrequencyModeEnum.To;
 
-            page.UpdateSettings(Settings);
+            page.UpdateSettings(settings);
         }
 
         await MainPage.ShowPage<FrequencyPage>(Navigation, page);

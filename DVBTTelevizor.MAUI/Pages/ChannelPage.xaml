@@ -20,6 +20,7 @@
                 <Setter Property="VerticalOptions" Value="FillAndExpand"/>
                 <!--Setter Property="Background" Value="#444444"/-->
                 <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="LineBreakMode" Value="WordWrap"/>
             </Style>
 
             <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
@@ -112,8 +113,7 @@
 
                 <Grid RowSpacing="0" Margin="10,10,10,10">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50*" />

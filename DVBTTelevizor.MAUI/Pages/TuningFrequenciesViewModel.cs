@@ -88,11 +88,18 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public long FrequencyFromWholePartMHz
+        public string FrequencyFromWholePartMHz
         {
             get
             {
-                return Convert.ToInt64(Math.Floor(FrequencyFromKHz / 1000.0));
+                var dabFreq = ParseDabFreq((int)(FrequencyFromKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return dabFreq;
+                }
+
+
+                return Convert.ToInt64(Math.Floor(FrequencyFromKHz / 1000.0)).ToString();
             }
         }
 
@@ -100,17 +107,29 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var part = (FrequencyFromKHz / 1000.0) - FrequencyFromWholePartMHz;
+                var dabFreq = ParseDabFreq((int)(FrequencyFromKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+
+                var part = (FrequencyFromKHz / 1000.0) - Convert.ToInt64(Math.Floor(FrequencyFromKHz / 1000.0));
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000}";
             }
         }
 
-        public long FrequencyToWholePartMHz
+        public string FrequencyToWholePartMHz
         {
             get
             {
-                return Convert.ToInt64(Math.Floor(FrequencyToKHz / 1000.0));
+                var dabFreq = ParseDabFreq((int)(FrequencyToKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return dabFreq;
+                }
+
+                return Convert.ToInt64(Math.Floor(FrequencyToKHz / 1000.0)).ToString();
             }
         }
 
@@ -118,7 +137,13 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                var part = (FrequencyToKHz / 1000.0) - FrequencyToWholePartMHz;
+                var dabFreq = ParseDabFreq((int)(FrequencyToKHz * 1000));
+                if (dabFreq != null)
+                {
+                    return "";
+                }
+
+                var part = (FrequencyToKHz / 1000.0) - Convert.ToInt64(Math.Floor(FrequencyToKHz / 1000.0));
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000}";
             }
