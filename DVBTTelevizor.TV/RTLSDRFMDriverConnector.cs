@@ -2,6 +2,7 @@
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
+using RTLSDR.FM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,26 +70,21 @@ namespace DVBTTelevizor.TV
 
         public override Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 if (LastFreqHasSignal)
                 {
-                    var dict = new Dictionary<ServiceDescriptor, long>();
-                    dict.Add(new ServiceDescriptor()
+                    Demodulator_OnServiceFound(this, new FMServiceFoundEventArgs()
                     {
-                        Free = true,
-                        Length = 0,
-                        ProgramNumber = _driver.Frequency,
-                        ProviderName = "FM radio",
-                        ServiceName = $"{(_driver.Frequency / 1000000.0).ToString("N1")} FM ",
-                        ServisType = (byte)DVBTDriverServiceType.Radio
+                        Percents = 100
+                    });
 
-                    }, _driver.Frequency);
+                    await Task.Delay(1000);   // play tuned radio effect for 1 second
 
                     return new DVBTDriverSearchProgramMapPIDsResult()
                     {
                         Result = DVBTDriverSearchProgramResultEnum.OK,
-                        ServiceDescriptors = dict
+                        ServiceDescriptors = new Dictionary<ServiceDescriptor, long>()
                     };
                 }
                 else

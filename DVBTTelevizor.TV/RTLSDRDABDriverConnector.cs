@@ -68,37 +68,12 @@ namespace DVBTTelevizor.TV
         {
             return Task.Run(async () =>
             {
-                FoundServices.Clear();
-
-                await Task.Delay(10000); // wait for demodulator sync and find the services
-
-                if (FoundServices.Count == 0)
-                {
-                    return new DVBTDriverSearchProgramMapPIDsResult()
-                    {
-                        Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
-                    };
-                }
-
-                var dict = new Dictionary<ServiceDescriptor, long>();
-                foreach (var service in FoundServices)
-                {
-                    dict.Add(new ServiceDescriptor()
-                    {
-                        Free = true,
-                        Length = 0,
-                        ProgramNumber = Convert.ToInt32(service.ServiceNumber),
-                        ProviderName = "DAB",
-                        ServiceName = service.ServiceName,
-                        ServisType = (byte)DVBTDriverServiceType.Radio
-
-                    }, _driver.Frequency);
-                }
+                await Task.Delay(10000); // wait for demodulator sync and find the services using service_found event
 
                 return new DVBTDriverSearchProgramMapPIDsResult()
                 {
                     Result = DVBTDriverSearchProgramResultEnum.OK,
-                    ServiceDescriptors = dict
+                    ServiceDescriptors = new Dictionary<ServiceDescriptor, long>()
                 };
             });
         }

@@ -111,15 +111,23 @@ namespace DVBTTelevizor.MAUI
 
             if ((e is FMServiceFoundEventArgs fm))
             {
+                if (Driver == null)
+                {
+                    return;
+                }
+                var sd = new MPEGTS.ServiceDescriptor()
+                {
+                    Free = true,
+                    ServiceName = $"FM {Driver.LastTunedFreq / 1_000_000.0:0.#} MHz",
+                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
+                    ProgramNumber = Convert.ToInt32(Driver.LastTunedFreq)
+                };
 
+                AddChannel(ChannelTypeEnum.FM, sd, Driver.LastTunedFreq, _driver == null ? 0 : _driver.LastTunedFreq, 0);
             }
 
             if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
             {
-                var chType = Settings.FM
-                            ? ChannelTypeEnum.FM
-                            : ChannelTypeEnum.DAB;
-
                 var sd = new MPEGTS.ServiceDescriptor()
                 {
                     Free = true,
@@ -128,7 +136,7 @@ namespace DVBTTelevizor.MAUI
                     ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
                 };
 
-                AddChannel(chType, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
+                AddChannel(ChannelTypeEnum.DAB, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
             }
         }
 
@@ -151,36 +159,6 @@ namespace DVBTTelevizor.MAUI
             _signalLocked = _driver.Synced;
             _signalSNR = 0;
         }
-
-        //private void Demodulator_OnServiceFound(object? sender, EventArgs e)
-        //{
-        //    _loggingService.Info($"Demodulator_OnServiceFound");
-
-        //    if ((e is FMServiceFoundEventArgs fm))
-        //    {
-        //        return; // Fm is tuned on accord the spectrum
-        //    }
-
-        //    if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
-        //    {
-        //        if (_tunedServices.Contains(de.Service.ServiceNumber))
-        //        {
-        //            return; // already tuned
-        //        }
-
-        //        _tunedServices.Add(de.Service.ServiceNumber);
-
-        //        var sd = new MPEGTS.ServiceDescriptor()
-        //        {
-        //            Free = true,
-        //            ServiceName = de.Service.ServiceName,
-        //            ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
-        //            ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
-        //        };
-
-        //        AddChannel(ChannelTypeEnum.DAB, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
-        //    }
-        //}
 
         private void TuningProgressPageViewModel_SignalChanged(object? sender, EventArgs e)
         {
@@ -518,6 +496,8 @@ namespace DVBTTelevizor.MAUI
 
                 var searchMapPIDsResult = await _driver.SearchProgramMapPIDs(false);
 
+                // DDVBT returns channels in searchMapPIDsResult, FM/DAB use service_found event
+
                 switch (searchMapPIDsResult.Result)
                 {
                     case DVBTDriverSearchProgramResultEnum.Error:
@@ -544,8 +524,6 @@ namespace DVBTTelevizor.MAUI
 
                 var mapPIDToServiceDescriptor = new Dictionary<long, MPEGTS.ServiceDescriptor>();
 
-                var configChannels = _configuration.GetChannels();
-
                 foreach (var serviceDescriptor in searchMapPIDsResult.ServiceDescriptors)
                 {
                     if (State != TuneStateEnum.InProgress)
@@ -564,12 +542,20 @@ namespace DVBTTelevizor.MAUI
                         continue;
                     }
 
+                    var channelType = ChannelTypeEnum.DVBT;
+                    if (Settings.DVBT2 || Settings.DVBT)
+                    {
+                        channelType = dvbtTypeIndex == 0 ? ChannelTypeEnum.DVBT : ChannelTypeEnum.DVBT2;
+                    } else if (Settings.FM)
+                    {
+                        channelType = ChannelTypeEnum.FM;
+                    }
+                    else if (Settings.DAB)
+                    {
+                        channelType = ChannelTypeEnum.DAB;
+                    }
 
-                    var chType = Settings.FM ? ChannelTypeEnum.FM :
-                                 Settings.DAB ? ChannelTypeEnum.DAB :
-                                 dvbtTypeIndex == 0 ? ChannelTypeEnum.DVBT : ChannelTypeEnum.DVBT2;
-
-                    AddChannel(chType, serviceDescriptor.Key, serviceDescriptor.Value, freq, bandWidth);
+                    AddChannel(channelType, serviceDescriptor.Key, serviceDescriptor.Value, freq, bandWidth);
                 }
 
             }
@@ -590,7 +576,6 @@ namespace DVBTTelevizor.MAUI
             ch.Bandwdith = bandWidth;
             ch.Number = String.Empty;
             ch.ChannelType = chType;
-
             ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
             ch.NonFree = !serviceDescriptor.Free;
 
@@ -598,7 +583,21 @@ namespace DVBTTelevizor.MAUI
 
             if (ChannelFound != null)
             {
-                ChannelFound(this, new ChannelFoundEventArgs() { Channel = ch });
+                ChannelFound(this, new ChannelFoundEventArgs()
+                {
+                    Channel = new Channel()
+                    {
+                        ProgramMapPID = MapPID,
+                        Name = serviceDescriptor.ServiceName,
+                        ProviderName = serviceDescriptor.ProviderName,
+                        Frequency = frequency,
+                        Bandwdith = bandWidth,
+                        Number = String.Empty,
+                        ChannelType = chType,
+                        Type = (ServiceTypeEnum)serviceDescriptor.ServisType,
+                        NonFree = !serviceDescriptor.Free
+                    }
+                });
             }
         }
 

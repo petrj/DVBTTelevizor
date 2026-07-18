@@ -29,7 +29,7 @@ namespace DVBTTelevizor.TV
         public long LastTunedFreq { get; set; }
 
         public event EventHandler StatusChanged;
-        public event EventHandler OnServiceFound;
+        public event EventHandler? OnServiceFound;
         public event EventHandler? RawDataReceived;
 
         public const int SpectrumFFTSize = 16384;
@@ -37,7 +37,6 @@ namespace DVBTTelevizor.TV
         public const int SpectrumHeight = 100;
         public const int SpectrumHThresholdOffset = 15;
         public bool LastFreqHasSignal { get; set; } = false;
-        protected List<DABService> FoundServices { get; set; } = new List<DABService>();
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
@@ -59,29 +58,20 @@ namespace DVBTTelevizor.TV
             _spectrumWorker = new SpectrumWorker(_log, SpectrumFFTSize, AudioTools.DABSampleRate);
         }
 
-        private void Demodulator_OnServiceFound(object? sender, EventArgs e)
+        protected void Demodulator_OnServiceFound(object? sender, EventArgs e)
         {
             if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
             {
                 _log.Info($"DAB service found: {de.Service}");
 
-                if (OnServiceFound != null)
-                {
-                    OnServiceFound(this, e);
-                }
+                OnServiceFound?.Invoke(this, e);
+            }
 
-                // updating inner list of found services
+            if (e is FMServiceFoundEventArgs)
+            {
+                _log.Info($"FM service found");
 
-                foreach (var s in FoundServices)
-                {
-                    if (s.ServiceName == de.Service.ServiceName &&
-                        s.ServiceNumber == de.Service.ServiceNumber)
-                    {
-                        return;
-                    }
-                }
-
-                FoundServices.Add(de.Service);
+                OnServiceFound?.Invoke(this, e);
             }
         }
 
@@ -517,6 +507,7 @@ namespace DVBTTelevizor.TV
                     if (_driver.State == DriverStateEnum.Connected)
                     {
                         _driver.SetFrequency(Convert.ToInt32(frequency));
+                        LastTunedFreq = frequency;
                         successFlag = true;
                     }
                 }
