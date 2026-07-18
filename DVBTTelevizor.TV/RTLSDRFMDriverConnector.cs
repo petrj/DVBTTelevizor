@@ -79,7 +79,7 @@ namespace DVBTTelevizor.TV
                         Percents = 100
                     });
 
-                    await Task.Delay(1000);   // play tuned radio effect for 1 second
+                    await Task.Delay(3000);   // play tuned radio effect for 1 second
 
                     return new DVBTDriverSearchProgramMapPIDsResult()
                     {

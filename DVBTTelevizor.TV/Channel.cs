@@ -284,6 +284,7 @@ namespace DVBTTelevizor
                 {
                     case ServiceTypeEnum.DigitalRadioSoundService:
                     case ServiceTypeEnum.AdvancedCodecDigitalRadioSoundService:
+                    case ServiceTypeEnum.FMRadioService:
                         return DVBTDriverServiceType.Radio;
                     case ServiceTypeEnum.DigitalTelevisionService:
                     case ServiceTypeEnum.NVODReferenceService:

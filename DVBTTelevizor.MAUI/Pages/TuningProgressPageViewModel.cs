@@ -119,8 +119,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     Free = true,
                     ServiceName = $"FM {Driver.LastTunedFreq / 1_000_000.0:0.#} MHz",
-                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
-                    ProgramNumber = Convert.ToInt32(Driver.LastTunedFreq)
+                    ServisType = (byte)(ServiceTypeEnum.FMRadioService),
+                    ProgramNumber = Convert.ToInt32(Driver.LastTunedFreq/1000)
                 };
 
                 AddChannel(ChannelTypeEnum.FM, sd, Driver.LastTunedFreq, _driver == null ? 0 : _driver.LastTunedFreq, 0);
@@ -132,7 +132,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     Free = true,
                     ServiceName = de.Service.ServiceName,
-                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
+                    ServisType = (byte)(ServiceTypeEnum.DigitalRadioSoundService),
                     ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
                 };
 
@@ -443,7 +443,7 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 // when tunning FM/DAB, demmodulator is searching for frequencies in the background and the tuning never ends....
-                if ((_driver.DriverType == TV.AppDriverTypeEnum.DVBT) && (Settings.TuningMode != TuneModeEnum.Frequency))
+                if (Settings.TuningMode != TuneModeEnum.Frequency)
                 {
                     State = TuneStateEnum.Finished;
                 }
