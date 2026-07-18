@@ -56,8 +56,6 @@ namespace DVBTTelevizor.MAUI
 
         private IDriverConnector? _driver = null;
 
-        private List<uint> _tunedServices = new List<uint>();
-
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
@@ -66,6 +64,7 @@ namespace DVBTTelevizor.MAUI
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
             _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+            _driver.OnServiceFound += Demodulator_OnServiceFound;
 
             _listViewSelector = new ListViewSelector(Channels);
 
@@ -103,6 +102,33 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return _driver;
+            }
+        }
+
+        private void Demodulator_OnServiceFound(object? sender, EventArgs e)
+        {
+            _loggingService.Info($"Demodulator_OnServiceFound");
+
+            if ((e is FMServiceFoundEventArgs fm))
+            {
+
+            }
+
+            if ((e is DABServiceFoundEventArgs de) && (de.Service != null))
+            {
+                var chType = Settings.FM
+                            ? ChannelTypeEnum.FM
+                            : ChannelTypeEnum.DAB;
+
+                var sd = new MPEGTS.ServiceDescriptor()
+                {
+                    Free = true,
+                    ServiceName = de.Service.ServiceName,
+                    ServisType = (byte)(Settings.FM ? ServiceTypeEnum.FMRadioService : ServiceTypeEnum.DigitalRadioSoundService),
+                    ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
+                };
+
+                AddChannel(chType, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
             }
         }
 
@@ -331,7 +357,6 @@ namespace DVBTTelevizor.MAUI
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _tunedServices.Clear();
                     _driver?.Clear();
                     _tunedMultiplexes.Clear();
                     _tunedNewChannels = 0;
