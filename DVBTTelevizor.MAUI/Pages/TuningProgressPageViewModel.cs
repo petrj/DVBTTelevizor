@@ -5,6 +5,7 @@ using LoggerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using MPEGTS;
+using RTLSDR.Common;
 using RTLSDR.DAB;
 using RTLSDR.FM;
 using System;
@@ -425,7 +426,29 @@ namespace DVBTTelevizor.MAUI
 
                         if (FrequencyToKHz != FrequencyFromKHz)
                         {
-                            _actualTunningFreqKHz += TuneBandWidthKHz;
+                            if (DABTuning)
+                            {
+                                // finding next channel
+                                var found = false;
+                                foreach (var dabFreq in AudioTools.DabFrequenciesHz)
+                                {
+                                    if (dabFreq.Value / 1000 > _actualTunningFreqKHz)
+                                    {
+                                        _actualTunningFreqKHz = dabFreq.Value / 1000;
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!found)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                _actualTunningFreqKHz += TuneBandWidthKHz;
+                            }
                         } else
                         {
                             break;
@@ -583,20 +606,23 @@ namespace DVBTTelevizor.MAUI
 
             if (ChannelFound != null)
             {
-                ChannelFound(this, new ChannelFoundEventArgs()
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    Channel = new Channel()
+                    ChannelFound(this, new ChannelFoundEventArgs()
                     {
-                        ProgramMapPID = MapPID,
-                        Name = serviceDescriptor.ServiceName,
-                        ProviderName = serviceDescriptor.ProviderName,
-                        Frequency = frequency,
-                        Bandwdith = bandWidth,
-                        Number = String.Empty,
-                        ChannelType = chType,
-                        Type = (ServiceTypeEnum)serviceDescriptor.ServisType,
-                        NonFree = !serviceDescriptor.Free
-                    }
+                        Channel = new Channel()
+                        {
+                            ProgramMapPID = MapPID,
+                            Name = serviceDescriptor.ServiceName,
+                            ProviderName = serviceDescriptor.ProviderName,
+                            Frequency = frequency,
+                            Bandwdith = bandWidth,
+                            Number = String.Empty,
+                            ChannelType = chType,
+                            Type = (ServiceTypeEnum)serviceDescriptor.ServisType,
+                            NonFree = !serviceDescriptor.Free
+                        }
+                    });
                 });
             }
         }
