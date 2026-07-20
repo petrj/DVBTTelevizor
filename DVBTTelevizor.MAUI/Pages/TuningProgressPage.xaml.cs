@@ -98,7 +98,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private void TuningProgressPage_Disappearing(object? sender, EventArgs e)
     {
-        _viewModel.State = TuningProgressPageViewModel.TuneStateEnum.Inactive;
+        //_viewModel.State = TuningProgressPageViewModel.TuneStateEnum.Inactive;
     }
 
     private void ChannelFound(object? sender, EventArgs e)
@@ -341,10 +341,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                     switch (_focusItems.FocusedItem.Name)
                     {
                         case "Back":
-                            MainThread.BeginInvokeOnMainThread(async () =>
-                            {
-                                await Navigation.PopAsync();
-                            });
+                            BackButton_Clicked(this, new EventArgs());
                             break;
                         case "Stop":
                             StopButton_Clicked(this,new EventArgs());
@@ -464,6 +461,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
+            if (_viewModel.State == TuneStateEnum.InProgress)
+            {
+                _viewModel.State = TuneStateEnum.Stopped;
+            }
+
             await Navigation.PopAsync();
         });
     }
@@ -499,6 +501,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _viewModel.ResetTune(true);
 
         _viewModel.State = TuneStateEnum.Finished;
+
+        _viewModel.NotifyChange();
 
         WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
     }
@@ -565,10 +569,5 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
         }
-    }
-
-    private void DriverhButton_Clicked(object sender, EventArgs e)
-    {
-
     }
 }
