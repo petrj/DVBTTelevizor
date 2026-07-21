@@ -2,35 +2,20 @@
 
 ![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/logo.png)
 
-#### CZ
-Android aplikace pro příjem TV pomocí USB DVBT/DVBT2 tuneru 
-
-Využívá ovladač "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
-
-- zdarma a bez reklam
-- podpora DVBT a DVBT2
-- podpora klávesnic a dálkových ovladačů připojených jako klávesnice (usb, bluetooth)
-- nahrávání vysílání (interní i externí úložiště)
-- automatické i ruční ladění
-- možnost importovat/exportovat naladěné kanály
-- EPG pro právě probíhající/následující program (bez podpory čínských znaků)
-- možnost zvětšení fontu (ideální pro tablety a TV)
-- pro Android 5.0 a vyšší (architektury: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a) 
-- titulky
-- volba audio stopy
-- teletext
-- podpora vzdáleného ovládání z jiného (Android) zařízení
-
-
 #### EN
-Android application for playing TV with USB DVBT/DVBT2 dongle
 
-Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver)
+DVBT/FM/DAB player for Android using USB DVBT/DVBT2/RTL-SDR dongle
 
-- free with no ads
+Using drivers:
+- "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
+- "RTL SDR driver": https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro
+
+- free with ads
 - DVBT and DVBT2 support
+- FM mono/stereo
+- DAB/DAB+
 - supporting external keyboards and remote controls connected as keyboard (usb, bluetooth)
-- recording 
+- recording
 - automatic and manual tuning
 - possibility to export/import tuned channels
 - EPG for current/next program (chinese characters are not supported)
@@ -39,6 +24,35 @@ Using "DVB-T Driver": (https://play.google.com/store/apps/details?id=info.martin
 - subtitles
 - teletext
 - remote access from other (Android) device
+    * Remote Televizor - Google Play: https://play.google.com/store/apps/details?id=net.petrjanousek.RemoteTelevizor
+    * Remote Televizor - github (apk, Windows): https://github.com/petrj/RemoteTelevizor/releases/tag/6.0
+
+#### CZ
+
+Přehrávač DVBT/FM/DAB pro Android využívající USB DVBT/DVBT2/RTL-SDR tuner
+
+Využívá ovladače
+- "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
+- "RTL SDR driver": https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro
+
+- zdarma a bez reklam
+- DVBT a DVBT2
+- FM mono/stereo
+- DAB/DAB+
+- podpora klávesnic a dálkových ovladačů připojených jako klávesnice (usb, bluetooth)
+- nahrávání vysílání (interní i externí úložiště)
+- automatické i ruční ladění
+- možnost importovat/exportovat naladěné kanály
+- EPG pro právě probíhající/následující program (bez podpory čínských znaků)
+- možnost zvětšení fontu (ideální pro tablety a TV)
+- pro Android 5.0 a vyšší (architektury: armeabi, armeabi-v7a, x86, x86_x64, arm64-v8a)
+- titulky
+- volba audio stopy
+- teletext
+- podpora vzdáleného ovládání z jiného (Android) zařízení
+    * Remote Televizor - Google Play: https://play.google.com/store/apps/details?id=net.petrjanousek.RemoteTelevizor
+    * Remote Televizor - github (apk, Windows): https://github.com/petrj/RemoteTelevizor/releases/tag/6.0
+
 
 ![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
 
