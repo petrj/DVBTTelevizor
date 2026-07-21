@@ -122,13 +122,15 @@
 		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
 		<PackageReference Include="Powershell.Modules" Version="1.0.3" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
-		<PackageReference Include="RTLSDR" Version="1.5.0" />
+		<PackageReference Include="RTLSDR" Version="1.5.1" />
 		<PackageReference Include="RTLSDR.Audio" Version="1.5.1" />
-		<PackageReference Include="RTLSDR.Common" Version="1.5.4" />
-		<PackageReference Include="RTLSDR.DAB" Version="1.6.1" />
+		<PackageReference Include="RTLSDR.Common" Version="1.5.7" />
+		<PackageReference Include="RTLSDR.DAB" Version="1.6.2" />
 		<PackageReference Include="RTLSDR.FM" Version="1.5.2" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.12" />
 		<PackageReference Include="System.Drawing.Common" Version="10.0.5" />
 		<PackageReference Include="System.Formats.Nrbf" Version="10.0.5" />
 		<PackageReference Include="VideoLAN.LibVLC.Android" Version="3.6.5" />
