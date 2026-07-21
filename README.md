@@ -2,13 +2,17 @@
 
 ![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/logo.png)
 
-#### EN
+## <img src="https://flagcdn.com/20x15/gb.png" alt="EN" width="20" height="15"> EN
 
 DVBT/FM/DAB player for Android using USB DVBT/DVBT2/RTL-SDR dongle
 
 Using drivers:
 - "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
 - "RTL SDR driver": https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro
+
+
+
+----------
 
 - free with ads
 - DVBT and DVBT2 support
@@ -34,6 +38,8 @@ Přehrávač DVBT/FM/DAB pro Android využívající USB DVBT/DVBT2/RTL-SDR tune
 Využívá ovladače
 - "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
 - "RTL SDR driver": https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro
+
+----------
 
 - zdarma a bez reklam
 - DVBT a DVBT2
