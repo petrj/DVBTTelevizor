@@ -13,9 +13,9 @@ DVBT/FM/DAB player for Android using USB DVBT/DVBT2/RTL-SDR dongle
 ## HW requirements:
 - Compatible USB DVBT/DVBT2/RTL-SDR tuner for Android
 
-## Key Features
-- free with ads
-- DVBT and DVBT2 support
+## Key Features:
+- free, no ads
+- DVBT and DVBT2
 - FM mono/stereo
 - DAB/DAB+
 - supporting external keyboards and remote controls connected as keyboard (usb, bluetooth)
@@ -31,7 +31,7 @@ DVBT/FM/DAB player for Android using USB DVBT/DVBT2/RTL-SDR dongle
     * Remote Televizor - Google Play: https://play.google.com/store/apps/details?id=net.petrjanousek.RemoteTelevizor
     * Remote Televizor - github (apk, Windows): https://github.com/petrj/RemoteTelevizor/releases/tag/6.0
 
-#### CZ
+## <img src="https://flagcdn.com/20x15/cz.png" alt="CZ" width="20" height="15"> CZ
 
 Přehrávač DVBT/FM/DAB pro Android využívající USB DVBT/DVBT2/RTL-SDR tuner
 
