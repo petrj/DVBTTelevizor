@@ -6,14 +6,14 @@
 
 DVBT/FM/DAB player for Android using USB DVBT/DVBT2/RTL-SDR dongle
 
-Using drivers:
+## Software requirements:
 - "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
 - "RTL SDR driver": https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro
 
+## HW requirements:
+- Compatible USB DVBT/DVBT2/RTL-SDR tuner for Android
 
-
-----------
-
+## Key Features
 - free with ads
 - DVBT and DVBT2 support
 - FM mono/stereo
@@ -35,12 +35,14 @@ Using drivers:
 
 Přehrávač DVBT/FM/DAB pro Android využívající USB DVBT/DVBT2/RTL-SDR tuner
 
-Využívá ovladače
+## SW požadavky:
 - "DVB-T Driver": https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver
 - "RTL SDR driver": https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro
 
-----------
+## HW požadavky:
+Kompatibilní USB DVBT/DVBT2/RTL-SDR tuner pro Android
 
+## Klíčové prvky:
 - zdarma a bez reklam
 - DVBT a DVBT2
 - FM mono/stereo
