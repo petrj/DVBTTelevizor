@@ -18,6 +18,8 @@ namespace DVBTTelevizor.TV
         private Dictionary<long, bool> _stationOnFrequency = new Dictionary<long, bool>();
         private ILoggingService _loggingService;
 
+        private string _aacFileName = null;
+
         public RTLSDRDABDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
             : base(loggingService, driver, demodulator, startupFrequency)
         {
@@ -32,6 +34,59 @@ namespace DVBTTelevizor.TV
             {
                 return DriverStreamTypeEnum.RAWAACAudio;
             }
+        }
+
+        public override void OnDataDemodulated(object? sender, EventArgs e)
+        {
+            base.OnDataDemodulated(sender, e);
+
+            if (e is AACDataDemodulatedEventArgs aacargs &&
+            aacargs.Data != null &&
+            aacargs.Data.Length > 0)
+            {
+                if (!string.IsNullOrWhiteSpace(_aacFileName))
+                {
+                    var adtsHeaderLength = aacargs.ADTSHeader?.Length ?? 0;
+                    var dataLength = aacargs.Data?.Length ?? 0;
+                    var adtsFrame = new byte[adtsHeaderLength + dataLength];
+                    if (aacargs.ADTSHeader != null)
+                    {
+                        Buffer.BlockCopy(aacargs.ADTSHeader, 0, adtsFrame, 0, adtsHeaderLength);
+                    }
+                    if (aacargs.Data != null)
+                    {
+                        Buffer.BlockCopy(aacargs.Data, 0, adtsFrame, adtsHeaderLength, dataLength);
+                    }
+
+                    File.AppendAllBytes(_aacFileName, adtsFrame);
+                }
+            }
+        }
+
+        public override string RecordFileName
+        {
+            get
+            {
+                return _aacFileName;
+            }
+        }
+
+        public override void StartRecording(string path)
+        {
+            var fN = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + DVBTDriverConnector.GetHumanReadableFrequency(LastTunedFreq).ToString().Replace(" ", "_").Replace(".", "_") + "." + "aac";
+
+            _aacFileName = Path.Combine(path, fN);
+
+            base.StartRecording(path);
+        }
+
+        public override string StopRecording()
+        {
+            base.StopRecording();
+
+            var fN = Path.GetFileName(_aacFileName);
+            _aacFileName = null;
+            return fN;
         }
 
         public override Task<DVBTDriverCapabilities> GetCapabalities()

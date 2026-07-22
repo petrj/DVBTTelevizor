@@ -61,6 +61,14 @@ namespace DVBTTelevizor.TV
             }
         }
 
+        public override string RecordFileName
+        {
+            get
+            {
+                return _waveFileName;
+            }
+        }
+
         public override void StartRecording(string path)
         {
             var fN = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + DVBTDriverConnector.GetHumanReadableFrequency(LastTunedFreq).ToString().Replace(" ", "_").Replace(".", "_")+"." + "wav";
