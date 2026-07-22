@@ -18,6 +18,9 @@ namespace DVBTTelevizor.TV
         {
         }
 
+        private Wave? _wave = null;
+        private string _waveFileName = null;
+
         public override AppDriverTypeEnum DriverType => AppDriverTypeEnum.FM;
 
         public override Task<DVBTDriverCapabilities> GetCapabalities()
@@ -33,6 +36,53 @@ namespace DVBTTelevizor.TV
                     SuccessFlag = true
                 };
             });
+        }
+
+        public override void OnDataDemodulated(object? sender, EventArgs e)
+        {
+            base.OnDataDemodulated(sender, e);
+
+            if (e is DataDemodulatedEventArgs dargs &&
+            dargs.Data != null &&
+            dargs.Data.Length > 0)
+            {
+                if (!string.IsNullOrWhiteSpace(_waveFileName))
+                {
+                    if ((_wave == null) && (dargs.AudioDescription != null))
+                    {
+                        _wave = new Wave();
+                        _wave.CreateWaveFile(_waveFileName, dargs.AudioDescription);
+                    }
+                    if (_wave != null && dargs.Data != null)
+                    {
+                        _wave.WriteSampleData(dargs.Data);
+                    }
+                }
+            }
+        }
+
+        public override void StartRecording(string path)
+        {
+            var fN = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + DVBTDriverConnector.GetHumanReadableFrequency(LastTunedFreq).ToString().Replace(" ", "_").Replace(".", "_")+"." + "wav";
+
+            _waveFileName = Path.Combine(path, fN);
+            _wave = null;
+
+            base.StartRecording(path);
+        }
+
+        public override string StopRecording()
+        {
+            base.StopRecording();
+
+            if (_wave != null)
+            {
+                _wave.CloseWaveFile();
+                _wave = null;
+            }
+            var fN = Path.GetFileName(_waveFileName);
+            _waveFileName = null;
+            return fN;
         }
 
         public override DriverStreamTypeEnum DVBTDriverStreamType

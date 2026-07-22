@@ -2090,7 +2090,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (_viewModel.RecordingChannel.ChannelType != ChannelTypeEnum.SledovaniTV)
                 {
-                    await _driver.StartRecording(_configuration.OutputDirectory);
+                    _driver.StartRecording(_configuration.OutputDirectory);
                 } else
                 {
                     _viewModel.SledovaniTVStartRecording();

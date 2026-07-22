@@ -167,13 +167,10 @@ namespace DVBTTelevizor.TV
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
         private DVBTDriverConfiguration _driverConfiguration;
-        private string? _recordingFileName = null;
 
         private bool _readingStream = true;
         private bool _streaming = false;
         private bool _recording = false;
-
-        private static object _readThreadLock = new object();
 
         public DVBTDriverConfiguration Configuration
         {
@@ -187,14 +184,11 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public string RecordFileName
+        public virtual string RecordFileName
         {
             get
             {
-                lock (_readThreadLock)
-                {
-                    return _recordingFileName;
-                }
+                return String.Empty;
             }
         }
 
@@ -210,10 +204,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                lock (_readThreadLock)
-                {
-                    return _streaming;
-                }
+                return _streaming;
             }
         }
 
@@ -254,10 +245,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                lock (_readThreadLock)
-                {
-                    return _recording;
-                }
+                return _recording;
             }
         }
 
@@ -265,10 +253,7 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                lock (_readThreadLock)
-                {
-                    return _readingStream;
-                }
+                return _readingStream;
             }
         }
 
@@ -463,9 +448,15 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task StartRecording(string path)
+        public virtual void StartRecording(string path)
         {
-            return Task.Run(() => { return; });
+            _recording = true;
+        }
+
+        public virtual string StopRecording()
+        {
+            _recording = false;
+            return string.Empty;
         }
 
         public void StartStream()
@@ -475,10 +466,6 @@ namespace DVBTTelevizor.TV
         public Task<bool> Stop()
         {
             return Task.Run(() => { return true; });
-        }
-
-        public void StopRecording()
-        {
         }
 
         public void StopStream()

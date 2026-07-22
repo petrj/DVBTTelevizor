@@ -327,7 +327,7 @@ namespace DVBTTelevizor
             StopBackgroundReading();
         }
 
-        public async Task StartRecording(string path)
+        public async void StartRecording(string path)
         {
             lock (_readThreadLock)
             {
@@ -348,17 +348,20 @@ namespace DVBTTelevizor
             }
         }
 
-        public void StopRecording()
+        public string StopRecording()
         {
+            string rf = null;
             lock (_readThreadLock)
             {
                 if (Recording)
                 {
+                    rf = Path.GetFileName(_recordingFileName);
                     _log.Debug($"Stopping recording");
                     _recording = false;
                     _recordingFileName = null;
                 }
             }
+            return rf;
         }
 
         private void StartReadBuffer()

@@ -425,9 +425,9 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task StartRecording(string path)
+        public void StartRecording(string path)
         {
-            return Task.Run(() => { return; });
+
         }
 
         public void StartStream()
@@ -444,8 +444,9 @@ namespace DVBTTelevizor.TV
             return Task.Run(() => { return true; });
         }
 
-        public void StopRecording()
+        public string StopRecording()
         {
+            return string.Empty;
         }
 
         public void StopStream()

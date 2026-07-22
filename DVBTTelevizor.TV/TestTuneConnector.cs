@@ -121,14 +121,15 @@ namespace DVBTTelevizor
             Connected = true;
         }
 
-        public async Task StartRecording(string path)
+        public async void StartRecording(string path)
         {
             Recording = true;
         }
 
-        public void StopRecording()
+        public string StopRecording()
         {
             Recording = false;
+            return string.Empty;
         }
 
         public void StopReadStream()
