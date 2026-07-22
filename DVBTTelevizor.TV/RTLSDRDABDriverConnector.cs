@@ -58,10 +58,16 @@ namespace DVBTTelevizor.TV
 
         public override bool IsOnSpectrumSignal()
         {
-            // TODO: check DAB spectrum
-            // For now, we will just return true to indicate that there is a signal present.
+            // check spectrum
+            if (_spectrumWorker != null)
+            {
+                var spectrum = _spectrumWorker.GetScaledSpectrum(SpectrumWidth, SpectrumHeight);
+                var isStationPresent = _spectrumWorker.IsDabStationPresent(spectrum);
 
-            return true;
+                return isStationPresent;
+            }
+
+            return false;
         }
 
         public override Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)

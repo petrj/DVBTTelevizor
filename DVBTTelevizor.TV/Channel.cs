@@ -1,6 +1,7 @@
 ﻿using DVBTTelevizor;
 using MPEGTS;
 using Newtonsoft.Json;
+using RTLSDR.Common;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -203,6 +204,11 @@ namespace DVBTTelevizor
                     return ProviderName;
                 }
 
+                if (string.IsNullOrWhiteSpace(ProviderName))
+                {
+                    return FrequencyShortLabel;
+                }
+
                 return $"{ProviderName} - {FrequencyShortLabel}";
             }
         }
@@ -211,12 +217,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                if (Frequency % 1000000 == 0)
-                {
-                    return (Frequency / 1000000).ToString("N0") + " MHz";
-                }
-
-                return (Frequency / 1000000.0).ToString("N3") + " MHz";
+                return DVBTDriverConnector.GetHumanReadableFrequency(Frequency);
             }
         }
 

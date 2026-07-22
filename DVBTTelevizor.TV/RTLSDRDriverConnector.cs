@@ -32,11 +32,17 @@ namespace DVBTTelevizor.TV
         public event EventHandler? OnServiceFound;
         public event EventHandler? RawDataReceived;
 
+
         public const int SpectrumFFTSize = 16384;
         public const int SpectrumWidth = 1024;
         public const int SpectrumHeight = 100;
         public const int SpectrumHThresholdOffset = 15;
         public bool LastFreqHasSignal { get; set; } = false;
+        public byte HasCarrier { get; set; } = 0;
+
+        public byte HasSignal { get; set; } = 0;
+        public byte HasLock { get; set; } = 0;
+        public float RFStrengthPercentage { get; set; } = 0;
 
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
@@ -369,28 +375,13 @@ namespace DVBTTelevizor.TV
             {
                 var state = new DVBTDriverStatus()
                 {
-                    SuccessFlag = true
+                    SuccessFlag = true,
+                    hasSignal = HasSignal,
+                    hasCarrier = HasCarrier,
+                    hasSync = (_demodulator != null && _demodulator.Synced) ? (byte)1 : (byte)0,
+                    hasLock = HasLock,
+                    rfStrengthPercentage = Convert.ToInt64(RFStrengthPercentage)
                 };
-
-                switch (_driver.State)
-                {
-                    case DriverStateEnum.DisConnected:
-                    case DriverStateEnum.NotInitialized:
-                    case DriverStateEnum.Error:
-                        state.hasCarrier = 0;
-                        state.hasSync = 0;
-                        state.hasSignal = 0;
-                        state.hasLock = 0;
-                        state.rfStrengthPercentage = 0;
-                    break;
-                    case DriverStateEnum.Connected:
-                        state.hasSignal = 1;
-                        state.hasCarrier = 0;
-                        state.hasSync = 0;
-                        state.hasLock = 0;
-                        //state.rfStrengthPercentage = Convert.ToInt64(_demodulator?.per);
-                        break;
-                }
 
                 if (StatusChanged != null)
                 {
@@ -408,7 +399,7 @@ namespace DVBTTelevizor.TV
                 return new DVBTDriverVersion()
                 {
                     SuccessFlag = true,
-                    Version = 1
+                    Version = 2
                 };
             });
         }
@@ -557,40 +548,44 @@ namespace DVBTTelevizor.TV
 
             await Task.Delay(1000);
 
+            var res = DVBTDriverSearchProgramResultEnum.NoSignal;
+
+            HasCarrier = 0;
+            HasLock = 0;
+            HasSignal = 0;
+            RFStrengthPercentage = 1;
+
             if (IsOnSpectrumSignal())
             {
                 //await Task.Delay(1000); // play tuned signal for a while
 
                 LastFreqHasSignal = true;
 
-                return new DVBTDriverTuneResult()
-                {
-                    Result = DVBTDriverSearchProgramResultEnum.OK,
-                    SignalState = new DVBTDriverStatus()
-                    {
-                        hasCarrier = 1,
-                        hasLock = 1,
-                        hasSync = 0,
-                        hasSignal = 1,
-                        SuccessFlag = true,
-                        //rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
-                    }
-                };
-            }
+                HasCarrier = 1;
+                HasLock = 1;
+                HasSignal = 1;
+                RFStrengthPercentage = 100;
 
-            LastFreqHasSignal = false;
+                res = DVBTDriverSearchProgramResultEnum.OK;
+
+            } else
+            {
+                _log.Debug($"No signal found on spectrum");
+
+                LastFreqHasSignal = false;
+            }
 
             return new DVBTDriverTuneResult()
             {
-                Result = DVBTDriverSearchProgramResultEnum.NoSignal,
+                Result = res,
                 SignalState = new DVBTDriverStatus()
                 {
-                    hasCarrier = 0,
-                    hasLock = 0,
-                    hasSync = 0,
-                    hasSignal = 0,
+                    hasCarrier = HasCarrier,
+                    hasLock = HasLock,
+                    hasSync = (_demodulator != null && _demodulator.Synced) ? (byte)1 : (byte)0,
+                    hasSignal = HasSignal,
                     SuccessFlag = true,
-                    //rfStrengthPercentage = Convert.ToInt64(_demodulator.PercentSignalPower)
+                    rfStrengthPercentage = Convert.ToInt64(RFStrengthPercentage)
                 }
             };
         }
