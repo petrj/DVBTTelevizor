@@ -2333,9 +2333,15 @@ namespace DVBTTelevizor.MAUI
                     {
                         WeakReferenceMessenger.Default.Send(new ToastMessage("Tuning {0} ....".Translated(channel.FrequencyShortLabel)));
 
+                        var clearDriver = _driver.LastTunedFreq != channel.Frequency;
+
                         var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
-                        _driver.Clear();
-                        _demodulator?.Clear();
+
+                        if (clearDriver)
+                        {
+                            _driver.Clear();
+                        }
+
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             switch (tunedRes.Result)

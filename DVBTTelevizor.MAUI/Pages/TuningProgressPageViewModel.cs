@@ -338,7 +338,6 @@ namespace DVBTTelevizor.MAUI
 
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _driver?.Clear();
                     _tunedMultiplexes.Clear();
                     _tunedNewChannels = 0;
                     Channels.Clear();
