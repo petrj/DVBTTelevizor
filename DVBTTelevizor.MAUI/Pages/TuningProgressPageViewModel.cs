@@ -121,7 +121,8 @@ namespace DVBTTelevizor.MAUI
                     Free = true,
                     ServiceName = $"FM {Driver.LastTunedFreq / 1_000_000.0:0.#} MHz",
                     ServisType = (byte)(ServiceTypeEnum.FMRadioService),
-                    ProgramNumber = Convert.ToInt32(Driver.LastTunedFreq/1000)
+                    ProgramNumber = Convert.ToInt32(Driver.LastTunedFreq/1000),
+                    ProviderName = $"FM radio"
                 };
 
                 AddChannel(ChannelTypeEnum.FM, sd, Driver.LastTunedFreq, _driver == null ? 0 : _driver.LastTunedFreq, 0);
@@ -134,7 +135,8 @@ namespace DVBTTelevizor.MAUI
                     Free = true,
                     ServiceName = de.Service.ServiceName,
                     ServisType = (byte)(ServiceTypeEnum.DigitalRadioSoundService),
-                    ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber)
+                    ProgramNumber = Convert.ToInt32(de.Service.ServiceNumber),
+                    ProviderName = $"DAB radio"
                 };
 
                 AddChannel(ChannelTypeEnum.DAB, sd, de.Service.ServiceNumber, _driver == null ? 0 : _driver.LastTunedFreq, 0);
