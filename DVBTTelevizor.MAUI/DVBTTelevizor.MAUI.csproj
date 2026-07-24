@@ -117,7 +117,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 		<PackageReference Include="NAudio" Version="2.3.0" />
-		<PackageReference Include="NLog" Version="6.1.1" />
+		<PackageReference Include="NLog" Version="6.1.4" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.0.4" />
 		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
 		<PackageReference Include="Powershell.Modules" Version="1.0.3" />
@@ -127,9 +127,9 @@
 		<PackageReference Include="RTLSDR.Common" Version="1.5.8" />
 		<PackageReference Include="RTLSDR.DAB" Version="1.6.3" />
 		<PackageReference Include="RTLSDR.FM" Version="1.5.2" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
-		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.150.1" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
 		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.12" />
 		<PackageReference Include="System.Drawing.Common" Version="10.0.5" />
 		<PackageReference Include="System.Formats.Nrbf" Version="10.0.5" />

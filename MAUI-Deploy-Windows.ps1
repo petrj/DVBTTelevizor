@@ -50,14 +50,14 @@ if (-not [String]::IsNullOrEmpty($passw))
     $signedAABPackage = $aABPackage `
         | Protect-BySignature `
             -Keystore "$HOME\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
-            -JarSigner "C:\Program Files\Android\openjdk\jdk-21.0.8\bin\jarsigner.exe" `
+            -JarSigner "jarsigner.exe" `
             -Alias "PJsAndroidKeyStore" `
             -Password $passw `
 
     $signedAPKPackage = $signedAABPackage | ConvertTo-APK `
             -Keystore "$HOME\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
             -Alias "PJsAndroidKeyStore" `
-            -Java  "C:\Program Files\Android\openjdk\jdk-21.0.8\bin\java.exe"`
+            -Java  "java.exe"`
             -Password $passw 
 
         $signedAABPackage | Copy-Item -Destination . -Force -Verbose
