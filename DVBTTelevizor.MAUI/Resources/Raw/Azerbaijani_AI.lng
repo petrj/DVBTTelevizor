@@ -283,3 +283,5 @@ dB=dB
 Now you can start rtl_tcp by:  rtl_tcp -a 0.0.0.0 -s 2048000=İndi rtl_tcp-u belə işə sala bilərsiniz: rtl_tcp -a 0.0.0.0 -s 2048000
 When running in the background, it is necessary to ensure that the app is not terminated due to battery optimization=Arxa planda işləyərkən tətbiqin batareya optimizasiyası səbəbindən bağlanmadığından əmin olun
 {0} channels updated, {1} added={0} kanal yeniləndi, {1} əlavə edildi
+Progress=İrəliləyiş
+Channels/new=Kanallar/yeni

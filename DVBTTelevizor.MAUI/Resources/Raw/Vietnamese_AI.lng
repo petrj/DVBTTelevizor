@@ -283,3 +283,5 @@ dB=dB
 Now you can start rtl_tcp by:  rtl_tcp -a 0.0.0.0 -s 2048000=Bây giờ bạn có thể bắt đầu rtl_tcp bằng: rtl_tcp -a 0.0.0.0 -s 2048000
 When running in the background, it is necessary to ensure that the app is not terminated due to battery optimization=Khi chạy ở chế độ nền, cần đảm bảo ứng dụng không bị đóng do tối ưu hóa pin
 {0} channels updated, {1} added=Đã cập nhật {0} kênh, thêm {1}
+Progress=Tiến trình
+Channels/new=Kênh/mới

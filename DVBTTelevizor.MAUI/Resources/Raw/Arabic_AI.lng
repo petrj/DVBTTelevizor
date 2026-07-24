@@ -283,3 +283,5 @@ dB=dB
 Now you can start rtl_tcp by:  rtl_tcp -a 0.0.0.0 -s 2048000=الآن يمكنك بدء rtl_tcp بواسطة: rtl_tcp -a 0.0.0.0 -s 2048000
 When running in the background, it is necessary to ensure that the app is not terminated due to battery optimization=عند التشغيل في الخلفية، من الضروري التأكد من أن التطبيق لا يتم إنهاؤه بسبب تحسين البطارية
 {0} channels updated, {1} added=تم تحديث {0} قناة، تمت إضافة {1}
+Progress=التقدم
+Channels/new=القنوات/جديدة

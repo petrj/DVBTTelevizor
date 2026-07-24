@@ -283,3 +283,5 @@ dB=дБ
 Now you can start rtl_tcp by:  rtl_tcp -a 0.0.0.0 -s 2048000=Тепер ви можете запустити rtl_tcp за допомогою: rtl_tcp -a 0.0.0.0 -s 2048000
 When running in the background, it is necessary to ensure that the app is not terminated due to battery optimization=Під час роботи у фоновому режимі необхідно переконатися, що додаток не завершується через оптимізацію батареї
 {0} channels updated, {1} added=Оновлено {0} каналів, додано {1}
+Progress=Прогрес
+Channels/new=Канали/нові
