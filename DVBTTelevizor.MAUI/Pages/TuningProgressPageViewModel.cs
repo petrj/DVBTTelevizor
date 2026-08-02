@@ -588,6 +588,10 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
                 throw;
             }
+            finally
+            {
+                NotifyChange();
+            }
         }
 
         private void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
@@ -625,6 +629,8 @@ namespace DVBTTelevizor.MAUI
                         }
                     });
                 });
+
+                NotifyChange();
             }
         }
 

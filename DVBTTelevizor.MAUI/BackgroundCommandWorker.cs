@@ -21,7 +21,6 @@ namespace DVBTTelevizor
                     try
                     {
 
-
                         Thread.CurrentThread.IsBackground = true;
 
                         Thread.Sleep(delaySeconds * 1000);
