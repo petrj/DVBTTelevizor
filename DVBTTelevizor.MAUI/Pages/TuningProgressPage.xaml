@@ -75,6 +75,15 @@
                 <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
 
+            <Style x:Key="SliderStyle" TargetType="Slider">
+                <!--Setter Property="ThumbColor" Value="AliceBlue"/-->
+                <Setter Property="MinimumTrackColor" Value="Blue"/>
+                <Setter Property="BackgroundColor" Value="Transparent"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Margin" Value="10,0,10,0"/>
+            </Style>
+
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -122,9 +131,15 @@
                 <ColumnDefinition Width="25*" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Progress'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-            <ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />
-            <Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+            <!--Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Progress'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/-->
+            <!--ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" /-->
+
+            <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource ButtonStyle}" Clicked="LeftButton_Clicked"/>
+            <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="RightButton_Clicked"/>
+
+            <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding FrequencyToKHz}" Value="{Binding FrequencyKHz}" Minimum="{Binding FrequencyFromKHz}" Style="{DynamicResource SliderStyle}"  ValueChanged="SliderFrequency_ValueChanged" IsEnabled="{Binding FreqSliderEnabled}"/>
+
+            <!--Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/-->
 
             <Label Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Signal'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
             <ProgressBar Grid.Row="1" Grid.Column="1" Progress="{Binding SignalProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" />

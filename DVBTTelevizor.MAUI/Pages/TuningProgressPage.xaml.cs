@@ -107,18 +107,18 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             if (e is ChannelFoundEventArgs che)
             {
-                _loggingService.Info($"Adding new channel: {che.Channel.Name}");
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    try
-                    {
-                        ChannelsListView.ScrollTo(che.Channel, ScrollToPosition.MakeVisible, false);
-                    }
-                    catch (Exception ex)
-                    {
-                        _loggingService.Error(ex);
-                    }
-                });
+                //_loggingService.Info($"Adding new channel: {che.Channel.Name}");
+                //MainThread.BeginInvokeOnMainThread(async () =>
+                //{
+                //    try
+                //    {
+                //        ChannelsListView.ScrollTo(che.Channel, ScrollToPosition.MakeVisible, false);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        _loggingService.Error(ex);
+                //    }
+                //});
             }
         }
         catch (Exception ex)
@@ -132,6 +132,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("Left", new List<View>() { LeftButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Right", new List<View>() { RightButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Start", new List<View>() { StartButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Stop", new List<View>() { StopButton }))
@@ -240,11 +242,12 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            await Task.Delay(200); // Allow UI to render first
-            StartButton_Clicked(this, new EventArgs());
-        });
+        // this will gonna freeze the app for a while!!!!!!!!!!!!!!!!!!!!!
+        //MainThread.BeginInvokeOnMainThread(async () =>
+        //{
+        //    await Task.Delay(200); // Allow UI to render first
+        //    StartButton_Clicked(this, new EventArgs());
+        //});
 
         _viewModel.NotifyChange();
     }
@@ -340,6 +343,12 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 {
                     switch (_focusItems.FocusedItem.Name)
                     {
+                        case "Left":
+                            LeftButton_Clicked(this, new EventArgs());
+                            break;
+                        case "Right":
+                            RightButton_Clicked(this, new EventArgs());
+                            break;
                         case "Back":
                             BackButton_Clicked(this, new EventArgs());
                             break;
@@ -569,5 +578,32 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
         }
+    }
+
+    private void SliderFrequency_ValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        _loggingService.Debug($"TuningProgressPage SliderFrequency_ValueChanged");
+
+        // round frequency
+
+        Task.Run(async () =>
+        {
+            _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(SliderFrequency.Value, SliderFrequency.Minimum, SliderFrequency.Maximum);
+            await _viewModel.TuneFreq(_viewModel.FrequencyKHz*1000,_viewModel.Settings.BandwidthKHz*1000, _viewModel.Settings.DVBT2 ? 1 : 0);
+        });
+    }
+
+    private void LeftButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage LeftButton_Clicked");
+
+        _viewModel.DecreaseFreq();
+    }
+
+    private void RightButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"FrequencyPage RightButton_Clicked");
+
+        _viewModel.IncreaseFreq();
     }
 }

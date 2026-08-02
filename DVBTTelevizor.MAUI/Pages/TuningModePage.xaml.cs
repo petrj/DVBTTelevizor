@@ -170,16 +170,13 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         switch (mode)
         {
             case TuneModeEnum.Automatic:
+            case TuneModeEnum.Frequency:
                 _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.DefaultFrequencyMinKHz;
                 _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.DefaultFrequencyMaxKHz;
                 break;
             case TuneModeEnum.Manual:
                 _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.FrequencyFromKHz;
                 _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.FrequencyToKHz;
-                break;
-            case TuneModeEnum.Frequency:
-                _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.FrequencyKHz;
-                _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.FrequencyKHz;
                 break;
         }
 
@@ -195,10 +192,6 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         await MainPage.ShowPage<T>(Navigation, page);
     }
 
-    private void SetDVBTSettings(TuneModeEnum mode)
-    {
-
-    }
     private async void ManualScanButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");
@@ -222,7 +215,7 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         }
         else
         {
-            await ShowPage<TuningFrequencyPage>(TuneModeEnum.Frequency);
+            await ShowPage<TuningProgressPage>(TuneModeEnum.Frequency);
         }
     }
 }

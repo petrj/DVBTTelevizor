@@ -1,5 +1,6 @@
 ﻿using DVBTTelevizor.TV;
 using LoggerService;
+using RTLSDR.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -266,6 +267,29 @@ namespace DVBTTelevizor
             {
 
             }
+        }
+
+        public int RoundFrequencyKHz(double freq, double min, double max)
+        {
+            var freqLong = Convert.ToInt64(freq);
+
+            if (FM)
+            {
+                // round to bandwith
+
+                var startFreq = AudioTools.FMMinFreq - min;
+
+                var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(freq - startFreq) / Convert.ToDecimal(BandwidthKHz)));
+
+                var freqRounded = Convert.ToInt64(Convert.ToDecimal(startFreq) + stepFreq * BandwidthKHz);
+
+                return Convert.ToInt32(freqRounded);
+            }
+
+            //if (!ValidFrequency(freqLong, true))
+            //    return Convert.ToInt32(freqLong);
+
+            return (int)Math.Round(freq);
         }
     }
 }

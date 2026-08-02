@@ -373,14 +373,61 @@ namespace DVBTTelevizor.MAUI
                     break;
             }
 
-            await Tune();
+            if (Settings.TuningMode == TuneModeEnum.Frequency)
+            {
+                await ManualTune();
+            }
+            else
+            {
+                await AutomaticTune();
+            }
         }
 
-        private async Task Tune()
+        private async Task ManualTune()
         {
             try
             {
-                _loggingService.Info("Tuning started");
+                _loggingService.Info("Manual tuning started");
+
+                _tuneState = TuneStateEnum.InProgress;
+
+                //_savedChannels = await _channelService.LoadChannels();
+
+                NotifyChange();
+
+                // DVBT using Connected, DAB/FM State, TODO: refactor to use State for all drivers
+                if (!(_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
+                {
+                    _tuneState = TuneStateEnum.Failed;
+                    return;
+                }
+
+                await TuneFreq(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, Settings.DVBT2? 1 : 0);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+                State = TuneStateEnum.Failed;
+            }
+            finally
+            {
+                _loggingService.Info("Tuning finished");
+
+                if (_tuneState == TuneStateEnum.Failed)
+                {
+                    WeakReferenceMessenger.Default.Send(new TuneFailedMessage(String.Empty));
+                }
+
+                NotifyChange();
+            }
+
+        }
+
+        private async Task AutomaticTune()
+        {
+            try
+            {
+                _loggingService.Info("Automatic tuning started");
 
                 _tuneState = TuneStateEnum.InProgress;
 
@@ -401,7 +448,8 @@ namespace DVBTTelevizor.MAUI
                     {
                         if (dvbtTypeIndex > 0)
                             continue;
-                    } else
+                    }
+                    else
                     {
                         if (!DVBTTuning && dvbtTypeIndex == 0)
                             continue;
@@ -418,7 +466,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
 
-                        await Tune(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
+                        await TuneFreq(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, dvbtTypeIndex);
 
                         if (State != TuneStateEnum.InProgress)
                         {
@@ -450,7 +498,8 @@ namespace DVBTTelevizor.MAUI
                             {
                                 _actualTunningFreqKHz += TuneBandWidthKHz;
                             }
-                        } else
+                        }
+                        else
                         {
                             break;
                         }
@@ -492,7 +541,7 @@ namespace DVBTTelevizor.MAUI
 
         }
 
-        private async Task Tune(long freq, long bandWidth, int dvbtTypeIndex)
+        public async Task TuneFreq(long freq, long bandWidth, int dvbtTypeIndex)
         {
             try
             {
@@ -764,7 +813,7 @@ namespace DVBTTelevizor.MAUI
 
                 OnPropertyChanged(nameof(SignalStrengthProgress));
                 OnPropertyChanged(nameof(DVBTPropertiesVisible));
-
+                OnPropertyChanged(nameof(FreqSliderEnabled));
             });
         }
 
@@ -926,6 +975,14 @@ namespace DVBTTelevizor.MAUI
                 var part = (FrequencyKHz / 1000.0) - Math.Floor(FrequencyKHz / 1000.0);
                 var part1000 = Convert.ToInt64(part * 1000).ToString().PadLeft(3, '0');
                 return $".{part1000} MHz";
+            }
+        }
+
+        public bool FreqSliderEnabled
+        {
+            get
+            {
+                return Settings.TuningMode == TuneModeEnum.Frequency;
             }
         }
 
@@ -1305,6 +1362,26 @@ namespace DVBTTelevizor.MAUI
                 _menuVisible = value;
 
                 OnPropertyChanged(nameof(MenuVisible));
+            }
+        }
+
+        public void DecreaseFreq()
+        {
+            if (FrequencyKHz - TuneBandWidthKHz > FrequencyFromKHz - (1 / 2 * TuneBandWidthKHz))
+            {
+                FrequencyKHz = Settings.RoundFrequencyKHz(FrequencyKHz - TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
+
+                NotifyChange();
+            }
+        }
+
+        public void IncreaseFreq()
+        {
+            if (FrequencyKHz + TuneBandWidthKHz <  FrequencyToKHz+(1/2* TuneBandWidthKHz))
+            {
+                FrequencyKHz = Settings.RoundFrequencyKHz(FrequencyKHz + TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
+
+                NotifyChange();
             }
         }
 
