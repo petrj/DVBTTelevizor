@@ -454,16 +454,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _viewModel.StopTune();
     }
 
-    private void ContinueButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Debug($"TuningProgressPage ContinueButton_Clicked");
-
-        Task.Run(async () =>
-        {
-            await _viewModel.StartTune();
-        });
-    }
-
     private void BackButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningProgressPage BackButton_Clicked");

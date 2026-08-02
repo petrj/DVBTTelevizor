@@ -286,6 +286,23 @@ namespace DVBTTelevizor
                 return Convert.ToInt32(freqRounded);
             }
 
+            if (DAB)
+            {
+                // there is not constant bandwidth, so rounding is different
+                var minFreqDist = long.MaxValue;
+                long freqRounded = AudioTools.DABMinFreq;
+                foreach (var f in AudioTools.DabFrequenciesHz)
+                {
+                    var dist = f.Value - freqLong * 1000;
+                    if (Math.Abs(dist) < Math.Abs(minFreqDist))
+                    {
+                        minFreqDist = dist;
+                        freqRounded = f.Value / 1000;
+                    }
+                }
+                return Convert.ToInt32(freqRounded);
+            }
+
             //if (!ValidFrequency(freqLong, true))
             //    return Convert.ToInt32(freqLong);
 

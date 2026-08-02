@@ -800,7 +800,6 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SelectedChannel));
 
                 OnPropertyChanged(nameof(StartButtonVisible));
-                OnPropertyChanged(nameof(ContinueButtonVisible));
                 OnPropertyChanged(nameof(StopButtonVisible));
                 OnPropertyChanged(nameof(BackButtonVisible));
                 OnPropertyChanged(nameof(FinishButtonVisible));
@@ -814,6 +813,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SignalStrengthProgress));
                 OnPropertyChanged(nameof(DVBTPropertiesVisible));
                 OnPropertyChanged(nameof(FreqSliderEnabled));
+                OnPropertyChanged(nameof(TuneButtonVisible));
             });
         }
 
@@ -929,6 +929,14 @@ namespace DVBTTelevizor.MAUI
             get
             {
                 return State == TuneStateEnum.InProgress;
+            }
+        }
+
+        public bool TuneButtonVisible
+        {
+            get
+            {
+                return Settings.TuningMode == TuneModeEnum.Frequency;
             }
         }
 
@@ -1258,18 +1266,13 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public bool ContinueButtonVisible
-        {
-            get
-            {
-                return State == TuneStateEnum.Stopped;
-            }
-        }
-
         public bool StartButtonVisible
         {
             get
             {
+                if (Settings.TuningMode == TuneModeEnum.Frequency)
+                    return false; // no start button in frequency mode
+
                 return State != TuneStateEnum.InProgress;
             }
         }
@@ -1278,6 +1281,9 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (Settings.TuningMode == TuneModeEnum.Frequency)
+                    return false; // no stop button in frequency mode
+
                 return State == TuneStateEnum.InProgress;
             }
         }
@@ -1295,6 +1301,9 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (Settings.TuningMode == TuneModeEnum.Frequency)
+                    return true; // awlays can go to home screen
+
                 return
                     (State == TuneStateEnum.Finished)
                     ||
@@ -1367,22 +1376,63 @@ namespace DVBTTelevizor.MAUI
 
         public void DecreaseFreq()
         {
-            if (FrequencyKHz - TuneBandWidthKHz > FrequencyFromKHz - (1 / 2 * TuneBandWidthKHz))
+            if (Settings.FM)
             {
-                FrequencyKHz = Settings.RoundFrequencyKHz(FrequencyKHz - TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
-
-                NotifyChange();
+                if (FrequencyKHz - TuneBandWidthKHz > FrequencyFromKHz - (1 / 2 * TuneBandWidthKHz))
+                {
+                    FrequencyKHz = Settings.RoundFrequencyKHz(FrequencyKHz - TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
+                }
             }
+
+            if (Settings.DAB)
+            {
+                // DAB frequencies are fixed, so we need to find the previous frequency in the list AudioTools.DabFrequenciesHz
+                var prevFreq = 174928;
+                foreach (var dabFreq in AudioTools.DabFrequenciesHz)
+                {
+                    if (dabFreq.Value / 1000 < FrequencyKHz)
+                    {
+                        prevFreq = dabFreq.Value / 1000;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                FrequencyKHz = prevFreq < 174928 ? 174928 : prevFreq;
+            }
+
+            NotifyChange();
         }
 
         public void IncreaseFreq()
         {
-            if (FrequencyKHz + TuneBandWidthKHz <  FrequencyToKHz+(1/2* TuneBandWidthKHz))
+            if (Settings.FM)
             {
-                FrequencyKHz = Settings.RoundFrequencyKHz(FrequencyKHz + TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
+                var nextFreq = AudioTools.FMMaxFreq;
+                nextFreq = Settings.RoundFrequencyKHz(FrequencyKHz + TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
 
-                NotifyChange();
+                FrequencyKHz = nextFreq > AudioTools.FMMaxFreq ? AudioTools.FMMaxFreq : nextFreq;
             }
+
+            if (Settings.DAB)
+            {
+                // DAB frequencies are fixed, so we need to find the next frequency in the list AudioTools.DabFrequenciesHz
+                var nextFreq = 239200;
+                foreach (var dabFreq in AudioTools.DabFrequenciesHz)
+                {
+                    if (dabFreq.Value / 1000 > FrequencyKHz)
+                    {
+                        nextFreq = dabFreq.Value / 1000;
+                        break;
+                    }
+                }
+
+                FrequencyKHz = nextFreq > 239200 ? 239200 : nextFreq;
+            }
+
+            NotifyChange();
         }
 
     }

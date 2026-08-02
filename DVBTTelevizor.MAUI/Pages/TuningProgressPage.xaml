@@ -26,13 +26,22 @@
                 <Setter Property="HorizontalTextAlignment" Value="Start"/>
             </Style>
 
+            <Style x:Key="TuneButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="1,1,1,0"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0"/>
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+            </Style>
+
             <Style x:Key="ButtonStyle" TargetType="Button">
                 <Setter Property="Margin" Value="5,5,5,0"/>
                 <Setter Property="FontAttributes" Value="Bold"/>
 
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="BorderWidth" Value="0"/>
-                <Setter Property="CornerRadius" Value="7"/>
                 <Setter Property="BackgroundColor" Value="Gray"/>
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
@@ -134,8 +143,8 @@
             <!--Label Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Progress'}" HorizontalOptions="Start" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/-->
             <!--ProgressBar Grid.Row="0" Grid.Column="1" Progress="{Binding TuningProgress}" BackgroundColor="#222222" ProgressColor="Blue" HorizontalOptions="Fill" VerticalOptions="Center" Margin="0,5,0,0" HeightRequest="10" /-->
 
-            <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource ButtonStyle}" Clicked="LeftButton_Clicked"/>
-            <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="RightButton_Clicked"/>
+            <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource TuneButtonStyle}" Clicked="LeftButton_Clicked" IsVisible="{Binding TuneButtonVisible}"/>
+            <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource TuneButtonStyle}" Clicked="RightButton_Clicked" IsVisible="{Binding TuneButtonVisible}"/>
 
             <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding FrequencyToKHz}" Value="{Binding FrequencyKHz}" Minimum="{Binding FrequencyFromKHz}" Style="{DynamicResource SliderStyle}"  ValueChanged="SliderFrequency_ValueChanged" IsEnabled="{Binding FreqSliderEnabled}"/>
 
@@ -283,7 +292,7 @@
 
             <Button x:Name="BackButton" Grid.Column="0" Text="{local:LngXamlExt Input='Back'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="BackButton_Clicked"/>
 
-            <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding BackButtonVisible}" Clicked="StartButton_Clicked"/>
+            <Button x:Name="StartButton" Grid.Column="1" Text="{local:LngXamlExt Input='Start'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StartButtonVisible}" Clicked="StartButton_Clicked"/>
 
             <Button x:Name="StopButton" Grid.Column="1" Text="{local:LngXamlExt Input='Stop'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding StopButtonVisible}" Clicked="StopButton_Clicked"/>
 
