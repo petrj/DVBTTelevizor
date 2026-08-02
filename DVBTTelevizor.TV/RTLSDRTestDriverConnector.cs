@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DVBTTelevizor.TV
 {
@@ -236,7 +237,12 @@ namespace DVBTTelevizor.TV
             else
             if (DriverType == AppDriverTypeEnum.DAB)
             {
-                fName = Path.Join(PublicDirectory, "DAB.raw");
+                if (AudioTools.FrequenciesDabMHz.ContainsKey(LastTunedFreq/1E+06))
+                {
+                    fName = $"{AudioTools.FrequenciesDabMHz[LastTunedFreq/1E+06]}.raw";
+                }
+
+                fName = Path.Join(PublicDirectory, fName);
                 _bytesPerSecond = 2114628*2;
             }
 
@@ -382,17 +388,6 @@ namespace DVBTTelevizor.TV
             return Task.Run(() => { return new EITScanResult(); });
         }
 
-        public virtual Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
-        {
-            return Task.Run(() =>
-            {
-                return new DVBTDriverSearchProgramMapPIDsResult()
-                {
-                    Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
-                };
-            });
-        }
-
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
             return Task.Run(() =>
@@ -474,6 +469,11 @@ namespace DVBTTelevizor.TV
 
             LastTunedFreq = frequency;
 
+            await Task.Delay(100); // Simulate some delay for tuning
+
+            await Disconnect();
+            Connect();
+
             return new DVBTDriverTuneResult()
             {
                 Result = DVBTDriverSearchProgramResultEnum.OK,
@@ -519,6 +519,34 @@ namespace DVBTTelevizor.TV
                     Result = DVBTDriverSearchProgramResultEnum.OK
                 };
             });
+        }
+
+        public async Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
+        {
+            string fName = "";
+            if (AudioTools.FrequenciesDabMHz.ContainsKey(LastTunedFreq / 1E+06))
+            {
+                fName = $"{AudioTools.FrequenciesDabMHz[LastTunedFreq / 1E+06]}.raw";
+            }
+
+            fName = Path.Join(PublicDirectory, fName);
+
+            if (!File.Exists(fName))
+            {
+                return new DVBTDriverSearchProgramMapPIDsResult()
+                {
+                    Result = DVBTDriverSearchProgramResultEnum.NoSignal,
+                    ServiceDescriptors = new Dictionary<ServiceDescriptor, long>()
+                };
+            }
+
+            await Task.Delay(4000);
+
+            return  new DVBTDriverSearchProgramMapPIDsResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.OK,
+                ServiceDescriptors = new Dictionary<ServiceDescriptor, long>()
+            };
         }
     }
 }
