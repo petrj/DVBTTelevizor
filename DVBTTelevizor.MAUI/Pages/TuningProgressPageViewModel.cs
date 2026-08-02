@@ -549,11 +549,6 @@ namespace DVBTTelevizor.MAUI
 
                 var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, false);
 
-                if (State != TuneStateEnum.InProgress)
-                {
-                    return;
-                }
-
                 _driver.Clear();
 
                 switch (tuneResult.Result)
@@ -936,7 +931,8 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.TuningMode == TuneModeEnum.Frequency;
+                return Settings.TuningMode == TuneModeEnum.Frequency &&
+                   State == TuneStateEnum.InProgress;
             }
         }
 
@@ -990,7 +986,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.TuningMode == TuneModeEnum.Frequency;
+                return Settings.TuningMode == TuneModeEnum.Frequency && State == TuneStateEnum.InProgress;
             }
         }
 
@@ -1270,9 +1266,6 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (Settings.TuningMode == TuneModeEnum.Frequency)
-                    return false; // no start button in frequency mode
-
                 return State != TuneStateEnum.InProgress;
             }
         }
@@ -1281,9 +1274,6 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (Settings.TuningMode == TuneModeEnum.Frequency)
-                    return false; // no stop button in frequency mode
-
                 return State == TuneStateEnum.InProgress;
             }
         }
@@ -1301,9 +1291,6 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (Settings.TuningMode == TuneModeEnum.Frequency)
-                    return true; // awlays can go to home screen
-
                 return
                     (State == TuneStateEnum.Finished)
                     ||

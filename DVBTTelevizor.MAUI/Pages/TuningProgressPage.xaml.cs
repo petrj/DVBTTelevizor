@@ -4,6 +4,7 @@ using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Maui.Layouts;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using static DVBTTelevizor.MAUI.TuningProgressPageViewModel;
 using static System.Net.Mime.MediaTypeNames;
@@ -33,6 +34,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     private DriverPage _driverPage;
 
     private AppMenu _appMenu = null;
+
+    private DateTime _lastSliderValuechangedActionTime = DateTime.MinValue;
+    private long _sliderFreqKHz = 0;
+    private ConcurrentQueue<long> _sliderFreqKHzQueue = new ConcurrentQueue<long>();
 
     public TuningProgressPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -242,6 +247,11 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
+        Task.Run(async () =>
+        {
+            await ResetTuningEnvironment();
+        });
+
         // this will gonna freeze the app for a while!!!!!!!!!!!!!!!!!!!!!
         //MainThread.BeginInvokeOnMainThread(async () =>
         //{
@@ -381,15 +391,28 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _viewModel?.ResetTune(clearChannels);
     }
 
+
+
     private async void StartButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
+
+        if (await ResetTuningEnvironment())
+        {
+            await _viewModel.StartTune();
+        }
+    }
+
+
+    private async Task<bool> ResetTuningEnvironment()
+    {
+        _loggingService.Debug($"ResetTuningEnvironment");
 
         if ((_viewModel.Driver == null))
         {
             _loggingService.Error("StartButton_Clicked - no driver");
             WeakReferenceMessenger.Default.Send(new ToastMessage("Error - no driver".Translated()));
-            return;
+            return false;
         }
 
         AppDriverTypeEnum? driverToChange = null;
@@ -416,7 +439,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 _appMenu.ShowConfirmChangeDriverMenu(_viewModel.Driver, driverToChange);
             });
 
-            return;
+            return false;
         }
 
         if (!_viewModel.Driver.Connected)
@@ -426,25 +449,10 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 _appMenu.ShowConnectDriverMenu(_viewModel.Driver);
             });
 
-            return;
+            return false;
         }
 
-        if (_viewModel.State == TuningProgressPageViewModel.TuneStateEnum.Stopped &&
-            _viewModel.Settings.TuningMode != TuneModeEnum.Frequency)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                _appMenu.ShowConfirmMenu(
-                "Tuning is in progress".Translated(),
-                "Start from beginning".Translated(),
-                "Continue".Translated(),
-                "menuFromBeginning",
-                "menuContinue");
-            });
-        } else
-        {
-            await _viewModel.StartTune();
-        }
+        return true;
     }
 
     private void StopButton_Clicked(object sender, EventArgs e)
@@ -574,6 +582,52 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage SliderFrequency_ValueChanged");
 
+        /*
+        Task.Run(async () =>
+        {
+            _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz((long)SliderFrequency.Value, SliderFrequency.Minimum, SliderFrequency.Maximum);
+            await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
+        });
+        */
+
+
+        _sliderFreqKHzQueue.Enqueue((long)SliderFrequency.Value);
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(100);
+
+            bool found = false;
+            long value = 0;
+            while (_sliderFreqKHzQueue.Count > 0)
+            {
+                found = true;
+                _sliderFreqKHzQueue.TryDequeue(out value);
+            }
+
+            if (found)
+            {
+                _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(value, SliderFrequency.Minimum, SliderFrequency.Maximum);
+                await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
+            }
+        });
+
+
+
+        /*
+        if (_lastSliderValuechangedActionTime == DateTime.MinValue)
+        {
+            // no action yet, just set the time and return
+            _lastSliderValuechangedActionTime = DateTime.Now;
+            _sliderFreqKHz = (long)SliderFrequency.Value;
+        } else
+        {
+            // check if enough time has passed since the last action
+            var ms = (DateTime.Now - _lastSliderValuechangedActionTime).TotalMilliseconds;
+            var timeSinceLastAction = DateTime.Now - _lastSliderValuechangedActionTime;
+
+        }
+
         // round frequency
 
         Task.Run(async () =>
@@ -581,6 +635,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(SliderFrequency.Value, SliderFrequency.Minimum, SliderFrequency.Maximum);
             await _viewModel.TuneFreq(_viewModel.FrequencyKHz*1000,_viewModel.Settings.BandwidthKHz*1000, _viewModel.Settings.DVBT2 ? 1 : 0);
         });
+
+        */
     }
 
     private void LeftButton_Clicked(object sender, EventArgs e)
