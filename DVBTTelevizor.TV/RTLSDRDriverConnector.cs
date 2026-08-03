@@ -521,7 +521,7 @@ namespace DVBTTelevizor.TV
                 };
             }
 
-            _demodulator?.Clear();
+            //_demodulator?.Clear();
             var tuneResult = await Tune(frequency, bandWidth, deliverySystem);
 
             if (!tuneResult.SuccessFlag)
