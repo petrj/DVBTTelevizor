@@ -542,24 +542,25 @@ namespace DVBTTelevizor.TV
             HasSignal = 0;
             RFStrengthPercentage = 1;
 
-            if (IsOnSpectrumSignal())
+            LastFreqHasSignal = false;
+
+            for (int at = 0; at < 10; at++)
             {
-                //await Task.Delay(1000); // play tuned signal for a while
+                if (IsOnSpectrumSignal())
+                {
+                    LastFreqHasSignal = true;
 
-                LastFreqHasSignal = true;
+                    HasCarrier = 1;
+                    HasLock = 1;
+                    HasSignal = 1;
+                    RFStrengthPercentage = 100;
 
-                HasCarrier = 1;
-                HasLock = 1;
-                HasSignal = 1;
-                RFStrengthPercentage = 100;
+                    res = DVBTDriverSearchProgramResultEnum.OK;
 
-                res = DVBTDriverSearchProgramResultEnum.OK;
+                    break;
+                }
 
-            } else
-            {
-                _log.Debug($"No signal found on spectrum");
-
-                LastFreqHasSignal = false;
+                await Task.Delay(250);
             }
 
             return new DVBTDriverTuneResult()

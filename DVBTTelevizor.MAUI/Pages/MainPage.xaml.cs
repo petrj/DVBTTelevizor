@@ -2351,15 +2351,25 @@ namespace DVBTTelevizor.MAUI
 
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
+                            var msg = "";
+
                             switch (tunedRes.Result)
                             {
                                 case DVBTDriverSearchProgramResultEnum.NoSignal:
+                                    msg = "No signal".Translated();
                                     WeakReferenceMessenger.Default.Send(new ToastMessage("No signal".Translated()));
                                     break;
                                 default:
-                                    WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
+                                    msg = "Playing failed".Translated();
                                     break;
                             }
+
+                            if (channel.ChannelType == ChannelTypeEnum.DAB)
+                            {
+                                msg += "...";
+                            }
+
+                            WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
 
                             return;
                         }
