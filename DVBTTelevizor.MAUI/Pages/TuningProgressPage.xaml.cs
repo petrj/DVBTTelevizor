@@ -385,20 +385,35 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService.Debug($"TuningProgressPage OnTextSent {text}");
     }
 
-
     public void ResetTune(bool clearChannels)
     {
-        _viewModel?.ResetTune(clearChannels);
+        _viewModel?.ResetTune(clearChannels, true);
     }
-
-
 
     private async void StartButton_Clicked(object sender, EventArgs e)
     {
         _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
 
+        if (_viewModel.Settings.TuningMode != TuneModeEnum.Frequency &&
+            _viewModel.FrequencyKHz > _viewModel.FrequencyFromKHz &&
+            _viewModel.FrequencyKHz < _viewModel.FrequencyToKHz)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _appMenu.ShowConfirmMenu(
+                "Confirm".Translated(),
+                "Start from beginning".Translated(),
+                "Continue".Translated(),
+                "menuFromBeginning",
+                "menuContinue");
+            });
+
+            return;
+        }
+
         if (await ResetTuningEnvironment())
         {
+            _viewModel.ResetTune(true, true);
             await _viewModel.StartTune();
         }
     }
@@ -505,7 +520,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
 
-        _viewModel.ResetTune(true);
+        _viewModel.ResetTune(true, true);
 
         _viewModel.State = TuneStateEnum.Finished;
 
@@ -540,12 +555,13 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         switch (menuId)
         {
             case "menuFromBeginning":
-                _viewModel.ResetTune(true);
+                _viewModel.ResetTune(true, true);
                 await _viewModel.StartTune();
                 break;
 
             case "menuContinue":
             case "menuRetryTune":
+                _viewModel.ResetTune(false, false);
                 await _viewModel.StartTune();
                 break;
 
@@ -582,15 +598,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningProgressPage SliderFrequency_ValueChanged");
 
-        /*
-        Task.Run(async () =>
-        {
-            _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz((long)SliderFrequency.Value, SliderFrequency.Minimum, SliderFrequency.Maximum);
-            await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
-        });
-        */
-
-
         _sliderFreqKHzQueue.Enqueue((long)SliderFrequency.Value);
 
         Task.Run(async () =>
@@ -609,34 +616,22 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             {
                 _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(value, SliderFrequency.Minimum, SliderFrequency.Maximum);
                 await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
+
+                // save to configuration
+                switch (_viewModel.Config.AppDriverType)
+                {
+                    case TV.AppDriverTypeEnum.FM:
+                        _viewModel.Config.FMFrequencyKHz = _viewModel.FrequencyKHz;
+                        break;
+                    case TV.AppDriverTypeEnum.DAB:
+                        _viewModel.Config.DABFrequencyKHz = _viewModel.FrequencyKHz;
+                        break;
+                    case AppDriverTypeEnum.DVBT:
+                        _viewModel.Config.FrequencyKHz = _viewModel.FrequencyKHz;
+                        break;
+                }
             }
         });
-
-
-
-        /*
-        if (_lastSliderValuechangedActionTime == DateTime.MinValue)
-        {
-            // no action yet, just set the time and return
-            _lastSliderValuechangedActionTime = DateTime.Now;
-            _sliderFreqKHz = (long)SliderFrequency.Value;
-        } else
-        {
-            // check if enough time has passed since the last action
-            var ms = (DateTime.Now - _lastSliderValuechangedActionTime).TotalMilliseconds;
-            var timeSinceLastAction = DateTime.Now - _lastSliderValuechangedActionTime;
-
-        }
-
-        // round frequency
-
-        Task.Run(async () =>
-        {
-            _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(SliderFrequency.Value, SliderFrequency.Minimum, SliderFrequency.Maximum);
-            await _viewModel.TuneFreq(_viewModel.FrequencyKHz*1000,_viewModel.Settings.BandwidthKHz*1000, _viewModel.Settings.DVBT2 ? 1 : 0);
-        });
-
-        */
     }
 
     private void LeftButton_Clicked(object sender, EventArgs e)

@@ -173,6 +173,7 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
             case TuneModeEnum.Frequency:
                 _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.DefaultFrequencyMinKHz;
                 _viewModel?.Settings.FrequencyToKHz = _viewModel.Settings.DefaultFrequencyMaxKHz;
+                _viewModel?.Settings.FrequencyKHz = _viewModel.Settings.FrequencyKHz;
                 break;
             case TuneModeEnum.Manual:
                 _viewModel?.Settings.FrequencyFromKHz = _viewModel.Settings.FrequencyFromKHz;

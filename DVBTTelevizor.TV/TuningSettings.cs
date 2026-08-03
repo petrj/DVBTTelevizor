@@ -308,5 +308,58 @@ namespace DVBTTelevizor
 
             return (int)Math.Round(freq);
         }
+
+        public double RoundFrequencyKHzParts(double freq, out string wholePart, out string decimalPart)
+        {
+            var freqLong = Convert.ToInt64(freq);
+            wholePart = "";
+            decimalPart = "";
+
+            if (FM)
+            {
+                // round to bandwith
+
+                var startFreq = AudioTools.FMMinFreq - AudioTools.FMMinFreq/1000;
+
+                var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(freq - startFreq) / Convert.ToDecimal(BandwidthKHz)));
+
+                var freqRounded = Convert.ToInt64(Convert.ToDecimal(startFreq) + stepFreq * BandwidthKHz);
+
+                wholePart = (freqRounded / 1000).ToString();
+
+                decimalPart = (freqRounded % 1000).ToString().PadLeft(3, '0');
+
+                return Convert.ToDouble(freqRounded);
+            }
+
+            if (DAB)
+            {
+                // there is not constant bandwidth, so rounding is different
+                var minFreqDist = long.MaxValue;
+                long freqRounded = AudioTools.DABMinFreq;
+                foreach (var f in AudioTools.DabFrequenciesHz)
+                {
+                    var dist = f.Value - freqLong * 1000;
+                    if (Math.Abs(dist) < Math.Abs(minFreqDist))
+                    {
+                        minFreqDist = dist;
+                        freqRounded = f.Value / 1000;
+                    }
+                }
+
+                wholePart = (freqRounded / 1000).ToString();
+                decimalPart = "." + (freqRounded % 1000).ToString().PadLeft(3, '0');
+
+                if (AudioTools.FrequenciesDabMHz.ContainsKey(freqRounded/1000.0))
+                {
+                    wholePart = AudioTools.FrequenciesDabMHz[freqRounded / 1000.0];
+                    decimalPart = "";
+                }
+
+                return Convert.ToDouble(freqRounded);
+            }
+
+            return Convert.ToDouble(freq);
+        }
     }
 }
