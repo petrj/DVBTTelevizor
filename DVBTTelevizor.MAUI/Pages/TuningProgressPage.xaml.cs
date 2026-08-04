@@ -250,16 +250,12 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         Task.Run(async () =>
         {
             await ResetTuningEnvironment();
+
+            await Task.Delay(200); // Allow UI to render first
+            StartButton_Clicked(this, new EventArgs());
+
+           await _viewModel.NotifyChange();
         });
-
-        // this will gonna freeze the app for a while!!!!!!!!!!!!!!!!!!!!!
-        //MainThread.BeginInvokeOnMainThread(async () =>
-        //{
-        //    await Task.Delay(200); // Allow UI to render first
-        //    StartButton_Clicked(this, new EventArgs());
-        //});
-
-        _viewModel.NotifyChange();
     }
 
     private void ActionDown()
@@ -614,7 +610,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
             if (found)
             {
-                _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(value, SliderFrequency.Minimum, SliderFrequency.Maximum);
+                _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(value);
                 await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
 
                 // save to configuration

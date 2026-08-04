@@ -267,7 +267,7 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
                 await ShowPage<TuningFrequenciesPage>();
                 break;
             case TuneModeEnum.Frequency:
-                await ShowPage<TuningFrequencyPage>();
+                await ShowPage<TuningProgressPage>();
                 break;
         }
     }

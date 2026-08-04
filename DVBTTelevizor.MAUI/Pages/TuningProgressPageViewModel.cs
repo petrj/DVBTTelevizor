@@ -383,14 +383,17 @@ namespace DVBTTelevizor.MAUI
 
         public async Task StartTune()
         {
-            if (Settings.TuningMode == TuneModeEnum.Frequency)
+            await Task.Run(async () =>
             {
-                await ManualTune();
-            }
-            else
-            {
-                await AutomaticTune();
-            }
+                if (Settings.TuningMode == TuneModeEnum.Frequency)
+                {
+                    await ManualTune();
+                }
+                else
+                {
+                    await AutomaticTune();
+                }
+            });
         }
 
         private async Task ManualTune()
@@ -514,7 +517,7 @@ namespace DVBTTelevizor.MAUI
                             break;
                         }
 
-                        NotifyChange();
+                        await NotifyChange();
 
                     } while (_actualTunningFreqKHz <= FrequencyToKHz);
 
@@ -758,7 +761,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async void NotifyChange()
+        public async Task NotifyChange()
         {
             //_loggingService.Debug("NotifyChange");
 
@@ -1361,61 +1364,18 @@ namespace DVBTTelevizor.MAUI
 
         public void DecreaseFreq()
         {
-            if (Settings.FM)
-            {
-                if (FrequencyKHz - TuneBandWidthKHz > FrequencyFromKHz - (1 / 2 * TuneBandWidthKHz))
-                {
-                    FrequencyKHz = Settings.RoundFrequencyKHz(FrequencyKHz - TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
-                }
-            }
+            var nextFreq = Settings.RoundFrequencyKHz(FrequencyKHz - TuneBandWidthKHz);
 
-            if (Settings.DAB)
-            {
-                // DAB frequencies are fixed, so we need to find the previous frequency in the list AudioTools.DabFrequenciesHz
-                var prevFreq = 174928;
-                foreach (var dabFreq in AudioTools.DabFrequenciesHz)
-                {
-                    if (dabFreq.Value / 1000 < FrequencyKHz)
-                    {
-                        prevFreq = dabFreq.Value / 1000;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                FrequencyKHz = prevFreq < 174928 ? 174928 : prevFreq;
-            }
+            FrequencyKHz = nextFreq < FrequencyFromKHz ? FrequencyFromKHz : nextFreq;
 
             NotifyChange();
         }
 
         public void IncreaseFreq()
         {
-            if (Settings.FM)
-            {
-                var nextFreq = AudioTools.FMMaxFreq;
-                nextFreq = Settings.RoundFrequencyKHz(FrequencyKHz + TuneBandWidthKHz, FrequencyFromKHz, FrequencyToKHz);
+            var nextFreq = Settings.RoundFrequencyKHz(FrequencyKHz + TuneBandWidthKHz);
 
-                FrequencyKHz = nextFreq > AudioTools.FMMaxFreq ? AudioTools.FMMaxFreq : nextFreq;
-            }
-
-            if (Settings.DAB)
-            {
-                // DAB frequencies are fixed, so we need to find the next frequency in the list AudioTools.DabFrequenciesHz
-                var nextFreq = 239200;
-                foreach (var dabFreq in AudioTools.DabFrequenciesHz)
-                {
-                    if (dabFreq.Value / 1000 > FrequencyKHz)
-                    {
-                        nextFreq = dabFreq.Value / 1000;
-                        break;
-                    }
-                }
-
-                FrequencyKHz = nextFreq > 239200 ? 239200 : nextFreq;
-            }
+            FrequencyKHz = nextFreq > FrequencyToKHz ? FrequencyToKHz : nextFreq;
 
             NotifyChange();
         }

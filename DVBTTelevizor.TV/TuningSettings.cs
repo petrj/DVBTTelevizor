@@ -269,51 +269,18 @@ namespace DVBTTelevizor
             }
         }
 
-        public int RoundFrequencyKHz(double freq, double min, double max)
+        public int RoundFrequencyKHz(double freq)
         {
-            var freqLong = Convert.ToInt64(freq);
-
-            if (FM)
-            {
-                // round to bandwith
-
-                var startFreq = AudioTools.FMMinFreq - min;
-
-                var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(freq - startFreq) / Convert.ToDecimal(BandwidthKHz)));
-
-                var freqRounded = Convert.ToInt64(Convert.ToDecimal(startFreq) + stepFreq * BandwidthKHz);
-
-                return Convert.ToInt32(freqRounded);
-            }
-
-            if (DAB)
-            {
-                // there is not constant bandwidth, so rounding is different
-                var minFreqDist = long.MaxValue;
-                long freqRounded = AudioTools.DABMinFreq;
-                foreach (var f in AudioTools.DabFrequenciesHz)
-                {
-                    var dist = f.Value - freqLong * 1000;
-                    if (Math.Abs(dist) < Math.Abs(minFreqDist))
-                    {
-                        minFreqDist = dist;
-                        freqRounded = f.Value / 1000;
-                    }
-                }
-                return Convert.ToInt32(freqRounded);
-            }
-
-            //if (!ValidFrequency(freqLong, true))
-            //    return Convert.ToInt32(freqLong);
-
-            return (int)Math.Round(freq);
+            return Convert.ToInt32(RoundFrequencyKHzParts(freq, out _, out _));
         }
 
         public double RoundFrequencyKHzParts(double freq, out string wholePart, out string decimalPart)
         {
             var freqLong = Convert.ToInt64(freq);
-            wholePart = "";
-            decimalPart = "";
+            var freqRounded = Convert.ToDouble(freqLong);
+
+            wholePart = (freqRounded / 1000).ToString("N0");
+            decimalPart = (freqRounded % 1000).ToString().PadLeft(3, '0');
 
             if (FM)
             {
@@ -323,20 +290,26 @@ namespace DVBTTelevizor
 
                 var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(freq - startFreq) / Convert.ToDecimal(BandwidthKHz)));
 
-                var freqRounded = Convert.ToInt64(Convert.ToDecimal(startFreq) + stepFreq * BandwidthKHz);
+                freqRounded = Convert.ToInt64(Convert.ToDecimal(startFreq) + stepFreq * BandwidthKHz);
 
-                wholePart = (freqRounded / 1000).ToString();
+                wholePart = (freqRounded / 1000).ToString("N0");
+                decimalPart = (freqRounded % 1000).ToString().PadLeft(1, '0') + " MHz";
+            }
 
-                decimalPart = (freqRounded % 1000).ToString().PadLeft(3, '0');
+            if (DVBT || DVBT2)
+            {
+                var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(freq - FrequencyFromKHz) / Convert.ToDecimal(BandwidthKHz)));
+                freqRounded = Convert.ToInt64(Convert.ToDecimal(FrequencyFromKHz) + stepFreq * BandwidthKHz);
 
-                return Convert.ToDouble(freqRounded);
+                wholePart = (freqRounded / 1000).ToString("N0");
+                decimalPart = "MHz";
             }
 
             if (DAB)
             {
                 // there is not constant bandwidth, so rounding is different
                 var minFreqDist = long.MaxValue;
-                long freqRounded = AudioTools.DABMinFreq;
+                freqRounded = AudioTools.DABMinFreq;
                 foreach (var f in AudioTools.DabFrequenciesHz)
                 {
                     var dist = f.Value - freqLong * 1000;
@@ -347,8 +320,8 @@ namespace DVBTTelevizor
                     }
                 }
 
-                wholePart = (freqRounded / 1000).ToString();
-                decimalPart = "." + (freqRounded % 1000).ToString().PadLeft(3, '0');
+                wholePart = (freqRounded / 1000).ToString("N0");
+                decimalPart = "." + (freqRounded % 1000).ToString().PadLeft(3, '0') + " MHz";
 
                 if (AudioTools.FrequenciesDabMHz.ContainsKey(freqRounded/1000.0))
                 {
@@ -356,10 +329,9 @@ namespace DVBTTelevizor
                     decimalPart = "";
                 }
 
-                return Convert.ToDouble(freqRounded);
             }
 
-            return Convert.ToDouble(freq);
+            return Convert.ToDouble(freqRounded);
         }
     }
 }
