@@ -55,7 +55,7 @@ namespace DVBTTelevizor.TV
             _driverConfiguration = new DVBTDriverConfiguration();
 
             _driver = driver;
-            _driver.OnDataReceived += _driver_OnDataReceived;
+            _driver.OnDataReceived += OnDataReceived;
 
             _demodulator = demodulator;
             _demodulator.OnDemodulated += OnDataDemodulated;
@@ -140,7 +140,7 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        private void _driver_OnDataReceived(object? sender, OnDataReceivedEventArgs e)
+        private void OnDataReceived(object? sender, OnDataReceivedEventArgs e)
         {
             if (_demodulator != null && e.Size>0)
             {
@@ -163,8 +163,6 @@ namespace DVBTTelevizor.TV
         }
 
         private Stream _recordStream = null;
-
-        public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
         private DVBTDriverConfiguration _driverConfiguration;
 
@@ -212,8 +210,46 @@ namespace DVBTTelevizor.TV
         {
             get
             {
-                return
-                    State.HasFlag(DVBTDriverStateEnum.Connected);
+                if (_driver == null)
+                {
+                    return false;
+                }
+
+                return _driver.State == DriverStateEnum.Connected;
+            }
+        }
+
+        public DVBTDriverStateEnum State
+        {
+            get
+            {
+                if (_driver == null)
+                {
+                    return DVBTDriverStateEnum.Disconnected;
+                }
+
+                var res = DVBTDriverStateEnum.Unknown;
+
+                switch (_driver.State)
+                {
+                    case DriverStateEnum.NotInitialized:
+                    case DriverStateEnum.DisConnected:
+                        res = DVBTDriverStateEnum.Disconnected;
+                        break;
+                    case DriverStateEnum.Connected:
+                        res = DVBTDriverStateEnum.Connected;
+                        res |= DVBTDriverStateEnum.Playing; // RTLSDR is always playing
+                        if (Recording)
+                        {
+                            res |= DVBTDriverStateEnum.Recording;
+                        }
+                        break;
+                    default:
+                        res = DVBTDriverStateEnum.Unknown;
+                        break;
+                }
+
+                return res;
             }
         }
 
@@ -312,8 +348,6 @@ namespace DVBTTelevizor.TV
                 _driver.SetFrequencyCorrection(0);
                 _driver.SetGainMode(false);
 
-                State = DVBTDriverStateEnum.Connected;
-
                 if (_spectrumWorker != null)
                 {
                     _spectrumWorker.Stop();
@@ -322,7 +356,7 @@ namespace DVBTTelevizor.TV
             }
             catch (Exception ex)
             {
-                State = DVBTDriverStateEnum.Disconnected;
+                _log.Error(ex);
             }
         }
 
@@ -331,7 +365,6 @@ namespace DVBTTelevizor.TV
             return Task.Run(() =>
             {
                 _driver.Disconnect();
-                State = DVBTDriverStateEnum.Disconnected;
             });
         }
 
