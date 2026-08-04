@@ -1050,16 +1050,11 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
-                if (_driver.Connected)
-                    return;
-
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
 
                 _driver.Configuration = config;
                 _driver.PublicDirectory = _publicDirectory;
                 _driver.Connect();
-
-                var state = _driver.State;
             }
             finally
             {
