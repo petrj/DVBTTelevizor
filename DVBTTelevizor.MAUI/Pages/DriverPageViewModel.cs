@@ -230,7 +230,16 @@ namespace DVBTTelevizor.MAUI
                 if (_driver.DriverType == _pageDriver)
                 {
                     // same driver
-                    if (_driver.Connected)
+                    if (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting))
+                    {
+                        return "Connecting".Translated();
+                    }
+                    else
+                    if (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
+                    {
+                        return "Disconnecting".Translated();
+                    }
+                    else if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
                     {
                         return "Connected".Translated();
                     }
@@ -318,7 +327,7 @@ namespace DVBTTelevizor.MAUI
                 if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show button if connected
-                    return _driver.Connected;
+                    return _driver.State.HasFlag(DVBTDriverStateEnum.Connected);
                 }
                 else
                 {
@@ -396,7 +405,7 @@ namespace DVBTTelevizor.MAUI
                 if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show connect button if not connected
-                    return !_driver.Connected;
+                    return _driver.State.HasFlag(DVBTDriverStateEnum.Disconnected);
                 } else
                 {
                     // different driver

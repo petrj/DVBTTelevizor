@@ -220,7 +220,7 @@ namespace DVBTTelevizor.TV
                     return false;
                 }
 
-                return _driver.State == DriverStateEnum.Connected;
+                return _driver.State.HasFlag(DriverStateEnum.Connected);
             }
         }
 
@@ -238,8 +238,6 @@ namespace DVBTTelevizor.TV
                 switch (_driver.State)
                 {
                     case DriverStateEnum.NotInitialized:
-                        res = DVBTDriverStateEnum.Disconnected;
-                        break;
                     case DriverStateEnum.DisConnected:
                         if (_connecting)
                         {
