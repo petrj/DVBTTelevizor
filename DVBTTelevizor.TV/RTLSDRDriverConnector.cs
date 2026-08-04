@@ -44,6 +44,9 @@ namespace DVBTTelevizor.TV
         public byte HasLock { get; set; } = 0;
         public float RFStrengthPercentage { get; set; } = 0;
 
+        private bool _connecting = false;
+        private bool _disconnecting = false;
+
         public RTLSDRDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
         {
             LastTunedFreq = startupFrequency;
@@ -142,6 +145,8 @@ namespace DVBTTelevizor.TV
 
         private void OnDataReceived(object? sender, OnDataReceivedEventArgs e)
         {
+            _connecting = false;
+
             if (_demodulator != null && e.Size>0)
             {
                 _demodulator.AddSamples(e.Data, e.Size);
@@ -233,15 +238,31 @@ namespace DVBTTelevizor.TV
                 switch (_driver.State)
                 {
                     case DriverStateEnum.NotInitialized:
-                    case DriverStateEnum.DisConnected:
                         res = DVBTDriverStateEnum.Disconnected;
                         break;
-                    case DriverStateEnum.Connected:
-                        res = DVBTDriverStateEnum.Connected;
-                        res |= DVBTDriverStateEnum.Playing; // RTLSDR is always playing
-                        if (Recording)
+                    case DriverStateEnum.DisConnected:
+                        if (_connecting)
                         {
-                            res |= DVBTDriverStateEnum.Recording;
+                            res = DVBTDriverStateEnum.Connecting;
+                        }
+                        else
+                        {
+                            res = DVBTDriverStateEnum.Disconnected;
+                        }
+                        break;
+                    case DriverStateEnum.Connected:
+                        if (_disconnecting)
+                        {
+                            res = DVBTDriverStateEnum.DisConnecting;
+                        }
+                        else
+                        {
+                            res = DVBTDriverStateEnum.Connected;
+                            res |= DVBTDriverStateEnum.Playing; // RTLSDR is always playing
+                            if (Recording)
+                            {
+                                res |= DVBTDriverStateEnum.Recording;
+                            }
                         }
                         break;
                     default:
@@ -325,6 +346,7 @@ namespace DVBTTelevizor.TV
                     return false;
                 }
 
+                _connecting = false;
                 return _driver.State == DriverStateEnum.Connected;
             });
         }
@@ -333,35 +355,44 @@ namespace DVBTTelevizor.TV
         {
             _log.Info($"RTL SDR driver: Connecting");
 
-            try
+            _connecting = true;
+            _disconnecting = false;
+
+            Task.Run(() =>
             {
-                _driver.Settings.Streamport = _driverConfiguration.TransferPort;
-                _driver.Settings.Port = _driverConfiguration.ControlPort;
-
-                _driver.Init(new DriverInitializationResult());
-                _driver.Installed = true;
-
-                _driver.SetFrequency(Convert.ToInt32(LastTunedFreq)); // must be set before init due to Test driver
-
-                _driver.SetSampleRate(_driver.Settings.SDRSampleRate);
-                _driver.SetDirectSampling(0);
-                _driver.SetFrequencyCorrection(0);
-                _driver.SetGainMode(false);
-
-                if (_spectrumWorker != null)
+                try
                 {
-                    _spectrumWorker.Stop();
+                    _driver.Settings.Streamport = _driverConfiguration.TransferPort;
+                    _driver.Settings.Port = _driverConfiguration.ControlPort;
+
+                    _driver.Init(new DriverInitializationResult());
+                    _driver.Installed = true;
+
+                    _driver.SetFrequency(Convert.ToInt32(LastTunedFreq)); // must be set before init due to Test driver
+
+                    _driver.SetSampleRate(_driver.Settings.SDRSampleRate);
+                    _driver.SetDirectSampling(0);
+                    _driver.SetFrequencyCorrection(0);
+                    _driver.SetGainMode(false);
+
+                    if (_spectrumWorker != null)
+                    {
+                        _spectrumWorker.Stop();
+                    }
+                    _spectrumWorker = new SpectrumWorker(_log, SpectrumFFTSize, _driver.Settings.SDRSampleRate);
                 }
-                _spectrumWorker = new SpectrumWorker(_log, SpectrumFFTSize, _driver.Settings.SDRSampleRate);
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex);
-            }
+                catch (Exception ex)
+                {
+                    _log.Error(ex);
+                }
+            });
         }
 
         public Task Disconnect()
         {
+            _connecting = false;
+            _disconnecting = true;
+
             return Task.Run(() =>
             {
                 _driver.Disconnect();

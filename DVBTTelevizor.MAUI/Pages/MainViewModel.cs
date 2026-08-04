@@ -18,6 +18,8 @@ namespace DVBTTelevizor.MAUI
 {
     public class MainViewModel : BaseViewModel
     {
+        private const int WaitForTimeoutSeconds = 10;
+
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
@@ -193,7 +195,10 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DriverHasBeenConnectedMessage>(this, (r, m) =>
             {
-                ConnectDriver(m.Value);
+                Task.Run(async () =>
+                {
+                    await ConnectDriver(m.Value);
+                });
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectionFailedMessage>(this, (r, m) =>
@@ -1029,13 +1034,23 @@ namespace DVBTTelevizor.MAUI
 
                 await _driver.Stop();
                 _driver.Disconnect(); // when calling with await, the driver is not disconnected and the state is not updated, so we call it without await
+
+                // wait 10 seconds for the driver to disconnect
+                for (var sec = 1; sec <= WaitForTimeoutSeconds; sec++)
+                {
+                    await Task.Delay(1000);
+                    UpdateDriverState();
+
+                    if (!_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
+                    {
+                        UpdateDriverState();
+                        break;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 _loggingService.Error(ex);
-            } finally
-            {
-                UpdateDriverState();
             }
         }
 
@@ -1044,21 +1059,36 @@ namespace DVBTTelevizor.MAUI
         /// Called only from one single place -> on message DriverHasBeenConnectedMessage received
         /// </summary>
         /// <param name="config"></param>
-        private void ConnectDriver(DVBTDriverConfiguration config)
+        private async Task ConnectDriver(DVBTDriverConfiguration config)
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
 
             try
             {
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
-
                 _driver.Configuration = config;
                 _driver.PublicDirectory = _publicDirectory;
                 _driver.Connect();
+
+                // wait 10 seconds for the driver to connect
+                for (var sec = 1; sec <= WaitForTimeoutSeconds; sec++)
+                {
+                    await Task.Delay(1000);
+                    UpdateDriverState();
+
+                    if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
+                    {
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
+                        UpdateDriverState();
+                        return;
+                    }
+                }
+
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(config.DeviceName)));
+
             }
-            finally
+            catch(Exception ex)
             {
-                UpdateDriverState();
+                _loggingService.Error(ex, "Connecting device failed");
             }
         }
 

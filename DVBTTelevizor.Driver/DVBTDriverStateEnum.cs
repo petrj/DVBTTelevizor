@@ -14,6 +14,8 @@ namespace DVBTTelevizor
         Connected = 2,
         Playing = 4,
         Recording = 8,
-        ScanningEPG = 16
+        ScanningEPG = 16,
+        Connecting = 32,
+        DisConnecting = 64,
     }
 }

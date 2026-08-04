@@ -79,8 +79,13 @@ namespace DVBTTelevizor.MAUI
             {
                 _range = string.Empty;
 
-                if (_driver == null || !_driver.Connected)
+                if (_driver == null)
                     return;
+
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting))
+                {
+                    _loggingService.Info(DeviceFriendlyName + ": Driver is connecting, waiting for connection to complete before checking capabilities.");
+                }
 
                 var cap = await _driver.GetCapabalities();
 
