@@ -213,6 +213,8 @@ namespace DVBTTelevizor
                 //return;
             }
 
+            State = DVBTDriverStateEnum.Connecting;
+
             try
             {
 
@@ -224,12 +226,11 @@ namespace DVBTTelevizor
                 _lastTunedDeliverySystem = -1;
 
                 StartBackgroundReading();
-
-                State = DVBTDriverStateEnum.Connected;
             }
             catch (Exception ex)
             {
                 _log.Error(ex, "Errro connecting DVBT driver");
+                State = DVBTDriverStateEnum.Disconnected;
             }
         }
 
@@ -244,6 +245,8 @@ namespace DVBTTelevizor
             var recordBackgroundWorker = new BackgroundWorker();
             recordBackgroundWorker.DoWork += worker_DoWork;
             recordBackgroundWorker.RunWorkerAsync();
+
+            State = DVBTDriverStateEnum.Connected;
         }
 
         private void StopBackgroundReading()
@@ -306,6 +309,8 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Dsconnecting");
 
+            State = DVBTDriverStateEnum.DisConnecting;
+
             try
             {
                 await SendCloseConnection();
@@ -325,6 +330,8 @@ namespace DVBTTelevizor
             }
 
             StopBackgroundReading();
+
+            State = DVBTDriverStateEnum.Disconnected;
         }
 
         public async void StartRecording(string path)
