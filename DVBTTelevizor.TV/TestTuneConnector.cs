@@ -65,7 +65,14 @@ namespace DVBTTelevizor
 
         public DVBTDriverConfiguration Configuration { get; set; } = new DVBTDriverConfiguration();
 
-        public bool Connected { get; set; } = false;
+        public bool Connected
+        {
+            get
+            {
+                return (State == DVBTDriverStateEnum.Connected);
+            }
+        }
+
         public bool Installed { get; set; } = true;
 
         public bool Recording { get; set; } = false;
@@ -118,7 +125,13 @@ namespace DVBTTelevizor
 
         public void Connect()
         {
-            Connected = true;
+            State = DVBTDriverStateEnum.Connecting;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000); // Simulate delay
+                State = DVBTDriverStateEnum.Connected;
+            });
         }
 
         public async void StartRecording(string path)
@@ -154,7 +167,13 @@ namespace DVBTTelevizor
 
         public async Task Disconnect()
         {
-            Connected = false;
+            State = DVBTDriverStateEnum.DisConnecting;
+
+            await Task.Run(async () =>
+            {
+                await Task.Delay(3000); // Simulate delay
+                State = DVBTDriverStateEnum.Disconnected;
+            });
         }
 
         public async Task<DVBTDriverCapabilities> GetCapabalities()

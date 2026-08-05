@@ -218,7 +218,10 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DisConnectMessage>(this, (r, m) =>
             {
-                DisconnectDriver();
+                Task.Run(async () =>
+                {
+                    await DisconnectDriver();
+                });
             });
 
             WeakReferenceMessenger.Default.Register<ChannelsChangedMessage>(this, (r, m) =>
@@ -1033,20 +1036,38 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 await _driver.Stop();
-                _driver.Disconnect(); // when calling with await, the driver is not disconnected and the state is not updated, so we call it without await
 
-                // wait 10 seconds for the driver to disconnect
+                // Start the disconnect on a background task so it doesn't block the UI thread
+                var disconnectTask = Task.Run(async () =>
+                {
+                    await _driver.Disconnect();
+                });
+
+                // Give the driver a moment to set the DisConnecting state
+                await Task.Delay(100);
+
+                // Notify UI of Disconnecting state
+                UpdateDriverState();
+
+                // Wait for the disconnect to complete
+                await disconnectTask;
+
+                // Notify UI of Disconnected state
+                UpdateDriverState();
+
+                // wait up to 10 seconds for the driver to complete disconnection
                 for (var sec = 1; sec <= WaitForTimeoutSeconds; sec++)
                 {
-                    await Task.Delay(1000);
-                    UpdateDriverState();
-
                     if (!_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
                     {
-                        UpdateDriverState();
                         break;
                     }
+
+                    await Task.Delay(1000);
                 }
+
+                // Final state update
+                UpdateDriverState();
             }
             catch (Exception ex)
             {
@@ -1370,15 +1391,21 @@ namespace DVBTTelevizor.MAUI
 
         private void NotifyChange()
         {
-            OnPropertyChanged(nameof(IsRefreshing));
-            OnPropertyChanged(nameof(Refreshed));
-            OnPropertyChanged(nameof(NotRefreshed));
-            OnPropertyChanged(nameof(TuneChannelsButtonVisible));
-            OnPropertyChanged(nameof(InstallDVBTDriverButtonVisible));
-            OnPropertyChanged(nameof(InstallFMDABDriverButtonVisible));
-            OnPropertyChanged(nameof(Channels));
-            OnPropertyChanged(nameof(DriverIconImage));
-            OnPropertyChanged(nameof(DriveImageVisible));
+            Task.Run(async () =>
+            {
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    OnPropertyChanged(nameof(IsRefreshing));
+                    OnPropertyChanged(nameof(Refreshed));
+                    OnPropertyChanged(nameof(NotRefreshed));
+                    OnPropertyChanged(nameof(TuneChannelsButtonVisible));
+                    OnPropertyChanged(nameof(InstallDVBTDriverButtonVisible));
+                    OnPropertyChanged(nameof(InstallFMDABDriverButtonVisible));
+                    OnPropertyChanged(nameof(Channels));
+                    OnPropertyChanged(nameof(DriverIconImage));
+                    OnPropertyChanged(nameof(DriveImageVisible));
+                });
+            });
         }
 
         public bool Refreshed
