@@ -532,6 +532,9 @@ namespace DVBTTelevizor
             channel.SelectedAudioTrack = SelectedAudioTrack;
             channel.SelectedSubtitle = SelectedSubtitle;
 
+            channel.Position = Position;
+            channel.PositionDescription = PositionDescription;
+
             return channel;
         }
 
