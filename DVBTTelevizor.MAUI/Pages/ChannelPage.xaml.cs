@@ -4,6 +4,8 @@ using LoggerService;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Maui.ApplicationModel;
+using System.Globalization;
 
 namespace DVBTTelevizor.MAUI;
 
@@ -47,6 +49,43 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         EntryNumber.Unfocused += EntryNumber_Unfocused;
 
         BuildFocusableItems();
+    }
+
+    // Tapped handler for PositionDescription label - opens default maps app with coordinates
+    private async void OnPositionTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            var ch = _channelPageViewModel.Channel;
+            if (ch == null)
+                return;
+
+            var pos = ch.Position; // expected format: "lat,lon"
+            if (string.IsNullOrWhiteSpace(pos))
+                return;
+
+            var parts = pos.Split(new[] {',', ';'}, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2)
+                return;
+
+            if (!double.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var lat))
+                return;
+            if (!double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var lon))
+                return;
+
+            // Try to open a geo: URI which most platforms understand. Use a label if available.
+            var label = string.IsNullOrWhiteSpace(ch.PositionDescription) ? ch.Name ?? "" : ch.PositionDescription;
+            var escapedLabel = Uri.EscapeDataString(label);
+
+            // geo URI: geo:lat,lon?q=lat,lon(label)
+            var uri = new Uri($"geo:{lat.ToString(CultureInfo.InvariantCulture)},{lon.ToString(CultureInfo.InvariantCulture)}?q={lat.ToString(CultureInfo.InvariantCulture)},{lon.ToString(CultureInfo.InvariantCulture)}({escapedLabel})");
+
+            await Launcher.OpenAsync(uri);
+        }
+        catch (Exception ex)
+        {
+            _loggingService?.Error(ex);
+        }
     }
 
     private void ShowMenu()
