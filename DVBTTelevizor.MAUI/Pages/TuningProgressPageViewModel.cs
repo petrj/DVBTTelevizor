@@ -651,7 +651,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
+        private async void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
         {
             var ch = new Channel();
             ch.ProgramMapPID = MapPID;
@@ -663,6 +663,18 @@ namespace DVBTTelevizor.MAUI
             ch.ChannelType = chType;
             ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
             ch.NonFree = !serviceDescriptor.Free;
+
+            // try to get geo position asynchronously (non-blocking for callers)
+            try
+            {
+                var geo = await DVBTTelevizor.MAUI.Services.GeoHelper.GetGeoPositionAsync();
+                ch.Position = geo.position;
+                ch.PositionDescription = geo.description;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Debug($"GetGeoPositionAsync failed: {ex.Message}");
+            }
 
             _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
 
@@ -682,7 +694,9 @@ namespace DVBTTelevizor.MAUI
                             Number = String.Empty,
                             ChannelType = chType,
                             Type = (ServiceTypeEnum)serviceDescriptor.ServisType,
-                            NonFree = !serviceDescriptor.Free
+                            NonFree = !serviceDescriptor.Free,
+                            Position = ch.Position,
+                            PositionDescription = ch.PositionDescription
                         }
                     });
                 });

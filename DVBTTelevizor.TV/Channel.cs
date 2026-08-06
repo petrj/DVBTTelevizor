@@ -47,6 +47,8 @@ namespace DVBTTelevizor
 
         public string? SelectedSubtitle { get; set; } = null;
         public string? SelectedAudioTrack { get; set; } = null;
+        public string? Position { get; set; } = null;
+        public string? PositionDescription { get; set; } = null;
 
         private bool _recording = false;
 
