@@ -203,9 +203,16 @@ namespace DVBTTelevizor
             }
         }
 
+        private const int DefaultConnectTimeoutSeconds = 5;
+
         public void Connect()
         {
-            _log.Debug($"Connecting");
+            Connect(DefaultConnectTimeoutSeconds);
+        }
+
+        public void Connect(int timeoutSeconds)
+        {
+            _log.Debug($"Connecting (timeout: {timeoutSeconds}s)");
 
             if (State == DVBTDriverStateEnum.Connected)
             {
@@ -215,31 +222,76 @@ namespace DVBTTelevizor
 
             State = DVBTDriverStateEnum.Connecting;
 
-            try
+            // Run the (potentially blocking) TCP connect on a background thread
+            // and enforce a timeout so we never get stuck in the Connecting state.
+            _ = Task.Run(async () =>
             {
+                try
+                {
+                    _controlClient = new TcpClient();
 
-                _controlClient = new TcpClient();
-                _controlClient.Connect("127.0.0.1", _driverConfiguration.ControlPort);
-                _controlStream = _controlClient.GetStream();
+                    using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
+                    {
+                        await _controlClient.ConnectAsync("127.0.0.1", _driverConfiguration.ControlPort, cts.Token).ConfigureAwait(false);
+                    }
 
-                _lastTunedFreq = -1;
-                _lastTunedDeliverySystem = -1;
+                    _controlStream = _controlClient.GetStream();
 
-                StartBackgroundReading();
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex, "Errro connecting DVBT driver");
-                State = DVBTDriverStateEnum.Disconnected;
-            }
+                    _lastTunedFreq = -1;
+                    _lastTunedDeliverySystem = -1;
+
+                    await StartBackgroundReadingAsync(timeoutSeconds).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    _log.Error($"Connecting DVBT driver timed out after {timeoutSeconds}s");
+                    SafeCloseClientsOnConnectFailure();
+                    State = DVBTDriverStateEnum.Disconnected;
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex, "Error connecting DVBT driver");
+                    SafeCloseClientsOnConnectFailure();
+                    State = DVBTDriverStateEnum.Disconnected;
+                }
+            });
         }
 
-        private void StartBackgroundReading()
+        private void SafeCloseClientsOnConnectFailure()
         {
-            _log.Debug($"Starting background reading");
+            try
+            {
+                _controlStream?.Close();
+            }
+            catch { }
+            try
+            {
+                _controlClient?.Close();
+            }
+            catch { }
+            try
+            {
+                _transferStream?.Close();
+            }
+            catch { }
+            try
+            {
+                _transferClient?.Close();
+            }
+            catch { }
+        }
+
+        private async Task StartBackgroundReadingAsync(int timeoutSeconds)
+        {
+            _log.Debug($"Starting background reading (timeout: {timeoutSeconds}s)");
 
             _transferClient = new TcpClient();
-            _transferClient.Connect("127.0.0.1", _driverConfiguration.TransferPort);
+
+            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds)))
+            {
+                await _transferClient.ConnectAsync("127.0.0.1", _driverConfiguration.TransferPort, cts.Token).ConfigureAwait(false);
+            }
+
             _transferStream = _transferClient.GetStream();
 
             var recordBackgroundWorker = new BackgroundWorker();
