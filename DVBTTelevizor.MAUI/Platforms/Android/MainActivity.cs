@@ -623,6 +623,27 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public override bool OnGenericMotionEvent(MotionEvent? e)
+        {
+            if (e != null && e.Action == MotionEventActions.Scroll)
+            {
+                float vScroll = e.GetAxisValue(Axis.Vscroll);
+
+                if (vScroll > 0)
+                {
+                    // Mouse wheel scrolled UP (away from user)
+                    WeakReferenceMessenger.Default.Send(new KeyDownMessage("up"));
+                }
+                else if (vScroll < 0)
+                {
+                    // Mouse wheel scrolled DOWN (towards user)
+                    WeakReferenceMessenger.Default.Send(new KeyDownMessage("down"));
+                }
+            }
+
+            return base.OnGenericMotionEvent(e);
+        }
+
         private void ShowToastMessage(string message, int AppFontSize = 0)
         {
 
