@@ -416,6 +416,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("Up", new List<View>() { ButtonUp }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Down", new List<View>() { ButtonDown }))
             .AddItem(KeyboardFocusableItem.CreateFrom("MapPID", new List<View>() { MapPIDBoxView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("Position", new List<View>() { PositionBoxView }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Audio", new List<View>() { ButtonChangeAudio }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Subtitles", new List<View>() { ButtonChangeSubtitles }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Delete", new List<View>() { ButtonDeleteChannel }));
@@ -542,6 +543,10 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
                         case "Delete":
                             ButtonDeleteChannel_Clicked(this, new EventArgs());
                             break;
+                        case "Position":
+                            OnPositionTapped(this, new EventArgs());
+                            break;
+
                     }
                 });
                 break;

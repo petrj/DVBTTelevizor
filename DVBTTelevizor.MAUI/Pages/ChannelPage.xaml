@@ -160,11 +160,12 @@
                 <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Map PID'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
-                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" x:Name="PositionBoxView"></BoxView>
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
                 <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Position'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.Position}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 
+                <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" x:Name="PositionBoxView"/>
                 <!-- Make PositionDescription tappable to open maps -->
                 <Label x:Name="LabelPositionDescription" Margin="10,0,10,10" Text="{Binding Channel.PositionDescription}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}">
                     <Label.GestureRecognizers>
