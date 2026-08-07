@@ -381,6 +381,10 @@ namespace DVBTTelevizor.MAUI
                 if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show if connected
+                    if (_driver.Connected)
+                    {
+                        _loggingService.Info($"GainButtonVisible: driver is connected, show gain button");
+                    }
                     return _driver.Connected;
                 }
 
@@ -405,8 +409,11 @@ namespace DVBTTelevizor.MAUI
                 if (_driver.DriverType == _pageDriver)
                 {
                     // same driver, show connect button if not connected
-                    return _driver.State.HasFlag(DVBTDriverStateEnum.Disconnected);
-                } else
+
+                    return _driver.State is DVBTDriverStateEnum.Disconnected
+                        or DVBTDriverStateEnum.Unknown;
+                }
+                else
                 {
                     // different driver
                     return true;// show connect button to allow user to switch driver

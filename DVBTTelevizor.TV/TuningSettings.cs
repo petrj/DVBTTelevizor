@@ -292,8 +292,12 @@ namespace DVBTTelevizor
 
                 freqRounded = Convert.ToInt64(Convert.ToDecimal(startFreq) + stepFreq * BandwidthKHz);
 
-                wholePart = (freqRounded / 1000).ToString("N0");
-                decimalPart = (freqRounded % 1000).ToString().PadLeft(1, '0') + " MHz";
+                // freqRounded ~ 103500
+
+                string str = freqRounded.ToString();
+
+                wholePart = str.Substring(0, str.Length - 3); // Everything except the last 3 characters
+                decimalPart = str.Substring(str.Length - 3);  // Last 3 characters
             }
 
             if (DVBT || DVBT2)
@@ -301,7 +305,7 @@ namespace DVBTTelevizor
                 var stepFreq = Math.Round(Math.Truncate(Convert.ToDecimal(freq - FrequencyFromKHz) / Convert.ToDecimal(BandwidthKHz)));
                 freqRounded = Convert.ToInt64(Convert.ToDecimal(FrequencyFromKHz) + stepFreq * BandwidthKHz);
 
-                wholePart = (freqRounded / 1000).ToString("N0");
+                wholePart = (freqRounded / 1000.0).ToString("N0");
                 decimalPart = "MHz";
             }
 

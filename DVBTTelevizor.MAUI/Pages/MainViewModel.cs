@@ -18,7 +18,7 @@ namespace DVBTTelevizor.MAUI
 {
     public class MainViewModel : BaseViewModel
     {
-        private const int WaitForTimeoutSeconds = 10;
+        private const int WaitForTimeoutSeconds = 6;
 
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
@@ -1088,23 +1088,38 @@ namespace DVBTTelevizor.MAUI
             {
                 _driver.Configuration = config;
                 _driver.PublicDirectory = _publicDirectory;
-                _driver.Connect();
 
-                // wait 10 seconds for the driver to connect
+                var connectTask = Task.Run(async () =>
+                {
+                    _driver.Connect();
+                });
+
+                await connectTask;
+
+                await Task.Delay(100);
+
+                UpdateDriverState();
+
+                // wait for the driver to complete connection
                 for (var sec = 1; sec <= WaitForTimeoutSeconds; sec++)
                 {
-                    await Task.Delay(1000);
-                    UpdateDriverState();
-
                     if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
                     {
                         WeakReferenceMessenger.Default.Send(new ToastMessage("Device found: {0}".Translated(config.DeviceName)));
-                        UpdateDriverState();
-                        return;
+                        break;
                     }
+
+                    await Task.Delay(1000);
                 }
 
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(config.DeviceName)));
+                if (!_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
+                {
+                    _loggingService.Info($"Connection failed: {_driver.State}");
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Connection failed: {0}".Translated(config.DeviceName)));
+                }
+
+                // Final state update
+                UpdateDriverState();
 
             }
             catch(Exception ex)

@@ -42,6 +42,17 @@ namespace DVBTTelevizor.MAUI.WinUI
                     }));
             });
 
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
+            {
+                WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                {
+                    DeviceName = "Testing DVBT driver",
+                    ControlPort = 1234,
+                    TransferPort = 1235,
+                    PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                }));
+            });
+
             WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
             {
                 WeakReferenceMessenger.Default.Send(new KeyDownMessage(m.Value));
