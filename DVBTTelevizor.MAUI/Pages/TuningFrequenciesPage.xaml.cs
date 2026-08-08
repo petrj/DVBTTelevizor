@@ -46,8 +46,8 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreqFrom", new List<View>() { EditFreqFromButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreqTo", new List<View>() { EditFreqToButton }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreqFrom", new List<View>() { FrequencyFromBoxView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("EditFreqTo", new List<View>() { FrequencyToBoxView }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Back", new List<View>() { BackButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("Next", new List<View>() { NextButton }));
 
@@ -248,5 +248,14 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
     public void UpdateSettings(TuningSettings tuningSettings)
     {
         _tuningFrequenciesViewModel.Settings = tuningSettings;
+    }
+
+    private void FromFreq_Tapped(object sender, TappedEventArgs e)
+    {
+        EditFreqFromButton_Clicked(sender, e);
+    }
+    private void ToFreq_Tapped(object sender, TappedEventArgs e)
+    {
+        EditFreqToButton_Clicked(sender, e);
     }
 }

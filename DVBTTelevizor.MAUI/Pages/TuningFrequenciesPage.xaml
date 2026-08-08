@@ -37,6 +37,7 @@
                 <RowDefinition Height="20*" />
                 <RowDefinition Height="60*" />
                 <RowDefinition Height="20*" />
+                <RowDefinition Height="20*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30*" />
@@ -44,36 +45,46 @@
                 <ColumnDefinition Width="30*" />
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
+
+            <BoxView x:Name="FrequencyFromBoxView" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" BackgroundColor="LightGray">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="FromFreq_Tapped" NumberOfTapsRequired="1" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <BoxView x:Name="FrequencyToBoxView"   Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Grid.ColumnSpan="2" BackgroundColor="LightGray">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="ToFreq_Tapped" NumberOfTapsRequired="1" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
 
             <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='From'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
 
             <Label Grid.Row="0" Grid.Column="2"  Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='To'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
 
-            <Label Grid.Row="1" Grid.Column="0"  Text="{Binding FrequencyFromWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
-            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding FrequencyFromDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
+            <Label Grid.Row="1" Grid.Column="0"  Text="{Binding FrequencyFromWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="FromFreq_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding FrequencyFromDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="FromFreq_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
 
-            <Label Grid.Row="1" Grid.Column="2"  Text="{Binding FrequencyToWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
-            <Label Grid.Row="1" Grid.Column="3"  Text="{Binding FrequencyToDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
+            <Label Grid.Row="1" Grid.Column="2"  Text="{Binding FrequencyToWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="ToFreq_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Row="1" Grid.Column="3"  Text="{Binding FrequencyToDecimalPartMHzCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="ToFreq_Tapped" NumberOfTapsRequired="1" />
+                </Label.GestureRecognizers>
+            </Label>
 
-            <Label Grid.Row="2" Grid.Column="0"  Grid.ColumnSpan="4" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
-
-        </Grid>
-
-        <Grid x:Name="FrequenciesButtonGrid" AbsoluteLayout.LayoutBounds="0.5, 0.6, 0.95, 0.15" AbsoluteLayout.LayoutFlags="All" RowSpacing="0" Margin="0,0,0,0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="8*" />
-                <ColumnDefinition Width="37*" />
-                <ColumnDefinition Width="10*" />
-                <ColumnDefinition Width="37*" />
-                <ColumnDefinition Width="8*" />
-            </Grid.ColumnDefinitions>
-
-            <Button x:Name="EditFreqFromButton" Grid.Row="0" Grid.Column="1" Text="{local:LngXamlExt Input='Edit'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="EditFreqFromButton_Clicked"/>
-            <Button x:Name="EditFreqToButton" Grid.Row="0" Grid.Column="3" Text="{local:LngXamlExt Input='Edit'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="True" Clicked="EditFreqToButton_Clicked"/>
+            <Label Grid.Row="3" Grid.Column="0"  Grid.ColumnSpan="4" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
 
         </Grid>
 
