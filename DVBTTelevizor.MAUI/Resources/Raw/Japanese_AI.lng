@@ -285,3 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added={0} 件のチャンネルが更新され、{1} 件が追加されました
 Progress=進捗
 Channels/new=チャンネル/新規
+Position=
+Connecting=
+Disconnecting=

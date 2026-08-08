@@ -285,3 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added=Aktualizováno {0} kanálů, přidáno {1}
 Progress=Stav
 Channels/new=Kanály/nové
+Position=Lokace
+Connecting=Připojování
+Disconnecting=Odpojování

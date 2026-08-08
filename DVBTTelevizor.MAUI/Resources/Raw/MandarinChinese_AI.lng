@@ -285,3 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added=已更新 {0} 个频道，添加 {1} 个
 Progress=进度
 Channels/new=频道/新增
+Position=
+Connecting=
+Disconnecting=

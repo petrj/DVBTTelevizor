@@ -285,3 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added={0} canali aggiornati, {1} aggiunti
 Progress=Avanzamento
 Channels/new=Canali/nuovi
+Position=
+Connecting=
+Disconnecting=

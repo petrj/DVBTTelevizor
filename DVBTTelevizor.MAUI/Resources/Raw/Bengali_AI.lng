@@ -285,3 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added={0} টি চ্যানেল আপডেট হয়েছে, {1} টি যোগ করা হয়েছে
 Progress=অগ্রগতি
 Channels/new=চ্যানেল/নতুন
+Position=
+Connecting=
+Disconnecting=

@@ -285,3 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added=อัปเดตช่อง {0} รายการ, เพิ่ม {1} รายการ
 Progress=ความคืบหน้า
 Channels/new=ช่อง/ใหม่
+Position=
+Connecting=
+Disconnecting=
