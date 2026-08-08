@@ -1178,11 +1178,6 @@ namespace DVBTTelevizor.MAUI
                     return "donglegreen.png";
                 }
 
-                if (_driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
-                {
-                    return "dongleorange.png";
-                }
-
                 if (
                     (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting)) ||
                     (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
@@ -1191,9 +1186,38 @@ namespace DVBTTelevizor.MAUI
                     return "donglepurple.png";
                 }
 
+                if (!IsDriverInstalled(_driver.DriverType))
+                {
+                    return "donglegray.png";
+                }
+
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
+                {
+                    return "dongleorange.png";
+                }
 
                 return "dongleorange.png";
             }
+        }
+
+        private bool IsDriverInstalled(AppDriverTypeEnum appDriverType)
+        {
+            if (_driver == null)
+            {
+                return false;
+            }
+
+            if (appDriverType == AppDriverTypeEnum.DVBT)
+            {
+                return DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value;
+            }
+
+            if ((appDriverType == AppDriverTypeEnum.FM) || (appDriverType == AppDriverTypeEnum.DAB))
+            {
+                return RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value;
+            }
+
+            return false;
         }
 
 

@@ -215,11 +215,6 @@ namespace DVBTTelevizor.MAUI
                         return "donglegreen.png";
                     }
 
-                    if (_driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
-                    {
-                        return "dongleorange.png";
-                    }
-
                     if (
                         (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting)) ||
                         (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
@@ -227,6 +222,21 @@ namespace DVBTTelevizor.MAUI
                     {
                         return "donglepurple.png";
                     }
+
+                    if (!IsDriverInstalled(_pageDriver))
+                    {
+                        return "donglegray.png";
+                    }
+
+                    if (_driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
+                    {
+                        return "dongleorange.png";
+                    }
+                }
+
+                if (!IsDriverInstalled(_driver.DriverType))
+                {
+                    return "donglegray.png";
                 }
 
                 return "dongleorange.png";
