@@ -1168,25 +1168,29 @@ namespace DVBTTelevizor.MAUI
                     return "donglegray.png";
                 }
 
-                if (_driver.State is DVBTDriverStateEnum.Unknown)
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Unknown))
                 {
                     return "donglered.png";
                 }
 
-                if (_driver.State is DVBTDriverStateEnum.Connected)
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
                 {
                     return "donglegreen.png";
                 }
 
-                if (_driver.State is DVBTDriverStateEnum.Disconnected)
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
                 {
                     return "dongleorange.png";
                 }
 
-                if (_driver.State is DVBTDriverStateEnum.Connecting or DVBTDriverStateEnum.DisConnecting)
+                if (
+                    (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting)) ||
+                    (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
+                    )
                 {
                     return "donglepurple.png";
                 }
+
 
                 return "dongleorange.png";
             }

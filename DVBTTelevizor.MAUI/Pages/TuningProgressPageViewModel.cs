@@ -47,7 +47,7 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
         private Channel? _selectedChannel;
 
-        private Dictionary<string, int> _tunedMultiplexes = new Dictionary<string, int>();
+        private Dictionary<long, int> _tunedMultiplexes = new Dictionary<long, int>();
         private int _tunedNewChannels = 0;
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
@@ -263,7 +263,7 @@ namespace DVBTTelevizor.MAUI
                         var configChannels = _configuration.GetChannels();
 
                         // looking for the same channel
-                        var channelAlreadyFound = false;
+                        var channelAlreadySaved = false;
                         foreach (var configChannel in configChannels)
                         {
                             if (
@@ -272,7 +272,7 @@ namespace DVBTTelevizor.MAUI
                                 (configChannel.Frequency == che.Channel.Frequency)
                                )
                             {
-                                channelAlreadyFound = true;
+                                channelAlreadySaved = true;
                                 break;
                             }
                         }
@@ -293,30 +293,28 @@ namespace DVBTTelevizor.MAUI
 
                         if (che.Channel.ProviderName != null)
                         {
-                            if (!_tunedMultiplexes.ContainsKey(che.Channel.ProviderName))
+                            if (!_tunedMultiplexes.ContainsKey(che.Channel.Frequency))
                             {
-                                _tunedMultiplexes.Add(che.Channel.ProviderName, 0);
+                                _tunedMultiplexes.Add(che.Channel.Frequency, 0);
                             }
-                            _tunedMultiplexes[che.Channel.ProviderName]++;
+                            _tunedMultiplexes[che.Channel.Frequency]++;
                         }
 
                         if (!channelAlreadyTuned)
                         {
                             Channels.Add(che.Channel);
-                        }
-
-                        if (channelAlreadyFound || channelAlreadyTuned)
+                        } else
                         {
-                            _loggingService.Debug($"Found already saved channel: \"{che.Channel.Name}\"");
-                            return;
+                            _tunedNewChannels++;
                         }
 
-                        che.Channel.Number = GetNextFreeChannelNumber(configChannels);
-                        _tunedNewChannels++;
+                        if (!channelAlreadySaved)
+                        {
+                            che.Channel.Number = GetNextFreeChannelNumber(configChannels);
+                            configChannels.Add(che.Channel.Clone());
 
-                        configChannels.Add(che.Channel.Clone());
-
-                        _configuration.SaveChannels(configChannels);
+                            _configuration.SaveChannels(configChannels);
+                        }
 
                         //WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
                     }

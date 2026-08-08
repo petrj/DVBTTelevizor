@@ -55,7 +55,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DVBT) ? "configdriverconnected.png" : "configdriver.png";
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DVBT) ? "dvbtconnected.png" : "dvbt.png";
             }
         }
 
@@ -63,7 +63,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.FM) ? "configdriverconnected.png" : "configdriver.png";
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.FM) ? "fmconnected.png" : "fm.png";
             }
         }
 
@@ -71,7 +71,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DAB) ? "configdriverconnected.png" : "configdriver.png";
+                return (_driver != null) && (_driver.DriverType == AppDriverTypeEnum.DAB) ? "dabconnected.png" : "dab.png";
             }
         }
 

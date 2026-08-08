@@ -464,13 +464,31 @@ namespace DVBTTelevizor
                 }
                 */
 
-                switch (ServiceType)
+                var icon = "other.png";
+
+                switch (ChannelType)
                 {
-                    case DVBTDriverServiceType.TV: return "tv.png";
-                    case DVBTDriverServiceType.Radio: return "radio.png";
-                    default:
-                        return "other.png";
+                    case ChannelTypeEnum.DVBT:
+                    case ChannelTypeEnum.DVBT2:
+                        switch (ServiceType)
+                        {
+                            case DVBTDriverServiceType.TV:
+                                icon = "tv.png";
+                                    break;
+                            case DVBTDriverServiceType.Radio:
+                                icon = "radio.png";
+                                break;
+                        }
+                        break;
+                    case ChannelTypeEnum.FM:
+                        icon = "radio.png";
+                        break;
+                    case ChannelTypeEnum.DAB:
+                        icon = "digitalradio.png";
+                        break;
                 }
+
+                return icon;
             }
         }
 

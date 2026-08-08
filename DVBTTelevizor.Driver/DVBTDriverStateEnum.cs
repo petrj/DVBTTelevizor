@@ -9,7 +9,6 @@ namespace DVBTTelevizor
     [Flags]
     public enum DVBTDriverStateEnum
     {
-        Unknown = 0,
         Disconnected = 1,
         Connected = 2,
         Playing = 4,
@@ -17,5 +16,6 @@ namespace DVBTTelevizor
         ScanningEPG = 16,
         Connecting = 32,
         DisConnecting = 64,
+        Unknown = 128
     }
 }
