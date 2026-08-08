@@ -170,6 +170,13 @@ public partial class GainPage : ContentPage, IOnKeyDown
                         case "Manual":
                             RadioButtonManual.IsChecked = !RadioButtonManual.IsChecked;
                             break;
+
+                        case "Left":
+                            LeftButton_Clicked(this, new EventArgs());
+                            break;
+                        case "Right":
+                            RightButton_Clicked(this, new EventArgs());
+                            break;
                     }
                 });
                 break;

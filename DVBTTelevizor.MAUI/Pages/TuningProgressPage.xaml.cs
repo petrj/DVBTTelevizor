@@ -309,11 +309,75 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         });
     }
 
-    public void OnKeyDown(string key, bool longPress)
+    private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        var menuItems = _appMenu.MenuItems;
+
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+            case KeyboardNavigationActionEnum.Down:
+                Task.Run(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(menuItems, false);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Left:
+            case KeyboardNavigationActionEnum.Up:
+                Task.Run(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(menuItems, true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Back:
+                MainMenu.MenuVisible = false;
+                _viewModel.MenuVisible = false;
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+                var item = GetSelectedMenuItem();
+                if (item != null)
+                {
+                    OnMenuIsTapped(item);
+                }
+                break;
+        }
+    }
+
+    private MenuItem? GetSelectedMenuItem()
+    {
+        var menuItems = _appMenu.MenuItems;
+
+        if (menuItems == null)
+            return null;
+
+        foreach (var item in menuItems)
+        {
+            if (item.Selected)
+            {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    public async void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"TuningProgressPage Page OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+        if (MainMenu.MenuVisible)
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnMenuKeyDown(keyAction);
+            });
+            return;
+        }
 
         switch (keyAction)
         {

@@ -1,4 +1,3 @@
-
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -84,11 +83,20 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
     }
 
-    public void OnKeyDown(string key, bool longPress)
+    public async void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"DriverPage OnKeyDown {key}");
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+        if (MainMenu.MenuVisible)
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                OnMenuKeyDown(keyAction);
+            });
+            return;
+        }
 
         switch (keyAction)
         {
@@ -286,6 +294,61 @@ public partial class DriverPage : ContentPage, IOnKeyDown
                 break;
 
         }
+    }
+
+    private void OnMenuKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        var menuItems = _appMenu.MenuItems;
+
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+            case KeyboardNavigationActionEnum.Down:
+                Task.Run(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(menuItems, false);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Left:
+            case KeyboardNavigationActionEnum.Up:
+                Task.Run(async () =>
+                {
+                    await MainMenu.SelectNextMenuItem(menuItems, true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Back:
+                MainMenu.MenuVisible = false;
+                _driverPageViewModel.MenuVisible = false;
+                break;
+
+            case KeyboardNavigationActionEnum.OK:
+                var item = GetSelectedMenuItem();
+                if (item != null)
+                {
+                    OnMenuIsTapped(item);
+                }
+                break;
+        }
+    }
+
+    private MenuItem? GetSelectedMenuItem()
+    {
+        var menuItems = _appMenu.MenuItems;
+
+        if (menuItems == null)
+            return null;
+
+        foreach (var item in menuItems)
+        {
+            if (item.Selected)
+            {
+                return item;
+            }
+        }
+
+        return null;
     }
 
 }

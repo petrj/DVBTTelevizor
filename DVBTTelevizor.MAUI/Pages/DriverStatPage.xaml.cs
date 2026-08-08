@@ -85,6 +85,12 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     {
         _focusItems = new KeyboardFocusableItemList();
 
+        _focusItems = new KeyboardFocusableItemList();
+
+        _focusItems
+            .AddItem(KeyboardFocusableItem.CreateFrom("PositionBoxView1", new List<View>() { PositionBoxView1 }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("PositionBoxView2", new List<View>() { PositionBoxView2 }));
+
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }
 
@@ -106,6 +112,22 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
         switch (keyAction)
         {
+            case KeyboardNavigationActionEnum.Down:
+            case KeyboardNavigationActionEnum.Right:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _focusItems.FocusNextItem(true);
+                });
+                break;
+
+            case KeyboardNavigationActionEnum.Up:
+            case KeyboardNavigationActionEnum.Left:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _focusItems.FocusPreviousItem(true);
+                });
+                break;
+
             case KeyboardNavigationActionEnum.Back:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
@@ -128,7 +150,6 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
                 break;
         }
     }
-
     public void OnTextSent(string text)
     {
         _loggingService.Debug($"DriverStatPage Page OnTextSent {text}");

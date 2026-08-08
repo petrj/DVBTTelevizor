@@ -134,4 +134,25 @@ public partial class SelectDriverPage : ContentPage, IOnKeyDown
 
         await MainPage.ShowPage<DriverPage>(Navigation, page);
     }
+
+    private async void DVBTButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"SelectDriverPage: DVBTButton_Clicked");
+
+        _viewModel.CommandDVBT.Execute(null);
+    }
+
+    private async void FMButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"SelectDriverPage: FMButton_Clicked");
+
+        _viewModel.CommandFM.Execute(null);
+    }
+
+    private async void DABButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"SelectDriverPage: DABButton_Clicked(object sender, EventArgs e)\r\n");
+
+        _viewModel.CommandDAB.Execute(null);
+    }
 }

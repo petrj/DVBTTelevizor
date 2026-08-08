@@ -10,6 +10,12 @@
     <ContentPage.Resources>
         <ResourceDictionary>
 
+            <Style x:Key="SeparatorBoxViewStyle" TargetType="BoxView">
+                <Setter Property="VerticalOptions" Value="FillAndExpand"/>
+                <Setter Property="HorizontalOptions" Value="FillAndExpand"/>
+                <Setter Property="HeightRequest" Value="1"/>
+                <Setter Property="Color" Value="Gray"/>
+            </Style>
             <Style x:Key="StatLabelStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="white"/>
             </Style>
@@ -102,6 +108,8 @@
 
     <AbsoluteLayout BackgroundColor="Black">
 
+        <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" x:Name="PositionBoxView1"/>
+
         <skia:SKCanvasView AbsoluteLayout.LayoutBounds="0.5,0.5,1.0,1.0" AbsoluteLayout.LayoutFlags="All"
             IsVisible="True"
             x:Name="SpectrumCanvas"
@@ -110,6 +118,8 @@
         <CollectionView  AbsoluteLayout.LayoutBounds="0.5,0.5,0.95,0.95" AbsoluteLayout.LayoutFlags="All" BackgroundColor="Transparent"
         ItemsSource="{Binding Stats}"
         ItemTemplate="{StaticResource StatSelector}" />
+
+        <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" x:Name="PositionBoxView2"/>
 
     </AbsoluteLayout>
 

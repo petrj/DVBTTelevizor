@@ -18,7 +18,7 @@ namespace DVBTTelevizor.MAUI
 {
     public class MainViewModel : BaseViewModel
     {
-        private const int WaitForTimeoutSeconds = 6;
+        private const int WaitForTimeoutSeconds = 8;
 
         private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 

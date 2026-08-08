@@ -138,7 +138,7 @@
                 <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
-            <BoxView x:Name="HWBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="HWBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
 
             <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='HW'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
             <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Best choice for dongles supporting HW gain'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
@@ -192,8 +192,8 @@
                 <ColumnDefinition Width="20*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="LeftButton_Clicked"/>
-            <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="RightButton_Clicked"/>
+            <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="LeftButton_Clicked" IsVisible="{Binding ManualGainBoxVisible}" />
+            <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource ButtonStyle}" Clicked="RightButton_Clicked" IsVisible="{Binding ManualGainBoxVisible}" />
 
             <BoxView x:Name="SliderFrequencyBoxView" Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent"/>
             <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding GainMax}" Value="{Binding GainValue, Mode=TwoWay}" Minimum="{Binding GainMin}" Style="{DynamicResource SliderStyle}" ValueChanged="SliderFrequency_ValueChanged"/>
