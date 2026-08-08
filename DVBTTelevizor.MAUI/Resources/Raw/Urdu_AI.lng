@@ -285,6 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added={0} چینلز اپ ڈیٹ ہوئے، {1} شامل کیے گئے
 Progress=پیشرفت
 Channels/new=چینلز/نئے
-Position=
-Connecting=
-Disconnecting=
+Position=مقام
+Connecting=جڑ رہا ہے
+Disconnecting=منقطع ہو رہا ہے

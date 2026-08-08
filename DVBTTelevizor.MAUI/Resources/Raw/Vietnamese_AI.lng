@@ -285,6 +285,6 @@ When running in the background, it is necessary to ensure that the app is not te
 {0} channels updated, {1} added=Đã cập nhật {0} kênh, thêm {1}
 Progress=Tiến trình
 Channels/new=Kênh/mới
-Position=
-Connecting=
-Disconnecting=
+Position=Vị trí
+Connecting=Đang kết nối
+Disconnecting=Đang ngắt kết nối
