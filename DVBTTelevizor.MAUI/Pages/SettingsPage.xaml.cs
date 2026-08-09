@@ -392,17 +392,19 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         }
     }
 
-    private void DeleteChannels(ChannelTypeEnum? channelType, bool update = true)
+    private void DeleteChannels(ChannelTypeEnum? channelType, bool notify = true)
     {
         if (channelType == null)
         {
             // delete all channels
             _configuration.SaveChannels(new ObservableCollection<Channel>());
 
-            if (update)
+            if (notify)
             {
                 WeakReferenceMessenger.Default.Send(new ToastMessage("All existing channels were deleted".Translated()));
             }
+
+            WeakReferenceMessenger.Default.Send(new ChannelsDeletedMessage(String.Empty));
         }
         else
         {
@@ -425,13 +427,13 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
             _configuration.SaveChannels(channels);
 
-            if (update)
+            if (notify)
             {
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Selected channels were deleted".Translated()));
             }
         }
 
-        if (update)
+        if (notify)
         {
             WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
         }

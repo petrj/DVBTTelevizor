@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -645,6 +646,7 @@ namespace DVBTTelevizor.MAUI
                     Refreshed = true;
 
                     NotifyChannelChange();
+                    NotifyChange();
                 });
 
                 _loggingService.Debug($"Channels refreshed");
@@ -896,7 +898,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (Channels.Count > 0)
+                if (NotRefreshed || (Channels.Count > 0))
                 {
                     return false;
                 }
@@ -909,7 +911,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (Channels.Count > 0)
+                if (NotRefreshed || (Channels.Count > 0))
                 {
                     return false;
                 }
@@ -1168,16 +1170,6 @@ namespace DVBTTelevizor.MAUI
                     return "donglegray.png";
                 }
 
-                if (_driver.State.HasFlag(DVBTDriverStateEnum.Unknown))
-                {
-                    return "donglered.png";
-                }
-
-                if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
-                {
-                    return "donglegreen.png";
-                }
-
                 if (
                     (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting)) ||
                     (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
@@ -1190,6 +1182,18 @@ namespace DVBTTelevizor.MAUI
                 {
                     return "donglegray.png";
                 }
+
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Unknown))
+                {
+                    return "donglered.png";
+                }
+
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
+                {
+                    return "donglegreen.png";
+                }
+
+
 
                 if (_driver.State.HasFlag(DVBTDriverStateEnum.Disconnected))
                 {

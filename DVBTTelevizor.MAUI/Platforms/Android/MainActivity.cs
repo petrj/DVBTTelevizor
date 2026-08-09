@@ -21,8 +21,8 @@ using Environment = System.Environment;
 
 namespace DVBTTelevizor.MAUI
 {
-    //[Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
-    [IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
+    [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+    //[IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
     public class MainActivity : MauiAppCompatActivity
     {
         private const int StartRequestCode = 1000;
@@ -59,6 +59,8 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService = new DummyLoggingService();
 
+            base.OnCreate(savedInstanceState);
+
             // prevent sleep:
             var  win = (this as Android.App.Activity).Window;
             win.AddFlags(WindowManagerFlags.KeepScreenOn);
@@ -86,7 +88,6 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, "Error while initializing UsbManager");
             }
 
-            base.OnCreate(savedInstanceState);
         }
 
         private async void UsbAttachedOrDetached(object sender, EventArgs e)

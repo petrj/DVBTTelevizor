@@ -470,6 +470,7 @@ namespace DVBTTelevizor
                 {
                     case ChannelTypeEnum.DVBT:
                     case ChannelTypeEnum.DVBT2:
+                    case ChannelTypeEnum.SledovaniTV:
                         switch (ServiceType)
                         {
                             case DVBTDriverServiceType.TV:

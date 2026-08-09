@@ -348,6 +348,14 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<ChannelsDeletedMessage>(this, (r, m) =>
+            {
+                Task.Run(async () =>
+                {
+                    await ActionStop(true);
+                });
+            });
+
             WeakReferenceMessenger.Default.Register<SelectedChannelChangedMessage>(this, (r, m) =>
             {
                 Task.Run(async () => await FocusSelectedChannel());
@@ -2336,6 +2344,8 @@ namespace DVBTTelevizor.MAUI
                         var clearDriver = _driver.LastTunedFreq != channel.Frequency;
 
                         var tunedRes = await _driver.TuneEnhanced(channel.Frequency, channel.Bandwdith, (int)channel.ChannelType, false);
+
+                        await _driver.GetStatus(); // for refreshing signal percents
 
                         if (clearDriver)
                         {
