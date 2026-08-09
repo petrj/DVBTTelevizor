@@ -88,6 +88,7 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex, "Error while initializing UsbManager");
             }
 
+            WeakReferenceMessenger.Default.Send(new MainActivityStartedMessage(String.Empty));
         }
 
         private async void UsbAttachedOrDetached(object sender, EventArgs e)

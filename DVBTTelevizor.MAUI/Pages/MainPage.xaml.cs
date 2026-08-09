@@ -247,18 +247,6 @@ namespace DVBTTelevizor.MAUI
                 });
             });
 
-            if (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP))
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(11000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
-
-                    _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
-                    var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
-                    WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
-                });
-            }
-
             if (_configuration.WriteToExternalDevice && !string.IsNullOrWhiteSpace(_configuration.ExternalDevicePathUri))
             {
                 Task.Run(async () =>
@@ -346,8 +334,32 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task OnActivityStart()
+        {
+            if (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            {
+                _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
+                var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
+                WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
+            }
+
+            // auto connect driver at start
+
+            await SendConnectDriverRequest(_configuration.AppDriverType);
+
+            await AutoPlay();
+        }
+
         private void SubscribeMessages()
         {
+            WeakReferenceMessenger.Default.Register<MainActivityStartedMessage>(this, (r, m) =>
+            {
+                Task.Run(async () =>
+                {
+                    await OnActivityStart();
+                });
+            });
+
             WeakReferenceMessenger.Default.Register<ChannelsDeletedMessage>(this, (r, m) =>
             {
                 Task.Run(async () =>
@@ -1500,11 +1512,7 @@ namespace DVBTTelevizor.MAUI
 
                 Task.Run(async () =>
                 {
-                    await SendConnectDriverRequest(_configuration.AppDriverType);
-
                     await _viewModel.RefreshChannels();
-
-                    await AutoPlay();
 
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {

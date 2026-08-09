@@ -59,7 +59,7 @@
             </BoxView>
 
             <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='From'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
-
+            <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="4" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Center" VerticalOptions="Center" BackgroundColor="Transparent" />
             <Label Grid.Row="0" Grid.Column="2"  Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='To'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
 
             <Label Grid.Row="1" Grid.Column="0"  Text="{Binding FrequencyFromWholePartMHz}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End">
@@ -84,7 +84,7 @@
                 </Label.GestureRecognizers>
             </Label>
 
-            <Label Grid.Row="3" Grid.Column="0"  Grid.ColumnSpan="4" Text="{local:LngXamlExt Input='MHz'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Center" VerticalOptions="Center"/>
+
 
         </Grid>
 

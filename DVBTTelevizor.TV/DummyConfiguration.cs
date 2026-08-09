@@ -63,7 +63,7 @@ namespace DVBTTelevizor.TV
         public string SledovaniTVPIN { get; set; } = String.Empty;
         public string SledovaniTVDeviceID { get; set; } = String.Empty;
         public string SledovaniTVDevicePassword { get; set; } = String.Empty;
-        public bool TestingMode { get; set; } = true;
+        public bool TestingMode { get; set; } = false;
         public GainEnum Gain { get; set; } = GainEnum.HW;
         public int GainValue { get; set; } = 0;
 
