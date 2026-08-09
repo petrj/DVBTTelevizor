@@ -3689,6 +3689,39 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task GoToChannelNumber()
+        {
+            try
+            {
+                string result = await DisplayPromptAsync(
+                    title: "Go to channel number".Translated(),
+                    message: "Channel number:",
+                    accept: "OK",
+                    cancel: "Cancel",
+                    initialValue: "1",
+                    keyboard: Keyboard.Numeric);
+
+                if (double.TryParse(result, out double numericValue))
+                {
+                    // Use numericValue here
+
+                    var ch =  await _viewModel.SelectChannelByNumber(result);
+
+                    if (ch == null)
+                    {
+                        WeakReferenceMessenger.Default.Send(new ToastMessage("Channel number not found".Translated()));
+                    } else
+                    {
+                        await FocusSelectedChannel();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private async void OnMenuIsTapped(MenuItem menuItem)
         {
             var menuId = menuItem.Id;
@@ -3797,7 +3830,9 @@ namespace DVBTTelevizor.MAUI
                         var filterPage = MainPage.GetOrCreatePage<FilterPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider, RefreshChannelsAfterFilterChanged);
                         await MainPage.ShowPage<FilterPage>(Navigation, filterPage);
                     await ShowPage<FilterPage>();
-
+                    break;
+                case "menuGoToChannelNumber":
+                    await GoToChannelNumber();
                     break;
                 case "menuCancelPlay":
                     await ActionStop(true);
@@ -3940,6 +3975,12 @@ namespace DVBTTelevizor.MAUI
             }
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuSettings", "Settings".Translated(), "settings.png"));
+
+            if ((_viewModel.Channels.Count > 0) && (_viewModel.SelectedChannel != null))
+            {
+                _menuItems.Add(MainMenu.CreateMenuItem("menuGoToChannelNumber", "Go to channel number..".Translated(), "num.png"));
+            }
+
             _menuItems.Add(MainMenu.CreateMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png"));
             _menuItems.Add(MainMenu.CreateMenuItem("menuQuit", "Quit application".Translated(), "quit.png", true));
 
