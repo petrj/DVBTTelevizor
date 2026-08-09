@@ -3658,6 +3658,37 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async void RefreshChannelsAfterFilterChanged()
+        {
+            try
+            {
+                await _viewModel.RefreshChannels();
+
+                // is playing channel visible after filter changed?
+                var chShown = false;
+                if (_viewModel.PlayingChannel != null)
+                {
+                    foreach (var ch in _viewModel.Channels)
+                    {
+                        if (ch.UniqueIdentifier == _viewModel.PlayingChannel.UniqueIdentifier)
+                        {
+                            chShown = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!chShown)
+                {
+                    await ActionStop(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
         private async void OnMenuIsTapped(MenuItem menuItem)
         {
             var menuId = menuItem.Id;
@@ -3763,6 +3794,8 @@ namespace DVBTTelevizor.MAUI
                     }
                     break;
                 case "menuFilter":
+                        var filterPage = MainPage.GetOrCreatePage<FilterPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider, RefreshChannelsAfterFilterChanged);
+                        await MainPage.ShowPage<FilterPage>(Navigation, filterPage);
                     await ShowPage<FilterPage>();
 
                     break;
