@@ -146,7 +146,7 @@
             <Button Grid.Row="0" Grid.Column="0" x:Name="LeftButton" Text="-" FontSize="{Binding FontSizeForCaption}"  Style="{DynamicResource TuneButtonStyle}" Clicked="LeftButton_Clicked" IsVisible="{Binding TuneButtonVisible}"/>
             <Button Grid.Row="0" Grid.Column="2" x:Name="RightButton" Text="+" FontSize="{Binding FontSizeForCaption}" Style="{DynamicResource TuneButtonStyle}" Clicked="RightButton_Clicked" IsVisible="{Binding TuneButtonVisible}"/>
 
-            <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding FrequencyToKHz}" Value="{Binding FrequencyKHz}" Minimum="{Binding FrequencyFromKHz}" Style="{DynamicResource SliderStyle}"  ValueChanged="SliderFrequency_ValueChanged" IsEnabled="{Binding FreqSliderEnabled}"/>
+            <Slider Grid.Row="0" Grid.Column="1" x:Name="SliderFrequency" Maximum="{Binding FrequencyToKHz}" Value="{Binding FrequencyKHz}" Minimum="{Binding FrequencyFromKHz}" Style="{DynamicResource SliderStyle}"  DragCompleted="SliderFrequency_DragCompleted" ValueChanged="SliderFrequency_ValueChanged" IsEnabled="{Binding FreqSliderEnabled}"/>
 
             <!--Label Grid.Row="0" Grid.Column="2" Text="{Binding TuningProgressCaption}" HorizontalOptions="End" VerticalOptions="Center" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/-->
 

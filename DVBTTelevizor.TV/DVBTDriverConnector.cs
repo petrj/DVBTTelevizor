@@ -226,7 +226,7 @@ namespace DVBTTelevizor
 
             // Run the (potentially blocking) TCP connect on a background thread
             // and enforce a timeout so we never get stuck in the Connecting state.
-            _ = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 try
                 {

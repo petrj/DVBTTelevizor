@@ -654,44 +654,32 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         }
     }
 
+    private void SliderFrequency_DragCompleted(object sender, EventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(SliderFrequency.Value);
+            await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
+
+            // save to configuration
+            switch (_viewModel.Config.AppDriverType)
+            {
+                case TV.AppDriverTypeEnum.FM:
+                    _viewModel.Config.FMFrequencyKHz = _viewModel.FrequencyKHz;
+                    break;
+                case TV.AppDriverTypeEnum.DAB:
+                    _viewModel.Config.DABFrequencyKHz = _viewModel.FrequencyKHz;
+                    break;
+                case AppDriverTypeEnum.DVBT:
+                    _viewModel.Config.FrequencyKHz = _viewModel.FrequencyKHz;
+                    break;
+            }
+        });
+    }
+
     private void SliderFrequency_ValueChanged(object sender, ValueChangedEventArgs e)
     {
         _loggingService.Debug($"TuningProgressPage SliderFrequency_ValueChanged");
-
-        _sliderFreqKHzQueue.Enqueue((long)SliderFrequency.Value);
-
-        Task.Run(async () =>
-        {
-            await Task.Delay(100);
-
-            bool found = false;
-            long value = 0;
-            while (_sliderFreqKHzQueue.Count > 0)
-            {
-                found = true;
-                _sliderFreqKHzQueue.TryDequeue(out value);
-            }
-
-            if (found)
-            {
-                _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(value);
-                await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
-
-                // save to configuration
-                switch (_viewModel.Config.AppDriverType)
-                {
-                    case TV.AppDriverTypeEnum.FM:
-                        _viewModel.Config.FMFrequencyKHz = _viewModel.FrequencyKHz;
-                        break;
-                    case TV.AppDriverTypeEnum.DAB:
-                        _viewModel.Config.DABFrequencyKHz = _viewModel.FrequencyKHz;
-                        break;
-                    case AppDriverTypeEnum.DVBT:
-                        _viewModel.Config.FrequencyKHz = _viewModel.FrequencyKHz;
-                        break;
-                }
-            }
-        });
     }
 
     private void LeftButton_Clicked(object sender, EventArgs e)
