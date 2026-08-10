@@ -556,6 +556,8 @@ namespace DVBTTelevizor.MAUI
         {
             try
             {
+                _loggingService.Info($"Tuning {freq}");
+
                 //SignalStrengthProgress = 0;
 
                 var tuneResult = await _driver.TuneEnhanced(freq, bandWidth, dvbtTypeIndex, false);

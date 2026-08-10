@@ -46,15 +46,6 @@ namespace DVBTTelevizor.MAUI
         private DateTime _dispatchKeyEventEnabledAt = DateTime.MaxValue;
         private NotificationHelper? _notificationHelper;
 
-        private void EnableNLOGLogging()
-        {
-            Assembly assembly = typeof(App).GetTypeInfo().Assembly;
-            NLog.Config.ISetupBuilder setupBuilder = NLog.LogManager.Setup();
-            NLog.Config.ISetupBuilder configuredSetupBuilder = setupBuilder.LoadConfigurationFromAssemblyResource(assembly);
-            _loggingService = new NLogLoggingService(configuredSetupBuilder.GetCurrentClassLogger());
-
-        }
-
         protected override void OnCreate(Bundle savedInstanceState)
         {
             _loggingService = new DummyLoggingService();
@@ -164,11 +155,6 @@ namespace DVBTTelevizor.MAUI
 
         private void SubscribeMessages()
         {
-            WeakReferenceMessenger.Default.Register<EnableLoggingMessage>(this, (r, m) =>
-            {
-                EnableNLOGLogging();
-            });
-
             WeakReferenceMessenger.Default.Register<ExternalDeviceWriteRequestMessage>(this, (r, m) =>
             {
                 RequestStoragePermission();
@@ -181,8 +167,8 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<SetUDPLoggingIPMessage>(this, (r, m) =>
             {
-                if (_loggingService != null &&
-                _loggingService is NLogLoggingService nlogService)
+                _loggingService = new LoggerProvider().GetLoggingService();
+                if (_loggingService is NLogLoggingService nlogService)
                 {
                     nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address = m.Value;
                 }

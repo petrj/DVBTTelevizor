@@ -256,16 +256,6 @@ namespace DVBTTelevizor.MAUI
                 });
             }
 
-            if (_configuration.EnableLogging)
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message, log from first 10 seconds can be found in Public directory
-
-                    WeakReferenceMessenger.Default.Send(new EnableLoggingMessage(System.String.Empty));
-                });
-            }
-
             if (_configuration.SledovaniTVEnabled)
             {
                 Task.Run(async () =>
@@ -336,10 +326,16 @@ namespace DVBTTelevizor.MAUI
 
         private async Task OnActivityStart()
         {
-            if (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP))
+            if (_configuration.EnableLogging && (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP)))
             {
                 _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
                 var addr = $"udp4://{_configuration.LoggingUDPIP}:9999";
+
+                if (_loggingService is NLogLoggingService nlogService)
+                {
+                    nlogService.GetConfiguration().FindTargetByName<NLog.Targets.NetworkTarget>("udp").Address = addr;
+                }
+
                 WeakReferenceMessenger.Default.Send(new SetUDPLoggingIPMessage(addr));
             }
 
