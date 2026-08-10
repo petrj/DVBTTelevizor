@@ -687,6 +687,8 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService.Debug($"FrequencyPage LeftButton_Clicked");
 
         _viewModel.DecreaseFreq();
+
+        SliderFrequency_DragCompleted(this, new EventArgs());
     }
 
     private void RightButton_Clicked(object sender, EventArgs e)
@@ -694,5 +696,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService.Debug($"FrequencyPage RightButton_Clicked");
 
         _viewModel.IncreaseFreq();
+
+        SliderFrequency_DragCompleted(this, new EventArgs());
     }
 }
