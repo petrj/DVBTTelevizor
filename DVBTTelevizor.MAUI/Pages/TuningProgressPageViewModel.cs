@@ -519,6 +519,11 @@ namespace DVBTTelevizor.MAUI
 
                     } while (_actualTunningFreqKHz <= FrequencyToKHz);
 
+                    if (_actualTunningFreqKHz > FrequencyToKHz)
+                    {
+                        _actualTunningFreqKHz = FrequencyToKHz;
+                    }
+
                     if (dvbtTypeIndex == 0 && DVBT2Tuning)
                     {
                         // reset position to DVBT2

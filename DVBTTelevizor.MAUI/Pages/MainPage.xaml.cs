@@ -324,7 +324,13 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        // this method is called when the MainActivity is started, so works only in Android paltform!
         private async Task OnActivityStart()
+        {
+            AutoStart();
+        }
+
+        private async Task AutoStart()
         {
             if (_configuration.EnableLogging && (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP)))
             {
@@ -340,10 +346,7 @@ namespace DVBTTelevizor.MAUI
             }
 
             // auto connect driver at start
-
             await SendConnectDriverRequest(_configuration.AppDriverType);
-
-            await AutoPlay();
         }
 
         private void SubscribeMessages()
@@ -1454,6 +1457,8 @@ namespace DVBTTelevizor.MAUI
 
         private async Task AutoPlay()
         {
+            await Task.Delay(5000);
+
             _loggingService.Debug("AutoPlay");
 
             if ((System.String.IsNullOrWhiteSpace(_configuration.AutoPlayedChannelUniqueID)) ||
@@ -1521,7 +1526,12 @@ namespace DVBTTelevizor.MAUI
                             _focusItems.FocusItem("QuickTuneButton");
                         }
                     });
+
+                    await AutoStart(); // in this time must not MainActivity exists and thi method will be clalled in ActvityStarted()
+
+                    await AutoPlay();
                 });
+
             }
             _focusItems.DeFocusAll();
 
@@ -3982,7 +3992,7 @@ namespace DVBTTelevizor.MAUI
 
             if ((_viewModel.Channels.Count > 0) && (_viewModel.SelectedChannel != null))
             {
-                _menuItems.Add(MainMenu.CreateMenuItem("menuGoToChannelNumber", "Go to channel number..".Translated(), "num.png"));
+                _menuItems.Add(MainMenu.CreateMenuItem("menuGoToChannelNumber", "Go to channel number".Translated(), "num.png"));
             }
 
             _menuItems.Add(MainMenu.CreateMenuItem("menuRefresh", "Refresh channels".Translated(), "refresh.png"));

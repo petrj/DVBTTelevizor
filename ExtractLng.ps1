@@ -11,7 +11,10 @@ Text to translate 2=Text k přeložení 2
 This is varaible 1: {0} and this variable 2: {1}= Toto je proměnná 1: {0} a toto je proměnná 2: {1}
 #>
 
-$files = Get-ChildItem -Path .\DVBTTelevizor.MAUI -Recurse | where { $_.Name.EndsWith(".cs") -or $_.Name.EndsWith(".xaml") }
+$files = Get-ChildItem -Path .\DVBTTelevizor.MAUI -Recurse -File | Where-Object { 
+    ($_.Name.EndsWith(".cs") -or $_.Name.EndsWith(".xaml")) -and 
+    ($_.FullName -notmatch '\\(?:bin|obj)\\')
+}
 $referenceDict = Get-Content -Path .\DVBTTelevizor.MAUI\Resources\Raw\Czech.lng
 $alreadyTranslatedText = @()
 
@@ -74,6 +77,9 @@ $xamlRegex = [regex] "Input='([^']*)'"
 foreach ($f in $files)
 {
     $content = Get-Content -Path $f.FullName -Raw
+    if ([string]::IsNullOrEmpty($content)) {
+        continue
+    }
 
     foreach ($match in $translatedRegex.Matches($content))
     {

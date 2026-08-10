@@ -38,6 +38,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     private DateTime _lastSliderValuechangedActionTime = DateTime.MinValue;
     private long _sliderFreqKHz = 0;
     private ConcurrentQueue<long> _sliderFreqKHzQueue = new ConcurrentQueue<long>();
+    private bool _tuneAfterConnect = false;
 
     public TuningProgressPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -82,6 +83,18 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         WeakReferenceMessenger.Default.Register<ShowTuningProgressDriverPageMessage>(this, (r, m) =>
         {
             DriverButton_Clicked(this, new EventArgs());
+        });
+
+        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+        {
+            if (_tuneAfterConnect && m.Value.Connected)
+            {
+                _tuneAfterConnect = false;
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    StartButton_Clicked(this, new EventArgs());
+                });
+            }
         });
 
         _commandUpdateBitrate = new Command(() =>
@@ -649,6 +662,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
             case "menuConfirmConnectDriver":
             case "menuConfirmChangeDriver":
+                _tuneAfterConnect = true;
                 WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
                 break;
         }

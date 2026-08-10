@@ -40,8 +40,6 @@ namespace DVBTTelevizor.MAUI.WinUI
                         ControlPort = testDVBTDriver.ControlIPEndPoint.Port,
                         TransferPort = testDVBTDriver.TransferIPEndPoint.Port
                     }));
-
-                WeakReferenceMessenger.Default.Send(new MainActivityStartedMessage(String.Empty));
             });
 
             WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
@@ -117,8 +115,9 @@ namespace DVBTTelevizor.MAUI.WinUI
             });
 
             UnhandledException += App_UnhandledException;
-        }
 
+            WeakReferenceMessenger.Default.Send(new MainActivityStartedMessage(String.Empty));
+        }
 
         private void ShowToastMessage(string msg)
         {
