@@ -288,3 +288,5 @@ Channels/new=Kanály/nové
 Position=Lokace
 Connecting=Připojování
 Disconnecting=Odpojování
+Go to channel number=Přejít na kanál dle čísla
+Channel number not found=Kanál dle čísla nebyl nalezen
