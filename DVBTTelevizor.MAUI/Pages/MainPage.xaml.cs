@@ -2787,9 +2787,6 @@ namespace DVBTTelevizor.MAUI
                     case Type t when t == typeof(TuningProgressPage):
                         page = new TuningProgressPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
                         break;
-                    case Type t when t == typeof(TuningFrequencyPage):
-                        page = new TuningFrequencyPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
-                        break;
                     case Type t when t == typeof(TuningFrequenciesPage):
                         page = new TuningFrequenciesPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
                         break;

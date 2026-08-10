@@ -840,7 +840,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SignalStrengthProgress));
                 OnPropertyChanged(nameof(DVBTPropertiesVisible));
                 OnPropertyChanged(nameof(FreqSliderEnabled));
-                OnPropertyChanged(nameof(TuneButtonVisible));
+                OnPropertyChanged(nameof(TuneButtonVisible)); // used for increase/decrease frequency buttons
             });
         }
 
@@ -963,8 +963,14 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.TuningMode == TuneModeEnum.Frequency &&
-                   State == TuneStateEnum.InProgress;
+                return
+                (
+                   (Settings.TuningMode == TuneModeEnum.Frequency &&
+                   State == TuneStateEnum.InProgress)
+                   ||
+                   (Settings.TuningMode != TuneModeEnum.Frequency &&
+                    ((State == TuneStateEnum.Stopped) || (State == TuneStateEnum.Finished)))
+                );
             }
         }
 
@@ -1006,7 +1012,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Settings.TuningMode == TuneModeEnum.Frequency && State == TuneStateEnum.InProgress;
+                return TuneButtonVisible;
             }
         }
 
