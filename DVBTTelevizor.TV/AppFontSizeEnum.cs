@@ -6,6 +6,9 @@ namespace DVBTTelevizor
 {
     public enum AppFontSizeEnum
     {
+        Smallest = -3,
+        VerySmall = -2,
+        Smaller = -1,
         Normal = 0,
         AboveNormal = 1,
         Big = 2,
@@ -13,7 +16,7 @@ namespace DVBTTelevizor
         VeryBig = 4,
         Huge = 5,
         HugePlus = 6,
-        HugeTriplePLus = 7
-
+        HugeTriplePLus = 7,
+        Colossal = 8
     }
 }

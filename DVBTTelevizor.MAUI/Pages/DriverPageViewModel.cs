@@ -158,6 +158,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(DriverIconImage));
                 OnPropertyChanged(nameof(LastTuneFrequency));
                 OnPropertyChanged(nameof(ConnectedDeviceVisible));
+                OnPropertyChanged(nameof(ConnectedDevice));
                 OnPropertyChanged(nameof(StatusTitle));
 
                 OnPropertyChanged(nameof(DisconnectButtonVisible));
@@ -297,6 +298,30 @@ namespace DVBTTelevizor.MAUI
                 }
 
                 return IsDriverInstalled(_pageDriver);
+            }
+        }
+
+        public string ConnectedDevice
+        {
+            get
+            {
+                if (_driver == null)
+                {
+                    return String.Empty;
+                }
+
+                if (!IsDriverInstalled(_pageDriver))
+                {
+                    return String.Empty;
+                }
+
+                if (_driver.Configuration == null)
+                {
+                    return String.Empty;
+                }
+
+
+                return _driver.Configuration.DeviceName;
             }
         }
 

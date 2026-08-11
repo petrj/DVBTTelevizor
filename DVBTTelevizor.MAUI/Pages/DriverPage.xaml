@@ -68,10 +68,35 @@
 
         <Label AbsoluteLayout.LayoutBounds="0.5,0.01,0.9,0.15" AbsoluteLayout.LayoutFlags="All" Text="{Binding StatusTitle}"  Style="{DynamicResource CaptionStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForCaption}"/>
 
-        <Image AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.20" AbsoluteLayout.LayoutFlags="All" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
-        <Label AbsoluteLayout.LayoutBounds="0.5,0.50,0.9,0.05" AbsoluteLayout.LayoutFlags="All" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.15,0.8,0.2" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80*" />
+                <RowDefinition Height="20*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.70,0.6,0.25" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
+                <Image Grid.Row="0" Source="{Binding DriverIconImage}" HorizontalOptions="Center" VerticalOptions="Center" />
+                <Label Grid.Row="1" Text="{Binding ConnectedDevice}"  Style="{DynamicResource LabelStyle}" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding ConnectedDeviceVisible}"/>
+        </Grid>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.38,0.5,0.11" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*" />
+                <ColumnDefinition Width="60*" />
+                <ColumnDefinition Width="20*" />
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="DriverPreferencesButton" Grid.Column="1" Text="{local:LngXamlExt Input='Settings..'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverPreferencesVisible}" Clicked="DriverPreferencesButton_Clicked"/>
+            <Button x:Name="InstallDriverButton"  Grid.Column="1"  Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
+
+        </Grid>
+
+        <Grid AbsoluteLayout.LayoutBounds="0.5,0.65,0.6,0.3" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding DisconnectButtonVisible}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
@@ -113,23 +138,7 @@
             <BoxView x:Name="SyncedRangeBoxView" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
 
             <Label  Grid.Row="5" Grid.Column="0" Text="{local:LngXamlExt Input='Synced'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLabel}" />
-            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ConnectedDeviceSynced}" HorizontalOptions="End" Margin="0"  FlowDirection="RightToLeft" />
-
-        </Grid>
-
-
-        <Grid AbsoluteLayout.LayoutBounds="0.5,0.4,0.8,0.15" AbsoluteLayout.LayoutFlags="All" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="60*" />
-                <ColumnDefinition Width="20*" />
-            </Grid.ColumnDefinitions>
-
-            <Button x:Name="DriverPreferencesButton" Grid.Column="1" Text="{local:LngXamlExt Input='Settings..'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding DriverPreferencesVisible}" Clicked="DriverPreferencesButton_Clicked"/>
-            <Button x:Name="InstallDriverButton"  Grid.Column="1"  Text="{local:LngXamlExt Input='Install driver'}" Style="{DynamicResource ButtonStyle}" FontSize="{Binding FontSizeForLabel}" IsVisible="{Binding InstallDriverButtonVisible}" Clicked="InstallDriverButton_Clicked" />
+            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ConnectedDeviceSynced}" HorizontalOptions="End" Margin="0,0,0,0"  FlowDirection="RightToLeft" IsEnabled="False" />
 
         </Grid>
 

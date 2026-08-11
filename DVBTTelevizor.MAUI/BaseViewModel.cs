@@ -140,6 +140,12 @@ namespace DVBTTelevizor.MAUI
         {
             switch (_configuration.AppFontSize)
             {
+                case AppFontSizeEnum.Smallest:
+                    return Convert.ToInt32(Math.Round(normalSize * 0.8));
+                case AppFontSizeEnum.VerySmall:
+                    return Convert.ToInt32(Math.Round(normalSize * 0.9));
+                case AppFontSizeEnum.Smaller:
+                    return Convert.ToInt32(Math.Round(normalSize * 0.95));
                 case AppFontSizeEnum.AboveNormal:
                     return Convert.ToInt32(Math.Round(normalSize * 1.12));
                 case AppFontSizeEnum.Big:
@@ -154,6 +160,8 @@ namespace DVBTTelevizor.MAUI
                     return Convert.ToInt32(Math.Round(normalSize * 2.20));
                 case AppFontSizeEnum.HugeTriplePLus:
                     return Convert.ToInt32(Math.Round(normalSize * 2.50));
+                case AppFontSizeEnum.Colossal:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.70));
                 default: return normalSize;
             }
         }
