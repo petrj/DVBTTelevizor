@@ -371,7 +371,7 @@ namespace DVBTTelevizor.MAUI
                         _actualTunningFreqKHz = Config.DABFrequencyKHz;
                         break;
                     case AppDriverTypeEnum.DVBT:
-                       // _actualTunningFreqKHz = _viewModel.Config.FrequencyKHz = _viewModel.Settings.FrequencyKHz;
+                        _actualTunningFreqKHz = Config.FrequencyKHz;
                         break;
                 }
             }
@@ -406,20 +406,28 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Info("Manual tuning started");
 
-                _tuneState = TuneStateEnum.InProgress;
-
-                //_savedChannels = await _channelService.LoadChannels();
-
-                NotifyChange();
-
-                // DVBT using Connected, DAB/FM State, TODO: refactor to use State for all drivers
-                if (!(_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected)))
+                if (!_driver.Connected)
                 {
                     _tuneState = TuneStateEnum.Failed;
                     return;
                 }
 
-                await TuneFreq(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, Settings.DVBT2? 1 : 0);
+                _tuneState = TuneStateEnum.InProgress;
+
+                await NotifyChange();
+
+                do
+                {
+                    _loggingService.Info($"Tuning freq. {_actualTunningFreqKHz}");
+
+                    await TuneFreq(_actualTunningFreqKHz * 1000, TuneBandWidthKHz * 1000, Settings.DVBT2 ? 1 : 0);
+
+                    await NotifyChange();
+
+                    await Task.Delay(5000);
+
+                } while (State == TuneStateEnum.InProgress);
+
             }
             catch (Exception ex)
             {
@@ -742,6 +750,11 @@ namespace DVBTTelevizor.MAUI
 
         public void UpdateActualFreq()
         {
+            if (Settings.TuningMode == TuneModeEnum.Frequency)
+            {
+                _actualTunningFreqKHz = Settings.FrequencyKHz;
+            }
+
             if (_actualTunningFreqKHz > Settings.FrequencyToKHz || _actualTunningFreqKHz < Settings.FrequencyFromKHz)
             {
                 _actualTunningFreqKHz = Settings.FrequencyFromKHz;
