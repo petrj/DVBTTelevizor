@@ -25,6 +25,8 @@ namespace LibVLCSharp.MAUI
         private static bool _messageRegistered;
 
         private const string ClassName = "DVBTTelevizorEmbeddedVLCClass";
+        // Toggle this to force-assign a top-level window for testing whether native rendering works
+        private const bool FORCE_TOP_LEVEL_FALLBACK = true;
 
         public static IPropertyMapper<VideoView, VideoViewHandler> Mapper = new PropertyMapper<VideoView, VideoViewHandler>(ViewHandler.ViewMapper)
         {
@@ -85,11 +87,11 @@ namespace LibVLCSharp.MAUI
 
         public static void MapMediaPlayer(VideoViewHandler handler, VideoView view)
         {
+            if (handler?.PlatformView == null || view?.MediaPlayer == null)
+                return;
+
             try
             {
-                if (handler.PlatformView == null || view.MediaPlayer == null)
-                    return;
-
                 if (_videoHwnd == IntPtr.Zero)
                 {
                     var platformWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView;
@@ -100,26 +102,126 @@ namespace LibVLCSharp.MAUI
 
                     EnsureClassRegistered();
 
-                    _videoHwnd = CreateWindowEx(
-                        WS_EX_TRANSPARENT,           // let the XAML sibling receive mouse input
-                        ClassName,
-                        string.Empty,
-                        WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
-                        0, 0, 1, 1,                  // sized to nothing until UpdateVideoWindowPosition fires
-                        _parentHwnd,
-                        IntPtr.Zero,
-                        GetModuleHandle(null),
-                        IntPtr.Zero);
+                    int[] tryExStyles = new int[]
+                    {
+                        WS_EX_NOREDIRECTIONBITMAP,
+                        WS_EX_NOREDIRECTIONBITMAP | WS_EX_TRANSPARENT,
+                        WS_EX_TRANSPARENT
+                    };
+
+                    int chosenEx = 0;
+                    foreach (var ex in tryExStyles)
+                    {
+                        _videoHwnd = CreateWindowEx(
+                            ex,
+                            ClassName,
+                            string.Empty,
+                            WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
+                            0, 0, 1, 1,
+                            _parentHwnd,
+                            IntPtr.Zero,
+                            GetModuleHandle(null),
+                            IntPtr.Zero);
+
+                        if (_videoHwnd != IntPtr.Zero)
+                        {
+                            chosenEx = ex;
+                            break;
+                        }
+                    }
 
                     if (_videoHwnd == IntPtr.Zero)
+                        throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "Failed to create embedded VLC child window");
+
+                    System.Diagnostics.Debug.WriteLine($"VideoViewHandler: created hwnd=0x{_videoHwnd.ToString("X")} exStyle=0x{chosenEx.ToString("X")}");
+
+                    ShowWindow(_videoHwnd, SW_SHOW);
+                    UpdateWindow(_videoHwnd);
+                }
+
+                // Assign embedded hwnd
+                view.MediaPlayer.Hwnd = _videoHwnd;
+
+                // Optional debug: create a top-level window to verify native rendering
+                if (FORCE_TOP_LEVEL_FALLBACK)
+                {
+                    try
                     {
-                        throw new System.ComponentModel.Win32Exception(
-                            Marshal.GetLastWin32Error(),
-                            "Failed to create embedded VLC child window");
+                        IntPtr topHwnd = CreateWindowEx(
+                            0,
+                            ClassName,
+                            "VLC Video (debug)",
+                            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+                            CW_USEDEFAULT, CW_USEDEFAULT, 640, 480,
+                            IntPtr.Zero,
+                            IntPtr.Zero,
+                            GetModuleHandle(null),
+                            IntPtr.Zero);
+
+                        if (topHwnd != IntPtr.Zero)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"VideoViewHandler: created debug top-level hwnd=0x{topHwnd.ToString("X")}");
+                            view.MediaPlayer.Hwnd = topHwnd;
+                            ShowWindow(topHwnd, SW_SHOW);
+                            UpdateWindow(topHwnd);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"VideoViewHandler: failed to create debug top-level window: {Marshal.GetLastWin32Error()}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("VideoViewHandler: debug top-level creation failed: " + ex);
                     }
                 }
 
-                view.MediaPlayer.Hwnd = _videoHwnd;
+                // Subscribe to events for diagnostics
+                try
+                {
+                    var mp = view.MediaPlayer;
+                    if (mp != null)
+                    {
+                        mp.Playing += (s, e) =>
+                        {
+                            try
+                            {
+                                System.Diagnostics.Debug.WriteLine($"VideoViewHandler: Playing event. IsPlaying={mp.IsPlaying} State={mp.State} VideoTrackCount={mp.VideoTrackCount} VideoTrack={mp.VideoTrack}");
+
+                                try
+                                {
+                                    foreach (var desc in mp.VideoTrackDescription)
+                                        System.Diagnostics.Debug.WriteLine($"VideoViewHandler: VideoTrackDesc id={desc.Id} name={desc.Name}");
+                                }
+                                catch { }
+
+                                try
+                                {
+                                    foreach (var desc in mp.AudioTrackDescription)
+                                        System.Diagnostics.Debug.WriteLine($"VideoViewHandler: AudioTrackDesc id={desc.Id} name={desc.Name}");
+                                }
+                                catch { }
+
+                                try
+                                {
+                                    foreach (var desc in mp.SpuDescription)
+                                        System.Diagnostics.Debug.WriteLine($"VideoViewHandler: SpuDesc id={desc.Id} name={desc.Name}");
+                                }
+                                catch { }
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine("VideoViewHandler: Playing handler error: " + ex);
+                            }
+                        };
+
+                        mp.EncounteredError += (s, e) => System.Diagnostics.Debug.WriteLine("VideoViewHandler: MediaPlayer encountered error");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("VideoViewHandler: event subscription failed: " + ex);
+                }
             }
             catch (Exception ex)
             {
@@ -224,6 +326,14 @@ namespace LibVLCSharp.MAUI
         [DllImport("user32.dll")]
         private static extern uint GetDpiForWindow(IntPtr hwnd);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool UpdateWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_SHOW = 5;
+
         private static readonly IntPtr HWND_TOP = IntPtr.Zero;
         private const uint SWP_NOACTIVATE = 0x0010;
 
@@ -232,6 +342,10 @@ namespace LibVLCSharp.MAUI
         private const uint WS_CLIPSIBLINGS = 0x04000000;
 
         private const int WS_EX_TRANSPARENT = 0x00000020;
+        // Allow native windows to render directly when hosted in WinUI / WinAppSDK (avoids black/blank rendering)
+        private const int WS_EX_NOREDIRECTIONBITMAP = 0x00200000;
+        private const uint WS_OVERLAPPEDWINDOW = 0x00CF0000;
+        private const int CW_USEDEFAULT = unchecked((int)0x80000000);
 
         private const uint WM_NCHITTEST = 0x0084;
         private const int HTTRANSPARENT = -1;
