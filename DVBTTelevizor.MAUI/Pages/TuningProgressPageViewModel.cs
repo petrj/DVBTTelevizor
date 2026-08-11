@@ -57,15 +57,21 @@ namespace DVBTTelevizor.MAUI
 
         private IDriverConnector? _driver = null;
 
+        private void SetupDriver(IDriverConnector driver)
+        {
+            _driver = driver;
+
+            _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
+            _driver.OnServiceFound += Demodulator_OnServiceFound;
+        }
+
         public TuningProgressPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
-            _driver = driver;
+            SetupDriver(driver);
             Settings = new TuningSettings(loggingService);
 
             ChannelFound += TuningProgressPageViewModel_ChannelFound;
-            _driver.StatusChanged += TuningProgressPageViewModel_SignalChanged;
-            _driver.OnServiceFound += Demodulator_OnServiceFound;
 
             _listViewSelector = new ListViewSelector(Channels);
 
@@ -80,7 +86,7 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
-                _driver = m.Value;
+                SetupDriver(m.Value);
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     NotifyChange();

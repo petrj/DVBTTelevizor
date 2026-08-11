@@ -26,20 +26,30 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
     private SpectrumWorker? _spectrumWorker = null;
     private bool _visible = false;
 
+    private void SetupDriver(IDriverConnector driver)
+    {
+        _driver = driver;
+
+        _driver.RawDataReceived += _driver_RawDataReceived;
+    }
+
     public DriverStatPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
+        SetupDriver(driver);
         _configuration = tvConfiguration;
         _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new DriverStatPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
-        _driver.RawDataReceived += _driver_RawDataReceived;
-
         BuildFocusableItems();
+
+        WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
+        {
+            SetupDriver(m.Value);
+        });
 
         // Start a timer to update the spectrum ~60 FPS
         Dispatcher.StartTimer(TimeSpan.FromMilliseconds(200), () =>

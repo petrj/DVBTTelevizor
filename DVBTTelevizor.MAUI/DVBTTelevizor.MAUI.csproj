@@ -54,15 +54,14 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
-
-	  <!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
-	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+		<!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
+		<AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+		<AndroidUseAapt2>True</AndroidUseAapt2>
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
 		<AndroidFastDeploymentEnabled>true</AndroidFastDeploymentEnabled>
 		<UseFastDeployment>true</UseFastDeployment>
-	  <UseSharedRuntime>true</UseSharedRuntime>
-	  <MandroidLinkMode>None</MandroidLinkMode>
+		<UseSharedRuntime>true</UseSharedRuntime>
+		<MandroidLinkMode>None</MandroidLinkMode>
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 
