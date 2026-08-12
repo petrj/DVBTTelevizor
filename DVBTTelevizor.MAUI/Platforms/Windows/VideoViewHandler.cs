@@ -1,4 +1,6 @@
 ﻿using Microsoft.Maui.Handlers;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using System;
 using System.Runtime.InteropServices;
 using WinRT.Interop;
@@ -23,6 +25,8 @@ namespace LibVLCSharp.MAUI
         private static WndProc? _wndProcDelegate;
         private static bool _classRegistered;
         private static bool _messageRegistered;
+        // Static recipient prevents WeakReferenceMessenger from dropping the handler after GC.
+        private static readonly object _positionRecipient = new object();
 
         private const string ClassName = "DVBTTelevizorEmbeddedVLCClass";
 
@@ -45,7 +49,7 @@ namespace LibVLCSharp.MAUI
             _messageRegistered = true;
 
             WeakReferenceMessenger.Default.Register<ChangedVideoPositionMessage>(
-                new object(),
+                _positionRecipient,
                 (_, m) =>
                 {
                     if (_videoHwnd == IntPtr.Zero || _parentHwnd == IntPtr.Zero || m.Value == null)
@@ -62,10 +66,12 @@ namespace LibVLCSharp.MAUI
                                 double scale = GetDpiForWindow(_parentHwnd) / 96.0;
                                 if (scale <= 0) scale = 1.0;
 
+                                int titleBarH = GetTitleBarHeightPixels();
                                 int x = (int)Math.Round(rect.Left * scale);
-                                int y = (int)Math.Round(rect.Top * scale);
+                                int rawY = (int)Math.Round(rect.Top * scale);
+                                int y = Math.Max(rawY, titleBarH);
                                 int w = Math.Max(1, (int)Math.Round(rect.Width * scale));
-                                int h = Math.Max(1, (int)Math.Round(rect.Height * scale));
+                                int h = Math.Max(1, (int)Math.Round((rect.Top + rect.Height) * scale) - y);
 
                                 // HWND_TOP + no SWP_NOZORDER -> keep video on top of the XAML sibling.
                                 SetWindowPos(_videoHwnd, HWND_TOP, x, y, w, h, SWP_NOACTIVATE);
@@ -223,6 +229,19 @@ namespace LibVLCSharp.MAUI
 
         [DllImport("user32.dll")]
         private static extern uint GetDpiForWindow(IntPtr hwnd);
+
+        // Returns the title-bar height in raw pixels; non-zero only when content is extended into the title bar.
+        private static int GetTitleBarHeightPixels()
+        {
+            if (_parentHwnd == IntPtr.Zero) return 0;
+            try
+            {
+                var windowId = Win32Interop.GetWindowIdFromWindow(_parentHwnd);
+                var appWindow = AppWindow.GetFromWindowId(windowId);
+                return appWindow.TitleBar.Height;
+            }
+            catch { return 0; }
+        }
 
         private static readonly IntPtr HWND_TOP = IntPtr.Zero;
         private const uint SWP_NOACTIVATE = 0x0010;

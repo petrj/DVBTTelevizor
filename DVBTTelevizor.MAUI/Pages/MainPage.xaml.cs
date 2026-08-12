@@ -231,6 +231,9 @@ namespace DVBTTelevizor.MAUI
 
             SubscribeMessages();
 
+            // Update video window position whenever VideoStackLayout is laid out at a new size.
+            VideoStackLayout.SizeChanged += (_, _) => UpdateVideoWindowPosition();
+
             CommandCheckStream = new Microsoft.Maui.Controls.Command(() =>
             {
                 Task.Run(async () =>
@@ -1419,22 +1422,11 @@ namespace DVBTTelevizor.MAUI
 
         private void UpdateVideoWindowPosition()
         {
-            switch (_viewModel.PlayingState)
-            {
-                case PlayingStateEnum.Playing:
-                    WeakReferenceMessenger.Default.Send(
-                    new ChangedVideoPositionMessage(
-                        new Rect(0, 0, this.Width, this.Height)));
-                    break;
-
-                //case PlayingStateEnum.PlayingInPreview:
-                default:
-                    WeakReferenceMessenger.Default.Send(
-                    new ChangedVideoPositionMessage(
-                        new Rect((0.70) * Width, (0.78) * Height,
-                                 (0.30) * Width, (0.22) * Height)));
-                    break;
-            }
+#if WINDOWS
+            var bounds = VideoStackLayout.Bounds;
+            WeakReferenceMessenger.Default.Send(new ChangedVideoPositionMessage(
+                new Rect(bounds.X, bounds.Y, Math.Max(1, bounds.Width), Math.Max(1, bounds.Height))));
+#endif
         }
 
         public PlayingStateEnum PlayingState
