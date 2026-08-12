@@ -210,6 +210,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
 
         if  (_driverPageViewModel.PageDriver == _driverPageViewModel.Driver.DriverType)
         {
+            _driverPageViewModel.IsConnecting = true; // DVBT driver connection can lead to non-updating the state in GUI
+
             switch (_driverPageViewModel.PageDriver)
             {
                 case AppDriverTypeEnum.DVBT:
@@ -230,6 +232,8 @@ public partial class DriverPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"DriverPage DisconnectButton_Clicked");
 
         WeakReferenceMessenger.Default.Send(new DisConnectMessage(String.Empty));
+
+        _driverPageViewModel.IsDisConnecting = true; // DVBT driver connection can lead to non-updating the state in GUI
     }
 
     private async void GainButton_Clicked(object sender, EventArgs e)

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
@@ -21,6 +21,10 @@ namespace DVBTTelevizor.MAUI
         private bool? _dvbtDriverInstalled = null;
         private bool? _rtlsdrDriverInstalled = null;
         private IDriverConnector? _driver = null;
+
+        // android driver is woring on foreground and driver state cannot be updated by DriverChangedMessage
+        private bool _isConnecting = false;
+        private bool _isDisConnecting = false;
 
         public DriverPageViewModel(ILoggingService loggingService, IDriverConnector? driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
@@ -54,6 +58,28 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        public bool IsConnecting
+        {
+            get
+                { return _isConnecting; }
+            set
+            {
+                _isConnecting = value;
+                NotifyDriverChange();
+            }
+        }
+
+        public bool IsDisConnecting
+        {
+            get
+            { return _isDisConnecting; }
+            set
+            {
+                _isDisConnecting = value;
+                NotifyDriverChange();
+            }
+        }
+
         public bool? DvbtDriverInstalled
         {
             get => _dvbtDriverInstalled;
@@ -82,17 +108,27 @@ namespace DVBTTelevizor.MAUI
                 if (_driver == null)
                     return;
 
+                // when conecting DVBTdriver, State can be in UNKNOWN state, so ignoring this state for discard IsConnecting/IdDisonnecting
+                if (!_driver.State.HasFlag(DVBTDriverStateEnum.Unknown))
+                {
+                    IsConnecting = _driver.State.HasFlag(DVBTDriverStateEnum.Connecting);
+                    IsDisConnecting = _driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting);
+                }
+
                 if (_driver.State.HasFlag(DVBTDriverStateEnum.Connecting))
                 {
                     _loggingService.Info(DeviceFriendlyName + ": Driver is connecting, waiting for connection to complete before checking capabilities.");
                 }
 
-                var cap = await _driver.GetCapabalities();
-
-                // setting min/max frequencies from device
-                if (cap.SuccessFlag)
+                if (_driver.State.HasFlag(DVBTDriverStateEnum.Connected))
                 {
-                    _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")} MHz";
+                    var cap = await _driver.GetCapabalities();
+
+                    // setting min/max frequencies from device
+                    if (cap.SuccessFlag)
+                    {
+                        _range = $"{Convert.ToDouble(cap.minFrequency / 1E+6).ToString("N1")} - {Convert.ToDouble(cap.maxFrequency / 1E+6).ToString("N1")} MHz";
+                    }
                 }
             }
             finally
@@ -197,6 +233,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (IsConnecting)
+                {
+                    return "donglepurple.png";
+                }
+
                 if (_driver == null)
                 {
                     return "donglegray.png";
@@ -257,6 +298,11 @@ namespace DVBTTelevizor.MAUI
                 if (!IsDriverInstalled(_pageDriver))
                 {
                     return "Driver not installed".Translated();
+                }
+
+                if (IsConnecting)
+                {
+                    return "Connecting".Translated();
                 }
 
                 if (_driver.DriverType == _pageDriver)
@@ -370,6 +416,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (IsConnecting)
+                {
+                    return false;
+                }
+
                 if (_driver == null || _pageDriver == null)
                 {
                     return false; // page is not yet initialized
@@ -452,6 +503,11 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
+                if (IsConnecting)
+                {
+                    return false;
+                }
+
                 if (_driver == null || _pageDriver == null)
                 {
                     return false; // page is not yet initialized
