@@ -1689,8 +1689,13 @@ namespace DVBTTelevizor.MAUI
                 var options = new string[]
                 {
                     "--avcodec-hw=any",
-                    "--file-caching=1500",     // local files/streams
-                    "--network-caching=2000",  // DVB/UDP/HTTP streams
+                    "--file-caching=3000",     // local files/streams
+                    "--network-caching=3000",   // DVB/UDP/HTTP streams
+                    "--live-caching=3000",
+
+                    // Prevent clock jitter/drop frames that trigger Android OS buffering state
+                    "--clock-jitter=0",
+                    "--clock-synchro=0"
                 };
 
                 _LibVLC = new LibVLC(options);
