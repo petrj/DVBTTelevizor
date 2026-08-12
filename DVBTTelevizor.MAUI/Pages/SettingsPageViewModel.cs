@@ -172,14 +172,18 @@ namespace DVBTTelevizor.MAUI
         {
             FontSizes.Clear();
 
+            FontSizes.Add("Smallest".Translated());
+            FontSizes.Add("Very small".Translated());
+            FontSizes.Add("Smaller".Translated());
             FontSizes.Add("Normal".Translated());
             FontSizes.Add("Above normal".Translated());
             FontSizes.Add("Big".Translated());
             FontSizes.Add("Bigger".Translated());
             FontSizes.Add("Very big".Translated());
             FontSizes.Add("Huge".Translated());
-            FontSizes.Add("Huge".Translated() + " +");
-            FontSizes.Add("Huge".Translated() + " +++");
+            FontSizes.Add("Huge+".Translated());
+            FontSizes.Add("Huge++".Translated());
+            FontSizes.Add("Colossal".Translated());
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {

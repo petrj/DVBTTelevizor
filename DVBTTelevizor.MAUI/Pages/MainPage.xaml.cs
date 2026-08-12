@@ -125,6 +125,8 @@ namespace DVBTTelevizor.MAUI
 
         public static Dictionary<Type, Page> Pages { get; set; }  = new Dictionary<Type, Page>();
 
+        private bool _autostarted = false;
+
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration, IRTLSDRDriverPlatformImplementation sdrDriverPlatformImplementation)
         {
             _publicDirectoryProvider = publicDirectoryProvider;
@@ -327,14 +329,10 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        // this method is called when the MainActivity is started, so works only in Android paltform!
-        private async Task OnActivityStart()
-        {
-            AutoStart();
-        }
-
         private async Task AutoStart()
         {
+            _autostarted = true;
+
             if (_configuration.EnableLogging && (!System.String.IsNullOrEmpty(_configuration.LoggingUDPIP)))
             {
                 _loggingService.Info($"Setting UDP logging IP: {_configuration.LoggingUDPIP}");
@@ -358,7 +356,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run(async () =>
                 {
-                    await OnActivityStart();
+                    await AutoStart();
                 });
             });
 
@@ -1519,7 +1517,10 @@ namespace DVBTTelevizor.MAUI
                         }
                     });
 
-                    await AutoStart(); // in this time must not MainActivity exists and thi method will be clalled in ActvityStarted()
+                    if (!_autostarted)
+                    {
+                        await AutoStart();
+                    }
 
                     await AutoPlay();
                 });
