@@ -76,20 +76,20 @@
                 <ColumnDefinition Width="30*" />
             </Grid.ColumnDefinitions>
 
-            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="DVBTBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-10,0,10,0"/>
 
             <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
             <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
             <Switch BackgroundColor="Transparent"  Grid.Row="0" Grid.Column="1" x:Name="DVBTSwitch"  IsToggled="{Binding DVBT, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}">
             </Switch>
 
-            <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"/>
+            <BoxView x:Name="DVBT2BoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-10,0,10,0"/>
 
             <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='DVBT 2'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}" />
             <BoxView Grid.Row="1" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
             <Switch Grid.Row="1" Grid.Column="1" x:Name="DVBT2Switch"  IsToggled="{Binding DVBT2, Mode=TwoWay}" Style="{DynamicResource SwitchStyle}"/>
 
-            <BoxView x:Name="BandwidthBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" />
+            <BoxView x:Name="BandwidthBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent"  Margin="-10,0,10,0"/>
 
             <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Bandwidth'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
             <Picker

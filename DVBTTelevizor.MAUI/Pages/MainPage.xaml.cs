@@ -1502,6 +1502,8 @@ namespace DVBTTelevizor.MAUI
 
                 Task.Run(async () =>
                 {
+                    await _viewModel.RefreshChannels();
+
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         if (_viewModel.Channels.Count > 0)
@@ -1523,11 +1525,13 @@ namespace DVBTTelevizor.MAUI
                 });
 
             }
-
-            Task.Run(async () =>
+            else
             {
-                await _viewModel.RefreshChannels();
-            });
+                Task.Run(async () =>
+                {
+
+                });
+            }
 
             _focusItems.DeFocusAll();
         }
@@ -1687,8 +1691,6 @@ namespace DVBTTelevizor.MAUI
                     "--avcodec-hw=any",
                     "--file-caching=1500",     // local files/streams
                     "--network-caching=2000",  // DVB/UDP/HTTP streams
-                    //"--mediacodec",
-                    //"--no-mediacodec-dr"
                 };
 
                 _LibVLC = new LibVLC(options);
@@ -1701,6 +1703,8 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer.Media = media;
                 _mediaPlayer.Play();
                 */
+
+
             }
             catch (Exception ex)
             {
