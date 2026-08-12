@@ -1489,7 +1489,6 @@ namespace DVBTTelevizor.MAUI
 
             base.OnAppearing();
 
-
             if (_firstAppearing)
             {
                 _firstAppearing = false;
@@ -1503,8 +1502,6 @@ namespace DVBTTelevizor.MAUI
 
                 Task.Run(async () =>
                 {
-                    await _viewModel.RefreshChannels();
-
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
                         if (_viewModel.Channels.Count > 0)
@@ -1526,8 +1523,13 @@ namespace DVBTTelevizor.MAUI
                 });
 
             }
-            _focusItems.DeFocusAll();
 
+            Task.Run(async () =>
+            {
+                await _viewModel.RefreshChannels();
+            });
+
+            _focusItems.DeFocusAll();
         }
 
         private async Task DisconnectDriver()
