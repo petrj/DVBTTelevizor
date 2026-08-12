@@ -14,6 +14,7 @@ using DVBTTelevizor.MAUI.Messages;
 using Google.Android.Material.Snackbar;
 using LoggerService;
 using NLog;
+using NLog.LayoutRenderers.Wrappers;
 using RTLSDR;
 using System.Diagnostics;
 using System.Reflection;
@@ -38,7 +39,8 @@ namespace DVBTTelevizor.MAUI
         private int _SDRDriverPort = 0;
         private int _audioRecieverPort = 8012;
 
-        private bool _waitingForInit = false;
+        private CancellationTokenSource? _waitForinitCancellation;
+
         private static Android.Widget.Toast _instance;
         private ILoggingService _loggingService = null;
 
@@ -803,7 +805,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public void InitDriver()
+        public async Task InitDriver()
         {
             try
             {
@@ -812,21 +814,31 @@ namespace DVBTTelevizor.MAUI
                 req.SetData(scheme.Build());
                 req.PutExtra(Intent.ExtraReturnResult, true);
 
-                _waitingForInit = true;
+                var timeoutSecs = 10;
+                var startTime = DateTime.Now;
+                _waitForinitCancellation = new CancellationTokenSource();
 
                 Task.Run(async () =>
                 {
-                    await Task.Delay(10000); // wait 10 secs;
-
-                    if (_waitingForInit)
+                    try
                     {
-                        _waitingForInit = false;
+                        while ((DateTime.Now - startTime).TotalSeconds < timeoutSecs)
+                        {
+                            await Task.Delay(200);
+
+                            if (_waitForinitCancellation.IsCancellationRequested)
+                            {
+                                return;
+                            }
+                        }
 
                         _loggingService.Info("Device response timeout");
                         WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Device response timeout".Translated()));
                     }
-
-                });
+                    catch (System.OperationCanceledException)
+                    {
+                    }
+                }, _waitForinitCancellation.Token);
 
                 _loggingService.Info("Starting activity");
                 _ignoreRequest[StartRequestCode] = false;
@@ -842,7 +854,7 @@ namespace DVBTTelevizor.MAUI
             catch (Exception ex)
             {
                 _loggingService.Error(ex, "InitDriver");
-                _waitingForInit = false;
+                _waitForinitCancellation?.Cancel();
             }
         }
 
@@ -900,7 +912,7 @@ namespace DVBTTelevizor.MAUI
 
         private void ProcessDriverConnectResult(Result resultCode, Intent data)
         {
-            _waitingForInit = false;
+            _waitForinitCancellation?.Cancel();
 
             if (resultCode == Result.Canceled)
             {
