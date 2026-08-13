@@ -212,25 +212,6 @@
                                 ItemDisplayBinding="{Binding NameWithNumber}"/>
                     </Grid>
 
-                    <Grid Margin="30,0,10,0" >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="70*" />
-                            <ColumnDefinition Width="30*" />
-                        </Grid.ColumnDefinitions>
-
-                        <BoxView x:Name="EnableRTLSDRBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
-
-                        <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Enable SDR'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
-                        <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
-                        <Switch Grid.Row="0" Grid.Column="1" x:Name="EnableRTLSDRSwitch"  IsToggled="{Binding Config.RTLSDREnabled, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
-                        <Label  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{local:LngXamlExt Input='(FM radio is experimental function and requires SDR driver)'}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="End"/>
-
-                    </Grid>
-
                 </StackLayout>
 
                 <StackLayout Margin="0,0,0,10">
