@@ -1,6 +1,6 @@
 cd $PSScriptRoot
 
-dotnet nuget locals all --clear
+#dotnet nuget locals all --clear
 
 #dotnet clean C:\DVBTTelevizor\DVBTTelevizor.MAUI\
 

@@ -387,13 +387,16 @@ namespace DVBTTelevizor
 
                 if (_lastFreq == 490000000)
                 {
-                    serviceDescriptors.Add(new ServiceDescriptor()
+                    for (var i=1;i<10;i++)
                     {
-                        ProviderName = "Multiplex A",
-                        ServiceName = "Advertisment",
-                        ServisType = (byte)DVBTDriverServiceType.TV,
-                        Free = true
-                    }, 310);
+                        serviceDescriptors.Add(new ServiceDescriptor()
+                        {
+                            ProviderName = "Multiplex A",
+                            ServiceName = $"Advertisment {i}",
+                            ServisType = (byte)DVBTDriverServiceType.TV,
+                            Free = true
+                        }, 310 + (i-1));
+                    }
                 }
 
                 if (_lastFreq == 514000000)
@@ -405,13 +408,16 @@ namespace DVBTTelevizor
                         ServisType = (byte)DVBTDriverServiceType.TV,
                         Free = true
                     }, 2300);
-                    serviceDescriptors.Add(new ServiceDescriptor()
+                    for (var i = 1; i < 5; i++)
                     {
-                        ProviderName = "Multiplex B",
-                        ServiceName = "Sport",
-                        ServisType = (byte)DVBTDriverServiceType.TV,
-                        Free = true
-                    }, 2400);
+                        serviceDescriptors.Add(new ServiceDescriptor()
+                        {
+                            ProviderName = "Multiplex B",
+                            ServiceName = $"Sport {i}",
+                            ServisType = (byte)DVBTDriverServiceType.TV,
+                            Free = true
+                        }, 2400 + (i-1));
+                    }
                     serviceDescriptors.Add(new ServiceDescriptor()
                     {
                         ProviderName = "Multiplex B",

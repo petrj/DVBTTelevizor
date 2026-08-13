@@ -324,7 +324,7 @@ namespace DVBTTelevizor.MAUI
                             _configuration.SaveChannels(configChannels);
                         }
 
-                        //WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
+                        WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
                     }
                     finally
                     {

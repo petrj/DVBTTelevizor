@@ -71,6 +71,18 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             });
         });
 
+        WeakReferenceMessenger.Default.Register<ChannelHasBeenAddedMessage>(this, (r, m) =>
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                var lastChannel = _viewModel.Channels.Last();
+                if (lastChannel != null)
+                {
+                    ChannelsListView.ScrollTo(lastChannel, ScrollToPosition.MakeVisible, false);
+                }
+            });
+        });
+
         WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>
         {
             MainThread.BeginInvokeOnMainThread(async () =>
