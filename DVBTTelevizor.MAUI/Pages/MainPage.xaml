@@ -185,7 +185,16 @@
 
     <AbsoluteLayout x:Name="MainAbsoluteLayout" BackgroundColor="Black" Margin="0,0,0,0">
 
-       <StackLayout x:Name="VideoStackLayout" IsVisible="{Binding VideoStackLayoutVisible}" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
+        <!-- ActivityIndicator must be before Video, there is a bug in AndroidTV which still shows the indicator -->
+        <ActivityIndicator
+            AbsoluteLayout.LayoutBounds="0.5,0.4,0.15,0.15"
+            AbsoluteLayout.LayoutFlags="All"
+            IsRunning="{Binding NotRefreshed}"
+            Color="#42b3ff"
+            IsVisible="{Binding NotRefreshed}"
+            x:Name="RefreshActivityIndicator"/>
+
+        <StackLayout x:Name="VideoStackLayout" IsVisible="{Binding VideoStackLayoutVisible}" AbsoluteLayout.LayoutBounds="0.0,0.0,1.0,1.0" AbsoluteLayout.LayoutFlags="All"  BackgroundColor="Black">
             <vlc:VideoView IsVisible="True" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" x:Name="videoView" Margin="0,0,0,0" />
             <StackLayout.GestureRecognizers >
                 <TapGestureRecognizer Tapped="VideoStackLayout_Tapped" NumberOfTapsRequired="1" />
@@ -201,8 +210,6 @@
                     LongPressDuration="750" />
             </StackLayout.Behaviors>
         </StackLayout>
-
-        <ActivityIndicator AbsoluteLayout.LayoutBounds="0.5,0.4,0.15,0.15" AbsoluteLayout.LayoutFlags="All" IsRunning="{Binding NotRefreshed}" Color="#42b3ff" IsVisible="{Binding NotRefreshed}" />
 
         <Grid
             x:Name="EPGDetailGrid"

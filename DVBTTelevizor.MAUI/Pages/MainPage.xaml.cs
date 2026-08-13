@@ -851,7 +851,11 @@ namespace DVBTTelevizor.MAUI
             }
 
             _driver.OnRawAudioDemodulated += OnRawAudioDemodulated;
-            _demodulator?.OnDynamicLabelChanged += OnDynamicLabelChanged;
+
+            if (_demodulator != null)
+            {
+                _demodulator.OnDynamicLabelChanged += OnDynamicLabelChanged;
+            }
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
@@ -1529,7 +1533,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run(async () =>
                 {
-
+                    await _viewModel.RefreshChannels();
                 });
             }
 
@@ -1541,8 +1545,11 @@ namespace DVBTTelevizor.MAUI
             if (_driver != null)
             {
                 _driver.OnRawAudioDemodulated -= OnRawAudioDemodulated;
-                _demodulator?.OnDynamicLabelChanged -= OnDynamicLabelChanged;
-                _demodulator?.Stop();
+                if (_demodulator != null)
+                {
+                    _demodulator.OnDynamicLabelChanged -= OnDynamicLabelChanged;
+                    _demodulator.Stop();
+                }
                 await _viewModel.DisconnectDriver();
                 _driver = null;
             }
@@ -1691,11 +1698,7 @@ namespace DVBTTelevizor.MAUI
                     "--avcodec-hw=any",
                     "--file-caching=3000",     // local files/streams
                     "--network-caching=3000",   // DVB/UDP/HTTP streams
-                    "--live-caching=3000",
-
-                    // Prevent clock jitter/drop frames that trigger Android OS buffering state
-                    "--clock-jitter=0",
-                    "--clock-synchro=0"
+                    "--live-caching=3000"
                 };
 
                 _LibVLC = new LibVLC(options);
@@ -1703,13 +1706,12 @@ namespace DVBTTelevizor.MAUI
                 _mediaPlayer = new LibVLCSharp.Shared.MediaPlayer(_LibVLC);
                 videoView.MediaPlayer = _mediaPlayer;
 
-                /*  debug video
-                var media = new Media(_LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
+                //debug video
+                /*
+                var media = new Media(_LibVLC, new Uri("/storage/emulated/0/Android/media/net.petrjanousek.DVBTTelevizor/DVBT-MPEGTS-514MHz-2023-08-15-23-13-38.ts"));
                 _mediaPlayer.Media = media;
                 _mediaPlayer.Play();
                 */
-
-
             }
             catch (Exception ex)
             {
