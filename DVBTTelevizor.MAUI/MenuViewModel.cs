@@ -29,6 +29,12 @@ namespace DVBTTelevizor.MAUI
         {
             switch (index)
             {
+                case -3:
+                    return Convert.ToInt32(Math.Round(normalSize * 0.8));
+                case -2:
+                    return Convert.ToInt32(Math.Round(normalSize * 0.9));
+                case -1:
+                    return Convert.ToInt32(Math.Round(normalSize * 0.95));
                 case 1:
                     return Convert.ToInt32(Math.Round(normalSize * 1.12));
                 case 2:
@@ -40,9 +46,11 @@ namespace DVBTTelevizor.MAUI
                 case 5:
                     return Convert.ToInt32(Math.Round(normalSize * 2.0));
                 case 6:
-                    return Convert.ToInt32(Math.Round(normalSize * 2.25));
+                    return Convert.ToInt32(Math.Round(normalSize * 2.20));
                 case 7:
                     return Convert.ToInt32(Math.Round(normalSize * 2.5));
+                case 8:
+                    return Convert.ToInt32(Math.Round(normalSize * 2.7));
                 default: return normalSize;
             }
         }

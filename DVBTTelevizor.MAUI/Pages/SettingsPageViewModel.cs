@@ -255,18 +255,21 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
+        // offset converts between negative enum values (-3..8) and list indices (0..11)
+        private static readonly int _fontSizeOffset = -(int)AppFontSizeEnum.Smallest;
+
         public int AppFontSizeIndex
         {
             get
             {
-                return (int)_configuration.AppFontSize;
+                return (int)_configuration.AppFontSize + _fontSizeOffset;
             }
             set
             {
-                _configuration.AppFontSize = (AppFontSizeEnum)value;
+                _configuration.AppFontSize = (AppFontSizeEnum)(value - _fontSizeOffset);
 
                 OnPropertyChanged(nameof(AppFontSizeIndex));
-                WeakReferenceMessenger.Default.Send(new FontSizeChangedMessage(AppFontSizeIndex));
+                WeakReferenceMessenger.Default.Send(new FontSizeChangedMessage((int)_configuration.AppFontSize));
             }
         }
 
