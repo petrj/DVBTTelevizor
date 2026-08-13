@@ -16,6 +16,7 @@
 	<PackageReference Include="RTLSDR.DAB" Version="1.6.3" />
 	<PackageReference Include="RTLSDR.FM" Version="1.5.2" />
     <PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -309,9 +309,11 @@ namespace DVBTTelevizor.MAUI
                         if (!channelAlreadyTuned)
                         {
                             Channels.Add(che.Channel);
-                        } else
-                        {
-                            _tunedNewChannels++;
+
+                            if (!channelAlreadySaved)
+                            {
+                                _tunedNewChannels++;
+                            }
                         }
 
                         if (!channelAlreadySaved)

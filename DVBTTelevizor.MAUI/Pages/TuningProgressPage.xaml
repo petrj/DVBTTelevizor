@@ -236,6 +236,7 @@
           ItemsSource="{Binding Channels}"
           CachingStrategy="RecycleElement"
           Style="{StaticResource ListViewStyle}"
+          SelectionMode="None"
           SelectedItem="{Binding SelectedChannel, Mode=TwoWay}">
 
             <ListView.ItemTemplate>
