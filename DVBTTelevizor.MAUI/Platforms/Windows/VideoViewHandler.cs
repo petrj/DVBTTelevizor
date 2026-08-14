@@ -29,6 +29,30 @@ namespace LibVLCSharp.MAUI
         private static bool _messageRegistered;
         // Static recipient prevents WeakReferenceMessenger from dropping the handler after GC.
         private static readonly object _positionRecipient = new object();
+        private static bool _isVideoExplicitlyHidden;
+
+        public static void SetVideoVisibility(bool visible)
+        {
+            _isVideoExplicitlyHidden = !visible;
+
+            if (_videoHwnd == IntPtr.Zero)
+                return;
+
+            try
+            {
+                Microsoft.Maui.ApplicationModel.MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (_videoHwnd != IntPtr.Zero)
+                    {
+                        ShowWindow(_videoHwnd, visible ? SW_SHOWNA : SW_HIDE);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("VideoViewHandler.SetVideoVisibility error: " + ex);
+            }
+        }
 
         // Mouse gesture tracking
         private static bool _isMouseDown;
@@ -59,6 +83,13 @@ namespace LibVLCSharp.MAUI
                 return;
             _messageRegistered = true;
 
+            WeakReferenceMessenger.Default.Register<ChangedMenuVisibilityMessage>(
+                _positionRecipient,
+                (_, m) =>
+                {
+                    SetVideoVisibility(!m.Value);
+                });
+
             WeakReferenceMessenger.Default.Register<ChangedVideoPositionMessage>(
                 _positionRecipient,
                 (_, m) =>
@@ -84,8 +115,15 @@ namespace LibVLCSharp.MAUI
                                 int w = Math.Max(1, (int)Math.Round(rect.Width * scale));
                                 int h = Math.Max(1, (int)Math.Round((rect.Top + rect.Height) * scale) - y);
 
-                                // HWND_TOP + no SWP_NOZORDER -> keep video on top of the XAML sibling.
-                                SetWindowPos(_videoHwnd, HWND_TOP, x, y, w, h, SWP_NOACTIVATE);
+                                if (_isVideoExplicitlyHidden)
+                                {
+                                    SetWindowPos(_videoHwnd, HWND_TOP, x, y, w, h, SWP_NOACTIVATE | SWP_HIDEWINDOW);
+                                }
+                                else
+                                {
+                                    // HWND_TOP + no SWP_NOZORDER -> keep video on top of the XAML sibling.
+                                    SetWindowPos(_videoHwnd, HWND_TOP, x, y, w, h, SWP_NOACTIVATE);
+                                }
 
                                 SubclassAllChildren(_videoHwnd);
                             }
@@ -442,6 +480,16 @@ namespace LibVLCSharp.MAUI
             }
             catch { return 0; }
         }
+
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_HIDE = 0;
+        private const int SW_SHOW = 5;
+        private const int SW_SHOWNA = 8;
+
+        private const uint SWP_HIDEWINDOW = 0x0080;
+        private const uint SWP_SHOWWINDOW = 0x0040;
 
         private static readonly IntPtr HWND_TOP = IntPtr.Zero;
         private const uint SWP_NOACTIVATE = 0x0010;

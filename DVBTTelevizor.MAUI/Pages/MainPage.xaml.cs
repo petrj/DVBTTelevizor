@@ -486,7 +486,7 @@ namespace DVBTTelevizor.MAUI
                             await ActionStop(false);
                             break;
                         case VideoGestureType.Click:
-                            VideoStackLayout_Tapped(this, new TappedEventArgs(null));
+                            MenuButton_Clicked(this, new EventArgs());
                             break;
                         case VideoGestureType.DoubleClick:
                             VideoStackLayout_DoubleTapped(this, new TappedEventArgs(null));
@@ -2762,6 +2762,8 @@ namespace DVBTTelevizor.MAUI
             } finally
             {
                 _menuShowEnabled = true;
+
+                WeakReferenceMessenger.Default.Send(new ChangedMenuVisibilityMessage(MainMenu.MenuVisible));
             }
         }
 
@@ -3791,6 +3793,7 @@ namespace DVBTTelevizor.MAUI
                     SettingsButton_Clicked(this, null);
                     break;
                 case "menuClose":
+                        WeakReferenceMessenger.Default.Send(new ChangedMenuVisibilityMessage(false));
                     break;
                 case "menuQuit":
                     WeakReferenceMessenger.Default.Send(new QuitAppMessage(null));
