@@ -1605,16 +1605,9 @@ namespace DVBTTelevizor.MAUI
                 {
                     case AppDriverTypeEnum.DVBT:
 
-
                         if (_configuration.TestingMode)
                         {
-                            WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
-                            {
-                                DeviceName = "Testing DVBT driver",
-                                ControlPort = 1234,
-                                TransferPort = 1235,
-                                PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
-                            }));
+                            WeakReferenceMessenger.Default.Send(new DVBTDriverTestConnectMessage(string.Empty));
                         }
                         else
                         {

@@ -17,6 +17,7 @@ namespace DVBTTelevizor.MAUI.WinUI
     public partial class App : MauiWinUIApplication
     {
         private ILoggingService _loggingService;
+        private TestDVBTDriver _testDVBTDriver = null;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -29,28 +30,28 @@ namespace DVBTTelevizor.MAUI.WinUI
 
             WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
             {
-                var testDVBTDriver = new TestDVBTDriver(_loggingService);
-                testDVBTDriver.PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath();
-                testDVBTDriver.Connect();
-
-                WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
-                    new DVBTDriverConfiguration()
-                    {
-                        DeviceName = "Testing device",
-                        ControlPort = testDVBTDriver.ControlIPEndPoint.Port,
-                        TransferPort = testDVBTDriver.TransferIPEndPoint.Port
-                    }));
-            });
-
-            WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
-            {
                 WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
                 {
-                    DeviceName = "Testing DVBT driver",
+                    DeviceName = "Testing Tune DVBT driver",
                     ControlPort = 1234,
                     TransferPort = 1235,
                     PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
                 }));
+            });
+
+            WeakReferenceMessenger.Default.Register<DVBTDriverConnectAndroidMessage>(this, (r, m) =>
+            {
+                _testDVBTDriver = new TestDVBTDriver(_loggingService);
+                _testDVBTDriver.PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath();
+                _testDVBTDriver.Connect();
+
+                WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(
+                    new DVBTDriverConfiguration()
+                    {
+                        DeviceName = "Testing DVBT driver",
+                        ControlPort = _testDVBTDriver.ControlIPEndPoint.Port,
+                        TransferPort = _testDVBTDriver.TransferIPEndPoint.Port
+                    }));
             });
 
             WeakReferenceMessenger.Default.Register<RemoteKeyPlatformActionMessage>(this, (r, m) =>
