@@ -261,6 +261,8 @@ namespace DVBTTelevizor
 
         private void SafeCloseClientsOnConnectFailure()
         {
+            _log.Debug("Closing clients after connect failure");
+
             try
             {
                 _controlStream?.Close();
@@ -411,6 +413,8 @@ namespace DVBTTelevizor
 
         public string StopRecording()
         {
+            _log.Debug("StopRecording");
+
             string rf = null;
             lock (_readThreadLock)
             {
@@ -1097,12 +1101,21 @@ namespace DVBTTelevizor
 
         private void SaveBuffer(string namePrefix, byte[] buffer)
         {
-            var fileName = Path.Combine(PublicDirectory, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
-            using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            _log.Debug($"Saving buffer {namePrefix} ({buffer.Length} bytes)");
+
+            try
             {
-                fs.Write(buffer, 0, buffer.Length);
-                fs.Flush();
-                fs.Close();
+                var fileName = Path.Combine(PublicDirectory, $"{namePrefix}.{DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss")}.dat");
+                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    fs.Write(buffer, 0, buffer.Length);
+                    fs.Flush();
+                    fs.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, $"Error saving buffer {namePrefix}");
             }
         }
 
@@ -1570,6 +1583,8 @@ namespace DVBTTelevizor
 
         public async Task<DVBTDriverTuneResult> WaitForSignal(bool fastTuning)
         {
+            _log.Debug($"Waiting for signal, fastTuning: {fastTuning}");
+
             var res = new DVBTDriverTuneResult() { Result = DVBTDriverSearchProgramResultEnum.NoSignal };
 
             // timeout for get signal:
