@@ -1768,11 +1768,21 @@ namespace DVBTTelevizor
 #if TestingDVBTDriver
                 var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(GetReadBufferData()), true);
                 MoveEIT(scanResult);
+                return scanResult;
 #else
-                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(GetReadBufferData()));
+                var data = GetReadBufferData();
+
+                if (data == null)
+                {
+                    return new EITScanResult()
+                    {
+                        OK = false
+                    };
+                }
+
+                return eitService.Scan(MPEGTransportStreamPacket.Parse(data));
 #endif
 
-                return scanResult;
             }
             catch (Exception ex)
             {
