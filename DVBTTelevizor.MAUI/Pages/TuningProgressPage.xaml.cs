@@ -73,14 +73,20 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         WeakReferenceMessenger.Default.Register<ChannelHasBeenAddedMessage>(this, (r, m) =>
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            try
             {
-                var lastChannel = _viewModel.Channels.Last();
-                if (lastChannel != null)
+                MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    ChannelsListView.ScrollTo(lastChannel, ScrollToPosition.MakeVisible, false);
-                }
-            });
+                    var lastChannel = _viewModel.Channels.Last();
+                    if (lastChannel != null)
+                    {
+                        ChannelsListView.ScrollTo(lastChannel, ScrollToPosition.MakeVisible, false);
+                    }
+                });
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         });
 
         WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>

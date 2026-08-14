@@ -102,7 +102,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return true;
+                return DriverStreamDataAvailable;
             }
         }
 

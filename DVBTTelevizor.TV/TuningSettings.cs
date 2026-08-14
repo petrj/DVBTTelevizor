@@ -41,6 +41,8 @@ namespace DVBTTelevizor
         public long DefaultBandwidthKHz { get; set; } = 8000;
         public long DefaultDABBandwidthKHz { get; set; } = 1712;
 
+        public bool LocationEnabled { get; set; } = false;
+
         public TuningSettings(ILoggingService loggingService)
         {
             _loggingService = loggingService;
@@ -66,7 +68,8 @@ namespace DVBTTelevizor
                  DefaultFrequencyMinKHz = DefaultFrequencyMinKHz,
                  DefaultFrequencyMaxKHz = DefaultFrequencyMaxKHz,
                  DeviceBandWidthMinKHz = DeviceBandWidthMinKHz,
-                 DeviceBandWidthMaxKHz = DeviceBandWidthMaxKHz
+                 DeviceBandWidthMaxKHz = DeviceBandWidthMaxKHz,
+                 LocationEnabled = LocationEnabled
             };
         }
 

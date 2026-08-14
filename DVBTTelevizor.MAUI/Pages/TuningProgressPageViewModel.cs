@@ -685,16 +685,19 @@ namespace DVBTTelevizor.MAUI
             ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
             ch.NonFree = !serviceDescriptor.Free;
 
-            // try to get geo position asynchronously (non-blocking for callers)
-            try
+            if (Settings.LocationEnabled)
             {
-                var geo = await DVBTTelevizor.MAUI.Services.GeoHelper.GetGeoPositionAsync();
-                ch.Position = geo.position;
-                ch.PositionDescription = geo.description;
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Debug($"GetGeoPositionAsync failed: {ex.Message}");
+                // try to get geo position asynchronously (non-blocking for callers)
+                try
+                {
+                    var geo = await DVBTTelevizor.MAUI.Services.GeoHelper.GetGeoPositionAsync();
+                    ch.Position = geo.position;
+                    ch.PositionDescription = geo.description;
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Debug($"GetGeoPositionAsync failed: {ex.Message}");
+                }
             }
 
             _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");

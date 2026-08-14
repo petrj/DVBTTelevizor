@@ -148,6 +148,21 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"TuningDriverPage OnTextSent {text}");
     }
+    private async Task<bool> RequestLocationPermissionAsync()
+    {
+        // Ensure permission requests always run on the Main UI thread
+        return await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+            }
+
+            return status == PermissionStatus.Granted;
+        });
+    }
 
     public async Task ShowPage<T>(AppDriverTypeEnum? driverType) where T : Page
     {
@@ -206,6 +221,8 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
                     break;
             }
         }
+
+        _tuningSettings.LocationEnabled = await RequestLocationPermissionAsync();
 
         var page = MainPage.GetOrCreatePage<T>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider);
 
