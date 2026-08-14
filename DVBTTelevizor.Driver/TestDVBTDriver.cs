@@ -369,7 +369,7 @@ namespace DVBTTelevizor
 
                                                 if (timeStamp.HasValue && timeStamp.Value != ulong.MinValue)
                                                 {
-                                                    _loggingService.Debug($"Timestamp: {timeStamp}");
+                                                    //_loggingService.Debug($"Timestamp: {timeStamp}");
 
                                                     if (firstPCRTimeStamp == ulong.MinValue)
                                                     {

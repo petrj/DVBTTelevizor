@@ -329,12 +329,9 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            if (!_driver.Connected)
+            if ((_driver != null) && (!_driver.Connected) && (!silent))
             {
-                if (!silent)
-                {
-                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Cannot scan EPG (device not connected)".Translated()));
-                }
+                WeakReferenceMessenger.Default.Send(new ToastMessage($"Cannot scan EPG (device not connected)".Translated()));
                 return;
             }
 
@@ -360,7 +357,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info("ScanEPGInternal");
 
-            if (_scanningEPG)
+            if ((_driver == null) || _scanningEPG)
             {
                 return;
             }
@@ -1085,6 +1082,11 @@ namespace DVBTTelevizor.MAUI
         private async Task ConnectDriver(DVBTDriverConfiguration config)
         {
             _loggingService.Info("Connecting device: " + config.DeviceName);
+
+            if (_driver == null)
+            {
+                return;
+            }
 
             try
             {

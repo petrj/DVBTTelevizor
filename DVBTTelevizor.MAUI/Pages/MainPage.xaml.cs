@@ -211,7 +211,7 @@ namespace DVBTTelevizor.MAUI
 
             _configuration.ConfigDirectory = PublicDirectory;
 
-            InitDriver();
+            //InitDriver();
 
             _iptv = new SledovaniTV.SledovaniTV(_loggingService);
             _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
@@ -530,7 +530,7 @@ namespace DVBTTelevizor.MAUI
 
         private async Task CheckStream()
         {
-            if (!_checkStreamEnabled || (PlayingState == PlayingStateEnum.Stopped))
+            if ((_driver == null) || (!_checkStreamEnabled) || (PlayingState == PlayingStateEnum.Stopped))
                 return;
 
             _loggingService.Debug($"CheckStream");
@@ -1584,10 +1584,9 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
-
                 if (_driver != null)
                 {
-                    if (_driver.Connected || _driver.State.HasFlag(DVBTDriverStateEnum.Connected))
+                    if (_driver.Connected)
                     {
                         await DisconnectDriver();
                         await Task.Delay(2000); // wait for driver to disconnect
@@ -2040,7 +2039,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Debug($"ActionStop (Force: {force}, PlayingState: {PlayingState})");
 
-            if (PlayingState == PlayingStateEnum.Stopped)
+            if ((_driver == null) || (PlayingState == PlayingStateEnum.Stopped))
                 return;
 
             // do not check _media or videoView.MediaPlayer.IsPlaying: in case of no signal is MediaPlayer stopped
@@ -2096,6 +2095,11 @@ namespace DVBTTelevizor.MAUI
         public async Task ActionRecord(Channel channel = null)
         {
             _loggingService.Debug($"ActionRecord");
+
+            if (_driver == null)
+            {
+                return;
+            }
 
             try
             {
@@ -2160,6 +2164,11 @@ namespace DVBTTelevizor.MAUI
         public async Task ActionStopRecord()
         {
             _loggingService.Debug($"ActionStopRecord");
+
+            if (_driver == null)
+            {
+                return;
+            }
 
             if (_viewModel.RecordingChannel == null)
                 return;
@@ -2278,6 +2287,11 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
+                if (_driver == null)
+                {
+                    return;
+                }
+
                 if (channel == null)
                 {
                     channel = _viewModel.SelectedChannel;

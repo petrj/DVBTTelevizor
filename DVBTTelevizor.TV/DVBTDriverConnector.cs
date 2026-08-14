@@ -312,26 +312,6 @@ namespace DVBTTelevizor
             _transferClient.Close();
         }
 
-        private void StartReadStream()
-        {
-            lock (_readThreadLock)
-            {
-                _log.Debug($"Starting read stream");
-
-                _readingStream = true;
-            }
-        }
-
-        private void StopReadStream()
-        {
-            lock (_readThreadLock)
-            {
-                _log.Debug($"Stopping read stream");
-
-                _readingStream = false;
-            }
-        }
-
         public void StartStream()
         {
             _log.Debug($"PlayStream");
@@ -465,7 +445,7 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                _log.Debug($"clearing buffer");
+                _log.Debug($"Clearing buffer");
 
                 _readBuffer.Clear();
             }
@@ -1765,11 +1745,6 @@ namespace DVBTTelevizor
 
                 var eitService = new EITService(_log);
 
-#if TestingDVBTDriver
-                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(GetReadBufferData()), true);
-                MoveEIT(scanResult);
-                return scanResult;
-#else
                 var data = GetReadBufferData();
 
                 if (data == null)
@@ -1780,8 +1755,13 @@ namespace DVBTTelevizor
                     };
                 }
 
-                return eitService.Scan(MPEGTransportStreamPacket.Parse(data));
+#if MoveEITTime
+                var scanResult = eitService.Scan(MPEGTransportStreamPacket.Parse(data), true);
+                MoveEIT(scanResult);
+                return scanResult;
+#else
 #endif
+                return eitService.Scan(MPEGTransportStreamPacket.Parse(data));
 
             }
             catch (Exception ex)
