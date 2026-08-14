@@ -102,6 +102,11 @@ namespace DVBTTelevizor.DBManager
 
         public async Task<EITScanResult> Scan(int msTimeout = 2000)
         {
+            if (_driver == null)
+            {
+                return new EITScanResult() {  OK = false };
+            }
+
             _log.Debug($"[EIT] Scanning freq {_driver.LastTunedFreq}");
 
             if (Scanning)

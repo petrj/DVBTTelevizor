@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -73,13 +72,17 @@ namespace DVBTTelevizor.MAUI
         private bool? _rtlsdrDriverInstalled = null;
         public bool MainLayoutVisible { get; set; } = true;
 
+        private IPublicDirectoryProvider _publicDirectoryProvider;
+
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
             _driver = driver;
 
-            EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
-            PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
+            _publicDirectoryProvider = publicDirectoryProvider;
+
+             EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
+             PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 
             _iptv = iptv;
 
@@ -190,6 +193,9 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 _driver = m.Value;
+
+                EIT.SetDriver(_driver);
+                PID.SetDriver(_driver);
 
                 NotifyChange();
             });
@@ -430,6 +436,10 @@ namespace DVBTTelevizor.MAUI
                         WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
             finally
             {

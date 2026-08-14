@@ -2,6 +2,7 @@
 using LibVLCSharp.Shared;
 using LoggerService;
 using MPEGTS;
+using Newtonsoft.Json.Bson;
 using SQLite;
 using System;
 using System.Collections.Concurrent;
@@ -29,12 +30,17 @@ namespace DVBTTelevizor.DBManager
         public DBManager(ILoggingService loggingService, IPublicDirectoryProvider publicDirectoryProvider, IDriverConnector driver)
         {
             _log = loggingService;
-            _driver = driver;
+            SetDriver(_driver);
             _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
             var saveDBsWorker = new BackgroundWorker();
             saveDBsWorker.DoWork += SaveWorker_DoWork;
             saveDBsWorker.RunWorkerAsync();
+        }
+
+        public void SetDriver(IDriverConnector? driver)
+        {
+            _driver = driver;
         }
 
         public virtual void AddItemsToDB(long freq, long programMapPID, List<T> items)
