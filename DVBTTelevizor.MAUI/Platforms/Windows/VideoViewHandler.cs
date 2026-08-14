@@ -1,8 +1,9 @@
-﻿using Microsoft.Maui.Handlers;
+using Microsoft.Maui.Handlers;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using WinRT.Interop;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI;
@@ -21,12 +22,22 @@ namespace LibVLCSharp.MAUI
         // Single embedded child HWND that VLC renders into.
         private static IntPtr _videoHwnd = IntPtr.Zero;
         private static IntPtr _parentHwnd = IntPtr.Zero;
-        // Keep the WndProc delegate rooted so the GC does not collect it.
+        // Keep delegates rooted so GC does not collect them.
         private static WndProc? _wndProcDelegate;
+        private static SubclassProc? _subclassProcDelegate;
         private static bool _classRegistered;
         private static bool _messageRegistered;
         // Static recipient prevents WeakReferenceMessenger from dropping the handler after GC.
         private static readonly object _positionRecipient = new object();
+
+        // Mouse gesture tracking
+        private static bool _isMouseDown;
+        private static POINT _mouseDownPos;
+        private static long _mouseDownTime;
+        private static bool _isDoubleClick;
+        private static System.Threading.Timer? _singleClickTimer;
+        private static readonly object _clickLock = new object();
+        private const int SwipeThreshold = 50; // pixels
 
         private const string ClassName = "DVBTTelevizorEmbeddedVLCClass";
 
@@ -75,6 +86,8 @@ namespace LibVLCSharp.MAUI
 
                                 // HWND_TOP + no SWP_NOZORDER -> keep video on top of the XAML sibling.
                                 SetWindowPos(_videoHwnd, HWND_TOP, x, y, w, h, SWP_NOACTIVATE);
+
+                                SubclassAllChildren(_videoHwnd);
                             }
                             catch (Exception ex)
                             {
@@ -107,7 +120,7 @@ namespace LibVLCSharp.MAUI
                     EnsureClassRegistered();
 
                     _videoHwnd = CreateWindowEx(
-                        WS_EX_TRANSPARENT,           // let the XAML sibling receive mouse input
+                        0,
                         ClassName,
                         string.Empty,
                         WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
@@ -125,7 +138,11 @@ namespace LibVLCSharp.MAUI
                     }
                 }
 
+                view.MediaPlayer.EnableMouseInput = false;
+                view.MediaPlayer.EnableKeyInput = false;
                 view.MediaPlayer.Hwnd = _videoHwnd;
+
+                SubclassAllChildren(_videoHwnd);
             }
             catch (Exception ex)
             {
@@ -140,17 +157,32 @@ namespace LibVLCSharp.MAUI
 
             _wndProcDelegate = static (hWnd, msg, wParam, lParam) =>
             {
-                // Make the child mouse-transparent so MAUI gesture recognizers still fire.
-                if (msg == WM_NCHITTEST)
-                    return (IntPtr)HTTRANSPARENT;
+                if (msg == WM_PARENTNOTIFY && ((uint)wParam.ToInt64() & 0xFFFF) == WM_CREATE)
+                {
+                    SubclassChildWindow(lParam);
+                }
+
+                ProcessMouseMessage(hWnd, msg, wParam, lParam);
 
                 return DefWindowProc(hWnd, msg, wParam, lParam);
+            };
+
+            _subclassProcDelegate = static (hWnd, uMsg, wParam, lParam, uIdSubclass, dwRefData) =>
+            {
+                ProcessMouseMessage(hWnd, uMsg, wParam, lParam);
+
+                if (uMsg == WM_NCDESTROY)
+                {
+                    RemoveWindowSubclass(hWnd, _subclassProcDelegate!, uIdSubclass);
+                }
+
+                return DefSubclassProc(hWnd, uMsg, wParam, lParam);
             };
 
             var wc = new WNDCLASSEX
             {
                 cbSize = (uint)Marshal.SizeOf(typeof(WNDCLASSEX)),
-                style = 0,
+                style = CS_DBLCLKS,
                 lpfnWndProc = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate),
                 cbClsExtra = 0,
                 cbWndExtra = 0,
@@ -174,6 +206,137 @@ namespace LibVLCSharp.MAUI
             _classRegistered = true;
         }
 
+        private static void SubclassChildWindow(IntPtr childHwnd)
+        {
+            if (childHwnd == IntPtr.Zero || _subclassProcDelegate == null)
+                return;
+
+            SetWindowSubclass(childHwnd, _subclassProcDelegate, (UIntPtr)1, UIntPtr.Zero);
+        }
+
+        private static void SubclassAllChildren(IntPtr parent)
+        {
+            if (parent == IntPtr.Zero)
+                return;
+
+            EnumChildWindows(parent, (childHwnd, _) =>
+            {
+                SubclassChildWindow(childHwnd);
+                return true;
+            }, IntPtr.Zero);
+        }
+
+        private static bool ProcessMouseMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
+        {
+            switch (msg)
+            {
+                case WM_LBUTTONDOWN:
+                    lock (_clickLock)
+                    {
+                        _isMouseDown = true;
+                        _isDoubleClick = false;
+                        GetCursorPos(out _mouseDownPos);
+                        _mouseDownTime = Environment.TickCount64;
+                        SetCapture(hWnd);
+                    }
+                    return true;
+
+                case WM_LBUTTONDBLCLK:
+                    lock (_clickLock)
+                    {
+                        _isDoubleClick = true;
+                        _isMouseDown = false;
+                        CancelSingleClickTimer();
+                        ReleaseCapture();
+                        DispatchGesture(VideoGestureType.DoubleClick);
+                    }
+                    return true;
+
+                case WM_LBUTTONUP:
+                    lock (_clickLock)
+                    {
+                        if (_isDoubleClick)
+                        {
+                            _isDoubleClick = false;
+                            _isMouseDown = false;
+                            ReleaseCapture();
+                            return true;
+                        }
+
+                        if (!_isMouseDown)
+                        {
+                            ReleaseCapture();
+                            return false;
+                        }
+
+                        _isMouseDown = false;
+                        ReleaseCapture();
+
+                        GetCursorPos(out POINT currentPos);
+                        int dx = currentPos.X - _mouseDownPos.X;
+                        int dy = currentPos.Y - _mouseDownPos.Y;
+                        long elapsed = Environment.TickCount64 - _mouseDownTime;
+
+                        // Check for horizontal swipe (at least 50px, mostly horizontal, within 1500ms)
+                        if (Math.Abs(dx) >= SwipeThreshold && Math.Abs(dx) > Math.Abs(dy) && elapsed < 1500)
+                        {
+                            CancelSingleClickTimer();
+                            if (dx < 0)
+                            {
+                                DispatchGesture(VideoGestureType.LeftSwipe);
+                            }
+                            else
+                            {
+                                DispatchGesture(VideoGestureType.RightSwipe);
+                            }
+                        }
+                        else if (Math.Abs(dx) < 20 && Math.Abs(dy) < 20)
+                        {
+                            // Single click candidate - delay to differentiate from double click
+                            CancelSingleClickTimer();
+                            int dblClickTime = (int)Math.Min(GetDoubleClickTime(), 300);
+                            _singleClickTimer = new System.Threading.Timer(_ =>
+                            {
+                                lock (_clickLock)
+                                {
+                                    _singleClickTimer?.Dispose();
+                                    _singleClickTimer = null;
+                                }
+                                DispatchGesture(VideoGestureType.Click);
+                            }, null, dblClickTime, Timeout.Infinite);
+                        }
+                    }
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static void CancelSingleClickTimer()
+        {
+            _singleClickTimer?.Dispose();
+            _singleClickTimer = null;
+        }
+
+        private static void DispatchGesture(VideoGestureType gesture)
+        {
+            try
+            {
+                WeakReferenceMessenger.Default.Send(new VideoGestureMessage(gesture));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error dispatching video gesture: {ex}");
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public struct WNDCLASSEX
         {
@@ -192,6 +355,8 @@ namespace LibVLCSharp.MAUI
         }
 
         public delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        public delegate IntPtr SubclassProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, UIntPtr uIdSubclass, UIntPtr dwRefData);
+        public delegate bool EnumChildProc(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern ushort RegisterClassEx([In] ref WNDCLASSEX lpwcx);
@@ -230,6 +395,41 @@ namespace LibVLCSharp.MAUI
         [DllImport("user32.dll")]
         private static extern uint GetDpiForWindow(IntPtr hwnd);
 
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetCapture(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        [DllImport("user32.dll")]
+        public static extern uint GetDoubleClickTime();
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumChildWindows(IntPtr hWndParent, EnumChildProc lpEnumFunc, IntPtr lParam);
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        public static extern bool SetWindowSubclass(
+            IntPtr hWnd,
+            SubclassProc pfnSubclass,
+            UIntPtr uIdSubclass,
+            UIntPtr dwRefData);
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        public static extern IntPtr DefSubclassProc(
+            IntPtr hWnd,
+            uint uMsg,
+            IntPtr wParam,
+            IntPtr lParam);
+
+        [DllImport("comctl32.dll", SetLastError = true)]
+        public static extern bool RemoveWindowSubclass(
+            IntPtr hWnd,
+            SubclassProc pfnSubclass,
+            UIntPtr uIdSubclass);
+
         // Returns the title-bar height in raw pixels; non-zero only when content is extended into the title bar.
         private static int GetTitleBarHeightPixels()
         {
@@ -250,9 +450,15 @@ namespace LibVLCSharp.MAUI
         private const uint WS_VISIBLE = 0x10000000;
         private const uint WS_CLIPSIBLINGS = 0x04000000;
 
-        private const int WS_EX_TRANSPARENT = 0x00000020;
+        private const uint CS_DBLCLKS = 0x0008;
 
-        private const uint WM_NCHITTEST = 0x0084;
-        private const int HTTRANSPARENT = -1;
+        private const uint WM_CREATE = 0x0001;
+        private const uint WM_NCDESTROY = 0x0082;
+        private const uint WM_PARENTNOTIFY = 0x0210;
+
+        private const uint WM_MOUSEMOVE = 0x0200;
+        private const uint WM_LBUTTONDOWN = 0x0201;
+        private const uint WM_LBUTTONUP = 0x0202;
+        private const uint WM_LBUTTONDBLCLK = 0x0203;
     }
 }

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -470,6 +470,29 @@ namespace DVBTTelevizor.MAUI
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
                 UpdateMenu();
+            });
+
+            WeakReferenceMessenger.Default.Register<VideoGestureMessage>(this, (r, m) =>
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _loggingService?.Debug($"VideoGestureMessage received: {m.Value}");
+                    switch (m.Value)
+                    {
+                        case VideoGestureType.LeftSwipe:
+                            await ActionStop(true);
+                            break;
+                        case VideoGestureType.RightSwipe:
+                            await ActionStop(false);
+                            break;
+                        case VideoGestureType.Click:
+                            VideoStackLayout_Tapped(this, new TappedEventArgs(null));
+                            break;
+                        case VideoGestureType.DoubleClick:
+                            VideoStackLayout_DoubleTapped(this, new TappedEventArgs(null));
+                            break;
+                    }
+                });
             });
         }
 
