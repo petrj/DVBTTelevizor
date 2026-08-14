@@ -683,8 +683,14 @@ namespace DVBTTelevizor
                             }
                             if (readingBuffer)
                             {
-                                for (var i = 0; i < bytesRead; i++)
-                                    _readBuffer.Add(buffer[i]);
+                                lock (_readThreadLock)
+                                {
+                                    if (_readingBuffer)
+                                    {
+                                        for (var i = 0; i < bytesRead; i++)
+                                            _readBuffer.Add(buffer[i]);
+                                    }
+                                }
                             }
                             if (streaming)
                             {
@@ -1765,6 +1771,7 @@ namespace DVBTTelevizor
             finally
             {
                 ClearReadBuffer();
+                StopReadBuffer();
             }
         }
 
