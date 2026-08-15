@@ -26,7 +26,7 @@
 
 	<meta-data android:name="com.google.android.play.billingclient.version" android:value="10.0.0" />
 
-	<!--uses-feature android:name="android.software.leanback" android:required="true" />
-	<uses-feature android:name="android.hardware.touchscreen" android:required="false" /-->
+	<uses-feature android:name="android.software.leanback" android:required="true" />
+	<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
 </manifest>
