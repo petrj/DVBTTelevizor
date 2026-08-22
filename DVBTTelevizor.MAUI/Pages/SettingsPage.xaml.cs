@@ -51,6 +51,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         PlayOnBackgroundSwitch.Toggled += PlayOnBackgroundSwitch_Toggled;
         FullscreenSwitch.Toggled += FullscreenSwitch_Toggled;
         RemoteSDRSwitch.Toggled += RemoteSDRSwitch_Toggled;
+        RemoteVLCSwitch.Toggled += RemoteVLCSwitch_Toggled;
 
         BuildFocusableItems();
 
@@ -78,6 +79,15 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                 await ProcessCheckBatterySettingsResult(m.Value);
             });
         });
+    }
+
+    private void RemoteVLCSwitch_Toggled(object? sender, ToggledEventArgs e)
+    {
+        if (RemoteVLCSwitch.IsToggled)
+        {
+            BuildInfoMenu("Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****".Translated(), "OK".Translated());
+        }
+
     }
 
     private void RemoteSDRSwitch_Toggled(object? sender, ToggledEventArgs e)
@@ -156,6 +166,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDR", new List<View>() { RemoteSDRBoxView, RemoteSDRSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDRIP", new List<View>() { RemoteSDRIPBoxView, RemoteSDRIPEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("RemoteSDRPort", new List<View>() { RemoteSDRPortBoxView, RemoteSDRportEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteVLC", new List<View>() { RemoteVLCBoxView, RemoteVLCSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteVLCIP", new List<View>() { RemoteVLCIPBoxView, RemoteVLCIPEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteVLCPort", new List<View>() { RemoteVLCPortBoxView, RemoteVLCportEntry }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("RemoteVLCPassword", new List<View>() { RemoteVLCPasswordBoxView, RemoteVLCPasswordEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("UDPIPLogging", new List<View>() { UDPIPLoggingBoxView, UDPIPEntry }))
 
@@ -769,6 +784,18 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                             break;
                         case "RemoteSDRport":
                             RemoteSDRportEntry.Focus();
+                            break;
+                        case "RemoteVLC":
+                            RemoteVLCSwitch.IsToggled = !RemoteVLCSwitch.IsToggled;
+                            break;
+                        case "RemoteVLCIP":
+                            RemoteVLCIPEntry.Focus();
+                            break;
+                        case "RemoteVLCPort":
+                            RemoteVLCportEntry.Focus();
+                            break;
+                        case "RemoteVLCPassword":
+                            RemoteVLCPasswordEntry.Focus();
                             break;
 
                     }

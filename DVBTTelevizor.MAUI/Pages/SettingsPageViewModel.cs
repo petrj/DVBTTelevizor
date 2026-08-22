@@ -538,6 +538,20 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public bool AllowRemoteVLC
+        {
+            get
+            {
+                return _configuration.AllowRemoteVLC;
+            }
+            set
+            {
+                _configuration.AllowRemoteVLC = value;
+
+                OnPropertyChanged(nameof(AllowRemoteVLC));
+            }
+        }
+
 
     }
 }

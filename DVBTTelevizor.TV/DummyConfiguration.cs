@@ -73,6 +73,14 @@ namespace DVBTTelevizor.TV
 
         public int RemoteSDRPort { get; set; } = 1234;
 
+        public bool AllowRemoteVLC { get; set; } = false;
+
+        public string RemoteVLCIP { get; set; } = "127.0.0.1";
+
+        public int RemoteVLCPort { get; set; } = 1234;
+
+        public string RemoteVLCPassword { get; set; } = "123";
+
         public ObservableCollection<Channel> GetChannels()
         {
             return new ObservableCollection<Channel>();
@@ -129,6 +137,11 @@ namespace DVBTTelevizor.TV
             configuration.AllowRemoteSDR = AllowRemoteSDR;
             configuration.RemoteSDRIP = RemoteSDRIP;
             configuration.RemoteSDRPort = RemoteSDRPort;
+
+            configuration.AllowRemoteVLC = AllowRemoteVLC;
+            configuration.RemoteVLCIP = RemoteVLCIP;
+            configuration.RemoteVLCPort = RemoteVLCPort;
+            configuration.RemoteVLCPassword = RemoteVLCPassword;
         }
     }
 }

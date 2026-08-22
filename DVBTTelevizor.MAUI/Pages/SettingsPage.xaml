@@ -478,7 +478,59 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
 
-                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutSledovaniTV">
+                <StackLayout Margin="0,10,0,10" x:Name="StackLayoutRemoteVLC">
+
+                    <Label Text="{local:LngXamlExt Input='Remote VLC'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                    <Grid Margin="30,10,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="RemoteVLCBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                    <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='Allow remote VLC'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <BoxView Grid.Row="0" Grid.Column="1" Style="{StaticResource BoxViewStyle}"/>
+                    <Switch Grid.Row="0" Grid.Column="1" x:Name="RemoteVLCSwitch"  IsToggled="{Binding AllowRemoteVLC, Mode=TwoWay}"  Style="{StaticResource CommonSwitchTextStyle}"/>
+                </Grid>
+
+                <Grid Margin="60,10,10,0" IsVisible="{Binding AllowRemoteVLC}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+
+                    <BoxView x:Name="RemoteVLCIPBoxView" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                    <Label  Grid.Row="0" Grid.Column="0" Text="{local:LngXamlExt Input='IP'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="RemoteVLCIPEntry"  Text="{Binding Config.RemoteVLCIP, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}"/>
+
+                    <BoxView x:Name="RemoteVLCPortBoxView" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                    <Label  Grid.Row="1" Grid.Column="0" Text="{local:LngXamlExt Input='Port'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Entry Grid.Row="1" Grid.Column="1" x:Name="RemoteVLCportEntry"  Text="{Binding Config.RemoteVLCPort, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}" Keyboard="Numeric"/>
+
+                    <BoxView x:Name="RemoteVLCPasswordBoxView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Transparent" Margin="-5,-5,-5,-5"/>
+
+                    <Label  Grid.Row="2" Grid.Column="0" Text="{local:LngXamlExt Input='Password'}" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                    <Entry Grid.Row="2" Grid.Column="1" x:Name="RemoteVLCPasswordEntry"  Text="{Binding Config.RemoteVLCPassword, Mode=TwoWay}"  Style="{StaticResource EntryStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                </Grid>
+
+            </StackLayout>
+
+            <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" ></BoxView>
+
+            <StackLayout Margin="0,10,0,10" x:Name="StackLayoutSledovaniTV">
                     <Label Text="{local:LngXamlExt Input='SledovaniTV'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}"/>
 
                     <Label Text="{local:LngXamlExt Input='SledovaniTV is czech IPTV. You must have an existing account and you must be connected to Internet'}" Style="{DynamicResource DetailLabelStyle}" FontSize="{Binding FontSizeForLabel}"/>
