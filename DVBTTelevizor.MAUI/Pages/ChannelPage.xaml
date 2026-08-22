@@ -157,6 +157,9 @@
 
                 <BoxView Style="{DynamicResource SeparatorBoxViewStyle}" x:Name="MapPIDBoxView"></BoxView>
 
+                <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='DVB ID'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
+                <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramNumber}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
+
                 <Label Margin="10,0,10,0" Text="{local:LngXamlExt Input='Map PID'}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForCaption}" />
                 <Label Margin="10,0,10,10" Text="{Binding Channel.ProgramMapPID}" HorizontalOptions="End" VerticalTextAlignment="End" Style="{DynamicResource LabelStyle}" FontSize="{Binding FontSizeForLabel}"  />
 

@@ -677,6 +677,7 @@ namespace DVBTTelevizor.MAUI
             var ch = new Channel();
             ch.ProgramMapPID = MapPID;
             ch.Name = serviceDescriptor.ServiceName;
+            ch.ProgramNumber = serviceDescriptor.ProgramNumber;
             ch.ProviderName = serviceDescriptor.ProviderName;
             ch.Frequency = frequency;
             ch.Bandwdith = bandWidth;
@@ -720,7 +721,8 @@ namespace DVBTTelevizor.MAUI
                             Type = (ServiceTypeEnum)serviceDescriptor.ServisType,
                             NonFree = !serviceDescriptor.Free,
                             Position = ch.Position,
-                            PositionDescription = ch.PositionDescription
+                            PositionDescription = ch.PositionDescription,
+                            ProgramNumber = ch.ProgramNumber
                         }
                     });
                 });

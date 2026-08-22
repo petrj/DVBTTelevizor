@@ -27,6 +27,7 @@ namespace DVBTTelevizor
 
         public long Frequency { get; set; }
         public long ProgramMapPID { get; set; }
+        public long ProgramNumber { get; set; }
         public ServiceTypeEnum Type { get; set; } = ServiceTypeEnum.Other;
         public EventItem? CurrentEventItem { get; set; } = null;
         public EventItem? NextEventItem { get; set; } = null;
@@ -532,6 +533,7 @@ namespace DVBTTelevizor
             channel.Bandwdith = Bandwdith;
             channel.Number = Number;
             channel.NonFree = NonFree;
+            channel.ProgramNumber = ProgramNumber;
 
             channel.AudioTracks = new Dictionary<int, string>();
             foreach (var track in AudioTracks)
