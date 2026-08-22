@@ -810,7 +810,14 @@ namespace DVBTTelevizor.MAUI
                     }
                     else
                     {
-                        _driver = new DVBTDriverConnector(_loggingService);
+                        if (_configuration.AllowRemoteVLC)
+                        {
+                            _driver = new RemoteVLCDriverConnector(_loggingService, _configuration.RemoteVLCIP, _configuration.RemoteVLCPort, _configuration.RemoteVLCPassword);
+                        }
+                        else
+                        {
+                            _driver = new DVBTDriverConnector(_loggingService);
+                        }
                     }
                     break;
                 case AppDriverTypeEnum.FM:
