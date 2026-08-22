@@ -1,14 +1,20 @@
 ﻿using LoggerService;
 using MPEGTS;
+using RTLSDR;
 using RTLSDR.Common;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 
 namespace DVBTTelevizor.TV
 {
     public class RemoteVLCDriverConnector : IDriverConnector
     {
+        public int ConnectTimeoutSeconds { get; set; } = 5;
+
         private DVBTDriverConfiguration _driverConfiguration;
         private ILoggingService _log;
         private UDPStreamer _UDPStreamer;
@@ -19,10 +25,14 @@ namespace DVBTTelevizor.TV
         private bool _streaming = false;
         private bool _recording = false;
         private bool _readingBuffer = false;
+        private string? _recordingFileName = null;
         private string _dataStreamInfo = "Data reading not initialized";
         private string _IP = "127.0.0.1";
         private int _port = 1234;
         private string _password = "1234";
+        private readonly HttpClient _httpClient;
+        private long _bitrate = 0;
+        private bool _driverStreamDataAvailable = false;
 
 
         public event EventHandler? OnRawAudioDemodulated;
@@ -43,6 +53,16 @@ namespace DVBTTelevizor.TV
 
             _UDPStreamer = new UDPStreamer(_log);
             _driverConfiguration = new DVBTDriverConfiguration();
+
+            _httpClient = new HttpClient
+            {
+                BaseAddress = new Uri($"http://{_IP}:{_port}/"),
+                Timeout = TimeSpan.FromSeconds(ConnectTimeoutSeconds)
+            };
+
+            // VLC vyžaduje prázdné uživatelské jméno a heslo u Basic Auth
+            string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($":{password}"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
         }
 
 
@@ -57,7 +77,13 @@ namespace DVBTTelevizor.TV
         public DVBTDriverStateEnum State { get; private set; } = DVBTDriverStateEnum.Unknown;
 
 
-        public bool Connected => throw new NotImplementedException();
+        public bool Connected
+        {
+            get
+            {
+                return State.HasFlag(DVBTDriverStateEnum.Connected);
+            }
+        }
 
         public DriverStreamTypeEnum DVBTDriverStreamType
         {
@@ -137,7 +163,16 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public string RecordFileName => throw new NotImplementedException();
+        public string RecordFileName
+        {
+            get
+            {
+                lock (_readThreadLock)
+                {
+                    return _recordingFileName;
+                }
+            }
+        }
 
         public string PublicDirectory { get; set; } = "";
 
@@ -159,7 +194,13 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public long Bitrate => throw new NotImplementedException();
+        public long Bitrate
+        {
+            get
+            {
+                return _bitrate;
+            }
+        }
 
         public long LastTunedFreq
         {
@@ -169,8 +210,13 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        public bool DriverStreamDataAvailable => throw new NotImplementedException();
-
+        public bool DriverStreamDataAvailable
+        {
+            get
+            {
+                return _driverStreamDataAvailable;
+            }
+        }
 
         public DVBTDriverConfiguration Configuration
         {
@@ -191,17 +237,57 @@ namespace DVBTTelevizor.TV
 
         public Task<bool> CheckStatus()
         {
-            throw new NotImplementedException();
+            return Task.Run(async () =>
+            {
+                var state = await GetStatus();
+                return state.SuccessFlag == true;
+            });
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+
         }
 
         public void Connect()
         {
-            throw new NotImplementedException();
+            Connect(ConnectTimeoutSeconds);
+        }
+
+        public void Connect(int timeoutSeconds)
+        {
+            _log.Debug($"Connecting (timeout: {timeoutSeconds}s)");
+
+            if (State == DVBTDriverStateEnum.Connected)
+            {
+                _log.Debug($"Already connected");
+                //return;
+            }
+
+            State = DVBTDriverStateEnum.Connecting;
+
+            // Run the (potentially blocking) TCP connect on a background thread
+            // and enforce a timeout so we never get stuck in the Connecting state.
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var state = await GetStatus();
+
+                    if (state == null || !state.SuccessFlag)
+                    {
+                        State = DVBTDriverStateEnum.Disconnected;
+                    } else
+                    {
+                        State = DVBTDriverStateEnum.Connected;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Error(ex, "Error connecting remote VLC");
+                    State = DVBTDriverStateEnum.Disconnected;
+                }
+            });
         }
 
         public Task Disconnect()
@@ -214,19 +300,67 @@ namespace DVBTTelevizor.TV
             throw new NotImplementedException();
         }
 
-        public Task<DVBTDriverCapabilities> GetCapabalities()
+        public async Task<DVBTDriverCapabilities> GetCapabalities()
         {
-            throw new NotImplementedException();
+            return new DVBTDriverCapabilities()
+            {
+                SuccessFlag = true,
+
+                supportedDeliverySystems = 3,
+                minFrequency = 474000000,
+                maxFrequency = 714000000,
+                frequencyStepSize = 8,
+                vendorId = 0,
+                productId = 0
+            };
         }
 
-        public Task<DVBTDriverStatus> GetStatus()
+        public async Task<string?> SendRequestAsync(string endpoint)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.GetAsync(endpoint);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var resp = await response.Content.ReadAsStringAsync();
+                _log.Debug(resp);
+                return resp;
+            }
+
+            return null;
+        }
+
+        public async Task<DVBTDriverStatus> GetStatus()
+        {
+            var res = new DVBTDriverStatus();
+
+            try
+            {
+                string? result = await SendRequestAsync("requests/status.xml");
+
+                if (result != null)
+                {
+                    res.SuccessFlag = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                res.SuccessFlag = false;
+            }
+
+            return res;
         }
 
         public Task<DVBTDriverVersion> GetVersion()
         {
-            throw new NotImplementedException();
+            return Task.Run(() =>
+            {
+                return new DVBTDriverVersion()
+                {
+                    SuccessFlag = true,
+                    Version = 1
+                };
+            });
         }
 
         public Task<EITScanResult> ScanEPG(int msTimeout = 2000)
@@ -251,17 +385,28 @@ namespace DVBTTelevizor.TV
 
         public Task SetGain(GainEnum gain, int value = 0)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task<DVBTDriverResponse> SetPIDs(List<long> PIDs)
         {
-            throw new NotImplementedException();
+            return Task.Run(() => {
+                return new DVBTDriverResponse()
+                {
+                    SuccessFlag = true
+                };
+            });
         }
 
         public Task<DVBTDriverSearchPIDsResult> SetupChannelPIDs(long mapPID, bool fastTuning)
         {
-            throw new NotImplementedException();
+            return Task.Run(() => {
+                return new DVBTDriverSearchPIDsResult()
+                {
+                    PIDs = new List<long>() { mapPID },
+                    Result = DVBTDriverSearchProgramResultEnum.OK
+                };
+            });
         }
 
         public void StartRecording(string path)

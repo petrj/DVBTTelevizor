@@ -1618,7 +1618,20 @@ namespace DVBTTelevizor.MAUI
                         }
                         else
                         {
-                            WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
+                            if (_configuration.AllowRemoteVLC)
+                            {
+                                WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                                {
+                                    DeviceName = "Remote VLC driver",
+                                    ControlPort = 1234,
+                                    TransferPort = 1235,
+                                    PublicDirectory = new PublicDirectoryProvider().GetPublicDirectoryPath()
+                                }));
+                            }
+                            else
+                            {
+                                WeakReferenceMessenger.Default.Send(new DVBTDriverConnectAndroidMessage("Connect"));
+                            }
                         }
                         break;
 
