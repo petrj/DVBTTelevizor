@@ -32,8 +32,8 @@ Function Send-TCPMessage
             $bytes = [System.Array]::CreateInstance([byte],$BufferSize)
             $ipAddress = [System.Net.IPAddress]::Parse($IP)
 
-            $remoteEndPoint = New-Object System.Net.IPEndPoint($ipAddress, $Port);            
-            
+            $remoteEndPoint = New-Object System.Net.IPEndPoint($ipAddress, $Port);
+
             $sender = New-Object System.Net.Sockets.Socket($ipAddress.AddressFamily, [System.Net.Sockets.SocketType]::Stream, [System.Net.Sockets.ProtocolType]::Tcp)
 
          # connect and send data
@@ -41,7 +41,7 @@ Function Send-TCPMessage
             $sender.Connect($remoteEndPoint)
 
             $senderIP =  $sender.RemoteEndPoint.Address.ToString()
-            
+
             $bytesSent = $sender.Send( [System.Text.encoding]::ASCII.GetBytes($Message));
             $bytesSent += $sender.Send( [System.Text.encoding]::ASCII.GetBytes($TerminateString));
 
@@ -58,14 +58,14 @@ Function Send-TCPMessage
                 {
                     break;
                 }
-            }    
+            }
 
             $responseMessage = $data.Substring(0, $data.Length - $TerminateString.Length);
 
             $sender.Shutdown([System.Net.Sockets.SocketShutdown]::Both);
             $sender.Close();
 
-            return $responseMessage;            
+            return $responseMessage;
 
         } catch
         {
@@ -213,7 +213,7 @@ $msg = @"
 Add-Type -AssemblyName System.Windows.Forms
 
 
-function Get-KeyDownMessage 
+function Get-KeyDownMessage
 {
     [CmdletBinding()]
     param(
@@ -229,7 +229,7 @@ function Get-KeyDownMessage
             [ValidateNotNullOrEmpty()]
             [string]$Sender= "Powershell ISE"
         )
-    
+
     Process {
 
 $msgTemplate = @"
@@ -259,7 +259,7 @@ function Show-GUI {
             [ValidateNotNullOrEmpty()]
             [string]$Port
     )
-    
+
     Process {
 
         # for key codes use Android.Views.Keycode enum
@@ -275,7 +275,7 @@ function Show-GUI {
         $btnLeft.Text = "Left"
         $btnLeft.Location = New-Object System.Drawing.Point(20, 100)
         $btnLeft.Add_Click(
-        { 
+        {
             Get-KeyDownMessage -keyCode "DpadLeft" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
@@ -283,16 +283,16 @@ function Show-GUI {
         $btnRight.Text = "Right"
         $btnRight.Location = New-Object System.Drawing.Point(220, 100)
         $btnRight.Add_Click(
-        { 
-         
-            Get-KeyDownMessage -keyCode "DpadRight" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP        
+        {
+
+            Get-KeyDownMessage -keyCode "DpadRight" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
         $btnUp = New-Object System.Windows.Forms.Button
         $btnUp.Text = "Up"
         $btnUp.Location = New-Object System.Drawing.Point(120, 50)
         $btnUp.Add_Click(
-        { 
+        {
             Get-KeyDownMessage -keyCode "DpadUp" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
@@ -300,7 +300,7 @@ function Show-GUI {
         $btnDown.Text = "Down"
         $btnDown.Location = New-Object System.Drawing.Point(120, 150)
         $btnDown.Add_Click(
-        { 
+        {
             Get-KeyDownMessage -keyCode "DpadDown" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
@@ -308,7 +308,7 @@ function Show-GUI {
         $okDown.Text = "OK"
         $okDown.Location = New-Object System.Drawing.Point(120, 100)
         $okDown.Add_Click(
-        { 
+        {
             Get-KeyDownMessage -keyCode "DpadCenter" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
@@ -316,19 +316,19 @@ function Show-GUI {
         $backDown.Text = "Back"
         $backDown.Location = New-Object System.Drawing.Point(20, 20)
         $backDown.Add_Click(
-        { 
+        {
             Get-KeyDownMessage -keyCode "Escape" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
-        
+
         $posx = 350
         $posy = 50
         for ($i=1;$i -le 9;$i++)
         {
             $numDown = New-Object System.Windows.Forms.Button
-            $numDown.Text = $i.ToString()            
+            $numDown.Text = $i.ToString()
             $numDown.Location = New-Object System.Drawing.Point($posx, $posy)
             $numDown.Add_Click(
-            { 
+            {
                 Get-KeyDownMessage -keyCode ("Num" + $this.Text) -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
             })
 
@@ -343,10 +343,10 @@ function Show-GUI {
         }
 
         $num0 = New-Object System.Windows.Forms.Button
-        $num0.Text = "0"           
+        $num0.Text = "0"
         $num0.Location = New-Object System.Drawing.Point(430, 200)
         $num0.Add_Click(
-        { 
+        {
             Get-KeyDownMessage -keyCode "Num0" -SecurityKey $SecurityKey | Encrypt-Message  -Key $SecurityKey | Send-TCPMessage -Port $Port -IP $IP
         })
 
@@ -369,8 +369,8 @@ function Show-GUI {
 
 if ([String]::IsNullOrWhiteSpace($IP))
 {
-    $IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object IPAddress  | Select-Object IPAddress -ExpandProperty IPAddress
-    Write-host ("Detected IP:" + $IP) 
+    $IP = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.InterfaceAlias -notlike "Loopback*" -and $_.IPAddress.StartsWith("10.") } | Select-Object -ExpandProperty IPAddress -First 1
+    Write-host ("Detected IP:" + $IP)
 }
 
 

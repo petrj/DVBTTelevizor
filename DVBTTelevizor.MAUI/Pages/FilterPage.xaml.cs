@@ -214,6 +214,12 @@ public partial class FilterPage : ContentPage, IOnKeyDown
 
     public void OnKeyBoardMultiplexToggled()
     {
-        _filterPageViewModel.UpdateFilter();
+        var selMultiplex = _filterPageViewModel.GetSelectedMultiplex();
+        if (selMultiplex != null)
+        {
+            selMultiplex.IsEnabled = !selMultiplex.IsEnabled;
+            selMultiplex.NotifyChanges();
+            _filterPageViewModel.UpdateFilter();
+        }
     }
 }
