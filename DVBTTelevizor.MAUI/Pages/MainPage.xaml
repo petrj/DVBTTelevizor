@@ -400,7 +400,8 @@
         </Image>
 
 
-         <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.55,0.75,0.15" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="QuickTuneButton" IsVisible="{Binding TuneChannelsButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.55,0.75,0.15" Text="{local:LngXamlExt Input='Tune'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="TuneButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
+        <Button x:Name="FilterButton" IsVisible="{Binding FilterButtonButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.55,0.75,0.15" Text="{local:LngXamlExt Input='Filter'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="FilterButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
 
         <Button x:Name="DVBTDriverButton" IsVisible="{Binding InstallDVBTDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.75,0.75,0.15" Text="{local:LngXamlExt Input='Install DVBT driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="DVBTDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />
         <Button x:Name="FMDABDriverButton" IsVisible="{Binding InstallFMDABDriverButtonVisible}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0.5,0.95,0.75,0.15" Text="{local:LngXamlExt Input='Install FM/DAB driver'}" Style="{DynamicResource ButtonStyle}" BackgroundColor="Gray" Clicked="FMDABDriverButton_Clicked" FontSize="{Binding FontSizeForCaption}" />

@@ -48,6 +48,7 @@ namespace DVBTTelevizor.MAUI
         private bool _scanningEPG = false;
 
         private bool _refreshing = false;
+        private bool? _anyChannelExist = null;
         private bool _refreshed = false;
 
         private bool _doNotAutomaticallyShowEPGDetail = false;
@@ -568,7 +569,9 @@ namespace DVBTTelevizor.MAUI
 
                 var channels = _configuration.GetChannels();
 
-                _loggingService.Debug($"Clearing channels");
+                _anyChannelExist = channels.Count > 0;
+
+                //_loggingService.Debug($"Clearing channels");
 
                 var channelsToAdd = new ObservableCollection<Channel>();
 
@@ -874,7 +877,25 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                if (NotRefreshed || (Channels.Count > 0))
+                if (NotRefreshed || (!AnyChannelExist.HasValue) || (AnyChannelExist.Value))
+                {
+                    return false;
+                }
+
+                return (DvbtDriverInstalled.HasValue && DvbtDriverInstalled.Value)
+                        ||
+                        (RtlsdrDriverInstalled.HasValue && RtlsdrDriverInstalled.Value);
+            }
+        }
+
+        public bool FilterButtonButtonVisible
+        {
+            get
+            {
+                if (NotRefreshed ||
+                   (!AnyChannelExist.HasValue) ||
+                   (!AnyChannelExist.Value) ||
+                   Channels.Count>0)
                 {
                     return false;
                 }
@@ -1028,6 +1049,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(RecordingLabel));
             OnPropertyChanged(nameof(ChannelsListViewVisible));
             OnPropertyChanged(nameof(TuneChannelsButtonVisible));
+            OnPropertyChanged(nameof(FilterButtonButtonVisible));
             OnPropertyChanged(nameof(ChannelIcon));
             OnPropertyChanged(nameof(PlayingChannel));
             OnPropertyChanged(nameof(Channels));
@@ -1469,6 +1491,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     OnPropertyChanged(nameof(IsRefreshing));
                     OnPropertyChanged(nameof(Refreshed));
+                    OnPropertyChanged(nameof(FilterButtonButtonVisible));
                     OnPropertyChanged(nameof(NotRefreshed));
                     OnPropertyChanged(nameof(TuneChannelsButtonVisible));
                     OnPropertyChanged(nameof(InstallDVBTDriverButtonVisible));
@@ -1618,6 +1641,13 @@ namespace DVBTTelevizor.MAUI
         {
             get => _doNotAutomaticallyShowEPGDetail;
             set => _doNotAutomaticallyShowEPGDetail = value;
+        }
+        public bool? AnyChannelExist
+        {
+            get
+            {
+                return _anyChannelExist;
+            }
         }
 
         public void SledovaniTVStartRecording()

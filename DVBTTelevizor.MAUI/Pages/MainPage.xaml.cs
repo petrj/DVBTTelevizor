@@ -1100,6 +1100,7 @@ namespace DVBTTelevizor.MAUI
                 .AddItem(KeyboardFocusableItem.CreateFrom("EPGDetailGrid", new List<View>() { EPGDetailGrid }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("DriverStateButton", new List<View>() { DriverStateButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("TuneButton", new List<View>() { TuneButton }))
+                .AddItem(KeyboardFocusableItem.CreateFrom("FilterButton", new List<View>() { FilterButton }))
                 .AddItem(KeyboardFocusableItem.CreateFrom("MenuButton", new List<View>() { MenuButton }));
 
             _focusItems.OnItemFocusedEvent += _focusItems_OnItemFocusedEvent;
@@ -1736,7 +1737,12 @@ namespace DVBTTelevizor.MAUI
 
         private async void TuneButton_Clicked(object sender, EventArgs e)
         {
-            ShowPage<TuningDriverPage>();
+            await ShowPage<TuningDriverPage>();
+        }
+
+        private async void FilterButton_Clicked(object sender, EventArgs e)
+        {
+            await ShowPage<FilterPage>();
         }
 
         private void DriverButton_Clicked(object sender, EventArgs e)
@@ -1802,6 +1808,13 @@ namespace DVBTTelevizor.MAUI
                         TuneButton_Clicked(this, new EventArgs());
                     });
                     break;
+                case "FilterButton":
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        FilterButton_Clicked(this, new EventArgs());
+                    });
+                    break;
+
                 case "DVBTTelevizorButton":
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
@@ -4018,7 +4031,8 @@ namespace DVBTTelevizor.MAUI
 
             if (
                     (_viewModel.PlayingState != PlayingStateEnum.Playing) &&
-                    (_viewModel.Channels.Count > 0)
+                    (_viewModel.AnyChannelExist.HasValue &&
+                    _viewModel.AnyChannelExist.Value)
                 )
             {
                 _menuItems.Add(MainMenu.CreateMenuItem("menuFilter", "Filter".Translated(), "filter.png"));
