@@ -1,3 +1,4 @@
+using DVBTTelevizor.MAUI;
 using LoggerService;
 using MPEGTS;
 using NLog.Targets;
@@ -5,16 +6,22 @@ using RTLSDR;
 using RTLSDR.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DVBTTelevizor.TV
 {
     public class RemoteVLCDriverConnector : IDriverConnector
     {
         public int ConnectTimeoutSeconds { get; set; } = 5;
+        public int ReceiveTimeoutMiliSeconds { get; set; } = 5000;
+        public int ReadBufferSize { get; set; } = 32768;
 
         private DVBTDriverConfiguration _driverConfiguration;
         private ILoggingService _log;
@@ -29,12 +36,17 @@ namespace DVBTTelevizor.TV
         private string? _recordingFileName = null;
         private string _dataStreamInfo = "Data reading not initialized";
         private string _IP = "127.0.0.1";
-        private int _port = 1234;
+        private int _port = 8080;
         private string _password = "1234";
+
+        List<byte> _readBuffer = new List<byte>();
+
+        // VLC http communication
         private readonly HttpClient _httpClient;
+
         private long _bitrate = 0;
         private bool _driverStreamDataAvailable = false;
-
+        private string _recordDirectory = "";
 
         public event EventHandler? OnRawAudioDemodulated;
         public event EventHandler? OnServiceFound;
@@ -65,6 +77,179 @@ namespace DVBTTelevizor.TV
             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($":{password}"));
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
         }
+
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _log.Debug("Starting DVBT reader thread");
+
+            var totalBytesRead = 0;
+            _bitrate = 0;
+            string? _lastSpeedCalculationSec = null;
+
+            try
+            {
+                DataStreamInfo = "";
+
+                FileStream recordFileStream = null;
+                long bytesReadFromLastMeasureStartTime = 0;
+
+                bool readingStream = true;
+                bool rec = false;
+                bool readingBuffer = false;
+                bool streaming = false;
+
+                DateTime lastBitRateMeasureStartTime = DateTime.Now;
+
+                IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                UdpClient udpClient = new UdpClient(1234);
+
+                do
+                {
+                    lock (_readThreadLock)
+                    {
+                        // sync reading record state
+                        rec = _recording;
+                        readingBuffer = _readingBuffer;
+                        readingStream = _readingStream;
+                        streaming = _streaming;
+                    }
+
+                    string status = String.Empty;
+
+                    if (_lastTunedFreq >= 0)
+                    {
+                        status = $"Tuned {(_lastTunedFreq / 1000000).ToString("N2")} MHz";
+                    }
+                    else
+                    {
+                        status = $"Not tuned";
+                    }
+
+                    if (!readingStream)
+                    {
+                        status += ", not reading";
+                        System.Threading.Thread.Sleep(50);
+                    }
+                    else
+                    {
+                        status += ", reading";
+
+                        if (rec)
+                        {
+                            status += ", recording";
+                        }
+                        if (readingBuffer)
+                        {
+                            status += ", bufferring";
+                        }
+                        if (streaming)
+                        {
+                            status += ", streaming";
+                        }
+
+                        if (udpClient.Available > 0)
+                        {
+                            var buffer = udpClient.Receive(ref remoteEndPoint);
+                            var bytesRead = buffer.Length;
+                            totalBytesRead += bytesRead;
+                            bytesReadFromLastMeasureStartTime += bytesRead;
+
+                            if (RawDataReceived != null)
+                            {
+                                RawDataReceived(this, new RawDataReceivedEventArgs()
+                                {
+                                    Data = buffer,
+                                    DataSize = bytesRead
+                                });
+                            }
+
+                            if (rec)
+                            {
+                                if (recordFileStream == null)
+                                {
+                                    var fileNameFreq = (_lastTunedFreq / 1000000).ToString() + "MHz";
+                                    _recordingFileName = Path.Combine(_recordDirectory, $"DVBT-MPEGTS-{fileNameFreq}-{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.ts");
+
+                                    if (System.IO.File.Exists(_recordingFileName))
+                                        System.IO.File.Delete(_recordingFileName);
+
+                                    recordFileStream = new FileStream(_recordingFileName, FileMode.Create, FileAccess.Write);
+                                }
+
+                                recordFileStream.Write(buffer, 0, bytesRead);
+                            }
+                            if (readingBuffer)
+                            {
+                                lock (_readThreadLock)
+                                {
+                                    if (_readingBuffer)
+                                    {
+                                        for (var i = 0; i < bytesRead; i++)
+                                            _readBuffer.Add(buffer[i]);
+                                    }
+                                }
+                            }
+                            if (streaming)
+                            {
+                                _UDPStreamer.SendByteArray(buffer, bytesRead);
+
+                                if (!_driverStreamDataAvailable && bytesRead > 0)
+                                {
+                                    _driverStreamDataAvailable = true;
+                                    _log.Debug("DVBT driver data available");
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            System.Threading.Thread.Sleep(50);
+                        }
+
+                        if (!rec && recordFileStream != null)
+                        {
+                            recordFileStream.Flush();
+                            recordFileStream.Close();
+                            recordFileStream = null;
+                        }
+
+                        // calculating speed
+
+                        var currentLastSpeedCalculationSec = DateTime.Now.ToString("yyyyMMddhhmmss");
+
+                        if (_lastSpeedCalculationSec != currentLastSpeedCalculationSec)
+                        {
+                            // occurs once per second
+
+                            if (bytesReadFromLastMeasureStartTime > 0)
+                            {
+                                _bitrate = bytesReadFromLastMeasureStartTime * 8;
+
+                                status += $"({DVBTDriverConnector.GetHumanReadableBitRate(_bitrate)})";
+                            }
+
+                            //_log.Debug($"{status}");
+
+                            bytesReadFromLastMeasureStartTime = 0;
+                            _lastSpeedCalculationSec = currentLastSpeedCalculationSec;
+                        }
+                    }
+
+                    DataStreamInfo = status;
+
+                }
+                while (_readingStream);
+
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "Error while reading from TransferPort");
+            }
+
+            _log.Debug($"Reading data finished");
+            DataStreamInfo = "Reading data finished";
+        }
+
 
 
         public AppDriverTypeEnum DriverType
@@ -175,6 +360,58 @@ namespace DVBTTelevizor.TV
             }
         }
 
+        private void StartReadBuffer()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"starting read buffer");
+
+                _readBuffer.Clear();
+                _readingBuffer = true;
+            }
+        }
+
+        private byte[] GetReadBufferData()
+        {
+            lock (_readThreadLock)
+            {
+                if (_readBuffer.Count == 0)
+                    return null;
+
+                return _readBuffer.ToArray();
+            }
+        }
+
+        private bool BufferContainsData()
+        {
+            lock (_readThreadLock)
+            {
+                //_log.Debug($"Getting buffer count");
+
+                return _readBuffer.Count > 0;
+            }
+        }
+
+        private void ClearReadBuffer()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"Clearing buffer");
+
+                _readBuffer.Clear();
+            }
+        }
+
+        private void StopReadBuffer()
+        {
+            lock (_readThreadLock)
+            {
+                _log.Debug($"Stopping read buffer (total bytes found: {_readBuffer.Count})");
+
+                _readingBuffer = false;
+            }
+        }
+
         public string PublicDirectory { get; set; } = "";
 
         public string DataStreamInfo
@@ -255,6 +492,17 @@ namespace DVBTTelevizor.TV
             Connect(ConnectTimeoutSeconds);
         }
 
+        private async Task StartBackgroundReadingAsync(int timeoutSeconds)
+        {
+            _log.Debug($"Starting background reading (timeout: {timeoutSeconds}s)");
+
+            var recordBackgroundWorker = new BackgroundWorker();
+            recordBackgroundWorker.DoWork += worker_DoWork;
+            recordBackgroundWorker.RunWorkerAsync();
+
+            State = DVBTDriverStateEnum.Connected;
+        }
+
         public void Connect(int timeoutSeconds)
         {
             _log.Debug($"Connecting (timeout: {timeoutSeconds}s)");
@@ -281,6 +529,8 @@ namespace DVBTTelevizor.TV
                     } else
                     {
                         State = DVBTDriverStateEnum.Connected;
+
+                        await StartBackgroundReadingAsync(timeoutSeconds).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
@@ -316,7 +566,6 @@ namespace DVBTTelevizor.TV
 
             return "127.0.0.1";
         }
-
         public Task Disconnect()
         {
             return Task.Run(async () =>
@@ -408,12 +657,67 @@ namespace DVBTTelevizor.TV
             return Task.FromResult(new EITScanResult());
         }
 
-        public Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
+        public async Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            return Task.FromResult(new DVBTDriverSearchProgramMapPIDsResult()
+            var startTime = DateTime.Now;
+            var timeoutForReadingBuffer = 15; //  15 secs
+
+            StartReadBuffer();
+
+            await Task.Delay(200);
+
+            SDTTable sdtTable = null;
+            PSITable psiTable = null;
+            Dictionary<ServiceDescriptor, long> serviceDescriptors = null;
+
+            List<MPEGTransportStreamPacket> packets = null;
+
+            while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
+            {
+                // searching for PID 0 (PSI) and 17 (SDT) packets ..
+
+                try
+                {
+                    var data = GetReadBufferData();
+                    packets = MPEGTransportStreamPacket.Parse(data);
+
+                    sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
+                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
+
+                }
+                catch (Exception e)
+                {
+                    _log.Debug($"Wrong data in Buffer");
+                    ClearReadBuffer();
+                    await Task.Delay(200);
+                    continue;
+                }
+
+                if (sdtTable != null && psiTable != null)
+                {
+                    // does SDT table belongs to this frequency?
+                    serviceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
+
+                    if (serviceDescriptors.Count > 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        _log.Debug($"Wrong SDTTable in buffer!");
+                        ClearReadBuffer();
+                    }
+                }
+
+                await Task.Delay(200);
+            }
+
+            StopReadBuffer();
+
+            return new DVBTDriverSearchProgramMapPIDsResult()
             {
                 Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
-            });
+            };
         }
 
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
