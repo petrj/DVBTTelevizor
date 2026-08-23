@@ -537,30 +537,30 @@ namespace DVBTTelevizor.TV
             {
                 _lastTunedFreq = frequency;
 
-                // Delivery system: 0: DVB-T, 1: DVB-T2
+                // Delivery system: dvb-t or dvb-t2
                 string scheme = deliverySystem == 0 ? "dvb-t" : "dvb-t2";
 
-                // Bandwidth in MHz (e.g. 8000000 -> 8)
+                // Bandwidth in MHz
                 var bandWidthMhz = (int)(bandWidth / 1E+6);
                 if (bandWidthMhz <= 0)
                 {
                     bandWidthMhz = 8;
                 }
 
-                string input = $"{scheme}://frequency={frequency}:bandwidth={bandWidthMhz}";
+                string input = $"{scheme}://frequency={frequency}";
 
-                // Resolve destination IP and port where Remote VLC sends the UDP TS stream
+                // Resolve destination IP and port
                 string targetHost = GetLocalIPAddressForRemote(_IP);
                 int targetPort = _UDPStreamer?.Port ?? 1234;
                 string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
 
                 _log.Info($"RemoteVLCDriverConnector: TuneEnhanced -> input: {input}, sout: {sout}");
 
-                // 1. Stop existing stream before deleting / reconfiguring
+                // 1. Stop existing stream before reconfiguring
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv stop")}");
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("del tv")}");
 
-                // 2. Setup new broadcast stream (if already exists, ignore 'Name already in use')
+                // 2. Setup broadcast stream
                 var newRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("new tv broadcast enabled")}");
                 var newErr = GetVlmError(newRes);
                 if (newErr != null && !newErr.Contains("Name already in use", StringComparison.OrdinalIgnoreCase))
@@ -568,19 +568,15 @@ namespace DVBTTelevizor.TV
                     _log.Error($"RemoteVLCDriverConnector: VLM 'new tv' failed: {newErr}");
                 }
 
-                var inputRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv input {input}")}");
-                var inputErr = GetVlmError(inputRes);
-                if (inputErr != null)
-                {
-                    _log.Error($"RemoteVLCDriverConnector: VLM 'setup tv input' failed: {inputErr}");
-                }
+                // Set input MRL: dvb-t2://frequency=658000000
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv input {input}")}");
 
-                var outputRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv output {sout}")}");
-                var outputErr = GetVlmError(outputRes);
-                if (outputErr != null)
-                {
-                    _log.Error($"RemoteVLCDriverConnector: VLM 'setup tv output' failed: {outputErr}");
-                }
+                // Set options matching working CLI
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv option dvb-bandwidth={bandWidthMhz}")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
+
+                // Set stream output
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv output {sout}")}");
 
                 // 3. Start streaming
                 string? response = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv play")}");
