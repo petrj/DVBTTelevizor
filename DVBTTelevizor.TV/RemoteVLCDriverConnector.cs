@@ -11,7 +11,10 @@ using System.IO;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -681,6 +684,17 @@ namespace DVBTTelevizor.TV
                     var data = GetReadBufferData();
                     packets = MPEGTransportStreamPacket.Parse(data);
 
+                    /*
+                    var pid0packets = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 0);
+                    var pid17packets = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 17);
+
+                    if (pid0packets.Count>0 || pid17packets.Count>0)
+                    {
+                        _log.Info("0, 17");
+                        var sdtTable2 = DVBTTable.CreateFromPackets<SDTTable2>(packets, 17);
+                    }
+                    */
+
                     sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
                     psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
 
@@ -714,11 +728,40 @@ namespace DVBTTelevizor.TV
 
             StopReadBuffer();
 
+            /*
+            try
+            {
+                // Query standard HTTP status endpoint (contains active input media information)
+                string? xmlResponse = await SendRequestAsync("requests/status.xml");
+
+                if (string.IsNullOrWhiteSpace(xmlResponse))
+                {
+                    // Fall back to querying VLM state directly if main status is empty
+                    xmlResponse = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("show tv")}");
+                }
+
+                if (string.IsNullOrWhiteSpace(xmlResponse))
+                {
+
+                }
+            } catch (Exception e)
+            {
+
+            };
+            */
             return new DVBTDriverSearchProgramMapPIDsResult()
             {
                 Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
             };
         }
+
+        public record VlcInformation(
+        [property: JsonPropertyName("category")] Dictionary<string, Dictionary<string, string>>? Category
+        );
+
+        public record VlcStatusResponse(
+        [property: JsonPropertyName("information")] VlcInformation? Information
+        );
 
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
@@ -856,7 +899,10 @@ namespace DVBTTelevizor.TV
                 // Resolve destination IP and port
                 string targetHost = GetLocalIPAddressForRemote(_IP);
                 int targetPort = _UDPStreamer?.Port ?? 1234;
-                string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
+
+                // Force mux=ts to keep original PIDs (ts-es-id-pid) and pass all metadata/tables (sout-all)
+                string sout = $"#std{{access=udp,mux={{ts-es-id-pid,sout-all}},dst={targetHost}:{targetPort}}}";
+
 
                 _log.Info($"RemoteVLCDriverConnector: TuneEnhanced -> input: {input}, sout: {sout}");
 
@@ -875,8 +921,20 @@ namespace DVBTTelevizor.TV
                 // Set input MRL: dvb-t2://frequency=658000000
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv input {input}")}");
 
-                // Set options matching working CLI
+                // Set options to retain raw stream tables and preserve original PIDs
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv option dvb-bandwidth={bandWidthMhz}")}");
+
+                // Tells DVB tuner driver not to filter out SI/PSI PIDs at the hardware/tuner layer
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sout-all")}");
+
+                // Tells VLC core pipeline to process all tracks and pass metadata tables downstream
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option sout-all")}");
+
+                // Enable DVB SDT and PSI table parsing for VLM
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sdt-parser")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option program-numbers")}");
+
+                // Preserves original PID mapping
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
 
                 // Set stream output
