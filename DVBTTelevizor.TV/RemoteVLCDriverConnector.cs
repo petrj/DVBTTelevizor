@@ -1,5 +1,6 @@
-﻿using LoggerService;
+using LoggerService;
 using MPEGTS;
+using NLog.Targets;
 using RTLSDR;
 using RTLSDR.Common;
 using System;
@@ -107,10 +108,10 @@ namespace DVBTTelevizor.TV
             {
                 if (_UDPStreamer == null)
                 {
-                    return "udp://@localhost:1234";
+                    return "udp://@:1234";
                 }
 
-                return $"udp://@{_UDPStreamer.IP}:{_UDPStreamer.Port}";
+                return $"udp://@:{_UDPStreamer.Port}";
             }
         }
 
@@ -290,14 +291,44 @@ namespace DVBTTelevizor.TV
             });
         }
 
+        private string GetLocalIPAddressForRemote(string remoteIp)
+        {
+            try
+            {
+                if (remoteIp == "127.0.0.1" || remoteIp.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+                {
+                    return "127.0.0.1";
+                }
+
+                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+                {
+                    socket.Connect(remoteIp, 65530);
+                    if (socket.LocalEndPoint is IPEndPoint endPoint)
+                    {
+                        return endPoint.Address.ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "RemoteVLCDriverConnector: Failed to resolve local IP for remote VLC");
+            }
+
+            return "127.0.0.1";
+        }
+
         public Task Disconnect()
         {
-            throw new NotImplementedException();
+            return Task.Run(async () =>
+            {
+                await Stop();
+                State = DVBTDriverStateEnum.Disconnected;
+            });
         }
 
         public Task<bool> DriverSendingData(int readMsTimeout = 500)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_driverStreamDataAvailable);
         }
 
         public async Task<DVBTDriverCapabilities> GetCapabalities()
@@ -317,13 +348,22 @@ namespace DVBTTelevizor.TV
 
         public async Task<string?> SendRequestAsync(string endpoint)
         {
-            var response = await _httpClient.GetAsync(endpoint);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
+                var response = await _httpClient.GetAsync(endpoint);
                 var resp = await response.Content.ReadAsStringAsync();
-                _log.Debug(resp);
-                return resp;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _log.Debug($"VLC Response [{endpoint}]: {resp}");
+                    return resp;
+                }
+
+                _log.Error($"VLC HTTP error [{(int)response.StatusCode} {response.ReasonPhrase}] for {endpoint}: {resp}");
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, $"VLC Request failed for {endpoint}");
             }
 
             return null;
@@ -341,10 +381,10 @@ namespace DVBTTelevizor.TV
                 {
                     res.SuccessFlag = true;
                 }
-
             }
             catch (Exception ex)
             {
+                _log.Error(ex, "RemoteVLCDriverConnector: GetStatus error");
                 res.SuccessFlag = false;
             }
 
@@ -365,22 +405,31 @@ namespace DVBTTelevizor.TV
 
         public Task<EITScanResult> ScanEPG(int msTimeout = 2000)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new EITScanResult());
         }
 
         public Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new DVBTDriverSearchProgramMapPIDsResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
+            });
         }
 
         public Task<DVBTDriverSearchPIDsResult> SearchProgramPIDs(long mapPID, bool setPIDsAndSync)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new DVBTDriverSearchPIDsResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.OK
+            });
         }
 
         public Task<DVBTDriverSearchAllPIDsResult> SearchProgramPIDs(List<long> MapPIDs)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new DVBTDriverSearchAllPIDsResult()
+            {
+                Result = DVBTDriverSearchProgramResultEnum.OK
+            });
         }
 
         public Task SetGain(GainEnum gain, int value = 0)
@@ -411,47 +460,164 @@ namespace DVBTTelevizor.TV
 
         public void StartRecording(string path)
         {
-            throw new NotImplementedException();
+            _recordingFileName = path;
+            _recording = true;
         }
 
         public void StartStream()
         {
-            throw new NotImplementedException();
+            _streaming = true;
         }
 
-        public Task<bool> Stop()
+        public async Task<bool> Stop()
         {
-            throw new NotImplementedException();
+            _log.Debug("RemoteVLCDriverConnector: Stopping stream");
+            try
+            {
+                _streaming = false;
+                _driverStreamDataAvailable = false;
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv stop")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("del tv")}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "RemoteVLCDriverConnector: Stop error");
+                return false;
+            }
         }
 
         public string StopRecording()
         {
-            throw new NotImplementedException();
+            _recording = false;
+            return _recordingFileName ?? "";
         }
 
         public void StopStream()
         {
-            throw new NotImplementedException();
+            _streaming = false;
         }
 
-        public Task<DVBTDriverResponse> Tune(long frequency, long bandwidth, int deliverySystem)
+        public async Task<DVBTDriverResponse> Tune(long frequency, long bandwidth, int deliverySystem)
         {
-            throw new NotImplementedException();
+            var res = await TuneEnhanced(frequency, bandwidth, deliverySystem, false);
+            return new DVBTDriverResponse()
+            {
+                SuccessFlag = res.Result == DVBTDriverSearchProgramResultEnum.OK
+            };
         }
 
-        public Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
+        private string? GetVlmError(string? response)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(response))
+            {
+                return "Empty response";
+            }
+
+            var match = System.Text.RegularExpressions.Regex.Match(response, @"<error>(.*?)</error>", System.Text.RegularExpressions.RegexOptions.Singleline);
+            if (match.Success)
+            {
+                var msg = match.Groups[1].Value.Trim();
+                return string.IsNullOrEmpty(msg) ? null : msg;
+            }
+
+            if (response.Contains("<error/>"))
+            {
+                return null;
+            }
+
+            return null;
+        }
+
+        public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
+        {
+            var res = new DVBTDriverTuneResult();
+
+            try
+            {
+                _lastTunedFreq = frequency;
+
+                // Delivery system: 0: DVB-T, 1: DVB-T2
+                string scheme = deliverySystem == 0 ? "dvb-t" : "dvb-t2";
+
+                // Bandwidth in MHz (e.g. 8000000 -> 8)
+                var bandWidthMhz = (int)(bandWidth / 1E+6);
+                if (bandWidthMhz <= 0)
+                {
+                    bandWidthMhz = 8;
+                }
+
+                string input = $"{scheme}://frequency={frequency}:bandwidth={bandWidthMhz}";
+
+                // Resolve destination IP and port where Remote VLC sends the UDP TS stream
+                string targetHost = GetLocalIPAddressForRemote(_IP);
+                int targetPort = _UDPStreamer?.Port ?? 1234;
+                string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
+
+                _log.Info($"RemoteVLCDriverConnector: TuneEnhanced -> input: {input}, sout: {sout}");
+
+                // 1. Stop existing stream before deleting / reconfiguring
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv stop")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("del tv")}");
+
+                // 2. Setup new broadcast stream (if already exists, ignore 'Name already in use')
+                var newRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("new tv broadcast enabled")}");
+                var newErr = GetVlmError(newRes);
+                if (newErr != null && !newErr.Contains("Name already in use", StringComparison.OrdinalIgnoreCase))
+                {
+                    _log.Error($"RemoteVLCDriverConnector: VLM 'new tv' failed: {newErr}");
+                }
+
+                var inputRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv input {input}")}");
+                var inputErr = GetVlmError(inputRes);
+                if (inputErr != null)
+                {
+                    _log.Error($"RemoteVLCDriverConnector: VLM 'setup tv input' failed: {inputErr}");
+                }
+
+                var outputRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv output {sout}")}");
+                var outputErr = GetVlmError(outputRes);
+                if (outputErr != null)
+                {
+                    _log.Error($"RemoteVLCDriverConnector: VLM 'setup tv output' failed: {outputErr}");
+                }
+
+                // 3. Start streaming
+                string? response = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv play")}");
+                var playErr = GetVlmError(response);
+
+                if (response != null && playErr == null)
+                {
+                    _streaming = true;
+                    _driverStreamDataAvailable = true;
+                    res.Result = DVBTDriverSearchProgramResultEnum.OK;
+                }
+                else
+                {
+                    _log.Error($"RemoteVLCDriverConnector: VLM control play failed: {playErr ?? "null response"}");
+                    res.Result = DVBTDriverSearchProgramResultEnum.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "RemoteVLCDriverConnector: TuneEnhanced error");
+                res.Result = DVBTDriverSearchProgramResultEnum.Error;
+            }
+
+            return res;
         }
 
         public Task WaitForBufferPIDs(List<long> PIDs, int readMsTimeout = 500, int msTimeout = 6000)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task<DVBTDriverTuneResult> WaitForSignal(bool fastTuning)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new DVBTDriverTuneResult()
+            {
+                Result = _driverStreamDataAvailable ? DVBTDriverSearchProgramResultEnum.OK : DVBTDriverSearchProgramResultEnum.NoSignal
+            });
         }
     }
 }
