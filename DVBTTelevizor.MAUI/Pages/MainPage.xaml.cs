@@ -2496,7 +2496,7 @@ namespace DVBTTelevizor.MAUI
                             return;
                         }
 
-                        //_viewModel.PID.AddChannelPIDs(channel.Frequency, channel.ProgramMapPID, setupPIDsRes.PIDs);
+                      _viewModel.PID.AddChannelPIDs(channel.Frequency, channel.ProgramMapPID, setupPIDsRes.PIDs);
                     }
 
                     _driver.StartStream();

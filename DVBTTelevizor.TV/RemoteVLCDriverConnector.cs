@@ -900,8 +900,8 @@ namespace DVBTTelevizor.TV
                 string targetHost = GetLocalIPAddressForRemote(_IP);
                 int targetPort = _UDPStreamer?.Port ?? 1234;
 
-                // Force mux=ts to keep original PIDs (ts-es-id-pid) and pass all metadata/tables (sout-all)
-                string sout = $"#std{{access=udp,mux={{ts-es-id-pid,sout-all}},dst={targetHost}:{targetPort}}}";
+                // Force mux=ts with all tracks and preserving original PIDs
+                string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
 
 
                 _log.Info($"RemoteVLCDriverConnector: TuneEnhanced -> input: {input}, sout: {sout}");
@@ -923,19 +923,21 @@ namespace DVBTTelevizor.TV
 
                 // Set options to retain raw stream tables and preserve original PIDs
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv option dvb-bandwidth={bandWidthMhz}")}");
+               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option demux=ts")}");
+                //await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-extra-pmt=0x0,0x11")}");
 
                 // Tells DVB tuner driver not to filter out SI/PSI PIDs at the hardware/tuner layer
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sout-all")}");
+               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sout-all")}");
 
                 // Tells VLC core pipeline to process all tracks and pass metadata tables downstream
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option sout-all")}");
+               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option sout-all")}");
 
                 // Enable DVB SDT and PSI table parsing for VLM
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sdt-parser")}");
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option program-numbers")}");
+                //await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sdt-parser")}");
+                //await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option program-numbers")}");
 
                 // Preserves original PID mapping
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
+               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
 
                 // Set stream output
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv output {sout}")}");
