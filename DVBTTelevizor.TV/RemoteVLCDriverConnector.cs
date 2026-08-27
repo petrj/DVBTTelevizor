@@ -665,39 +665,627 @@ namespace DVBTTelevizor.TV
             var startTime = DateTime.Now;
             var timeoutForReadingBuffer = 15; //  15 secs
 
-            StartReadBuffer();
-
-            await Task.Delay(200);
-
-            SDTTable sdtTable = null;
-            PSITable psiTable = null;
-            Dictionary<ServiceDescriptor, long> serviceDescriptors = null;
-
-            List<MPEGTransportStreamPacket> packets = null;
-
             while ((DateTime.Now - startTime).TotalSeconds < timeoutForReadingBuffer)
             {
-                // searching for PID 0 (PSI) and 17 (SDT) packets ..
-
                 try
                 {
-                    var data = GetReadBufferData();
-                    packets = MPEGTransportStreamPacket.Parse(data);
+                   var jsonResponse = await SendRequestAsync("requests/status.json");
 
                     /*
-                    var pid0packets = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 0);
-                    var pid17packets = MPEGTransportStreamPacket.GetAllPacketsPayloadBytesByPID(packets, 17);
 
-                    if (pid0packets.Count>0 || pid17packets.Count>0)
+
                     {
-                        _log.Info("0, 17");
-                        var sdtTable2 = DVBTTable.CreateFromPackets<SDTTable2>(packets, 17);
-                    }
-                    */
+  "fullscreen":0,
+  "subtitledelay":0,
+  "equalizer":[],
+  "videoeffects":{
+    "saturation":1,
+    "gamma":1,
+    "contrast":1,
+    "hue":0,
+    "brightness":1
+  },
+  "length":0,
+  "currentplid":4,
+  "seek_sec":10,
+  "volume":0,
+  "time":372,
+  "version":"3.0.23 Vetinari",
+  "stats":{
+    "displayedpictures":0,
+    "decodedvideo":0,
+    "demuxbitrate":4.1372137069702,
+    "averageinputbitrate":0,
+    "inputbitrate":4.637659072876,
+    "demuxreadbytes":1536648697,
+    "averagedemuxbitrate":0,
+    "readpackets":805843,
+    "demuxdiscontinuity":0,
+    "lostpictures":0,
+    "decodedaudio":0,
+    "sentbytes":0,
+    "sentpackets":0,
+    "readbytes":1730409904,
+    "playedabuffers":0,
+    "demuxreadpackets":0,
+    "demuxcorrupted":0,
+    "sendbitrate":0,
+    "lostabuffers":0
+  },
+  "state":"playing",
+  "loop":false,
+  "information":{
+    "title":0,
+    "chapters":[],
+    "category":{
+      "Stream 23":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"289",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      " Nova Lady [Program 526]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      " Prima sport [Program 797]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "DB Test 2 [Program 1585]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      " Nova Krimi [Program 518]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 22":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Type":"Audio",
+        "Description":"Audio description for the visually impaired",
+        "Original_ID":"1299"
+      },
+      "Stream 17":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"274",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 0":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"1345",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 19":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"278"
+      },
+      "Stream 13":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"354",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 34":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"338",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "PRAHA TV [Program 8202]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 47":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1042",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 18":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Type":"Audio",
+        "Description":"Audio description for the visually impaired",
+        "Original_ID":"275"
+      },
+      "Stream 4":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Type":"Audio",
+        "Description":"Audio description for the visually impaired",
+        "Original_ID":"323"
+      },
+      "Stream 24":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"290",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 44":{
+        "Original_ID":"307",
+        "Description":"Audio description for the visually impaired",
+        "Type":"Audio",
+        "Codec":"HEAD"
+      },
+      "Stream 12":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"353",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "ABC TV [Program 6923]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Slager muzika [Program 5641]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 2":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"321",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "RELAX [Program 2817]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Televize pres antenu [Program 33031]":{
+        "Now_Playing":"Můj oblíbený televizní program",
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 7":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"3362",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 20":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"1297",
+        "Orientation":"Top left",
+        "Video_resolution":"1920x1080",
+        "Buffer_dimensions":"1920x1080"
+      },
+      "DB Test 1 [Program 1537]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 38":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"785",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 14":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Type":"Audio",
+        "Description":"Audio description for the visually impaired",
+        "Original_ID":"355"
+      },
+      "Radio Cas Rock [Program 17926]":{
+        "Type":"FM Radio",
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 21":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1298",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "REBEL [Program 2818]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 27":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"1313",
+        "Orientation":"Top left",
+        "Video_resolution":"1920x1080",
+        "Buffer_dimensions":"1920x1080"
+      },
+      "Stream 32":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1458",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 33":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"337",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 50":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"3857",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 48":{
+        "Original_ID":"1043",
+        "Description":"Audio description for the visually impaired",
+        "Type":"Audio",
+        "Codec":"HEAD"
+      },
+      "Stream 37":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"3634",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 1":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1346",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 8":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"1809",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 26":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"294"
+      },
+      "Stream 39":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"786",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 5":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"326"
+      },
+      " Nova [Program 525]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "JOJ Family [Program 2562]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 42":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"305",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 16":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"273",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 40":{
+        "Language":"Original audio",
+        "Codec":"HEAD",
+        "Original_ID":"788",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 9":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1810",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      " Nova Action [Program 515]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 43":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"306",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 25":{
+        "Original_ID":"291",
+        "Description":"Audio description for the visually impaired",
+        "Type":"Audio",
+        "Codec":"HEAD"
+      },
+      "Stream 35":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"342"
+      },
+      "Stream 30":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"2321",
+        "Orientation":"Top left",
+        "Video_resolution":"1920x1080",
+        "Buffer_dimensions":"1920x1080"
+      },
+      "Stream 6":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"3361",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 3":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"322",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 36":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"3633",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 11":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"3378",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 45":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"310"
+      },
+      "meta":{
+        "filename":"frequency=658000000",
+        "publisher":"DB, MUX 24"
+      },
+      "Stream 51":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"3858",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 52":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"3633",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 49":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles",
+        "Original_ID":"1046"
+      },
+      "Stream 10":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"3377",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      "Stream 28":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1314",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Radio Cas [Program 17925]":{
+        "Type":"FM Radio",
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 31":{
+        "Type":"Audio",
+        "Codec":"HEAD",
+        "Original_ID":"2322",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      " Nova Cinema [Program 524]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 53":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"3634",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Stream 46":{
+        "Color_primaries":"ITU-R BT.709",
+        "Codec":"MPEG-H Part2/HEVC (H.265) (hevc)",
+        "Color_transfer_function":"ITU-R BT.709",
+        "Color_space":"ITU-R BT.709 Range",
+        "Frame_rate":"50",
+        "Type":"Video",
+        "Original_ID":"1041",
+        "Orientation":"Top left",
+        "Video_resolution":"960x540",
+        "Buffer_dimensions":"960x544"
+      },
+      " Nova Fun [Program 517]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 41":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"790"
+      },
+      "Stream 29":{
+        "Language":"Czech",
+        "Codec":"HEAD",
+        "Original_ID":"1442",
+        "Type":"Audio",
+        "Decoded_sample_rate":"24000 Hz"
+      },
+      "Slager original [Program 5640]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      },
+      "Stream 15":{
+        "Language":"Czech",
+        "Codec":"DVB Subtitles (dvbs)",
+        "Type":"Subtitle",
+        "Description":"DVB subtitles: hearing impaired",
+        "Original_ID":"358"
+      },
+      "CS Mystery [Program 6146]":{
+        "Status":"Running",
+        "Publisher":"DB, MUX 24"
+      }
+    },
+    "chapter":0,
+    "titles":[]
+  },
+  "repeat":false,
+  "apiversion":3,
+  "audiodelay":0,
+  "random":false,
+  "rate":1,
+  "position":0,
+  "audiofilters":{
+    "filter_0":""
+  }
+}
 
-                    sdtTable = DVBTTable.CreateFromPackets<SDTTable>(packets, 17);
-                    psiTable = DVBTTable.CreateFromPackets<PSITable>(packets, 0);
 
+                     */
                 }
                 catch (Exception e)
                 {
@@ -707,48 +1295,11 @@ namespace DVBTTelevizor.TV
                     continue;
                 }
 
-                if (sdtTable != null && psiTable != null)
-                {
-                    // does SDT table belongs to this frequency?
-                    serviceDescriptors = MPEGTransportStreamPacket.GetAvailableServicesMapPIDs(sdtTable, psiTable);
-
-                    if (serviceDescriptors.Count > 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        _log.Debug($"Wrong SDTTable in buffer!");
-                        ClearReadBuffer();
-                    }
-                }
-
                 await Task.Delay(200);
             }
 
             StopReadBuffer();
 
-            /*
-            try
-            {
-                // Query standard HTTP status endpoint (contains active input media information)
-                string? xmlResponse = await SendRequestAsync("requests/status.xml");
-
-                if (string.IsNullOrWhiteSpace(xmlResponse))
-                {
-                    // Fall back to querying VLM state directly if main status is empty
-                    xmlResponse = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("show tv")}");
-                }
-
-                if (string.IsNullOrWhiteSpace(xmlResponse))
-                {
-
-                }
-            } catch (Exception e)
-            {
-
-            };
-            */
             return new DVBTDriverSearchProgramMapPIDsResult()
             {
                 Result = DVBTDriverSearchProgramResultEnum.NoProgramFound
@@ -923,21 +1474,21 @@ namespace DVBTTelevizor.TV
 
                 // Set options to retain raw stream tables and preserve original PIDs
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv option dvb-bandwidth={bandWidthMhz}")}");
-               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option demux=ts")}");
-                //await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-extra-pmt=0x0,0x11")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option demux=ts")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-extra-pmt=0x0,0x11")}");
 
                 // Tells DVB tuner driver not to filter out SI/PSI PIDs at the hardware/tuner layer
-               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sout-all")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sout-all")}");
 
                 // Tells VLC core pipeline to process all tracks and pass metadata tables downstream
-               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option sout-all")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option sout-all")}");
 
                 // Enable DVB SDT and PSI table parsing for VLM
-                //await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sdt-parser")}");
-                //await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option program-numbers")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sdt-parser")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option program-numbers")}");
 
                 // Preserves original PID mapping
-               // await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
+                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
 
                 // Set stream output
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv output {sout}")}");
