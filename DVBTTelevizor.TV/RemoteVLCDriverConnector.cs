@@ -1425,8 +1425,15 @@ namespace DVBTTelevizor.TV
             {
                 _streaming = false;
                 _driverStreamDataAvailable = false;
+
+                // Stop and clear VLC playlist
+                await SendRequestAsync("requests/status.json?command=pl_stop");
+                await SendRequestAsync("requests/status.json?command=pl_empty");
+
+                // Clean up VLM instance if any was running
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv stop")}");
                 await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("del tv")}");
+
                 return true;
             }
             catch (Exception ex)
@@ -1505,50 +1512,25 @@ namespace DVBTTelevizor.TV
                 // Force mux=ts with all tracks and preserving original PIDs
                 string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
 
-
                 _log.Info($"RemoteVLCDriverConnector: TuneEnhanced -> input: {input}, sout: {sout}");
 
-                // 1. Stop existing stream before reconfiguring
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv stop")}");
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("del tv")}");
+                // 1. Stop and clean up any existing playlist playback / VLM instances
+                await Stop();
 
-                // 2. Setup broadcast stream
-                var newRes = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("new tv broadcast enabled")}");
-                var newErr = GetVlmError(newRes);
-                if (newErr != null && !newErr.Contains("Name already in use", StringComparison.OrdinalIgnoreCase))
-                {
-                    _log.Error($"RemoteVLCDriverConnector: VLM 'new tv' failed: {newErr}");
-                }
+                // 2. Start playing directly in VLC playlist via in_play so metadata tables are populated in status.json
+                var urlBuilder = new StringBuilder();
+                urlBuilder.Append($"requests/status.json?command=in_play&input={Uri.EscapeDataString(input)}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString($":dvb-bandwidth={bandWidthMhz}")}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString(":dvb-sdt-parser")}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString(":program-numbers")}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString(":dvb-sout-all")}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString(":sout-all")}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString(":ts-es-id-pid")}");
+                urlBuilder.Append($"&option={Uri.EscapeDataString($":sout={sout}")}");
 
-                // Set input MRL: dvb-t2://frequency=658000000
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv input {input}")}");
+                string? response = await SendRequestAsync(urlBuilder.ToString());
 
-                // Set options to retain raw stream tables and preserve original PIDs
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv option dvb-bandwidth={bandWidthMhz}")}");
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option demux=ts")}");
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-extra-pmt=0x0,0x11")}");
-
-                // Tells DVB tuner driver not to filter out SI/PSI PIDs at the hardware/tuner layer
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sout-all")}");
-
-                // Tells VLC core pipeline to process all tracks and pass metadata tables downstream
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option sout-all")}");
-
-                // Enable DVB SDT and PSI table parsing for VLM
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option dvb-sdt-parser")}");
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option program-numbers")}");
-
-                // Preserves original PID mapping
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("setup tv option ts-es-id-pid")}");
-
-                // Set stream output
-                await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString($"setup tv output {sout}")}");
-
-                // 3. Start streaming
-                string? response = await SendRequestAsync($"requests/vlm_cmd.xml?command={Uri.EscapeDataString("control tv play")}");
-                var playErr = GetVlmError(response);
-
-                if (response != null && playErr == null)
+                if (response != null)
                 {
                     _streaming = true;
                     _driverStreamDataAvailable = true;
@@ -1556,7 +1538,7 @@ namespace DVBTTelevizor.TV
                 }
                 else
                 {
-                    _log.Error($"RemoteVLCDriverConnector: VLM control play failed: {playErr ?? "null response"}");
+                    _log.Error("RemoteVLCDriverConnector: in_play command failed: null response");
                     res.Result = DVBTDriverSearchProgramResultEnum.Error;
                 }
             }
