@@ -30,6 +30,8 @@ namespace DVBTTelevizor.TV
         private ILoggingService _log;
         private UDPStreamer _UDPStreamer;
         private long _lastTunedFreq = -1;
+        private int _lastTunedDeliverySystem = -1;
+        private long _lastTunedBandwidth = -1;
         private static object _readThreadLock = new object();
         private static object _infoLock = new object();
         private bool _readingStream = true;
@@ -1388,7 +1390,11 @@ namespace DVBTTelevizor.TV
 
         public Task<DVBTDriverResponse> SetPIDs(List<long> PIDs)
         {
-            return Task.Run(() => {
+            return Task.Run(async () =>
+            {
+                await TuneInternal(_lastTunedFreq, _lastTunedBandwidth, _lastTunedDeliverySystem, PIDs.FirstOrDefault());
+
+
                 return new DVBTDriverResponse()
                 {
                     SuccessFlag = true
@@ -1463,35 +1469,20 @@ namespace DVBTTelevizor.TV
             };
         }
 
-        private string? GetVlmError(string? response)
+        public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
         {
-            if (string.IsNullOrWhiteSpace(response))
-            {
-                return "Empty response";
-            }
-
-            var match = System.Text.RegularExpressions.Regex.Match(response, @"<error>(.*?)</error>", System.Text.RegularExpressions.RegexOptions.Singleline);
-            if (match.Success)
-            {
-                var msg = match.Groups[1].Value.Trim();
-                return string.IsNullOrEmpty(msg) ? null : msg;
-            }
-
-            if (response.Contains("<error/>"))
-            {
-                return null;
-            }
-
-            return null;
+            return await TuneInternal(frequency, bandWidth, deliverySystem);
         }
 
-        public async Task<DVBTDriverTuneResult> TuneEnhanced(long frequency, long bandWidth, int deliverySystem, bool fastTuning)
+        private async Task<DVBTDriverTuneResult> TuneInternal(long frequency, long bandWidth, int deliverySystem, long programNumber = -1)
         {
             var res = new DVBTDriverTuneResult();
 
             try
             {
                 _lastTunedFreq = frequency;
+                _lastTunedBandwidth = bandWidth;
+                _lastTunedDeliverySystem = deliverySystem;
 
                 // Delivery system: dvb-t or dvb-t2
                 string scheme = deliverySystem == 0 ? "dvb-t" : "dvb-t2";
@@ -1512,7 +1503,7 @@ namespace DVBTTelevizor.TV
                 // Force mux=ts with all tracks and preserving original PIDs
                 string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
 
-                _log.Info($"RemoteVLCDriverConnector: TuneEnhanced -> input: {input}, sout: {sout}");
+                _log.Info($"RemoteVLCDriverConnector: TuneInternal -> input: {input}, programNumber: {programNumber}, sout: {sout}");
 
                 // 1. Stop and clean up any existing playlist playback / VLM instances
                 await Stop();
@@ -1521,10 +1512,19 @@ namespace DVBTTelevizor.TV
                 var urlBuilder = new StringBuilder();
                 urlBuilder.Append($"requests/status.json?command=in_play&input={Uri.EscapeDataString(input)}");
                 urlBuilder.Append($"&option={Uri.EscapeDataString($":dvb-bandwidth={bandWidthMhz}")}");
+
+                if (programNumber > 0)
+                {
+                    urlBuilder.Append($"&option={Uri.EscapeDataString($":program={programNumber}")}");
+                }
+                else
+                {
+                    urlBuilder.Append($"&option={Uri.EscapeDataString(":program-numbers")}");
+                    urlBuilder.Append($"&option={Uri.EscapeDataString(":dvb-sout-all")}");
+                    urlBuilder.Append($"&option={Uri.EscapeDataString(":sout-all")}");
+                }
+
                 urlBuilder.Append($"&option={Uri.EscapeDataString(":dvb-sdt-parser")}");
-                urlBuilder.Append($"&option={Uri.EscapeDataString(":program-numbers")}");
-                urlBuilder.Append($"&option={Uri.EscapeDataString(":dvb-sout-all")}");
-                urlBuilder.Append($"&option={Uri.EscapeDataString(":sout-all")}");
                 urlBuilder.Append($"&option={Uri.EscapeDataString(":ts-es-id-pid")}");
                 urlBuilder.Append($"&option={Uri.EscapeDataString($":sout={sout}")}");
 
@@ -1544,7 +1544,7 @@ namespace DVBTTelevizor.TV
             }
             catch (Exception ex)
             {
-                _log.Error(ex, "RemoteVLCDriverConnector: TuneEnhanced error");
+                _log.Error(ex, "RemoteVLCDriverConnector: TuneInternal error");
                 res.Result = DVBTDriverSearchProgramResultEnum.Error;
             }
 
