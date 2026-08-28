@@ -26,6 +26,7 @@ namespace DVBTTelevizor.TV
         public int ReceiveTimeoutMiliSeconds { get; set; } = 5000;
         public int ReadBufferSize { get; set; } = 32768;
 
+        private int _transferPort = 42000;
         private DVBTDriverConfiguration _driverConfiguration;
         private ILoggingService _log;
         private UDPStreamer _UDPStreamer;
@@ -69,8 +70,16 @@ namespace DVBTTelevizor.TV
 
             _log.Debug($"Initializing remote VLC driver");
 
+            _transferPort = UDPStreamer.FindAvailablePort(42000, 43000);
+            if (_transferPort == -1)
+            {
+                _transferPort = 42000;
+            }
+
             _UDPStreamer = new UDPStreamer(_log);
             _driverConfiguration = new DVBTDriverConfiguration();
+
+            _log.Info($"RemoteVLCDriverConnector: TransferPort: {_transferPort}, Player Stream: {_UDPStreamer.IP}:{_UDPStreamer.Port}");
 
             _httpClient = new HttpClient
             {
@@ -85,7 +94,7 @@ namespace DVBTTelevizor.TV
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            _log.Debug("Starting DVBT reader thread");
+            _log.Debug($"Starting DVBT reader thread on transfer port {_transferPort}");
 
             var totalBytesRead = 0;
             _bitrate = 0;
@@ -106,7 +115,7 @@ namespace DVBTTelevizor.TV
                 DateTime lastBitRateMeasureStartTime = DateTime.Now;
 
                 IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                UdpClient udpClient = new UdpClient(1234);
+                using UdpClient udpClient = new UdpClient(_transferPort);
 
                 do
                 {
@@ -1498,7 +1507,7 @@ namespace DVBTTelevizor.TV
 
                 // Resolve destination IP and port
                 string targetHost = GetLocalIPAddressForRemote(_IP);
-                int targetPort = _UDPStreamer?.Port ?? 1234;
+                int targetPort = _transferPort;
 
                 // Force mux=ts with preserving original PIDs
                 string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
