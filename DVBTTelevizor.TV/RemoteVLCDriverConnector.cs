@@ -669,7 +669,58 @@ namespace DVBTTelevizor.TV
             {
                 try
                 {
-                   var jsonResponse = await SendRequestAsync("requests/status.json");
+                  var jsonResponse = await SendRequestAsync("requests/status.json");
+                  if (!string.IsNullOrWhiteSpace(jsonResponse))
+                  {
+                    var status = JsonSerializer.Deserialize<VlcStatusResponse>(jsonResponse);
+                    var serviceDescriptors = new Dictionary<ServiceDescriptor, long>();
+
+                    if (status?.Information?.Category != null)
+                    {
+                      foreach (var category in status.Information.Category)
+                      {
+                        var match = System.Text.RegularExpressions.Regex.Match(
+                          category.Key,
+                          @"^\s*(.*?)\s*\[Program\s+(\d+)\]\s*$",
+                          System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+                        if (!match.Success || !int.TryParse(match.Groups[2].Value, out var programNumber))
+                        {
+                          continue;
+                        }
+
+                        var metadata = category.Value;
+                        metadata.TryGetValue("Publisher", out var providerName);
+                        metadata.TryGetValue("Type", out var serviceType);
+
+                        var descriptor = new ServiceDescriptor
+                        {
+                          ServiceName = match.Groups[1].Value.Trim(),
+                          ProviderName = providerName ?? string.Empty,
+                          ProgramNumber = programNumber,
+                          ServisType = (byte)(string.Equals(serviceType, "FM Radio", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(serviceType, "Radio", StringComparison.OrdinalIgnoreCase)
+                            ? DVBTDriverServiceType.Radio
+                            : DVBTDriverServiceType.TV),
+                          Free = true
+                        };
+
+                        // VLC status.json does not expose the PMT PID; the program number
+                        // is the only stable service-level identifier available here.
+                        serviceDescriptors[descriptor] = programNumber;
+                      }
+                    }
+
+                    if (serviceDescriptors.Count > 0)
+                    {
+                      StopReadBuffer();
+                      return new DVBTDriverSearchProgramMapPIDsResult
+                      {
+                        Result = DVBTDriverSearchProgramResultEnum.OK,
+                        ServiceDescriptors = serviceDescriptors
+                      };
+                    }
+                  }
 
                     /*
 
