@@ -296,3 +296,6 @@ Smaller=Менший
 Huge+=Величезний+
 Huge++=Величезний++
 Colossal=Колосальний
+Remote VLC=
+Allow remote VLC=
+Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****=
