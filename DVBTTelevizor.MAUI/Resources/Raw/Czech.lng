@@ -297,6 +297,6 @@ Huge+=Obrovský+
 Huge++=Obrovský++
 Colossal=Kolossální
 DVB ID=
-Remote VLC=
-Allow remote VLC=
-Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****=
+Remote VLC=Vzdálené VLC
+Allow remote VLC=Povolit vzdálené VLC
+Now you can start VLC by:  cvlc -I http --http-host 0.0.0.0 --http-password ****=Nyní můžete VLC spustit pomocí:

@@ -296,3 +296,6 @@ Smaller=Nhỏ hơn
 Huge+=Khổng lồ+
 Huge++=Khổng lồ++
 Colossal=Đồ sộ
+Remote VLC=VLC từ xa
+Allow remote VLC=Cho phép VLC từ xa
+Now you can start VLC by:  cvlc -I http --http-host 0.0.0.0 --http-password ****=Bây giờ bạn có thể khởi động VLC bằng:

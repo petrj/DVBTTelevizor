@@ -296,6 +296,6 @@ Smaller=ছোট
 Huge+=অতিদৈত্য+
 Huge++=অতিদৈত্য++
 Colossal=মহাবিশাল
-Remote VLC=
-Allow remote VLC=
-Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****=
+Remote VLC=রিমোট ভিএলসি
+Allow remote VLC=রিমোট ভিএলসি অনুমোদন করুন
+Now you can start VLC by:  cvlc -I http --http-host 0.0.0.0 --http-password ****=এখন আপনি এভাবে ভিএলসি চালু করতে পারেন:

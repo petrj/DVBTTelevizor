@@ -85,7 +85,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     {
         if (RemoteVLCSwitch.IsToggled)
         {
-            BuildInfoMenu("Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****".Translated(), "OK".Translated());
+            BuildInfoMenu("Now you can start VLC by:  cvlc -I http --http-host 0.0.0.0 --http-password ****".Translated(), "OK".Translated());
         }
 
     }

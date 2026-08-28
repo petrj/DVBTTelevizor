@@ -296,6 +296,6 @@ Smaller=Kleiner
 Huge+=Riesig+
 Huge++=Riesig++
 Colossal=Kolossal
-Remote VLC=
-Allow remote VLC=
-Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****=
+Remote VLC=Remote-VLC
+Allow remote VLC=Remote-VLC zulassen
+Now you can start VLC by:  cvlc -I http --http-host 0.0.0.0 --http-password ****=Jetzt können Sie VLC mit folgendem Befehl starten:

@@ -296,6 +296,6 @@ Smaller=更小
 Huge+=巨型+
 Huge++=巨型++
 Colossal=巨大的
-Remote VLC=
-Allow remote VLC=
-Now you can start VLC by:  cvlc -I http --http-host=0.0.0.0 --http-password=****=
+Remote VLC=远程 VLC
+Allow remote VLC=允许远程 VLC
+Now you can start VLC by:  cvlc -I http --http-host 0.0.0.0 --http-password ****=现在您可以通过以下命令启动 VLC：
