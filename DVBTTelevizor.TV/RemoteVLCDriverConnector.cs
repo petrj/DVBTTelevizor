@@ -1500,7 +1500,7 @@ namespace DVBTTelevizor.TV
                 string targetHost = GetLocalIPAddressForRemote(_IP);
                 int targetPort = _UDPStreamer?.Port ?? 1234;
 
-                // Force mux=ts with all tracks and preserving original PIDs
+                // Force mux=ts with preserving original PIDs
                 string sout = $"#std{{access=udp,mux=ts,dst={targetHost}:{targetPort}}}";
 
                 _log.Info($"RemoteVLCDriverConnector: TuneInternal -> input: {input}, programNumber: {programNumber}, sout: {sout}");
@@ -1516,6 +1516,7 @@ namespace DVBTTelevizor.TV
                 if (programNumber > 0)
                 {
                     urlBuilder.Append($"&option={Uri.EscapeDataString($":program={programNumber}")}");
+                    urlBuilder.Append($"&option={Uri.EscapeDataString($":programs={programNumber}")}");
                 }
                 else
                 {
