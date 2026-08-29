@@ -376,12 +376,40 @@ namespace DVBTTelevizor
         {
             get
             {
+                if (PermanentCurrentEvent())
+                {
+                    return 0;
+                }
+
                 var epg = CurrentEventItem;
 
                 return epg == null
                     ? 0
                     : epg.Progress;
             }
+        }
+
+        // Remote VLC, DAB or FM drivers does not provide time of events
+        // such events are defined as whole-day event form 00:00 to 23:59:59
+        // for such event will not be displayed the time
+        public bool PermanentCurrentEvent()
+        {
+            if (CurrentEventItem == null ||
+                CurrentEventItem.FinishTime == DateTime.MinValue ||
+                CurrentEventItem.StartTime == DateTime.MinValue ||
+                CurrentEventItem.FinishTime == DateTime.MaxValue ||
+                CurrentEventItem.FinishTime == DateTime.MaxValue)
+                {
+                    return false;
+                }
+
+            if (CurrentEventItem.StartTime > DateTime.Now ||
+                CurrentEventItem.FinishTime < DateTime.Now)
+            {
+                return false;
+            }
+
+            return (CurrentEventItem.FinishTime - CurrentEventItem.StartTime).TotalHours >23;
         }
 
         public string CurrentEPGEventTime
@@ -393,16 +421,11 @@ namespace DVBTTelevizor
                     CurrentEventItem.FinishTime < DateTime.Now)
                     return string.Empty;
 
-                switch (ChannelType)
+                if (PermanentCurrentEvent())
                 {
-                    case ChannelTypeEnum.DVBT:
-                    case ChannelTypeEnum.DVBT2:
-                    case ChannelTypeEnum.SledovaniTV:
-                        return CurrentEventItem.StartTime.ToString("HH:mm") + " - " + CurrentEventItem.FinishTime.ToString("HH:mm");
-                    default:
-                        return string.Empty;
+                    return string.Empty;
                 }
-
+                return CurrentEventItem.StartTime.ToString("HH:mm") + " - " + CurrentEventItem.FinishTime.ToString("HH:mm");
             }
         }
 

@@ -100,6 +100,29 @@ namespace DVBTTelevizor.DBManager
             return res;
         }
 
+        //private void RemoveCurrentEvents(string key)
+        //{
+        //    if (_freqValues == null ||
+        //        !_freqValues.ContainsKey(key));
+
+        //    var eventItems = _freqValues[key];
+        //    var evToRemove = new List<EventItem>();
+
+        //    foreach (var ev in eventItems)
+        //    {
+        //        if (ev.EventId<0)
+        //        {
+        //            evToRemove.Add(ev);
+        //        }
+        //    }
+
+        //    while (evToRemove.Count>0)
+        //    {
+        //        eventItems.Remove(evToRemove.ElementAt(0));
+        //        evToRemove.RemoveAt(0);
+        //    }
+        //}
+
         public async Task<EITScanResult> Scan(int msTimeout = 2000)
         {
             if (_driver == null)
@@ -137,9 +160,20 @@ namespace DVBTTelevizor.DBManager
 
                 if (scanRes.CurrentEvents != null)
                 {
+
+                    //var first = true;
+
                     // adding current events with negative ID
                     foreach (var ev in scanRes.CurrentEvents)
                     {
+                        //if (first)
+                        //{
+                        //    // current event should be always updated, not inserted!
+                        //    var key = GetKey(_driver.LastTunedFreq, ev.Key);
+                        //    RemoveCurrentEvents(key);
+                        //    first = false;
+                        //}
+
                         var evCloned = ev.Value.Clone();
                         evCloned.EventId = -evCloned.EventId;
 

@@ -612,9 +612,85 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task<EITScanResult> ScanEPG(int msTimeout = 2000)
+        private static readonly System.Text.RegularExpressions.Regex ProgramNameRegex =
+     new(@"^\s*(.*?)\s*\[Program\s+(\d+)\]\s*$", System.Text.RegularExpressions.RegexOptions.CultureInvariant | System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        public async Task<EITScanResult> ScanEPG(int msTimeout = 15000)
         {
-            return Task.FromResult(new EITScanResult());
+            var res = new EITScanResult();
+            const int delayMs = 1000;
+            int maxAttempts = Math.Max(1, msTimeout / delayMs);
+
+            try
+            {
+                for (int attempt = 1; attempt <= maxAttempts; attempt++)
+                {
+                    var jsonResponse = await SendRequestAsync("requests/status.json");
+
+                    if (!string.IsNullOrWhiteSpace(jsonResponse))
+                    {
+                        var status = JsonSerializer.Deserialize<VlcStatusResponse>(jsonResponse);
+
+                        if (status?.Information?.Category != null)
+                        {
+                            var events = ParseCurrentEvents(status.Information.Category);
+
+                            if (events.Count > 0)
+                            {
+                                res.CurrentEvents = events;
+                                res.OK = true;
+                                return res;
+                            }
+                        }
+                    }
+
+                    if (attempt < maxAttempts)
+                    {
+                        await Task.Delay(delayMs);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error(ex, "RemoteVLCDriverConnector: ScanEPG error");
+                res.OK = false;
+                return res;
+            }
+
+            res.OK = false;
+            return res;
+        }
+
+        private static Dictionary<int, EventItem> ParseCurrentEvents(Dictionary<string, Dictionary<string, string>> categories)
+        {
+            var events = new Dictionary<int, EventItem>();
+            var today = DateTime.Now.Date;
+            var endOfDay = today.AddDays(1).AddSeconds(-1);
+
+            foreach (var category in categories)
+            {
+                var match = ProgramNameRegex.Match(category.Key);
+                if (!match.Success || !int.TryParse(match.Groups[2].Value, out var programNumber))
+                {
+                    continue;
+                }
+
+                var metadata = category.Value;
+                if (metadata != null && metadata.TryGetValue("Now_Playing", out var nowPlaying) && !string.IsNullOrWhiteSpace(nowPlaying))
+                {
+                    var trimmedTitle = nowPlaying.Trim();
+                    events[programNumber] = new EventItem
+                    {
+                        EventId = 0,
+                        EventName = trimmedTitle,
+                        Text = trimmedTitle,
+                        StartTime = today,
+                        FinishTime = endOfDay
+                    };
+                }
+            }
+
+            return events;
         }
 
         public async Task<DVBTDriverSearchProgramMapPIDsResult> SearchProgramMapPIDs(bool tunePID0and17 = true)
@@ -670,7 +746,6 @@ namespace DVBTTelevizor.TV
 
                     if (serviceDescriptors.Count > 0)
                     {
-                      StopReadBuffer();
                       return new DVBTDriverSearchProgramMapPIDsResult
                       {
                         Result = DVBTDriverSearchProgramResultEnum.OK,

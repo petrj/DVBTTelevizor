@@ -1371,6 +1371,11 @@ namespace DVBTTelevizor.MAUI
                 if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
                     return String.Empty;
 
+                if (SelectedChannel.PermanentCurrentEvent())
+                {
+                    return String.Empty;
+                }
+
                 return SelectedChannel.CurrentEventItem.EPGTimeStartDescription;
             }
         }
@@ -1382,6 +1387,11 @@ namespace DVBTTelevizor.MAUI
                 if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
                     return String.Empty;
 
+                if (SelectedChannel.PermanentCurrentEvent())
+                {
+                    return String.Empty;
+                }
+
                 return SelectedChannel.CurrentEventItem.EPGTimeFinishDescription;
             }
         }
@@ -1392,6 +1402,11 @@ namespace DVBTTelevizor.MAUI
             {
                 if (SelectedChannel == null || SelectedChannel.CurrentEventItem == null)
                     return 0;
+
+                if (SelectedChannel.PermanentCurrentEvent())
+                {
+                    return 0;
+                }
 
                 return SelectedChannel.CurrentEventItem.Progress;
             }
