@@ -100,28 +100,30 @@ namespace DVBTTelevizor.DBManager
             return res;
         }
 
-        //private void RemoveCurrentEvents(string key)
-        //{
-        //    if (_freqValues == null ||
-        //        !_freqValues.ContainsKey(key));
+        private void RemoveCurrentEvents(long freq, long programMapPID)
+        {
+            var key = GetKey(freq, programMapPID);
+            if (!_freqValues.ContainsKey(key))
+            {
+                return;
+            }
 
-        //    var eventItems = _freqValues[key];
-        //    var evToRemove = new List<EventItem>();
+            var eventItemsToDelete = new List<EventItem>();
 
-        //    foreach (var ev in eventItems)
-        //    {
-        //        if (ev.EventId<0)
-        //        {
-        //            evToRemove.Add(ev);
-        //        }
-        //    }
+            foreach (var ev in _freqValues[key])
+            {
+                if (ev.EventId<0)
+                {
+                    eventItemsToDelete.Add(ev);
+                }
+            }
 
-        //    while (evToRemove.Count>0)
-        //    {
-        //        eventItems.Remove(evToRemove.ElementAt(0));
-        //        evToRemove.RemoveAt(0);
-        //    }
-        //}
+            while (eventItemsToDelete.Count > 0)
+            {
+                _freqValues[key].Remove(eventItemsToDelete.ElementAt(0));
+                eventItemsToDelete.RemoveAt(0);
+            }
+        }
 
         public async Task<EITScanResult> Scan(int msTimeout = 2000)
         {
@@ -160,20 +162,9 @@ namespace DVBTTelevizor.DBManager
 
                 if (scanRes.CurrentEvents != null)
                 {
-
-                    //var first = true;
-
                     // adding current events with negative ID
                     foreach (var ev in scanRes.CurrentEvents)
                     {
-                        //if (first)
-                        //{
-                        //    // current event should be always updated, not inserted!
-                        //    var key = GetKey(_driver.LastTunedFreq, ev.Key);
-                        //    RemoveCurrentEvents(key);
-                        //    first = false;
-                        //}
-
                         var evCloned = ev.Value.Clone();
                         evCloned.EventId = -evCloned.EventId;
 
@@ -273,6 +264,12 @@ namespace DVBTTelevizor.DBManager
             if (!_freqValues.ContainsKey(key))
             {
                 _freqValues.TryAdd(key, new List<EventItem>());
+            }
+
+            // negative event IDs are for current events, so we can have duplicates with different IDs
+            if (eventItem.EventId < 0)
+            {
+               RemoveCurrentEvents(freq, programMapPID);
             }
 
             _freqValues[key].Add(eventItem);

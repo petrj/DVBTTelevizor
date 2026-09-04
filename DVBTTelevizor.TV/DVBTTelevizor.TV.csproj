@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="LoggerService" Version="1.0.5" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
-    <PackageReference Include="MPEGTS" Version="1.0.27" />
+    <PackageReference Include="MPEGTS" Version="1.0.28" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	<PackageReference Include="RTLSDR" Version="1.5.1" />
 	<PackageReference Include="RTLSDR.Common" Version="1.5.8" />

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="LoggerService" Version="1.0.5" />
-    <PackageReference Include="MPEGTS" Version="1.0.27" />
+    <PackageReference Include="MPEGTS" Version="1.0.28" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NLog" Version="6.1.4" />
   </ItemGroup>
