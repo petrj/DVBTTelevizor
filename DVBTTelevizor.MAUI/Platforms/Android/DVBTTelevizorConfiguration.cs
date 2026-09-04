@@ -886,5 +886,53 @@ namespace DVBTTelevizor.MAUI
                 SavePersistingSettingValue<int>("RemoteSDRPort", value);
             }
         }
+
+        public bool AllowRemoteVLC
+        {
+            get
+            {
+                return GetPersistingSettingValue<bool>("AllowRemoteVLC");
+            }
+            set
+            {
+                SavePersistingSettingValue<bool>("AllowRemoteVLC", value);
+            }
+        }
+
+        public string RemoteVLCIP
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("RemoteVLCIP");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("RemoteVLCIP", value);
+            }
+        }
+
+        public int RemoteVLCPort
+        {
+            get
+            {
+                return GetPersistingSettingValue<int>("RemoteVLCPort", 1234);
+            }
+            set
+            {
+                SavePersistingSettingValue<int>("RemoteVLCPort", value);
+            }
+        }
+
+        public string RemoteVLCPassword
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("RemoteVLCPassword");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("RemoteVLCPassword", value);
+            }
+        }
     }
 }
