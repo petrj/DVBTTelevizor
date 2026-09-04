@@ -617,6 +617,11 @@ namespace DVBTTelevizor.TV
 
         public async Task<EITScanResult> ScanEPG(int msTimeout = 15000)
         {
+            if (msTimeout<7000)
+            {
+                msTimeout = 7000;  // we must wait longer time for VLC
+            }
+
             var res = new EITScanResult();
             const int delayMs = 1000;
             int maxAttempts = Math.Max(1, msTimeout / delayMs);
