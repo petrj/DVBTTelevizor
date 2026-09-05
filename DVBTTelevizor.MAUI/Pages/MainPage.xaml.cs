@@ -1117,7 +1117,6 @@ namespace DVBTTelevizor.MAUI
         {
             _viewModel.NotifyChannelChange();
 
-
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 if (_viewModel.SelectedChannel == null)
@@ -1129,6 +1128,8 @@ namespace DVBTTelevizor.MAUI
                 _viewModel.SelectedChannel.NotifyChanges();
 
                 ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+
+                await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0,0, false);
             });
         }
 
