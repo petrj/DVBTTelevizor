@@ -50,7 +50,7 @@ if (-not [String]::IsNullOrEmpty($passw))
     $signedAABPackage = $aABPackage `
         | Protect-BySignature `
             -Keystore "$HOME\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
-            -JarSigner "C:\Program Files\Java\jdk-26\bin\jarsigner.exe" `
+            -JarSigner "jarsigner.exe" `
             -Alias "PJsAndroidKeyStore" `
             -Password $passw `
 
