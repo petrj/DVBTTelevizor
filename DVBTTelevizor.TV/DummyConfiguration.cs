@@ -90,6 +90,73 @@ namespace DVBTTelevizor.TV
         {
         }
 
+        public static DummyConfiguration FromConfiguration(ITVConfiguration configuration)
+        {
+            var dummyConfig = new DummyConfiguration();
+
+            dummyConfig.LastSelectedChannelUniqueIdentifier = configuration.LastSelectedChannelUniqueIdentifier;
+            dummyConfig.AutoPlayedChannelUniqueID = configuration.AutoPlayedChannelUniqueID;
+            dummyConfig.AppDriverType = configuration.AppDriverType;
+            dummyConfig.AppFontSize = configuration.AppFontSize;
+            dummyConfig.Language = configuration.Language;
+            dummyConfig.Fullscreen = configuration.Fullscreen;
+            dummyConfig.PlayOnBackground = configuration.PlayOnBackground;
+            dummyConfig.ShowTVChannels = configuration.ShowTVChannels;
+            dummyConfig.ShowNonFreeChannels = configuration.ShowNonFreeChannels;
+            dummyConfig.ShowRadioChannels = configuration.ShowRadioChannels;
+            dummyConfig.ShowOtherChannels = configuration.ShowOtherChannels;
+            dummyConfig.AllowRemoteAccessService = configuration.AllowRemoteAccessService;
+            dummyConfig.RemoteAccessServiceIP = configuration.RemoteAccessServiceIP;
+            dummyConfig.RemoteAccessServicePort = configuration.RemoteAccessServicePort;
+            dummyConfig.RemoteAccessServiceSecurityKey = configuration.RemoteAccessServiceSecurityKey;
+            dummyConfig.EnableLogging = configuration.EnableLogging;
+            dummyConfig.LoggingUDPIP = configuration.LoggingUDPIP;
+            dummyConfig.TuneDVBTEnabled = configuration.TuneDVBTEnabled;
+            dummyConfig.TuneDVBT2Enabled = configuration.TuneDVBT2Enabled;
+            dummyConfig.TuneDVBTPreferred = configuration.TuneDVBTPreferred;
+            dummyConfig.FrequencyFromKHz = configuration.FrequencyFromKHz;
+            dummyConfig.FrequencyToKHz = configuration.FrequencyToKHz;
+            dummyConfig.FrequencyKHz = configuration.FrequencyKHz;
+            dummyConfig.FMFrequencyFromKHz = configuration.FMFrequencyFromKHz;
+            dummyConfig.FMFrequencyToKHz = configuration.FMFrequencyToKHz;
+            dummyConfig.FMFrequencyKHz = configuration.FMFrequencyKHz;
+            dummyConfig.DABFrequencyFromKHz = configuration.DABFrequencyFromKHz;
+            dummyConfig.DABFrequencyToKHz = configuration.DABFrequencyToKHz;
+            dummyConfig.DABFrequencyKHz = configuration.DABFrequencyKHz;
+            dummyConfig.DVBTBandwidthKHz = configuration.DVBTBandwidthKHz;
+            dummyConfig.FMDVBTBandwidthKHz = configuration.FMDVBTBandwidthKHz;
+            dummyConfig.SDRDriverStreamPort = configuration.SDRDriverStreamPort;
+            dummyConfig.SDRDriverPort = configuration.SDRDriverPort;
+            dummyConfig.SDRSampleRate = configuration.SDRSampleRate;
+            dummyConfig.WriteToExternalDevice = configuration.WriteToExternalDevice;
+            dummyConfig.ExternalDevicePath = configuration.ExternalDevicePath;
+            dummyConfig.ExternalDevicePathUri = configuration.ExternalDevicePathUri;
+            dummyConfig.FilteredMultiplexes = configuration.FilteredMultiplexes;
+            dummyConfig.SledovaniTVEnabled = configuration.SledovaniTVEnabled;
+            dummyConfig.SledovaniTVUserName = configuration.SledovaniTVUserName;
+            dummyConfig.SledovaniTVPassword = configuration.SledovaniTVPassword;
+            dummyConfig.SledovaniTVShowAdultChannels = configuration.SledovaniTVShowAdultChannels;
+            dummyConfig.SledovaniTVPIN = configuration.SledovaniTVPIN;
+            dummyConfig.SledovaniTVDeviceID = configuration.SledovaniTVDeviceID;
+            dummyConfig.SledovaniTVDevicePassword = configuration.SledovaniTVDevicePassword;
+            dummyConfig.RTLSDREnabled = configuration.RTLSDREnabled;
+            dummyConfig.TestingMode = configuration.TestingMode;
+            dummyConfig.Gain = configuration.Gain;
+            dummyConfig.GainValue = configuration.GainValue;
+            dummyConfig.AllowRemoteSDR = configuration.AllowRemoteSDR;
+            dummyConfig.RemoteSDRIP = configuration.RemoteSDRIP;
+            dummyConfig.RemoteSDRPort = configuration.RemoteSDRPort;
+            dummyConfig.AllowRemoteVLC = configuration.AllowRemoteVLC;
+            dummyConfig.RemoteVLCIP = configuration.RemoteVLCIP;
+            dummyConfig.RemoteVLCPort = configuration.RemoteVLCPort;
+            dummyConfig.RemoteVLCPassword = configuration.RemoteVLCPassword;
+            dummyConfig.UpdatedTo2026 = configuration.UpdatedTo2026;
+            dummyConfig.UpdatedTo2026_rev2 = configuration.UpdatedTo2026_rev2;
+            dummyConfig.ConfigDirectory = configuration.ConfigDirectory;
+
+            return dummyConfig;
+        }
+
         public void UpdateConfig(ITVConfiguration configuration)
         {
             configuration.LastSelectedChannelUniqueIdentifier = LastSelectedChannelUniqueIdentifier;
@@ -115,13 +182,21 @@ namespace DVBTTelevizor.TV
             configuration.FrequencyFromKHz = FrequencyFromKHz;
             configuration.FrequencyToKHz = FrequencyToKHz;
             configuration.FrequencyKHz = FrequencyKHz;
+            configuration.FMFrequencyFromKHz = FMFrequencyFromKHz;
+            configuration.FMFrequencyToKHz = FMFrequencyToKHz;
+            configuration.FMFrequencyKHz = FMFrequencyKHz;
+            configuration.DABFrequencyFromKHz = DABFrequencyFromKHz;
+            configuration.DABFrequencyToKHz = DABFrequencyToKHz;
+            configuration.DABFrequencyKHz = DABFrequencyKHz;
             configuration.DVBTBandwidthKHz = DVBTBandwidthKHz;
+            configuration.FMDVBTBandwidthKHz = FMDVBTBandwidthKHz;
             configuration.SDRDriverStreamPort = SDRDriverStreamPort;
             configuration.SDRDriverPort = SDRDriverPort;
             configuration.SDRSampleRate = SDRSampleRate;
             configuration.WriteToExternalDevice = WriteToExternalDevice;
             configuration.ExternalDevicePath = ExternalDevicePath;
             configuration.ExternalDevicePathUri = ExternalDevicePathUri;
+            configuration.FilteredMultiplexes = FilteredMultiplexes;
             configuration.SledovaniTVEnabled = SledovaniTVEnabled;
             configuration.SledovaniTVUserName = SledovaniTVUserName;
             configuration.SledovaniTVPassword = SledovaniTVPassword;
@@ -130,18 +205,19 @@ namespace DVBTTelevizor.TV
             configuration.SledovaniTVDeviceID = SledovaniTVDeviceID;
             configuration.SledovaniTVDevicePassword = SledovaniTVDevicePassword;
             configuration.RTLSDREnabled = RTLSDREnabled;
-            configuration.Gain = Gain;
             configuration.TestingMode = TestingMode;
+            configuration.Gain = Gain;
             configuration.GainValue = GainValue;
-
             configuration.AllowRemoteSDR = AllowRemoteSDR;
             configuration.RemoteSDRIP = RemoteSDRIP;
             configuration.RemoteSDRPort = RemoteSDRPort;
-
             configuration.AllowRemoteVLC = AllowRemoteVLC;
             configuration.RemoteVLCIP = RemoteVLCIP;
             configuration.RemoteVLCPort = RemoteVLCPort;
             configuration.RemoteVLCPassword = RemoteVLCPassword;
+            configuration.UpdatedTo2026 = UpdatedTo2026;
+            configuration.UpdatedTo2026_rev2 = UpdatedTo2026_rev2;
+            configuration.ConfigDirectory = ConfigDirectory;
         }
     }
 }

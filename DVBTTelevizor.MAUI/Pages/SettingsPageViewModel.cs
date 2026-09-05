@@ -467,13 +467,20 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
-                var settingsJSON = Newtonsoft.Json.JsonConvert.SerializeObject(_configuration, Newtonsoft.Json.Formatting.Indented);
+                // Create a DummyConfiguration from the current configuration
+                var dummyConfig = DummyConfiguration.FromConfiguration(_configuration);
+
+                var settingsJSON = Newtonsoft.Json.JsonConvert.SerializeObject(dummyConfig, Newtonsoft.Json.Formatting.Indented);
+
+                _loggingService.Info($"Serialized settings JSON: {settingsJSON}");
 
                 if (File.Exists(AndroidSettingsListPath))
                 {
                     File.Delete(AndroidChannelsListPath);
                 }
                 System.IO.File.WriteAllText(AndroidSettingsListPath, settingsJSON);
+
+                _loggingService.Info($"Settings exported to: {AndroidSettingsListPath}");
 
                 WeakReferenceMessenger.Default.Send(new ToastMessage("Settings exported".Translated()));
 
