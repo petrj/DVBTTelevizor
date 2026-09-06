@@ -6,7 +6,8 @@
         <package android:name="info.martinmarinov.dvbdriver" />
     </queries>
 
-    <application
+	<application
+		android:usesCleartextTraffic="true"
 		android:allowBackup="true"
 		android:supportsRtl="true"
 		android:label="DVBT Televizor"

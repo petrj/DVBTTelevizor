@@ -970,7 +970,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                return GetPersistingSettingValue<int>("RemoteVLCPort", 1234);
+                return GetPersistingSettingValue<int>("RemoteVLCPort", 8080);
             }
             set
             {
