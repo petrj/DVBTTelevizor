@@ -338,3 +338,4 @@ OnlineTelevizor\OnlineTelevizor.UWP\BundleArtifacts\*
 *.appxbundle
 *.odg#
 .sonarqube/
+SonarQubeAnalysis.json
