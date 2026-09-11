@@ -312,8 +312,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         return "Connecting".Translated();
                     }
-                    else
-                    if (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
+                    else if (_driver.State.HasFlag(DVBTDriverStateEnum.DisConnecting))
                     {
                         return "Disconnecting".Translated();
                     }

@@ -1,4 +1,4 @@
-﻿using Android.Content;
+using Android.Content;
 using Android.Preferences;
 using System;
 using System.Collections.Generic;
@@ -64,17 +64,15 @@ namespace DVBTTelevizor
                 {
                     val = _sharedPrefs.GetString(key, Convert.ToString(defaultValue));
                 }
-                else
-                if (typeof(T) == typeof(bool))
+                else if (typeof(T) == typeof(bool))
                 {
                     val = _sharedPrefs.GetBoolean(key, Convert.ToBoolean(defaultValue));
                 }
-                else
-                if (typeof(T) == typeof(int))
+                else if (typeof(T) == typeof(int))
                 {
                     val = _sharedPrefs.GetInt(key, Convert.ToInt32(defaultValue));
-                } else
-                if (typeof(T) == typeof(long))
+                }
+                else if (typeof(T) == typeof(long))
                 {
                     val = _sharedPrefs.GetLong(key, Convert.ToInt32(defaultValue));
                 }

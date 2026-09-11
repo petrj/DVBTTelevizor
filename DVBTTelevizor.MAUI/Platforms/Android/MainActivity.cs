@@ -1,4 +1,4 @@
-﻿using Android;
+using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -45,7 +45,7 @@ namespace DVBTTelevizor.MAUI
 
         private CancellationTokenSource? _waitForinitCancellation;
 
-        private static Android.Widget.Toast _instance;
+        private Android.Widget.Toast? _instance;
         private ILoggingService _loggingService = null;
 
         private bool _dispatchKeyEventEnabled = false;
@@ -590,7 +590,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 else
                 {
-                    if (keyAction != KeyboardNavigationActionEnum.Unknown)
+                    if (keyAction != KeyboardNavigationActionEnum.None)
                     {
                         _loggingService.Debug($"DispatchKeyEvent: {code} -> sending to application, time: {e.EventTime - e.DownTime}");
 

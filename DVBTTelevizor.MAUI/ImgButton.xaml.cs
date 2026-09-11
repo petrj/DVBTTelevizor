@@ -65,7 +65,7 @@ public partial class ImgButton : ContentView
 
     private static void OnAnyValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
-
+        // Property change notification handled via data binding
     }
 
     public ImgButton()

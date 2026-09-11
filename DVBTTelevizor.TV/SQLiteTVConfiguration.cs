@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.MAUI;
 using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Data.Sqlite;
@@ -102,18 +102,15 @@ namespace DVBTTelevizor
                 {
                     val = stringVal;
                 }
-                else
-                if (typeof(T) == typeof(bool))
+                else if (typeof(T) == typeof(bool))
                 {
                     val = Convert.ToBoolean(stringVal);
                 }
-                else
-                if (typeof(T) == typeof(int))
+                else if (typeof(T) == typeof(int))
                 {
                     val = Convert.ToInt32(stringVal);
                 }
-                else
-                if (typeof(T) == typeof(long))
+                else if (typeof(T) == typeof(long))
                 {
                     val = Convert.ToInt64(stringVal);
                 }

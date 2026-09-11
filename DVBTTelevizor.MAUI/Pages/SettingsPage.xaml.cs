@@ -22,12 +22,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
     private SettingsPageViewModel _settingsPageViewModel;
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
     private string _lngBefore = "";
-
-    private SledovaniTV.SledovaniTV _iptv;
 
     private KeyboardFocusableItemList _focusItems;
     private List<MenuItem> _menuItems = new List<MenuItem>();
@@ -37,10 +33,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
-        _iptv = iptv;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _settingsPageViewModel = new SettingsPageViewModel(loggingService, driver, iptv, tvConfiguration, publicDirectoryProvider);
 
@@ -129,7 +122,7 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
 
     private void SettingsPage_Unloaded(object? sender, EventArgs e)
     {
-
+        // Cleanup handled when page is unloaded if needed
     }
 
     private void BuildFocusableItems()

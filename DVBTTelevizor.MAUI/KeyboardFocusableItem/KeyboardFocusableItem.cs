@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using System;
 using System.Collections.Generic;
@@ -122,45 +122,41 @@ namespace DVBTTelevizor.MAUI
                 {
                     boxView.BackgroundColor = Color.FromHex("#303F9F");
                     boxView.Focus();
-                } else
-                if (part is RadioButton radioButton)
+                }
+                else if (part is RadioButton radioButton)
                 {
                     radioButton.BackgroundColor = Color.FromHex("#303F9F");
                     radioButton.TextColor = Colors.White;
                     radioButton.Focus();
                 }
-                else
-                if (part is Button button)
+                else if (part is Button button)
                 {
                     button.BackgroundColor = Color.FromHex("#303F9F");
                     button.TextColor = Colors.White;
                     button.Focus();
-                } else
-                if (part is ImageButton ibutton)
+                }
+                else if (part is ImageButton ibutton)
                 {
                     ibutton.BackgroundColor = Color.FromHex("#303F9F");
                     //button.TextColor = Colors.White;
                     ibutton.Focus();
-                } else
-                if (part is Label lbl)
+                }
+                else if (part is Label lbl)
                 {
                     lbl.BackgroundColor = Color.FromHex("#303F9F");
                     lbl.Focus();
                 }
-                else
-                if (part is ImgButton ibtn)
+                else if (part is ImgButton ibtn)
                 {
                     ibtn.ButtonColor = Color.FromHex("#303F9F");
                     //button.TextColor = Colors.White;
                     ibtn.FocusItem(true); // Focus event did not fired when debugging in Windows
                 }
-                else
-                if (part is Picker picker)
+                else if (part is Picker picker)
                 {
                     //picker.BackgroundColor = Color.FromHex("#303F9F");
                 }
-                else
-                if (part is Entry entry)
+                else if (part is Entry entry)
                 {
                     //entry.BackgroundColor = Color.FromHex("#303F9F");
                 }
@@ -179,38 +175,34 @@ namespace DVBTTelevizor.MAUI
                 {
                     boxView.BackgroundColor = Colors.Transparent;
                 }
-                else
-                if (part is Button button)
+                else if (part is Button button)
                 {
                     button.BackgroundColor = Colors.Gray;
                     button.TextColor = Colors.Black;
-                } else
-                if (part is RadioButton radioButton)
+                }
+                else if (part is RadioButton radioButton)
                 {
                     radioButton.BackgroundColor = Colors.Gray;
                     radioButton.TextColor = Colors.Black;
                 }
-                else
-                if (part is ImageButton ibutton)
+                else if (part is ImageButton ibutton)
                 {
                     ibutton.BackgroundColor = Colors.Gray;
-                } else
-                if (part is ImgButton ibtn)
+                }
+                else if (part is ImgButton ibtn)
                 {
                     ibtn.ButtonColor = Colors.Gray;
                     ibtn.FocusItem(false); // Focus event did not fired when debugging in Windows
-                } else
-                if (part is Label lbl)
+                }
+                else if (part is Label lbl)
                 {
                     lbl.Background = Colors.Transparent;
                 }
-                else
-                if (part is Picker picker)
+                else if (part is Picker picker)
                 {
                     //picker.BackgroundColor = Color.FromHex("#222222");
                 }
-                else
-                if (part is Entry entry)
+                else if (part is Entry entry)
                 {
                     //entry.BackgroundColor = Color.FromHex("#222222");
                 }

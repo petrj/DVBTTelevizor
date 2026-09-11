@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,7 @@ namespace DVBTTelevizor.MAUI
     [Flags]
     public enum KeyboardNavigationActionEnum
     {
-        Unknown = 0,
+        None = 0,
         OK = 1,
         Up = 2,
         Right = 4,
@@ -42,7 +42,7 @@ namespace DVBTTelevizor.MAUI
             if (Special(key))
                 return KeyboardNavigationActionEnum.Special;
 
-            return KeyboardNavigationActionEnum.Unknown;
+            return KeyboardNavigationActionEnum.None;
         }
 
         public static bool Special(string key)

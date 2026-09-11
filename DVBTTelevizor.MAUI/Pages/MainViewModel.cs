@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
@@ -42,7 +42,6 @@ namespace DVBTTelevizor.MAUI
         private bool _EPGDetailEnabled = true;
         private bool _EPGDetailFocused = false;
 
-        private Channel? _selectedChannel;
         private Channel _playingChannel;
         private Channel _recordingChannel;
         private bool _scanningEPG = false;
@@ -73,14 +72,10 @@ namespace DVBTTelevizor.MAUI
         private bool? _rtlsdrDriverInstalled = null;
         public bool MainLayoutVisible { get; set; } = true;
 
-        private IPublicDirectoryProvider _publicDirectoryProvider;
-
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
             _driver = driver;
-
-            _publicDirectoryProvider = publicDirectoryProvider;
 
              EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
              PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
@@ -633,8 +628,7 @@ namespace DVBTTelevizor.MAUI
                     if (lastChannel != null)
                     {
                         channelToSelect = lastChannel;
-                    } else
-                    if (firstChannel != null)
+                    } else if (firstChannel != null)
                     {
                         channelToSelect = firstChannel;
                     }

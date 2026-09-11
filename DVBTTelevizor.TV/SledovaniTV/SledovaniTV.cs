@@ -1,4 +1,4 @@
-﻿using LoggerService;
+using LoggerService;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -698,7 +698,7 @@ namespace SledovaniTV
                  channelsJson.GetStringValue("status") == "1" &&
                  channelsJson.HasValue("channels"))
                 {
-                    foreach (JObject channelJson in channelsJson["channels"])
+                    foreach (JToken channelJson in channelsJson["channels"])
                     {
                         //Locked:
                         // "none"
@@ -815,8 +815,7 @@ namespace SledovaniTV
                 {
                     // unlocked
                 }
-                else
-                if ((unlockResponseJson.HasValue("error")) &&
+                else if ((unlockResponseJson.HasValue("error")) &&
                     (unlockResponseJson.GetStringValue("error") == "bad pin"))
                 {
                     _status = StatusEnum.BadPin;

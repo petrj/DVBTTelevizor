@@ -65,7 +65,7 @@ namespace LibVLCSharp.MAUI
 
         private const string ClassName = "DVBTTelevizorEmbeddedVLCClass";
 
-        public static IPropertyMapper<VideoView, VideoViewHandler> Mapper = new PropertyMapper<VideoView, VideoViewHandler>(ViewHandler.ViewMapper)
+        public static readonly IPropertyMapper<VideoView, VideoViewHandler> Mapper = new PropertyMapper<VideoView, VideoViewHandler>(ViewHandler.ViewMapper)
         {
             [nameof(VideoView.MediaPlayer)] = MapMediaPlayer
         };

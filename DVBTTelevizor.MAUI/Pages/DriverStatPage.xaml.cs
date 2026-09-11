@@ -17,8 +17,6 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
-    private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
 
     private System.Drawing.Point[]? _spectrum = null;
 
@@ -39,8 +37,6 @@ public partial class DriverStatPage : ContentPage, IOnKeyDown
 
         _loggingService = loggingService;
         SetupDriver(driver);
-        _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new DriverStatPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 

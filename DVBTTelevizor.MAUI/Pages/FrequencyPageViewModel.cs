@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using RTLSDR.Common;
@@ -12,13 +12,11 @@ namespace DVBTTelevizor.MAUI
 
         private TuningSettings _tuneSettings { get; set; }
         private bool isReadonly = false;
-        private IDriverConnector _driver;
 
         public FrequencyPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)
         {
             _tuneSettings = new TuningSettings(_loggingService);
-            _driver = driver;
         }
 
         public TuningSettings Settings

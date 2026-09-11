@@ -1,4 +1,4 @@
-﻿using LoggerService;
+using LoggerService;
 using MPEGTS;
 using RTLSDR;
 using RTLSDR.Common;
@@ -16,14 +16,12 @@ namespace DVBTTelevizor.TV
     {
         private DateTime _lastStationTest = DateTime.MinValue;
         private Dictionary<long, bool> _stationOnFrequency = new Dictionary<long, bool>();
-        private ILoggingService _loggingService;
 
         private string _aacFileName = null;
 
         public RTLSDRDABDriverConnector(ILoggingService loggingService, ISDR driver, IDemodulator demodulator, int startupFrequency)
             : base(loggingService, driver, demodulator, startupFrequency)
         {
-            _loggingService = loggingService;
         }
 
         public override AppDriverTypeEnum DriverType => AppDriverTypeEnum.DAB;

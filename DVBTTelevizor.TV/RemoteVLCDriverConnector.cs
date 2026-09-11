@@ -43,7 +43,6 @@ namespace DVBTTelevizor.TV
         private string _dataStreamInfo = "Data reading not initialized";
         private string _IP = "127.0.0.1";
         private int _port = 8080;
-        private string _password = "1234";
 
         List<byte> _readBuffer = new List<byte>();
 
@@ -66,7 +65,6 @@ namespace DVBTTelevizor.TV
 
             _IP = IP;
             _port = port;
-            _password = password;
 
             _log.Debug($"Initializing remote VLC driver");
 
@@ -615,7 +613,7 @@ namespace DVBTTelevizor.TV
         private static readonly System.Text.RegularExpressions.Regex ProgramNameRegex =
      new(@"^\s*(.*?)\s*\[Program\s+(\d+)\]\s*$", System.Text.RegularExpressions.RegexOptions.CultureInvariant | System.Text.RegularExpressions.RegexOptions.Compiled);
 
-        public async Task<EITScanResult> ScanEPG(int msTimeout = 15000)
+        public async Task<EITScanResult> ScanEPG(int msTimeout = 2000)
         {
             if (msTimeout<7000)
             {

@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.MAUI;
 using LibVLCSharp.Shared;
 using LoggerService;
 using MPEGTS;
@@ -18,7 +18,7 @@ namespace DVBTTelevizor.DBManager
     {
         public virtual string Key { get; set; } = "DB";
 
-        protected static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        protected static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         protected ILoggingService _log;
         protected IDriverConnector _driver;

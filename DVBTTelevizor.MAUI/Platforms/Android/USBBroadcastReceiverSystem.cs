@@ -1,4 +1,4 @@
-﻿using Android.Content;
+using Android.Content;
 
 namespace DVBTTelevizor.MAUI
 {
@@ -8,7 +8,7 @@ namespace DVBTTelevizor.MAUI
     {
         public USBBroadcastReceiverSystem() { }
         public event EventHandler UsbAttachedOrDetached;
-        public override void OnReceive(Context c, Intent i)
+        public override void OnReceive(Context context, Intent intent)
         {
             UsbAttachedOrDetached(this, EventArgs.Empty);
         }

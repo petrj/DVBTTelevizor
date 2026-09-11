@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.MAUI;
 using LoggerService;
 using MPEGTS;
 using RTLSDR;
@@ -234,8 +234,7 @@ namespace DVBTTelevizor.TV
                 fName = Path.Join(PublicDirectory, "FM.raw");
                 _bytesPerSecond = 2114628;
             }
-            else
-            if (DriverType == AppDriverTypeEnum.DAB)
+            else if (DriverType == AppDriverTypeEnum.DAB)
             {
                 if (AudioTools.FrequenciesDabMHz.ContainsKey(LastTunedFreq/1E+06))
                 {

@@ -1768,12 +1768,12 @@ namespace DVBTTelevizor.MAUI
 
         private void DriverButton_Clicked(object sender, EventArgs e)
         {
-
+            // Handled elsewhere or placeholder
         }
 
         private void SwipeGestureRecognizer_Swiped(object sender, SwipedEventArgs e)
         {
-
+            // Default swipe handler intentionally left blank
         }
 
         private void VideoSwiped_Left(object sender, SwipedEventArgs e)
@@ -1983,14 +1983,12 @@ namespace DVBTTelevizor.MAUI
                     {
                         _focusItems.FocusItem("ChannelsListView");
                     }
-                    else
-                    if (_focusItems.FocusedItemName == "ChannelsListView")
+                    else if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
                         _viewModel.SelectNextChannel();
                         await FocusSelectedChannel();
                     }
-                    else
-                    if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                    else if (_focusItems.FocusedItemName == "EPGDetailGrid")
                     {
                         // scroll down
                         await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
@@ -2033,14 +2031,12 @@ namespace DVBTTelevizor.MAUI
                     {
                         _focusItems.FocusItem("ChannelsListView");
                     }
-                    else
-                if (_focusItems.FocusedItemName == "ChannelsListView")
+                    else if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
                         _viewModel.SelectPreiousChannel();
                         await FocusSelectedChannel();
                     }
-                    else
-                if (_focusItems.FocusedItemName == "EPGDetailGrid")
+                    else if (_focusItems.FocusedItemName == "EPGDetailGrid")
                     {
                         // scroll up
                         await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
@@ -2957,8 +2953,7 @@ namespace DVBTTelevizor.MAUI
                     if (pageOnTop is NavigationPage np)
                     {
                         result = np.CurrentPage;
-                    } else
-                    if (pageOnTop is Page p)
+                    } else if (pageOnTop is Page p)
                     {
                         result = p;
                     }
@@ -3267,8 +3262,7 @@ namespace DVBTTelevizor.MAUI
                                             await _viewModel.SelectFirstChannel();
                                             _lastTimeHome = true;
                                         }
-                                        else
-                                        if (_viewModel.StandingOnStart)
+                                        else if (_viewModel.StandingOnStart)
                                         {
                                             await _viewModel.SelectLastChannel();
                                             _lastTimeHome = false;
@@ -4091,8 +4085,7 @@ namespace DVBTTelevizor.MAUI
             {
                 _viewModel.PlayingState = PlayingStateEnum.PlayingInPreview;
             }
-            else
-            if (_viewModel.PlayingState == PlayingStateEnum.PlayingInPreview)
+            else if (_viewModel.PlayingState == PlayingStateEnum.PlayingInPreview)
             {
                 _viewModel.PlayingState = PlayingStateEnum.Playing;
             }

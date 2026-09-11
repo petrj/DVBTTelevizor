@@ -12,9 +12,6 @@ public partial class AboutPage : ContentPage, IOnKeyDown
     private AboutPageViewModel _aboutPageViewModel;
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
-    private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -23,9 +20,6 @@ public partial class AboutPage : ContentPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
-        _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _aboutPageViewModel = new AboutPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 

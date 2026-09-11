@@ -11,9 +11,7 @@ public partial class GainPage : ContentPage, IOnKeyDown
     private GainPageViewModel _viewModel;
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
 
 
     public TuneFrequencyModeEnum TuneFrequencyMode { get; set; } = TuneFrequencyModeEnum.Center;
@@ -27,9 +25,7 @@ public partial class GainPage : ContentPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new GainPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 

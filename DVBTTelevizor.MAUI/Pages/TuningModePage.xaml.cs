@@ -13,7 +13,6 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
     private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
@@ -26,8 +25,6 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
         _driver = driver;
         _configuration = tvConfiguration;
         _publicDirectoryProvider = publicDirectoryProvider;
-
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new TuningModePageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 

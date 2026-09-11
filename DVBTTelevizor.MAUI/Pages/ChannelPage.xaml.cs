@@ -14,9 +14,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private ChannelPageViewModel _channelPageViewModel;
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
     private string? _previousName = null;
     private string? _previousNumber = null;
 
@@ -28,9 +26,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
         _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _channelPageViewModel = new ChannelPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
@@ -128,8 +124,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             WeakReferenceMessenger.Default.Send(new SetAudioTrackMessage(menuId));
 
             ch.SelectedAudioTrack = menuId.Substring(9);
-        } else
-        if (menuId.StartsWith("setSubtitles"))
+        } else if (menuId.StartsWith("setSubtitles"))
         {
             WeakReferenceMessenger.Default.Send(new SetSubtitlesMessage(menuId));
             ch.SelectedSubtitle = menuId.Substring(13);

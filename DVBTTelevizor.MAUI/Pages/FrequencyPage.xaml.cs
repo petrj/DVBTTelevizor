@@ -11,9 +11,6 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
     private FrequencyPageViewModel _viewModel;
 
     private ILoggingService _loggingService;
-    private IDriverConnector _driver;
-    private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
     private long _oldFreq = 0;
 
     public TuneFrequencyModeEnum TuneFrequencyMode { get; set; } = TuneFrequencyModeEnum.Center;
@@ -27,9 +24,6 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
         InitializeComponent();
 
         _loggingService = loggingService;
-        _driver = driver;
-        _configuration = tvConfiguration;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new FrequencyPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
@@ -52,7 +46,7 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
 
     private void SliderFrequency_Unfocused(object? sender, FocusEventArgs e)
     {
-
+        // Event handler intentionally left blank
     }
 
     private void MHZEntry_Focused(object? sender, FocusEventArgs e)
