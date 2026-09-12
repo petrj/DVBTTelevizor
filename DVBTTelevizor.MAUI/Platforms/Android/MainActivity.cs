@@ -835,19 +835,20 @@ namespace DVBTTelevizor.MAUI
 
                             if (_waitForinitCancellation.IsCancellationRequested)
                             {
+                                _waitForinitCancellation?.Dispose();
                                 return;
                             }
                         }
 
                         _loggingService.Info("Device response timeout");
                         WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage("Device response timeout".Translated()));
+
                     }
                     catch (System.OperationCanceledException)
                     {
+                        _waitForinitCancellation?.Dispose();
                     }
                 }, _waitForinitCancellation.Token);
-
-                _waitForinitCancellation.Dispose();
 
                 _loggingService.Info("Starting activity");
                 _ignoreRequest[StartRequestCode] = false;
