@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +13,10 @@ namespace DVBTTelevizor.MAUI
 {
     public class AppMenu
     {
-        private Menu _menu = null;
+        private readonly Menu _menu = null;
         private AppFontSizeEnum _appFontSize = AppFontSizeEnum.Normal;
 
-        private List<MenuItem> _menuItems = new List<MenuItem>();
+        private readonly List<MenuItem> _menuItems = new List<MenuItem>();
         private bool _visible = false;
 
         public event EventHandler<MenuVisibleChangedEventArgs>? MenuVisibleChanged;

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
@@ -10,8 +10,8 @@ namespace DVBTTelevizor.MAUI
     {
         public bool NotifyEnabled { get; set; } = true;
         private bool _isReadonly = false;
-        private IDriverConnector _driver;
-        private ITVConfiguration _tvConfiguration;
+        private readonly IDriverConnector _driver;
+        private readonly ITVConfiguration _tvConfiguration;
 
         public GainPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)

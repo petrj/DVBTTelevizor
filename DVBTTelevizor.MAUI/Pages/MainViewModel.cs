@@ -33,10 +33,10 @@ namespace DVBTTelevizor.MAUI
 
         private IDriverConnector? _driver = null;
 
-        private SledovaniTV.SledovaniTV _iptv;
+        private readonly SledovaniTV.SledovaniTV _iptv;
 
         private PlayingStateEnum _playingState = PlayingStateEnum.Stopped;
-        private ListViewSelector? _listViewSelector = null;
+        private readonly ListViewSelector? _listViewSelector = null;
         private bool? _EPGDetailVisibleLastValue = null;
 
         private bool _EPGDetailEnabled = true;
@@ -54,7 +54,7 @@ namespace DVBTTelevizor.MAUI
 
         private bool? _videoStackLayoutvisible = null;
 
-        private BackgroundWorker _recordingBackgroundWorker = new BackgroundWorker();
+        private readonly BackgroundWorker _recordingBackgroundWorker = new BackgroundWorker();
 
         public ICommand CommandPlay { get; set; }
         public ICommand CommandTune { get; set; }

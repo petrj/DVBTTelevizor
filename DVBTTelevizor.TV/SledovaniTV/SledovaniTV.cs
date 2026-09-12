@@ -17,7 +17,7 @@ namespace SledovaniTV
 {
     public class SledovaniTV
     {
-        private ILoggingService _log;
+        private readonly ILoggingService _log;
         private const string ServiceUrl = "http://sledovanitv.cz/api/";
 
         private Credentials? _credentials;

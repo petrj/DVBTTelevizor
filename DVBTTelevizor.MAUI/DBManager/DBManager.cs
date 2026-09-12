@@ -26,7 +26,7 @@ namespace DVBTTelevizor.DBManager
 
         private CancellationTokenSource _cts = null;
 
-        private ConcurrentQueue<Dictionary<string, List<T>>> _saveQueue = new ConcurrentQueue<Dictionary<string, List<T>>>();
+        private readonly ConcurrentQueue<Dictionary<string, List<T>>> _saveQueue = new ConcurrentQueue<Dictionary<string, List<T>>>();
         protected ConcurrentDictionary<string, List<T>> _freqValues { get; set; } = new ConcurrentDictionary<string, List<T>>();
 
         public DBManager(ILoggingService loggingService, IPublicDirectoryProvider publicDirectoryProvider, IDriverConnector driver)

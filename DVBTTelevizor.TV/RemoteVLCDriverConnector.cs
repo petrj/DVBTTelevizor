@@ -26,32 +26,32 @@ namespace DVBTTelevizor.TV
         public int ReceiveTimeoutMiliSeconds { get; set; } = 5000;
         public int ReadBufferSize { get; set; } = 32768;
 
-        private int _transferPort = 42000;
+        private readonly int _transferPort = 42000;
         private DVBTDriverConfiguration _driverConfiguration;
-        private ILoggingService _log;
-        private UDPStreamer _UDPStreamer;
+        private readonly ILoggingService _log;
+        private readonly UDPStreamer _UDPStreamer;
         private long _lastTunedFreq = -1;
         private int _lastTunedDeliverySystem = -1;
         private long _lastTunedBandwidth = -1;
         private static object _readThreadLock = new object();
         private static object _infoLock = new object();
-        private bool _readingStream = true;
+        private readonly bool _readingStream = true;
         private bool _streaming = false;
         private bool _recording = false;
-        private bool _readingBuffer = false;
+        private readonly bool _readingBuffer = false;
         private string? _recordingFileName = null;
         private string _dataStreamInfo = "Data reading not initialized";
-        private string _IP = "127.0.0.1";
-        private int _port = 8080;
+        private readonly string _IP = "127.0.0.1";
+        private readonly int _port = 8080;
 
-        List<byte> _readBuffer = new List<byte>();
+        private readonly List<byte> _readBuffer = new List<byte>();
 
         // VLC http communication
         private readonly HttpClient _httpClient;
 
         private long _bitrate = 0;
         private bool _driverStreamDataAvailable = false;
-        private string _recordDirectory = "";
+        private readonly string _recordDirectory = "";
 
         public event EventHandler? OnRawAudioDemodulated;
         public event EventHandler? OnServiceFound;

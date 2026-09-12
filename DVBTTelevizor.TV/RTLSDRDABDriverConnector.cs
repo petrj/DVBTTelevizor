@@ -14,8 +14,8 @@ namespace DVBTTelevizor.TV
 {
     public class RTLSDRDABDriverConnector : RTLSDRDriverConnector
     {
-        private DateTime _lastStationTest = DateTime.MinValue;
-        private Dictionary<long, bool> _stationOnFrequency = new Dictionary<long, bool>();
+        private readonly DateTime _lastStationTest = DateTime.MinValue;
+        private readonly Dictionary<long, bool> _stationOnFrequency = new Dictionary<long, bool>();
 
         private string _aacFileName = null;
 

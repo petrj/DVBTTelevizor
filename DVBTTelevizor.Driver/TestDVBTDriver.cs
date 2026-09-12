@@ -26,8 +26,8 @@ namespace DVBTTelevizor
 
         public bool SendingDataDisabled { get; set; } = false;
 
-        private BackgroundWorker _controlWorker;
-        private BackgroundWorker _transferWorker;
+        private readonly BackgroundWorker _controlWorker;
+        private readonly BackgroundWorker _transferWorker;
 
         private const int MaxBufferSize = 1250000;
         private const int MinBufferSize = 1250;
@@ -35,7 +35,7 @@ namespace DVBTTelevizor
         private IPEndPoint _controlIPEndPoint = null;
         private IPEndPoint _transferIPEndPoint = null;
 
-        private ILoggingService _loggingService;
+        private readonly ILoggingService _loggingService;
 
         private long _frequency = 0;
         private long _bandWidth = 0;
@@ -43,11 +43,11 @@ namespace DVBTTelevizor
 
         private long _sendingDataFrequency = 0;
         private int _sendingDataPosition = 0;
-        private Dictionary<long, List<byte>> _freqStreams = null;
+        private readonly Dictionary<long, List<byte>> _freqStreams = null;
 
-        private List<long> _PIDFilter = new List<long>();
+        private readonly List<long> _PIDFilter = new List<long>();
 
-        private object key = 1;
+        private readonly object key = 1;
 
         public TestDVBTDriver(ILoggingService loggingService)
         {

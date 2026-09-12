@@ -12,12 +12,12 @@ namespace DVBTTelevizor
     {
         public const int MaxPacketSize = 1400;
 
-        private ILoggingService _log;
-        private UdpClient _UDPClient = null;
-        private IPEndPoint _EndPoint = null;
+        private readonly ILoggingService _log;
+        private readonly UdpClient _UDPClient = null;
+        private readonly IPEndPoint _EndPoint = null;
 
-        private string _ip;
-        private int _port = 1234;
+        private readonly string _ip;
+        private readonly int _port = 1234;
 
         public string IP
         {

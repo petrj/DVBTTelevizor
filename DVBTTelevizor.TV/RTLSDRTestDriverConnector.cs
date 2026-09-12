@@ -17,9 +17,9 @@ namespace DVBTTelevizor.TV
     public class RTLSDRTestDriverConnector : IDriverConnector
     {
         protected ILoggingService _log;
-        private IDemodulator _demodulator = null;
-        private DateTime _lastTimeForGettingStatus = DateTime.MinValue;
-        private AppDriverTypeEnum _driverType = AppDriverTypeEnum.DAB;
+        private readonly IDemodulator _demodulator = null;
+        private readonly DateTime _lastTimeForGettingStatus = DateTime.MinValue;
+        private readonly AppDriverTypeEnum _driverType = AppDriverTypeEnum.DAB;
         private CancellationTokenSource? _cts;
         private long _bytesPerSecond = 2114628;
 

@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.MAUI;
 using LoggerService;
 using MPEGTS;
 using Newtonsoft.Json.Bson;
@@ -167,12 +167,12 @@ namespace DVBTTelevizor.TV
             }
         }
 
-        private Stream _recordStream = null;
+        private readonly Stream _recordStream = null;
 
         private DVBTDriverConfiguration _driverConfiguration;
 
-        private bool _readingStream = true;
-        private bool _streaming = false;
+        private readonly bool _readingStream = true;
+        private readonly bool _streaming = false;
         private bool _recording = false;
 
         public DVBTDriverConfiguration Configuration

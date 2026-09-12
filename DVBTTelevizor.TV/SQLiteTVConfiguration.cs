@@ -16,8 +16,8 @@ namespace DVBTTelevizor
 {
     public class SQLiteTVConfiguration : ITVConfiguration
     {
-        private ILoggingService _loggingService;
-        private string _configDBPath = string.Empty;
+        private readonly ILoggingService _loggingService;
+        private readonly string _configDBPath = string.Empty;
         private string _configDirectory = string.Empty;
 
         public SQLiteTVConfiguration(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider)

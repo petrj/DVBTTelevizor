@@ -11,9 +11,9 @@ namespace DVBTTelevizor
 {
     public abstract class CustomSharedPreferencesObject
     {
-        private ISharedPreferences _sharedPrefs;
-        private ISharedPreferencesEditor _prefsEditor;
-        private Context _context;
+        private readonly ISharedPreferences _sharedPrefs;
+        private readonly ISharedPreferencesEditor _prefsEditor;
+        private readonly Context _context;
 
         public CustomSharedPreferencesObject()
         {

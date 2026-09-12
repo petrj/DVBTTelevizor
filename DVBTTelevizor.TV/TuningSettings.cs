@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.TV;
+using DVBTTelevizor.TV;
 using LoggerService;
 using RTLSDR.Common;
 using System;
@@ -11,7 +11,7 @@ namespace DVBTTelevizor
 {
     public class TuningSettings
     {
-        ILoggingService _loggingService = null;
+        private readonly ILoggingService _loggingService = null;
 
         public TuneModeEnum TuningMode { get; set; } = TuneModeEnum.Automatic;
 

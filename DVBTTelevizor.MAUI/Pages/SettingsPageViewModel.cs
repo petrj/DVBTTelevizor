@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
@@ -19,7 +19,7 @@ namespace DVBTTelevizor.MAUI
         private const string DefaultLanguage = "English (default)";
         private int? previousDVBTDriverTypeindex = null;
         private bool _requestWriteToSDCardDisabled = false;
-        private SledovaniTV.SledovaniTV _iptv;
+        private readonly SledovaniTV.SledovaniTV _iptv;
 
         public string IgnoreLanguageChangeNotify { get; set; } = null;
 

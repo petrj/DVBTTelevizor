@@ -25,7 +25,7 @@ namespace DVBTTelevizor
 
         public event EventHandler? OnRawAudioDemodulated; // not used, DVBT uses VideoStream
 
-        private ILoggingService _log;
+        private readonly ILoggingService _log;
         private DVBTDriverConfiguration _driverConfiguration;
         private TcpClient? _controlClient = null;
         private TcpClient? _transferClient = null;
@@ -37,14 +37,14 @@ namespace DVBTTelevizor
 
         private const int ReadBufferSize = 32768;
 
-        private bool _readingStream = true;
+        private readonly bool _readingStream = true;
         private bool _streaming = false;
         private bool _recording = false;
         private bool _readingBuffer = false;
         private bool _driverStreamDataAvailable = false;
         private string? _recordingFileName = null;
 
-        List<byte> _readBuffer = new List<byte>();
+        private readonly List<byte> _readBuffer = new List<byte>();
         private string? _lastSpeedCalculationSec = null;
 
         private static object _readThreadLock = new object();
@@ -52,7 +52,7 @@ namespace DVBTTelevizor
 
         private string _dataStreamInfo = "Data reading not initialized";
 
-        private UDPStreamer _UDPStreamer;
+        private readonly UDPStreamer _UDPStreamer;
 
         public delegate void StatusChangedEventHandler(object sender, DVBTDriverStatusChangedEventArgs e);
         public event EventHandler? StatusChanged = null;

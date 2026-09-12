@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.TV;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Plugin.InAppBilling;
 using System;
@@ -13,8 +13,8 @@ namespace DVBTTelevizor.MAUI
     public class FilterPageViewModel : BaseViewModel
     {
         public ObservableCollection<MultiplexInfo> Multiplexes { get; } = new ObservableCollection<MultiplexInfo>();
-        private ITVConfiguration _tvConfiguration;
-        private ILoggingService _loggingService;
+        private readonly ITVConfiguration _tvConfiguration;
+        private readonly ILoggingService _loggingService;
 
         public FilterPageViewModel(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
           : base(loggingService, driver, tvConfiguration, publicDirectoryProvider)

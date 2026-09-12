@@ -30,6 +30,8 @@ namespace DVBTTelevizor.MAUI
 {
     public partial class MainPage : ContentPage, IOnKeyDown
     {
+        private static readonly string[] EmptyMediaOptions = Array.Empty<string>();
+
         private MainViewModel _viewModel;
         private ILoggingService _loggingService { get; set; }
         private IDemodulator? _demodulator { get; set; } = null;
@@ -2517,7 +2519,7 @@ namespace DVBTTelevizor.MAUI
                                 _media = new Media(_LibVLC, _driver.StreamUrl, FromType.FromLocation);
                                 break;
                             case DriverStreamTypeEnum.Stream:
-                                _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), new string[] { });
+                                _media = new Media(_LibVLC, new StreamMediaInput(_driver.VideoStream), EmptyMediaOptions);
                                 break;
                             case DriverStreamTypeEnum.RAWPCMAudio:
 

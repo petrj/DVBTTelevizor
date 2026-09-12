@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.TV;
+using DVBTTelevizor.TV;
 using LoggerService;
 using RTLSDR;
 using System;
@@ -11,7 +11,7 @@ namespace DVBTTelevizor.MAUI.Platforms.Windows
 {
     public class RTLSDRDriverPlatformImplementation : IRTLSDRDriverPlatformImplementation
     {
-        private ILoggingProvider _loggingProvider;
+        private readonly ILoggingProvider _loggingProvider;
 
         public RTLSDRDriverPlatformImplementation(ILoggingProvider loggingProvider)
         {

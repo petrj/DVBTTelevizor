@@ -16,7 +16,7 @@ namespace DVBTTelevizor.MAUI
     [JsonObject(MemberSerialization.OptIn)]
     internal class DVBTTelevizorConfiguration : CustomSharedPreferencesObject, ITVConfiguration
     {
-        private ILoggingService _loggingService;
+        private readonly ILoggingService _loggingService;
         private string _configDirectory = string.Empty;
 
         public bool Fullscreen

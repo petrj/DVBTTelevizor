@@ -18,6 +18,8 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
     private string? _previousName = null;
     private string? _previousNumber = null;
 
+    private static readonly char[] PositionSeparators = [',', ';'];
+
     private List<MenuItem> _menuItems = new List<MenuItem>();
     private KeyboardFocusableItemList _focusItems;
 
@@ -60,7 +62,7 @@ public partial class ChannelPage : ContentPage, IOnKeyDown
             if (string.IsNullOrWhiteSpace(pos))
                 return;
 
-            var parts = pos.Split(new[] {',', ';'}, StringSplitOptions.RemoveEmptyEntries);
+            var parts = pos.Split(PositionSeparators, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 2)
                 return;
 

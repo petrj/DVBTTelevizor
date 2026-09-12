@@ -28,21 +28,20 @@ namespace DVBTTelevizor.MAUI
         //[IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
     // Android Phone:
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
-    public class
-        : MauiAppCompatActivity
+    public class MainActivity : MauiAppCompatActivity
     {
         private const int StartRequestCode = 1000;
         private const int StartRequestCodeRTLSDR = 1001;
         private const int StartRequestCodeDriverPreferences = 1002;
         private const int FolderAccessRequestCode = 1003;
         private const int StorageAccessRequestCode = 1004;
-        private Dictionary<int,bool> _ignoreRequest = new Dictionary<int,bool>();
-        private int _audioSampleRate = 96000;
-        private int _audioChannels = 2;
-        private bool _startAudioReceiverThread = false;
+        private readonly Dictionary<int,bool> _ignoreRequest = new Dictionary<int,bool>();
+        private readonly int _audioSampleRate = 96000;
+        private readonly int _audioChannels = 2;
+        private readonly bool _startAudioReceiverThread = false;
         private int _SDRDriverStreamPort = 0;
         private int _SDRDriverPort = 0;
-        private int _audioRecieverPort = 8012;
+        private readonly int _audioRecieverPort = 8012;
 
         private CancellationTokenSource? _waitForinitCancellation;
 

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui;
@@ -14,7 +14,7 @@ namespace DVBTTelevizor.MAUI
     public class TuningSelectDVBTPageViewModel : BaseViewModel
     {
         private string? _selectedBandwidth = null;
-        private Dictionary<string, int> _dict = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _dict = new Dictionary<string, int>();
 
         public bool Initializing { get; set; } = true;
 

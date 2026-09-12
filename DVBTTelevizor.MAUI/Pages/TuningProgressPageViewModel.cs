@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
@@ -47,11 +47,11 @@ namespace DVBTTelevizor.MAUI
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
         private Channel? _selectedChannel;
 
-        private Dictionary<long, int> _tunedMultiplexes = new Dictionary<long, int>();
+        private readonly Dictionary<long, int> _tunedMultiplexes = new Dictionary<long, int>();
         private int _tunedNewChannels = 0;
 
         private TuneStateEnum _tuneState = TuneStateEnum.Inactive;
-        private ListViewSelector? _listViewSelector = null;
+        private readonly ListViewSelector? _listViewSelector = null;
 
         public event EventHandler? ChannelFound = null;
 
