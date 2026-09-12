@@ -114,7 +114,7 @@ namespace DVBTTelevizor.DBManager
             _cts?.Dispose();
         }
 
-        protected string GetKey(long freq, long programMapPID)
+        protected static string GetKey(long freq, long programMapPID)
         {
             return $"{freq}.{programMapPID}";
         }

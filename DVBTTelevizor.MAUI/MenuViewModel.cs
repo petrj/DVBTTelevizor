@@ -25,7 +25,7 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        private int GetScaledSize(int index, int normalSize = 12)
+        private static int GetScaledSize(int index, int normalSize = 12)
         {
             switch (index)
             {

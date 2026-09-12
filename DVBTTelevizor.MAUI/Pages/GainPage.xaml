@@ -175,7 +175,7 @@
             </Grid.ColumnDefinitions>
 
             <Label Grid.Row="0" Grid.Column="1"  Text="{Binding GainCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForLargeCaption}" HorizontalOptions="End" VerticalOptions="End"/>
-            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding GaunUnitCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
+            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding GainUnitCaption}" Style="{DynamicResource CaptionStyle}" FontSize="{Binding FontSizeForDetailNote}" HorizontalOptions="Start" VerticalOptions="End"/>
 
         </Grid>
 

@@ -254,12 +254,12 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string HighlightedButtonColor
+        public static string HighlightedButtonColor
         {
             get { return "#00AA00"; }
         }
 
-        public string ButtonColor
+        public static string ButtonColor
         {
             get { return "Gray"; }
         }

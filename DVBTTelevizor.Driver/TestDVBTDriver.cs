@@ -37,10 +37,6 @@ namespace DVBTTelevizor
 
         private readonly ILoggingService _loggingService;
 
-        private long _frequency = 0;
-        private long _bandWidth = 0;
-        private long _deliverySystem = 0;
-
         private long _sendingDataFrequency = 0;
         private int _sendingDataPosition = 0;
         private readonly Dictionary<long, List<byte>> _freqStreams = null;
@@ -253,7 +249,7 @@ namespace DVBTTelevizor
             }
         }
 
-        private string GetHumanReadableSize(double bytes, bool highPrecision = false)
+        private static string GetHumanReadableSize(double bytes, bool highPrecision = false)
         {
             var frm = highPrecision ? "N2" : "N0";
 
@@ -270,7 +266,7 @@ namespace DVBTTelevizor
             return bytes.ToString(frm) + " B";
         }
 
-        private int GetCorrectedBufferSize(int bufferSize)
+        private static int GetCorrectedBufferSize(int bufferSize)
         {
             // divisible by 188
             while (bufferSize % 188 != 0)
@@ -565,15 +561,15 @@ namespace DVBTTelevizor
 
         private byte[] Tune(byte[] request)
         {
-            _frequency = DVBTDriverResponse.GetBigEndianLongFromByteArray(request, 2);
-            _bandWidth = DVBTDriverResponse.GetBigEndianLongFromByteArray(request, 10);
-            _deliverySystem = DVBTDriverResponse.GetBigEndianLongFromByteArray(request, 18);
+            var frequency = DVBTDriverResponse.GetBigEndianLongFromByteArray(request, 2);
+            var bandWidth = DVBTDriverResponse.GetBigEndianLongFromByteArray(request, 10);
+            var _deliverySystem = DVBTDriverResponse.GetBigEndianLongFromByteArray(request, 18);
 
-            _loggingService.Info($"TestingDVBTDriver Tuning: {_frequency / 1000000} MHz ({_bandWidth}/{_deliverySystem})");
+            _loggingService.Info($"TestingDVBTDriver Tuning: {frequency / 1000000} MHz ({bandWidth}/{_deliverySystem})");
 
             // looking for MPEGTS dump of this _frequency
             var folder = PublicDirectory;
-            var fNamePattern = "DVBT-MPEGTS-" + (_frequency / 1000000).ToString("N0") + "*.ts";
+            var fNamePattern = "DVBT-MPEGTS-" + (frequency / 1000000).ToString("N0") + "*.ts";
             var res = System.IO.Directory.GetFiles(folder, fNamePattern);
 
             lock(key)
@@ -581,15 +577,15 @@ namespace DVBTTelevizor
 
                 if (res.Length > 0 && _deliverySystem == 1)
                 {
-                    if (!_freqStreams.ContainsKey(_frequency))
+                    if (!_freqStreams.ContainsKey(frequency))
                     {
-                        _freqStreams.Add(_frequency, null);
+                        _freqStreams.Add(frequency, null);
                     }
 
-                    _freqStreams[_frequency] = LoadBytesFromFile(res[0]);
+                    _freqStreams[frequency] = LoadBytesFromFile(res[0]);
 
                     _sendingDataPosition = 0;
-                    _sendingDataFrequency = _frequency;
+                    _sendingDataFrequency = frequency;
                 }
                 else
                 {

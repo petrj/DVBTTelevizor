@@ -37,7 +37,7 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(GainCaption));
                 OnPropertyChanged(nameof(GainValue));
 
-                OnPropertyChanged(nameof(GaunUnitCaption));
+                OnPropertyChanged(nameof(GainUnitCaption));
                 OnPropertyChanged(nameof(GainMin));
                 OnPropertyChanged(nameof(GainMax));
                 OnPropertyChanged(nameof(GainMinTitle));
@@ -160,7 +160,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string GaunUnitCaption
+        public static string GainUnitCaption
         {
             get
             {
@@ -168,7 +168,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public int GainMin
+        public static int GainMin
         {
             get
             {
@@ -176,7 +176,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public int GainMax
+        public static int GainMax
         {
             get
             {
@@ -184,7 +184,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string GainMinTitle
+        public static string GainMinTitle
         {
             get
             {
@@ -192,7 +192,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public string GainMaxTitle
+        public static string GainMaxTitle
         {
             get
             {
