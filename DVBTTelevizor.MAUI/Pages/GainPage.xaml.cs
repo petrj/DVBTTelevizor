@@ -41,9 +41,9 @@ public partial class GainPage : ContentPage, IOnKeyDown
 
         _configuration.GainValue -= 10;
 
-        if (_configuration.GainValue  < _viewModel.GainMin)
+        if (_configuration.GainValue  < GainPageViewModel.GainMin)
         {
-            _configuration.GainValue = _viewModel.GainMin;
+            _configuration.GainValue = GainPageViewModel.GainMin;
         }
 
         _viewModel.NotifyChange();
@@ -58,9 +58,9 @@ public partial class GainPage : ContentPage, IOnKeyDown
 
         _configuration.GainValue += 10;
 
-        if (_configuration.GainValue > _viewModel.GainMax)
+        if (_configuration.GainValue > GainPageViewModel.GainMax)
         {
-            _configuration.GainValue = _viewModel.GainMax;
+            _configuration.GainValue = GainPageViewModel.GainMax;
         }
 
         _viewModel.NotifyChange();

@@ -168,15 +168,15 @@ namespace DVBTTelevizor
                 }
                 if (typeof(T) == typeof(bool))
                 {
-                    SavePersistingStringValue(key, value.ToString());
+                    SavePersistingStringValue(key, value?.ToString() ?? string.Empty);
                 }
                 if (typeof(T) == typeof(int))
                 {
-                    SavePersistingStringValue(key, value.ToString());
+                    SavePersistingStringValue(key, value?.ToString() ?? string.Empty);
                 }
                 if (typeof(T) == typeof(long))
                 {
-                    SavePersistingStringValue(key, value.ToString());
+                    SavePersistingStringValue(key, value?.ToString() ?? string.Empty);
                 }
             }
             catch (Exception ex)

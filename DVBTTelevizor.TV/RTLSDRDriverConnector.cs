@@ -107,30 +107,31 @@ namespace DVBTTelevizor.TV
 
         public async Task SetGain(GainEnum gain, int value = 0)
         {
-            if (_driver == null)
+            var driver = _driver;
+            if (driver == null)
             {
                 return;
             }
 
             if (gain == GainEnum.HW)
             {
-                _driver?.SetGain(0);
-                _driver?.SetGainMode(false);
-                _driver?.SetIfGain(true);
-                _driver?.SetAGCMode(true);
+                driver.SetGain(0);
+                driver.SetGainMode(false);
+                driver.SetIfGain(true);
+                driver.SetAGCMode(true);
             }
             else
             {
                 // always manual
-                _driver?.SetGainMode(true);
+                driver.SetGainMode(true);
                 if (gain == GainEnum.Auto)
                 {
-                    _driver?.SetGain(0);
-                    await _driver?.AutoSetGain();
+                    driver.SetGain(0);
+                    await driver.AutoSetGain();
                 }
                 else
                 {
-                    _driver?.SetGain(value);
+                    driver.SetGain(value);
                 }
             }
         }

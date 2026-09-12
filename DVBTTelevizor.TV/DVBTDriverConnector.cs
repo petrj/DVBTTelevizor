@@ -307,7 +307,7 @@ namespace DVBTTelevizor
         {
             _log.Debug($"Stopping background reading");
 
-            _transferClient.Close();
+            _transferClient?.Close();
         }
 
         public void StartStream()
@@ -356,7 +356,7 @@ namespace DVBTTelevizor
 
             try
             {
-                _controlClient.Close();
+                _controlClient?.Close();
             }
             catch (Exception ex)
             {
@@ -495,7 +495,7 @@ namespace DVBTTelevizor
 
                     do
                     {
-                        if (_controlClient.Client.Available > 0)
+                        if (_controlClient?.Client?.Available > 0)
                         {
                             //_log.Debug("Reading from stream ...");
 
@@ -633,9 +633,10 @@ namespace DVBTTelevizor
                             status += ", streaming";
                         }
 
-                        if (_transferClient.Available > 0)
+                        var transferStream = _transferStream;
+                        if (_transferClient != null && _transferClient.Available > 0 && transferStream != null)
                         {
-                            var bytesRead = _transferStream.Read(buffer, 0, buffer.Length);
+                            var bytesRead = transferStream.Read(buffer, 0, buffer.Length);
                             totalBytesRead += bytesRead;
                             bytesReadFromLastMeasureStartTime += bytesRead;
 
@@ -724,7 +725,7 @@ namespace DVBTTelevizor
                     DataStreamInfo = status;
 
                 }
-                while (_transferClient.Connected);
+                while (_transferClient != null && _transferClient.Connected);
 
             }
             catch (Exception ex)
@@ -1437,8 +1438,8 @@ namespace DVBTTelevizor
                 SignalState = new DVBTDriverStatus()
             };
 
-            DVBTDriverResponse tuneRes = null;
-            DVBTDriverResponse setPIDres = null;
+            DVBTDriverResponse? tuneRes = null;
+            DVBTDriverResponse? setPIDres = null;
 
             double getSignalTime = 0;
             double testDataTime = 0;
@@ -1474,7 +1475,7 @@ namespace DVBTTelevizor
 
                     tuneTime += (DateTime.Now - startTuneTime).TotalMilliseconds;
 
-                    if (!tuneRes.SuccessFlag)
+                    if (tuneRes == null || !tuneRes.SuccessFlag)
                     {
                         res.Result = DVBTDriverSearchProgramResultEnum.Error;
                         return res;
@@ -1500,7 +1501,7 @@ namespace DVBTTelevizor
 
                     setPIDsTime += (DateTime.Now - startSetPIDsStartTime).TotalMilliseconds;
 
-                    if (!setPIDres.SuccessFlag)
+                    if (setPIDres == null || !setPIDres.SuccessFlag)
                     {
                         res.Result = DVBTDriverSearchProgramResultEnum.Error;
                         return res;
@@ -1570,7 +1571,7 @@ namespace DVBTTelevizor
             var totalTimeoutforSignalSeconds = fastTuning ? 3 : 10;
             var timeoutforSignalLockSeconds = fastTuning ? 2 : 5;
 
-            DVBTDriverStatus status = null;
+            DVBTDriverStatus? status = null;
 
             while ((DateTime.Now - startTime).TotalSeconds < totalTimeoutforSignalSeconds)
             {
@@ -1599,7 +1600,7 @@ namespace DVBTTelevizor
                 await Task.Delay(fastTuning ? 400 : 850);
             }
 
-            if (status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
+            if (status == null || status.hasSignal != 1 || status.hasSync != 1 || status.hasLock != 1)
             {
                 res.Result = DVBTDriverSearchProgramResultEnum.NoSignal;
                 return res;

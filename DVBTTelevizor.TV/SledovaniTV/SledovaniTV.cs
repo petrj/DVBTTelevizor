@@ -177,6 +177,11 @@ namespace SledovaniTV
 
                 using (var response = await request.GetResponseAsync() as HttpWebResponse)
                 {
+                    if (response == null)
+                    {
+                        throw new InvalidOperationException("Failed to get HTTP response");
+                    }
+
                     string responseString;
                     using (var sr = new StreamReader(response.GetResponseStream()))
                     {
@@ -210,10 +215,18 @@ namespace SledovaniTV
 
             try
             {
+                var credentials = _credentials;
+                if (credentials == null)
+                {
+                    _status = StatusEnum.EmptyCredentials;
+                    _log.Info("Empty credentials");
+                    return;
+                }
+
                 var ps = new Dictionary<string, string>()
                 {
-                    { "username", _credentials.Username },
-                    { "password", _credentials.Password },
+                    { "username", credentials.Username },
+                    { "password", credentials.Password },
                     { "type", "androidportable" }  // xbmc, androidportable, samsungtv, androidsmarttv, ios
                 };
 
@@ -339,7 +352,8 @@ namespace SledovaniTV
                 return;
             }
 
-            if (String.IsNullOrEmpty(_credentials.Username) ||
+            if (_credentials == null ||
+                String.IsNullOrEmpty(_credentials.Username) ||
                 String.IsNullOrEmpty(_credentials.Password))
             {
                 _status = StatusEnum.EmptyCredentials;
@@ -498,38 +512,45 @@ namespace SledovaniTV
                     epgJson.GetStringValue("status")=="1" &&
                     epgJson.HasValue("channels"))
                 {
-                    foreach (var epgCh in epgJson.GetValue("channels"))
+                    var channels = epgJson.GetValue("channels");
+                    if (channels != null)
                     {
-                        // id from path (channels.ct1")
-                        var chId = epgCh.Path.Substring(9);
-
-                        foreach (var epg in epgJson.GetValue("channels")[chId])
+                        foreach (var epgCh in channels)
                         {
-                            var title = epg["title"].ToString();
-                            var times = epg["startTime"].ToString();
-                            var timef = epg["endTime"].ToString();
-                            var desc = epg["description"].ToString();
-                            var epgEventId = epg["eventId"].ToString();
+                            // id from path (channels.ct1")
+                            var chId = epgCh.Path.Substring(9);
+                            var channelEpg = channels[chId];
+                            if (channelEpg == null)
+                                continue;
 
-                            var item = new EventItem()
+                            foreach (var epg in channelEpg)
                             {
-                                LanguageCode = chId, // Chanel id is int for DVBT, but string for SledovaniTV,
-                                                     // using LanguageCode property as workaround
-                                                     // TODO: change EventItem.ServiceId to string
-                                // EventId = Convert.ToInt32(epgEventId),
-                                EventName = title,
-                                StartTime = DateTime.ParseExact(times, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
-                                FinishTime = DateTime.ParseExact(timef, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
-                                Text = desc
+                                var title = epg["title"]?.ToString() ?? string.Empty;
+                                var times = epg["startTime"]?.ToString() ?? string.Empty;
+                                var timef = epg["endTime"]?.ToString() ?? string.Empty;
+                                var desc = epg["description"]?.ToString() ?? string.Empty;
+                                var epgEventId = epg["eventId"]?.ToString() ?? string.Empty;
+
+                                var item = new EventItem()
+                                {
+                                    LanguageCode = chId, // Chanel id is int for DVBT, but string for SledovaniTV,
+                                                         // using LanguageCode property as workaround
+                                                         // TODO: change EventItem.ServiceId to string
+                                    // EventId = Convert.ToInt32(epgEventId),
+                                    EventName = title,
+                                    StartTime = DateTime.ParseExact(times, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
+                                    FinishTime = DateTime.ParseExact(timef, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
+                                    Text = desc
+                                };
+
+                                if (!result.ContainsKey(chId))
+                                {
+                                    result.Add(chId, new List<EventItem>());
+                                }
+                                result[chId].Add(item);
                             };
-
-                            if (!result.ContainsKey(chId))
-                            {
-                                result.Add(chId, new List<EventItem>());
-                            }
-                            result[chId].Add(item);
-                        };
-                     }
+                        }
+                    }
                 }
             }
             catch (WebException wex)
@@ -597,19 +618,23 @@ namespace SledovaniTV
                    streamQualityJson.GetStringValue("status") == "1" &&
                    streamQualityJson.HasValue("qualities"))
                 {
-                    foreach (var qToken in streamQualityJson.GetValue("qualities"))
+                    var qualities = streamQualityJson.GetValue("qualities");
+                    if (qualities != null)
                     {
-                        var q = JObject.Parse(qToken.ToString());
-                        var id = q["id"];
-
-                        var quality = new Quality()
+                        foreach (var qToken in qualities)
                         {
-                            Id = q["id"].ToString(),
-                            Name = q["name"].ToString(),
-                            Allowed = q["allowed"].ToString()
-                        };
+                            var q = JObject.Parse(qToken.ToString());
+                            var id = q["id"];
 
-                        result.Add(quality);
+                            var quality = new Quality()
+                            {
+                                Id = q["id"]?.ToString() ?? string.Empty,
+                                Name = q["name"]?.ToString() ?? string.Empty,
+                                Allowed = q["allowed"]?.ToString() ?? string.Empty
+                            };
+
+                            result.Add(quality);
+                        }
                     }
                 }
             }
@@ -698,51 +723,55 @@ namespace SledovaniTV
                  channelsJson.GetStringValue("status") == "1" &&
                  channelsJson.HasValue("channels"))
                 {
-                    foreach (JToken channelJson in channelsJson["channels"])
+                    var channels = channelsJson["channels"];
+                    if (channels != null)
                     {
-                        //Locked:
-                        // "none"
-                        // "noAccess"
-                        // "pin"
-
-                        if (channelJson["locked"].ToString() != "none")
+                        foreach (JToken channelJson in channels)
                         {
-                            continue; // TODO: unlock
+                            //Locked:
+                            // "none"
+                            // "noAccess"
+                            // "pin"
+
+                            if (channelJson["locked"]?.ToString() != "none")
+                            {
+                                continue; // TODO: unlock
+                            }
+
+                            var channelType = channelJson["type"]?.ToString();
+                            ServiceTypeEnum serviceType = ServiceTypeEnum.Other;
+                            switch (channelType)
+                            {
+                                case "radio":
+                                    serviceType = ServiceTypeEnum.DigitalRadioSoundService;
+                                    break;
+                                case "tv":
+                                    serviceType = ServiceTypeEnum.DigitalTelevisionService;
+                                    break;
+                            }
+
+                            var ch = new Channel()
+                            {
+                                Number = number.ToString(),
+
+                                ChannelId = channelJson["id"]?.ToString(),
+                                Name = channelJson["name"]?.ToString(),
+                                Url = channelJson["url"]?.ToString(),
+
+                                Type = serviceType,
+
+                                IconUrl = channelJson["logoUrl"]?.ToString(),
+
+                                //Locked = channelJson["locked"]?.ToString(),
+                                //Group = channelJson["group"]?.ToString()
+
+                                ProviderName = "SledovaniTV",
+                                ChannelType = ChannelTypeEnum.SledovaniTV
+                            };
+
+                            number++;
+                            result.Add(ch);
                         }
-
-                        var channelType = channelJson["type"].ToString();
-                        ServiceTypeEnum serviceType = ServiceTypeEnum.Other;
-                        switch (channelType)
-                        {
-                            case "radio":
-                                serviceType = ServiceTypeEnum.DigitalRadioSoundService;
-                                break;
-                            case "tv":
-                                serviceType = ServiceTypeEnum.DigitalTelevisionService;
-                                break;
-                        }
-
-                        var ch = new Channel()
-                        {
-                            Number = number.ToString(),
-
-                            ChannelId = channelJson["id"].ToString(),
-                            Name = channelJson["name"].ToString(),
-                            Url = channelJson["url"].ToString(),
-
-                            Type = serviceType,
-
-                            IconUrl = channelJson["logoUrl"].ToString(),
-
-                            //Locked = channelJson["locked"].ToString(),
-                            //Group = channelJson["group"].ToString()
-
-                            ProviderName = "SledovaniTV",
-                            ChannelType = ChannelTypeEnum.SledovaniTV
-                        };
-
-                        number++;
-                        result.Add(ch);
                     }
 
                     _log.Info($"Received {result.Count} channels");
@@ -772,13 +801,20 @@ namespace SledovaniTV
             if (_status != StatusEnum.Logged)
                 return;
 
+            var credentials = _credentials;
+            if (credentials == null || string.IsNullOrEmpty(credentials.ChildLockPIN))
+            {
+                _log.Info("Child lock PIN is not set");
+                return;
+            }
+
             _log.Info("Unlocking adult channels");
 
             try
             {
                 var ps = new Dictionary<string, string>()
                 {
-                    { "pin", _credentials.ChildLockPIN },
+                    { "pin", credentials.ChildLockPIN },
                     { "whitelogo", "0" },
                     { "PHPSESSID", _session.PHPSESSID }
                 };

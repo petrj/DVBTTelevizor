@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +9,7 @@ namespace DVBTTelevizor
     {
         public static string GetStringValue(this JObject obj, string key)
         {
-            return obj[key].ToString();
+            return obj[key]?.ToString() ?? string.Empty;
         }
 
         public static bool HasValue(this JObject obj, string key)
