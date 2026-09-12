@@ -2079,8 +2079,8 @@ namespace DVBTTelevizor.MAUI
             if (!force && (PlayingState == PlayingStateEnum.Playing))
             {
                 PlayingState = PlayingStateEnum.PlayingInPreview;
-                //_viewModel.EPGDetailEnabled = true;
-            }
+                _viewModel.EPGDetailEnabled = true;
+             }
             else
             {
 
