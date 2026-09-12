@@ -10,7 +10,6 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
     private ILoggingService _loggingService;
     private IDriverConnector _driver;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
 
     private KeyboardFocusableItemList _focusItems;
 
@@ -28,7 +27,6 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
         _driver = driver;
         _configuration = tvConfiguration;
         _publicDirectoryProvider = publicDirectoryProvider;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _tuningSelectDVBTViewModel = new TuningSelectDVBTPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
         _tuningSelectDVBTViewModel.Initializing = false;
@@ -69,13 +67,11 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
         {
             _lastSelectedCenterItem = "DVBT";
         }
-        else
-        if (_focusItems.FocusedItem.Name == "DVBT2")
+        else if (_focusItems.FocusedItem.Name == "DVBT2")
         {
             _lastSelectedCenterItem = "DVBT2";
         }
-        else
-        if (_focusItems.FocusedItem.Name == "Bandwidth")
+        else if (_focusItems.FocusedItem.Name == "Bandwidth")
         {
             _lastSelectedCenterItem = "Bandwidth";
         }

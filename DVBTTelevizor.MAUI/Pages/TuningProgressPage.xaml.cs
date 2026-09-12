@@ -25,7 +25,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private ILoggingService _loggingService;
     private ITVConfiguration _configuration;
-    private string _publicDirectory = "";
     private IPublicDirectoryProvider _publicDirectoryProvider;
 
     private KeyboardFocusableItemList _focusItems;
@@ -47,7 +46,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         _loggingService = loggingService;
         _configuration = tvConfiguration;
         _publicDirectoryProvider = publicDirectoryProvider;
-        _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
         BindingContext = _viewModel = new TuningProgressPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 

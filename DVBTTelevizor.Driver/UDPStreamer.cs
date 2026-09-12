@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
@@ -66,8 +66,8 @@ namespace DVBTTelevizor
                 if (UDPStreamer.IsPortAvailable(1234)) // default VLC port for UDP stream (https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers)
                 {
                     port = 1234;
-                } else
-                if (UDPStreamer.IsPortAvailable(8000))
+                }
+                else if (UDPStreamer.IsPortAvailable(8000))
                 {
                     port = 8000;
                 }

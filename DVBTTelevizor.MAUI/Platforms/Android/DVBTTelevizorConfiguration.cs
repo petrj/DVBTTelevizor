@@ -1,4 +1,4 @@
-﻿using Android.OS.Storage;
+using Android.OS.Storage;
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.TV;
 using LoggerService;
@@ -573,100 +573,133 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                // Android output (record) directory
-                if (WriteToExternalDevice)
+                return WriteToExternalDevice
+                    ? GetExternalDeviceOutputDirectory()
+                    : GetInternalDeviceOutputDirectory();
+            }
+        }
+
+        private string GetExternalDeviceOutputDirectory()
+        {
+            if (!String.IsNullOrEmpty(ExternalDevicePath))
+            {
+                return ExternalDevicePath;
+            }
+
+            var externalPath = GetExternalPathFromStorageManager();
+            if (!String.IsNullOrEmpty(externalPath))
+            {
+                return externalPath;
+            }
+
+            return GetExternalPathFromDirs();
+        }
+
+        private static string GetExternalPathFromStorageManager()
+        {
+            try
+            {
+                var context = Android.App.Application.Context;
+                var storageManager = (Android.OS.Storage.StorageManager)context.GetSystemService(Android.Content.Context.StorageService);
+
+                var volumeList = (Java.Lang.Object[])storageManager.Class.GetDeclaredMethod("getVolumeList").Invoke(storageManager);
+
+                foreach (var storage in volumeList)
                 {
-                    // external device
-
-                    if (!String.IsNullOrEmpty(ExternalDevicePath))
+                    if (storage is StorageVolume volume && !volume.IsPrimary && !volume.IsEmulated && volume.IsRemovable)
                     {
-                        return ExternalDevicePath;
-                    }
-
-                    var externalPath = "";
-
-                    try
-                    {
-                        var context = Android.App.Application.Context;
-                        var storageManager = (Android.OS.Storage.StorageManager)context.GetSystemService(Android.Content.Context.StorageService);
-
-                        var volumeList = (Java.Lang.Object[])storageManager.Class.GetDeclaredMethod("getVolumeList").Invoke(storageManager);
-
-                        var list = new List<string>();
-
-                        foreach (var storage in volumeList)
-                        {
-                            if (storage is StorageVolume volume)
-                            {
-                                if (volume.IsPrimary || volume.IsEmulated || !volume.IsRemovable)
-                                {
-                                    continue;
-                                }
-
-                                // first external device
-                                externalPath = volume.Directory.AbsolutePath;
-                                break;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // fallback for older API:
-
-                        var dirs = Android.App.Application.Context.GetExternalFilesDirs(null);
-                        foreach (var dir in dirs)
-                        {
-                            if (dir.ToString().StartsWith("/storage/emulated/"))
-                            {
-                                continue;
-                            }
-
-                            // first external device
-                            externalPath = dir.ToString();
-                            break;
-                        }
-                    }
-
-                    //if (externalPath.EndsWith("files"))
-                    //{
-                    //    externalPath = externalPath.Substring(0, externalPath.Length - 5); // remove "files" from the end
-                    //}
-
-                    return externalPath;
-
-                } else
-                {
-                    // internal device
-
-                    try
-                    {
-                        // internal storage - always writable directory
-                        try
-                        {
-                            var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
-
-                            if (pathToExternalMediaDirs.Length == 0)
-                                throw new DirectoryNotFoundException();
-
-                            return pathToExternalMediaDirs[0].AbsolutePath;
-                        }
-                        catch
-                        {
-                            // fallback for older API:
-
-                            var internalStorageDir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
-
-                            return internalStorageDir.AbsolutePath;
-                        }
-                    }
-                    catch
-                    {
-                        var dir = Android.App.Application.Context.GetExternalFilesDir("");
-
-                        return dir.AbsolutePath;
+                        return volume.Directory.AbsolutePath;
                     }
                 }
             }
+            catch (Exception)
+            {
+                // fallback will be used
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetExternalPathFromDirs()
+        {
+            try
+            {
+                var dirs = Android.App.Application.Context.GetExternalFilesDirs(null);
+                foreach (var dir in dirs)
+                {
+                    if (dir != null && !dir.ToString().StartsWith("/storage/emulated/"))
+                    {
+                        return dir.ToString();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetInternalDeviceOutputDirectory()
+        {
+            var path = GetExternalMediaDirectory();
+            if (!String.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+
+            path = GetSpecialFolderMyDocumentsDirectory();
+            if (!String.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+
+            try
+            {
+                var dir = Android.App.Application.Context.GetExternalFilesDir("");
+                return dir != null ? dir.AbsolutePath : string.Empty;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        private static string GetExternalMediaDirectory()
+        {
+            try
+            {
+                var pathToExternalMediaDirs = Android.App.Application.Context.GetExternalMediaDirs();
+                if (pathToExternalMediaDirs != null && pathToExternalMediaDirs.Length > 0 && pathToExternalMediaDirs[0] != null)
+                {
+                    return pathToExternalMediaDirs[0].AbsolutePath;
+                }
+            }
+            catch (Exception)
+            {
+                // fallback for older API
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetSpecialFolderMyDocumentsDirectory()
+        {
+            try
+            {
+                var internalStorageDir = Android.App.Application.Context.GetExternalFilesDir(Environment.SpecialFolder.MyDocuments.ToString());
+                if (internalStorageDir != null)
+                {
+                    return internalStorageDir.AbsolutePath;
+                }
+            }
+            catch (Exception)
+            {
+                // fallback for older API
+            }
+
+            return string.Empty;
         }
 
         public string LastSelectedChannelUniqueIdentifier

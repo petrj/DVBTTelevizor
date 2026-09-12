@@ -105,8 +105,7 @@ public partial class Menu : ContentView
                 await MenuScrollView.ScrollToAsync(MenuLayout.Children[menuIndex] as Element, ScrollToPosition.MakeVisible, false);
                 break;
             }
-            else
-            if (item.Selected)
+            else if (item.Selected)
             {
                 item.Selected = false;
                 item.Update();

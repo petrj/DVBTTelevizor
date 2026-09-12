@@ -44,7 +44,6 @@ namespace DVBTTelevizor
         private long _sendingDataFrequency = 0;
         private int _sendingDataPosition = 0;
         private Dictionary<long, List<byte>> _freqStreams = null;
-        private TimeSpan _timeShift;
 
         private List<long> _PIDFilter = new List<long>();
 
@@ -384,7 +383,6 @@ namespace DVBTTelevizor
 
                                                         if (shift < 0)
                                                         {
-                                                            _timeShift = TimeSpan.MinValue;
                                                             firstPCRTimeStamp = ulong.MinValue;
                                                             firstPCRTimeStampTime = DateTime.MinValue;
                                                             continue;
@@ -407,8 +405,7 @@ namespace DVBTTelevizor
                                                             PCR += $" >>> {GetHumanReadableSize(newBufferSize)}";
 
                                                         }
-                                                        else
-                                                        if (newBufferSize < bufferSize)
+                                                        else if (newBufferSize < bufferSize)
                                                         {
                                                             if (newBufferSize < MinBufferSize)
                                                             {
@@ -447,7 +444,6 @@ namespace DVBTTelevizor
                                         else
                                         {
                                             _sendingDataPosition = 0;
-                                            _timeShift = TimeSpan.MinValue;
                                             firstPCRTimeStamp = ulong.MinValue;
                                             firstPCRTimeStampTime = DateTime.MinValue;
                                         }
@@ -594,7 +590,6 @@ namespace DVBTTelevizor
 
                     _sendingDataPosition = 0;
                     _sendingDataFrequency = _frequency;
-                    _timeShift = TimeSpan.MinValue;
                 }
                 else
                 {

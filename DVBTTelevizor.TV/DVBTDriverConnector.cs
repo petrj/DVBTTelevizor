@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.MAUI;
+using DVBTTelevizor.MAUI;
 using DVBTTelevizor.TV;
 using LoggerService;
 using MPEGTS;
@@ -33,7 +33,6 @@ namespace DVBTTelevizor
         private NetworkStream? _transferStream = null;
 
         private long _lastTunedFreq = -1;
-        private long _lastTunedDeliverySystem = -1;
         private long _bitrate = 0;
 
         private const int ReadBufferSize = 32768;
@@ -240,7 +239,6 @@ namespace DVBTTelevizor
                     _controlStream = _controlClient.GetStream();
 
                     _lastTunedFreq = -1;
-                    _lastTunedDeliverySystem = -1;
 
                     await StartBackgroundReadingAsync(timeoutSeconds).ConfigureAwait(false);
                 }
@@ -914,7 +912,6 @@ namespace DVBTTelevizor
                 if (successFlag == 1)
                 {
                     _lastTunedFreq = frequency;
-                    _lastTunedDeliverySystem = deliverySystem;
                 }
 
                 _log.Debug($"Tune response: {successFlag}");

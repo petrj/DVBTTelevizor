@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.TV;
+using DVBTTelevizor.TV;
 using LoggerService;
 using MPEGTS;
 using System;
@@ -21,13 +21,12 @@ namespace DVBTTelevizor
         private long _lastPID { get; set; }
 
         public event EventHandler? StatusChanged = null;
-        ILoggingService _log;
 
         public AppDriverTypeEnum DriverType => AppDriverTypeEnum.DVBT;
 
         public TestTuneConnector(ILoggingService loggingService)
         {
-            _log = loggingService;
+            // Logging service not needed in test connector
         }
 
 
@@ -147,6 +146,7 @@ namespace DVBTTelevizor
 
         public void StopReadStream()
         {
+            // Empty implementation for test tune connector
         }
 
         public void StartStream()
