@@ -466,10 +466,6 @@ namespace DVBTTelevizor
                 _loggingService.Debug("Loading channels");
 
                 var json = GetPersistingSettingValue<string>("ChannelsJson");
-                //if (string.IsNullOrEmpty(json) && (File.Exists(ChannelsConfigFileName)))
-                //{
-                //    json = File.ReadAllText(ChannelsConfigFileName);
-                //}
 
                 if (!string.IsNullOrEmpty(json))
                 {

@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor.TV;
+using DVBTTelevizor.TV;
 using MPEGTS;
 using System;
 using System.Collections.Generic;
@@ -82,7 +82,6 @@ namespace DVBTTelevizor
         Task<EITScanResult> ScanEPG(int msTimeout = 2000);
         Task CheckPIDs();
 
-        //void StatusChangedEventHandler(object sender, StatusChangedEventArgs e);
         event EventHandler StatusChanged;
 
         Task SetGain(GainEnum gain, int value = 0);

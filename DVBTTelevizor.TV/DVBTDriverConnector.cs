@@ -218,7 +218,6 @@ namespace DVBTTelevizor
             if (State == DVBTDriverStateEnum.Connected)
             {
                 _log.Debug($"Already connected");
-                //return;
             }
 
             State = DVBTDriverStateEnum.Connecting;
@@ -433,8 +432,6 @@ namespace DVBTTelevizor
         {
             lock (_readThreadLock)
             {
-                //_log.Debug($"Getting buffer count");
-
                 return _readBuffer.Count > 0;
             }
         }
@@ -463,10 +460,8 @@ namespace DVBTTelevizor
         {
             _log.Debug("Stopping ...");
 
-            //StartReadStream();
             StopStream();
 
-            //var setPIDsRes = await SetPIDs(new List<long>() { 0, 16, 17 });
             var setPIDsRes = await SetPIDs(new List<long>() { });
             if (!setPIDsRes.SuccessFlag)
                 return false;

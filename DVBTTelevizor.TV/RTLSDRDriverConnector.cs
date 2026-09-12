@@ -54,7 +54,6 @@ namespace DVBTTelevizor.TV
 
             _log.Debug($"Initializing RTLSDR TCP-IP Driver Connector");
 
-            //_UDPStreamer = new UDPStreamer(_log);
             _driverConfiguration = new DVBTDriverConfiguration();
 
             _driver = driver;
@@ -162,9 +161,6 @@ namespace DVBTTelevizor.TV
                         DataSize = e.Size
                     });
                 }
-
-                // save raw data for analysis
-                //RecordData(e.Data, e.Size);
             }
         }
 
@@ -584,7 +580,6 @@ namespace DVBTTelevizor.TV
                 };
             }
 
-            //_demodulator?.Clear();
             var tuneResult = await Tune(frequency, bandWidth, deliverySystem);
 
             if (!tuneResult.SuccessFlag)

@@ -75,13 +75,6 @@ namespace DVBTTelevizor
 
         public bool ValidFrequency(long freq, bool device)
         {
-            /*
-            var dvbtValid = ((freq >= TuningSettings.FrequencyMinKHz) && (freq <= TuningSettings.FrequencyMaxKHz));
-            var deviceValid = ((freq >= DeviceFrequencyFromKHz) && (freq <= DeviceFrequencyToKHz));
-
-            return device ? deviceValid && dvbtValid : dvbtValid;
-            */
-
             return (freq >= DeviceFrequencyMinKHz) && (freq <= DeviceFrequencyMaxKHz);
         }
 
@@ -94,7 +87,6 @@ namespace DVBTTelevizor
 
                     SetFMSettings();
 
-                    //BandwidthKHz = configuration.FMDVBTBandwidthKHz;
                     FrequencyKHz = configuration.FMFrequencyKHz;
                     FrequencyFromKHz = configuration.FMFrequencyFromKHz;
                     FrequencyToKHz = configuration.FMFrequencyToKHz;
@@ -133,7 +125,6 @@ namespace DVBTTelevizor
             DAB = false;
             DVBT = false;
             DVBT2 = false;
-            //_tuningSettings.FrequencyKHz = 88000;
             FrequencyFromKHz = 88000;
             FrequencyToKHz = 108000;
             FrequencyKHz = FrequencyFromKHz;
@@ -213,9 +204,6 @@ namespace DVBTTelevizor
                 {
                     BandwidthKHz = DefaultBandwidthKHz;
                 }
-
-                //DeviceFrequencyMinKHz = driver.FrequencyMinKHz;
-                //DeviceFrequencyMaxKHz = driver.FrequencyMaxKHz;
 
                 if (driver.Connected)
                 {

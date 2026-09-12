@@ -1,4 +1,4 @@
-﻿using DVBTTelevizor;
+using DVBTTelevizor;
 using MPEGTS;
 using Newtonsoft.Json;
 using RTLSDR.Common;
@@ -481,12 +481,7 @@ namespace DVBTTelevizor
         {
             get
             {
-                /* There is some bug in Android (Motorola) and no image is shown when url used
-                if (!string.IsNullOrWhiteSpace(IconUrl))
-                {
-                    return IconUrl;
-                }
-                */
+                // There is some bug in Android (Motorola) and no image is shown when url used
 
                 var icon = "other.png";
 

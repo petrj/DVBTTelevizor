@@ -337,8 +337,6 @@ namespace DVBTTelevizor
 
                                         if (_sendingDataPosition + bufferSize < _freqStreams[_sendingDataFrequency].Count)
                                         {
-                                            //_loggingService.Debug($"TestingDVBTDriver sending data....");
-
                                             var thisSecBytes = new byte[bufferSize];
                                             _freqStreams[_sendingDataFrequency].CopyTo(_sendingDataPosition, thisSecBytes, 0, bufferSize);
 
@@ -364,8 +362,6 @@ namespace DVBTTelevizor
 
                                                 if (timeStamp.HasValue && timeStamp.Value != ulong.MinValue)
                                                 {
-                                                    //_loggingService.Debug($"Timestamp: {timeStamp}");
-
                                                     if (firstPCRTimeStamp == ulong.MinValue)
                                                     {
                                                         firstPCRTimeStamp = timeStamp.Value;
@@ -383,7 +379,6 @@ namespace DVBTTelevizor
                                                             firstPCRTimeStampTime = DateTime.MinValue;
                                                             continue;
                                                         }
-                                                        //var speedCorrectionLShiftPerSec = shift / (streamTimeSpan).TotalSeconds;
                                                         var missingBytesForWholeStream = Math.Round((shift / loopsPerSecond) * bufferSize, 2);
 
                                                         PCR = $" (PCR time shift: {Math.Round(shift, 2).ToString("N2")} s, missingBytes: {GetHumanReadableSize(missingBytesForWholeStream)})";
@@ -718,8 +713,6 @@ namespace DVBTTelevizor
                     {
                         using (var handler = listener.Accept())
                         {
-                            //var readStarted = DateTime.Now;
-
                             while (true)
                             {
                                 int bytesRec = handler.Receive(buffer);

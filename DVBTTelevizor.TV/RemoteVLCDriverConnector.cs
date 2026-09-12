@@ -240,8 +240,6 @@ namespace DVBTTelevizor.TV
                                 status += $"({DVBTDriverConnector.GetHumanReadableBitRate(_bitrate)})";
                             }
 
-                            //_log.Debug($"{status}");
-
                             bytesReadFromLastMeasureStartTime = 0;
                             _lastSpeedCalculationSec = currentLastSpeedCalculationSec;
                         }
@@ -468,7 +466,6 @@ namespace DVBTTelevizor.TV
             if (State == DVBTDriverStateEnum.Connected)
             {
                 _log.Debug($"Already connected");
-                //return;
             }
 
             State = DVBTDriverStateEnum.Connecting;

@@ -127,8 +127,6 @@ namespace DVBTTelevizor
 
                 if (array != null && count > 0)
                 {
-                    //_log.Info($"[UDP] --> {(count / 1024).ToString("N0")} KB");
-
                     var bufferPart = new byte[MaxPacketSize];
                     var bufferPartSize = 0;
                     var bufferPos = 0;
@@ -168,7 +166,6 @@ namespace DVBTTelevizor
                     return ipAddress;
                 }
             }
-            //throw new Exception("No suitable IP address found.");
             return null;
         }
 
