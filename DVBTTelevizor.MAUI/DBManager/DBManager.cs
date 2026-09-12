@@ -49,7 +49,7 @@ namespace DVBTTelevizor.DBManager
 
         public void Stop()
         {
-            _cts.Cancel();
+            _cts?.Cancel();
         }
 
         public void SetDriver(IDriverConnector? driver)
@@ -110,6 +110,8 @@ namespace DVBTTelevizor.DBManager
                     Thread.Sleep(200);
                 }
             }
+
+            _cts?.Dispose();
         }
 
         protected string GetKey(long freq, long programMapPID)

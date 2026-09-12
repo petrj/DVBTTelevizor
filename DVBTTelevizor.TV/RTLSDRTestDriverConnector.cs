@@ -221,6 +221,7 @@ namespace DVBTTelevizor.TV
              {
                  _cts = new CancellationTokenSource();
                  await ReadData(_cts.Token);
+                 _cts?.Dispose();
              });
         }
 
