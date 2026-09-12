@@ -20,6 +20,8 @@ namespace DVBTTelevizor
         private long _lastFreq { get; set; }
         private long _lastPID { get; set; }
 
+        private long _bitrate = 0;
+
         public event EventHandler? StatusChanged = null;
 
         public AppDriverTypeEnum DriverType => AppDriverTypeEnum.DVBT;
@@ -98,6 +100,7 @@ namespace DVBTTelevizor
             set
             {
                 // test driver => empty setter
+                _bitrate = value;
             }
         }
 
