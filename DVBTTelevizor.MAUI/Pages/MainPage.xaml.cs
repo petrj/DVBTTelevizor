@@ -3935,7 +3935,7 @@ namespace DVBTTelevizor.MAUI
                     break;
 
                 case "menuConnectDriver":
-                    //WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(System.String.Empty));
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(_driver == null ? AppDriverTypeEnum.DVBT : _driver.DriverType));
                     break;
 
                 case "DVBTDriverButton":
