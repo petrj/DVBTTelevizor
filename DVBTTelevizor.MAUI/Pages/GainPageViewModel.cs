@@ -129,7 +129,10 @@ namespace DVBTTelevizor.MAUI
             get => _tvConfiguration?.Gain == GainEnum.HW;
             set
             {
-                SetGain(GainEnum.HW);
+                if (value)
+                {
+                    SetGain(GainEnum.HW);
+                }
             }
         }
 
@@ -138,7 +141,10 @@ namespace DVBTTelevizor.MAUI
             get => _tvConfiguration?.Gain == GainEnum.Auto;
             set
             {
-                SetGain(GainEnum.Auto);
+                if (value)
+                {
+                    SetGain(GainEnum.Auto);
+                }
             }
         }
 
@@ -147,7 +153,10 @@ namespace DVBTTelevizor.MAUI
             get => _tvConfiguration?.Gain == GainEnum.Manual;
             set
             {
-                SetGain(GainEnum.Manual);
+                if (value)
+                {
+                    SetGain(GainEnum.Manual);
+                }
             }
         }
 

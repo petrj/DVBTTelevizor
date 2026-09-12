@@ -24,6 +24,8 @@ namespace DVBTTelevizor.DBManager
         protected IDriverConnector _driver;
         protected string _publicDirectory;
 
+        private CancellationTokenSource _cts = null;
+
         private ConcurrentQueue<Dictionary<string, List<T>>> _saveQueue = new ConcurrentQueue<Dictionary<string, List<T>>>();
         protected ConcurrentDictionary<string, List<T>> _freqValues { get; set; } = new ConcurrentDictionary<string, List<T>>();
 
@@ -33,9 +35,21 @@ namespace DVBTTelevizor.DBManager
             SetDriver(_driver);
             _publicDirectory = publicDirectoryProvider.GetPublicDirectoryPath();
 
+            _cts = new CancellationTokenSource();
+
+            Start();
+        }
+
+        public void Start()
+        {
             var saveDBsWorker = new BackgroundWorker();
             saveDBsWorker.DoWork += SaveWorker_DoWork;
             saveDBsWorker.RunWorkerAsync();
+        }
+
+        public void Stop()
+        {
+            _cts.Cancel();
         }
 
         public void SetDriver(IDriverConnector? driver)
@@ -63,7 +77,7 @@ namespace DVBTTelevizor.DBManager
         /// <param name="e"></param>
         public virtual void SaveWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (true)
+            while (!_cts.IsCancellationRequested)
             {
                 if (_saveQueue.Count > 0)
                 {

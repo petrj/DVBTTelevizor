@@ -28,7 +28,8 @@ namespace DVBTTelevizor.MAUI
         //[IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
     // Android Phone:
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, LaunchMode = LaunchMode.SingleTop, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
-    public class MainActivity : MauiAppCompatActivity
+    public class
+        : MauiAppCompatActivity
     {
         private const int StartRequestCode = 1000;
         private const int StartRequestCodeRTLSDR = 1001;
@@ -846,6 +847,8 @@ namespace DVBTTelevizor.MAUI
                     {
                     }
                 }, _waitForinitCancellation.Token);
+
+                _waitForinitCancellation.Dispose();
 
                 _loggingService.Info("Starting activity");
                 _ignoreRequest[StartRequestCode] = false;
