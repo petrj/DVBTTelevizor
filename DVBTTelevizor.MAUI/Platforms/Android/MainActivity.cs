@@ -282,10 +282,16 @@ namespace DVBTTelevizor.MAUI
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    var uri = Android.Net.Uri.Parse(m.Value);
-                    var intent = new Intent(Intent.ActionView, uri);
-                    intent.AddFlags(ActivityFlags.NewTask);
-                    Android.App.Application.Context.StartActivity(intent);
+                    try
+                    {
+                        var uri = Android.Net.Uri.Parse(m.Value);
+                        var intent = new Intent(Intent.ActionView, uri);
+                        intent.AddFlags(ActivityFlags.NewTask);
+                        Android.App.Application.Context.StartActivity(intent);
+                    } catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
             });
 
@@ -484,33 +490,39 @@ namespace DVBTTelevizor.MAUI
 
         private void RequestStoragePermission()
         {
-            _loggingService.Debug("RequestStoragePermission");
-
-            int sdkInt = (int)Build.VERSION.SdkInt;
-
-            if (sdkInt >= 30)
+            try
             {
-                // Android 11+ (API 30+)
-                LaunchFolderPicker();
-            }
-            else
-            {
-                //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageWrite>();
-                //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageRead>();
+                _loggingService.Debug("RequestStoragePermission");
 
-                if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted)
+                int sdkInt = (int)Build.VERSION.SdkInt;
+
+                if (sdkInt >= 30)
                 {
-                    ActivityCompat.RequestPermissions(this,
-                        new string[]
-                        {
-                            Manifest.Permission.WriteExternalStorage,
-                            Manifest.Permission.ReadExternalStorage
-                        }, StorageAccessRequestCode);
+                    // Android 11+ (API 30+)
+                    LaunchFolderPicker();
                 }
                 else
                 {
-                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessGranted(null));
+                    //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageWrite>();
+                    //Xamarin.Essentials.Permissions.RequestAsync<Permissions.StorageRead>();
+
+                    if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Android.Content.PM.Permission.Granted)
+                    {
+                        ActivityCompat.RequestPermissions(this,
+                            new string[]
+                            {
+                            Manifest.Permission.WriteExternalStorage,
+                            Manifest.Permission.ReadExternalStorage
+                            }, StorageAccessRequestCode);
+                    }
+                    else
+                    {
+                        WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessGranted(null));
+                    }
                 }
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         }
 
@@ -738,7 +750,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 catch (Exception ex)
                 {
-
+                    _loggingService.Error(ex);
                 }
             });
         }
@@ -1029,70 +1041,75 @@ namespace DVBTTelevizor.MAUI
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
-            if (_ignoreRequest.ContainsKey(requestCode) && _ignoreRequest[requestCode])
+            try
             {
-                _loggingService.Debug($"Ignoring activity result for request code: {requestCode}");
-                _ignoreRequest[requestCode] = false; // reset the flag
-                return;
-            }
-
-            if (requestCode == StartRequestCode)
-            {
-                ProcessDriverConnectResult(resultCode,data);
-            }
-            if (requestCode == StartRequestCodeRTLSDR)
-            {
-                if (resultCode == Result.Ok)
+                if (_ignoreRequest.ContainsKey(requestCode) && _ignoreRequest[requestCode])
                 {
-                    var x = data.GetIntExtra("SDRDriverPort", 1234);
-                    var y = data.GetIntExtra("SDRDriverStreamPort", 1235);
-
-                    WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
-                    {
-                        //SupportedTcpCommands = data.GetIntArrayExtra("supportedTcpCommands"),
-                        DeviceName = data.GetStringExtra("deviceName"),
-                        ControlPort = _SDRDriverPort,
-                        TransferPort = _SDRDriverStreamPort,
-                        PublicDirectory = GetAndroidDirectory(null)
-                    }));
-
-                    //+RestartAudio();
+                    _loggingService.Debug($"Ignoring activity result for request code: {requestCode}");
+                    _ignoreRequest[requestCode] = false; // reset the flag
+                    return;
                 }
-                else
+
+                if (requestCode == StartRequestCode)
                 {
-                    var errorMsg = (data == null ? "no description" : data.GetStringExtra("detailed_exception_message"));
+                    ProcessDriverConnectResult(resultCode, data);
+                }
+                if (requestCode == StartRequestCodeRTLSDR)
+                {
+                    if (resultCode == Result.Ok)
+                    {
+                        var x = data.GetIntExtra("SDRDriverPort", 1234);
+                        var y = data.GetIntExtra("SDRDriverStreamPort", 1235);
 
-                    _loggingService.Info($"Driver Init failed: {errorMsg}");
+                        WeakReferenceMessenger.Default.Send(new DriverHasBeenConnectedMessage(new DVBTDriverConfiguration()
+                        {
+                            //SupportedTcpCommands = data.GetIntArrayExtra("supportedTcpCommands"),
+                            DeviceName = data.GetStringExtra("deviceName"),
+                            ControlPort = _SDRDriverPort,
+                            TransferPort = _SDRDriverStreamPort,
+                            PublicDirectory = GetAndroidDirectory(null)
+                        }));
 
-                    WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorMsg));/*(""));DVBTDriverConfiguration()
+                        //+RestartAudio();
+                    }
+                    else
+                    {
+                        var errorMsg = (data == null ? "no description" : data.GetStringExtra("detailed_exception_message"));
+
+                        _loggingService.Info($"Driver Init failed: {errorMsg}");
+
+                        WeakReferenceMessenger.Default.Send(new DVBTDriverConnectionFailedMessage(errorMsg));/*(""));DVBTDriverConfiguration()
                     {
                         ErrorId = data == null ? -1 : data.GetIntExtra("marto.rtl_tcp_andro.RtlTcpExceptionId", -1),
                         ExceptionCode = data == null ? 0 : data.GetIntExtra("detailed_exception_code", 0),
                         DetailedDescription = data == null ? "unknown" : data.GetStringExtra("detailed_exception_message")
                     }));*/
+                    }
                 }
-            }
 
-            if (requestCode == FolderAccessRequestCode && resultCode == Result.Ok && data != null)
-            {
-                Android.Net.Uri treeUri = data.Data;
-
-                _loggingService.Info($"Setting External directory: {treeUri.ToString()}");
-
-                var takeFlags = data.Flags & (ActivityFlags.GrantReadUriPermission | ActivityFlags.GrantWriteUriPermission);
-                ContentResolver.TakePersistableUriPermission(treeUri, takeFlags);
-
-                var path = GetFullPathFromTreeUri(treeUri);
-
-                _loggingService.Info($"full path directory: {path}");
-
-                WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessGranted(new ExternalDeviceWriteAccessGrantedSettings()
+                if (requestCode == FolderAccessRequestCode && resultCode == Result.Ok && data != null)
                 {
-                     Path = path,
-                     PathUri = treeUri.ToString()
-                }));
-            }
+                    Android.Net.Uri treeUri = data.Data;
 
+                    _loggingService.Info($"Setting External directory: {treeUri.ToString()}");
+
+                    var takeFlags = data.Flags & (ActivityFlags.GrantReadUriPermission | ActivityFlags.GrantWriteUriPermission);
+                    ContentResolver.TakePersistableUriPermission(treeUri, takeFlags);
+
+                    var path = GetFullPathFromTreeUri(treeUri);
+
+                    _loggingService.Info($"full path directory: {path}");
+
+                    WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessGranted(new ExternalDeviceWriteAccessGrantedSettings()
+                    {
+                        Path = path,
+                        PathUri = treeUri.ToString()
+                    }));
+                }
+            } catch(Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
     }
 }
