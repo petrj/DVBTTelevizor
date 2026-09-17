@@ -26,7 +26,19 @@ namespace DVBTTelevizor.MAUI.WinUI
         public App()
         {
             _loggingService = new LoggerProvider().GetLoggingService();
-            this.InitializeComponent();
+            // Attach global handler early so exceptions during InitializeComponent are caught
+            UnhandledException += App_UnhandledException;
+
+            try
+            {
+                this.InitializeComponent();
+            }
+            catch (System.Exception ex)
+            {
+                // Log and rethrow so debugger / crash reporter still receive the exception
+                _loggingService?.Error(ex);
+                throw;
+            }
 
             WeakReferenceMessenger.Default.Register<DVBTDriverTestConnectMessage>(this, (r, m) =>
             {
@@ -115,7 +127,6 @@ namespace DVBTTelevizor.MAUI.WinUI
                 }));
             });
 
-            UnhandledException += App_UnhandledException;
 
             WeakReferenceMessenger.Default.Send(new MainActivityStartedMessage(String.Empty));
         }

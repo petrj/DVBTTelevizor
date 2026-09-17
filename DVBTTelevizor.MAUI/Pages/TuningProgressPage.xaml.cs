@@ -57,8 +57,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         BuildFocusableItems();
 
-        _viewModel.ChannelFound += ChannelFound;
-
         WeakReferenceMessenger.Default.Register<TuneFailedMessage>(this, (r, m) =>
         {
             MainThread.BeginInvokeOnMainThread(async () =>
@@ -71,20 +69,21 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         WeakReferenceMessenger.Default.Register<ChannelHasBeenAddedMessage>(this, (r, m) =>
         {
-            try
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                try
                 {
                     var lastChannel = _viewModel.Channels.Last();
                     if (lastChannel != null)
                     {
                         ChannelsListView.ScrollTo(lastChannel, ScrollToPosition.MakeVisible, false);
                     }
-                });
-            } catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
+            });
         });
 
         WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>
@@ -135,32 +134,6 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         //_viewModel.State = TuningProgressPageViewModel.TuneStateEnum.Inactive;
     }
 
-    private void ChannelFound(object? sender, EventArgs e)
-    {
-        try
-        {
-            if (e is ChannelFoundEventArgs che)
-            {
-                //_loggingService.Info($"Adding new channel: {che.Channel.Name}");
-                //MainThread.BeginInvokeOnMainThread(async () =>
-                //{
-                //    try
-                //    {
-                //        ChannelsListView.ScrollTo(che.Channel, ScrollToPosition.MakeVisible, false);
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        _loggingService.Error(ex);
-                //    }
-                //});
-            }
-        }
-        catch (Exception ex)
-        {
-            _loggingService.Error(ex);
-        }
-    }
-
     private void BuildFocusableItems()
     {
         _focusItems = new KeyboardFocusableItemList();
@@ -190,8 +163,14 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _viewModel.SelectFirstChannel();
-                    ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                    try
+                    {
+                        _viewModel.SelectFirstChannel();
+                        ChannelsListView.ScrollTo(ChannelsListView.SelectedItem, ScrollToPosition.Center, animated: true);
+                    } catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
             }
         } else
@@ -510,53 +489,60 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private async Task<bool> ResetTuningEnvironment()
     {
-        _loggingService.Debug($"ResetTuningEnvironment");
+        try
+        {
+            _loggingService.Debug($"ResetTuningEnvironment");
 
-        if ((_viewModel.Driver == null))
-        {
-            _loggingService.Error("StartButton_Clicked - no driver");
-            WeakReferenceMessenger.Default.Send(new ToastMessage("Error - no driver".Translated()));
-            return false;
-        }
-
-        AppDriverTypeEnum? driverToChange = null;
-        if ((_viewModel.Settings.FM) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.FM))
-        {
-            // need to change driver
-            driverToChange = AppDriverTypeEnum.FM;
-        }
-        if ((_viewModel.Settings.DAB) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.DAB))
-        {
-            // need to change driver
-            driverToChange = AppDriverTypeEnum.DAB;
-        }
-        if ((_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.DVBT))
-        {
-            // need to change driver
-            driverToChange = AppDriverTypeEnum.DVBT;
-        }
-
-        if (driverToChange != null)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            if ((_viewModel.Driver == null))
             {
-                _appMenu.ShowConfirmChangeDriverMenu(_viewModel.Driver, driverToChange);
-            });
+                _loggingService.Error("StartButton_Clicked - no driver");
+                WeakReferenceMessenger.Default.Send(new ToastMessage("Error - no driver".Translated()));
+                return false;
+            }
 
-            return false;
-        }
-
-        if (!_viewModel.Driver.Connected)
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            AppDriverTypeEnum? driverToChange = null;
+            if ((_viewModel.Settings.FM) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.FM))
             {
-                _appMenu.ShowConnectDriverMenu(_viewModel.Driver);
-            });
+                // need to change driver
+                driverToChange = AppDriverTypeEnum.FM;
+            }
+            if ((_viewModel.Settings.DAB) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.DAB))
+            {
+                // need to change driver
+                driverToChange = AppDriverTypeEnum.DAB;
+            }
+            if ((_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2) && (_viewModel.Driver.DriverType != TV.AppDriverTypeEnum.DVBT))
+            {
+                // need to change driver
+                driverToChange = AppDriverTypeEnum.DVBT;
+            }
 
-            return false;
+            if (driverToChange != null)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _appMenu.ShowConfirmChangeDriverMenu(_viewModel.Driver, driverToChange);
+                });
+
+                return false;
+            }
+
+            if (!_viewModel.Driver.Connected)
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    _appMenu.ShowConnectDriverMenu(_viewModel.Driver);
+                });
+
+                return false;
+            }
+
+            return true;
+        } catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+             return false;
         }
-
-        return true;
     }
 
     private void StopButton_Clicked(object sender, EventArgs e)

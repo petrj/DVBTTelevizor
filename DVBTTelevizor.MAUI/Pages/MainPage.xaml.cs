@@ -1126,12 +1126,18 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
-                _viewModel.SelectedChannel.Focused = true;
-                _viewModel.SelectedChannel.NotifyChanges();
+                try
+                {
+                    _viewModel.SelectedChannel.Focused = true;
+                    _viewModel.SelectedChannel.NotifyChanges();
 
-                ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
+                    ChannelsListView.ScrollTo(_viewModel.SelectedChannel, ScrollToPosition.MakeVisible, false);
 
-                await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0,0, false);
+                    await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0, 0, false);
+                } catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         }
 

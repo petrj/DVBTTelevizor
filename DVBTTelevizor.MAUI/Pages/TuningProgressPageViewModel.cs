@@ -80,7 +80,7 @@ namespace DVBTTelevizor.MAUI
                 UpdateDriverStat(m.Value);
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    NotifyChange();
+                    await NotifyChange();
                 });
             });
 
@@ -260,6 +260,8 @@ namespace DVBTTelevizor.MAUI
 
         private void TuningProgressPageViewModel_ChannelFound(object? sender, EventArgs e)
         {
+            _loggingService.Info("TuningProgressPageViewModel_ChannelFound");
+
             if (e is ChannelFoundEventArgs che)
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
@@ -426,7 +428,7 @@ namespace DVBTTelevizor.MAUI
 
                     await NotifyChange();
 
-                    await Task.Delay(5000);
+                    await Task.Delay(3000);
 
                 } while (State == TuneStateEnum.InProgress);
 
@@ -460,7 +462,7 @@ namespace DVBTTelevizor.MAUI
 
                 //_savedChannels = await _channelService.LoadChannels();
 
-                NotifyChange();
+                await NotifyChange();
 
                 for (var dvbtTypeIndex = 0; dvbtTypeIndex <= 1; dvbtTypeIndex++)
                 {
@@ -674,38 +676,39 @@ namespace DVBTTelevizor.MAUI
 
         private async void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
         {
-            var ch = new Channel();
-            ch.ProgramMapPID = MapPID;
-            ch.Name = serviceDescriptor.ServiceName;
-            ch.ProgramNumber = serviceDescriptor.ProgramNumber;
-            ch.ProviderName = serviceDescriptor.ProviderName;
-            ch.Frequency = frequency;
-            ch.Bandwdith = bandWidth;
-            ch.Number = String.Empty;
-            ch.ChannelType = chType;
-            ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
-            ch.NonFree = !serviceDescriptor.Free;
-
-            if (Settings.LocationEnabled)
+            _loggingService.Info($"AddChannel MapPID: {MapPID}");
+            try
             {
-                // try to get geo position asynchronously (non-blocking for callers)
-                try
-                {
-                    var geo = await DVBTTelevizor.MAUI.Services.GeoHelper.GetGeoPositionAsync();
-                    ch.Position = geo.position;
-                    ch.PositionDescription = geo.description;
-                }
-                catch (Exception ex)
-                {
-                    _loggingService.Debug($"GetGeoPositionAsync failed: {ex.Message}");
-                }
-            }
+                var ch = new Channel();
+                ch.ProgramMapPID = MapPID;
+                ch.Name = serviceDescriptor.ServiceName;
+                ch.ProgramNumber = serviceDescriptor.ProgramNumber;
+                ch.ProviderName = serviceDescriptor.ProviderName;
+                ch.Frequency = frequency;
+                ch.Bandwdith = bandWidth;
+                ch.Number = String.Empty;
+                ch.ChannelType = chType;
+                ch.Type = (ServiceTypeEnum)serviceDescriptor.ServisType;
+                ch.NonFree = !serviceDescriptor.Free;
 
-            _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
+                if (Settings.LocationEnabled)
+                {
+                    // try to get geo position asynchronously (non-blocking for callers)
+                    try
+                    {
+                        var geo = await DVBTTelevizor.MAUI.Services.GeoHelper.GetGeoPositionAsync();
+                        ch.Position = geo.position;
+                        ch.PositionDescription = geo.description;
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Debug($"GetGeoPositionAsync failed: {ex.Message}");
+                    }
+                }
 
-            if (ChannelFound != null)
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
+
+                if (ChannelFound != null)
                 {
                     ChannelFound(this, new ChannelFoundEventArgs()
                     {
@@ -725,9 +728,12 @@ namespace DVBTTelevizor.MAUI
                             ProgramNumber = ch.ProgramNumber
                         }
                     });
-                });
 
-                NotifyChange();
+                    await NotifyChange();
+                }
+            } catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         }
 
@@ -808,7 +814,7 @@ namespace DVBTTelevizor.MAUI
 
         public async Task NotifyChange()
         {
-            //_loggingService.Debug("NotifyChange");
+            _loggingService.Debug("NotifyChange");
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
@@ -867,6 +873,8 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(DVBTPropertiesVisible));
                 OnPropertyChanged(nameof(FreqSliderEnabled));
                 OnPropertyChanged(nameof(TuneButtonVisible)); // used for increase/decrease frequency buttons
+
+                _loggingService.Debug("Notify change finished");
             });
         }
 
