@@ -2467,13 +2467,6 @@ namespace DVBTTelevizor.MAUI
                             _driver.Clear();
                         }
 
-                        // in case of play DAB channel, remember the service number for the tim ethe signal s up
-                        if ((channel.ChannelType == ChannelTypeEnum.DAB) &&
-                            (_demodulator is DABProcessor ds))
-                        {
-                            ds.ServiceNumber = Convert.ToInt32(channel.ProgramMapPID);
-                        }
-
                         if (tunedRes.Result != DVBTDriverSearchProgramResultEnum.OK)
                         {
                             var msg = "";
@@ -2531,6 +2524,13 @@ namespace DVBTTelevizor.MAUI
                         }
 
                       _viewModel.PID.AddChannelPIDs(channel.Frequency, channel.ProgramMapPID, setupPIDsRes.PIDs);
+                    }
+
+                    // in case of play DAB channel, remember the service number for the tim ethe signal s up
+                    if ((channel.ChannelType == ChannelTypeEnum.DAB) &&
+                        (_demodulator is DABProcessor ds))
+                    {
+                        ds.SetProcessingService(Convert.ToInt32(channel.ProgramMapPID));
                     }
 
                     _driver.StartStream();

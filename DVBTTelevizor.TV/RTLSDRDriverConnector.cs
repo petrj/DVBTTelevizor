@@ -486,7 +486,7 @@ namespace DVBTTelevizor.TV
             });
         }
 
-        public Task<DVBTDriverResponse> SetPIDs(List<long> PIDs)
+        public virtual Task<DVBTDriverResponse> SetPIDs(List<long> PIDs)
         {
             return Task.Run(() => {
                 return new DVBTDriverResponse()
