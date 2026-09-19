@@ -2540,6 +2540,8 @@ namespace DVBTTelevizor.MAUI
 
                 if (shouldMediaPlay)
                 {
+                    _media = null;
+
                     if (channel.ChannelType == ChannelTypeEnum.SledovaniTV)
                     {
                         _media = new Media(_LibVLC, channel.Url, FromType.FromLocation);
