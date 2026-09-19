@@ -1,4 +1,5 @@
 using DVBTTelevizor;
+using DVBTTelevizor.TV;
 using MPEGTS;
 using Newtonsoft.Json;
 using RTLSDR.Common;
@@ -16,6 +17,8 @@ namespace DVBTTelevizor
     public class Channel : JSONObject
     {
         [PrimaryKey, Column("Number")]
+
+        public string CacheFolder { get; set; } = "img";
         public string Number { get; set; } = "0";
 
         public string? ChannelId { get; set; }
@@ -481,7 +484,28 @@ namespace DVBTTelevizor
         {
             get
             {
-                // There is some bug in Android (Motorola) and no image is shown when url used
+                // There is some bug in Android (Motorola) and no image is shown when url used, using cahce instead of url, so we will use cache for all channels, not only SledovaniTV
+
+                if (!string.IsNullOrWhiteSpace(CacheFolder))
+                {
+                    var ext = ImgCache.GetFileExtensionFromUrl(IconUrl);
+
+                    // by UniqueIdentifier
+                    var normalizedFileName = ImgCache.ToNormalizedFileName(UniqueIdentifier) + ".png";
+                    var cachedFileName = Path.Combine(CacheFolder, normalizedFileName);
+                    if (File.Exists(cachedFileName))
+                    {
+                        return cachedFileName;
+                    }
+
+                    // by name
+                    normalizedFileName = ImgCache.ToNormalizedFileName(Name) + ".png";
+                    cachedFileName = Path.Combine(CacheFolder, normalizedFileName);
+                    if (File.Exists(cachedFileName))
+                    {
+                        return cachedFileName;
+                    }
+                }
 
                 var icon = "other.png";
 

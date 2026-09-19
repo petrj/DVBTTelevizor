@@ -54,6 +54,8 @@ namespace DVBTTelevizor.MAUI
 
         private bool? _videoStackLayoutvisible = null;
 
+        private ImgCache _imgCache;
+
         private readonly BackgroundWorker _recordingBackgroundWorker = new BackgroundWorker();
 
         public ICommand CommandPlay { get; set; }
@@ -72,10 +74,12 @@ namespace DVBTTelevizor.MAUI
         private bool? _rtlsdrDriverInstalled = null;
         public bool MainLayoutVisible { get; set; } = true;
 
+
         public MainViewModel(ILoggingService loggingService, IDriverConnector driver, SledovaniTV.SledovaniTV iptv, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
             :base(loggingService,driver, tvConfiguration, publicDirectoryProvider)
         {
             _driver = driver;
+            _imgCache = new ImgCache(loggingService, publicDirectoryProvider);
 
              EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
              PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
@@ -564,6 +568,8 @@ namespace DVBTTelevizor.MAUI
 
                 var channels = _configuration.GetChannels();
 
+                await _imgCache.DownloadChannelsIcons(channels);
+
                 _anyChannelExist = channels.Count > 0;
 
                 //_loggingService.Debug($"Clearing channels");
@@ -602,6 +608,7 @@ namespace DVBTTelevizor.MAUI
 
                     var ch = channel.Clone();
                     ch.Selected = false;
+                    ch.CacheFolder = _imgCache.CacheFolder;
 
                     if (firstChannel == null)
                     {
