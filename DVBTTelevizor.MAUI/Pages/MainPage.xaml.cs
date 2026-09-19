@@ -992,7 +992,9 @@ namespace DVBTTelevizor.MAUI
                     {
                         MainThread.BeginInvokeOnMainThread(async () =>
                         {
+                            _configuration.SaveChannels(_viewModel.Channels);
                             _viewModel.PlayingChannel.NotifyChanges();
+                            _viewModel.NotifyChannelChange();
                         });
                     }
                 });

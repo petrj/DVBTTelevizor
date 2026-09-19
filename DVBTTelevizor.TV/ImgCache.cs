@@ -87,6 +87,7 @@ namespace DVBTTelevizor.TV
                     }
                 }
 
+                ch.IconUrl = normalizedFileName;
                 System.IO.File.WriteAllBytes(imgPath, slide.ImageBytes);
 
                 return true;
