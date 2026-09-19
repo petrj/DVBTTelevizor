@@ -156,6 +156,14 @@ namespace DVBTTelevizor.TV
 
             try
             {
+                // try to read it as file name extension
+                var ext = System.IO.Path.GetExtension(url);
+
+                if (ext != null && ext.Length > 1 && ext.StartsWith("."))
+                {
+                    return ext;
+                }
+
                 // Parse the main URL
                 var uri = new Uri(url);
 

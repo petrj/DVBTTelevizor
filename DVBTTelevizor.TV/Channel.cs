@@ -491,7 +491,7 @@ namespace DVBTTelevizor
                     var ext = ImgCache.GetFileExtensionFromUrl(IconUrl);
 
                     // by UniqueIdentifier
-                    var normalizedFileName = ImgCache.ToNormalizedFileName(UniqueIdentifier) + ".png";
+                    var normalizedFileName = ImgCache.ToNormalizedFileName(UniqueIdentifier) + ext;
                     var cachedFileName = Path.Combine(CacheFolder, normalizedFileName);
                     if (File.Exists(cachedFileName))
                     {
@@ -499,7 +499,7 @@ namespace DVBTTelevizor
                     }
 
                     // by name
-                    normalizedFileName = ImgCache.ToNormalizedFileName(Name) + ".png";
+                    normalizedFileName = ImgCache.ToNormalizedFileName(Name) + ext;
                     cachedFileName = Path.Combine(CacheFolder, normalizedFileName);
                     if (File.Exists(cachedFileName))
                     {
