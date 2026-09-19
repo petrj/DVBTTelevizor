@@ -887,10 +887,12 @@ namespace DVBTTelevizor.MAUI
             if (_demodulator != null)
             {
                 _demodulator.OnDynamicLabelChanged += OnDynamicLabelChanged;
+                _demodulator.OnSlideShowChanged += OnSlideShowChanged;
             }
 
             WeakReferenceMessenger.Default.Send(new DriverChangedMessage(_driver));
         }
+
 
         private void ProcessAACAudioData(AACDataDemodulatedEventArgs ed)
         {
@@ -971,6 +973,29 @@ namespace DVBTTelevizor.MAUI
             catch (Exception ex)
             {
                 _loggingService.Error(ex);
+            }
+        }
+
+        private void OnSlideShowChanged(object? sender, EventArgs e)
+        {
+            if (_viewModel.PlayingChannel == null)
+            {
+                return;
+            }
+
+            if (e is SlideShowChangedEventArgs sse)
+            {
+                // download to cache!
+                Task.Run(async () =>
+                {
+                    if (await _viewModel.AddDABSlideToCache(_viewModel.PlayingChannel, sse.Slide))
+                    {
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            _viewModel.PlayingChannel.NotifyChanges();
+                        });
+                    }
+                });
             }
         }
 

@@ -1,8 +1,12 @@
 ﻿using LoggerService;
+using RTLSDR.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Threading.Channels;
+using static System.Net.Mime.MediaTypeNames;
+using System.Security.Cryptography;
 
 namespace DVBTTelevizor.TV
 {
@@ -26,6 +30,71 @@ namespace DVBTTelevizor.TV
             get
             {
                 return _cacheDirectory;
+            }
+        }
+
+        public async Task<bool> DownloadDABSlide(Channel ch, DABSlide slide)
+        {
+            _loggingService.Info($"ImgCache: DownloadDABSlide: channel={ch?.Name}, name={slide?.ContentName}");
+
+            try
+            {
+                if (ch == null)
+                {
+                    _loggingService.Info($"ImgCache: DownloadDABSlide: Invalid channel");
+                    return false;
+                }
+
+                if (slide == null || slide.ImageBytes == null || slide.ImageBytes.Length == 0)
+                {
+                    _loggingService.Info($"ImgCache: DownloadDABSlide: Invalid slide data.");
+                    return false;
+                }
+
+                if (!Directory.Exists(_cacheDirectory))
+                {
+                    Directory.CreateDirectory(_cacheDirectory);
+                }
+
+                var mimeParts = slide.MimeType.Split('/');
+
+                if (mimeParts == null || mimeParts.Length != 2)
+                {
+                    throw new InvalidDataException();
+                }
+
+                var mimeType = mimeParts[0];    // "image"
+                var mimeExt = mimeParts[1];    // "png"
+
+                var normalizedFileName = ToNormalizedFileName(ch.UniqueIdentifier) + "." + mimeExt;
+
+                var imgPath = Path.Join(_cacheDirectory, normalizedFileName);
+
+                if (File.Exists(imgPath))
+                {
+                    _loggingService.Info($"ImgCache: DownloadDABSlide: File already exists: {imgPath}");
+
+                    var existingBytes = File.ReadAllBytes(imgPath);
+                    var cacheHash = MD5.HashData(existingBytes);
+                    var imgHash = MD5.HashData(slide.ImageBytes);
+
+                    if (cacheHash.AsSpan().SequenceEqual(imgHash))
+                    {
+                        return false; // same image
+                    } else
+                    {
+                        File.Delete(imgPath);
+                    }
+                }
+
+                System.IO.File.WriteAllBytes(imgPath, slide.ImageBytes);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error($"ImgCache: DownloadDABSlide: Exception: {ex.Message}");
+                return false;
             }
         }
 

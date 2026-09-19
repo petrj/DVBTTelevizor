@@ -7,6 +7,7 @@ using LoggerService;
 using MPEGTS;
 using Newtonsoft.Json;
 using Plugin.InAppBilling;
+using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
@@ -543,6 +544,16 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Error(ex);
             }
+        }
+
+        public async Task<bool> AddDABSlideToCache(Channel ch, DABSlide Slide)
+        {
+            if (_imgCache == null)
+            {
+                return false;
+            }
+
+            return await _imgCache.DownloadDABSlide(ch, Slide);
         }
 
         public async Task RefreshChannels()
