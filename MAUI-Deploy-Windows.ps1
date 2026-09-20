@@ -6,13 +6,13 @@ Script for creating AAB/APK release for publishing to Google Play
     Android TV necessary release modifications:
 
      1) DVBTTelevizor.MAUI\Platforms\Android\AndroidManifest.xml
-  
+
 			<uses-feature android:name="android.software.leanback" android:required="true" />
 			<uses-feature android:name="android.hardware.faketouch" android:required="false" />
 			<uses-feature android:name="android.hardware.touchscreen" android:required="false" />
- 
+
      2) DVBTTelevizor.MAUI\Platforms\Android\MainActivity.cs
- 
+
         [IntentFilter(new[] { Intent.ActionMain }, AutoVerify = true, Categories = new[] { Intent.CategoryLeanbackLauncher })]
 
 
@@ -25,7 +25,7 @@ Script for creating AAB/APK release for publishing to Google Play
     $maxVersion = Get-ChildItem "$env:USERPROFILE\.nuget\packages\powershell.modules\" | Select-Object -Property Name -ExpandProperty Name | sort-object -Descending | Select-Object -First 1
     $modulePath = "$env:USERPROFILE\.nuget\packages\powershell.modules\$maxVersion\PowerShell.Modules\"
 
-    if (Get-Module -Name BuildModule) 
+    if (Get-Module -Name BuildModule)
     {
         Write-Host "Reloading BuildModule module version $maxVersion..."
         Remove-Module BuildModule
@@ -58,16 +58,15 @@ if (-not [String]::IsNullOrEmpty($passw))
             -Keystore "$HOME\PJsAndroidKeyStore\PJsAndroidKeyStore.keystore" `
             -Alias "PJsAndroidKeyStore" `
             -Java  "java.exe"`
-            -Password $passw 
+            -Password $passw
 
         $signedAABPackage | Copy-Item -Destination . -Force -Verbose
         $signedAPKPackage | Copy-Item -Destination . -Force -Verbose
 } else
 {
-    
+
     $aABPackage | Copy-Item -Destination . -Force -Verbose
 }
-  
 
 
-   
+

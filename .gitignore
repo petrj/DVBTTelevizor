@@ -339,3 +339,5 @@ OnlineTelevizor\OnlineTelevizor.UWP\BundleArtifacts\*
 *.odg#
 .sonarqube/
 SonarQubeAnalysis*.json
+*.msix
+*.cer
