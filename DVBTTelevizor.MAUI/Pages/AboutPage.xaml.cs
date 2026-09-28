@@ -130,7 +130,7 @@ public partial class AboutPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"Web_Tapped");
 
-        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://www.dvbttelevizor.petrjanousek.net/"));
+        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://dvbttelevizor.petrjanousek.net/"));
     }
 
     private void Email_Tapped(object sender, TappedEventArgs e)
