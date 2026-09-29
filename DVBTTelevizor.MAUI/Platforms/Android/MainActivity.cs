@@ -793,11 +793,11 @@ namespace DVBTTelevizor.MAUI
 
         private void InitRTLSDRDriver(int port, int streamPort, int samplerate = 2048000)
         {
-            try
-            {
-                _loggingService.Info($"Initializing RTLSDR driver: port:{port}, sampleRate: {samplerate}");
+            _loggingService.Info($"Initializing RTLSDR driver: port:{port}, sampleRate: {samplerate}");
 
-                MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                try
                 {
                     var req = new Intent(Intent.ActionView);
                     req.SetData(Android.Net.Uri.Parse($"iqsrc://-a 127.0.0.1 -p \"{port}\" -s \"{samplerate}\""));
@@ -809,19 +809,19 @@ namespace DVBTTelevizor.MAUI
 
                     _ignoreRequest[StartRequestCodeRTLSDR] = false;
                     StartActivityForResult(req, StartRequestCodeRTLSDR);
-                });
-            }
-            catch (ActivityNotFoundException ex)
-            {
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
-                _ignoreRequest[StartRequestCodeRTLSDR] = true;
-                _loggingService.Info("Activity not found");
-                WeakReferenceMessenger.Default.Send(new RTLSDRDriverNotInstalledMessage("Device response timeout".Translated()));
-            }
-            catch (Exception ex)
-            {
-                WeakReferenceMessenger.Default.Send(new ToastMessage("Driver initializing failed".Translated()));
-            }
+                }
+                catch (ActivityNotFoundException ex)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Driver is not installed".Translated()));
+                    _ignoreRequest[StartRequestCodeRTLSDR] = true;
+                    _loggingService.Info("Activity not found");
+                    WeakReferenceMessenger.Default.Send(new RTLSDRDriverNotInstalledMessage("Device response timeout".Translated()));
+                }
+                catch (Exception ex)
+                {
+                    WeakReferenceMessenger.Default.Send(new ToastMessage("Driver initializing failed".Translated()));
+                }
+            });
         }
 
         public async Task InitDriver()
