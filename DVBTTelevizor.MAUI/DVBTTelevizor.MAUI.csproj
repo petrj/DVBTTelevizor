@@ -71,8 +71,8 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <PublishTrimmed>True</PublishTrimmed>
-	  <AndroidEnableProguard>true</AndroidEnableProguard>
-	  <AndroidLinkTool>r8</AndroidLinkTool>
+		<!--AndroidEnableProguard>true</AndroidEnableProguard>
+		<AndroidLinkTool>r8</AndroidLinkTool-->
 	</PropertyGroup>
 
 	<ItemGroup>
