@@ -34,10 +34,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationVersion>2026023</ApplicationVersion>
-		<VersionCode>2026023</VersionCode>
-		<VersionName>2026023</VersionName>
-		<ApplicationDisplayVersion>2026023</ApplicationDisplayVersion>
+		<ApplicationVersion>2026025</ApplicationVersion>
+		<VersionCode>2026025</VersionCode>
+		<VersionName>2026025</VersionName>
+		<ApplicationDisplayVersion>2026025</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<!-- Versions
@@ -53,28 +53,26 @@
 		<WindowsPackageType>MSIX</WindowsPackageType>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
-		<!--AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi-->
-		<AndroidEnableMultiDex>True</AndroidEnableMultiDex>
-		<AndroidUseAapt2>True</AndroidUseAapt2>
-		<AndroidPackageFormat>apk</AndroidPackageFormat>
-		<AndroidFastDeploymentEnabled>true</AndroidFastDeploymentEnabled>
-		<UseFastDeployment>true</UseFastDeployment>
-		<UseSharedRuntime>true</UseSharedRuntime>
-		<MandroidLinkMode>None</MandroidLinkMode>
-		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-	</PropertyGroup>
+	<PropertyGroup Condition="$(TargetFramework.Contains('android')) and '$(Configuration)' == 'Release'">
+		<AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+		<AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
+		<AndroidUseAapt2>true</AndroidUseAapt2>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
-	  <AndroidCreatePackagePerAbi>True</AndroidCreatePackagePerAbi>
-	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
-	  <AndroidPackageFormat>aab</AndroidPackageFormat>
-	  <AndroidUseAapt2>True</AndroidUseAapt2>
-	  <PublishTrimmed>True</PublishTrimmed>
+		<!-- Kličové vlastnosti pro aktivaci R8 v .NET 10 Android SDK -->
+		<AndroidEnableCodeShrinking>true</AndroidEnableCodeShrinking>
+		<AndroidEnableProguard>true</AndroidEnableProguard>
+		<AndroidLinkTool>r8</AndroidLinkTool>
+		<AndroidProguardConfigFile>proguard-rules.pro</AndroidProguardConfigFile>
+		<AndroidExtraProguardOptions>-repackageclasses ''</AndroidExtraProguardOptions>
 
-	  <AndroidEnableProguard>true</AndroidEnableProguard>
-	  <AndroidLinkTool>r8</AndroidLinkTool>
-	  <AndroidProguardConfigFile>proguard-rules.pro</AndroidProguardConfigFile>
+		<!-- .NET Trimmer -->
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
+
+		<!-- Debug Symboly pro crash logy -->
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
