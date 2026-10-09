@@ -34,10 +34,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationVersion>2026020</ApplicationVersion>
-		<VersionCode>2026020</VersionCode>
-		<VersionName>2026020</VersionName>
-		<ApplicationDisplayVersion>2026020</ApplicationDisplayVersion>
+		<ApplicationVersion>2026022</ApplicationVersion>
+		<VersionCode>2026022</VersionCode>
+		<VersionName>2026022</VersionName>
+		<ApplicationDisplayVersion>2026022</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<!-- Versions
@@ -71,8 +71,10 @@
 	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <PublishTrimmed>True</PublishTrimmed>
-		<!--AndroidEnableProguard>true</AndroidEnableProguard>
-		<AndroidLinkTool>r8</AndroidLinkTool-->
+
+	  <AndroidEnableProguard>true</AndroidEnableProguard>
+	  <AndroidLinkTool>r8</AndroidLinkTool>
+	  <AndroidProguardConfigFile>proguard-rules.pro</AndroidProguardConfigFile>
 	</PropertyGroup>
 
 	<ItemGroup>
