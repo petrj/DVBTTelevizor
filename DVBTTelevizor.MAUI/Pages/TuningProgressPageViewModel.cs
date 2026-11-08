@@ -674,7 +674,7 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
-                NotifyChange();
+                await NotifyChange();
             }
         }
 
