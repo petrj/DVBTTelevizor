@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -264,75 +265,78 @@ namespace DVBTTelevizor.MAUI
 
             if (e is ChannelFoundEventArgs che)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                try
                 {
-                    try
+                    var configChannels = _configuration.GetChannels();
+
+                    // looking for the same channel
+                    var channelAlreadySaved = false;
+                    foreach (var configChannel in configChannels)
                     {
-                        var configChannels = _configuration.GetChannels();
-
-                        // looking for the same channel
-                        var channelAlreadySaved = false;
-                        foreach (var configChannel in configChannels)
+                        if (
+                            (configChannel.ChannelType == che.Channel.ChannelType) &&
+                            (configChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
+                            (configChannel.Frequency == che.Channel.Frequency)
+                            )
                         {
-                            if (
-                                (configChannel.ChannelType == che.Channel.ChannelType) &&
-                                (configChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
-                                (configChannel.Frequency == che.Channel.Frequency)
-                               )
-                            {
-                                channelAlreadySaved = true;
-                                break;
-                            }
+                            channelAlreadySaved = true;
+                            break;
                         }
+                    }
 
-                        // looking for the same channel in already tuned channels
-                        var channelAlreadyTuned = false;
-                        foreach (var tunedChannel in Channels)
+                    // looking for the same channel in already tuned channels
+                    var channelAlreadyTuned = false;
+                    foreach (var tunedChannel in Channels)
+                    {
+                        if (
+                            (tunedChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
+                            (tunedChannel.Frequency == che.Channel.Frequency)
+                            )
                         {
-                            if (
-                                (tunedChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
-                                (tunedChannel.Frequency == che.Channel.Frequency)
-                               )
-                            {
-                                channelAlreadyTuned = true;
-                                break;
-                            }
+                            channelAlreadyTuned = true;
+                            break;
                         }
+                    }
 
-                        if (che.Channel.ProviderName != null)
+                    if (che.Channel.ProviderName != null)
+                    {
+                        if (!_tunedMultiplexes.ContainsKey(che.Channel.Frequency))
                         {
-                            if (!_tunedMultiplexes.ContainsKey(che.Channel.Frequency))
-                            {
-                                _tunedMultiplexes.Add(che.Channel.Frequency, 0);
-                            }
-                            _tunedMultiplexes[che.Channel.Frequency]++;
+                            _tunedMultiplexes.Add(che.Channel.Frequency, 0);
                         }
+                        _tunedMultiplexes[che.Channel.Frequency]++;
+                    }
 
-                        if (!channelAlreadyTuned)
-                        {
-                            Channels.Add(che.Channel);
-
-                            if (!channelAlreadySaved)
-                            {
-                                _tunedNewChannels++;
-                            }
-                        }
+                    if (!channelAlreadyTuned)
+                    {
+                        Channels.Add(che.Channel);
 
                         if (!channelAlreadySaved)
                         {
-                            che.Channel.Number = GetNextFreeChannelNumber(configChannels);
-                            configChannels.Add(che.Channel.Clone());
-
-                            _configuration.SaveChannels(configChannels);
+                            _tunedNewChannels++;
                         }
+                    }
 
-                        WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
-                    }
-                    finally
+                    if (!channelAlreadySaved)
                     {
-                        NotifyChange();
+                        che.Channel.Number = GetNextFreeChannelNumber(configChannels);
+                        configChannels.Add(che.Channel.Clone());
+
+                        _configuration.SaveChannels(configChannels);
                     }
-                });
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
+                finally
+                {
+                    Task.Run(async () =>
+                    {
+                        await NotifyChange();
+                        WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
+                    });
+                }
             }
         }
 
@@ -729,7 +733,7 @@ namespace DVBTTelevizor.MAUI
                         }
                     });
 
-                    await NotifyChange();
+                    //await NotifyChange();
                 }
             } catch (Exception ex)
             {

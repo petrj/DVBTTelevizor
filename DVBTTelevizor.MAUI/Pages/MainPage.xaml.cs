@@ -826,6 +826,8 @@ namespace DVBTTelevizor.MAUI
 
                     _demodulator = new FMDemodulator(_loggingService);
 
+                    var startupFreq = _configuration.FMFrequencyKHz*1000>=AudioTools.FMMinFreq && _configuration.FMFrequencyKHz * 1000 <= AudioTools.FMMaxFreq ? Convert.ToInt32(_configuration.FMFrequencyKHz * 1000) : AudioTools.FMMinFreq;
+
                     if (_configuration.TestingMode)
                     {
                         _driver = new RTLSDRTestDriverConnector(_loggingService, _demodulator, AppDriverTypeEnum.FM);
@@ -838,20 +840,22 @@ namespace DVBTTelevizor.MAUI
 
                         _driver = new RTLSDRFMDriverConnector(_loggingService,
                                     sdrDriver,
-                                    _demodulator, 104000000);
+                                    _demodulator, startupFreq);
                     }
                     else
                     {
                         var sdrDriver = _sdrDriverPlatformImplementation.GetRTLSDRDriver();
                         _driver = new RTLSDRFMDriverConnector(_loggingService,
                                     sdrDriver,
-                                    _demodulator, 104000000);
+                                    _demodulator, startupFreq);
                     }
 
                     _demodulator.Start();
                     break;
                 case AppDriverTypeEnum.DAB:
                     _demodulator = new DABProcessor(_loggingService);
+
+                    var startupFr = _configuration.DABFrequencyKHz * 1000 >= AudioTools.DABMinFreq && _configuration.DABFrequencyKHz * 1000 <= AudioTools.DABMaxFreq ? Convert.ToInt32(_configuration.DABFrequencyKHz * 1000) : AudioTools.DABMinFreq;
 
                     if (_configuration.TestingMode)
                     {
@@ -865,12 +869,12 @@ namespace DVBTTelevizor.MAUI
 
                         _driver = new RTLSDRDABDriverConnector(_loggingService,
                         sdrDriver,
-                        _demodulator, 199360000); // 8C on startup
+                        _demodulator, startupFr);
                     } else
                     {
                         _driver = new RTLSDRDABDriverConnector(_loggingService,
                             _sdrDriverPlatformImplementation.GetRTLSDRDriver(),
-                            _demodulator, 199360000); // 8C on startup
+                            _demodulator, startupFr);
                     }
 
                     _demodulator.Start();
