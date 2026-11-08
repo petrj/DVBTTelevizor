@@ -2489,6 +2489,7 @@ namespace DVBTTelevizor.MAUI
 
                             WeakReferenceMessenger.Default.Send(new ToastMessage(msg));
 
+                            _refreshGUIEnabled = true;
                             PlayingState = PlayingStateEnum.Stopped;
                             return;
                         }
@@ -2508,6 +2509,8 @@ namespace DVBTTelevizor.MAUI
                         {
                             WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
                             _viewModel.PlayingChannel = null;
+                            _refreshGUIEnabled = true;
+                            PlayingState = PlayingStateEnum.Stopped;
                             return;
                         }
                     }
@@ -2519,6 +2522,7 @@ namespace DVBTTelevizor.MAUI
                         {
                             WeakReferenceMessenger.Default.Send(new ToastMessage("Playing failed".Translated()));
                             _viewModel.PlayingChannel = null;
+                            _refreshGUIEnabled = true;
                             PlayingState = PlayingStateEnum.Stopped;
                             return;
                         }
