@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using DVBTTelevizor.TV;
 using LoggerService;
+using RTLSDR.Common;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
@@ -201,23 +202,23 @@ public partial class TuningDriverPage : ContentPage, IOnKeyDown
                 case AppDriverTypeEnum.DVBT:
                     _tuningSettings.DVBT = true;
                     _tuningSettings.DVBT2 = true;
-                    _tuningSettings.FrequencyKHz = _configuration.FrequencyKHz;
-                    _tuningSettings.FrequencyFromKHz = _configuration.FrequencyFromKHz;
-                    _tuningSettings.FrequencyToKHz = _configuration.FrequencyToKHz;
+                    _tuningSettings.FrequencyKHz = _tuningSettings.ValidFrequency(_configuration.FrequencyKHz) ? _configuration.FrequencyKHz : _tuningSettings.DeviceFrequencyMinKHz;
+                    _tuningSettings.FrequencyFromKHz = _tuningSettings.ValidFrequency(_configuration.FrequencyFromKHz) ? _configuration.FrequencyFromKHz : _tuningSettings.DeviceFrequencyMinKHz;
+                    _tuningSettings.FrequencyToKHz = _tuningSettings.ValidFrequency(_configuration.FrequencyToKHz) ? _configuration.FrequencyToKHz : _tuningSettings.DeviceFrequencyMaxKHz;
                     break;
                 case AppDriverTypeEnum.FM:
                     _tuningSettings.FM = true;
                     _tuningSettings.TuningMode = TuneModeEnum.Frequency;
-                    _tuningSettings.FrequencyKHz = _configuration.FMFrequencyKHz;
-                    _tuningSettings.FrequencyFromKHz = _configuration.FMFrequencyFromKHz;
-                    _tuningSettings.FrequencyToKHz = _configuration.FMFrequencyToKHz;
+                    _tuningSettings.FrequencyKHz =  _tuningSettings.ValidFrequency(_configuration.FMFrequencyKHz) ? _configuration.FMFrequencyKHz : _tuningSettings.DeviceFrequencyMinKHz;
+                    _tuningSettings.FrequencyFromKHz = _tuningSettings.ValidFrequency(_configuration.FMFrequencyFromKHz) ? _configuration.FMFrequencyFromKHz : _tuningSettings.DeviceFrequencyMinKHz;
+                    _tuningSettings.FrequencyToKHz = _tuningSettings.ValidFrequency(_configuration.FMFrequencyToKHz) ? _configuration.FMFrequencyToKHz : _tuningSettings.DeviceFrequencyMaxKHz;
                     break;
                 case AppDriverTypeEnum.DAB:
                     _tuningSettings.DAB = true;
                     _tuningSettings.TuningMode = TuneModeEnum.Frequency;
-                    _tuningSettings.FrequencyKHz = _configuration.DABFrequencyKHz;
-                    _tuningSettings.FrequencyFromKHz = _configuration.DABFrequencyFromKHz;
-                    _tuningSettings.FrequencyToKHz = _configuration.DABFrequencyToKHz;
+                    _tuningSettings.FrequencyKHz = _tuningSettings.ValidFrequency(_configuration.DABFrequencyKHz) ? _configuration.DABFrequencyKHz : AudioTools.DABMinFreq;
+                    _tuningSettings.FrequencyFromKHz = _tuningSettings.ValidFrequency(_configuration.DABFrequencyFromKHz) ? _configuration.DABFrequencyFromKHz : AudioTools.DABMinFreq;
+                    _tuningSettings.FrequencyToKHz = _tuningSettings.ValidFrequency(_configuration.DABFrequencyToKHz) ? _configuration.DABFrequencyToKHz : AudioTools.DABMaxFreq;
                     break;
             }
         }

@@ -145,24 +145,32 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
                     _viewModel?.Settings.DVBT = true;
                     _viewModel?.Settings.DVBT2 = true;
                     _viewModel?.Settings.TuneDVBTPreferred = false;
-                   break;
+                    break;
                 case TuneModeEnum.Manual:
 
-                        _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
-                        _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
-                        _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+                    _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
+                    _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                    _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
 
                     break;
                 case TuneModeEnum.Frequency:
 
-                        _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
-                        _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
-                        _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
+                    _viewModel?.Settings.DVBT = _configuration.TuneDVBTEnabled;
+                    _viewModel?.Settings.DVBT2 = _configuration.TuneDVBT2Enabled;
+                    _viewModel?.Settings.TuneDVBTPreferred = _configuration.TuneDVBTPreferred;
 
 
                     break;
             }
         }
+        //} else if (_configuration.AppDriverType == TV.AppDriverTypeEnum.FM)
+        //{
+        //    _viewModel?.Settings.SetFMSettings();
+        //}
+        //else if (_configuration.AppDriverType == TV.AppDriverTypeEnum.DAB)
+        //{
+        //    _viewModel?.Settings.SetDABSettings();
+        //}
 
         switch (mode)
         {

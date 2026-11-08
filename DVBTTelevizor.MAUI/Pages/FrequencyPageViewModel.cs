@@ -194,7 +194,7 @@ namespace DVBTTelevizor.MAUI
         public void IncreaseFreq()
         {
             var freq = FrequencyKHz + TuneBandWidthKHz;
-            if (!_tuneSettings.ValidFrequency(freq, true))
+            if (!_tuneSettings.ValidFrequency(freq))
             {
                 freq = FrequencyMaxKHz;
             }
@@ -208,7 +208,7 @@ namespace DVBTTelevizor.MAUI
         public void DecreaseFreq()
         {
             var freq = FrequencyKHz - TuneBandWidthKHz;
-            if (!_tuneSettings.ValidFrequency(freq, true))
+            if (!_tuneSettings.ValidFrequency(freq))
             {
                 freq = FrequencyMinKHz;
             }
@@ -224,7 +224,7 @@ namespace DVBTTelevizor.MAUI
             Rounding = true;
             try
             {
-                if (!_tuneSettings.ValidFrequency(FrequencyKHz, true))
+                if (!_tuneSettings.ValidFrequency(FrequencyKHz))
                     return;
 
                 Int64 freqRounded = _tuneSettings.DefaultFrequencyMinKHz;

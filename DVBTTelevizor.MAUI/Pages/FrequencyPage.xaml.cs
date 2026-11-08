@@ -73,7 +73,7 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
             return;
         }
 
-        if (!_viewModel.Settings.ValidFrequency(Convert.ToInt64(mhz*1000.0), true))
+        if (!_viewModel.Settings.ValidFrequency(Convert.ToInt64(mhz*1000.0)))
         {
             WeakReferenceMessenger.Default.Send(new ToastMessage("Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(mhz.ToString(), _viewModel.Settings.DeviceFrequencyMinKHz.ToString(), _viewModel.Settings.DeviceFrequencyMaxKHz.ToString())));
             _viewModel.FrequencyKHz = _oldFreq;
@@ -94,7 +94,7 @@ public partial class FrequencyPage : ContentPage, ITuningPage, IOnKeyDown
             return;
         }
 
-        if (!_viewModel.Settings.ValidFrequency(khz, true))
+        if (!_viewModel.Settings.ValidFrequency(khz))
         {
             WeakReferenceMessenger.Default.Send(new ToastMessage("Frequency \"{0}\" MHz is out of range {1} MHz - {2} MHz".Translated(khz.ToString(), _viewModel.FrequencyMinKHz.ToString(), _viewModel.FrequencyMaxKHz.ToString())));
             _viewModel.FrequencyKHz = _oldFreq;

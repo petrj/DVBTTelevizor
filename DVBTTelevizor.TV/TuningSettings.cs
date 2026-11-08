@@ -73,7 +73,7 @@ namespace DVBTTelevizor
             };
         }
 
-        public bool ValidFrequency(long freq, bool device)
+        public bool ValidFrequency(long freq)
         {
             return (freq >= DeviceFrequencyMinKHz) && (freq <= DeviceFrequencyMaxKHz);
         }
@@ -217,11 +217,11 @@ namespace DVBTTelevizor
                             DeviceFrequencyMinKHz = cap.minFrequency / 1000;
                             DeviceFrequencyMaxKHz = cap.maxFrequency / 1000;
 
-                            if (!ValidFrequency(DeviceFrequencyMinKHz, false))
+                            if (!ValidFrequency(DeviceFrequencyMinKHz))
                             {
                                 DeviceFrequencyMinKHz = DeviceFrequencyMinKHz;
                             }
-                            if (!ValidFrequency(DeviceFrequencyMaxKHz, false))
+                            if (!ValidFrequency(DeviceFrequencyMaxKHz))
                             {
                                 DeviceFrequencyMaxKHz = DeviceFrequencyMaxKHz;
                             }
@@ -235,17 +235,17 @@ namespace DVBTTelevizor
 
                 // fix
 
-                if (!ValidFrequency(FrequencyKHz, true))
+                if (!ValidFrequency(FrequencyKHz))
                 {
                     FrequencyKHz = DeviceFrequencyMinKHz;
                 }
 
-                if (!ValidFrequency(FrequencyFromKHz, true))
+                if (!ValidFrequency(FrequencyFromKHz))
                 {
                     FrequencyFromKHz = DeviceFrequencyMinKHz;
                 }
 
-                if (!ValidFrequency(FrequencyToKHz, true))
+                if (!ValidFrequency(FrequencyToKHz))
                 {
                     FrequencyToKHz = DeviceFrequencyMaxKHz;
                 }
