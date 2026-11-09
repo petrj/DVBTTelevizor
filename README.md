@@ -68,6 +68,8 @@ Kompatibilní USB DVBT/DVBT2/RTL-SDR tuner pro Android
 
 ![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
 
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/t1.png" width="800" alt="Screenshott1"/>
+
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/004.png" width="800" alt="Screenshot4"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/012.png" width="800" alt="Screenshot12"/>
 
@@ -94,7 +96,6 @@ Kompatibilní USB DVBT/DVBT2/RTL-SDR tuner pro Android
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/022.png" width="400" alt="Screenshot22"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/023.png" width="400" alt="Screenshot23"/>
 
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/t1.png" width="800" alt="Screenshott1"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/t2.png" width="500" alt="Screenshott2"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/t3.png" width="800" alt="Screenshott3"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/t4.png" width="800" alt="Screenshott4"/>
