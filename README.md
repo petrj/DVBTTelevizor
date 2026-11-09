@@ -68,8 +68,8 @@ Kompatibilní USB DVBT/DVBT2/RTL-SDR tuner pro Android
 
 ![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
 
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/004.png" width="600" alt="Screenshot4"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/019.png" width="600" alt="Screenshot19"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/004.png" width="800" alt="Screenshot4"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/012.png" width="800" alt="Screenshot12"/>
 
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/001.png" width="400" alt="Screenshot1"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/002.png" width="400" alt="Screenshot2"/>
@@ -81,13 +81,14 @@ Kompatibilní USB DVBT/DVBT2/RTL-SDR tuner pro Android
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/009.png" width="400" alt="Screenshot9"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/010.png" width="400" alt="Screenshot10"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/011.png" width="400" alt="Screenshot11"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/012.png" width="400" alt="Screenshot12"/>
+
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/013.png" width="400" alt="Screenshot13"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/014.png" width="400" alt="Screenshot14"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/015.png" width="400" alt="Screenshot15"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/016.png" width="400" alt="Screenshot16"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/017.png" width="400" alt="Screenshot17"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/018.png" width="400" alt="Screenshot18"/>
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/019.png" width="600" alt="Screenshot19"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/020.png" width="400" alt="Screenshot20"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/021.png" width="400" alt="Screenshot21"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/022.png" width="400" alt="Screenshot22"/>
