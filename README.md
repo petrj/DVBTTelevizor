@@ -68,10 +68,11 @@ Kompatibilní USB DVBT/DVBT2/RTL-SDR tuner pro Android
 
 ![icon](https://github.com/petrj/DVBTTelevizor/blob/master/Graphics/icon256x256.png)
 
+<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/004.png" width="600" alt="Screenshot4"/>
+
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/001.png" width="400" alt="Screenshot1"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/002.png" width="400" alt="Screenshot2"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/003.png" width="400" alt="Screenshot3"/>
-<img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/004.png" width="400" alt="Screenshot4"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/005.png" width="400" alt="Screenshot5"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/006.png" width="400" alt="Screenshot6"/>
 <img src="https://raw.github.com/petrj/DVBTTelevizor/master/Graphics/007.png" width="400" alt="Screenshot7"/>
