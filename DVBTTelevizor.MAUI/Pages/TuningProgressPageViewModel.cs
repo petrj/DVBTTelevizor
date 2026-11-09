@@ -5,6 +5,7 @@ using LoggerService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using MPEGTS;
+using Newtonsoft.Json;
 using RTLSDR.Common;
 using RTLSDR.DAB;
 using RTLSDR.FM;
@@ -25,7 +26,8 @@ namespace DVBTTelevizor.MAUI
 {
     public class TuningProgressPageViewModel : BaseViewModel
     {
-        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private static SemaphoreSlim _semaphoreSlimSelectedChannel = new SemaphoreSlim(1, 1);
+        private static readonly object _channelUpdateLock = new object();
 
         public TuningSettings Settings { get; set; }
         public ICommand CommandDriver { get; set; }
@@ -71,8 +73,6 @@ namespace DVBTTelevizor.MAUI
         {
             SetupDriver(driver);
             Settings = new TuningSettings(loggingService);
-
-            ChannelFound += TuningProgressPageViewModel_ChannelFound;
 
             _listViewSelector = new ListViewSelector(Channels);
 
@@ -259,13 +259,13 @@ namespace DVBTTelevizor.MAUI
             return max.ToString();
         }
 
-        private void TuningProgressPageViewModel_ChannelFound(object? sender, EventArgs e)
+        private void OnChannelFound(Channel channel)
         {
             _loggingService.Info("TuningProgressPageViewModel_ChannelFound");
 
-            if (e is ChannelFoundEventArgs che)
+            try
             {
-                try
+                lock (_channelUpdateLock)
                 {
                     var configChannels = _configuration.GetChannels();
 
@@ -274,9 +274,9 @@ namespace DVBTTelevizor.MAUI
                     foreach (var configChannel in configChannels)
                     {
                         if (
-                            (configChannel.ChannelType == che.Channel.ChannelType) &&
-                            (configChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
-                            (configChannel.Frequency == che.Channel.Frequency)
+                            (configChannel.ChannelType == channel.ChannelType) &&
+                            (configChannel.ProgramMapPID == channel.ProgramMapPID) &&
+                            (configChannel.Frequency == channel.Frequency)
                             )
                         {
                             channelAlreadySaved = true;
@@ -289,8 +289,8 @@ namespace DVBTTelevizor.MAUI
                     foreach (var tunedChannel in Channels)
                     {
                         if (
-                            (tunedChannel.ProgramMapPID == che.Channel.ProgramMapPID) &&
-                            (tunedChannel.Frequency == che.Channel.Frequency)
+                            (tunedChannel.ProgramMapPID == channel.ProgramMapPID) &&
+                            (tunedChannel.Frequency == channel.Frequency)
                             )
                         {
                             channelAlreadyTuned = true;
@@ -298,18 +298,18 @@ namespace DVBTTelevizor.MAUI
                         }
                     }
 
-                    if (che.Channel.ProviderName != null)
+                    if (channel.ProviderName != null)
                     {
-                        if (!_tunedMultiplexes.ContainsKey(che.Channel.Frequency))
+                        if (!_tunedMultiplexes.ContainsKey(channel.Frequency))
                         {
-                            _tunedMultiplexes.Add(che.Channel.Frequency, 0);
+                            _tunedMultiplexes.Add(channel.Frequency, 0);
                         }
-                        _tunedMultiplexes[che.Channel.Frequency]++;
+                        _tunedMultiplexes[channel.Frequency]++;
                     }
 
                     if (!channelAlreadyTuned)
                     {
-                        Channels.Add(che.Channel);
+                        Channels.Add(channel);
 
                         if (!channelAlreadySaved)
                         {
@@ -319,25 +319,27 @@ namespace DVBTTelevizor.MAUI
 
                     if (!channelAlreadySaved)
                     {
-                        che.Channel.Number = GetNextFreeChannelNumber(configChannels);
-                        configChannels.Add(che.Channel.Clone());
+                        channel.Number = GetNextFreeChannelNumber(configChannels);
+                        configChannels.Add(channel.Clone());
 
+                        _loggingService.Debug($"New channel {channel.Name} added to configuration with number {channel.Number} ({JsonConvert.SerializeObject(configChannels)})");
                         _configuration.SaveChannels(configChannels);
                     }
                 }
-                catch (Exception ex)
-                {
-                    _loggingService.Error(ex);
-                }
-                finally
-                {
-                    Task.Run(async () =>
-                    {
-                        await NotifyChange();
-                        WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
-                    });
-                }
             }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+            finally
+            {
+                Task.Run(async () =>
+                {
+                    await NotifyChange();
+                    WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
+                });
+            }
+
         }
 
         public void ResetTune(bool clearChannels, bool fromBeginning)
@@ -712,28 +714,14 @@ namespace DVBTTelevizor.MAUI
 
                 _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
 
+                OnChannelFound(ch);
+
                 if (ChannelFound != null)
                 {
                     ChannelFound(this, new ChannelFoundEventArgs()
                     {
-                        Channel = new Channel()
-                        {
-                            ProgramMapPID = MapPID,
-                            Name = serviceDescriptor.ServiceName,
-                            ProviderName = serviceDescriptor.ProviderName,
-                            Frequency = frequency,
-                            Bandwdith = bandWidth,
-                            Number = String.Empty,
-                            ChannelType = chType,
-                            Type = (ServiceTypeEnum)serviceDescriptor.ServisType,
-                            NonFree = !serviceDescriptor.Free,
-                            Position = ch.Position,
-                            PositionDescription = ch.PositionDescription,
-                            ProgramNumber = ch.ProgramNumber
-                        }
+                        Channel = ch
                     });
-
-                    //await NotifyChange();
                 }
             } catch (Exception ex)
             {
@@ -790,19 +778,19 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                _semaphoreSlim.WaitAsync();
+                _semaphoreSlimSelectedChannel.WaitAsync();
                 try
                 {
                     return _selectedChannel;
                 }
                 finally
                 {
-                    _semaphoreSlim.Release();
+                    _semaphoreSlimSelectedChannel.Release();
                 };
             }
             set
             {
-                _semaphoreSlim.WaitAsync();
+                _semaphoreSlimSelectedChannel.WaitAsync();
                 try
                 {
                     _selectedChannel = value;
@@ -811,7 +799,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 finally
                 {
-                    _semaphoreSlim.Release();
+                    _semaphoreSlimSelectedChannel.Release();
                 };
             }
         }
@@ -1445,4 +1433,3 @@ namespace DVBTTelevizor.MAUI
 
     }
 }
-
