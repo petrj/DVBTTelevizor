@@ -311,12 +311,15 @@ namespace DVBTTelevizor.MAUI
                     if (!string.IsNullOrWhiteSpace(_iptv.LastErrorDescription))
                     {
                         var msg = "Pairing failed".Translated();
-                        WeakReferenceMessenger.Default.Send(new ToastMessage($"msg: {_iptv.LastErrorDescription}"));
+                        WeakReferenceMessenger.Default.Send(new ToastMessage($"{msg}. {_iptv.LastErrorDescription}"));
                     }
                 }
 
                 SledovaniTVRefreshed = false;
                 await SledovaniTVRefresh();
+
+
+                WeakReferenceMessenger.Default.Send(new SledovaniTVStateChangedMessage(_iptv));
             }
             catch (Exception ex)
             {
