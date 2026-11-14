@@ -117,6 +117,7 @@ namespace DVBTTelevizor.MAUI
 
             OnPropertyChanged(nameof(AudioTracksButtonVisible));
             OnPropertyChanged(nameof(SubtitlesTracksButtonVisible));
+            OnPropertyChanged(nameof(StreamVideoSize));
         }
 
         public bool AudioTracksButtonVisible

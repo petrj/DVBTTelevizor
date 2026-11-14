@@ -95,6 +95,8 @@ namespace DVBTTelevizor.MAUI
             }
             set
             {
+                if (value == null)
+                    return;
                 _selectedStreamQuality = value;
                 _configuration.SledovaniTVResolution = value?.Id?? string.Empty;
                 OnPropertyChanged(nameof(SelectedStreamQuality));
