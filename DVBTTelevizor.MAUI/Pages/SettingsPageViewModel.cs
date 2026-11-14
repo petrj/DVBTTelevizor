@@ -4,11 +4,13 @@ using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
 using Newtonsoft.Json;
+using SledovaniTV;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,14 +21,18 @@ namespace DVBTTelevizor.MAUI
         private const string DefaultLanguage = "English (default)";
         private int? previousDVBTDriverTypeindex = null;
         private bool _requestWriteToSDCardDisabled = false;
-        private readonly SledovaniTV.SledovaniTV _iptv;
+        private SledovaniTV.SledovaniTV? _iptv;
 
         public string IgnoreLanguageChangeNotify { get; set; } = null;
+
+        private Quality? _selectedStreamQuality = null;
 
         public ObservableCollection<Channel> AutoPlayChannels { get; set; } = new ObservableCollection<Channel>();
         public ObservableCollection<string> DVBTDrivers { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> FontSizes { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> Languages { get; set; } = new ObservableCollection<string>();
+
+        public ObservableCollection<Quality> Resolutions { get; set; } = new ObservableCollection<Quality>();
 
         public Channel _selectedChannel = null;
         private bool _showPairedDevice = false;
@@ -40,6 +46,59 @@ namespace DVBTTelevizor.MAUI
             {
                 AllowWriteToSDCard(m?.Value?.Path, m?.Value?.PathUri);
             });
+
+
+            WeakReferenceMessenger.Default.Register<SledovaniTVStateChangedMessage>(this, (r, m) =>
+            {
+                _iptv = m.Value;
+                UpdateStreamQualities();
+                NotifySledovaniTVChange();
+            });
+        }
+
+        public void UpdateStreamQualities()
+        {
+            Task.Run(async () =>
+            {
+                Resolutions.Clear();
+
+                var autoQuality = new Quality() { Name = "Auto", Id = string.Empty };
+                _selectedStreamQuality = autoQuality;
+
+                Resolutions.Add(autoQuality);
+
+                if (_iptv != null && _iptv.Status == StatusEnum.Logged)
+                {
+                    var qualities = await _iptv.GetStreamQualities();
+                    foreach (var q in qualities)
+                    {
+                        if (q.Id == _configuration.SledovaniTVResolution)
+                        {
+                            _selectedStreamQuality = q;
+                        }
+                        Resolutions.Add(q);
+                    }
+                }
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    OnPropertyChanged(nameof(Resolutions));
+                    OnPropertyChanged(nameof(SelectedStreamQuality));
+                });
+            });
+        }
+
+        public Quality SelectedStreamQuality
+        {
+            get
+            {
+                return _selectedStreamQuality;
+            }
+            set
+            {
+                _selectedStreamQuality = value;
+                _configuration.SledovaniTVResolution = value?.Id?? string.Empty;
+                OnPropertyChanged(nameof(SelectedStreamQuality));
+            }
         }
 
         public void AllowWriteToSDCard(string path, string pathUri)
@@ -322,7 +381,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return Config.SledovaniTVShowAdultChannels;
+                return _iptv != null && _iptv.Paired && Config.SledovaniTVShowAdultChannels;
             }
             set
             {
@@ -349,7 +408,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _iptv.Paired;
+                return (_iptv != null && _iptv.Paired);
             }
         }
 
@@ -357,7 +416,7 @@ namespace DVBTTelevizor.MAUI
         {
             get
             {
-                return _iptv.NotPaired;
+                return  (_iptv == null || !_iptv.Paired);
             }
         }
 
@@ -372,94 +431,7 @@ namespace DVBTTelevizor.MAUI
             OnPropertyChanged(nameof(SledovaniTVEnabled));
         }
 
-        public async Task SledovaniTVPair()
-        {
-            _loggingService.Info("SledovaniTVPair");
 
-            try
-            {
-                _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
-                _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
-                await _iptv.Login();
-                _configuration.SledovaniTVDeviceID = _iptv.Connection.deviceId;
-                _configuration.SledovaniTVDevicePassword = _iptv.Connection.password;
-
-                NotifySledovaniTVChange();
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
-        }
-
-        public async Task SledovaniTVReloadChannels()
-        {
-            _loggingService.Info("SledovaniTVReloadChannels");
-
-            try
-            {
-                var iptvChannels = await _iptv.GetChannels();
-                var channels = _configuration.GetChannels();
-
-                var countImported = 0;
-                var countUpdated = 0;
-
-                foreach (var iptvChannel in iptvChannels)
-                {
-                    var found = false;
-
-                    // searching for online channel with the same id
-                    foreach (var channel in channels)
-                    {
-                        if ((channel.ChannelType == ChannelTypeEnum.SledovaniTV) && (channel.ChannelId == iptvChannel.ChannelId))
-                        {
-                            // update
-                            found = true;
-
-                            channel.Url = iptvChannel.Url;
-                            channel.IconUrl = iptvChannel.IconUrl;
-                            channel.Name = iptvChannel.Name;
-                            channel.ProviderName = "SledovaniTV";
-
-                            countUpdated++;
-
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        // create
-                        var num = TuningProgressPageViewModel.GetNextFreeChannelNumber(channels);
-                        var ch = new Channel()
-                        {
-                            Number = num,
-                            ChannelId = iptvChannel.ChannelId,
-                            Url = iptvChannel.Url,
-                            IconUrl = iptvChannel.IconUrl,
-                            Name = iptvChannel.Name,
-                            ProviderName = "SledovaniTV",
-                            Type = iptvChannel.Type,
-                            ChannelType = ChannelTypeEnum.SledovaniTV
-                        };
-
-                        channels.Add(ch);
-                        countImported++;
-                    }
-                }
-
-                _configuration.SaveChannels(channels);
-
-                WeakReferenceMessenger.Default.Send(new ChannelsChangedMessage(String.Empty));
-                WeakReferenceMessenger.Default.Send(new ToastMessage("{0} channels updated, {1} added".Translated(countUpdated.ToString(), countImported.ToString())));
-
-                NotifySledovaniTVChange();
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Error(ex);
-            }
-        }
 
         public async Task ExportSettings()
         {

@@ -14,6 +14,7 @@ using RTLSDR.Audio;
 using RTLSDR.Common;
 using RTLSDR.DAB;
 using RTLSDR.FM;
+using SledovaniTV;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -83,7 +84,6 @@ namespace DVBTTelevizor.MAUI
         private LibVLC? _LibVLC;
         private LibVLCSharp.Shared.MediaPlayer? _mediaPlayer;
         private Media _media;
-        private SledovaniTV.SledovaniTV _iptv;
 
         private AppMenu _appMenu = null;
 
@@ -215,15 +215,7 @@ namespace DVBTTelevizor.MAUI
 
             //InitDriver();
 
-            _iptv = new SledovaniTV.SledovaniTV(_loggingService);
-            _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
-            _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
-            if (_configuration.ShowNonFreeChannels)
-            {
-                Task.Run(async () => { await _iptv.Unlock(); });
-            }
-
-            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, _iptv, tvConfiguration, publicDirectoryProvider);
+            BindingContext = _viewModel = new MainViewModel(_loggingService, _driver, tvConfiguration, publicDirectoryProvider);
 
             NavigationPage.SetHasNavigationBar(this, false);
 
@@ -260,16 +252,6 @@ namespace DVBTTelevizor.MAUI
                 {
                     await Task.Delay(10000); // wait to ensure the MainActivity has subsribed the message
                     WeakReferenceMessenger.Default.Send(new ExternalDeviceWriteAccessRestore(_configuration.ExternalDevicePathUri));
-                });
-            }
-
-            if (_configuration.SledovaniTVEnabled)
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(2000);
-
-                    await _iptv.GetChannels(); // just for logging to service
                 });
             }
 
@@ -2935,12 +2917,12 @@ namespace DVBTTelevizor.MAUI
 
         public Page GetOrCreatePage<T>() where T : Page
         {
-            return MainPage.GetOrCreatePage<T>(_loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
+            return MainPage.GetOrCreatePage<T>(_loggingService, _driver, _viewModel.IPTV, _configuration, _publicDirectoryProvider);
         }
 
         public async Task ShowPage<T>() where T : Page
         {
-            await MainPage.ShowPage<T>(Navigation, _loggingService, _driver, _iptv, _configuration, _publicDirectoryProvider);
+            await MainPage.ShowPage<T>(Navigation, _loggingService, _driver, _viewModel.IPTV, _configuration, _publicDirectoryProvider);
         }
 
         public static async Task ShowPage<T>(
@@ -3916,6 +3898,7 @@ namespace DVBTTelevizor.MAUI
                     EditChannel(_viewModel.SelectedChannel);
                     break;
                 case "menuRefresh":
+                    _viewModel.SledovaniTVRefreshed = false;
                     await _viewModel.RefreshChannels();
                     break;
                 case "menuBack":

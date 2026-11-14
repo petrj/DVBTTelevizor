@@ -61,6 +61,8 @@ namespace DVBTTelevizor.TV
         public string SledovaniTVPassword { get; set; } = String.Empty;
         public bool SledovaniTVShowAdultChannels { get; set; } = false;
         public string SledovaniTVPIN { get; set; } = String.Empty;
+
+        public string SledovaniTVResolution { get; set; } = String.Empty;
         public string SledovaniTVDeviceID { get; set; } = String.Empty;
         public string SledovaniTVDevicePassword { get; set; } = String.Empty;
         public bool TestingMode { get; set; } = false;
@@ -153,6 +155,7 @@ namespace DVBTTelevizor.TV
             dummyConfig.UpdatedTo2026 = configuration.UpdatedTo2026;
             dummyConfig.UpdatedTo2026_rev2 = configuration.UpdatedTo2026_rev2;
             dummyConfig.ConfigDirectory = configuration.ConfigDirectory;
+            dummyConfig.SledovaniTVResolution = configuration.SledovaniTVResolution;
 
             return dummyConfig;
         }
@@ -218,6 +221,7 @@ namespace DVBTTelevizor.TV
             configuration.UpdatedTo2026 = UpdatedTo2026;
             configuration.UpdatedTo2026_rev2 = UpdatedTo2026_rev2;
             configuration.ConfigDirectory = ConfigDirectory;
+            configuration.SledovaniTVResolution = SledovaniTVResolution;
         }
     }
 }

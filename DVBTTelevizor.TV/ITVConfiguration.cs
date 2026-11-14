@@ -82,6 +82,8 @@ namespace DVBTTelevizor
         string SledovaniTVDeviceID { get; set; }
         string SledovaniTVDevicePassword { get; set; }
 
+        string SledovaniTVResolution { get; set; }
+
         bool RTLSDREnabled { get; set; }
 
         bool TestingMode { get; set; }

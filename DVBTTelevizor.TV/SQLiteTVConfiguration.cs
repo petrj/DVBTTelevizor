@@ -813,6 +813,18 @@ namespace DVBTTelevizor
             }
         }
 
+        public string SledovaniTVResolution
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVResolution");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVResolution", value);
+            }
+        }
+
         public string FilteredMultiplexes
         {
             get

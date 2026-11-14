@@ -797,6 +797,17 @@ namespace DVBTTelevizor.MAUI
                 SavePersistingSettingValue<string>("SledovaniTVDevicePassword", value);
             }
         }
+        public string SledovaniTVResolution
+        {
+            get
+            {
+                return GetPersistingSettingValue<string>("SledovaniTVResolution");
+            }
+            set
+            {
+                SavePersistingSettingValue<string>("SledovaniTVResolution", value);
+            }
+        }
 
         public string FilteredMultiplexes
         {

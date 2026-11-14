@@ -64,33 +64,7 @@ namespace SledovaniTV
         {
             get
             {
-                return
-                    _deviceConnection == null ||
-                    _deviceConnection.IsEmpty;
-            }
-        }
-
-        public bool EPGEnabled
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public bool QualityFilterEnabled
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public bool AdultLockEnabled
-        {
-            get
-            {
-                return true;
+                return !Paired;
             }
         }
 
@@ -99,19 +73,6 @@ namespace SledovaniTV
             get
             {
                 return _deviceConnection;
-            }
-        }
-
-        public string PHPSESSID
-        {
-            get
-            {
-                if (_session == null || String.IsNullOrEmpty(_session.PHPSESSID))
-                {
-                    return null;
-                }
-
-                return _session.PHPSESSID;
             }
         }
 
@@ -190,7 +151,7 @@ namespace SledovaniTV
         /// <summary>
         /// Pairing device with user credentials (_credentials)
         /// </summary>
-        private async Task CreatePairing()
+        public async Task Pair()
         {
             _log.Info($"Pairing device with user credentials");
 
@@ -232,7 +193,7 @@ namespace SledovaniTV
 
                             _log.Info($"Login failed - {LastErrorDescription}");
                         }
-                        _status = StatusEnum.LoginFailed;
+                        _status = StatusEnum.PairingFailed;
                     }
                 }
                 else
@@ -262,7 +223,7 @@ namespace SledovaniTV
         }
 
         /// <summary>
-        /// Login device to service
+        /// Login device to service using paired device credentials (_deviceConnection)
         /// </summary>
         private async Task DeviceLogin()
         {
@@ -316,16 +277,17 @@ namespace SledovaniTV
         public async Task Login(bool force = false)
         {
             LastErrorDescription = String.Empty;
+            _log.Info(force ? "Forced login" : "Login");
 
             if (force)
+            {
                 _status = StatusEnum.NotInitialized;
+            }
 
             if (!force && _session != null && !String.IsNullOrEmpty(_session.PHPSESSID))
             {
                 _status = StatusEnum.Logged;
             }
-
-            _log.Info("Login");
 
             if (!force && Status == StatusEnum.Logged)
             {
@@ -342,41 +304,16 @@ namespace SledovaniTV
                 return;
             }
 
-            if (!force && _deviceConnection != null &&
-                !String.IsNullOrEmpty(_deviceConnection.deviceId) &&
-                !String.IsNullOrEmpty(_deviceConnection.password))
+            if (_deviceConnection == null ||
+                String.IsNullOrEmpty(_deviceConnection.deviceId) ||
+                String.IsNullOrEmpty(_deviceConnection.password))
             {
-                _status = StatusEnum.Paired;
+                _status = StatusEnum.EmptyCredentials;
+                _log.Info("Device not paired");
+                return;
             }
-
-            if (Status != StatusEnum.Paired)
-            {
-                await CreatePairing();
-
-                if (Status != StatusEnum.Paired)
-                {
-                    _log.Info("Pairing failed");
-                    return; // bad credentials, no internet connection ?
-                }
-            }
-
-            // login
 
             await DeviceLogin();
-
-            if (Status == StatusEnum.LoginFailed)
-            {
-                // bad device connection ? Pairing again
-                await CreatePairing();
-
-                if (Status != StatusEnum.Paired)
-                {
-                    _log.Info("Pairing failed again");
-                    return; // bad credentials, no internet connection ?
-                }
-
-                await DeviceLogin();
-            }
         }
 
         public async Task<string> GetEPGItemDescription(EventItem epgItem)
@@ -631,15 +568,6 @@ namespace SledovaniTV
             }
 
             return result;
-        }
-
-        public void ResetConnection()
-        {
-            _log.Info("ResetConnection");
-
-            _status = StatusEnum.NotInitialized;
-
-            _session.PHPSESSID = null;
         }
 
         public async Task<List<Channel>> GetChannels(string quality = null)
@@ -911,17 +839,5 @@ namespace SledovaniTV
             }
         }
 
-        public async Task Stop()
-        {
-            // nothing to stop
-        }
-
-        public bool SubtitlesEnabled
-        {
-            get
-            {
-                return false;
-            }
-        }
     }
 }

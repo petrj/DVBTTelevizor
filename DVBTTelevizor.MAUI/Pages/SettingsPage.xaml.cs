@@ -46,6 +46,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         RemoteSDRSwitch.Toggled += RemoteSDRSwitch_Toggled;
         RemoteVLCSwitch.Toggled += RemoteVLCSwitch_Toggled;
 
+        SledovaniTVSwitch.Toggled += async delegate
+        {
+            WeakReferenceMessenger.Default.Send(new SledovaniTVConnectMessage(SledovaniTVSwitch.IsToggled));
+        };
+
         BuildFocusableItems();
 
         LanguagePicker.SelectedIndexChanged += delegate
@@ -172,14 +177,16 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPassword", new List<View>() { SledovaniTVPasswordBoxView, SledovaniTVPasswordEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPairButton", new List<View>() { SledovaniTVPairButton }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVReloadChannelsButton", new List<View>() { SledovaniTVReloadChannelsButton }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowDevice", new List<View>() { SledovaniTVShowDeviceBoxView, SledovaniTVShowPairedDeviceSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVDevicePasswordBoxView, SledovaniTVDevicePasswordEntry }))
 
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
+
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVUnpairButton", new List<View>() { SledovaniTVUnPairButton }))
 
             .AddItem(KeyboardFocusableItem.CreateFrom("ExportSettingsToFile", new List<View>() { ExportSettingsToFileButton }))
             .AddItem(KeyboardFocusableItem.CreateFrom("ImportSettingsFromFile", new List<View>() { ImportSettingsFromFileButton }));
@@ -242,6 +249,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             _settingsPageViewModel.NotifyLanguageChange();
 
             FixPickerValue(LanguagePicker, _settingsPageViewModel.SelectedLanguage);
+
+            _settingsPageViewModel.UpdateStreamQualities();
         }
     }
 
@@ -472,15 +481,15 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             case "menuGoToBatteryOptimizationSettings":
                 WeakReferenceMessenger.Default.Send(new OpenBatteryOptimizationSettingsMessage(String.Empty));
                 break;
-            case "menuSledovaniTVReloadChannels":
-                await _settingsPageViewModel.SledovaniTVReloadChannels();
-                break;
             case "menuConfirmOverwriteSettingsExport":
                 await _settingsPageViewModel.ExportSettings();
                 break;
 
             case "menuConfirmImportSettingsExport":
                 await _settingsPageViewModel.ImportSettings();
+                break;
+            case "menuUnpairDevice":
+                WeakReferenceMessenger.Default.Send(new UnPairSledovaniTVMessage(String.Empty));
                 break;
         }
     }
@@ -737,8 +746,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                             SledovaniTVPairButton_Clicked(this, new EventArgs());
                             break;
 
-                        case "SledovaniTVReloadChannelsButton":
-                            SledovaniTVReloadChannelsButton_Clicked(this, new EventArgs());
+                        case "SledovaniTVUnPairButton":
+                            SledovaniTVUnpairButton_Clicked(this, new EventArgs());
                             break;
 
                         case "SledovaniTVShowDevice":
@@ -986,13 +995,6 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
         BuildConfirmMenu("Clear cache?".Translated(), "Clear EPG cand channel cache".Translated(), "Cancel".Translated(), "menuClearCache");
     }
 
-    private void SledovaniTVReloadChannelsButton_Clicked(object sender, EventArgs e)
-    {
-        _loggingService.Info("SledovaniTVReloadChannelsButton_Clicked");
-
-        BuildConfirmMenu("SledovaniTV - Reloading will reset all channels changes".Translated(), "Reload all channels".Translated(), "Cancel".Translated(), "menuSledovaniTVReloadChannels");
-    }
-
     private async void SledovaniTVPairButton_Clicked(object sender, EventArgs e)
     {
         if (String.IsNullOrWhiteSpace(_configuration.SledovaniTVUserName) &&
@@ -1001,7 +1003,18 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             WeakReferenceMessenger.Default.Send(new ToastMessage("Empty credentials".Translated()));
             return;
         }
-        await _settingsPageViewModel.SledovaniTVPair();
+
+        WeakReferenceMessenger.Default.Send(new PairSledovaniTVMessage(String.Empty));
+    }
+
+    private async void SledovaniTVUnpairButton_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"SledovaniTVUnpairButton_Clicked");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            BuildConfirmMenu("Are you sure to unpair the device?".Translated(), "Unpair device".Translated(), "Close".Translated(), "menuUnpairDevice");
+        });
     }
 
     private void ExportSettingsToFileButton_Clicked(object sender, EventArgs e)
