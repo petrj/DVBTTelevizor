@@ -181,6 +181,8 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowAdultChannels", new List<View>() { SledovaniTVShowAdultChannelsBoxView, SledovaniTVShowAdultChannelsSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVPIN", new List<View>() { SledovaniTVPINBoxView, SledovaniTVPINEntry }))
 
+            .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVResolution", new List<View>() { SledovaniTVResolutionBoxView, ResolutionPicker }))
+
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVShowDevice", new List<View>() { SledovaniTVShowDeviceBoxView, SledovaniTVShowPairedDeviceSwitch }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDeviceID", new List<View>() { SledovaniTVDeviceIDBoxView, SledovaniTVDeviceIDEntry }))
             .AddItem(KeyboardFocusableItem.CreateFrom("SledovaniTVDevicePassword", new List<View>() { SledovaniTVDevicePasswordBoxView, SledovaniTVDevicePasswordEntry }))
@@ -769,6 +771,11 @@ public partial class SettingsPage : ContentPage, IOnKeyDown
                         case "SledovaniTVPIN":
                             SledovaniTVPINEntry.Focus();
                             break;
+
+                        case "SledovaniTVResolution":
+                            ShowPicker(ResolutionPicker);
+                            break;
+
                         case "ExportSettingsToFile":
                             ExportSettingsToFileButton_Clicked(this, new EventArgs());
                             break;
