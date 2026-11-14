@@ -12,6 +12,7 @@ namespace DVBTTelevizor.TV
     {
         public bool UpdatedTo2026 { get; set; } = false;
         public bool UpdatedTo2026_rev2 { get; set; } = false;
+        public bool UpdatedTo2026_rev3 { get; set; } = false;
         public bool RTLSDREnabled { get; set; } = false;
 
         public string ConfigDirectory { get; set; } = String.Empty;
@@ -154,6 +155,7 @@ namespace DVBTTelevizor.TV
             dummyConfig.RemoteVLCPassword = configuration.RemoteVLCPassword;
             dummyConfig.UpdatedTo2026 = configuration.UpdatedTo2026;
             dummyConfig.UpdatedTo2026_rev2 = configuration.UpdatedTo2026_rev2;
+            dummyConfig.UpdatedTo2026_rev3 = configuration.UpdatedTo2026_rev3;
             dummyConfig.ConfigDirectory = configuration.ConfigDirectory;
             dummyConfig.SledovaniTVResolution = configuration.SledovaniTVResolution;
 
@@ -220,6 +222,7 @@ namespace DVBTTelevizor.TV
             configuration.RemoteVLCPassword = RemoteVLCPassword;
             configuration.UpdatedTo2026 = UpdatedTo2026;
             configuration.UpdatedTo2026_rev2 = UpdatedTo2026_rev2;
+            configuration.UpdatedTo2026_rev3 = UpdatedTo2026_rev3;
             configuration.ConfigDirectory = ConfigDirectory;
             configuration.SledovaniTVResolution = SledovaniTVResolution;
         }

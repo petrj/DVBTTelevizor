@@ -96,6 +96,7 @@ namespace DVBTTelevizor
 
         bool UpdatedTo2026 { get; set; }
         bool UpdatedTo2026_rev2 { get; set; }
+        bool UpdatedTo2026_rev3 { get; set; }
 
 
         bool AllowRemoteVLC { get; set; }

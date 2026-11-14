@@ -139,7 +139,7 @@ namespace DVBTTelevizor.MAUI
 
             Task.Run(async () =>
             {
-                if (!_configuration.UpdatedTo2026 || !_configuration.UpdatedTo2026_rev2)
+                if (!_configuration.UpdatedTo2026 || !_configuration.UpdatedTo2026_rev2 || !_configuration.UpdatedTo2026_rev3)
                 {
                     await ExtractAssetFile("Arabic_AI.lng");
                     await ExtractAssetFile("Azerbaijani_AI.lng");
@@ -164,6 +164,7 @@ namespace DVBTTelevizor.MAUI
 
                     _configuration.UpdatedTo2026 = true;
                     _configuration.UpdatedTo2026_rev2 = true;
+                    _configuration.UpdatedTo2026_rev3 = true;
                 }
 
                 // language
