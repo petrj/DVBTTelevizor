@@ -259,73 +259,76 @@ namespace DVBTTelevizor.MAUI
             return max.ToString();
         }
 
-        private void OnChannelFound(Channel channel)
+        private async Task OnChannelFoundAsync(Channel channel)
         {
             _loggingService.Info("TuningProgressPageViewModel_ChannelFound");
 
             try
             {
-                lock (_channelUpdateLock)
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    var configChannels = _configuration.GetChannels();
-
-                    // looking for the same channel
-                    var channelAlreadySaved = false;
-                    foreach (var configChannel in configChannels)
+                    lock (_channelUpdateLock)
                     {
-                        if (
-                            (configChannel.ChannelType == channel.ChannelType) &&
-                            (configChannel.ProgramMapPID == channel.ProgramMapPID) &&
-                            (configChannel.Frequency == channel.Frequency)
-                            )
+                        var configChannels = _configuration.GetChannels();
+
+                        // looking for the same channel
+                        var channelAlreadySaved = false;
+                        foreach (var configChannel in configChannels)
                         {
-                            channelAlreadySaved = true;
-                            break;
+                            if (
+                                (configChannel.ChannelType == channel.ChannelType) &&
+                                (configChannel.ProgramMapPID == channel.ProgramMapPID) &&
+                                (configChannel.Frequency == channel.Frequency)
+                                )
+                            {
+                                channelAlreadySaved = true;
+                                break;
+                            }
                         }
-                    }
 
-                    // looking for the same channel in already tuned channels
-                    var channelAlreadyTuned = false;
-                    foreach (var tunedChannel in Channels)
-                    {
-                        if (
-                            (tunedChannel.ProgramMapPID == channel.ProgramMapPID) &&
-                            (tunedChannel.Frequency == channel.Frequency)
-                            )
+                        // looking for the same channel in already tuned channels
+                        var channelAlreadyTuned = false;
+                        foreach (var tunedChannel in Channels)
                         {
-                            channelAlreadyTuned = true;
-                            break;
+                            if (
+                                (tunedChannel.ProgramMapPID == channel.ProgramMapPID) &&
+                                (tunedChannel.Frequency == channel.Frequency)
+                                )
+                            {
+                                channelAlreadyTuned = true;
+                                break;
+                            }
                         }
-                    }
 
-                    if (channel.ProviderName != null)
-                    {
-                        if (!_tunedMultiplexes.ContainsKey(channel.Frequency))
+                        if (channel.ProviderName != null)
                         {
-                            _tunedMultiplexes.Add(channel.Frequency, 0);
+                            if (!_tunedMultiplexes.ContainsKey(channel.Frequency))
+                            {
+                                _tunedMultiplexes.Add(channel.Frequency, 0);
+                            }
+                            _tunedMultiplexes[channel.Frequency]++;
                         }
-                        _tunedMultiplexes[channel.Frequency]++;
-                    }
 
-                    if (!channelAlreadyTuned)
-                    {
-                        Channels.Add(channel);
+                        if (!channelAlreadyTuned)
+                        {
+                            Channels.Add(channel);
+
+                            if (!channelAlreadySaved)
+                            {
+                                _tunedNewChannels++;
+                            }
+                        }
 
                         if (!channelAlreadySaved)
                         {
-                            _tunedNewChannels++;
+                            channel.Number = GetNextFreeChannelNumber(configChannels);
+                            configChannels.Add(channel.Clone());
+
+                            _loggingService.Debug($"New channel {channel.Name} added to configuration with number {channel.Number} ({JsonConvert.SerializeObject(configChannels)})");
+                            _configuration.SaveChannels(configChannels);
                         }
                     }
-
-                    if (!channelAlreadySaved)
-                    {
-                        channel.Number = GetNextFreeChannelNumber(configChannels);
-                        configChannels.Add(channel.Clone());
-
-                        _loggingService.Debug($"New channel {channel.Name} added to configuration with number {channel.Number} ({JsonConvert.SerializeObject(configChannels)})");
-                        _configuration.SaveChannels(configChannels);
-                    }
-                }
+                });
             }
             catch (Exception ex)
             {
@@ -333,11 +336,8 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
-                Task.Run(async () =>
-                {
-                    await NotifyChange();
-                    WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
-                });
+                await NotifyChange();
+                WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
             }
 
         }
@@ -714,7 +714,7 @@ namespace DVBTTelevizor.MAUI
 
                 _loggingService.Debug($"Found channel \"{serviceDescriptor.ServiceName}\"");
 
-                OnChannelFound(ch);
+                await OnChannelFoundAsync(ch);
 
                 if (ChannelFound != null)
                 {
