@@ -169,25 +169,38 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
     private async void NextButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningSelectDVBTPage NextButton_Clicked");
-
-        var page = MainPage.GetOrCreatePage<TuningProgressPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider) as TuningProgressPage;
-
-        if (Settings != null)
+        try
         {
-            Settings.FrequencyKHz = Settings.FrequencyFromKHz;
+            _loggingService.Debug($"TuningSelectDVBTPage NextButton_Clicked");
 
-            page?.UpdateSettings(Settings);
+            var page = MainPage.GetOrCreatePage<TuningProgressPage>(_loggingService, _driver, null, _configuration, _publicDirectoryProvider) as TuningProgressPage;
+
+            if (Settings != null)
+            {
+                Settings.FrequencyKHz = Settings.FrequencyFromKHz;
+                page?.UpdateSettings(Settings);
+            }
+
+            page?.ResetTune(true);
+            await MainPage.ShowPage<TuningProgressPage>(Navigation, page);
         }
-
-        page?.ResetTune(true);
-        await MainPage.ShowPage<TuningProgressPage>(Navigation, page);
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
      private async void EditFreqToButton_Clicked(object sender, EventArgs e)
     {
-        _editingFrom = false;
-        await ShowFreqPage();
+        try
+        {
+            _editingFrom = false;
+            await ShowFreqPage();
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
     private void _frequencyPage_Disappearing(object? sender, EventArgs e)
@@ -211,8 +224,15 @@ public partial class TuningFrequenciesPage : ContentPage, ITuningPage, IOnKeyDow
 
     private async void EditFreqFromButton_Clicked(object sender, EventArgs e)
     {
-        _editingFrom = true;
-        await ShowFreqPage();
+        try
+        {
+            _editingFrom = true;
+            await ShowFreqPage();
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
     private FrequencyPage GetFreqPage()

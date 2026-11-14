@@ -59,17 +59,22 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         WeakReferenceMessenger.Default.Register<TuneFailedMessage>(this, (r, m) =>
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                //BuildConfirmMenu("Tuning failed. Check USB connection".Translated(), "Retry".Translated(), "Cancel".Translated(), "menuRetryTune", "menuCancel");
-                //BuildRetryTuneMenu();
-                _appMenu.ShowRetryTuneMenu(_viewModel.Driver);
+                try
+                {
+                    _appMenu.ShowRetryTuneMenu(_viewModel.Driver);
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         });
 
         WeakReferenceMessenger.Default.Register<ChannelHasBeenAddedMessage>(this, (r, m) =>
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
                 try
                 {
@@ -78,19 +83,26 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                     {
                         ChannelsListView.ScrollTo(lastChannel, ScrollToPosition.MakeVisible, false);
                     }
-                    }
-                    catch (Exception ex)
-                    {
-                        _loggingService.Error(ex);
-                    }
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         });
 
         WeakReferenceMessenger.Default.Register<StartTuneMessage>(this, (r, m) =>
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                StartButton_Clicked(this, new EventArgs());
+                try
+                {
+                    StartButton_Clicked(this, new EventArgs());
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         });
 
@@ -105,9 +117,16 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
             if (_tuneAfterConnect && m.Value.Connected)
             {
                 _tuneAfterConnect = false;
-                MainThread.BeginInvokeOnMainThread(async () =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    StartButton_Clicked(this, new EventArgs());
+                    try
+                    {
+                        StartButton_Clicked(this, new EventArgs());
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
             }
         });
@@ -161,7 +180,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
                 _focusItems.FocusNextItem(true);
             } else
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
                     try
                     {
@@ -177,7 +196,7 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
         {
             if (_viewModel.SelectedChannel != null)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
                     _viewModel.DeselectAll();
                 });
@@ -374,77 +393,98 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     public async void OnKeyDown(string key, bool longPress)
     {
-        _loggingService.Debug($"TuningProgressPage Page OnKeyDown {key}");
-
-        var keyAction = KeyboardDeterminer.GetKeyAction(key);
-
-        if (MainMenu.MenuVisible)
+        try
         {
-            await MainThread.InvokeOnMainThreadAsync(async () =>
+            _loggingService.Debug($"TuningProgressPage Page OnKeyDown {key}");
+
+            var keyAction = KeyboardDeterminer.GetKeyAction(key);
+
+            if (MainMenu.MenuVisible)
             {
-                OnMenuKeyDown(keyAction);
-            });
-            return;
-        }
-
-        switch (keyAction)
-        {
-            case KeyboardNavigationActionEnum.Right:
-                ActionRight();
-                break;
-
-            case KeyboardNavigationActionEnum.Down:
-                ActionDown();
-                break;
-
-            case KeyboardNavigationActionEnum.Up:
-                ActionUp();
-                break;
-
-            case KeyboardNavigationActionEnum.Left:
-                ActionLeft();
-                break;
-
-            case KeyboardNavigationActionEnum.Back:
-                MainThread.BeginInvokeOnMainThread(async () =>
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    await Navigation.PopAsync();
+                    OnMenuKeyDown(keyAction);
                 });
-                break;
+                return;
+            }
 
-            case KeyboardNavigationActionEnum.OK:
+            switch (keyAction)
+            {
+                case KeyboardNavigationActionEnum.Right:
+                    ActionRight();
+                    break;
 
-                if (_focusItems.FocusedItem == null)
-                    return;
+                case KeyboardNavigationActionEnum.Down:
+                    ActionDown();
+                    break;
 
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    switch (_focusItems.FocusedItem.Name)
+                case KeyboardNavigationActionEnum.Up:
+                    ActionUp();
+                    break;
+
+                case KeyboardNavigationActionEnum.Left:
+                    ActionLeft();
+                    break;
+
+                case KeyboardNavigationActionEnum.Back:
+                    MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        case "Left":
-                            LeftButton_Clicked(this, new EventArgs());
-                            break;
-                        case "Right":
-                            RightButton_Clicked(this, new EventArgs());
-                            break;
-                        case "Back":
-                            BackButton_Clicked(this, new EventArgs());
-                            break;
-                        case "Stop":
-                            StopButton_Clicked(this,new EventArgs());
-                            break;
-                        case "Start":
-                            StartButton_Clicked(this, new EventArgs());
-                            break;
-                        case "Finish":
-                            FinishButton_Clicked(this, new EventArgs());
-                            break;
-                        case "Driver":
-                            DriverButton_Clicked(this, new EventArgs());
-                            break;
-                    }
-                });
-                break;
+                        try
+                        {
+                            await Navigation.PopAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            _loggingService.Error(ex);
+                        }
+                    });
+                    break;
+
+                case KeyboardNavigationActionEnum.OK:
+
+                    if (_focusItems.FocusedItem == null)
+                        return;
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        try
+                        {
+                            switch (_focusItems.FocusedItem.Name)
+                            {
+                                case "Left":
+                                    LeftButton_Clicked(this, new EventArgs());
+                                    break;
+                                case "Right":
+                                    RightButton_Clicked(this, new EventArgs());
+                                    break;
+                                case "Back":
+                                    BackButton_Clicked(this, new EventArgs());
+                                    break;
+                                case "Stop":
+                                    StopButton_Clicked(this, new EventArgs());
+                                    break;
+                                case "Start":
+                                    StartButton_Clicked(this, new EventArgs());
+                                    break;
+                                case "Finish":
+                                    FinishButton_Clicked(this, new EventArgs());
+                                    break;
+                                case "Driver":
+                                    DriverButton_Clicked(this, new EventArgs());
+                                    break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _loggingService.Error(ex);
+                        }
+                    });
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
         }
     }
 
@@ -460,29 +500,43 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private async void StartButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
-
-        if (_viewModel.Settings.TuningMode != TuneModeEnum.Frequency &&
-            _viewModel.FrequencyKHz > _viewModel.FrequencyFromKHz &&
-            _viewModel.FrequencyKHz < _viewModel.FrequencyToKHz)
+        try
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            _loggingService.Debug($"TuningProgressPage StartButton_Clicked");
+
+            if (_viewModel.Settings.TuningMode != TuneModeEnum.Frequency &&
+                _viewModel.FrequencyKHz > _viewModel.FrequencyFromKHz &&
+                _viewModel.FrequencyKHz < _viewModel.FrequencyToKHz)
             {
-                _appMenu.ShowConfirmMenu(
-                "Confirm".Translated(),
-                "Start from beginning".Translated(),
-                "Continue".Translated(),
-                "menuFromBeginning",
-                "menuContinue");
-            });
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    try
+                    {
+                        _appMenu.ShowConfirmMenu(
+                            "Confirm".Translated(),
+                            "Start from beginning".Translated(),
+                            "Continue".Translated(),
+                            "menuFromBeginning",
+                            "menuContinue");
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
+                });
 
-            return;
+                return;
+            }
+
+            if (await ResetTuningEnvironment())
+            {
+                _viewModel.ResetTune(true, true);
+                await _viewModel.StartTune();
+            }
         }
-
-        if (await ResetTuningEnvironment())
+        catch (Exception ex)
         {
-            _viewModel.ResetTune(true, true);
-            await _viewModel.StartTune();
+            _loggingService.Error(ex);
         }
     }
 
@@ -519,9 +573,16 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
             if (driverToChange != null)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    _appMenu.ShowConfirmChangeDriverMenu(_viewModel.Driver, driverToChange);
+                    try
+                    {
+                        _appMenu.ShowConfirmChangeDriverMenu(_viewModel.Driver, driverToChange);
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
 
                 return false;
@@ -529,9 +590,16 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
             if (!_viewModel.Driver.Connected)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    _appMenu.ShowConnectDriverMenu(_viewModel.Driver);
+                    try
+                    {
+                        _appMenu.ShowConnectDriverMenu(_viewModel.Driver);
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
 
                 return false;
@@ -558,23 +626,37 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            if (_viewModel.State == TuneStateEnum.InProgress)
+            try
             {
-                _viewModel.State = TuneStateEnum.Stopped;
-            }
+                if (_viewModel.State == TuneStateEnum.InProgress)
+                {
+                    _viewModel.State = TuneStateEnum.Stopped;
+                }
 
-            await Navigation.PopAsync();
+                await Navigation.PopAsync();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         });
     }
 
 
     private async void DriverButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningProgressPage DriverButton_Clicked");
+        try
+        {
+            _loggingService.Debug($"TuningProgressPage DriverButton_Clicked");
 
-        _driverPage.PageDriver = _viewModel.Driver.DriverType;
+            _driverPage.PageDriver = _viewModel.Driver.DriverType;
 
-        await ShowPage(_driverPage);
+            await ShowPage(_driverPage);
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
     private async Task ShowPage(ContentPage page)
@@ -593,15 +675,22 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private async void FinishButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
+        try
+        {
+            _loggingService.Debug($"TuningProgressPage FinishButton_Clicked");
 
-        _viewModel.ResetTune(true, true);
+            _viewModel.ResetTune(true, true);
 
-        _viewModel.State = TuneStateEnum.Finished;
+            _viewModel.State = TuneStateEnum.Finished;
 
-        _viewModel.NotifyChange();
+            await _viewModel.NotifyChange();
 
-        WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
+            WeakReferenceMessenger.Default.Send(new FinishTuningMessage(String.Empty));
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
     public void UpdateSettings(TuningSettings tuningSettings)
@@ -622,51 +711,65 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
 
     private async void OnMenuIsTapped(MenuItem item)
     {
-        var menuId = item.Id;
-        _loggingService.Info($"Menu tapped: {menuId}");
-
-        _appMenu.HideMenu();
-
-        switch (menuId)
+        try
         {
-            case "menuFromBeginning":
-                _viewModel.ResetTune(true, true);
-                await _viewModel.StartTune();
-                break;
+            var menuId = item.Id;
+            _loggingService.Info($"Menu tapped: {menuId}");
 
-            case "menuContinue":
-            case "menuRetryTune":
-                _viewModel.ResetTune(false, false);
-                await _viewModel.StartTune();
-                break;
+            _appMenu.HideMenu();
 
-            case "menuDriver":
-                var driverPage = new DriverPage(_loggingService, _viewModel.Driver, _configuration, _publicDirectoryProvider);
-                await Navigation.PushAsync(driverPage);
-                break;
+            switch (menuId)
+            {
+                case "menuFromBeginning":
+                    _viewModel.ResetTune(true, true);
+                    await _viewModel.StartTune();
+                    break;
 
-            case "menuInstallDriver":
+                case "menuContinue":
+                case "menuRetryTune":
+                    _viewModel.ResetTune(false, false);
+                    await _viewModel.StartTune();
+                    break;
 
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    switch (_viewModel.Driver.DriverType)
+                case "menuDriver":
+                    var driverPage = new DriverPage(_loggingService, _viewModel.Driver, _configuration, _publicDirectoryProvider);
+                    await Navigation.PushAsync(driverPage);
+                    break;
+
+                case "menuInstallDriver":
+
+                    MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        case TV.AppDriverTypeEnum.DVBT:
-                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
-                            break;
-                        case TV.AppDriverTypeEnum.FM:
-                        case TV.AppDriverTypeEnum.DAB:
-                            await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
-                            break;
-                    }
-                });
-                break;
+                        try
+                        {
+                            switch (_viewModel.Driver.DriverType)
+                            {
+                                case TV.AppDriverTypeEnum.DVBT:
+                                    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=info.martinmarinov.dvbdriver", BrowserLaunchMode.External);
+                                    break;
+                                case TV.AppDriverTypeEnum.FM:
+                                case TV.AppDriverTypeEnum.DAB:
+                                    await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+                                    break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _loggingService.Error(ex);
+                        }
+                    });
+                    break;
 
-            case "menuConfirmConnectDriver":
-            case "menuConfirmChangeDriver":
-                _tuneAfterConnect = true;
-                WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
-                break;
+                case "menuConfirmConnectDriver":
+                case "menuConfirmChangeDriver":
+                    _tuneAfterConnect = true;
+                    WeakReferenceMessenger.Default.Send(new SendConnectDriverRequestMessage(item.DriverType));
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
         }
     }
 
@@ -674,21 +777,28 @@ public partial class TuningProgressPage : ContentPage, ITuningPage, IOnKeyDown
     {
         Task.Run(async () =>
         {
-            _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(SliderFrequency.Value);
-            await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
-
-            // save to configuration
-            switch (_viewModel.Config.AppDriverType)
+            try
             {
-                case TV.AppDriverTypeEnum.FM:
-                    _viewModel.Config.FMFrequencyKHz = _viewModel.FrequencyKHz;
-                    break;
-                case TV.AppDriverTypeEnum.DAB:
-                    _viewModel.Config.DABFrequencyKHz = _viewModel.FrequencyKHz;
-                    break;
-                case AppDriverTypeEnum.DVBT:
-                    _viewModel.Config.FrequencyKHz = _viewModel.FrequencyKHz;
-                    break;
+                _viewModel.FrequencyKHz = _viewModel.Settings.RoundFrequencyKHz(SliderFrequency.Value);
+                await _viewModel.TuneFreq(_viewModel.FrequencyKHz * 1000, _viewModel.Settings.BandwidthKHz * 1000, _viewModel.Settings.DVBT2 ? 1 : 0);
+
+                // save to configuration
+                switch (_viewModel.Config.AppDriverType)
+                {
+                    case TV.AppDriverTypeEnum.FM:
+                        _viewModel.Config.FMFrequencyKHz = _viewModel.FrequencyKHz;
+                        break;
+                    case TV.AppDriverTypeEnum.DAB:
+                        _viewModel.Config.DABFrequencyKHz = _viewModel.FrequencyKHz;
+                        break;
+                    case AppDriverTypeEnum.DVBT:
+                        _viewModel.Config.FrequencyKHz = _viewModel.FrequencyKHz;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
             }
         });
     }

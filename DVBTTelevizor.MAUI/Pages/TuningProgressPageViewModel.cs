@@ -78,19 +78,33 @@ namespace DVBTTelevizor.MAUI
 
             WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
-                UpdateDriverStat(m.Value);
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    await NotifyChange();
+                    try
+                    {
+                        UpdateDriverStat(m.Value);
+                        await NotifyChange();
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
             });
 
             WeakReferenceMessenger.Default.Register<DriverChangedMessage>(this, (r, m) =>
             {
-                SetupDriver(m.Value);
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    NotifyChange();
+                    try
+                    {
+                        SetupDriver(m.Value);
+                        await NotifyChange();
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
             });
 
@@ -150,7 +164,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        private async void UpdateDriverStat(DriverStat? stat)
+        private void UpdateDriverStat(DriverStat? stat)
         {
             if (stat == null)
             {
@@ -192,8 +206,15 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _selectedChannel = _listViewSelector?.SelectFirstChannel();
-                NotifyChange();
+                try
+                {
+                    _selectedChannel = _listViewSelector?.SelectFirstChannel();
+                    await NotifyChange();
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         }
 
@@ -205,8 +226,15 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _listViewSelector?.DeselectAll();
-                NotifyChange();
+                try
+                {
+                    _listViewSelector?.DeselectAll();
+                    await NotifyChange();
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         }
 
@@ -216,8 +244,15 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _selectedChannel = _listViewSelector?.SelectNextChannel();
-                NotifyChange();
+                try
+                {
+                    _selectedChannel = _listViewSelector?.SelectNextChannel();
+                    await NotifyChange();
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         }
 
@@ -227,8 +262,15 @@ namespace DVBTTelevizor.MAUI
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                _selectedChannel = _listViewSelector?.SelectPreviousChannel();
-                NotifyChange();
+                try
+                {
+                    _selectedChannel = _listViewSelector?.SelectPreviousChannel();
+                    await NotifyChange();
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             });
         }
 
@@ -336,8 +378,15 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
-                await NotifyChange();
-                WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
+                try
+                {
+                    await NotifyChange();
+                    WeakReferenceMessenger.Default.Send(new ChannelHasBeenAddedMessage(null));
+                }
+                catch (Exception ex)
+                {
+                    _loggingService.Error(ex);
+                }
             }
 
         }
@@ -350,11 +399,18 @@ namespace DVBTTelevizor.MAUI
             {
                 _loggingService.Info("Clearing channels");
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    _tunedMultiplexes.Clear();
-                    _tunedNewChannels = 0;
-                    Channels.Clear();
+                    try
+                    {
+                        _tunedMultiplexes.Clear();
+                        _tunedNewChannels = 0;
+                        Channels.Clear();
+                    }
+                    catch (Exception ex)
+                    {
+                        _loggingService.Error(ex);
+                    }
                 });
             }
 
@@ -682,9 +738,10 @@ namespace DVBTTelevizor.MAUI
 
         private async void AddChannel(ChannelTypeEnum chType, MPEGTS.ServiceDescriptor serviceDescriptor, long MapPID, long frequency, long bandWidth)
         {
-            _loggingService.Info($"AddChannel MapPID: {MapPID}");
             try
             {
+                _loggingService.Info($"AddChannel MapPID: {MapPID}");
+
                 var ch = new Channel();
                 ch.ProgramMapPID = MapPID;
                 ch.Name = serviceDescriptor.ServiceName;
@@ -1380,12 +1437,13 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async void SelectChannelsListView(ListView list)
+        public async Task SelectChannelsListView(ListView list)
         {
-            _loggingService.Info($"Selecting ChannelsListView");
+            try
+            {
+                _loggingService.Info($"Selecting ChannelsListView");
 
-            await Task.Run(
-                () =>
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
                     if (Channels.Count == 0)
                     {
@@ -1402,6 +1460,11 @@ namespace DVBTTelevizor.MAUI
 
                     list.Focus();
                 });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
 

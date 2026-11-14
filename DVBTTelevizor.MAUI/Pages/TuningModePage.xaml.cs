@@ -126,9 +126,15 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 
     private async void AutoScanButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningModePage: AutoScanButton_Clicked");
-
-        await ShowPage<TuningProgressPage>(TuneModeEnum.Automatic);
+        try
+        {
+            _loggingService.Debug($"TuningModePage: AutoScanButton_Clicked");
+            await ShowPage<TuningProgressPage>(TuneModeEnum.Automatic);
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
+        }
     }
 
     public async Task ShowPage<T>(TuneModeEnum mode) where T : Page
@@ -201,28 +207,43 @@ public partial class TuningModePage : ContentPage, IOnKeyDown, ITuningPage
 
     private async void ManualScanButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");
+        try
+        {
+            _loggingService.Debug($"TuningModePage: ManualScanButton_Clicked");
 
-        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
+            if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
+            {
+                await ShowPage<TuningSelectDVBTPage>(TuneModeEnum.Manual);
+            }
+            else
+            {
+                await ShowPage<TuningFrequenciesPage>(TuneModeEnum.Manual);
+            }
+        }
+        catch (Exception ex)
         {
-            await ShowPage<TuningSelectDVBTPage>(TuneModeEnum.Manual);
-        } else
-        {
-            await ShowPage<TuningFrequenciesPage>(TuneModeEnum.Manual);
+            _loggingService.Error(ex);
         }
     }
 
     private async void TuneButton_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"TuningModePage: TuneButton_Clicked");
+        try
+        {
+            _loggingService.Debug($"TuningModePage: TuneButton_Clicked");
 
-        if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
-        {
-            await ShowPage<TuningSelectDVBTPage>(TuneModeEnum.Frequency);
+            if (_viewModel.Settings.DVBT || _viewModel.Settings.DVBT2)
+            {
+                await ShowPage<TuningSelectDVBTPage>(TuneModeEnum.Frequency);
+            }
+            else
+            {
+                await ShowPage<TuningProgressPage>(TuneModeEnum.Frequency);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await ShowPage<TuningProgressPage>(TuneModeEnum.Frequency);
+            _loggingService.Error(ex);
         }
     }
 }

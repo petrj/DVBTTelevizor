@@ -257,14 +257,21 @@ public partial class TuningSelectDVBTPage : ContentPage, ITuningPage, IOnKeyDown
 
     private async void NextButton_Clicked(object sender, EventArgs e)
     {
-        switch (_tuningSelectDVBTViewModel.Settings.TuningMode)
+        try
         {
-            case TuneModeEnum.Manual:
-                await ShowPage<TuningFrequenciesPage>();
-                break;
-            case TuneModeEnum.Frequency:
-                await ShowPage<TuningProgressPage>();
-                break;
+            switch (_tuningSelectDVBTViewModel.Settings.TuningMode)
+            {
+                case TuneModeEnum.Manual:
+                    await ShowPage<TuningFrequenciesPage>();
+                    break;
+                case TuneModeEnum.Frequency:
+                    await ShowPage<TuningProgressPage>();
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            _loggingService.Error(ex);
         }
     }
 }
