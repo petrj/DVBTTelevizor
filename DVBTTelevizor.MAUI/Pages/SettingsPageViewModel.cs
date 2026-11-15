@@ -474,10 +474,7 @@ namespace DVBTTelevizor.MAUI
                 var json = File.ReadAllText(AndroidSettingsListPath);
                 var cfg = JsonConvert.DeserializeObject<DummyConfiguration>(json);
 
-                cfg.UpdateConfig(_configuration);
-
-                _iptv.SetCredentials(_configuration.SledovaniTVUserName, _configuration.SledovaniTVPassword, _configuration.SledovaniTVPIN);
-                _iptv.SetDeviceCredential(_configuration.SledovaniTVDeviceID, _configuration.SledovaniTVDevicePassword);
+                cfg?.UpdateConfig(_configuration);
 
                 NotifyConfigChange();
                 NotifyLanguageChange();
