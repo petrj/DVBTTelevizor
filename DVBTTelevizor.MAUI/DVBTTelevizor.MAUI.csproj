@@ -34,10 +34,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationVersion>2026030</ApplicationVersion>
-		<VersionCode>2026030</VersionCode>
-		<VersionName>2026030</VersionName>
-		<ApplicationDisplayVersion>2026030</ApplicationDisplayVersion>
+		<ApplicationVersion>2026035</ApplicationVersion>
+		<VersionCode>2026035</VersionCode>
+		<VersionName>2026035</VersionName>
+		<ApplicationDisplayVersion>2026035</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<!-- Versions
@@ -71,12 +71,18 @@
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 		<AndroidUseAapt2>True</AndroidUseAapt2>
 		<PublishTrimmed>True</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
 
+		<!-- Debugging -->
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>portable</DebugType>
 
-		<!--AndroidEnableProguard>true</AndroidEnableProguard>
-		<AndroidLinkTool>r8</AndroidLinkTool-->
+		<!-- r8 shrinking / obfuscation -->
+		<AndroidEnableCodeShrinking>true</AndroidEnableCodeShrinking>
+		<AndroidEnableProguard>true</AndroidEnableProguard>
+		<AndroidLinkTool>r8</AndroidLinkTool>
+		<AndroidProguardConfigFile>proguard-rules.pro</AndroidProguardConfigFile>
+		<AndroidExtraProguardOptions>-repackageclasses ''</AndroidExtraProguardOptions>
 	</PropertyGroup>
 
 	<ItemGroup>
