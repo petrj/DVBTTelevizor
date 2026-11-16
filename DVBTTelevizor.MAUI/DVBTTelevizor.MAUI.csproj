@@ -78,11 +78,11 @@
 		<DebugType>portable</DebugType>
 
 		<!-- r8 shrinking / obfuscation -->
-		<AndroidEnableCodeShrinking>true</AndroidEnableCodeShrinking>
+		<!--AndroidEnableCodeShrinking>true</AndroidEnableCodeShrinking>
 		<AndroidEnableProguard>true</AndroidEnableProguard>
 		<AndroidLinkTool>r8</AndroidLinkTool>
 		<AndroidProguardConfigFile>proguard-rules.pro</AndroidProguardConfigFile>
-		<AndroidExtraProguardOptions>-repackageclasses ''</AndroidExtraProguardOptions>
+		<AndroidExtraProguardOptions>-repackageclasses ''</AndroidExtraProguardOptions-->
 	</PropertyGroup>
 
 	<ItemGroup>
