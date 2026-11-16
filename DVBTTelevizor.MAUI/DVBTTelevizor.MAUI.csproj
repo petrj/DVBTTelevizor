@@ -76,14 +76,16 @@
 		<!-- Debugging -->
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>portable</DebugType>
+		<AndroidIncludeDebugSymbols>true</AndroidIncludeDebugSymbols>
 
-		<!-- r8 shrinking / obfuscation -->
-		<!--AndroidEnableCodeShrinking>true</AndroidEnableCodeShrinking>
+		<!-- R8 shrinking -->
 		<AndroidEnableProguard>true</AndroidEnableProguard>
 		<AndroidLinkTool>r8</AndroidLinkTool>
-		<AndroidProguardConfigFile>proguard-rules.pro</AndroidProguardConfigFile>
-		<AndroidExtraProguardOptions>-repackageclasses ''</AndroidExtraProguardOptions-->
 	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android' and '$(Configuration)' == 'Release'">
+		<ProguardConfiguration Include="proguard-rules.pro" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
