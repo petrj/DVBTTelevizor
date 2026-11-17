@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
-using Plugin.InAppBilling;
 using RTLSDR.Common;
 using System;
 using System.Collections.Generic;

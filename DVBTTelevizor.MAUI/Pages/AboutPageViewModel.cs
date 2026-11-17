@@ -1,13 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
-using Plugin.InAppBilling;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if BILLING
+using Plugin.InAppBilling;
+#endif
 
 namespace DVBTTelevizor.MAUI
 {
@@ -21,6 +23,7 @@ namespace DVBTTelevizor.MAUI
         public async Task<bool> Donate(string productId= "donation.2025.1")
         {
             _loggingService.Info($"Donate {productId}");
+#if BILLING
 
             IInAppBilling billing = null;
             try
@@ -99,6 +102,10 @@ namespace DVBTTelevizor.MAUI
                     await billing.DisconnectAsync();
                 }
             }
+#else
+            return false;
+#endif
+
         }
     }
 

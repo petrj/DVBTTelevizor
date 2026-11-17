@@ -20,7 +20,7 @@
 		<!-- App Identifier -->
 		<ApplicationId>net.petrjanousek.DVBTTelevizor</ApplicationId>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">23.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.26100.0</TargetPlatformMinVersion>
 
@@ -133,7 +133,6 @@
 		<PackageReference Include="NAudio" Version="2.3.0" />
 		<PackageReference Include="NLog" Version="6.1.4" />
 		<PackageReference Include="NLog.Targets.Network" Version="6.1.4" />
-		<PackageReference Include="Plugin.InAppBilling" Version="10.0.0" />
 		<PackageReference Include="Powershell.Modules" Version="1.0.6" />
 		<PackageReference Include="RemoteAccessService" Version="1.0.4" />
 		<PackageReference Include="RTLSDR" Version="1.5.1" />

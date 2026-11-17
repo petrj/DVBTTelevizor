@@ -6,7 +6,6 @@ using LibVLCSharp.Shared;
 using LoggerService;
 using MPEGTS;
 using Newtonsoft.Json;
-using Plugin.InAppBilling;
 using RTLSDR.Common;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,6 +13,9 @@ using System.Data;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Windows.Input;
+#if BILLING
+using Plugin.InAppBilling;
+#endif
 
 namespace DVBTTelevizor.MAUI
 {
@@ -1716,7 +1718,7 @@ namespace DVBTTelevizor.MAUI
         public async Task CheckPendingPurchasesAsync()
         {
             _loggingService.Info("CheckPendingPurchasesAsync");
-
+#if BILLING
             if (!CrossInAppBilling.IsSupported)
             {
                 _loggingService.Error("Billing system is not supported on this device");
@@ -1762,6 +1764,7 @@ namespace DVBTTelevizor.MAUI
             {
                 await billing.DisconnectAsync();
             }
+#endif
         }
 
         public bool StandingOnStart

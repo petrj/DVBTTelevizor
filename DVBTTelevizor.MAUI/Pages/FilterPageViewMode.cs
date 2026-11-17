@@ -1,6 +1,5 @@
 using DVBTTelevizor.TV;
 using LoggerService;
-using Plugin.InAppBilling;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
