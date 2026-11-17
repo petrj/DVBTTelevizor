@@ -89,7 +89,7 @@ function New-GooglePlayNativeDebugSymbols
 
     Import-Module $modulePath/BuildModule/BuildModule.psd1
 
-$passw = Get-Password
+$passw = Get-SecureStringFromUserInput -Message "Enter password to Android store:" -EnvironmentVariable $env:PJsAndroidStore
 
 ./Clear.ps1
 
