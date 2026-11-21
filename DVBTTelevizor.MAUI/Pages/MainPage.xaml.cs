@@ -2897,6 +2897,10 @@ namespace DVBTTelevizor.MAUI
                     case Type t when t == typeof(DriverPage):
                         page = new DriverPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
                         break;
+                    case Type t when t == typeof(EPGPage):
+                        page = new EPGPage(loggingService, driverConnector, configuration, publicDirectoryProvider);
+                        break;
+
 
                     default:
                         throw new ArgumentException("Unknown page");
@@ -3513,6 +3517,29 @@ namespace DVBTTelevizor.MAUI
                 _loggingService.Error(ex);
             }
         }
+
+        private async Task EPGMenu_Tapped()
+        {
+            if (_viewModel.SelectedChannel == null )
+            {
+                return;
+            }
+
+            await ShowPage<EPGPage>();
+
+            var epgPage = GetOrCreatePage<EPGPage>() as EPGPage;
+
+            if (epgPage == null)
+            {
+                return;
+            }
+
+            epgPage.Channel = _viewModel.SelectedChannel;
+            epgPage.Channels = _viewModel.Channels;
+
+            await MainPage.ShowPage<EPGPage>(Navigation, epgPage);
+        }
+
         private async Task AudioMenu_Tapped()
         {
             try
@@ -3869,6 +3896,9 @@ namespace DVBTTelevizor.MAUI
                 case "menuAudio":
                     await AudioMenu_Tapped();
                     break;
+                case "menuEPG":
+                    await EPGMenu_Tapped();
+                    break;
                 case "menuAspect":
                     await AspectMenu_Tapped();
                     break;
@@ -4062,6 +4092,8 @@ namespace DVBTTelevizor.MAUI
                 {
                     _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show program info".Translated(), "epg.png"));
                 }
+
+                _menuItems.Add(MainMenu.CreateMenuItem("menuEPG", "EPG".Translated(), "epg.png"));
 
                 _menuItems.Add(MainMenu.CreateMenuItem("menuScanEPG", "Scan EPG".Translated(), "epgscan.png"));
 

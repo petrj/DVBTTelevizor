@@ -42,14 +42,15 @@
 
 	<!-- Versions
 		Value 2025003 is too big for Windows
+		2026.36 is not a valid integer
 		-->
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('windows'))">
-		<ApplicationDisplayVersion>2026.36</ApplicationDisplayVersion>
-		<ApplicationVersion>2026.36</ApplicationVersion>
-		<VersionCode>2026.36</VersionCode>
-		<VersionName>2026.36</VersionName>
-		<ApplicationDisplayVersion>2026.36</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
+		<ApplicationVersion>2026</ApplicationVersion>
+		<VersionCode>2026</VersionCode>
+		<VersionName>2026</VersionName>
+		<ApplicationDisplayVersion>2026</ApplicationDisplayVersion>
 		<WindowsPackageType>MSIX</WindowsPackageType>
 	</PropertyGroup>
 
@@ -171,6 +172,9 @@
 	  <Compile Update="Menu.xaml.cs">
 	    <DependentUpon>Menu.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Pages\EPGage.xaml.cs">
+	    <DependentUpon>EPGage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\DriverStatPage.xaml.cs">
 	    <DependentUpon>DriverStatPage.xaml</DependentUpon>
 	  </Compile>
@@ -226,6 +230,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="ImgButton.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\EPGPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\DriverStatPage.xaml">

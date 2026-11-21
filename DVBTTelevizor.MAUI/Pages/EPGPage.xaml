@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DVBTTelevizor.MAUI.EPGPage"
+             xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             BackgroundColor="Black"
+             Title="{local:LngXamlExt Input='EPG'}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="CaptionStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="#41b3ff"/>
+            </Style>
+
+            <Style x:Key="ButtonStyle" TargetType="Button">
+                <Setter Property="Margin" Value="30,20,20,20"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="BorderWidth" Value="0" />
+                <Setter Property="CornerRadius" Value="7"/>
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <Style x:Key="ListViewStyle" TargetType="ListView">
+                <Setter Property="HasUnevenRows" Value="True"/>
+                <Setter Property="IsPullToRefreshEnabled" Value="True"/>
+                <Setter Property="BackgroundColor" Value="Black"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="LabelStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+            </Style>
+
+
+            <Style x:Key="TimeTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="Start"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+
+            <Style x:Key="EPGTitleTextStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="MaxLines" Value="2"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="TextColor" Value="White"/>
+            </Style>
+
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <AbsoluteLayout BackgroundColor="Black">
+
+        <ListView
+               x:Name="EPGListView"
+               AbsoluteLayout.LayoutBounds="0.0, 0.0, 1.0, 1.0"
+               AbsoluteLayout.LayoutFlags="All"
+               ItemsSource="{Binding EventItems}"
+               CachingStrategy="RetainElement"
+               RefreshCommand="{Binding RefreshCommand}"
+               IsRefreshing="{Binding IsRefreshing}"
+               Style="{StaticResource ListViewStyle}"
+               SelectionMode="None"
+               HasUnevenRows="True"
+               ItemSelected="EPGListView_ItemSelected">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <ViewCell.View>
+                            <Grid RowSpacing="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="1" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="30*" />
+                                    <ColumnDefinition Width="70*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0"  Text="{Binding EPGTimeStartDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding FontSizeForCaption}" />
+                                <Label Grid.Row="0" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}"/>
+
+                            </Grid>
+
+                        </ViewCell.View>
+
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </AbsoluteLayout>
+
+</ContentPage>
