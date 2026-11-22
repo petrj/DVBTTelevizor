@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Controls.PlatformConfiguration;
@@ -154,6 +155,20 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                 return;
 
             _epgPageViewModel.Channels = value;
+        }
+    }
+    public EITManager EIT
+    {
+        get
+        {
+            return _epgPageViewModel?.EIT;
+        }
+        set
+        {
+            if (_epgPageViewModel == null)
+                return;
+
+            _epgPageViewModel.EIT = value;
         }
     }
 

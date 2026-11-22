@@ -3534,8 +3534,10 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-            epgPage.Channel = _viewModel.SelectedChannel;
+
             epgPage.Channels = _viewModel.Channels;
+            epgPage.EIT = _viewModel.EIT;
+            epgPage.Channel = _viewModel.SelectedChannel;
 
             await MainPage.ShowPage<EPGPage>(Navigation, epgPage);
         }

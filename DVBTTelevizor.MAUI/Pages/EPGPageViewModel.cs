@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
 using LibVLCSharp.Shared;
 using LoggerService;
@@ -23,6 +24,17 @@ namespace DVBTTelevizor.MAUI
 
         private ObservableCollection<Channel>? _channels { get; set; } = new ObservableCollection<Channel>();
         private ObservableCollection<EventItem>? _eventItems { get; set; } = new ObservableCollection<EventItem>();
+
+        private EITManager? _eitManager { get; set; } = null;
+
+        public EITManager EIT
+        {
+            get => _eitManager;
+            set
+            {
+                _eitManager = value;
+            }
+        }
 
         public bool IsRefreshing
         {
@@ -131,7 +143,7 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _channel = value;
-                //NotifyChange();
+                OnPropertyChanged(nameof(Channel));
             }
         }
 
