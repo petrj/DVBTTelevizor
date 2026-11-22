@@ -47,7 +47,10 @@ public partial class EPGPage : ContentPage, IOnKeyDown
 
         Task.Run(async () =>
         {
-            await _epgPageViewModel.Refresh();
+            if (_epgPageViewModel?.RefreshCommand?.CanExecute(null) == true)
+            {
+                await _epgPageViewModel.RefreshCommand.ExecuteAsync(null);
+            }
         });
 
     }
@@ -68,7 +71,10 @@ public partial class EPGPage : ContentPage, IOnKeyDown
 
             Task.Run(async () =>
             {
-                await _epgPageViewModel.Refresh();
+                if (_epgPageViewModel?.RefreshCommand?.CanExecute(null) == true)
+                {
+                    await _epgPageViewModel.RefreshCommand.ExecuteAsync(null);
+                }
             });
         }
     }
@@ -179,9 +185,13 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         _loggingService.Debug($"Email_Tapped");
     }
 
-    private void EPGListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        _loggingService.Debug($"EPGListView_ItemSelected");
+        _loggingService.Debug($"OnSelectionChanged");
+        if (e.CurrentSelection.Count > 0 && e.CurrentSelection[0] is EventItem eventItem)
+        {
+            _loggingService.Debug($"Selected event: {eventItem.EventName}");
+        }
     }
 
 
@@ -192,6 +202,11 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         {
             _loggingService.Debug($"OnEventItem_Tapped: {eventItem.EventName}");
         }
+    }
+
+    private void Icon_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"Icon_Clicked");
     }
 
 }

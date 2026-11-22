@@ -3,11 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DVBTTelevizor.MAUI.EPGPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             xmlns:converters="clr-namespace:DVBTTelevizor.MAUI.Converters"
              BackgroundColor="Black"
              Title="{local:LngXamlExt Input='EPG'}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
+
+            <converters:SelectionColorConverter x:Key="SelectionColorConverter" />
+            <converters:SelectionVisibilityConverter x:Key="SelectionVisibilityConverter" />
 
             <Style x:Key="CaptionStyle" TargetType="Label">
                 <Setter Property="TextColor" Value="#41b3ff"/>
@@ -24,9 +28,7 @@
                 <Setter Property="CornerRadius" Value="20"/>
             </Style>
 
-            <Style x:Key="ListViewStyle" TargetType="ListView">
-                <Setter Property="HasUnevenRows" Value="True"/>
-                <Setter Property="IsPullToRefreshEnabled" Value="True"/>
+            <Style x:Key="CollectionViewStyle" TargetType="CollectionView">
                 <Setter Property="BackgroundColor" Value="Black"/>
                 <Setter Property="Margin" Value="0,0,0,0"/>
             </Style>
@@ -61,50 +63,164 @@
                 <Setter Property="TextColor" Value="White"/>
             </Style>
 
+            <Style x:Key="EPGTextStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="FontAttributes" Value="Italic"/>
+                <Setter Property="MaxLines" Value="1"/>
+                <Setter Property="Margin" Value="15,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+                <Setter Property="TextColor" Value="White"/>
+            </Style>
+
+            <Style x:Key="ProgressStyle" TargetType="ProgressBar">
+                <Setter Property="BackgroundColor" Value="#222222"/>
+                <Setter Property="ProgressColor" Value="White"/>
+            </Style>
+
+            <Style x:Key="EPGTitleTextStyle" TargetType="Label">
+                <!--Setter Property="TextColor" Value="#41b3ff"/-->
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="MaxLines" Value="2"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="TimeFromTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="Start"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="TimeToTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="SpringGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="DescriptionTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Padding" Value="5,5,5,5"/>
+                <Setter Property="VerticalTextAlignment" Value="Center"/>
+            </Style>
 
         </ResourceDictionary>
     </ContentPage.Resources>
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="{Binding Icon}"
+                 Order="Primary"
+                 Priority="0"
+                 Clicked="Icon_Clicked" />
+    </ContentPage.ToolbarItems>
+
     <AbsoluteLayout BackgroundColor="Black">
 
-        <ListView
-               x:Name="EPGListView"
-               AbsoluteLayout.LayoutBounds="0.0, 0.0, 1.0, 1.0"
+        <RefreshView
+               AbsoluteLayout.LayoutBounds="1.0, 0.5, 1.0, 0.5"
                AbsoluteLayout.LayoutFlags="All"
-               ItemsSource="{Binding EventItems}"
-               CachingStrategy="RetainElement"
-               RefreshCommand="{Binding RefreshCommand}"
-               IsRefreshing="{Binding IsRefreshing}"
-               Style="{StaticResource ListViewStyle}"
-               SelectionMode="None"
-               HasUnevenRows="True"
-               ItemSelected="EPGListView_ItemSelected">
+               Command="{Binding RefreshCommand}"
+               IsRefreshing="{Binding IsRefreshing}">
 
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <ViewCell.View>
-                            <Grid RowSpacing="0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="1" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="30*" />
-                                    <ColumnDefinition Width="70*" />
-                                </Grid.ColumnDefinitions>
+            <CollectionView
+                   x:Name="EPGListView"
+                   ItemsSource="{Binding EventItems}"
+                   SelectedItem="{Binding SelectedItem}"
+                   Style="{StaticResource CollectionViewStyle}"
+                   SelectionChangedCommand="{Binding SelectionChangedCommand}"
+                   SelectionChangedCommandParameter="{Binding SelectedItem}"
+                   SelectionMode="Single">
 
-                                <Label Grid.Row="0" Grid.Column="0"  Text="{Binding EPGTimeStartDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding FontSizeForCaption}" />
-                                <Label Grid.Row="0" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowSpacing="0" Padding="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="1" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20*" />
+                                <ColumnDefinition Width="80*" />
+                            </Grid.ColumnDefinitions>
 
-                            </Grid>
+                            <Grid.BackgroundColor>
+                                <MultiBinding Converter="{StaticResource SelectionColorConverter}">
+                                    <Binding Path="." />
+                                    <Binding Path="BindingContext.SelectedItem" Source="{RelativeSource AncestorType={x:Type ContentPage}}" />
+                                </MultiBinding>
+                            </Grid.BackgroundColor>
 
-                        </ViewCell.View>
+                            <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{Binding TimeDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding FontSizeForCaption}" />
+                            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="2" Grid.Column="1"  Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                            <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}">
+                                <ProgressBar.IsVisible>
+                                    <MultiBinding Converter="{StaticResource SelectionVisibilityConverter}">
+                                        <Binding Path="." />
+                                        <Binding Path="BindingContext.SelectedItem" Source="{RelativeSource AncestorType={x:Type ContentPage}}" />
+                                    </MultiBinding>
+                                </ProgressBar.IsVisible>
+                            </ProgressBar>
+
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </RefreshView>
+
+        <Grid
+            x:Name="EPGDetailGrid"
+            AbsoluteLayout.LayoutBounds="1.0, 1.0, 1.0, 0.5"
+            AbsoluteLayout.LayoutFlags="All"
+            BackgroundColor="#262626"
+            Margin="0,0,0,0"
+            Padding="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="60*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5"/>
+
+            <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
+            <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />
+
+            <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,0" x:Name="ProgresssBarGrid" BackgroundColor="Aqua" VerticalOptions="CenterAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <ProgressBar Grid.Row="0" Grid.Column="0" Progress="{Binding SelectedChannelEPGProgress}" Style="{DynamicResource ProgressStyle}" />
+            </Grid>
+
+            <ScrollView x:Name="SelectedChannelEPGDescriptionScrollView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="{Binding EPGDescriptionBackgroundColor}"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Margin="5,5,5,5" VerticalScrollBarVisibility="Always" >
+                <Label x:Name="LabelChannelEPGDescription" Text="{Binding SelectedChannelEPGDescription}"  Style="{DynamicResource DescriptionTextStyle}" FontSize="{Binding FontSizeForDescription}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"/>
+            </ScrollView>
+
+        </Grid>
 
     </AbsoluteLayout>
 
