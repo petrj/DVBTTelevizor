@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.MAUI.Messages;
 using LoggerService;
 using Microsoft.Maui.Controls.PlatformConfiguration;
+using Microsoft.Maui.Layouts;
 using MPEGTS;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
@@ -12,10 +13,17 @@ namespace DVBTTelevizor.MAUI;
 public partial class EPGPage : ContentPage, IOnKeyDown
 {
     private EPGPageViewModel _epgPageViewModel;
-
     private ILoggingService _loggingService;
 
     private KeyboardFocusableItemList _focusItems;
+    private bool IsPortrait { get; set; } = false;
+    private Size _lastAllocatedSize = new Size(-1, -1);
+
+    private Rect LandscapeItemsPosition { get; } = new Rect(0.0, 1.0, 0.5, 1.0);
+    private Rect LandscapeDetailPosition { get; } = new Rect(1.0, 1.0, 0.5, 1.0);
+
+    private Rect PortraitItemsPosition { get; } = new Rect(0.0, 0.0, 1.0, 0.5);
+    private Rect PortraitDetailPosition { get; } = new Rect(1.0, 1.0, 1.0, 0.5);
 
     public EPGPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -26,6 +34,61 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         BindingContext = _epgPageViewModel = new EPGPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
         BuildFocusableItems();
+    }
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        _loggingService.Debug($"OnSizeAllocated: {width}/{height}");
+
+        base.OnSizeAllocated(width, height);
+
+        if (_lastAllocatedSize.Width == width &&
+            _lastAllocatedSize.Height == height)
+        {
+            // no size changed
+            return;
+        }
+
+        if (width > height)
+        {
+            IsPortrait = false;
+        }
+        else
+        {
+            IsPortrait = true;
+        }
+
+        _lastAllocatedSize.Width = width;
+        _lastAllocatedSize.Height = height;
+
+        WeakReferenceMessenger.Default.Send(new ChangedSizeMessage(new Size(width, height)));
+
+        RefreshGUI();
+    }
+
+    private void RefreshGUI()
+    {
+        AbsoluteLayout.SetLayoutFlags(EPGRefreshView, AbsoluteLayoutFlags.All);
+        AbsoluteLayout.SetLayoutFlags(EPGDetailGrid, AbsoluteLayoutFlags.All);
+
+        if (IsPortrait)
+        {
+            // Refresh GUI for portrait mode
+            AbsoluteLayout.SetLayoutBounds(EPGRefreshView, PortraitItemsPosition);
+            AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, PortraitDetailPosition);
+        }
+        else
+        {
+            // Refresh GUI for landscape mode
+            AbsoluteLayout.SetLayoutBounds(EPGRefreshView, LandscapeItemsPosition);
+            AbsoluteLayout.SetLayoutBounds(EPGDetailGrid, LandscapeDetailPosition);
+        }
+
+        Task.Run(async () =>
+        {
+            await _epgPageViewModel.NotifyChange();
+        });
+
     }
 
     private void BuildFocusableItems()
