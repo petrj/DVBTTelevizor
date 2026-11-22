@@ -381,7 +381,7 @@ namespace SledovaniTV
         /// <summary>
         /// Getting EPG
         /// </summary>
-        public async Task<Dictionary<string,List<EventItem>>>GetEPG()
+        public async Task<Dictionary<string,List<EventItem>>>GetEPG(int duration=180)
         {
             _log.Info($"Refreshing EPG");
 
@@ -395,7 +395,7 @@ namespace SledovaniTV
                 {
                     { "PHPSESSID", _session.PHPSESSID },
                     { "detail", "1" },
-                    { "duration", "180" }
+                    { "duration", duration.ToString() }
                 };
 
                 var epgString = await SendRequest("epg", ps);

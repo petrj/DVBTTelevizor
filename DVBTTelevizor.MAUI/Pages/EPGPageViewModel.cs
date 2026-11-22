@@ -26,8 +26,18 @@ namespace DVBTTelevizor.MAUI
         private ObservableCollection<EventItem>? _eventItems { get; set; } = new ObservableCollection<EventItem>();
 
         private EITManager? _eitManager { get; set; } = null;
+        private SledovaniTV.SledovaniTV? _iptv { get; set; } = null;
 
-        public EITManager EIT
+        public SledovaniTV.SledovaniTV? IPTV
+        {
+            get => _iptv;
+            set
+            {
+                _iptv = value;
+            }
+        }
+
+        public EITManager? EIT
         {
             get => _eitManager;
             set
@@ -94,21 +104,44 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
+                List<EventItem> events;
+
+                if (_channel.ChannelType == ChannelTypeEnum.SledovaniTV)
+                {
+                    events = new List<EventItem>();
+
+                    if (IPTV != null && !string.IsNullOrWhiteSpace(_channel.ChannelId))
+                    {
+                        // TODO cahce EPG data for a channel to avoid unnecessary network requests
+                        //
+                        var iptvEvents = await IPTV.GetEPG(24*60);
+
+                        if (iptvEvents.TryGetValue(_channel.ChannelId, out var channelEvents))
+                        {
+                            events = channelEvents
+                                .OrderBy(eventItem => eventItem.StartTime)
+                                .Take(100)
+                                .ToList();
+                        }
+                    }
+                }
+                else
+                {
+                    events = EIT?.GetEvents(
+                        DateTime.Now,
+                        _channel.Frequency,
+                        _channel.ProgramMapPID,
+                        100) ?? new List<EventItem>();
+                }
+
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
+                    SelectedItem = null;
                     _eventItems?.Clear();
 
-                    var nextEvent = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0).AddHours(-1);
-
-                    for (var i = 0; i < 10; i++)
+                    foreach (var eventItem in events)
                     {
-                        _eventItems?.Add(new EventItem()
-                        {
-                            EventName = $"Event {i}",
-                            Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                            StartTime = nextEvent.AddHours(i * 10),
-                            FinishTime = nextEvent.AddHours((i+1) * 10)
-                        });
+                        _eventItems?.Add(eventItem);
                     }
 
                     // Auto-select first item if nothing is currently selected

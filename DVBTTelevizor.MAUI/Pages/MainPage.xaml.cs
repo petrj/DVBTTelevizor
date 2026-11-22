@@ -3537,6 +3537,7 @@ namespace DVBTTelevizor.MAUI
 
             epgPage.Channels = _viewModel.Channels;
             epgPage.EIT = _viewModel.EIT;
+            epgPage.IPTV = _viewModel.IPTV;
             epgPage.Channel = _viewModel.SelectedChannel;
 
             await MainPage.ShowPage<EPGPage>(Navigation, epgPage);

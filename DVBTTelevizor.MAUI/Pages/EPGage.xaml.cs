@@ -157,7 +157,7 @@ public partial class EPGPage : ContentPage, IOnKeyDown
             _epgPageViewModel.Channels = value;
         }
     }
-    public EITManager EIT
+    public EITManager? EIT
     {
         get
         {
@@ -171,6 +171,22 @@ public partial class EPGPage : ContentPage, IOnKeyDown
             _epgPageViewModel.EIT = value;
         }
     }
+
+    public SledovaniTV.SledovaniTV? IPTV
+    {
+        get
+        {
+            return _epgPageViewModel?.IPTV;
+        }
+        set
+        {
+            if (_epgPageViewModel == null)
+                return;
+
+            _epgPageViewModel.IPTV = value;
+        }
+    }
+
 
     public void OnKeyDown(string key, bool longPress)
     {
