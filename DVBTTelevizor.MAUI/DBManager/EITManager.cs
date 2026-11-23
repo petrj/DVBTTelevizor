@@ -100,9 +100,8 @@ namespace DVBTTelevizor.DBManager
             return res;
         }
 
-        private void RemoveCurrentEvents(long freq, long programMapPID)
+        private void RemoveCurrentEvents(string key)
         {
-            var key = GetKey(freq, programMapPID);
             if (!_freqValues.ContainsKey(key))
             {
                 return;
@@ -122,6 +121,54 @@ namespace DVBTTelevizor.DBManager
             {
                 _freqValues[key].Remove(eventItemsToDelete.ElementAt(0));
                 eventItemsToDelete.RemoveAt(0);
+            }
+        }
+
+        public async Task AddOnlineEvents(Dictionary<string, List<EventItem>> items)
+        {
+            _log.Debug($"[EIT] Adding online events {_driver.LastTunedFreq}");
+            foreach (var key in items.Keys)
+            {
+                foreach (var ev in items[key])
+                {
+                    AddEvent(key, ev);
+                }
+            }
+        }
+
+        public async void ClearOutdatedEvents(string? key = null)
+        {
+            var keys = new List<string>();
+
+            if (key != null)
+            {
+                keys = new List<string> { key };
+            }
+            else
+            {
+                keys = _freqValues.Keys.ToList();
+            }
+
+            // clearing outdated?
+            foreach (var k in keys)
+            {
+                var itemsToClear = new List<EventItem>();
+
+                foreach (var itm in _freqValues[k])
+                {
+                    if (itm.FinishTime < DateTime.Now)
+                    {
+                        itemsToClear.Add(itm);
+                    }
+                }
+
+                while (itemsToClear.Count > 0)
+                {
+                    _freqValues[k].Remove(itemsToClear[0]);
+                    itemsToClear.RemoveAt(0);
+                }
+
+                AddItemsToDB(k, _freqValues[k]);
             }
         }
 
@@ -200,24 +247,7 @@ namespace DVBTTelevizor.DBManager
 
                 foreach (var kvp in modifiedMapPIDs)
                 {
-                    var itemsToClear = new List<EventItem>();
-
-                    // clearing outdated?
-                    foreach (var itm in _freqValues[kvp.Key])
-                    {
-                        if (itm.FinishTime < DateTime.Now)
-                        {
-                            itemsToClear.Add(itm);
-                        }
-                    }
-
-                    while (itemsToClear.Count > 0)
-                    {
-                        _freqValues[kvp.Key].Remove(itemsToClear[0]);
-                        itemsToClear.RemoveAt(0);
-                    }
-
-                    AddItemsToDB(kvp.Key, _freqValues[kvp.Key]);
+                    ClearOutdatedEvents(kvp.Key);
                 }
 
                 return new EITScanResult()
@@ -242,12 +272,17 @@ namespace DVBTTelevizor.DBManager
 
         private bool AddEvent(long freq, long programMapPID, EventItem eventItem)
         {
+            return AddEvent(GetKey(freq, programMapPID), eventItem);
+        }
+
+        private bool AddEvent(string key, EventItem eventItem)
+        {
             if (eventItem.FinishTime<DateTime.Now)
             {
                 return false;
             }
 
-            var cachedItems = GetValues(freq, programMapPID);
+            var cachedItems = GetValues(key);
 
             if (cachedItems != null)
             {
@@ -260,7 +295,6 @@ namespace DVBTTelevizor.DBManager
                 }
             }
 
-            var key = GetKey(freq, programMapPID);
             if (!_freqValues.ContainsKey(key))
             {
                 _freqValues.TryAdd(key, new List<EventItem>());
@@ -269,7 +303,7 @@ namespace DVBTTelevizor.DBManager
             // negative event IDs are for current events, so we can have duplicates with different IDs
             if (eventItem.EventId < 0)
             {
-               RemoveCurrentEvents(freq, programMapPID);
+               RemoveCurrentEvents(key);
             }
 
             _freqValues[key].Add(eventItem);

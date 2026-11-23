@@ -138,12 +138,7 @@ namespace DVBTTelevizor.DBManager
 
         public virtual string GetDBFullPath(long freq, long programMapPID)
         {
-            var folder = Path.Combine(_publicDirectory, Key);
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-            return Path.Combine(folder, $"{GetKey(freq,programMapPID)}.sqllite");
+            return GetDBFullPath(GetKey(freq, programMapPID));
         }
 
         public virtual string GetDBFullPath(string freqKey)
@@ -158,27 +153,31 @@ namespace DVBTTelevizor.DBManager
 
         public virtual List<T> GetValues(long freq, long programMapPID)
         {
+            var freqKey = GetKey(freq, programMapPID);
+            return GetValues(freqKey);
+        }
+
+        public virtual List<T> GetValues(string key)
+        {
             try
             {
                 var res = new List<T>();
 
-                var freqKey = GetKey(freq, programMapPID);
-
-                if (_freqValues.ContainsKey(freqKey) &&
-                    _freqValues[freqKey] != null &&
-                    _freqValues[freqKey].Count > 0)
+                if (_freqValues.ContainsKey(key) &&
+                    _freqValues[key] != null &&
+                    _freqValues[key].Count > 0)
                 {
                     // in cache
 
-                    return _freqValues[freqKey];
+                    return _freqValues[key];
                 }
 
-                if (!_freqValues.ContainsKey(freqKey))
+                if (!_freqValues.ContainsKey(key))
                 {
-                    _freqValues.TryAdd(freqKey, res);
+                    _freqValues.TryAdd(key, res);
                 }
 
-                var dbPath = GetDBFullPath(freq, programMapPID);
+                var dbPath = GetDBFullPath(key);
                 if (!File.Exists(dbPath))
                 {
                     return null;

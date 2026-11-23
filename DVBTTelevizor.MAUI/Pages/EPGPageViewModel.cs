@@ -114,7 +114,9 @@ namespace DVBTTelevizor.MAUI
                     {
                         // TODO cahce EPG data for a channel to avoid unnecessary network requests
                         //
-                        var iptvEvents = await IPTV.GetEPG(24*60);
+                        var iptvEvents = await IPTV.GetEPG();   // 24*60
+
+                        EIT?.AddOnlineEvents(iptvEvents);
 
                         if (iptvEvents.TryGetValue(_channel.ChannelId, out var channelEvents))
                         {
