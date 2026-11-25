@@ -116,7 +116,7 @@ namespace DVBTTelevizor.MAUI
                         //
                         var iptvEvents = await IPTV.GetEPG();   // 24*60
 
-                        EIT?.AddOnlineEvents(iptvEvents);
+                        //EIT?.AddOnlineEvents(iptvEvents);
 
                         if (iptvEvents.TryGetValue(_channel.ChannelId, out var channelEvents))
                         {
@@ -149,7 +149,7 @@ namespace DVBTTelevizor.MAUI
                     // Auto-select first item if nothing is currently selected
                     if (SelectedItem == null && _eventItems?.Count > 0)
                     {
-                        SelectedItem = _eventItems[0];
+                        //SelectedItem = _eventItems[0];
                     }
                 });
 

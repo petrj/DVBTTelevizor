@@ -97,7 +97,9 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         _focusItems = new KeyboardFocusableItemList();
 
         _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("EPGListView", new List<View>() { EPGListView }));
+            .AddItem(KeyboardFocusableItem.CreateFrom("List", new List<View>() { EPGListView }))
+            .AddItem(KeyboardFocusableItem.CreateFrom("EPG", new List<View>() { EPGDetailGrid, EventNameLabel }));
+
 
         //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
     }

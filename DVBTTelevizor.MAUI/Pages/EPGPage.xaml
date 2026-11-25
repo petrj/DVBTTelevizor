@@ -128,33 +128,13 @@
     </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem IconImageSource="left.png"
+        <ToolbarItem IconImageSource="left.png" x:Name="LeftToolbarItem"
                  Clicked="Icon_Clicked" />
-        <ToolbarItem IconImageSource="right.png"
+        <ToolbarItem IconImageSource="right.png" x:Name="RightToolbarItem"
                  Clicked="Icon_Clicked" />
     </ContentPage.ToolbarItems>
 
     <AbsoluteLayout BackgroundColor="Black">
-
-        <Grid x:Name="MainToolBar"  AbsoluteLayout.LayoutBounds="0.0,0,1.0,0.1" AbsoluteLayout.LayoutFlags="All"
-              ColumnSpacing="5"
-              BackgroundColor="#29242a"
-              Margin="0,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="100*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="52*" />
-                <ColumnDefinition Width="16*" />
-                <ColumnDefinition Width="16*" />
-                <ColumnDefinition Width="16*" />
-            </Grid.ColumnDefinitions>
-
-            <local:ImgButton x:Name="DVBTTelevizorButton" Grid.Column="0" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="about.png" TapCommand="{Binding CommandAbout}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,0"/>
-            <local:ImgButton x:Name="DriverStateButton" Grid.Column="1" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding DriverIconImage}" TapCommand="{Binding CommandDriverState}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
-            <local:ImgButton x:Name="TuneButton" Grid.Column="2" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}"  Img="{Binding TuneIconImage}" TapCommand="{Binding CommandTune}"  HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
-            <local:ImgButton x:Name="MenuButton" Grid.Column="3" Grid.Row="0" TextFontSize="{Binding FontSizeForLabel}" Img="{Binding MenuIconImage}" TapCommand="{Binding CommandShowMenu}" HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,10,0"/>
-        </Grid>
 
         <RefreshView
                x:Name="EPGRefreshView"
@@ -231,6 +211,8 @@
                 <ColumnDefinition Width="50*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
+
+            <BoxView Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="3" x:Name="EventNameLabel" />
 
             <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForEPGTitle}" Margin="5,5,5,5"/>
 
