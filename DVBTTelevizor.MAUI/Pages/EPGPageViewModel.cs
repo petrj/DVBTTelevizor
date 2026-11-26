@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LibVLCSharp.Shared;
 using LoggerService;
 using Microsoft.Maui;
@@ -23,7 +24,7 @@ namespace DVBTTelevizor.MAUI
         private EventItem? _selectedItem = null;
 
         private ObservableCollection<Channel>? _channels { get; set; } = new ObservableCollection<Channel>();
-        private ObservableCollection<EventItem>? _eventItems { get; set; } = new ObservableCollection<EventItem>();
+        private ObservableCollection<EPGEventItem>? _eventItems { get; set; } = new ObservableCollection<EPGEventItem>();
 
         private EITManager? _eitManager { get; set; } = null;
         private SledovaniTV.SledovaniTV? _iptv { get; set; } = null;
@@ -59,16 +60,19 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public EventItem? SelectedItem
+        public EPGEventItem? SelectedItem
         {
-            get => _selectedItem;
-            set
+            get
             {
-                if (_selectedItem != value)
+                foreach (var epgEventItem in _eventItems ?? Enumerable.Empty<EPGEventItem>())
                 {
-                    _selectedItem = value;
-                    OnPropertyChanged(nameof(SelectedItem));
+                    if (epgEventItem.Selected)
+                    {
+                        return epgEventItem;
+                    }
                 }
+
+                return null;
             }
         }
 
@@ -138,19 +142,37 @@ namespace DVBTTelevizor.MAUI
 
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    SelectedItem = null;
+                    var selectedItem = SelectedItem;
+                    var selectFirst = false;
+                    if (selectedItem == null && EventItems?.Count > 0)
+                    {
+                        selectedItem = EventItems?.FirstOrDefault();
+                    }
+                    if (selectedItem == null)
+                    {
+                        selectFirst = true;
+                    }
+                    var selectedItemCSV = selectedItem?.CSV;
+                    var selectedItemFocused = selectedItem?.Focused ?? false;
                     _eventItems?.Clear();
 
                     foreach (var eventItem in events)
                     {
-                        _eventItems?.Add(eventItem);
+                        var it = new EPGEventItem(eventItem);
+                        if (selectFirst || !string.IsNullOrEmpty(selectedItemCSV) && it.CSV == selectedItemCSV)
+                        {
+                            selectFirst = false;
+                            it.Selected = true;
+                            it.Focused = selectedItemFocused;
+                        }
+                        _eventItems?.Add(it);
+
+                        MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            it.NotifyChanges();
+                        });
                     }
 
-                    // Auto-select first item if nothing is currently selected
-                    if (SelectedItem == null && _eventItems?.Count > 0)
-                    {
-                        //SelectedItem = _eventItems[0];
-                    }
                 });
 
                 await NotifyChange();
@@ -195,7 +217,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public ObservableCollection<EventItem>? EventItems
+        public ObservableCollection<EPGEventItem>? EventItems
         {
             get
             {
