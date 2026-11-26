@@ -14,7 +14,7 @@ using System.Text;
 namespace DVBTTelevizor
 {
     [Table("Channels")]
-    public class Channel : JSONObject
+    public class Channel : JSONObject, IListViewSelector
     {
         [PrimaryKey, Column("Number")]
 

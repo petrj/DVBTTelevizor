@@ -24,7 +24,9 @@ namespace DVBTTelevizor.MAUI
         private EventItem? _selectedItem = null;
 
         private ObservableCollection<Channel>? _channels { get; set; } = new ObservableCollection<Channel>();
-        private ObservableCollection<EPGEventItem>? _eventItems { get; set; } = new ObservableCollection<EPGEventItem>();
+        private ObservableCollection<EPGEventItem> _eventItems { get; set; } = new ObservableCollection<EPGEventItem>();
+
+        private readonly ListViewSelector? _eventItemsListViewSelector = null;
 
         private EITManager? _eitManager { get; set; } = null;
         private SledovaniTV.SledovaniTV? _iptv { get; set; } = null;
@@ -84,6 +86,8 @@ namespace DVBTTelevizor.MAUI
         {
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
             SelectionChangedCommand = new RelayCommand<EventItem>(OnItemSelected);
+
+            _eventItemsListViewSelector = new ListViewSelector(new ObservableCollection<IListViewSelector>(EventItems.Cast<IListViewSelector>()));
         }
 
         private async Task RefreshAsync()
@@ -217,7 +221,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public ObservableCollection<EPGEventItem>? EventItems
+        public ObservableCollection<EPGEventItem> EventItems
         {
             get
             {

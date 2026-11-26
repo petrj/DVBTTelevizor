@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DVBTTelevizor.TV;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,23 +11,23 @@ namespace DVBTTelevizor.MAUI
 {
     internal class ListViewSelector
     {
-        private ObservableCollection<Channel> _channels;
+        private ObservableCollection<IListViewSelector> _items;
 
-        public ListViewSelector(ObservableCollection<Channel> channels)
+        public ListViewSelector(ObservableCollection<IListViewSelector> items)
         {
-            SetChannels(channels);
+            SetItems(items);
         }
 
-        public void SetChannels(ObservableCollection<Channel> channels)
+        public void SetItems(ObservableCollection<IListViewSelector> items)
         {
-            _channels = channels;
+            _items = items;
         }
 
-        public Action OnChannelChanged { get; set; }
+        public Action OnItemChanged { get; set; }
 
-        public Channel? GetSelectedChannel()
+        public IListViewSelector? GetSelectedItem()
         {
-            foreach (var ch in _channels)
+            foreach (var ch in _items)
             {
                 if (ch.Selected)
                     return ch;
@@ -37,23 +38,23 @@ namespace DVBTTelevizor.MAUI
 
         public void DeselectAll()
         {
-            SetSelectedChannel(null);
+            SetSelectedItem(null);
         }
 
-        public void SetSelectedChannel(Channel? channel)
+        public void SetSelectedItem(IListViewSelector? item)
         {
             bool fireOnChanged = false;
 
-            foreach (var ch in _channels)
+            foreach (var ch in _items)
             {
-                var fireNotifyChannelChange = false;
+                var fireNotifyChange = false;
 
-                if (channel != null && ch.UniqueIdentifier == channel.UniqueIdentifier)
+                if (item != null && ch.UniqueIdentifier == item.UniqueIdentifier)
                 {
-                    if (!ch.Selected && OnChannelChanged != null)
+                    if (!ch.Selected && OnItemChanged != null)
                     {
                         fireOnChanged = true;
-                        fireNotifyChannelChange = true;
+                        fireNotifyChange = true;
                         ch.Selected = true;
                         ch.Focused = true;
                     }
@@ -62,17 +63,17 @@ namespace DVBTTelevizor.MAUI
                     if (ch.Selected)
                     {
                         ch.Selected = false;
-                        fireNotifyChannelChange = true;
+                        fireNotifyChange = true;
                     }
 
                     if (ch.Focused)
                     {
                         ch.Focused = false;
-                        fireNotifyChannelChange = true;
+                        fireNotifyChange = true;
                     }
                 }
 
-                if (fireNotifyChannelChange)
+                if (fireNotifyChange)
                 {
                     ch.NotifyChanges();
                 }
@@ -80,42 +81,42 @@ namespace DVBTTelevizor.MAUI
 
             if (fireOnChanged)
             {
-                if (OnChannelChanged != null)
+                if (OnItemChanged != null)
                 {
-                    OnChannelChanged();
+                    OnItemChanged();
                 }
             }
         }
 
-        public Channel? SelectFirstChannel()
+        public IListViewSelector? SelectFirstItem()
         {
-            foreach (var ch in _channels)
+            foreach (var ch in _items)
             {
-                SetSelectedChannel(ch);
+                SetSelectedItem(ch);
                 return ch;
             }
 
             return null;
         }
 
-        public Channel? SelectLastChannel()
+        public IListViewSelector? SelectLastItem()
         {
-            foreach (var ch in _channels.Reverse())
+            foreach (var ch in _items.Reverse())
             {
-                SetSelectedChannel(ch);
+                SetSelectedItem(ch);
                 return ch;
             }
 
             return null;
         }
 
-        public Channel? SelectChannelByNumber(string num)
+        public IListViewSelector? SelectItemByNumber(string num)
         {
-            foreach (var ch in _channels)
+            foreach (var ch in _items)
             {
                 if (ch.Number == num)
                 {
-                    SetSelectedChannel(ch);
+                    SetSelectedItem(ch);
                     return ch;
                 }
             }
@@ -123,12 +124,10 @@ namespace DVBTTelevizor.MAUI
             return null;
         }
 
-
-
-        public Channel? SelectPreviousChannel()
+        public IListViewSelector? SelectPreviousItem()
         {
             var selFound = false;
-            foreach (var ch in _channels.Reverse())
+            foreach (var ch in _items.Reverse())
             {
                 if (!selFound)
                 {
@@ -139,18 +138,18 @@ namespace DVBTTelevizor.MAUI
                 }
                 else
                 {
-                    SetSelectedChannel(ch);
+                    SetSelectedItem(ch);
                     return ch;
                 }
             }
 
-            return SelectLastChannel();
+            return SelectLastItem();
         }
 
-        public Channel? SelectNextChannel()
+        public IListViewSelector? SelectNextItem()
         {
             var selFound = false;
-            foreach (var ch in _channels)
+            foreach (var ch in _items)
             {
                 if (!selFound)
                 {
@@ -160,12 +159,12 @@ namespace DVBTTelevizor.MAUI
                     }
                 } else
                 {
-                    SetSelectedChannel(ch);
+                    SetSelectedItem(ch);
                     return ch;
                 }
             }
 
-            return SelectFirstChannel();
+            return SelectFirstItem();
         }
     }
 }

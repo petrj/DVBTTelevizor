@@ -74,7 +74,7 @@ namespace DVBTTelevizor.MAUI
             SetupDriver(driver);
             Settings = new TuningSettings(loggingService);
 
-            _listViewSelector = new ListViewSelector(Channels);
+            _listViewSelector = new ListViewSelector(new ObservableCollection<IListViewSelector>(Channels.Cast<IListViewSelector>()));
 
             WeakReferenceMessenger.Default.Register<DriverUpdateStatMessage>(this, (r, m) =>
             {
@@ -208,7 +208,7 @@ namespace DVBTTelevizor.MAUI
             {
                 try
                 {
-                    _selectedChannel = _listViewSelector?.SelectFirstChannel();
+                    _selectedChannel = _listViewSelector?.SelectFirstItem() as Channel;
                     await NotifyChange();
                 }
                 catch (Exception ex)
@@ -246,7 +246,7 @@ namespace DVBTTelevizor.MAUI
             {
                 try
                 {
-                    _selectedChannel = _listViewSelector?.SelectNextChannel();
+                    _selectedChannel = _listViewSelector?.SelectNextItem() as Channel;
                     await NotifyChange();
                 }
                 catch (Exception ex)
@@ -264,7 +264,7 @@ namespace DVBTTelevizor.MAUI
             {
                 try
                 {
-                    _selectedChannel = _listViewSelector?.SelectPreviousChannel();
+                    _selectedChannel = _listViewSelector?.SelectPreviousItem() as Channel;
                     await NotifyChange();
                 }
                 catch (Exception ex)

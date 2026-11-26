@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DVBTTelevizor.TV
 {
-    public class EPGEventItem : JSONObject
+    public class EPGEventItem : JSONObject, IListViewSelector
     {
         private EventItem? _eventItem;
 
@@ -58,6 +58,16 @@ namespace DVBTTelevizor.TV
         public string EventID
         {
             get => _eventItem?.EventId.ToString() ?? string.Empty;
+        }
+
+        public string UniqueIdentifier
+        {
+            get => CSV;
+        }
+
+        public string Number
+        {
+            get => EventID;
         }
 
         public void NotifyChanges()

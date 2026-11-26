@@ -199,6 +199,9 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         switch (keyAction)
         {
             case KeyboardNavigationActionEnum.Down:
+                break;
+
+
             case KeyboardNavigationActionEnum.Right:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {

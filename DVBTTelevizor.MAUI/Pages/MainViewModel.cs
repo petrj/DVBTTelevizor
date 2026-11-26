@@ -87,8 +87,8 @@ namespace DVBTTelevizor.MAUI
              EIT = new EITManager(loggingService, publicDirectoryProvider, driver);
              PID = new PIDManager(loggingService, publicDirectoryProvider, driver);
 
-            _listViewSelector = new ListViewSelector(Channels);
-            _listViewSelector.OnChannelChanged += delegate
+            _listViewSelector = new ListViewSelector(new ObservableCollection<IListViewSelector>(Channels.Cast<IListViewSelector>()));
+            _listViewSelector.OnItemChanged += delegate
             {
                 if (_configuration != null && SelectedChannel != null)
                 {
@@ -820,7 +820,7 @@ namespace DVBTTelevizor.MAUI
                 {
                     //Channels.Clear();
                     Channels = channelsToAdd;
-                    _listViewSelector?.SetChannels(Channels);
+                    _listViewSelector?.SetItems(new ObservableCollection<IListViewSelector>(Channels.Cast<IListViewSelector>()));
 
                     SelectedChannel = channelToSelect;
 
@@ -854,7 +854,7 @@ namespace DVBTTelevizor.MAUI
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                _listViewSelector?.SelectFirstChannel();
+                _listViewSelector?.SelectFirstItem();
                 NotifyChannelChange();
             });
         }
@@ -865,7 +865,7 @@ namespace DVBTTelevizor.MAUI
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                _listViewSelector?.SelectLastChannel();
+                _listViewSelector?.SelectLastItem();
                 NotifyChannelChange();
             });
         }
@@ -876,7 +876,7 @@ namespace DVBTTelevizor.MAUI
 
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                var ch  = _listViewSelector?.SelectChannelByNumber(num);
+                var ch  = _listViewSelector?.SelectItemByNumber(num) as Channel;
                 NotifyChannelChange();
                 return ch;
             });
@@ -886,7 +886,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Selecting next channel");
 
-            _listViewSelector?.SelectNextChannel();
+            _listViewSelector?.SelectNextItem();
             NotifyChannelChange();
 
             _loggingService.Info($"... selected");
@@ -896,7 +896,7 @@ namespace DVBTTelevizor.MAUI
         {
             _loggingService.Info($"Selecting previous channel");
 
-            _listViewSelector?.SelectPreviousChannel();
+            _listViewSelector?.SelectPreviousItem();
             NotifyChannelChange();
         }
 
@@ -1465,7 +1465,11 @@ namespace DVBTTelevizor.MAUI
                 _semaphoreSlim.WaitAsync();
                 try
                 {
-                    return _listViewSelector?.GetSelectedChannel();
+                    if (_listViewSelector?.GetSelectedItem() is Channel channel)
+                    {
+                        return channel;
+                    }
+                    return null;
                 }
                 finally
                 {
@@ -1477,7 +1481,7 @@ namespace DVBTTelevizor.MAUI
                 _semaphoreSlim.WaitAsync();
                 try
                 {
-                    _listViewSelector?.SetSelectedChannel(value);
+                    _listViewSelector?.SetSelectedItem(value);
 
                     NotifyChannelChange();
                 }
