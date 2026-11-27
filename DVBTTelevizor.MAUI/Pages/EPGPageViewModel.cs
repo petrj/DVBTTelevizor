@@ -27,6 +27,7 @@ namespace DVBTTelevizor.MAUI
         private ObservableCollection<EPGEventItem> _eventItems { get; set; } = new ObservableCollection<EPGEventItem>();
 
         private ListViewSelector? _eventItemsListViewSelector = null;
+        private ListViewSelector? _channelsListViewSelector = null;
 
         private EITManager? _eitManager { get; set; } = null;
         private SledovaniTV.SledovaniTV? _iptv { get; set; } = null;
@@ -90,11 +91,29 @@ namespace DVBTTelevizor.MAUI
             SelectionChangedCommand = new RelayCommand<EventItem>(OnItemSelected);
         }
 
+        public void SelectNextChannel()
+        {
+            _eventItems?.Clear();
+            _channelsListViewSelector?.SelectNextItem();
+            Channel = _channelsListViewSelector?.GetSelectedItem() as Channel;
+        }
+
+        public void SelectPreviousChannel()
+        {
+            _eventItems?.Clear();
+            _channelsListViewSelector?.SelectPreviousItem();
+            Channel = _channelsListViewSelector?.GetSelectedItem() as Channel;
+        }
+
         public void SelectNextItem()
         {
             _eventItemsListViewSelector?.SelectNextItem();
         }
 
+        public void SelectItem(EPGEventItem item)
+        {
+            _eventItemsListViewSelector?.SetSelectedItem(item);
+        }
 
         public void SelectPreviousItem()
         {
@@ -133,7 +152,7 @@ namespace DVBTTelevizor.MAUI
                     {
                         // TODO cahce EPG data for a channel to avoid unnecessary network requests
                         //
-                        var iptvEvents = await IPTV.GetEPG();   // 24*60
+                        var iptvEvents = await IPTV.GetEPG(24 * 60);   // 24*60
 
                         //EIT?.AddOnlineEvents(iptvEvents);
 
@@ -232,7 +251,7 @@ namespace DVBTTelevizor.MAUI
             set
             {
                 _channels = value;
-                //NotifyChange();
+                _channelsListViewSelector = new ListViewSelector(new ObservableCollection<IListViewSelector>(_channels?.Cast<IListViewSelector>() ?? Enumerable.Empty<IListViewSelector>()));
             }
         }
 
@@ -260,6 +279,8 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(SelectedItem));
                 OnPropertyChanged(nameof(EPGLabelBackgroundColor));
                 OnPropertyChanged(nameof(EPGLabelColor));
+                OnPropertyChanged(nameof(LeftButtonIcon));
+                OnPropertyChanged(nameof(RightButtonIcon));
             });
         }
 
@@ -298,6 +319,22 @@ namespace DVBTTelevizor.MAUI
                         return "#31a3cf";
                 }
                 //return "#29242a";
+            }
+        }
+
+        public string LeftButtonIcon
+        {
+            get
+            {
+                return _activeItem == EPGPageActiveItemEnum.LeftButton ? "leftselected.png" : "left.png";
+            }
+        }
+
+        public string RightButtonIcon
+        {
+            get
+            {
+                return _activeItem == EPGPageActiveItemEnum.RightButton ? "rightselected.png" : "right.png";
             }
         }
 

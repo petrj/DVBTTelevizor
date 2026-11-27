@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DVBTTelevizor.DBManager;
 using DVBTTelevizor.MAUI.Messages;
+using DVBTTelevizor.TV;
 using LoggerService;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Layouts;
@@ -33,6 +34,8 @@ public partial class EPGPage : ContentPage, IOnKeyDown
 
     private Rect PortraitItemsPosition { get; } = new Rect(0.0, 0.0, 1.0, 0.5);
     private Rect PortraitDetailPosition { get; } = new Rect(1.0, 1.0, 1.0, 0.5);
+
+    private DateTime _lastLongTappedTime = DateTime.MinValue;
 
     public EPGPage(ILoggingService loggingService, IDriverConnector driver, ITVConfiguration tvConfiguration, IPublicDirectoryProvider publicDirectoryProvider)
     {
@@ -196,6 +199,55 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                 _epgPageViewModel?.SelectPreviousItem();
                 break;
         }
+
+        _epgPageViewModel?.NotifyChange();
+    }
+
+    private void HandleEPGGridKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        _loggingService.Debug($"EPGPage HandleEPGGridKeyDown {keyAction}");
+
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Down:
+                // scroll down
+                Task.Run(async () =>
+                {
+                    await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                        SelectedChannelEPGDescriptionScrollView.ScrollX,
+                        SelectedChannelEPGDescriptionScrollView.ScrollY + 50, false);
+                });
+                break;
+            case KeyboardNavigationActionEnum.Up:
+                // scroll up
+                Task.Run(async () =>
+                {
+                    await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
+                        SelectedChannelEPGDescriptionScrollView.ScrollX,
+                        SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
+                });
+                break;
+        }
+    }
+
+    private void HandleButtonsKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        _loggingService.Debug($"EPGPage HandleButtonsKeyDown {keyAction}");
+
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.OK:
+
+                if (_epgPageViewModel?.ActiveItem == EPGPageActiveItemEnum.LeftButton)
+                {
+                    LeftToolbarItem_Clicked(this, EventArgs.Empty);
+                }
+                else if (_epgPageViewModel?.ActiveItem == EPGPageActiveItemEnum.RightButton)
+                {
+                    RightToolbarItem_Clicked(this, EventArgs.Empty);
+                }
+                break;
+        }
     }
 
     private void HandleSwitchFocusKeyDown(KeyboardNavigationActionEnum keyAction)
@@ -214,7 +266,7 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                         break;
                     case EPGPageActiveItemEnum.EPG:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.LeftButton;
-                        //_focusItems.SetFocus("RightButton");
+                        Task.Run(async () => { await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0, 0, false); });
                         break;
                     case EPGPageActiveItemEnum.LeftButton:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.RightButton;
@@ -247,6 +299,7 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                         break;
                     case EPGPageActiveItemEnum.LeftButton:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.EPG;
+                        Task.Run(async () => { await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0, 0, false); });
                         //_focusItems.SetFocus("List");
                         break;
                     case EPGPageActiveItemEnum.RightButton:
@@ -298,6 +351,19 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                     HandleListKeyDown(keyAction);
                 });
                 return;
+            case EPGPageActiveItemEnum.EPG:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    HandleEPGGridKeyDown(keyAction);
+                });
+                return;
+            case EPGPageActiveItemEnum.LeftButton:
+            case EPGPageActiveItemEnum.RightButton:
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    HandleButtonsKeyDown(keyAction);
+                });
+                return;
         }
     }
 
@@ -315,9 +381,52 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         }
     }
 
-    private void Icon_Clicked(object sender, EventArgs e)
+    private void LeftToolbarItem_Clicked(object sender, EventArgs e)
     {
-        _loggingService.Debug($"Icon_Clicked");
+        _loggingService.Debug($"LeftToolbarItem_Clicked");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _epgPageViewModel?.SelectPreviousChannel();
+            _epgPageViewModel?.RefreshCommand.Execute(null);
+        });
     }
 
+    private void RightToolbarItem_Clicked(object sender, EventArgs e)
+    {
+        _loggingService.Debug($"RightToolbarItem_Clicked");
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            _epgPageViewModel?.SelectNextChannel();
+            _epgPageViewModel?.RefreshCommand.Execute(null);
+        });
+    }
+
+    private void OnItem_Tapped(object sender, TappedEventArgs e)
+    {
+        _loggingService.Info("OnItem_Tapped");
+
+        // this event is fired immedietly after LongTappedEvent!
+        if ((DateTime.Now - _lastLongTappedTime).TotalMilliseconds < 1000)
+        {
+            return;
+        }
+
+        if (sender is Grid grid && grid.BindingContext is EPGEventItem item)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                _epgPageViewModel?.SelectItem(item);
+                await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0, 0, false);;
+                _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.List;
+                _epgPageViewModel?.NotifyChange();
+            });
+        }
+    }
+
+    private void OnItem_LongTapped(object sender, EventArgs e)
+    {
+        _lastLongTappedTime = DateTime.Now;
+    }
 }

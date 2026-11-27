@@ -63,6 +63,7 @@ namespace DVBTTelevizor.MAUI
                     if (ch.Selected || ch.Focused)
                     {
                         ch.Selected = false;
+                        ch.Focused = false;
                         fireNotifyChannelChange = true;
                         fireOnChanged = true;
                     }

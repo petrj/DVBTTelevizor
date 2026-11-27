@@ -3534,13 +3534,14 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
-
             epgPage.Channels = _viewModel.Channels;
             epgPage.EIT = _viewModel.EIT;
             epgPage.IPTV = _viewModel.IPTV;
             epgPage.Channel = _viewModel.SelectedChannel;
 
-            await MainPage.ShowPage<EPGPage>(Navigation, epgPage);
+            epgPage.Disappearing += delegate { Task.Run(async () => await FocusSelectedChannel()); };
+
+            //await MainPage.ShowPage<EPGPage>(Navigation, epgPage);
         }
 
         private async Task AudioMenu_Tapped()

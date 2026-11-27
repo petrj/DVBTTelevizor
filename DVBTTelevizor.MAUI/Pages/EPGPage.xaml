@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DVBTTelevizor.MAUI.EPGPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              BackgroundColor="Black">
 
     <NavigationPage.TitleView>
@@ -85,6 +86,7 @@
                 <Setter Property="Margin" Value="15,0,0,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="TextColor" Value="White"/>
+                <Setter Property="LineBreakMode" Value="TailTruncation"/>
             </Style>
 
             <Style x:Key="ProgressStyle" TargetType="ProgressBar">
@@ -123,10 +125,10 @@
     </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem IconImageSource="left.png" x:Name="LeftToolbarItem"
-                 Clicked="Icon_Clicked" />
-        <ToolbarItem IconImageSource="right.png" x:Name="RightToolbarItem"
-                 Clicked="Icon_Clicked" />
+        <ToolbarItem IconImageSource="{Binding LeftButtonIcon}" x:Name="LeftToolbarItem"
+                 Clicked="LeftToolbarItem_Clicked" />
+        <ToolbarItem IconImageSource="{Binding RightButtonIcon}" x:Name="RightToolbarItem"
+                 Clicked="RightToolbarItem_Clicked" />
     </ContentPage.ToolbarItems>
 
     <AbsoluteLayout BackgroundColor="Black">
@@ -164,9 +166,15 @@
                             <Label Grid.Row="1" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}" TextColor="{Binding TextColor}"/>
                             <Label Grid.Row="2" Grid.Column="1"  Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
-                            <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}">
-
-                            </ProgressBar>
+                            <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}"/>
+                            <Grid.Behaviors>
+                                <toolkit:TouchBehavior
+                                        LongPressCompleted="OnItem_LongTapped"
+                                        LongPressDuration="750" />
+                            </Grid.Behaviors>
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnItem_Tapped" />
+                            </Grid.GestureRecognizers>
 
                         </Grid>
                     </DataTemplate>
