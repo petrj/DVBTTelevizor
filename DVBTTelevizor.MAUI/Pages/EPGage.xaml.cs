@@ -11,12 +11,20 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DVBTTelevizor.MAUI;
 
+
+public enum EPGPageActiveItemEnum
+{
+    List,
+    EPG,
+    LeftButton,
+    RightButton
+}
+
 public partial class EPGPage : ContentPage, IOnKeyDown
 {
     private EPGPageViewModel _epgPageViewModel;
     private ILoggingService _loggingService;
 
-    private KeyboardFocusableItemList _focusItems;
     private bool IsPortrait { get; set; } = false;
     private Size _lastAllocatedSize = new Size(-1, -1);
 
@@ -34,7 +42,6 @@ public partial class EPGPage : ContentPage, IOnKeyDown
 
         BindingContext = _epgPageViewModel = new EPGPageViewModel(loggingService, driver, tvConfiguration, publicDirectoryProvider);
 
-        BuildFocusableItems();
     }
 
     protected override void OnSizeAllocated(double width, double height)
@@ -92,23 +99,10 @@ public partial class EPGPage : ContentPage, IOnKeyDown
 
     }
 
-    private void BuildFocusableItems()
-    {
-        _focusItems = new KeyboardFocusableItemList();
-
-        _focusItems
-            .AddItem(KeyboardFocusableItem.CreateFrom("List", new List<View>() { EPGListView }))
-            .AddItem(KeyboardFocusableItem.CreateFrom("EPG", new List<View>() { EPGDetailGrid, EventNameLabel }));
-
-
-        //_focusItems.OnItemFocusedEvent += Page_OnItemFocusedEvent;
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        _focusItems.DeFocusAll();
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
 
         Task.Run(async () =>
@@ -189,6 +183,82 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         }
     }
 
+    private void HandleListKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        _loggingService.Debug($"EPGPage HandleListKeyDown {keyAction}");
+
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Down:
+                _epgPageViewModel?.SelectNextItem();
+                break;
+            case KeyboardNavigationActionEnum.Up:
+                _epgPageViewModel?.SelectPreviousItem();
+                break;
+        }
+    }
+
+    private void HandleSwitchFocusKeyDown(KeyboardNavigationActionEnum keyAction)
+    {
+        switch (keyAction)
+        {
+            case KeyboardNavigationActionEnum.Right:
+
+                switch (_epgPageViewModel?.ActiveItem)
+                {
+                    case EPGPageActiveItemEnum.List:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.EPG;
+                        _epgPageViewModel.SelectedItem?.Focused = false;
+                        _epgPageViewModel.SelectedItem?.NotifyChanges();
+                        //_focusItems.SetFocus("EPG");
+                        break;
+                    case EPGPageActiveItemEnum.EPG:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.LeftButton;
+                        //_focusItems.SetFocus("RightButton");
+                        break;
+                    case EPGPageActiveItemEnum.LeftButton:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.RightButton;
+                        //_focusItems.SetFocus("List");
+                        break;
+                    case EPGPageActiveItemEnum.RightButton:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.List;
+                        _epgPageViewModel.SelectedItem?.Focused = true;
+                        _epgPageViewModel.SelectedItem?.NotifyChanges();
+                        //_focusItems.SetFocus("LeftButton");
+                        break;
+                }
+
+                break;
+            case KeyboardNavigationActionEnum.Left:
+
+                switch (_epgPageViewModel?.ActiveItem)
+                {
+                    case EPGPageActiveItemEnum.List:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.RightButton;
+                        _epgPageViewModel.SelectedItem?.Focused = false;
+                        _epgPageViewModel.SelectedItem?.NotifyChanges();
+                        //_focusItems.SetFocus("EPG");
+                        break;
+                    case EPGPageActiveItemEnum.EPG:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.List;
+                        _epgPageViewModel.SelectedItem?.Focused = true;
+                        _epgPageViewModel.SelectedItem?.NotifyChanges();
+                        //_focusItems.SetFocus("RightButton");
+                        break;
+                    case EPGPageActiveItemEnum.LeftButton:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.EPG;
+                        //_focusItems.SetFocus("List");
+                        break;
+                    case EPGPageActiveItemEnum.RightButton:
+                        _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.LeftButton;
+                        //_focusItems.SetFocus("LeftButton");
+                        break;
+                }
+
+                break;
+        }
+    }
+
 
     public void OnKeyDown(string key, bool longPress)
     {
@@ -196,67 +266,38 @@ public partial class EPGPage : ContentPage, IOnKeyDown
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
 
+        // handle
+        //  - left/right key actions for switching between list/epg/buttons
+        //  - back key action for going back to the previous page
+        //
         switch (keyAction)
         {
-            case KeyboardNavigationActionEnum.Down:
-                break;
-
-
             case KeyboardNavigationActionEnum.Right:
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    _focusItems.FocusNextItem(true);
-                });
-                break;
-
-            case KeyboardNavigationActionEnum.Up:
             case KeyboardNavigationActionEnum.Left:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    _focusItems.FocusPreviousItem(true);
+                    HandleSwitchFocusKeyDown(keyAction);
                 });
-                break;
-
+                Task.Run(async () => { await _epgPageViewModel.NotifyChange(); });
+                return;
             case KeyboardNavigationActionEnum.Back:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     await Navigation.PopAsync();
                 });
-                break;
+                return;
+        }
 
-            case KeyboardNavigationActionEnum.OK:
+        // handle key actions based on the active item
 
-                if (_focusItems.FocusedItem == null)
-                    return;
-
+        switch (_epgPageViewModel?.ActiveItem)
+        {
+            case EPGPageActiveItemEnum.List:
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    switch (_focusItems.FocusedItem.Name)
-                    {
-                        case "GithubLabel":
-                            GithubLabel_Tapped(this, new TappedEventArgs(null));
-                            break;
-                        case "WebLabel":
-                            Web_Tapped(this, new TappedEventArgs(null));
-                            break;
-                        case "Email":
-                            Email_Tapped(this, new TappedEventArgs(null));
-                            break;
-                        case "Donate1":
-                            _loggingService.Debug($"AboutPage: Donate1");
-                            break;
-                        case "Donate2":
-                            _loggingService.Debug($"AboutPage: Donate2");
-                            break;
-                        case "Donate3":
-                            _loggingService.Debug($"AboutPage: Donate3");
-                            break;
-                        case "Donate4":
-                            _loggingService.Debug($"AboutPage: Donate4");
-                            break;
-                    }
+                    HandleListKeyDown(keyAction);
                 });
-                break;
+                return;
         }
     }
 
@@ -264,35 +305,6 @@ public partial class EPGPage : ContentPage, IOnKeyDown
     {
         _loggingService.Debug($"AboutPage Page OnTextSent {text}");
     }
-
-    private void GithubLabel_Tapped(object sender, TappedEventArgs e)
-    {
-        _loggingService.Debug($"GithubLabel_Tapped");
-
-        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://github.com/petrj/DVBTTelevizor"));
-    }
-
-    private void Web_Tapped(object sender, TappedEventArgs e)
-    {
-        _loggingService.Debug($"Web_Tapped");
-
-        WeakReferenceMessenger.Default.Send(new OpenURLMessage("https://dvbttelevizor.petrjanousek.net/"));
-    }
-
-    private void Email_Tapped(object sender, TappedEventArgs e)
-    {
-        _loggingService.Debug($"Email_Tapped");
-    }
-
-    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        _loggingService.Debug($"OnSelectionChanged");
-        if (e.CurrentSelection.Count > 0 && e.CurrentSelection[0] is EventItem eventItem)
-        {
-            _loggingService.Debug($"Selected event: {eventItem.EventName}");
-        }
-    }
-
 
     private void OnEventItem_Tapped(object sender, TappedEventArgs e)
     {

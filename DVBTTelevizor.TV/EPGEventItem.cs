@@ -40,6 +40,19 @@ namespace DVBTTelevizor.TV
             }
         }
 
+        public string TextColor
+        {
+            get
+            {
+                //return Selected || Focused ?  "White" : "#31a3cf";
+                if (Focused)
+                {
+                    return "White";
+                }
+                return "#41b3ff";
+            }
+        }
+
         public string EventName
         {
             get => _eventItem?.EventName ?? string.Empty;
@@ -73,6 +86,7 @@ namespace DVBTTelevizor.TV
         public void NotifyChanges()
         {
             OnPropertyChanged(nameof(BackgroundColor));
+            OnPropertyChanged(nameof(TextColor));
             //OnPropertyChanged(nameof(ChannelTextLabelColor));
             //OnPropertyChanged(nameof(CurrentEPGEventTitle));
             //OnPropertyChanged(nameof(NextEPGEventTitle));

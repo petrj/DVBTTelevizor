@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="DVBTTelevizor.MAUI.EPGPage"
              xmlns:local="clr-namespace:DVBTTelevizor.MAUI"
-             xmlns:converters="clr-namespace:DVBTTelevizor.MAUI.Converters"
              BackgroundColor="Black">
 
     <NavigationPage.TitleView>
@@ -76,7 +75,6 @@
                 <Setter Property="MaxLines" Value="2"/>
                 <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
-                <Setter Property="TextColor" Value="#41b3ff"/>
             </Style>
 
             <Style x:Key="EPGTextStyle" TargetType="Label">
@@ -163,7 +161,7 @@
                             <BoxView Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Grid.ColumnSpan="2" BackgroundColor="{Binding BackgroundColor}" />
 
                             <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{Binding TimeDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding FontSizeForCaption}" />
-                            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}"/>
+                            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}" TextColor="{Binding TextColor}"/>
                             <Label Grid.Row="2" Grid.Column="1"  Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding FontSizeForLabel}"/>
 
                             <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}">
@@ -196,9 +194,11 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
-            <BoxView Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="3" x:Name="EventNameLabel" />
+            <BoxView Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="3" x:Name="EventNameLabel" BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EPGLabelBackgroundColor}"/>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForEPGTitle}" Margin="5,5,5,5"/>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding EventName}" Margin="5,5,5,5" Style="{DynamicResource EPGTitleTextStyle}"
+                   FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForEPGTitle}"
+                   TextColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EPGLabelColor}" />
 
             <Label Grid.Row="1" Grid.Column="0"  Text="{Binding StartTime, StringFormat='{}{0:HH:mm}'}"  Style="{DynamicResource TimeFromTextStyle}" />
             <Label Grid.Row="1" Grid.Column="2"  Text="{Binding FinishTime, StringFormat='{}{0:HH:mm}'}"  Style="{DynamicResource TimeToTextStyle}" />
