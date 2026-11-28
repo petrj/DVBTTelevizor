@@ -20,11 +20,11 @@ namespace DVBTTelevizor.DBManager
 
         }
 
-        public List<long> GetChannelPIDs(long freq, long programMapPID)
+        public List<long> GetChannelPIDs(string key)
         {
             var res = new List<long>();
 
-            var cachedPIDs = GetValues(freq, programMapPID);
+            var cachedPIDs = GetValues(key);
             if (cachedPIDs == null || cachedPIDs.Count == 0)
                 return res;
 
@@ -41,7 +41,7 @@ namespace DVBTTelevizor.DBManager
             return res;
         }
 
-        public void AddChannelPIDs(long freq, long programMapPID, List<long> PIDs)
+        public void AddChannelPIDs(string key, List<long> PIDs)
         {
             var channelPIDS = new List<ChannelPID>();
             foreach (var pid in PIDs)
@@ -53,7 +53,7 @@ namespace DVBTTelevizor.DBManager
                 });
             }
 
-            AddItemsToDB(freq, programMapPID, channelPIDS);
+            SaveItemsToDB(key, channelPIDS);
         }
     }
 }

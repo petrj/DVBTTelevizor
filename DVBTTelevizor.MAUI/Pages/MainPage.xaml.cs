@@ -2491,7 +2491,7 @@ namespace DVBTTelevizor.MAUI
                         signalStrengthPercentage = tunedRes.SignalState.rfStrengthPercentage;
                     }
 
-                    var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.Frequency, channel.ProgramMapPID);
+                    var cachedPIDs = _viewModel.PID.GetChannelPIDs(channel.UniqueIdentifier);
                     //var cachedPIDs = new List<long>();
 
                     if (cachedPIDs != null &&
@@ -2521,7 +2521,7 @@ namespace DVBTTelevizor.MAUI
                             return;
                         }
 
-                      _viewModel.PID.AddChannelPIDs(channel.Frequency, channel.ProgramMapPID, setupPIDsRes.PIDs);
+                      _viewModel.PID.AddChannelPIDs(channel.UniqueIdentifier, setupPIDsRes.PIDs);
                     }
 
                     // in case of play DAB channel, remember the service number for the tim ethe signal s up

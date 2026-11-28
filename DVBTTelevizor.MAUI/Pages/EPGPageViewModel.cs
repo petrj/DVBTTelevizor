@@ -266,6 +266,9 @@ namespace DVBTTelevizor.MAUI
                 OnPropertyChanged(nameof(EPGLabelColor));
                 OnPropertyChanged(nameof(LeftButtonIcon));
                 OnPropertyChanged(nameof(RightButtonIcon));
+
+                Channel?.NotifyChanges();
+                SelectedItem?.NotifyChanges();
             });
         }
 

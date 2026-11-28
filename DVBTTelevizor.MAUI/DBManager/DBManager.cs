@@ -57,12 +57,6 @@ namespace DVBTTelevizor.DBManager
             _driver = driver;
         }
 
-        public virtual void AddItemsToDB(long freq, long programMapPID, List<T> items)
-        {
-            var freqKey = GetKey(freq, programMapPID);
-            SaveItemsToDB(freqKey, items);
-        }
-
         public virtual void SaveItemsToDB(string key, List<T> items)
         {
             var dict = new Dictionary<string, List<T>>();
@@ -114,11 +108,6 @@ namespace DVBTTelevizor.DBManager
             _cts?.Dispose();
         }
 
-        protected static string GetKey(long freq, long programMapPID)
-        {
-            return $"{freq}.{programMapPID}";
-        }
-
         public virtual void ClearAll()
         {
             _log.Debug($"[IDBManager] Clear");
@@ -136,11 +125,6 @@ namespace DVBTTelevizor.DBManager
             }
         }
 
-        public virtual string GetDBFullPath(long freq, long programMapPID)
-        {
-            return GetDBFullPath(GetKey(freq, programMapPID));
-        }
-
         public virtual string GetDBFullPath(string freqKey)
         {
             var folder = Path.Combine(_publicDirectory, Key);
@@ -149,12 +133,6 @@ namespace DVBTTelevizor.DBManager
                 Directory.CreateDirectory(folder);
             }
             return Path.Combine(folder, $"{freqKey}.sqllite");
-        }
-
-        public virtual List<T> GetValues(long freq, long programMapPID)
-        {
-            var freqKey = GetKey(freq, programMapPID);
-            return GetValues(freqKey);
         }
 
         public virtual List<T> GetValues(string key)

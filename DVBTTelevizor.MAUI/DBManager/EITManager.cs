@@ -36,12 +36,6 @@ namespace DVBTTelevizor.DBManager
             }
         }
 
-        public EPGCurrentEvent GetEvent(DateTime date, long freq, long programMapPID)
-        {
-            var key = GetKey(freq, programMapPID);
-            return GetEvent(date, key);
-        }
-
         public EPGCurrentEvent GetEvent(DateTime date, string key)
         {
             var evs = GetEvents(date, key, 2);
@@ -62,12 +56,6 @@ namespace DVBTTelevizor.DBManager
             }
 
             return res;
-        }
-
-        public List<EventItem> GetEvents(DateTime date, long freq, long programMapPID, int count)
-        {
-            var key = GetKey(freq, programMapPID);
-            return GetEvents(date, key, count);
         }
 
         public List<EventItem> GetEvents(DateTime date, string key, int count)
@@ -250,7 +238,7 @@ namespace DVBTTelevizor.DBManager
                         var evCloned = ev.Value.Clone();
                         evCloned.EventId = -evCloned.EventId;
 
-                        if (AddEvent(_driver.LastTunedFreq, ev.Key, evCloned))
+                        if (AddEvent(channel.UniqueIdentifier, evCloned))
                         {
                             if (!modifiedMapPIDs.ContainsKey(channel.UniqueIdentifier))
                             {
@@ -276,7 +264,7 @@ namespace DVBTTelevizor.DBManager
 
                         foreach (var ev in sev.Value)
                         {
-                            if (AddEvent(_driver.LastTunedFreq, sev.Key, ev))
+                            if (AddEvent(channel.UniqueIdentifier, ev))
                             {
                                 if (!modifiedMapPIDs.ContainsKey(channel.UniqueIdentifier))
                                 {
@@ -310,11 +298,6 @@ namespace DVBTTelevizor.DBManager
             {
                 _scanning = false;
             }
-        }
-
-        private bool AddEvent(long freq, long programMapPID, EventItem eventItem)
-        {
-            return AddEvent(GetKey(freq, programMapPID), eventItem);
         }
 
         private bool AddEvent(string key, EventItem eventItem)

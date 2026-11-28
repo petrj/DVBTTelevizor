@@ -386,7 +386,7 @@ namespace DVBTTelevizor.MAUI
             {
                 if (EIT != null)
                 {
-                    var currEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
+                    var currEv = EIT.GetEvent(DateTime.Now, channel.UniqueIdentifier);
                     if (currEv != null)
                     {
                         channel.SetCurrentEvent(currEv);
