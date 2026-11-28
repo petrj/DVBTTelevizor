@@ -883,21 +883,27 @@ namespace DVBTTelevizor.MAUI
             });
         }
 
-        public void SelectNextChannel()
+        public void SelectNextChannel(bool jump = false)
         {
             _loggingService.Info($"Selecting next channel");
 
-            _listViewSelector?.SelectNextItem();
+            for (var i = 0; i < (jump ? 10 : 1); i++)
+            {
+                _listViewSelector?.SelectNextItem();
+            }
             NotifyChannelChange();
 
             _loggingService.Info($"... selected");
         }
 
-        public void SelectPreiousChannel()
+        public void SelectPreiousChannel(bool jump = false)
         {
             _loggingService.Info($"Selecting previous channel");
 
-            _listViewSelector?.SelectPreviousItem();
+            for (var i = 0; i < (jump ? 10 : 1); i++)
+            {
+                _listViewSelector?.SelectPreviousItem();
+            }
             NotifyChannelChange();
         }
 

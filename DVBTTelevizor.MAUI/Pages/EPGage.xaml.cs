@@ -194,9 +194,11 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         {
             case KeyboardNavigationActionEnum.Down:
                 _epgPageViewModel?.SelectNextItem();
+                Task.Run(async () => await FocusSelectedItem());
                 break;
             case KeyboardNavigationActionEnum.Up:
                 _epgPageViewModel?.SelectPreviousItem();
+                Task.Run(async () => await FocusSelectedItem());
                 break;
         }
 
@@ -260,9 +262,8 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                 {
                     case EPGPageActiveItemEnum.List:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.EPG;
-                        _epgPageViewModel.SelectedItem?.Focused = false;
-                        _epgPageViewModel.SelectedItem?.NotifyChanges();
-                        //_focusItems.SetFocus("EPG");
+                        _epgPageViewModel?.SelectedItem?.Focused = false;
+                        _epgPageViewModel?.SelectedItem?.NotifyChanges();
                         break;
                     case EPGPageActiveItemEnum.EPG:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.LeftButton;
@@ -270,13 +271,11 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                         break;
                     case EPGPageActiveItemEnum.LeftButton:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.RightButton;
-                        //_focusItems.SetFocus("List");
                         break;
                     case EPGPageActiveItemEnum.RightButton:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.List;
-                        _epgPageViewModel.SelectedItem?.Focused = true;
-                        _epgPageViewModel.SelectedItem?.NotifyChanges();
-                        //_focusItems.SetFocus("LeftButton");
+                        _epgPageViewModel?.SelectedItem?.Focused = true;
+                        _epgPageViewModel?.SelectedItem?.NotifyChanges();
                         break;
                 }
 
@@ -287,24 +286,20 @@ public partial class EPGPage : ContentPage, IOnKeyDown
                 {
                     case EPGPageActiveItemEnum.List:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.RightButton;
-                        _epgPageViewModel.SelectedItem?.Focused = false;
-                        _epgPageViewModel.SelectedItem?.NotifyChanges();
-                        //_focusItems.SetFocus("EPG");
+                        _epgPageViewModel?.SelectedItem?.Focused = false;
+                        _epgPageViewModel?.SelectedItem?.NotifyChanges();
                         break;
                     case EPGPageActiveItemEnum.EPG:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.List;
-                        _epgPageViewModel.SelectedItem?.Focused = true;
-                        _epgPageViewModel.SelectedItem?.NotifyChanges();
-                        //_focusItems.SetFocus("RightButton");
+                        _epgPageViewModel?.SelectedItem?.Focused = true;
+                        _epgPageViewModel?.SelectedItem?.NotifyChanges();
                         break;
                     case EPGPageActiveItemEnum.LeftButton:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.EPG;
                         Task.Run(async () => { await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0, 0, false); });
-                        //_focusItems.SetFocus("List");
                         break;
                     case EPGPageActiveItemEnum.RightButton:
                         _epgPageViewModel?.ActiveItem = EPGPageActiveItemEnum.LeftButton;
-                        //_focusItems.SetFocus("LeftButton");
                         break;
                 }
 
@@ -312,10 +307,73 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         }
     }
 
+    public async Task FocusSelectedItem()
+    {
+        await _epgPageViewModel.NotifyChange();
+
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            if (_epgPageViewModel.SelectedItem == null)
+            {
+                return;
+            }
+
+            try
+            {
+                _epgPageViewModel.SelectedItem.Focused = true;
+                _epgPageViewModel.SelectedItem.NotifyChanges();
+
+                EPGListView.ScrollTo(_epgPageViewModel.SelectedItem, position: ScrollToPosition.MakeVisible, animate: false);
+
+                await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(0, 0, false);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        });
+    }
+
 
     public void OnKeyDown(string key, bool longPress)
     {
         _loggingService.Debug($"EPGPage Page OnKeyDown {key}");
+
+        // handle special keys
+
+        switch (key.ToLower())
+        {
+            case "end":
+            case "moveend":
+                _epgPageViewModel?.SelectLastItem();
+                Task.Run(async () => await FocusSelectedItem());
+                return;
+            case "home":
+            case "movehome":
+                _epgPageViewModel?.SelectFirstItem();
+                Task.Run(async () => await FocusSelectedItem());
+                return;
+            case "mediafastforward":
+            case "mediaforward":
+            case "pagedown":
+                _epgPageViewModel?.SelectNextItem(true);
+                Task.Run(async () => await FocusSelectedItem());
+                return;
+            case "mediarewind":
+            case "mediafastrewind":
+            case "pageup":
+                _epgPageViewModel?.SelectPreviousItem(true);
+                Task.Run(async () => await FocusSelectedItem());
+                return;
+            case "green":
+            case "proggreen":
+            case "f10":
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Navigation.PopAsync();
+                });
+                return;
+        }
 
         var keyAction = KeyboardDeterminer.GetKeyAction(key);
 

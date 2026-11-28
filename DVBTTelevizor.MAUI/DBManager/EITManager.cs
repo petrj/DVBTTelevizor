@@ -127,7 +127,7 @@ namespace DVBTTelevizor.DBManager
 
         public async Task AddOnlineEvents(Dictionary<string, List<EventItem>> items, ObservableCollection<Channel>? Channels)
         {
-            _log.Debug($"[EIT] Adding online events {_driver.LastTunedFreq}");
+            _log.Debug($"[EIT] Adding online events");
 
             var modifiedKeys = new List<string>();
 
@@ -157,7 +157,7 @@ namespace DVBTTelevizor.DBManager
             }
         }
 
-        public async Task SaveKeyToDB(string key)
+        public async Task SaveKeyToDB(string key, bool deleteOutdated = true)
         {
             if (!_freqValues.ContainsKey(key))
             {
@@ -168,13 +168,16 @@ namespace DVBTTelevizor.DBManager
 
             // dete outdated events
 
-            //foreach (var itm in _freqValues[key])
-            //{
-            //    if (itm.FinishTime < DateTime.Now)
-            //    {
-            //        itemsToClear.Add(itm);
-            //    }
-            //}
+            if (deleteOutdated)
+            {
+                foreach (var itm in _freqValues[key])
+                {
+                    if (itm.FinishTime < DateTime.Now)
+                    {
+                        itemsToClear.Add(itm);
+                    }
+                }
+            }
 
             while (itemsToClear.Count > 0)
             {

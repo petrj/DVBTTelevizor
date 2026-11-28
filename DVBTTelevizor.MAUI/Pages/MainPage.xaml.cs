@@ -1999,7 +1999,7 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
-        public async Task ActionDown()
+        public async Task ActionDown(bool jump = false)
         {
             _loggingService.Debug($"ActionDown");
 
@@ -2014,7 +2014,7 @@ namespace DVBTTelevizor.MAUI
                     }
                     else if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
-                        _viewModel.SelectNextChannel();
+                        _viewModel.SelectNextChannel(jump);
                         await FocusSelectedChannel();
                     }
                     else if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -2041,13 +2041,13 @@ namespace DVBTTelevizor.MAUI
                 }
                 else
                 {
-                    _viewModel.SelectNextChannel();
+                    _viewModel.SelectNextChannel(jump);
                     await ActionPlay();
                 }
             }
         }
 
-        public async Task ActionUp()
+        public async Task ActionUp(bool jump = false)
         {
             _loggingService.Debug($"ActionUp");
 
@@ -2062,7 +2062,7 @@ namespace DVBTTelevizor.MAUI
                     }
                     else if (_focusItems.FocusedItemName == "ChannelsListView")
                     {
-                        _viewModel.SelectPreiousChannel();
+                        _viewModel.SelectPreiousChannel(jump);
                         await FocusSelectedChannel();
                     }
                     else if (_focusItems.FocusedItemName == "EPGDetailGrid")
@@ -2070,7 +2070,7 @@ namespace DVBTTelevizor.MAUI
                         // scroll up
                         await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                             SelectedChannelEPGDescriptionScrollView.ScrollX,
-                            SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
+                            SelectedChannelEPGDescriptionScrollView.ScrollY - (jump ? 3 : 1) * 50, false);
                     }
                     else
                     {
@@ -2084,11 +2084,11 @@ namespace DVBTTelevizor.MAUI
                     // scroll up
                     await SelectedChannelEPGDescriptionScrollView.ScrollToAsync(
                         SelectedChannelEPGDescriptionScrollView.ScrollX,
-                        SelectedChannelEPGDescriptionScrollView.ScrollY - 50, false);
+                        SelectedChannelEPGDescriptionScrollView.ScrollY - (jump ? 3 : 1) * 50, false);
                 }
                 else
                 {
-                    _viewModel.SelectPreiousChannel();
+                    _viewModel.SelectPreiousChannel(jump);
                     await ActionPlay();
                 }
             }
@@ -2957,15 +2957,21 @@ namespace DVBTTelevizor.MAUI
            Page page
            ) where T : Page
         {
-            if (page.IsLoaded)
+            try
             {
-                // preventing click when the settings page is just (or yet) loaded
+                if (page.IsLoaded)
+                {
+                    // preventing click when the settings page is just (or yet) loaded
+                    return;
+                }
+
+                await navigation.PushAsync(page);
+
                 return;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
-
-            await navigation.PushAsync(page);
-
-            return;
         }
 
         private async void SettingsButton_Clicked(object sender, EventArgs e)
@@ -3072,155 +3078,265 @@ namespace DVBTTelevizor.MAUI
                     return;
             }
 
-            Task.Run(async () =>
+            switch (key.ToLower())
             {
-                switch (key.ToLower())
-                {
-                    //case "end":
-                    //case "moveend":
-                    //    await ActionFirstOrLast(false);
-                    //    break;
-                    //case "home":
-                    //case "movehome":
-                    //    await ActionFirstOrLast(true);
-                    //    break;
-                    //case "mediafastforward":
-                    //case "mediaforward":
-                    //case "pagedown":
-                    //    await ActionKeyDown(10);
-                    //    break;
-                    //case "mediarewind":
-                    //case "mediafastrewind":
-                    //case "pageup":
-                    //    await ActionKeyUp(10);
-                    //    break;
-                    case "mediaplaypause":
-                    case "mediaplaystop":
-                        if (PlayingState == PlayingStateEnum.Stopped)
-                        {
-                            await ActionPlay();
-                        }
-                        else
-                        {
-                            await ActionStop(true);
-                        }
-                        break;
-                    case "mediastop":
-                    case "mediaclose":
+                case "end":
+                case "moveend":
+                    await _viewModel.SelectLastChannel();
+                    await FocusSelectedChannel();
+                    break;
+                case "home":
+                case "movehome":
+                    await _viewModel.SelectFirstChannel();
+                    await FocusSelectedChannel();
+                    break;
+                case "mediafastforward":
+                case "mediaforward":
+                case "pagedown":
+                    await ActionDown(true);
+                    break;
+                case "mediarewind":
+                case "mediafastrewind":
+                case "pageup":
+                    await ActionUp(true);
+                    break;
+                case "mediaplaypause":
+                case "mediaplaystop":
+                case "playpause":
+                    if (PlayingState == PlayingStateEnum.Stopped)
+                    {
+                        await ActionPlay();
+                    }
+                    else
+                    {
                         await ActionStop(true);
-                        break;
-                    case "f7":
-                    case "mediapause":
-                    case "forwarddel": // delete
-                    case "delete":
-                    case "altleft":
-                    case "minus":
-                    case "period":
-                    case "apostrophe":
-                    case "buttonselect":
-                    case "break": // pause
-                        await ActionStop(false);
-                        break;
-                    case "buttonl2":
-                    case "info":
-                    case "guide":
-                    case "i":
-                    case "g":
-                    case "numpadadd":
-                    case "buttonthumbl":
-                    case "f1":
-                    case "f8":
-                    case "menu":
-                    case "tab":
-                    case "equals":
-                    case "slash":
-                    case "backslash":
-                    case "insert":
-                    case "tvcontentsmenu":
-                        MenuButton_Clicked(this, new EventArgs());
-                        break;
-                    case "0":
-                    case "num0":
-                    case "number0":
-                        HandleNumKey(0);
-                        break;
-                    case "1":
-                    case "num1":
-                    case "number1":
-                        HandleNumKey(1);
-                        break;
-                    case "2":
-                    case "num2":
-                    case "number2":
-                        HandleNumKey(2);
-                        break;
-                    case "3":
-                    case "num3":
-                    case "number3":
-                        HandleNumKey(3);
-                        break;
-                    case "4":
-                    case "num4":
-                    case "number4":
-                        HandleNumKey(4);
-                        break;
-                    case "5":
-                    case "num5":
-                    case "number5":
-                        HandleNumKey(5);
-                        break;
-                    case "6":
-                    case "num6":
-                    case "number6":
-                        HandleNumKey(6);
-                        break;
-                    case "7":
-                    case "num7":
-                    case "number7":
-                        HandleNumKey(7);
-                        break;
-                    case "8":
-                    case "num8":
-                    case "number8":
-                        HandleNumKey(8);
-                        break;
-                    case "9":
-                    case "num9":
-                    case "number9":
-                        HandleNumKey(9);
-                        break;
-                    //case "f5":
-                    //case "numpad0":
-                    //case "green":
-                    //case "proggreen":
-                    //case "f10":
-                    //    Reset();
-                    //    Refresh();
-                    //    break;
-                    //case "record":
-                    //case "mediarecord":
-                    //case "red":
-                    //case "progred":
-                    //case "f9":
-                    //case "r":
-                    //    Device.BeginInvokeOnMainThread(async () => await _viewModel.RecordChannel(!_viewModel.IsRecording, true));
-                    //    break;
-                    //case "yellow":
-                    //case "progyellow":
-                    //case "f11":
-                    //case "l":
-                    //    _viewModel.ToggleFav();
-                    //    break;
-                    //case "blue":
-                    //case "progblue":
-                    //case "f12":
-                    //case "k":
-                    //case "leftshift":
-                    //case "shiftleft":
-                    //    ToggleAudioStream(null);
-                    //    break;
+                    }
+                    break;
+                case "mediastop":
+                case "mediaclose":
+                case "stop":
+                    await ActionStop(true);
+                    break;
+                case "f7":
+                case "mediapause":
+                case "forwarddel": // delete
+                case "delete":
+                case "altleft":
+                case "minus":
+                case "period":
+                case "apostrophe":
+                case "buttonselect":
+                case "break": // pause
+                    await ActionStop(false);
+                    break;
+                case "buttonl2":
+                case "info":
+                case "guide":
+                case "i":
+                case "g":
+                case "numpadadd":
+                case "buttonthumbl":
+                case "f1":
+                case "f8":
+                case "menu":
+                case "tab":
+                case "equals":
+                case "slash":
+                case "backslash":
+                case "insert":
+                case "tvcontentsmenu":
+                    MenuButton_Clicked(this, new EventArgs());
+                    break;
+                case "0":
+                case "num0":
+                case "number0":
+                    HandleNumKey(0);
+                    break;
+                case "1":
+                case "num1":
+                case "number1":
+                    HandleNumKey(1);
+                    break;
+                case "2":
+                case "num2":
+                case "number2":
+                    HandleNumKey(2);
+                    break;
+                case "3":
+                case "num3":
+                case "number3":
+                    HandleNumKey(3);
+                    break;
+                case "4":
+                case "num4":
+                case "number4":
+                    HandleNumKey(4);
+                    break;
+                case "5":
+                case "num5":
+                case "number5":
+                    HandleNumKey(5);
+                    break;
+                case "6":
+                case "num6":
+                case "number6":
+                    HandleNumKey(6);
+                    break;
+                case "7":
+                case "num7":
+                case "number7":
+                    HandleNumKey(7);
+                    break;
+                case "8":
+                case "num8":
+                case "number8":
+                    HandleNumKey(8);
+                    break;
+                case "9":
+                case "num9":
+                case "number9":
+                    HandleNumKey(9);
+                    break;
+                case "red":
+                case "progred":
+                case "record":
+                case "mediarecord":
+                case "f9":
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await ActionRecord();
+                    });
+                    break;
+                case "green":
+                case "proggreen":
+                case "f10":
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await EPGMenu_Tapped();
+                    });
+                    break;
+                case "yellow":
+                case "progyellow":
+                case "f11":
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        ToggleSubtitlesTrack();
+                    });
+                    break;
+                case "blue":
+                case "progblue":
+                case "f12":
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        ToggleAudioStream();
+                    });
+                    break;
+                default:
+                    WeakReferenceMessenger.Default.Send(new ToastMessage($"Unbound key: {key}"));
+                    break;
+            }
+
+        }
+
+        private void ToggleAudioStream()
+        {
+            try
+            {
+                if (videoView.MediaPlayer == null || videoView == null)
+                {
+                    return;
                 }
-            });
+
+                // checking stopped stream
+                if (!videoView.MediaPlayer.IsPlaying ||
+                    _viewModel.SelectedChannel == null)
+                {
+                    return;
+                }
+
+                var actualId = videoView.MediaPlayer.AudioTrack;
+
+                var foundActual = false;
+                int firstAudioTrack = -1;
+
+
+                foreach (var track in _viewModel.SelectedChannel.AudioTracks)
+                {
+                    if (firstAudioTrack == -1)
+                    {
+                        firstAudioTrack = track.Key;
+                    }
+
+                    if (!foundActual)
+                    {
+                        if (actualId == track.Key)
+                        {
+                            foundActual = true;
+                        }
+                    } else
+                    {
+                        SetAudio($"setAudio:{track.Key}");
+                        return;
+                    }
+                }
+
+                SetAudio($"setAudio:{firstAudioTrack}");
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
+        }
+
+        private void ToggleSubtitlesTrack()
+        {
+            try
+            {
+                if (videoView.MediaPlayer == null)
+                {
+                    return;
+                }
+
+                // checking stopped stream
+                if (!videoView.MediaPlayer.IsPlaying ||
+                    _viewModel.SelectedChannel == null)
+                {
+                    return;
+                }
+
+                var actualId = videoView.MediaPlayer.Spu;
+
+                var foundActual = false;
+                int firstTrack = -1;
+
+
+                foreach (var track in _viewModel.SelectedChannel.Subtitles)
+                {
+                    if (firstTrack == -1)
+                    {
+                        firstTrack = track.Key;
+                    }
+
+                    if (!foundActual)
+                    {
+                        if (actualId == track.Key)
+                        {
+                            foundActual = true;
+                        }
+                    }
+                    else
+                    {
+                        SetSubtitles($"setSubtitles::{track.Key}");
+                        return;
+                    }
+                }
+
+                SetSubtitles($"setSubtitles::{firstTrack}");
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Error(ex);
+            }
         }
 
         private void HandleNumKey(int number)
@@ -3778,7 +3894,12 @@ namespace DVBTTelevizor.MAUI
                         )
                     {
                         _loggingService.Info($"Changing audio track to: {desc.Id} ({desc.Name})");
-                        videoView.MediaPlayer.SetAudioTrack(desc.Id);
+
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            videoView.MediaPlayer.SetAudioTrack(desc.Id);
+                        });
+
                         WeakReferenceMessenger.Default.Send(new ToastMessage("Changing audio track: ".Translated() + desc.Name));
 
                         if (_viewModel.SelectedChannel != null)
@@ -4101,7 +4222,7 @@ namespace DVBTTelevizor.MAUI
 
                 if (_viewModel.EPGDetailVisible)
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide program info".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuHideEPG", "Hide program info".Translated(), "programinfo.png"));
                 }
                 else
                 {

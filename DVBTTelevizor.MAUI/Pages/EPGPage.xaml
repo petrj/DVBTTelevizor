@@ -85,7 +85,7 @@
                 <Setter Property="FontAttributes" Value="Bold"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="MaxLines" Value="2"/>
-                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Margin" Value="25,0,0,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
             </Style>
 
@@ -94,7 +94,7 @@
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="FontAttributes" Value="Italic"/>
                 <Setter Property="MaxLines" Value="1"/>
-                <Setter Property="Margin" Value="15,0,0,0"/>
+                <Setter Property="Margin" Value="50,0,0,0"/>
                 <Setter Property="Padding" Value="0,0,0,0"/>
                 <Setter Property="TextColor" Value="White"/>
                 <Setter Property="LineBreakMode" Value="TailTruncation"/>
@@ -164,23 +164,23 @@
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
                                 <RowDefinition Height="1" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="20*" />
-                                <ColumnDefinition Width="30*" />
-                                <ColumnDefinition Width="50*" />
+                                <ColumnDefinition Width="100*" />
                             </Grid.ColumnDefinitions>
 
-                            <BoxView Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Grid.ColumnSpan="3" BackgroundColor="{Binding BackgroundColor}" />
+                            <BoxView Grid.Row="0" Grid.Column="0"  Grid.RowSpan="5" BackgroundColor="{Binding BackgroundColor}" />
 
-                            <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{Binding TimeDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}" />
-                            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding DateDescription}" Style="{DynamicResource DateTextStyle}"  FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForDetailNote}" />
+                            <Label Grid.Row="0" Grid.Column="0"  Text="{Binding TimeDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}" />
 
-                            <Label Grid.Row="1" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForCaption}" TextColor="{Binding TextColor}"/>
-                            <Label Grid.Row="2" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}"/>
+                            <Label Grid.Row="1" Grid.Column="0"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForCaption}" TextColor="{Binding TextColor}"/>
+                            <Label Grid.Row="2" Grid.Column="0"  Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}"/>
 
-                            <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}"/>
+                            <Label Grid.Row="3" Grid.Column="0"  Text="{Binding DateDescription}" Style="{DynamicResource DateTextStyle}"  FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForDetailNote}" />
+
+                            <ProgressBar Grid.Row="4" Grid.Column="0" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}"/>
                             <Grid.Behaviors>
                                 <toolkit:TouchBehavior
                                         LongPressCompleted="OnItem_LongTapped"

@@ -105,9 +105,22 @@ namespace DVBTTelevizor.MAUI
             Channel = _channelsListViewSelector?.GetSelectedItem() as Channel;
         }
 
-        public void SelectNextItem()
+        public void SelectNextItem(bool jump = false)
         {
-            _eventItemsListViewSelector?.SelectNextItem();
+            for (var i = 0; i < (jump ? 10 : 1); i++)
+            {
+                _eventItemsListViewSelector?.SelectNextItem();
+            }
+        }
+
+        public void SelectLastItem()
+        {
+            _eventItemsListViewSelector?.SelectLastItem();
+        }
+
+        public void SelectFirstItem()
+        {
+            _eventItemsListViewSelector?.SelectFirstItem();
         }
 
         public void SelectItem(EPGEventItem item)
@@ -115,9 +128,12 @@ namespace DVBTTelevizor.MAUI
             _eventItemsListViewSelector?.SetSelectedItem(item);
         }
 
-        public void SelectPreviousItem()
+        public void SelectPreviousItem(bool jump = false)
         {
-            _eventItemsListViewSelector?.SelectPreviousItem();
+            for (var i = 0; i < (jump ? 10 : 1); i++)
+            {
+                _eventItemsListViewSelector?.SelectPreviousItem();
+            }
         }
 
         private async Task RefreshAsync()
