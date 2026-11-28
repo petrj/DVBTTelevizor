@@ -128,6 +128,7 @@ namespace DVBTTelevizor.MAUI
         public static Dictionary<Type, Page> Pages { get; set; }  = new Dictionary<Type, Page>();
 
         private bool _autostarted = false;
+        private bool _epgPageDisappearingHandled = false;
 
         public MainPage(ILoggingProvider loggingProvider, IPublicDirectoryProvider publicDirectoryProvider, ITVConfiguration tvConfiguration, IRTLSDRDriverPlatformImplementation sdrDriverPlatformImplementation)
         {
@@ -3534,14 +3535,18 @@ namespace DVBTTelevizor.MAUI
                 return;
             }
 
+            if (!_epgPageDisappearingHandled)
+            {
+                epgPage.Disappearing += delegate { Task.Run(async () => await FocusSelectedChannel()); };
+                _epgPageDisappearingHandled = true;
+            }
+
             epgPage.Channels = _viewModel.Channels;
             epgPage.EIT = _viewModel.EIT;
             epgPage.IPTV = _viewModel.IPTV;
             epgPage.Channel = _viewModel.SelectedChannel;
 
-            epgPage.Disappearing += delegate { Task.Run(async () => await FocusSelectedChannel()); };
-
-            //await MainPage.ShowPage<EPGPage>(Navigation, epgPage);
+            await epgPage.Refresh();
         }
 
         private async Task AudioMenu_Tapped()

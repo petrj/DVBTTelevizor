@@ -501,7 +501,7 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                var res = await EIT.Scan(msScanTimeOut);
+                var res = await EIT.Scan(Channels, msScanTimeOut);
 
                 if (!justPlaying)
                 {

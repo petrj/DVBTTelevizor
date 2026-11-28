@@ -13,16 +13,17 @@
             HorizontalOptions="Start">
             <Image
                 Source="{Binding Channel.Icon}"
-                HeightRequest="24"
-                WidthRequest="24"
+                HeightRequest="50"
+                WidthRequest="50"
                 Aspect="AspectFit"
                 VerticalOptions="Center" />
             <Label
                 Text="{Binding Channel.Name}"
                 TextColor="White"
-                FontSize="18"
+                FontSize="{Binding FontSizeForCaption}"
                 VerticalTextAlignment="Center"
-                VerticalOptions="Center" />
+                VerticalOptions="Center"
+                Margin="0,0,0,0"/>
         </HorizontalStackLayout>
     </NavigationPage.TitleView>
 
@@ -62,6 +63,16 @@
                 <Setter Property="TextColor" Value="SpringGreen"/>
                 <Setter Property="VerticalTextAlignment" Value="Start"/>
                 <Setter Property="HorizontalOptions" Value="Start"/>
+                <Setter Property="FontAttributes" Value="None"/>
+                <Setter Property="LineBreakMode" Value="NoWrap"/>
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Padding" Value="0,0,0,0"/>
+            </Style>
+
+            <Style x:Key="DateTextStyle" TargetType="Label">
+                <Setter Property="TextColor" Value="LightGreen"/>
+                <Setter Property="VerticalTextAlignment" Value="Start"/>
+                <Setter Property="HorizontalOptions" Value="End"/>
                 <Setter Property="FontAttributes" Value="None"/>
                 <Setter Property="LineBreakMode" Value="NoWrap"/>
                 <Setter Property="Margin" Value="5,0,5,0"/>
@@ -157,16 +168,19 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="20*" />
-                                <ColumnDefinition Width="80*" />
+                                <ColumnDefinition Width="30*" />
+                                <ColumnDefinition Width="50*" />
                             </Grid.ColumnDefinitions>
 
-                            <BoxView Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Grid.ColumnSpan="2" BackgroundColor="{Binding BackgroundColor}" />
+                            <BoxView Grid.Row="0" Grid.Column="0"  Grid.RowSpan="4" Grid.ColumnSpan="3" BackgroundColor="{Binding BackgroundColor}" />
 
-                            <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{Binding TimeDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding FontSizeForCaption}" />
-                            <Label Grid.Row="1" Grid.Column="1"  Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForCaption}" TextColor="{Binding TextColor}"/>
-                            <Label Grid.Row="2" Grid.Column="1"  Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding FontSizeForLabel}"/>
+                            <Label Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Text="{Binding TimeDescription}" Style="{DynamicResource TimeTextStyle}"  FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}" />
+                            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding DateDescription}" Style="{DynamicResource DateTextStyle}"  FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForDetailNote}" />
 
-                            <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}"/>
+                            <Label Grid.Row="1" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding EventName}" Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForCaption}" TextColor="{Binding TextColor}"/>
+                            <Label Grid.Row="2" Grid.Column="1"  Grid.ColumnSpan="2" Text="{Binding Text}" Style="{DynamicResource EPGTextStyle}" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}"/>
+
+                            <ProgressBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Progress="{Binding Progress}" Style="{DynamicResource ProgressStyle}"/>
                             <Grid.Behaviors>
                                 <toolkit:TouchBehavior
                                         LongPressCompleted="OnItem_LongTapped"
@@ -223,7 +237,7 @@
             </Grid>
 
             <ScrollView x:Name="SelectedChannelEPGDescriptionScrollView" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BackgroundColor="Black" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="5,5,5,5" VerticalScrollBarVisibility="Always" >
-                    <Label x:Name="LabelChannelEPGDescription" Text="{Binding Text}"  Style="{DynamicResource DescriptionTextStyle}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"/>
+                <Label x:Name="LabelChannelEPGDescription" Text="{Binding Text}"  Style="{DynamicResource DescriptionTextStyle}" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" FontSize="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FontSizeForLabel}"/>
             </ScrollView>
 
         </Grid>

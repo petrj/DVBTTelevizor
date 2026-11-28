@@ -63,6 +63,25 @@ namespace DVBTTelevizor.TV
             get => _eventItem?.TimeDescription ?? string.Empty;
         }
 
+        public string DateDescription
+        {
+            get
+            {
+
+                if (_eventItem == null)
+                {
+                    return string.Empty;
+                }
+
+                if (_eventItem.FinishTime == DateTime.MinValue || _eventItem.StartTime == DateTime.MinValue || _eventItem.FinishTime == DateTime.MaxValue || _eventItem.StartTime == DateTime.MaxValue)
+                {
+                    return string.Empty;
+                }
+
+                return $"{_eventItem.StartTime:d.M.yy}";
+            }
+        }
+
         public string Text
         {
             get => _eventItem?.Text ?? string.Empty;
@@ -87,12 +106,9 @@ namespace DVBTTelevizor.TV
         {
             OnPropertyChanged(nameof(BackgroundColor));
             OnPropertyChanged(nameof(TextColor));
-            //OnPropertyChanged(nameof(ChannelTextLabelColor));
-            //OnPropertyChanged(nameof(CurrentEPGEventTitle));
-            //OnPropertyChanged(nameof(NextEPGEventTitle));
-            //OnPropertyChanged(nameof(CurrentEPGEventTime));
-            //OnPropertyChanged(nameof(CurrentEPGEventProgress));
-            //OnPropertyChanged(nameof(ProviderNameAndFrequencyShortLabel));
+            OnPropertyChanged(nameof(DateDescription));
+            OnPropertyChanged(nameof(TimeDescription));
+            OnPropertyChanged(nameof(EventName));
         }
     }
 }

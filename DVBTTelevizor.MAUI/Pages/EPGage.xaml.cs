@@ -107,16 +107,15 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         base.OnAppearing();
 
         MainPage.SetToolBarColors(Parent as NavigationPage, Colors.White, Color.FromArgb("#29242a"));
+    }
 
-        Task.Run(async () =>
+    public async Task Refresh()
+    {
+        await _epgPageViewModel.RefreshOnlineEvents();
+        if (_epgPageViewModel?.RefreshCommand?.CanExecute(null) == true)
         {
-            if (_epgPageViewModel?.RefreshCommand?.CanExecute(null) == true)
-            {
-                await _epgPageViewModel.RefreshOnlineEvents();
-                await _epgPageViewModel.RefreshCommand.ExecuteAsync(null);
-            }
-        });
-
+            await _epgPageViewModel.RefreshCommand.ExecuteAsync(null);
+        }
     }
 
     public Channel? Channel

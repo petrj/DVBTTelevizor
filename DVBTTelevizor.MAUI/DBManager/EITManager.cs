@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace DVBTTelevizor.DBManager
 {
     public class EITManager : DBManager<EventItem>
@@ -139,6 +140,9 @@ namespace DVBTTelevizor.DBManager
         public async Task AddOnlineEvents(Dictionary<string, List<EventItem>> items, ObservableCollection<Channel>? Channels)
         {
             _log.Debug($"[EIT] Adding online events {_driver.LastTunedFreq}");
+
+            var modifiedKeys = new List<string>();
+
             foreach (var channelKey in items.Keys)
             {
                 // find online channel by key
@@ -152,10 +156,16 @@ namespace DVBTTelevizor.DBManager
 
                 foreach (var ev in items[channelKey])
                 {
-                    AddEvent(channel.UniqueIdentifier, ev);
+                    if (AddEvent(channel.UniqueIdentifier, ev))
+                    {
+                        modifiedKeys.Add(channel.UniqueIdentifier);
+                    }
                 }
+            }
 
-                await SaveKeyToDB(channel.UniqueIdentifier);
+            foreach (var key in modifiedKeys.Distinct())
+            {
+                await SaveKeyToDB(key);
             }
         }
 
@@ -188,7 +198,7 @@ namespace DVBTTelevizor.DBManager
 
         }
 
-        public async Task<EITScanResult> Scan(int msTimeout = 2000)
+        public async Task<EITScanResult> Scan(ObservableCollection<Channel>? channels, int msTimeout = 2000)
         {
             if (_driver == null)
             {
@@ -228,15 +238,23 @@ namespace DVBTTelevizor.DBManager
                     // adding current events with negative ID
                     foreach (var ev in scanRes.CurrentEvents)
                     {
+                        // find online channel by key
+                        var channel = channels?.FirstOrDefault(c => (c.Frequency == _driver.LastTunedFreq) && (c.ProgramMapPID == ev.Key));
+
+                        if (channel == null)
+                        {
+                            _log.Debug($"[EIT] Channel not found for freq {_driver.LastTunedFreq} and programMapPID {ev.Key}");
+                            continue;
+                        }
+
                         var evCloned = ev.Value.Clone();
                         evCloned.EventId = -evCloned.EventId;
 
                         if (AddEvent(_driver.LastTunedFreq, ev.Key, evCloned))
                         {
-                            var key = GetKey(_driver.LastTunedFreq, ev.Key);
-                            if (!modifiedMapPIDs.ContainsKey(key))
+                            if (!modifiedMapPIDs.ContainsKey(channel.UniqueIdentifier))
                             {
-                                modifiedMapPIDs.Add(key, null);
+                                modifiedMapPIDs.Add(channel.UniqueIdentifier, null);
                             }
                         }
                     }
@@ -247,14 +265,22 @@ namespace DVBTTelevizor.DBManager
                     // adding scheduled events
                     foreach (var sev in scanRes.ScheduledEvents)
                     {
+                        // find online channel by key
+                        var channel = channels?.FirstOrDefault(c => (c.Frequency == _driver.LastTunedFreq) && (c.ProgramMapPID == sev.Key));
+
+                        if (channel == null)
+                        {
+                            _log.Debug($"[EIT] Channel not found for freq {_driver.LastTunedFreq} and programMapPID {sev.Key}");
+                            continue;
+                        }
+
                         foreach (var ev in sev.Value)
                         {
                             if (AddEvent(_driver.LastTunedFreq, sev.Key, ev))
                             {
-                                var key = GetKey(_driver.LastTunedFreq, sev.Key);
-                                if (!modifiedMapPIDs.ContainsKey(key))
+                                if (!modifiedMapPIDs.ContainsKey(channel.UniqueIdentifier))
                                 {
-                                    modifiedMapPIDs.Add(key, null);
+                                    modifiedMapPIDs.Add(channel.UniqueIdentifier, null);
                                 }
                             }
                         }
@@ -263,7 +289,7 @@ namespace DVBTTelevizor.DBManager
 
                 foreach (var kvp in modifiedMapPIDs)
                 {
-                    SaveKeyToDB(kvp.Key);
+                    await SaveKeyToDB(kvp.Key);
                 }
 
                 return new EITScanResult()
