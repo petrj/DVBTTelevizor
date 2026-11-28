@@ -151,6 +151,7 @@ namespace DVBTTelevizor.MAUI
             {
                 Task.Run(async () =>
                 {
+                    await RefreshOnlineEPGEvents();
                     await RefreshEPG();
                 });
             });
@@ -358,8 +359,8 @@ namespace DVBTTelevizor.MAUI
 
             try
             {
-                EIT.Clear();
-                PID.Clear();
+                EIT.ClearAll();
+                PID.ClearAll();
 
                 _loggingService.Debug($"Cache cleared");
 
@@ -371,6 +372,7 @@ namespace DVBTTelevizor.MAUI
             }
             finally
             {
+                await RefreshOnlineEPGEvents();
                 await RefreshEPG();
             }
         }
@@ -551,6 +553,21 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        private async Task RefreshOnlineEPGEvents()
+        {
+            if (_configuration.SledovaniTVEnabled && IPTV != null)
+            {
+                //var epg = await IPTV.GetActualEPG();
+
+                var iptvEvents = await IPTV.GetEPG();   // default = 180 min
+
+                if (iptvEvents != null && iptvEvents.Count > 0)
+                {
+                    await EIT?.AddOnlineEvents(iptvEvents, Channels);
+                }
+            }
+        }
+
         private async Task RefreshEPG()
         {
             _loggingService.Debug($"RefreshEPG");
@@ -558,11 +575,12 @@ namespace DVBTTelevizor.MAUI
             try
             {
                 IsRefreshing = true;
+
                 await _semaphoreSlim.WaitAsync();
 
                 foreach (var channel in Channels)
                 {
-                    var channelEv = EIT.GetEvent(DateTime.Now, channel.Frequency, channel.ProgramMapPID);
+                    var channelEv = EIT.GetEvent(DateTime.Now, channel.UniqueIdentifier);
                     if (channelEv != null)
                     {
                         channel.ClearEPG();
@@ -571,23 +589,6 @@ namespace DVBTTelevizor.MAUI
                     }
                 }
 
-                if (_configuration.SledovaniTVEnabled && IPTV != null)
-                {
-                    var epg = await IPTV.GetActualEPG();
-
-                    foreach (var channel in Channels)
-                    {
-                        if ((channel.ChannelType == ChannelTypeEnum.SledovaniTV) &&
-                            (channel.ChannelId != null) &&
-                            (epg.ContainsKey(channel.ChannelId))
-                            )
-                        {
-                            channel.ClearEPG();
-                            channel.SetCurrentEvent(epg[channel.ChannelId]);
-                            channel.NotifyChanges();
-                        }
-                    }
-                }
             }
             catch (Exception ex)
             {

@@ -112,6 +112,7 @@ public partial class EPGPage : ContentPage, IOnKeyDown
         {
             if (_epgPageViewModel?.RefreshCommand?.CanExecute(null) == true)
             {
+                await _epgPageViewModel.RefreshOnlineEvents();
                 await _epgPageViewModel.RefreshCommand.ExecuteAsync(null);
             }
         });

@@ -5,6 +5,7 @@ using SQLite;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -36,7 +37,13 @@ namespace DVBTTelevizor.DBManager
 
         public EPGCurrentEvent GetEvent(DateTime date, long freq, long programMapPID)
         {
-            var evs = GetEvents(date, freq, programMapPID, 2);
+            var key = GetKey(freq, programMapPID);
+            return GetEvent(date, key);
+        }
+
+        public EPGCurrentEvent GetEvent(DateTime date, string key)
+        {
+            var evs = GetEvents(date, key, 2);
 
             if (evs == null || evs.Count == 0)
                 return null;
@@ -56,10 +63,15 @@ namespace DVBTTelevizor.DBManager
             return res;
         }
 
-
         public List<EventItem> GetEvents(DateTime date, long freq, long programMapPID, int count)
         {
-            var events = GetValues(freq, programMapPID);
+            var key = GetKey(freq, programMapPID);
+            return GetEvents(date, key, count);
+        }
+
+        public List<EventItem> GetEvents(DateTime date, string key, int count)
+        {
+            var events = GetValues(key);
 
             if (events == null || events.Count == 0)
             {
@@ -124,52 +136,56 @@ namespace DVBTTelevizor.DBManager
             }
         }
 
-        public async Task AddOnlineEvents(Dictionary<string, List<EventItem>> items)
+        public async Task AddOnlineEvents(Dictionary<string, List<EventItem>> items, ObservableCollection<Channel>? Channels)
         {
             _log.Debug($"[EIT] Adding online events {_driver.LastTunedFreq}");
-            foreach (var key in items.Keys)
+            foreach (var channelKey in items.Keys)
             {
-                foreach (var ev in items[key])
+                // find online channel by key
+                var channel = Channels?.FirstOrDefault(c => (c.ChannelType == ChannelTypeEnum.SledovaniTV) && (c.ChannelId == channelKey));
+
+                if (channel == null)
                 {
-                    AddEvent(key, ev);
+                    _log.Debug($"[EIT] Channel not found for key {channelKey}");
+                    continue;
                 }
+
+                foreach (var ev in items[channelKey])
+                {
+                    AddEvent(channel.UniqueIdentifier, ev);
+                }
+
+                await SaveKeyToDB(channel.UniqueIdentifier);
             }
         }
 
-        public async void ClearOutdatedEvents(string? key = null)
+        public async Task SaveKeyToDB(string key)
         {
-            var keys = new List<string>();
-
-            if (key != null)
+            if (!_freqValues.ContainsKey(key))
             {
-                keys = new List<string> { key };
-            }
-            else
-            {
-                keys = _freqValues.Keys.ToList();
+                return;
             }
 
-            // clearing outdated?
-            foreach (var k in keys)
+            var itemsToClear = new List<EventItem>();
+
+            // dete outdated events
+
+            //foreach (var itm in _freqValues[key])
+            //{
+            //    if (itm.FinishTime < DateTime.Now)
+            //    {
+            //        itemsToClear.Add(itm);
+            //    }
+            //}
+
+            while (itemsToClear.Count > 0)
             {
-                var itemsToClear = new List<EventItem>();
-
-                foreach (var itm in _freqValues[k])
-                {
-                    if (itm.FinishTime < DateTime.Now)
-                    {
-                        itemsToClear.Add(itm);
-                    }
-                }
-
-                while (itemsToClear.Count > 0)
-                {
-                    _freqValues[k].Remove(itemsToClear[0]);
-                    itemsToClear.RemoveAt(0);
-                }
-
-                AddItemsToDB(k, _freqValues[k]);
+                _freqValues[key].Remove(itemsToClear[0]);
+                itemsToClear.RemoveAt(0);
             }
+
+            SaveItemsToDB(key, _freqValues[key]);
+
         }
 
         public async Task<EITScanResult> Scan(int msTimeout = 2000)
@@ -247,7 +263,7 @@ namespace DVBTTelevizor.DBManager
 
                 foreach (var kvp in modifiedMapPIDs)
                 {
-                    ClearOutdatedEvents(kvp.Key);
+                    SaveKeyToDB(kvp.Key);
                 }
 
                 return new EITScanResult()

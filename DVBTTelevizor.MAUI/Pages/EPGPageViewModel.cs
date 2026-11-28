@@ -133,6 +133,19 @@ namespace DVBTTelevizor.MAUI
             }
         }
 
+        public async Task RefreshOnlineEvents()
+        {
+            if (IPTV != null)
+            {
+                var iptvEvents = await IPTV.GetEPG(24 * 60);   // 24*60
+
+                if (iptvEvents != null && iptvEvents.Count > 0)
+                {
+                    await EIT?.AddOnlineEvents(iptvEvents, Channels);
+                }
+            }
+        }
+
         private async Task Refresh()
         {
             try
@@ -142,42 +155,14 @@ namespace DVBTTelevizor.MAUI
                     return;
                 }
 
-                List<EventItem> events;
-
-                if (_channel.ChannelType == ChannelTypeEnum.SledovaniTV)
-                {
-                    events = new List<EventItem>();
-
-                    if (IPTV != null && !string.IsNullOrWhiteSpace(_channel.ChannelId))
-                    {
-                        // TODO cahce EPG data for a channel to avoid unnecessary network requests
-                        //
-                        var iptvEvents = await IPTV.GetEPG(24 * 60);   // 24*60
-
-                        //EIT?.AddOnlineEvents(iptvEvents);
-
-                        if (iptvEvents.TryGetValue(_channel.ChannelId, out var channelEvents))
-                        {
-                            events = channelEvents
-                                .OrderBy(eventItem => eventItem.StartTime)
-                                .Take(100)
-                                .ToList();
-                        }
-                    }
-                }
-                else
-                {
-                    events = EIT?.GetEvents(
+                var events = EIT?.GetEvents(
                         DateTime.Now,
-                        _channel.Frequency,
-                        _channel.ProgramMapPID,
+                        _channel.UniqueIdentifier,
                         100) ?? new List<EventItem>();
-                }
+
 
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    var selectedItemUniqueIdentifier = SelectedItem?.UniqueIdentifier;
-
                     var selectedItem = SelectedItem;
                     var selectFirst = false;
                     if (selectedItem == null && EventItems?.Count > 0)

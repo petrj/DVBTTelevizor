@@ -60,10 +60,10 @@ namespace DVBTTelevizor.DBManager
         public virtual void AddItemsToDB(long freq, long programMapPID, List<T> items)
         {
             var freqKey = GetKey(freq, programMapPID);
-            AddItemsToDB(freqKey, items);
+            SaveItemsToDB(freqKey, items);
         }
 
-        public virtual void AddItemsToDB(string key, List<T> items)
+        public virtual void SaveItemsToDB(string key, List<T> items)
         {
             var dict = new Dictionary<string, List<T>>();
             dict.Add(key, items);
@@ -119,7 +119,7 @@ namespace DVBTTelevizor.DBManager
             return $"{freq}.{programMapPID}";
         }
 
-        public virtual void Clear()
+        public virtual void ClearAll()
         {
             _log.Debug($"[IDBManager] Clear");
 
@@ -182,8 +182,6 @@ namespace DVBTTelevizor.DBManager
                 {
                     return null;
                 }
-
-                // adding to cache
 
                 var db = new SQLiteConnection(dbPath);
 
