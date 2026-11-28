@@ -146,7 +146,7 @@
 
         <RefreshView
                x:Name="EPGRefreshView"
-               AbsoluteLayout.LayoutBounds="0.0, 0.0, 0.5, 1.0"
+               AbsoluteLayout.LayoutBounds="0.0, 0.0, 0.3, 1.0"
                AbsoluteLayout.LayoutFlags="All"
                Command="{Binding RefreshCommand}"
                IsRefreshing="{Binding IsRefreshing}">
@@ -200,7 +200,7 @@
         <Grid
             x:Name="EPGDetailGrid"
             BindingContext="{Binding SelectedItem}"
-            AbsoluteLayout.LayoutBounds="1.0, 1.0, 1.0, 0.5"
+            AbsoluteLayout.LayoutBounds="1.0, 1.0, 1.0, 0.7"
             AbsoluteLayout.LayoutFlags="All"
             BackgroundColor="#262626"
             Margin="0,0,0,0"

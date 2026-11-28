@@ -230,7 +230,11 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5"/>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding SelectedChannelEPGTitle}"  Style="{DynamicResource EPGTitleTextStyle}" FontSize="{Binding FontSizeForEPGTitle}" TextColor="{Binding EPGDetailGridLabelTextColor}" BackgroundColor="{Binding EPGDetailGridLabelBackgroundColor}" Margin="5,5,5,5">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEPGLabel_Tapped" />
+                </Label.GestureRecognizers>
+            </Label>
 
             <Label Grid.Row="1" Grid.Column="0"  Text="{Binding SelectedChannelEPGTimeStart}"  Style="{DynamicResource TimeFromTextStyle}" FontSize="{Binding FontSizeForTime}"/>
             <Label Grid.Row="1" Grid.Column="2"  Text="{Binding SelectedChannelEPGTimeFinish}"  Style="{DynamicResource TimeToTextStyle}" FontSize="{Binding FontSizeForTime}" />

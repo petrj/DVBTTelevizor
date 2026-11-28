@@ -1883,6 +1883,12 @@ namespace DVBTTelevizor.MAUI
                         TuneButton_Clicked(this, new EventArgs());
                     });
                     break;
+                case "EPGDetailGrid":
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await EPGMenu_Tapped();
+                    });
+                    break;
             }
         }
 
@@ -4099,7 +4105,7 @@ namespace DVBTTelevizor.MAUI
                 }
                 else
                 {
-                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show program info".Translated(), "epg.png"));
+                    _menuItems.Add(MainMenu.CreateMenuItem("menuShowEPG", "Show program info".Translated(), "programinfo.png"));
                 }
 
                 _menuItems.Add(MainMenu.CreateMenuItem("menuEPG", "EPG".Translated(), "epg.png"));
@@ -4199,6 +4205,12 @@ namespace DVBTTelevizor.MAUI
         private async void FMDABDriverButton_Clicked(object sender, EventArgs e)
         {
             await Browser.OpenAsync("https://play.google.com/store/apps/details?id=marto.rtl_tcp_andro", BrowserLaunchMode.External);
+        }
+
+        private async void OnEPGLabel_Tapped(object sender, TappedEventArgs e)
+        {
+            _loggingService.Info("OnEPGLabel_Tapped");
+            await EPGMenu_Tapped();
         }
 
         private void OnChannel_Tapped(object sender, TappedEventArgs e)

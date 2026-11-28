@@ -102,6 +102,22 @@ namespace DVBTTelevizor.TV
             get => EventID;
         }
 
+        public double Progress
+        {
+            get => _eventItem?.Progress ?? 0.0;
+        }
+
+        public string StartTime
+        {
+            get => _eventItem?.StartTime == null ? String.Empty : _eventItem?.StartTime.ToString("HH:mm");
+        }
+
+        public string FinishTime
+        {
+            get => _eventItem?.FinishTime == null ? String.Empty : _eventItem?.FinishTime.ToString("HH:mm");
+        }
+
+
         public void NotifyChanges()
         {
             OnPropertyChanged(nameof(BackgroundColor));
@@ -109,6 +125,9 @@ namespace DVBTTelevizor.TV
             OnPropertyChanged(nameof(DateDescription));
             OnPropertyChanged(nameof(TimeDescription));
             OnPropertyChanged(nameof(EventName));
+            OnPropertyChanged(nameof(StartTime));
+            OnPropertyChanged(nameof(FinishTime));
+            OnPropertyChanged(nameof(Progress));
         }
     }
 }

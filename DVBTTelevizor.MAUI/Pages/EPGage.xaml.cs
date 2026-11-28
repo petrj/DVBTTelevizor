@@ -29,11 +29,11 @@ public partial class EPGPage : ContentPage, IOnKeyDown
     private bool IsPortrait { get; set; } = false;
     private Size _lastAllocatedSize = new Size(-1, -1);
 
-    private Rect LandscapeItemsPosition { get; } = new Rect(0.0, 1.0, 0.5, 1.0);
-    private Rect LandscapeDetailPosition { get; } = new Rect(1.0, 1.0, 0.5, 1.0);
+    private Rect LandscapeItemsPosition { get; } = new Rect(0.0, 1.0, 0.3, 1.0);
+    private Rect LandscapeDetailPosition { get; } = new Rect(1.0, 1.0, 0.7, 1.0);
 
-    private Rect PortraitItemsPosition { get; } = new Rect(0.0, 0.0, 1.0, 0.5);
-    private Rect PortraitDetailPosition { get; } = new Rect(1.0, 1.0, 1.0, 0.5);
+    private Rect PortraitItemsPosition { get; } = new Rect(0.0, 0.0, 1.0, 0.3);
+    private Rect PortraitDetailPosition { get; } = new Rect(1.0, 1.0, 1.0, 0.7);
 
     private DateTime _lastLongTappedTime = DateTime.MinValue;
 
