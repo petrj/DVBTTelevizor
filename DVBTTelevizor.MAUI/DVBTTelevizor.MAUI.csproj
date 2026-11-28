@@ -34,10 +34,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-		<ApplicationVersion>2026036</ApplicationVersion>
-		<VersionCode>2026036</VersionCode>
-		<VersionName>2026036</VersionName>
-		<ApplicationDisplayVersion>2026036</ApplicationDisplayVersion>
+		<ApplicationVersion>2026037</ApplicationVersion>
+		<VersionCode>2026037</VersionCode>
+		<VersionName>2026037</VersionName>
+		<ApplicationDisplayVersion>2026037</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<!-- Versions
